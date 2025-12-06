@@ -67,3 +67,12 @@
 - [x] Adicionar estatísticas de ocupação por turno
 - [x] Melhorar indicadores visuais dos turnos
 - [ ] Adicionar opção de colapsar/expandir turnos
+
+## Configuração de Turnos e Horários
+- [x] Criar página de gerenciamento de turnos
+- [x] Implementar CRUD completo de turnos (criar, editar, excluir)
+- [x] Criar página de gerenciamento de horários por turno
+- [x] Implementar CRUD completo de horários (criar, editar, excluir)
+- [ ] Adicionar validação de horários sobrepostos
+- [x] Adicionar link de configuração no dashboard
+- [ ] Adicionar botão de inicialização com dados padrão

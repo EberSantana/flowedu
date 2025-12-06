@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import Subjects from "./pages/Subjects";
 import Classes from "./pages/Classes";
 import Schedule from "./pages/Schedule";
+import Shifts from "./pages/Shifts";
+import TimeSlots from "./pages/TimeSlots";
 
 function Router() {
   return (
@@ -15,6 +17,8 @@ function Router() {
       <Route path={"/"} component={Dashboard} />
       <Route path={"/subjects"} component={Subjects} />
       <Route path={"/classes"} component={Classes} />
+      <Route path={"/shifts"} component={Shifts} />
+      <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
       <Route path={"/schedule"} component={Schedule} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

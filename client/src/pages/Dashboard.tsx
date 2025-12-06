@@ -94,6 +94,12 @@ export default function Dashboard() {
                   Gerenciar Turmas
                 </Button>
               </Link>
+              <Link href="/shifts">
+                <Button className="w-full justify-start" variant="outline">
+                  <Clock className="mr-2 h-4 w-4" />
+                  Configurar Turnos e Horários
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
