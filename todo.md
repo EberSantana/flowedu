@@ -60,3 +60,10 @@
 - [x] Implementar lógica de filtragem na visualização da grade
 - [x] Adicionar botão para limpar filtros
 - [x] Exibir indicador visual quando filtros estão ativos
+
+## Melhorias de Turnos
+- [x] Adicionar filtro para visualizar turno específico
+- [x] Implementar contador de aulas por turno
+- [x] Adicionar estatísticas de ocupação por turno
+- [x] Melhorar indicadores visuais dos turnos
+- [ ] Adicionar opção de colapsar/expandir turnos

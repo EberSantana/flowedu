@@ -25,6 +25,7 @@ export default function Schedule() {
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
   const [filterSubjectId, setFilterSubjectId] = useState<string>("");
   const [filterClassId, setFilterClassId] = useState<string>("");
+  const [filterShiftId, setFilterShiftId] = useState<string>("");
   const [formData, setFormData] = useState({
     subjectId: "",
     classId: "",
@@ -113,9 +114,41 @@ export default function Schedule() {
   const clearFilters = () => {
     setFilterSubjectId("all");
     setFilterClassId("all");
+    setFilterShiftId("all");
   };
 
-  const hasActiveFilters = (filterSubjectId !== "" && filterSubjectId !== "all") || (filterClassId !== "" && filterClassId !== "all");
+  const hasActiveFilters = (filterSubjectId !== "" && filterSubjectId !== "all") || (filterClassId !== "" && filterClassId !== "all") || (filterShiftId !== "" && filterShiftId !== "all");
+
+  const getShiftStats = (shiftId: number) => {
+    if (!fullSchedule) return { total: 0, occupied: 0, percentage: 0 };
+    
+    const shiftSlots = fullSchedule.timeSlots.filter(ts => ts.shiftId === shiftId);
+    const totalSlots = shiftSlots.length * 7; // 7 dias da semana
+    
+    let occupiedSlots = 0;
+    shiftSlots.forEach(slot => {
+      DAYS_OF_WEEK.forEach(day => {
+        const scheduledClass = scheduleMap.get(`${slot.id}-${day.id}`);
+        if (scheduledClass) {
+          // Aplicar filtros para contar apenas aulas visíveis
+          let isVisible = true;
+          if (filterSubjectId && filterSubjectId !== "all" && scheduledClass.subjectId !== parseInt(filterSubjectId)) {
+            isVisible = false;
+          }
+          if (filterClassId && filterClassId !== "all" && scheduledClass.classId !== parseInt(filterClassId)) {
+            isVisible = false;
+          }
+          if (isVisible) occupiedSlots++;
+        }
+      });
+    });
+    
+    return {
+      total: totalSlots,
+      occupied: occupiedSlots,
+      percentage: totalSlots > 0 ? Math.round((occupiedSlots / totalSlots) * 100) : 0
+    };
+  };
 
   const getSubjectById = (id: number) => {
     return fullSchedule?.subjects.find((s) => s.id === id);
@@ -184,7 +217,7 @@ export default function Schedule() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="filter-subject">Filtrar por Disciplina</Label>
                 <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
@@ -217,19 +250,40 @@ export default function Schedule() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-shift">Filtrar por Turno</Label>
+                <Select value={filterShiftId} onValueChange={setFilterShiftId}>
+                  <SelectTrigger id="filter-shift">
+                    <SelectValue placeholder="Todos os turnos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os turnos</SelectItem>
+                    {fullSchedule?.shifts.map((shift) => (
+                      <SelectItem key={shift.id} value={shift.id.toString()}>
+                        {shift.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             {hasActiveFilters && (
               <div className="mt-4 p-3 bg-blue-50 rounded-md">
                 <p className="text-sm text-blue-800">
                   <strong>Filtros ativos:</strong>
-                  {filterSubjectId && (
+                  {filterSubjectId && filterSubjectId !== "all" && (
                     <span className="ml-2">
                       Disciplina: {fullSchedule?.subjects.find(s => s.id === parseInt(filterSubjectId))?.name}
                     </span>
                   )}
-                  {filterClassId && (
+                  {filterClassId && filterClassId !== "all" && (
                     <span className="ml-2">
                       Turma: {fullSchedule?.classes.find(c => c.id === parseInt(filterClassId))?.name}
+                    </span>
+                  )}
+                  {filterShiftId && filterShiftId !== "all" && (
+                    <span className="ml-2">
+                      Turno: {fullSchedule?.shifts.find(s => s.id === parseInt(filterShiftId))?.name}
                     </span>
                   )}
                 </p>
@@ -240,12 +294,30 @@ export default function Schedule() {
 
         <div className="space-y-8">
           {fullSchedule.shifts.map((shift) => {
+            // Aplicar filtro de turno
+            if (filterShiftId && filterShiftId !== "all" && shift.id !== parseInt(filterShiftId)) {
+              return null;
+            }
+            
             const shiftSlots = fullSchedule.timeSlots.filter((ts) => ts.shiftId === shift.id);
+            const stats = getShiftStats(shift.id);
             
             return (
               <Card key={shift.id} className="bg-white shadow-lg overflow-hidden">
                 <CardHeader style={{ backgroundColor: shift.color }} className="text-white">
-                  <CardTitle className="text-2xl">{shift.name}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-2xl">{shift.name}</CardTitle>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="text-sm opacity-90">Aulas Agendadas</div>
+                        <div className="text-xl font-bold">{stats.occupied} / {stats.total}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm opacity-90">Ocupação</div>
+                        <div className="text-xl font-bold">{stats.percentage}%</div>
+                      </div>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
