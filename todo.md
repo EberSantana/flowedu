@@ -53,3 +53,10 @@
 - [ ] Documentar estrutura do banco de dados
 - [ ] Documentar rotas da API
 - [ ] Criar guia de uso do sistema
+
+## Novos Recursos - Filtros na Grade
+- [x] Adicionar seletor de filtro por disciplina
+- [x] Adicionar seletor de filtro por turma
+- [x] Implementar lógica de filtragem na visualização da grade
+- [x] Adicionar botão para limpar filtros
+- [x] Exibir indicador visual quando filtros estão ativos

@@ -23,6 +23,8 @@ const DAYS_OF_WEEK = [
 export default function Schedule() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
+  const [filterSubjectId, setFilterSubjectId] = useState<string>("");
+  const [filterClassId, setFilterClassId] = useState<string>("");
   const [formData, setFormData] = useState({
     subjectId: "",
     classId: "",
@@ -94,8 +96,26 @@ export default function Schedule() {
   }, [fullSchedule]);
 
   const getScheduledClass = (timeSlotId: number, dayOfWeek: number) => {
-    return scheduleMap.get(`${timeSlotId}-${dayOfWeek}`);
+    const scheduledClass = scheduleMap.get(`${timeSlotId}-${dayOfWeek}`);
+    if (!scheduledClass) return null;
+    
+    // Aplicar filtros
+    if (filterSubjectId && filterSubjectId !== "all" && scheduledClass.subjectId !== parseInt(filterSubjectId)) {
+      return null;
+    }
+    if (filterClassId && filterClassId !== "all" && scheduledClass.classId !== parseInt(filterClassId)) {
+      return null;
+    }
+    
+    return scheduledClass;
   };
+
+  const clearFilters = () => {
+    setFilterSubjectId("all");
+    setFilterClassId("all");
+  };
+
+  const hasActiveFilters = (filterSubjectId !== "" && filterSubjectId !== "all") || (filterClassId !== "" && filterClassId !== "all");
 
   const getSubjectById = (id: number) => {
     return fullSchedule?.subjects.find((s) => s.id === id);
@@ -144,11 +164,79 @@ export default function Schedule() {
               Voltar ao Dashboard
             </Button>
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-            <Calendar className="h-8 w-8 text-purple-600" />
-            Grade de Horários
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+              <Calendar className="h-8 w-8 text-purple-600" />
+              Grade de Horários
+            </h1>
+          </div>
         </div>
+
+        <Card className="bg-white shadow-lg mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Filtros</span>
+              {hasActiveFilters && (
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  Limpar Filtros
+                </Button>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="filter-subject">Filtrar por Disciplina</Label>
+                <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
+                  <SelectTrigger id="filter-subject">
+                    <SelectValue placeholder="Todas as disciplinas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as disciplinas</SelectItem>
+                    {fullSchedule?.subjects.map((subject) => (
+                      <SelectItem key={subject.id} value={subject.id.toString()}>
+                        {subject.name} ({subject.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-class">Filtrar por Turma</Label>
+                <Select value={filterClassId} onValueChange={setFilterClassId}>
+                  <SelectTrigger id="filter-class">
+                    <SelectValue placeholder="Todas as turmas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as turmas</SelectItem>
+                    {fullSchedule?.classes.map((classItem) => (
+                      <SelectItem key={classItem.id} value={classItem.id.toString()}>
+                        {classItem.name} ({classItem.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {hasActiveFilters && (
+              <div className="mt-4 p-3 bg-blue-50 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>Filtros ativos:</strong>
+                  {filterSubjectId && (
+                    <span className="ml-2">
+                      Disciplina: {fullSchedule?.subjects.find(s => s.id === parseInt(filterSubjectId))?.name}
+                    </span>
+                  )}
+                  {filterClassId && (
+                    <span className="ml-2">
+                      Turma: {fullSchedule?.classes.find(c => c.id === parseInt(filterClassId))?.name}
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <div className="space-y-8">
           {fullSchedule.shifts.map((shift) => {
