@@ -17,7 +17,6 @@ const DAYS_OF_WEEK = [
   { id: 4, name: "Quinta-Feira", short: "Qui" },
   { id: 5, name: "Sexta-Feira", short: "Sex" },
   { id: 6, name: "Sábado", short: "Sáb" },
-  { id: 0, name: "Domingo", short: "Dom" },
 ];
 
 export default function Schedule() {
@@ -123,7 +122,7 @@ export default function Schedule() {
     if (!fullSchedule) return { total: 0, occupied: 0, percentage: 0 };
     
     const shiftSlots = fullSchedule.timeSlots.filter(ts => ts.shiftId === shiftId);
-    const totalSlots = shiftSlots.length * 7; // 7 dias da semana
+    const totalSlots = shiftSlots.length * 6; // 6 dias da semana (Segunda a Sábado)
     
     let occupiedSlots = 0;
     shiftSlots.forEach(slot => {

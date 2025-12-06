@@ -76,3 +76,6 @@
 - [ ] Adicionar validação de horários sobrepostos
 - [x] Adicionar link de configuração no dashboard
 - [ ] Adicionar botão de inicialização com dados padrão
+
+## Ajustes na Grade
+- [x] Remover domingo da grade de horários
