@@ -1,11 +1,23 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users, 
+  subjects, 
+  classes, 
+  shifts, 
+  timeSlots, 
+  scheduledClasses,
+  InsertSubject,
+  InsertClass,
+  InsertShift,
+  InsertTimeSlot,
+  InsertScheduledClass
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -89,4 +101,270 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ========== SUBJECTS ==========
+
+export async function createSubject(data: InsertSubject) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(subjects).values(data);
+  return result;
+}
+
+export async function getSubjectsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(subjects).where(eq(subjects.userId, userId)).orderBy(subjects.name);
+}
+
+export async function getSubjectById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(subjects).where(
+    and(eq(subjects.id, id), eq(subjects.userId, userId))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateSubject(id: number, userId: number, data: Partial<InsertSubject>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(subjects).set(data).where(
+    and(eq(subjects.id, id), eq(subjects.userId, userId))
+  );
+}
+
+export async function deleteSubject(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(subjects).where(
+    and(eq(subjects.id, id), eq(subjects.userId, userId))
+  );
+}
+
+// ========== CLASSES ==========
+
+export async function createClass(data: InsertClass) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(classes).values(data);
+  return result;
+}
+
+export async function getClassesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(classes).where(eq(classes.userId, userId)).orderBy(classes.name);
+}
+
+export async function getClassById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(classes).where(
+    and(eq(classes.id, id), eq(classes.userId, userId))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateClass(id: number, userId: number, data: Partial<InsertClass>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(classes).set(data).where(
+    and(eq(classes.id, id), eq(classes.userId, userId))
+  );
+}
+
+export async function deleteClass(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(classes).where(
+    and(eq(classes.id, id), eq(classes.userId, userId))
+  );
+}
+
+// ========== SHIFTS ==========
+
+export async function createShift(data: InsertShift) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(shifts).values(data);
+  return result;
+}
+
+export async function getShiftsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(shifts).where(eq(shifts.userId, userId)).orderBy(shifts.displayOrder);
+}
+
+export async function getShiftById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(shifts).where(
+    and(eq(shifts.id, id), eq(shifts.userId, userId))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateShift(id: number, userId: number, data: Partial<InsertShift>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(shifts).set(data).where(
+    and(eq(shifts.id, id), eq(shifts.userId, userId))
+  );
+}
+
+export async function deleteShift(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(shifts).where(
+    and(eq(shifts.id, id), eq(shifts.userId, userId))
+  );
+}
+
+// ========== TIME SLOTS ==========
+
+export async function createTimeSlot(data: InsertTimeSlot) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(timeSlots).values(data);
+  return result;
+}
+
+export async function getTimeSlotsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(timeSlots).where(eq(timeSlots.userId, userId)).orderBy(timeSlots.shiftId, timeSlots.slotNumber);
+}
+
+export async function getTimeSlotsByShiftId(shiftId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(timeSlots).where(
+    and(eq(timeSlots.shiftId, shiftId), eq(timeSlots.userId, userId))
+  ).orderBy(timeSlots.slotNumber);
+}
+
+export async function getTimeSlotById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(timeSlots).where(
+    and(eq(timeSlots.id, id), eq(timeSlots.userId, userId))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateTimeSlot(id: number, userId: number, data: Partial<InsertTimeSlot>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(timeSlots).set(data).where(
+    and(eq(timeSlots.id, id), eq(timeSlots.userId, userId))
+  );
+}
+
+export async function deleteTimeSlot(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(timeSlots).where(
+    and(eq(timeSlots.id, id), eq(timeSlots.userId, userId))
+  );
+}
+
+// ========== SCHEDULED CLASSES ==========
+
+export async function createScheduledClass(data: InsertScheduledClass) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(scheduledClasses).values(data);
+  return result;
+}
+
+export async function getScheduledClassesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(scheduledClasses).where(eq(scheduledClasses.userId, userId)).orderBy(desc(scheduledClasses.createdAt));
+}
+
+export async function getScheduledClassById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(scheduledClasses).where(
+    and(eq(scheduledClasses.id, id), eq(scheduledClasses.userId, userId))
+  ).limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateScheduledClass(id: number, userId: number, data: Partial<InsertScheduledClass>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(scheduledClasses).set(data).where(
+    and(eq(scheduledClasses.id, id), eq(scheduledClasses.userId, userId))
+  );
+}
+
+export async function deleteScheduledClass(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(scheduledClasses).where(
+    and(eq(scheduledClasses.id, id), eq(scheduledClasses.userId, userId))
+  );
+}
+
+export async function checkScheduleConflict(
+  timeSlotId: number, 
+  dayOfWeek: number, 
+  classId: number, 
+  userId: number,
+  excludeId?: number
+) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const conditions = [
+    eq(scheduledClasses.timeSlotId, timeSlotId),
+    eq(scheduledClasses.dayOfWeek, dayOfWeek),
+    eq(scheduledClasses.classId, classId),
+    eq(scheduledClasses.userId, userId)
+  ];
+  
+  if (excludeId) {
+    // @ts-ignore
+    conditions.push(ne(scheduledClasses.id, excludeId));
+  }
+  
+  const result = await db.select().from(scheduledClasses).where(
+    and(...conditions)
+  ).limit(1);
+  
+  return result.length > 0;
+}
