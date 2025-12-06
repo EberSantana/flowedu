@@ -79,3 +79,13 @@
 
 ## Ajustes na Grade
 - [x] Remover domingo da grade de horários
+
+## Calendário Anual
+- [x] Criar tabela de eventos no banco de dados
+- [x] Implementar rotas tRPC para eventos
+- [x] Criar página de calendário anual
+- [x] Adicionar visualização mensal
+- [x] Incluir datas comemorativas brasileiras pré-cadastradas
+- [x] Implementar CRUD de observações personalizadas
+- [x] Adicionar filtros por tipo de evento
+- [x] Adicionar link no dashboard

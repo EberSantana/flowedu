@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, BookOpen, Users, Clock } from "lucide-react";
+import { BookOpen, Users, Calendar, Clock, CalendarDays } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -98,6 +98,12 @@ export default function Dashboard() {
                 <Button className="w-full justify-start" variant="outline">
                   <Clock className="mr-2 h-4 w-4" />
                   Configurar Turnos e Horários
+                </Button>
+              </Link>
+              <Link href="/calendar">
+                <Button className="w-full justify-start" variant="outline">
+                  <CalendarDays className="mr-2 h-4 w-4" />
+                  Calendário Anual
                 </Button>
               </Link>
             </CardContent>

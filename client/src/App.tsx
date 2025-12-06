@@ -10,6 +10,7 @@ import Classes from "./pages/Classes";
 import Schedule from "./pages/Schedule";
 import Shifts from "./pages/Shifts";
 import TimeSlots from "./pages/TimeSlots";
+import Calendar from "./pages/Calendar";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/shifts"} component={Shifts} />
       <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
       <Route path={"/schedule"} component={Schedule} />
+      <Route path={"/calendar"} component={Calendar} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

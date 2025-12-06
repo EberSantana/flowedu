@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { and, desc, eq, ne, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -8,11 +8,13 @@ import {
   shifts, 
   timeSlots, 
   scheduledClasses,
+  calendarEvents,
   InsertSubject,
   InsertClass,
   InsertShift,
   InsertTimeSlot,
-  InsertScheduledClass
+  InsertScheduledClass,
+  InsertCalendarEvent
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -367,4 +369,53 @@ export async function checkScheduleConflict(
   ).limit(1);
   
   return result.length > 0;
+}
+
+// ========== CALENDAR EVENTS ==========
+
+export async function getCalendarEventsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(calendarEvents).where(eq(calendarEvents.userId, userId));
+}
+
+export async function getCalendarEventsByYear(userId: number, year: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = `${year}-01-01`;
+  const endDate = `${year}-12-31`;
+  return db
+    .select()
+    .from(calendarEvents)
+    .where(
+      and(
+        eq(calendarEvents.userId, userId),
+        gte(calendarEvents.eventDate, startDate),
+        lte(calendarEvents.eventDate, endDate)
+      )
+    );
+}
+
+export async function createCalendarEvent(event: InsertCalendarEvent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(calendarEvents).values(event);
+  return result;
+}
+
+export async function updateCalendarEvent(id: number, userId: number, data: Partial<InsertCalendarEvent>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(calendarEvents)
+    .set(data)
+    .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId)));
+}
+
+export async function deleteCalendarEvent(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .delete(calendarEvents)
+    .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId)));
 }

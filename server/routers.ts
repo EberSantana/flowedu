@@ -282,6 +282,52 @@ export const appRouter = router({
       };
     }),
   }),
+  
+  calendar: router({
+    listByYear: protectedProcedure
+      .input(z.object({ year: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.getCalendarEventsByYear(ctx.user.id, input.year);
+      }),
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          description: z.string().optional(),
+          eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          eventType: z.enum(["holiday", "commemorative", "school_event", "personal"]),
+          isRecurring: z.number().default(0),
+          color: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.createCalendarEvent({
+          userId: ctx.user.id,
+          ...input,
+        });
+      }),
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          title: z.string().min(1).optional(),
+          description: z.string().optional(),
+          eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+          eventType: z.enum(["holiday", "commemorative", "school_event", "personal"]).optional(),
+          isRecurring: z.number().optional(),
+          color: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return db.updateCalendarEvent(id, ctx.user.id, data);
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteCalendarEvent(input.id, ctx.user.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

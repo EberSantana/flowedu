@@ -15,6 +15,13 @@
       "when": 1765050639146,
       "tag": "0001_fresh_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765060229203,
+      "tag": "0002_bright_lionheart",
+      "breakpoints": true
     }
   ]
 }
