@@ -127,3 +127,9 @@
 - [x] Melhorar visualização dos campos do plano de curso
 -- [x] Organizar campos em seções com destaque visual
 - [x] Facilitar navegação entre os campos do plano
+
+## Melhoria Crítica de Visibilidade do Plano de Curso
+- [x] Implementar sistema de abas (Tabs) separando informações básicas e plano de curso
+- [x] Corrigir problema de salvamento do plano de curso
+- [x] Melhorar layout geral do formulário de edição
+- [x] Garantir que todos os campos sejam salvos corretamente

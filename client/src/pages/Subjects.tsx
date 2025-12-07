@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
@@ -221,7 +222,13 @@ export default function Subjects() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="space-y-4 py-4">
+              <Tabs defaultValue="basic" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="basic">Informações Básicas</TabsTrigger>
+                  <TabsTrigger value="coursePlan">Plano de Curso</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="basic" className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome da Disciplina</Label>
                   <Input
@@ -269,25 +276,11 @@ export default function Subjects() {
                     />
                   </div>
                 </div>
+                </TabsContent>
                 
-                {/* Plano de Curso */}
-                <div className="border-t pt-4">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setShowCoursePlan(!showCoursePlan)}
-                    className="w-full justify-between"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Plano de Curso (opcional)
-                    </span>
-                    {showCoursePlan ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </Button>
-                  
-                  {showCoursePlan && (
-                    <ScrollArea className="h-[400px] pr-4">
-                      <div className="space-y-4 mt-4 pb-4">
+                <TabsContent value="coursePlan" className="py-4">
+                  <ScrollArea className="h-[500px] pr-4">
+                    <div className="space-y-4 pb-4">
                       <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
                         <div className="space-y-2">
                         <Label htmlFor="ementa">Ementa</Label>
@@ -362,9 +355,8 @@ export default function Subjects() {
                       </div>
                       </div>
                     </ScrollArea>
-                  )}
-                </div>
-              </div>
+                </TabsContent>
+              </Tabs>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancelar
