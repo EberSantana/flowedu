@@ -95,3 +95,10 @@
 - [x] Implementar sistema de versículos diários
 - [x] Adicionar rodapé em todas as páginas
 - [x] Estilizar rodapé de forma elegante
+
+## Plano de Curso
+- [x] Adicionar campos de plano de curso no schema de disciplinas
+- [x] Atualizar rotas tRPC para incluir plano de curso
+- [x] Criar interface de cadastro/edição de plano de curso
+- [x] Adicionar visualização detalhada do plano de curso
+- [ ] Implementar upload de arquivo PDF do plano de curso

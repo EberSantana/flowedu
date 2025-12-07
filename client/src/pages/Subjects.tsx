@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Subjects() {
@@ -18,7 +18,13 @@ export default function Subjects() {
     code: "",
     description: "",
     color: "#3b82f6",
+    courseObjectives: "",
+    courseContent: "",
+    methodology: "",
+    evaluation: "",
+    bibliography: "",
   });
+  const [showCoursePlan, setShowCoursePlan] = useState(false);
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
   const utils = trpc.useUtils();
@@ -56,9 +62,20 @@ export default function Subjects() {
   });
 
   const resetForm = () => {
-    setFormData({ name: "", code: "", description: "", color: "#3b82f6" });
+    setFormData({ 
+      name: "", 
+      code: "", 
+      description: "", 
+      color: "#3b82f6",
+      courseObjectives: "",
+      courseContent: "",
+      methodology: "",
+      evaluation: "",
+      bibliography: "",
+    });
     setEditingSubject(null);
     setIsDialogOpen(false);
+    setShowCoursePlan(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,6 +94,11 @@ export default function Subjects() {
       code: subject.code,
       description: subject.description || "",
       color: subject.color || "#3b82f6",
+      courseObjectives: subject.courseObjectives || "",
+      courseContent: subject.courseContent || "",
+      methodology: subject.methodology || "",
+      evaluation: subject.evaluation || "",
+      bibliography: subject.bibliography || "",
     });
     setIsDialogOpen(true);
   };
@@ -132,6 +154,14 @@ export default function Subjects() {
                 <CardContent>
                   {subject.description && (
                     <p className="text-sm text-gray-600 mb-4">{subject.description}</p>
+                  )}
+                  {(subject.courseObjectives || subject.courseContent || subject.methodology || subject.evaluation || subject.bibliography) && (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-2 text-blue-700 text-sm font-semibold">
+                        <FileText className="h-4 w-4" />
+                        <span>Plano de Curso cadastrado</span>
+                      </div>
+                    </div>
                   )}
                   <div className="flex gap-2">
                     <Button
@@ -227,6 +257,77 @@ export default function Subjects() {
                       placeholder="#3b82f6"
                     />
                   </div>
+                </div>
+                
+                {/* Plano de Curso */}
+                <div className="border-t pt-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowCoursePlan(!showCoursePlan)}
+                    className="w-full justify-between"
+                  >
+                    <span className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Plano de Curso (opcional)
+                    </span>
+                    {showCoursePlan ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </Button>
+                  
+                  {showCoursePlan && (
+                    <div className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="courseObjectives">Objetivos do Curso</Label>
+                        <Textarea
+                          id="courseObjectives"
+                          value={formData.courseObjectives}
+                          onChange={(e) => setFormData({ ...formData, courseObjectives: e.target.value })}
+                          placeholder="Descreva os objetivos de aprendizagem..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="courseContent">Conteúdo Programático</Label>
+                        <Textarea
+                          id="courseContent"
+                          value={formData.courseContent}
+                          onChange={(e) => setFormData({ ...formData, courseContent: e.target.value })}
+                          placeholder="Liste os tópicos e conteúdos que serão abordados..."
+                          rows={4}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="methodology">Metodologia de Ensino</Label>
+                        <Textarea
+                          id="methodology"
+                          value={formData.methodology}
+                          onChange={(e) => setFormData({ ...formData, methodology: e.target.value })}
+                          placeholder="Descreva as metodologias e estratégias de ensino..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="evaluation">Critérios de Avaliação</Label>
+                        <Textarea
+                          id="evaluation"
+                          value={formData.evaluation}
+                          onChange={(e) => setFormData({ ...formData, evaluation: e.target.value })}
+                          placeholder="Descreva como os alunos serão avaliados..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="bibliography">Bibliografia</Label>
+                        <Textarea
+                          id="bibliography"
+                          value={formData.bibliography}
+                          onChange={(e) => setFormData({ ...formData, bibliography: e.target.value })}
+                          placeholder="Liste as referências bibliográficas..."
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <DialogFooter>

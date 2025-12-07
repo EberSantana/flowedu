@@ -29,6 +29,11 @@ export const appRouter = router({
         code: z.string().min(1),
         description: z.string().optional(),
         color: z.string().default("#3b82f6"),
+        courseObjectives: z.string().optional(),
+        courseContent: z.string().optional(),
+        methodology: z.string().optional(),
+        evaluation: z.string().optional(),
+        bibliography: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await db.createSubject({
@@ -45,6 +50,11 @@ export const appRouter = router({
         code: z.string().min(1).optional(),
         description: z.string().optional(),
         color: z.string().optional(),
+        courseObjectives: z.string().optional(),
+        courseContent: z.string().optional(),
+        methodology: z.string().optional(),
+        evaluation: z.string().optional(),
+        bibliography: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;

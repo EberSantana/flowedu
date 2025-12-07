@@ -45,6 +45,13 @@ export const subjects = mysqlTable("subjects", {
   description: text("description"),
   color: varchar("color", { length: 7 }).default("#3b82f6"),
   userId: int("userId").notNull(),
+  // Campos do Plano de Curso
+  courseObjectives: text("courseObjectives"), // Objetivos do curso
+  courseContent: text("courseContent"), // Conteúdo programático
+  methodology: text("methodology"), // Metodologia de ensino
+  evaluation: text("evaluation"), // Critérios de avaliação
+  bibliography: text("bibliography"), // Bibliografia recomendada
+  coursePlanPdfUrl: text("coursePlanPdfUrl"), // URL do PDF do plano de curso
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
