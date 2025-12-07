@@ -11,20 +11,24 @@ import Schedule from "./pages/Schedule";
 import Shifts from "./pages/Shifts";
 import TimeSlots from "./pages/TimeSlots";
 import Calendar from "./pages/Calendar";
+import BibleFooter from "./components/BibleFooter";
 
 function Router() {
   return (
-    <Switch>
-      <Route path={"/"} component={Dashboard} />
-      <Route path={"/subjects"} component={Subjects} />
-      <Route path={"/classes"} component={Classes} />
-      <Route path={"/shifts"} component={Shifts} />
-      <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
-      <Route path={"/schedule"} component={Schedule} />
-      <Route path={"/calendar"} component={Calendar} />
-      <Route path={"/404"} component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <Switch>
+        <Route path={"/"} component={Dashboard} />
+        <Route path={"/subjects"} component={Subjects} />
+        <Route path={"/classes"} component={Classes} />
+        <Route path={"/shifts"} component={Shifts} />
+        <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
+        <Route path={"/schedule"} component={Schedule} />
+        <Route path={"/calendar"} component={Calendar} />
+        <Route path={"/404"} component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+      <BibleFooter />
+    </>
   );
 }
 

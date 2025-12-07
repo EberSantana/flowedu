@@ -89,3 +89,9 @@
 - [x] Implementar CRUD de observações personalizadas
 - [x] Adicionar filtros por tipo de evento
 - [x] Adicionar link no dashboard
+
+## Devocional Diário
+- [x] Criar componente de rodapé com versículo bíblico
+- [x] Implementar sistema de versículos diários
+- [x] Adicionar rodapé em todas as páginas
+- [x] Estilizar rodapé de forma elegante
