@@ -133,3 +133,11 @@
 - [x] Corrigir problema de salvamento do plano de curso
 - [x] Melhorar layout geral do formulário de edição
 - [x] Garantir que todos os campos sejam salvos corretamente
+
+## Integração com Google Drive e Google Classroom
+- [x] Adicionar campos de links do Google Drive na disciplina
+- [x] Adicionar campos de links do Google Classroom na disciplina
+- [x] Criar interface para gerenciar links de integração
+- [x] Adicionar botões de acesso rápido aos recursos do Google
+- [x] Implementar validação de URLs do Google
+- [x] Adicionar ícones e indicadores visuais para recursos vinculados

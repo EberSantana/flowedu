@@ -35,6 +35,8 @@ export const appRouter = router({
         programContent: z.string().optional(),
         basicBibliography: z.string().optional(),
         complementaryBibliography: z.string().optional(),
+        googleDriveUrl: z.string().optional(),
+        googleClassroomUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await db.createSubject({
@@ -57,6 +59,8 @@ export const appRouter = router({
         programContent: z.string().optional(),
         basicBibliography: z.string().optional(),
         complementaryBibliography: z.string().optional(),
+        googleDriveUrl: z.string().optional(),
+        googleClassroomUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;

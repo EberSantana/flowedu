@@ -53,6 +53,8 @@ export const subjects = mysqlTable("subjects", {
   basicBibliography: text("basicBibliography"), // Bibliografia básica
   complementaryBibliography: text("complementaryBibliography"), // Bibliografia complementar
   coursePlanPdfUrl: text("coursePlanPdfUrl"), // URL do PDF do plano de curso
+  googleDriveUrl: text("googleDriveUrl"), // URL da pasta do Google Drive
+  googleClassroomUrl: text("googleClassroomUrl"), // URL da turma do Google Classroom
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
