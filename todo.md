@@ -108,3 +108,6 @@
 - [x] Atualizar schema do banco de dados
 - [x] Atualizar rotas tRPC
 - [x] Atualizar interface de disciplinas
+
+## Ajuste Visual do Devocional
+- [x] Harmonizar cores do rodapé devocional com o design do site

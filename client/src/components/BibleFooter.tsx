@@ -53,25 +53,25 @@ export default function BibleFooter() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-r from-blue-900 via-purple-900 to-blue-900 text-white py-6 mt-12">
+    <footer className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 border-t border-slate-200 py-6 mt-12">
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-center space-y-3">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-yellow-300" />
-            <span className="text-sm font-semibold text-yellow-300 uppercase tracking-wide">
+            <BookOpen className="h-5 w-5 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">
               Devocional Diário
             </span>
           </div>
           <blockquote className="text-center max-w-3xl">
-            <p className="text-lg md:text-xl italic leading-relaxed">
+            <p className="text-lg md:text-xl italic leading-relaxed text-slate-700">
               "{verse.text}"
             </p>
-            <cite className="block mt-3 text-sm font-semibold text-blue-200">
+            <cite className="block mt-3 text-sm font-semibold text-slate-600">
               — {verse.reference} (NVI)
             </cite>
           </blockquote>
-          <div className="pt-4 border-t border-white/20 w-full text-center">
-            <p className="text-xs text-gray-300">
+          <div className="pt-4 border-t border-slate-200 w-full text-center">
+            <p className="text-xs text-slate-500">
               Sistema de Gestão de Tempo para Professores © {new Date().getFullYear()}
             </p>
           </div>
