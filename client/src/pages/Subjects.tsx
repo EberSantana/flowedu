@@ -286,8 +286,10 @@ export default function Subjects() {
                   </Button>
                   
                   {showCoursePlan && (
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
+                    <ScrollArea className="h-[400px] pr-4">
+                      <div className="space-y-4 mt-4 pb-4">
+                      <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                        <div className="space-y-2">
                         <Label htmlFor="ementa">Ementa</Label>
                         <Textarea
                           id="ementa"
@@ -296,8 +298,10 @@ export default function Subjects() {
                           placeholder="Descreva a ementa da disciplina..."
                           rows={3}
                         />
+                        </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
+                        <div className="space-y-2">
                         <Label htmlFor="generalObjective">Objetivo Geral</Label>
                         <Textarea
                           id="generalObjective"
@@ -306,8 +310,10 @@ export default function Subjects() {
                           placeholder="Descreva o objetivo geral da disciplina..."
                           rows={3}
                         />
+                        </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="bg-purple-50 p-3 rounded-lg border-l-4 border-purple-500">
+                        <div className="space-y-2">
                         <Label htmlFor="specificObjectives">Objetivos Específicos</Label>
                         <Textarea
                           id="specificObjectives"
@@ -316,8 +322,10 @@ export default function Subjects() {
                           placeholder="Liste os objetivos específicos..."
                           rows={4}
                         />
+                        </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-500">
+                        <div className="space-y-2">
                         <Label htmlFor="programContent">Conteúdo Programático</Label>
                         <Textarea
                           id="programContent"
@@ -326,8 +334,10 @@ export default function Subjects() {
                           placeholder="Liste os tópicos e conteúdos que serão abordados..."
                           rows={4}
                         />
+                        </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
+                        <div className="space-y-2">
                         <Label htmlFor="basicBibliography">Bibliografia Básica</Label>
                         <Textarea
                           id="basicBibliography"
@@ -336,8 +346,10 @@ export default function Subjects() {
                           placeholder="Liste as referências bibliográficas básicas..."
                           rows={4}
                         />
+                        </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="bg-pink-50 p-3 rounded-lg border-l-4 border-pink-500">
+                        <div className="space-y-2">
                         <Label htmlFor="complementaryBibliography">Bibliografia Complementar</Label>
                         <Textarea
                           id="complementaryBibliography"
@@ -346,8 +358,10 @@ export default function Subjects() {
                           placeholder="Liste as referências bibliográficas complementares..."
                           rows={4}
                         />
+                        </div>
                       </div>
-                    </div>
+                      </div>
+                    </ScrollArea>
                   )}
                 </div>
               </div>

@@ -121,3 +121,9 @@
 ## Melhoria no Modal do Plano de Curso
 - [x] Adicionar barra de rolagem personalizada no conteúdo do modal
 - [x] Melhorar fluidez na visualização de textos longos
+
+## Melhoria no Formulário de Edição do Plano de Curso
+- [x] Adicionar barra de rolagem na seção de plano de curso do formulário
+- [x] Melhorar visualização dos campos do plano de curso
+-- [x] Organizar campos em seções com destaque visual
+- [x] Facilitar navegação entre os campos do plano
