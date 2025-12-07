@@ -102,3 +102,9 @@
 - [x] Criar interface de cadastro/edição de plano de curso
 - [x] Adicionar visualização detalhada do plano de curso
 - [ ] Implementar upload de arquivo PDF do plano de curso
+
+## Ajuste de Campos do Plano de Curso
+- [x] Substituir campos antigos por: Ementa, Objetivo Geral, Objetivo Específico, Conteúdo Programático, Bibliografia Básica, Bibliografia Complementar
+- [x] Atualizar schema do banco de dados
+- [x] Atualizar rotas tRPC
+- [x] Atualizar interface de disciplinas

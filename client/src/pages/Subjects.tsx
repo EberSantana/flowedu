@@ -18,11 +18,12 @@ export default function Subjects() {
     code: "",
     description: "",
     color: "#3b82f6",
-    courseObjectives: "",
-    courseContent: "",
-    methodology: "",
-    evaluation: "",
-    bibliography: "",
+    ementa: "",
+    generalObjective: "",
+    specificObjectives: "",
+    programContent: "",
+    basicBibliography: "",
+    complementaryBibliography: "",
   });
   const [showCoursePlan, setShowCoursePlan] = useState(false);
 
@@ -67,11 +68,12 @@ export default function Subjects() {
       code: "", 
       description: "", 
       color: "#3b82f6",
-      courseObjectives: "",
-      courseContent: "",
-      methodology: "",
-      evaluation: "",
-      bibliography: "",
+      ementa: "",
+      generalObjective: "",
+      specificObjectives: "",
+      programContent: "",
+      basicBibliography: "",
+      complementaryBibliography: "",
     });
     setEditingSubject(null);
     setIsDialogOpen(false);
@@ -94,11 +96,12 @@ export default function Subjects() {
       code: subject.code,
       description: subject.description || "",
       color: subject.color || "#3b82f6",
-      courseObjectives: subject.courseObjectives || "",
-      courseContent: subject.courseContent || "",
-      methodology: subject.methodology || "",
-      evaluation: subject.evaluation || "",
-      bibliography: subject.bibliography || "",
+      ementa: subject.ementa || "",
+      generalObjective: subject.generalObjective || "",
+      specificObjectives: subject.specificObjectives || "",
+      programContent: subject.programContent || "",
+      basicBibliography: subject.basicBibliography || "",
+      complementaryBibliography: subject.complementaryBibliography || "",
     });
     setIsDialogOpen(true);
   };
@@ -155,7 +158,7 @@ export default function Subjects() {
                   {subject.description && (
                     <p className="text-sm text-gray-600 mb-4">{subject.description}</p>
                   )}
-                  {(subject.courseObjectives || subject.courseContent || subject.methodology || subject.evaluation || subject.bibliography) && (
+                  {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (
                     <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2 text-blue-700 text-sm font-semibold">
                         <FileText className="h-4 w-4" />
@@ -277,52 +280,62 @@ export default function Subjects() {
                   {showCoursePlan && (
                     <div className="space-y-4 mt-4">
                       <div className="space-y-2">
-                        <Label htmlFor="courseObjectives">Objetivos do Curso</Label>
+                        <Label htmlFor="ementa">Ementa</Label>
                         <Textarea
-                          id="courseObjectives"
-                          value={formData.courseObjectives}
-                          onChange={(e) => setFormData({ ...formData, courseObjectives: e.target.value })}
-                          placeholder="Descreva os objetivos de aprendizagem..."
+                          id="ementa"
+                          value={formData.ementa}
+                          onChange={(e) => setFormData({ ...formData, ementa: e.target.value })}
+                          placeholder="Descreva a ementa da disciplina..."
                           rows={3}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="courseContent">Conteúdo Programático</Label>
+                        <Label htmlFor="generalObjective">Objetivo Geral</Label>
                         <Textarea
-                          id="courseContent"
-                          value={formData.courseContent}
-                          onChange={(e) => setFormData({ ...formData, courseContent: e.target.value })}
+                          id="generalObjective"
+                          value={formData.generalObjective}
+                          onChange={(e) => setFormData({ ...formData, generalObjective: e.target.value })}
+                          placeholder="Descreva o objetivo geral da disciplina..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="specificObjectives">Objetivos Específicos</Label>
+                        <Textarea
+                          id="specificObjectives"
+                          value={formData.specificObjectives}
+                          onChange={(e) => setFormData({ ...formData, specificObjectives: e.target.value })}
+                          placeholder="Liste os objetivos específicos..."
+                          rows={4}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="programContent">Conteúdo Programático</Label>
+                        <Textarea
+                          id="programContent"
+                          value={formData.programContent}
+                          onChange={(e) => setFormData({ ...formData, programContent: e.target.value })}
                           placeholder="Liste os tópicos e conteúdos que serão abordados..."
                           rows={4}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="methodology">Metodologia de Ensino</Label>
+                        <Label htmlFor="basicBibliography">Bibliografia Básica</Label>
                         <Textarea
-                          id="methodology"
-                          value={formData.methodology}
-                          onChange={(e) => setFormData({ ...formData, methodology: e.target.value })}
-                          placeholder="Descreva as metodologias e estratégias de ensino..."
-                          rows={3}
+                          id="basicBibliography"
+                          value={formData.basicBibliography}
+                          onChange={(e) => setFormData({ ...formData, basicBibliography: e.target.value })}
+                          placeholder="Liste as referências bibliográficas básicas..."
+                          rows={4}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="evaluation">Critérios de Avaliação</Label>
+                        <Label htmlFor="complementaryBibliography">Bibliografia Complementar</Label>
                         <Textarea
-                          id="evaluation"
-                          value={formData.evaluation}
-                          onChange={(e) => setFormData({ ...formData, evaluation: e.target.value })}
-                          placeholder="Descreva como os alunos serão avaliados..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="bibliography">Bibliografia</Label>
-                        <Textarea
-                          id="bibliography"
-                          value={formData.bibliography}
-                          onChange={(e) => setFormData({ ...formData, bibliography: e.target.value })}
-                          placeholder="Liste as referências bibliográficas..."
+                          id="complementaryBibliography"
+                          value={formData.complementaryBibliography}
+                          onChange={(e) => setFormData({ ...formData, complementaryBibliography: e.target.value })}
+                          placeholder="Liste as referências bibliográficas complementares..."
                           rows={4}
                         />
                       </div>
