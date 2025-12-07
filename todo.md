@@ -111,3 +111,9 @@
 
 ## Ajuste Visual do Devocional
 - [x] Harmonizar cores do rodapé devocional com o design do site
+
+## Modal de Visualização do Plano de Curso
+- [x] Criar modal de visualização detalhada do plano de curso
+- [x] Adicionar botão clicável no indicador "Plano de Curso cadastrado"
+- [x] Formatar campos do plano de forma profissional
+- [x] Adicionar opção de impressão do plano de curso

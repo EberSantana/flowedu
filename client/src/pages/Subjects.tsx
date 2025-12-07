@@ -26,6 +26,7 @@ export default function Subjects() {
     complementaryBibliography: "",
   });
   const [showCoursePlan, setShowCoursePlan] = useState(false);
+  const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
   const utils = trpc.useUtils();
@@ -159,12 +160,18 @@ export default function Subjects() {
                     <p className="text-sm text-gray-600 mb-4">{subject.description}</p>
                   )}
                   {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center gap-2 text-blue-700 text-sm font-semibold">
-                        <FileText className="h-4 w-4" />
-                        <span>Plano de Curso cadastrado</span>
+                    <button
+                      onClick={() => setViewingCoursePlan(subject)}
+                      className="mb-4 w-full p-3 bg-blue-50 rounded-lg border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between text-blue-700 text-sm font-semibold">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          <span>Plano de Curso cadastrado</span>
+                        </div>
+                        <span className="text-xs text-blue-600">Clique para visualizar</span>
                       </div>
-                    </div>
+                    </button>
                   )}
                   <div className="flex gap-2">
                     <Button
@@ -352,6 +359,82 @@ export default function Subjects() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de Visualização do Plano de Curso */}
+        <Dialog open={!!viewingCoursePlan} onOpenChange={() => setViewingCoursePlan(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+                <FileText className="h-6 w-6" />
+                Plano de Curso - {viewingCoursePlan?.name}
+              </DialogTitle>
+              <DialogDescription>
+                Código: {viewingCoursePlan?.code}
+              </DialogDescription>
+            </DialogHeader>
+            
+            {viewingCoursePlan && (
+              <div className="space-y-6 py-4">
+                {viewingCoursePlan.ementa && (
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">Ementa</h3>
+                    <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.ementa}</p>
+                  </div>
+                )}
+
+                {viewingCoursePlan.generalObjective && (
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">Objetivo Geral</h3>
+                    <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.generalObjective}</p>
+                  </div>
+                )}
+
+                {viewingCoursePlan.specificObjectives && (
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">Objetivos Específicos</h3>
+                    <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.specificObjectives}</p>
+                  </div>
+                )}
+
+                {viewingCoursePlan.programContent && (
+                  <div className="border-l-4 border-orange-500 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">Conteúdo Programático</h3>
+                    <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.programContent}</p>
+                  </div>
+                )}
+
+                {viewingCoursePlan.basicBibliography && (
+                  <div className="border-l-4 border-red-500 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">Bibliografia Básica</h3>
+                    <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.basicBibliography}</p>
+                  </div>
+                )}
+
+                {viewingCoursePlan.complementaryBibliography && (
+                  <div className="border-l-4 border-pink-500 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">Bibliografia Complementar</h3>
+                    <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.complementaryBibliography}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <DialogFooter className="border-t pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => window.print()}
+                className="flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Imprimir
+              </Button>
+              <Button type="button" onClick={() => setViewingCoursePlan(null)}>
+                Fechar
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
