@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
@@ -376,7 +377,8 @@ export default function Subjects() {
             </DialogHeader>
             
             {viewingCoursePlan && (
-              <div className="space-y-6 py-4">
+              <ScrollArea className="h-[60vh] pr-4">
+                <div className="space-y-6 py-4">
                 {viewingCoursePlan.ementa && (
                   <div className="border-l-4 border-blue-500 pl-4">
                     <h3 className="text-lg font-semibold text-slate-700 mb-2">Ementa</h3>
@@ -418,7 +420,8 @@ export default function Subjects() {
                     <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.complementaryBibliography}</p>
                   </div>
                 )}
-              </div>
+                </div>
+              </ScrollArea>
             )}
 
             <DialogFooter className="border-t pt-4">

@@ -117,3 +117,7 @@
 - [x] Adicionar botão clicável no indicador "Plano de Curso cadastrado"
 - [x] Formatar campos do plano de forma profissional
 - [x] Adicionar opção de impressão do plano de curso
+
+## Melhoria no Modal do Plano de Curso
+- [x] Adicionar barra de rolagem personalizada no conteúdo do modal
+- [x] Melhorar fluidez na visualização de textos longos
