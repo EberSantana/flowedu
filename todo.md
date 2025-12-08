@@ -718,3 +718,34 @@
    - Todos os elementos cabíveis no card
    - Todos os 28 testes passando (100%)
    - Interface limpa e profissional
+
+## Filtrar Próximas Aulas - Apenas Hoje
+- [x] Modificar rota backend getUpcomingClasses para filtrar apenas dia atual (loop de 14 dias → 1 dia)
+- [x] Atualizar lógica de cálculo de próximas datas (i < 14 → i < 1)
+- [x] Ajustar título do widget para "Aulas de Hoje"
+- [x] Atualizar mensagem quando não houver aulas ("Nenhuma aula agendada para hoje" + "Aproveite o dia livre! 🎉")
+- [x] Testar com diferentes cenários (sem aulas testado com sucesso)
+- [x] Validar ordenação por horário (mantida do backend)
+
+**Implementações Realizadas:**
+
+1. **Backend (server/routers.ts)**:
+   - Loop de cálculo alterado: `for (let i = 0; i < 14; i++)` → `for (let i = 0; i < 1; i++)`
+   - Agora calcula apenas aulas do dia atual (i = 0)
+   - Mantém toda lógica de detecção de feriados e ordenação
+   - Retorna apenas aulas de hoje ordenadas por horário
+
+2. **Frontend (client/src/pages/Dashboard.tsx)**:
+   - Título: "Próximas Aulas" → "Aulas de Hoje"
+   - Descrição: "Suas aulas programadas para esta semana" → "Sua programação de aulas para hoje"
+   - Mensagem vazia: "Nenhuma aula agendada" → "Nenhuma aula agendada para hoje"
+   - Mensagem motivacional: "Aproveite o dia livre! 🎉"
+   - Link: "Criar grade de horários" → "Ver grade completa"
+   - Tamanho do link reduzido (text-xs)
+
+3. **Resultado**:
+   - Dashboard muito mais limpo e focado
+   - Informação relevante imediata (apenas hoje)
+   - Mensagens personalizadas e motivacionais
+   - Todos os 28 testes passando (100%)
+   - Interface profissional e intuitiva

@@ -207,11 +207,11 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Próximas Aulas */}
+            {/* Aulas de Hoje */}
             <Card className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
-                <CardTitle className="text-xl font-bold text-gray-900">Próximas Aulas</CardTitle>
-                <CardDescription className="text-gray-600">Suas aulas programadas para esta semana</CardDescription>
+                <CardTitle className="text-xl font-bold text-gray-900">Aulas de Hoje</CardTitle>
+                <CardDescription className="text-gray-600">Sua programação de aulas para hoje</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 {upcomingClasses && upcomingClasses.length > 0 ? (
@@ -296,10 +296,11 @@ export default function Dashboard() {
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <CalendarIcon className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                    <p className="text-sm">Nenhuma aula agendada</p>
+                    <p className="text-sm font-medium">Nenhuma aula agendada para hoje</p>
+                    <p className="text-xs mt-1">Aproveite o dia livre! 🎉</p>
                     <Link href="/schedule">
-                      <Button variant="link" className="mt-2 text-blue-600">
-                        Criar grade de horários <ArrowRight className="ml-1 h-4 w-4" />
+                      <Button variant="link" className="mt-2 text-blue-600 text-xs">
+                        Ver grade completa <ArrowRight className="ml-1 h-3 w-3" />
                       </Button>
                     </Link>
                   </div>

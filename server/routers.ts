@@ -217,10 +217,10 @@ export const appRouter = router({
       const today = new Date();
       const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
       
-      // Calcular próximas ocorrências das aulas (próximos 14 dias)
+      // Calcular aulas do dia atual apenas (i = 0)
       const upcomingClasses = [];
       
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 1; i++) {
         const checkDate = new Date(today);
         checkDate.setDate(today.getDate() + i);
         const dayOfWeek = checkDate.getDay();
