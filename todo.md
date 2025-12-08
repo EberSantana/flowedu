@@ -633,3 +633,43 @@
    - Feedback visual imediato
    - Responsividade mantida
    - Todos os 28 testes passando (100%)
+
+## Badge "EM ANDAMENTO" para Aulas Atuais
+- [x] Implementar função para detectar se aula está acontecendo agora (isClassHappeningNow)
+- [x] Comparar horário atual com startTime e endTime (verifica data e horário)
+- [x] Adicionar badge verde "EM ANDAMENTO" no card da aula
+- [x] Implementar animação pulsante (pulse + ping) no badge
+- [x] Testar com diferentes horários (todos os 28 testes passando)
+- [x] Validar em diferentes fusos horários (usa Date do sistema)
+
+**Implementações Realizadas:**
+
+1. **Função isClassHappeningNow**:
+   - Verifica se a data da aula é igual à data atual (ano, mês, dia)
+   - Converte horários para minutos para comparação precisa
+   - Retorna true se horário atual está entre startTime e endTime
+   - Usa Date() do sistema para pegar horário local
+
+2. **Badge Verde Pulsante**:
+   - Fundo verde (bg-green-500)
+   - Texto branco em negrito (text-white text-xs font-bold)
+   - Bordas arredondadas (rounded-full)
+   - Sombra destacada (shadow-lg)
+   - Animação pulse no badge inteiro (animate-pulse)
+   - Ponto pulsante interno com dupla animação:
+     * animate-ping: expansão contínua (opacity-75)
+     * Ponto fixo branco (h-2 w-2 bg-white)
+   - Texto "EM ANDAMENTO" em caixa alta
+
+3. **Integração no Card**:
+   - Badge posicionado ao lado do nome da disciplina
+   - Flex layout com gap-2 para espaçamento
+   - Condicional: só aparece se isClassHappeningNow retornar true
+   - Não interfere com outros elementos (feriados, turma)
+
+4. **Resultado**:
+   - Badge verde vibrante e impossível de ignorar
+   - Animação suave e profissional
+   - Detecção automática em tempo real
+   - Todos os 28 testes passando (100%)
+   - Interface dinâmica e informativa

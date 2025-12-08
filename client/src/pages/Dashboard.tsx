@@ -68,6 +68,31 @@ export default function Dashboard() {
     return `${day}/${month}`;
   };
 
+  // Verificar se aula está acontecendo agora
+  const isClassHappeningNow = (date: string, startTime: string, endTime: string) => {
+    const now = new Date();
+    const classDate = new Date(date);
+    
+    // Verificar se é o mesmo dia
+    if (
+      now.getFullYear() !== classDate.getFullYear() ||
+      now.getMonth() !== classDate.getMonth() ||
+      now.getDate() !== classDate.getDate()
+    ) {
+      return false;
+    }
+    
+    // Comparar horários
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+  };
+
   return (
     <>
       <Sidebar />
@@ -234,9 +259,20 @@ export default function Dashboard() {
                           
                           {/* Informações da aula */}
                           <div className="flex-1 min-w-0">
-                            <p className="font-bold text-gray-900 truncate text-lg mb-1">
-                              {cls.subjectName}
-                            </p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="font-bold text-gray-900 truncate text-lg">
+                                {cls.subjectName}
+                              </p>
+                              {isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full animate-pulse shadow-lg">
+                                  <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                                  </span>
+                                  EM ANDAMENTO
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-600 font-medium">
                               Turma: <span className="text-blue-600 font-semibold">{cls.className}</span>
                             </p>
