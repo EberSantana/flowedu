@@ -340,3 +340,8 @@
 - [ ] Ajustar tamanho de botões (min 44px)
 - [ ] Melhorar formulários em mobile
 - [ ] Testar em diferentes resoluções
+
+## Correção de Erro HTML - Tags <a> Aninhadas
+- [x] Identificar onde ocorre aninhamento de <a> no Sidebar (2 lugares)
+- [x] Corrigir estrutura HTML (remover tags <a> extras, usar Link diretamente)
+- [x] Testar e validar correção (erro eliminado)
