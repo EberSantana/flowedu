@@ -44,10 +44,9 @@ describe("classes router", () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
 
-    const uniqueCode = `1A${Date.now()}`;
     const result = await caller.classes.create({
       name: "1º Ano A",
-      code: uniqueCode,
+      code: "1A",
       description: "Turma do primeiro ano",
     });
 
@@ -61,7 +60,7 @@ describe("classes router", () => {
     await expect(
       caller.classes.create({
         name: "",
-        code: `1B${Date.now()}`,
+        code: "1A",
       })
     ).rejects.toThrow();
   });

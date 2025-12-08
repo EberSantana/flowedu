@@ -45,10 +45,9 @@ describe("subjects router", () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
 
-    const uniqueCode = `MAT${Date.now()}`;
     const result = await caller.subjects.create({
       name: "Matemática",
-      code: uniqueCode,
+      code: "MAT101",
       description: "Disciplina de matemática básica",
       color: "#3b82f6",
     });
@@ -63,7 +62,7 @@ describe("subjects router", () => {
     await expect(
       caller.subjects.create({
         name: "",
-        code: `MAT${Date.now()}`,
+        code: "MAT101",
       })
     ).rejects.toThrow();
   });
