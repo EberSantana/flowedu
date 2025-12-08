@@ -212,3 +212,51 @@
 - [x] Criar testes para soft delete e reativação (8 testes passando)
 - [x] Testar preservação de dados após desativação
 - [x] Testar listagens separadas de ativos e inativos
+
+## Melhorias do Sistema de Convites
+- [x] Integrar serviço de envio de e-mail (Resend)
+- [x] Criar template HTML profissional para e-mail de convite
+- [x] Corrigir geração de link de convite com URL completa
+- [x] Implementar envio real de e-mail ao criar convite
+- [x] Adicionar variáveis de ambiente para configuração de e-mail (RESEND_API_KEY, EMAIL_FROM)
+- [x] Testar recebimento e funcionamento do link
+- [x] Retornar status de envio de e-mail na resposta da API
+
+## Deleção Permanente de Usuários
+- [x] Adicionar função permanentDeleteUser no db.ts
+- [x] Criar rota tRPC admin.permanentDeleteUser
+- [x] Adicionar botão "Deletar Permanentemente" na interface (apenas para usuários inativos)
+- [x] Implementar confirmação dupla (confirm + prompt "DELETAR")
+- [x] Avisar sobre perda irreversível de dados com mensagem detalhada
+- [x] Criar testes para deleção permanente (3 testes passando)
+- [x] Impedir admin de deletar a si mesmo
+- [x] Botão vermelho escuro para feedback visual de ação crítica
+
+## Busca e Filtros
+- [x] Adicionar campo de busca na tabela de usuários
+- [x] Implementar filtro por nome e email (busca em tempo real)
+- [x] Adicionar filtro por papel (dropdown: Todos, Admins, Professores)
+- [x] Adicionar contador de resultados filtrados
+- [ ] Adicionar ordenação por colunas (nome, email, data) - futuro
+- [ ] Implementar paginação para listas grandes - futuro
+
+## Sistema de Notificações por E-mail
+- [x] E-mail de boas-vindas ao aceitar convite
+- [x] Template HTML responsivo para convites
+- [x] Template HTML responsivo para boas-vindas
+- [x] Configurar remetente (EMAIL_FROM ou padrão Resend)
+- [ ] Notificar usuário quando conta for desativada - futuro
+- [ ] Notificar quando papel for alterado (user ↔ admin) - futuro
+
+## Logs de Auditoria
+- [x] Criar tabela audit_logs no banco de dados
+- [x] Campos: timestamp, adminId, adminName, action, targetUserId, targetUserName, oldData, newData, ipAddress
+- [x] Adicionar tabela ao schema do Drizzle
+- [x] Criar funções de banco: createAuditLog, getAllAuditLogs, getAuditLogsByAdmin, getAuditLogsByUser
+- [x] Criar testes para logs de auditoria (4 testes passando)
+- [ ] Registrar criação de usuários - futuro
+- [ ] Registrar mudanças de papel - futuro
+- [ ] Registrar desativação/reativação - futuro
+- [ ] Registrar deleção permanente - futuro
+- [ ] Criar página de visualização de logs (admin) - futuro
+- [ ] Adicionar filtros por tipo de ação e período - futuro

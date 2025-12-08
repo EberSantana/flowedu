@@ -28,12 +28,30 @@ export default function AdminUsers() {
   const [, setLocation] = useLocation();
 
   const [showInactive, setShowInactive] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   
   const { data: activeUsers, isLoading: activeLoading, refetch: refetchActive } = trpc.admin.listActiveUsers.useQuery();
   const { data: inactiveUsers, isLoading: inactiveLoading, refetch: refetchInactive } = trpc.admin.listInactiveUsers.useQuery();
   
-  const allUsers = showInactive ? inactiveUsers : activeUsers;
+  let allUsers = showInactive ? inactiveUsers : activeUsers;
   const usersLoading = showInactive ? inactiveLoading : activeLoading;
+  
+  // Aplicar filtros
+  if (allUsers) {
+    // Filtro de busca
+    if (searchTerm) {
+      allUsers = allUsers.filter((u) => 
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Filtro de papel
+    if (roleFilter !== "all") {
+      allUsers = allUsers.filter((u) => u.role === roleFilter);
+    }
+  }
   
   const refetch = () => {
     refetchActive();
@@ -63,6 +81,16 @@ export default function AdminUsers() {
   const reactivateUserMutation = trpc.admin.reactivateUser.useMutation({
     onSuccess: () => {
       toast.success("Usuário reativado com sucesso!");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+
+  const permanentDeleteMutation = trpc.admin.permanentDeleteUser.useMutation({
+    onSuccess: () => {
+      toast.success("Usuário deletado permanentemente!");
       refetch();
     },
     onError: (error: any) => {
@@ -206,8 +234,38 @@ export default function AdminUsers() {
         {/* Tabela de Usuários */}
         <Card>
           <CardHeader>
-            <CardTitle>Todos os Usuários</CardTitle>
-            <CardDescription>Visualize e gerencie todos os usuários cadastrados</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Todos os Usuários</CardTitle>
+                <CardDescription>Visualize e gerencie todos os usuários cadastrados</CardDescription>
+              </div>
+              <div className="text-sm text-slate-600">
+                {allUsers?.length || 0} usuário(s) encontrado(s)
+              </div>
+            </div>
+            
+            {/* Filtros */}
+            <div className="flex gap-4 mt-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Buscar por nome ou e-mail..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <Select value={roleFilter} onValueChange={(value: any) => setRoleFilter(value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filtrar por papel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os papéis</SelectItem>
+                  <SelectItem value="admin">Administradores</SelectItem>
+                  <SelectItem value="user">Professores</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -274,37 +332,61 @@ export default function AdminUsers() {
                     </TableCell>
                     <TableCell>
                       {u.id !== user.id && (
-                        showInactive ? (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              if (confirm(`Tem certeza que deseja reativar o usuário ${u.name}?`)) {
-                                reactivateUserMutation.mutate({ userId: u.id });
-                              }
-                            }}
-                            disabled={reactivateUserMutation.isPending}
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                          >
-                            <RefreshCw className="w-4 h-4 mr-1" />
-                            Reativar
-                          </Button>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
-                                deleteUserMutation.mutate({ userId: u.id });
-                              }
-                            }}
-                            disabled={deleteUserMutation.isPending}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Desativar
-                          </Button>
-                        )
+                        <div className="flex gap-2">
+                          {showInactive ? (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm(`Tem certeza que deseja reativar o usuário ${u.name}?`)) {
+                                    reactivateUserMutation.mutate({ userId: u.id });
+                                  }
+                                }}
+                                disabled={reactivateUserMutation.isPending}
+                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                              >
+                                <RefreshCw className="w-4 h-4 mr-1" />
+                                Reativar
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  const confirmed = confirm(`⚠️ ATENÇÃO: Deletar Permanentemente\n\nTem certeza que deseja deletar PERMANENTEMENTE o usuário ${u.name}?\n\nEsta ação é IRREVERSÍVEL e irá:\n- Remover o usuário do sistema\n- Apagar todos os dados associados\n- Não poderá ser desfeita\n\nDigite SIM para confirmar.`);
+                                  if (confirmed) {
+                                    const doubleConfirm = prompt('Digite "DELETAR" em maiúsculas para confirmar a deleção permanente:');
+                                    if (doubleConfirm === 'DELETAR') {
+                                      permanentDeleteMutation.mutate({ userId: u.id });
+                                    } else {
+                                      toast.error('Deleção cancelada: confirmação incorreta');
+                                    }
+                                  }
+                                }}
+                                disabled={permanentDeleteMutation.isPending}
+                                className="text-red-800 hover:text-red-900 hover:bg-red-100 border-red-300"
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Deletar Permanentemente
+                              </Button>
+                            </>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
+                                  deleteUserMutation.mutate({ userId: u.id });
+                                }
+                              }}
+                              disabled={deleteUserMutation.isPending}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Desativar
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </TableCell>
                   </TableRow>

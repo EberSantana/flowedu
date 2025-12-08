@@ -404,6 +404,23 @@ export const appRouter = router({
         return db.reactivateUser(input.userId);
       }),
 
+    permanentDeleteUser: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        
+        // Impedir que admin delete permanentemente a si mesmo
+        if (ctx.user.id === input.userId) {
+          throw new Error('Você não pode deletar permanentemente sua própria conta');
+        }
+        
+        return db.permanentDeleteUser(input.userId);
+      }),
+
     listActiveUsers: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== 'admin') {
         throw new Error('Acesso negado: apenas administradores');
@@ -459,16 +476,35 @@ export const appRouter = router({
           expiresAt,
         });
 
+        // Gerar URL do convite (usar URL do frontend)
+        const baseUrl = process.env.VITE_OAUTH_PORTAL_URL || 'http://localhost:3000';
+        const inviteUrl = `${baseUrl}/accept-invite/${token}`;
+
+        // Enviar e-mail de convite
+        const { sendEmail, getInviteEmailTemplate } = await import('./_core/email');
+        const emailHtml = getInviteEmailTemplate(inviteUrl, ctx.user.name || 'Administrador', input.role);
+        
+        const emailResult = await sendEmail({
+          to: input.email,
+          subject: 'Convite para o Sistema de Gestão de Tempo para Professores',
+          html: emailHtml,
+        });
+
         // Enviar notificação ao owner
-        const inviteUrl = `${process.env.VITE_OAUTH_PORTAL_URL || 'http://localhost:3000'}/accept-invite/${token}`;
         await import('./_core/notification').then(m => 
           m.notifyOwner({
             title: 'Novo Convite Enviado',
-            content: `Um convite foi enviado para ${input.email} com papel de ${input.role === 'admin' ? 'Administrador' : 'Professor'}.\n\nLink do convite: ${inviteUrl}\n\nO convite expira em 7 dias.`
+            content: `Um convite foi enviado para ${input.email} com papel de ${input.role === 'admin' ? 'Administrador' : 'Professor'}.\n\nLink do convite: ${inviteUrl}\n\nE-mail enviado: ${emailResult.success ? 'Sim' : 'Não (erro: ' + emailResult.error + ')'}\n\nO convite expira em 7 dias.`
           })
         );
 
-        return { success: true, token, inviteUrl };
+        return { 
+          success: true, 
+          token, 
+          inviteUrl,
+          emailSent: emailResult.success,
+          emailError: emailResult.error 
+        };
       }),
 
     listInvitations: protectedProcedure.query(async ({ ctx }) => {
@@ -595,6 +631,16 @@ export const appRouter = router({
         if (newUser) {
           await db.updateInvitationStatus(invitation.id, 'accepted', newUser.id);
         }
+
+        // Enviar e-mail de boas-vindas
+        const { sendEmail, getWelcomeEmailTemplate } = await import('./_core/email');
+        const welcomeHtml = getWelcomeEmailTemplate(input.name, invitation.role);
+        
+        await sendEmail({
+          to: invitation.email,
+          subject: 'Bem-vindo ao Sistema de Gestão de Tempo para Professores!',
+          html: welcomeHtml,
+        });
 
         // Notificar owner
         await import('./_core/notification').then(m => 

@@ -1,4 +1,5 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 
 /**
  * Core user table backing auth flow.
@@ -38,6 +39,25 @@ export const invitations = mysqlTable("invitations", {
 
 export type Invitation = typeof invitations.$inferSelect;
 export type InsertInvitation = typeof invitations.$inferInsert;
+
+/**
+ * Tabela de logs de auditoria
+ */
+export const auditLogs = mysqlTable("audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  timestamp: datetime("timestamp").notNull().default(sql`CURRENT_TIMESTAMP`),
+  adminId: int("admin_id").notNull(),
+  adminName: varchar("admin_name", { length: 255 }).notNull(),
+  action: varchar("action", { length: 100 }).notNull(),
+  targetUserId: int("target_user_id"),
+  targetUserName: varchar("target_user_name", { length: 255 }),
+  oldData: text("old_data"),
+  newData: text("new_data"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
 
 /**
  * Tabela de eventos do calendário (datas comemorativas e observações)

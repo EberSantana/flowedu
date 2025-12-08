@@ -10,6 +10,7 @@ import {
   scheduledClasses,
   calendarEvents,
   invitations,
+  auditLogs,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -539,4 +540,58 @@ export async function getInactiveUsers() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(users).where(eq(users.active, false)).orderBy(desc(users.createdAt));
+}
+
+
+export async function permanentDeleteUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Deletar permanentemente o usuário
+  await db.delete(users).where(eq(users.id, userId));
+  
+  return { success: true };
+}
+
+
+// Audit Logs
+export async function createAuditLog(log: {
+  adminId: number;
+  adminName: string;
+  action: string;
+  targetUserId?: number;
+  targetUserName?: string;
+  oldData?: string;
+  newData?: string;
+  ipAddress?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(auditLogs).values(log);
+  return { success: true };
+}
+
+export async function getAllAuditLogs() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const logs = await db.select().from(auditLogs).orderBy(desc(auditLogs.timestamp));
+  return logs;
+}
+
+export async function getAuditLogsByAdmin(adminId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const logs = await db.select().from(auditLogs).where(eq(auditLogs.adminId, adminId)).orderBy(desc(auditLogs.timestamp));
+  return logs;
+}
+
+export async function getAuditLogsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const logs = await db.select().from(auditLogs).where(eq(auditLogs.targetUserId, userId)).orderBy(desc(auditLogs.timestamp));
+  return logs;
 }
