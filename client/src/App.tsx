@@ -13,8 +13,6 @@ import TimeSlots from "./pages/TimeSlots";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import AdminUsers from "./pages/AdminUsers";
-import Invitations from "./pages/Invitations";
-import AcceptInvite from "./pages/AcceptInvite";
 import BibleFooter from "./components/BibleFooter";
 
 function Router() {
@@ -30,8 +28,6 @@ function Router() {
         <Route path={"/calendar"} component={Calendar} />
         <Route path={"/profile"} component={Profile} />
         <Route path={"/admin/users"} component={AdminUsers} />
-        <Route path={"/admin/invitations"} component={Invitations} />
-        <Route path={"/accept-invite/:token"} component={AcceptInvite} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

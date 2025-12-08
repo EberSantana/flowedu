@@ -9,15 +9,13 @@ import {
   timeSlots, 
   scheduledClasses,
   calendarEvents,
-  invitations,
   auditLogs,
   InsertSubject,
   InsertClass,
   InsertShift,
   InsertTimeSlot,
   InsertScheduledClass,
-  InsertCalendarEvent,
-  InsertInvitation
+  InsertCalendarEvent
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -446,67 +444,6 @@ export async function updateUserRole(userId: number, role: "admin" | "user") {
   return { success: true };
 }
 
-
-// ========== INVITATION MANAGEMENT ==========
-
-export async function createInvitation(data: InsertInvitation) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.insert(invitations).values(data);
-  return { success: true };
-}
-
-export async function getInvitationByToken(token: string) {
-  const db = await getDb();
-  if (!db) return null;
-  const result = await db.select().from(invitations).where(eq(invitations.token, token));
-  return result[0] || null;
-}
-
-export async function getInvitationsByCreator(creatorId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(invitations).where(eq(invitations.createdBy, creatorId)).orderBy(desc(invitations.createdAt));
-}
-
-export async function getAllInvitations() {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(invitations).orderBy(desc(invitations.createdAt));
-}
-
-export async function updateInvitationStatus(id: number, status: "pending" | "accepted" | "expired" | "cancelled", acceptedBy?: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  const updateData: any = { status };
-  if (status === "accepted" && acceptedBy) {
-    updateData.acceptedBy = acceptedBy;
-    updateData.acceptedAt = new Date();
-  }
-  
-  await db.update(invitations).set(updateData).where(eq(invitations.id, id));
-  return { success: true };
-}
-
-export async function deleteInvitation(id: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.delete(invitations).where(eq(invitations.id, id));
-  return { success: true };
-}
-
-export async function checkEmailAlreadyInvited(email: string) {
-  const db = await getDb();
-  if (!db) return false;
-  const result = await db.select().from(invitations).where(
-    and(
-      eq(invitations.email, email),
-      eq(invitations.status, "pending")
-    )
-  );
-  return result.length > 0;
-}
 
 export async function checkEmailAlreadyRegistered(email: string) {
   const db = await getDb();
