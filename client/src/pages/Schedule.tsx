@@ -9,6 +9,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Calendar, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Link } from "wouter";
+import Sidebar from "@/components/Sidebar";
 
 const DAYS_OF_WEEK = [
   { id: 1, name: "Segunda-Feira", short: "Seg" },
@@ -187,22 +188,18 @@ export default function Schedule() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <div className="container mx-auto py-8">
-        <div className="mb-6">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="mb-2">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar ao Dashboard
-            </Button>
-          </Link>
-          <div className="flex items-center justify-between">
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <Calendar className="h-8 w-8 text-purple-600" />
-              Grade de Horários
-            </h1>
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 lg:ml-64">
+        <div className="container mx-auto py-8">
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <Calendar className="h-8 w-8 text-purple-600" />
+                Grade de Horários
+              </h1>
+            </div>
           </div>
-        </div>
 
         <Card className="bg-white shadow-lg mb-6">
           <CardHeader>
@@ -455,6 +452,7 @@ export default function Schedule() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

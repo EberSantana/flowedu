@@ -9,6 +9,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Users, Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import Sidebar from "@/components/Sidebar";
 
 export default function Classes() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -86,26 +87,22 @@ export default function Classes() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
-      <div className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="mb-2">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <Users className="h-8 w-8 text-green-600" />
-              Gerenciar Turmas
-            </h1>
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 lg:ml-64">
+        <div className="container mx-auto py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <Users className="h-8 w-8 text-green-600" />
+                Gerenciar Turmas
+              </h1>
+            </div>
+            <Button onClick={() => setIsDialogOpen(true)} size="lg">
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Turma
+            </Button>
           </div>
-          <Button onClick={() => setIsDialogOpen(true)} size="lg">
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Turma
-          </Button>
-        </div>
 
         {isLoading ? (
           <div className="text-center py-12">Carregando...</div>
@@ -211,6 +208,7 @@ export default function Classes() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

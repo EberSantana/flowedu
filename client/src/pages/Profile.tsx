@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
+import Sidebar from "@/components/Sidebar";
 
 export default function Profile() {
   const { user, loading, logout } = useAuth();
@@ -67,19 +68,15 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="container max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar ao Dashboard
-            </Button>
-          </Link>
-          <h1 className="text-4xl font-bold text-slate-800 mb-2">Meu Perfil</h1>
-          <p className="text-slate-600">Gerencie suas informações pessoais e configurações</p>
-        </div>
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6 lg:ml-64">
+        <div className="container max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">Meu Perfil</h1>
+            <p className="text-slate-600">Gerencie suas informações pessoais e configurações</p>
+          </div>
 
         <div className="grid gap-6">
           {/* Informações do Usuário */}
@@ -202,6 +199,7 @@ export default function Profile() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

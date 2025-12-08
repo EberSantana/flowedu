@@ -345,3 +345,16 @@
 - [x] Identificar onde ocorre aninhamento de <a> no Sidebar (2 lugares)
 - [x] Corrigir estrutura HTML (remover tags <a> extras, usar Link diretamente)
 - [x] Testar e validar correção (erro eliminado)
+
+## Integração do Sidebar em Todas as Páginas
+- [x] Aplicar Sidebar em Subjects.tsx
+- [x] Aplicar Sidebar em Classes.tsx
+- [x] Aplicar Sidebar em Shifts.tsx
+- [x] Aplicar Sidebar em Schedule.tsx
+- [x] Aplicar Sidebar em Calendar.tsx
+- [x] Aplicar Sidebar em AdminUsers.tsx
+- [x] Aplicar Sidebar em Profile.tsx
+- [x] Remover botões "Voltar ao Dashboard" (redundantes com sidebar)
+- [x] Ajustar padding/margin para considerar sidebar (lg:ml-64)
+- [x] Testar navegação em todas as páginas (Dashboard funcionando perfeitamente)
+- [x] Verificar responsividade mobile (sidebar colapsável com menu hambúrguer)

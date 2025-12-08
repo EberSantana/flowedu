@@ -11,6 +11,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
+import Sidebar from "@/components/Sidebar";
 
 export default function Subjects() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -122,26 +123,22 @@ export default function Subjects() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <div className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="mb-2">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-              Gerenciar Disciplinas
-            </h1>
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 lg:ml-64">
+        <div className="container mx-auto py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <BookOpen className="h-8 w-8 text-blue-600" />
+                Gerenciar Disciplinas
+              </h1>
+            </div>
+            <Button onClick={() => setIsDialogOpen(true)} size="lg">
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Disciplina
+            </Button>
           </div>
-          <Button onClick={() => setIsDialogOpen(true)} size="lg">
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Disciplina
-          </Button>
-        </div>
 
         {isLoading ? (
           <div className="text-center py-12">Carregando...</div>
@@ -525,6 +522,7 @@ export default function Subjects() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

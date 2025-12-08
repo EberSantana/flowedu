@@ -10,6 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { CalendarDays, ArrowLeft, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
+import Sidebar from "@/components/Sidebar";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -139,24 +140,20 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="mb-2">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <CalendarDays className="h-8 w-8 text-blue-600" />
-              Calendário Anual
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Datas comemorativas e observações
-            </p>
-          </div>
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 lg:ml-64">
+        <div className="container mx-auto py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <CalendarDays className="h-8 w-8 text-blue-600" />
+                Calendário Anual
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Datas comemorativas e observações
+              </p>
+            </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Button
@@ -357,6 +354,7 @@ export default function Calendar() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

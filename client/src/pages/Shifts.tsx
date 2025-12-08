@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Clock, Plus, Pencil, Trash2, ArrowLeft, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import Sidebar from "@/components/Sidebar";
 
 export default function Shifts() {
   const [, setLocation] = useLocation();
@@ -90,26 +91,22 @@ export default function Shifts() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
-      <div className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="mb-2">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <Clock className="h-8 w-8 text-orange-600" />
-              Configurar Turnos
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Gerencie os turnos e seus horários antes de criar a grade de aulas
-            </p>
-          </div>
-          <Button onClick={() => setIsDialogOpen(true)} size="lg">
-            <Plus className="mr-2 h-4 w-4" />
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 lg:ml-64">
+        <div className="container mx-auto py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                <Clock className="h-8 w-8 text-orange-600" />
+                Configurar Turnos
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Gerencie os turnos e seus horários antes de criar a grade de aulas
+              </p>
+            </div>
+            <Button onClick={() => setIsDialogOpen(true)} size="lg">
+              <Plus className="mr-2 h-4 w-4" />
             Novo Turno
           </Button>
         </div>
@@ -244,6 +241,7 @@ export default function Shifts() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -22,6 +22,7 @@ import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft, Trash2, RefreshC
 import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
+import Sidebar from "@/components/Sidebar";
 
 export default function AdminUsers() {
   const { user, loading } = useAuth();
@@ -176,26 +177,22 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
-      <div className="container max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar ao Dashboard
-            </Button>
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                <Users className="w-10 h-10 text-purple-600" />
-                Gerenciamento de Usuários
-              </h1>
-              <p className="text-slate-600">Administre contas e permissões do sistema</p>
-            </div>
-            <Button
-              variant="outline"
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6 lg:ml-64">
+        <div className="container max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+                  <Users className="w-10 h-10 text-purple-600" />
+                  Gerenciamento de Usuários
+                </h1>
+                <p className="text-slate-600">Administre contas e permissões do sistema</p>
+              </div>
+              <Button
+                variant="outline"
               onClick={() => setShowInactive(!showInactive)}
               className="flex items-center gap-2"
             >
@@ -518,6 +515,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
