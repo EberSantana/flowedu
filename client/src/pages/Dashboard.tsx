@@ -231,63 +231,63 @@ export default function Dashboard() {
                           style={{ backgroundColor: cls.subjectColor || '#6B7280' }}
                         />
                         
-                        <div className="flex items-center gap-4 p-4 pl-6">
-                          {/* Indicador de Data e Dia */}
-                          <div className={`flex flex-col items-center justify-center rounded-xl px-4 py-3 min-w-[90px] shadow-md transition-transform duration-300 group-hover:scale-105 ${
+                        <div className="flex items-center gap-2 p-3 pl-5">
+                          {/* Indicador de Data e Dia - Compacto */}
+                          <div className={`flex flex-col items-center justify-center rounded-lg px-2.5 py-2 min-w-[70px] shadow-sm transition-transform duration-300 group-hover:scale-105 ${
                             cls.isHoliday
                               ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700'
                               : 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
                           }`}>
-                            <span className="text-xs font-bold text-white uppercase tracking-wider">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wide">
                               {cls.dayOfWeek.substring(0, 3)}
                             </span>
-                            <span className="text-2xl font-extrabold text-white mt-1">
+                            <span className="text-xl font-extrabold text-white">
                               {formatDate(cls.date)}
                             </span>
                           </div>
                           
-                          {/* Horário */}
-                          <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl px-4 py-3 border-2 border-gray-200 min-w-[80px] shadow-sm">
-                            <Clock className="h-5 w-5 text-blue-600 mb-1" />
-                            <span className="text-sm font-bold text-gray-900">
+                          {/* Horário - Compacto */}
+                          <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg px-2.5 py-2 border border-gray-200 min-w-[65px] shadow-sm">
+                            <Clock className="h-4 w-4 text-blue-600 mb-0.5" />
+                            <span className="text-xs font-bold text-gray-900">
                               {cls.startTime}
                             </span>
-                            <span className="text-xs text-gray-500 font-medium">
+                            <span className="text-[10px] text-gray-500 font-medium">
                               {cls.endTime}
                             </span>
                           </div>
                           
-                          {/* Informações da aula */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <p className="font-bold text-gray-900 truncate text-lg">
+                          {/* Informações da aula - Flex otimizado */}
+                          <div className="flex-1 min-w-0 pr-2">
+                            <div className="flex items-start gap-2 flex-wrap">
+                              <p className="font-bold text-gray-900 text-base leading-tight break-words max-w-full">
                                 {cls.subjectName}
                               </p>
                               {isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full animate-pulse shadow-lg">
-                                  <span className="relative flex h-2 w-2">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
+                                  <span className="relative flex h-1.5 w-1.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                                   </span>
-                                  EM ANDAMENTO
+                                  AGORA
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 font-medium">
+                            <p className="text-xs text-gray-600 font-medium mt-0.5">
                               Turma: <span className="text-blue-600 font-semibold">{cls.className}</span>
                             </p>
                             {cls.isHoliday && (
-                              <div className="flex items-center gap-2 mt-2 bg-red-100 border border-red-300 rounded-lg px-3 py-1.5">
-                                <AlertCircle className="h-4 w-4 text-red-600" />
-                                <p className="text-xs text-red-700 font-bold">
+                              <div className="flex items-center gap-1.5 mt-1.5 bg-red-100 border border-red-300 rounded-md px-2 py-1">
+                                <AlertCircle className="h-3 w-3 text-red-600 flex-shrink-0" />
+                                <p className="text-[10px] text-red-700 font-bold">
                                   Feriado: {cls.holidayName}
                                 </p>
                               </div>
                             )}
                           </div>
                           
-                          <div className="flex items-center">
-                            <ArrowRight className="h-5 w-5 text-gray-400 transition-transform duration-300 group-hover:translate-x-1" />
+                          <div className="flex items-center flex-shrink-0">
+                            <ArrowRight className="h-4 w-4 text-gray-400 transition-transform duration-300 group-hover:translate-x-1" />
                           </div>
                         </div>
                       </div>

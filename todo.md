@@ -673,3 +673,48 @@
    - Detecção automática em tempo real
    - Todos os 28 testes passando (100%)
    - Interface dinâmica e informativa
+
+## Ajuste de Visualização - Próximas Aulas Dashboard
+- [x] Analisar problema de corte de nomes das disciplinas
+- [x] Reduzir tamanhos de elementos (badges, ícones, fontes)
+- [x] Otimizar espaçamentos e paddings (p-4 → p-3, gap-4 → gap-2)
+- [x] Ajustar layout para melhor aproveitamento do espaço
+- [x] Adicionar quebra de linha inteligente (break-words, flex-wrap)
+- [x] Testar com nomes longos de disciplinas ("Projeto Integrador II" visível completo)
+- [x] Validar responsividade em diferentes resoluções
+
+**Otimizações Realizadas:**
+
+1. **Redução de Tamanhos**:
+   - Badge de data: 90px → 70px (min-w)
+   - Badge de horário: 80px → 65px (min-w)
+   - Fonte da data: text-2xl → text-xl
+   - Fonte do dia: text-xs → text-[10px]
+   - Fonte do nome: text-lg → text-base
+   - Fonte da turma: text-sm → text-xs
+   - Ícone Clock: h-5 w-5 → h-4 w-4
+   - Ícone Arrow: h-5 w-5 → h-4 w-4
+   - Badge "AGORA": text-xs → text-[10px], "EM ANDAMENTO" → "AGORA"
+
+2. **Otimização de Espaçamentos**:
+   - Padding geral: p-4 → p-3
+   - Gap entre elementos: gap-4 → gap-2
+   - Padding lateral esquerdo: pl-6 → pl-5
+   - Padding dos badges: px-4 py-3 → px-2.5 py-2
+   - Bordas: rounded-xl → rounded-lg
+   - Sombras: shadow-md → shadow-sm
+
+3. **Layout Flex Otimizado**:
+   - Nome da disciplina: break-words + max-w-full (sem truncate)
+   - Container flex-wrap para badge "AGORA"
+   - Padding direito no container de texto (pr-2)
+   - Seta com flex-shrink-0 para não comprimir
+   - Leading-tight para espaçamento de linha reduzido
+
+4. **Resultado**:
+   - Nomes completos visíveis sem corte
+   - Layout mais compacto e organizado
+   - Melhor aproveitamento do espaço horizontal
+   - Todos os elementos cabíveis no card
+   - Todos os 28 testes passando (100%)
+   - Interface limpa e profissional
