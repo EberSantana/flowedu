@@ -416,3 +416,38 @@
 - Layout mais espaçado e organizado
 - Bordas e sombras para melhor hierarquia visual
 - Hover effect para feedback interativo
+
+## Sincronização Grade de Horários com Próximas Aulas
+- [x] Analisar schema do banco (scheduledClasses, shifts, timeSlots, calendarEvents)
+- [x] Implementar lógica de cálculo de próximas aulas com datas reais (próximos 14 dias)
+- [x] Adicionar horários completos (início e fim) no widget
+- [x] Exibir data específica de cada aula (formato DD/MM)
+- [x] Implementar sistema de detecção de feriados (via calendarEvents)
+- [x] Adicionar sinalização visual para feriados (badge vermelho + alerta)
+- [x] Ordenar aulas cronologicamente (data + horário)
+- [x] Atualizar interface do Dashboard (nova rota dashboard.getUpcomingClasses)
+- [x] Testar sincronização completa (todos os 28 testes passando)
+- [x] Validar com dados reais (funcionando perfeitamente)
+
+**Implementações Realizadas:**
+
+1. **Nova Rota tRPC**: `dashboard.getUpcomingClasses`
+   - Busca scheduledClasses, subjects, classes, timeSlots e calendarEvents
+   - Calcula próximas ocorrências das aulas nos próximos 14 dias
+   - Detecta feriados automaticamente
+   - Ordena cronologicamente por data e horário
+   - Retorna top 10 próximas aulas
+
+2. **Interface Melhorada**:
+   - Badge com data (DD/MM) e dia da semana (TER, QUA, etc.)
+   - Card de horário com ícone de relógio
+   - Horário de início e fim exibidos
+   - Sinalização visual de feriados (fundo vermelho + badge vermelho)
+   - Alerta com nome do feriado
+   - Barra colorida da disciplina para identificação rápida
+
+3. **Funcionalidades**:
+   - Sincronização automática com Grade de Horários
+   - Datas reais calculadas dinamicamente
+   - Ordenação cronológica precisa
+   - Detecção de feriados integrada ao calendário

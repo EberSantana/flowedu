@@ -37,6 +37,7 @@ export default function Dashboard() {
   const { data: subjects } = trpc.subjects.list.useQuery();
   const { data: classes } = trpc.classes.list.useQuery();
   const { data: scheduledClasses } = trpc.schedule.list.useQuery();
+  const { data: upcomingClasses } = trpc.dashboard.getUpcomingClasses.useQuery();
 
   // Calcular total de aulas agendadas
   const totalScheduledClasses = scheduledClasses?.length || 0;
@@ -59,25 +60,12 @@ export default function Dashboard() {
       tension: 0.4,
     }]
   };
-
-  // Obter próximas aulas (hoje e próximos dias)
-  const today = new Date().getDay(); // 0 = Domingo, 1 = Segunda, etc
-  const todayIndex = today === 0 ? -1 : today - 1; // Ajustar para índice 0-4
   
-  const upcomingClasses = scheduledClasses
-    ?.filter(sc => sc.dayOfWeek >= todayIndex)
-    ?.slice(0, 5)
-    ?.map(sc => {
-      const subject = subjects?.find(s => s.id === sc.subjectId);
-      const classInfo = classes?.find(c => c.id === sc.classId);
-      return {
-        ...sc,
-        subjectName: subject?.name || 'Disciplina',
-        subjectColor: subject?.color || '#6B7280',
-        className: classInfo?.name || 'Turma',
-        dayName: DAYS_OF_WEEK[sc.dayOfWeek] || 'Dia',
-      };
-    }) || [];
+  // Formatar data para exibição (ex: "15/01")
+  const formatDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}`;
+  };
 
   return (
     <>
@@ -188,27 +176,46 @@ export default function Dashboard() {
                 <CardDescription>Suas aulas programadas para esta semana</CardDescription>
               </CardHeader>
               <CardContent>
-                {upcomingClasses.length > 0 ? (
+                {upcomingClasses && upcomingClasses.length > 0 ? (
                   <div className="space-y-3">
                     {upcomingClasses.map((cls, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors border-2 ${
+                          cls.isHoliday 
+                            ? 'bg-red-50 border-red-300 opacity-75' 
+                            : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+                        }`}
                       >
-                        {/* Indicador de Dia da Semana */}
-                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg px-4 py-2.5 min-w-[80px] shadow-sm">
-                          <span className="text-xs font-medium text-blue-100 uppercase tracking-wide">
-                            {cls.dayName.substring(0, 3)}
+                        {/* Indicador de Data e Dia */}
+                        <div className={`flex flex-col items-center justify-center rounded-lg px-3 py-2 min-w-[85px] shadow-sm ${
+                          cls.isHoliday
+                            ? 'bg-gradient-to-br from-red-500 to-red-600'
+                            : 'bg-gradient-to-br from-blue-500 to-blue-600'
+                        }`}>
+                          <span className="text-xs font-medium text-white uppercase tracking-wide">
+                            {cls.dayOfWeek.substring(0, 3)}
                           </span>
-                          <span className="text-sm font-bold text-white mt-0.5">
-                            {cls.dayName}
+                          <span className="text-lg font-bold text-white">
+                            {formatDate(cls.date)}
+                          </span>
+                        </div>
+                        
+                        {/* Horário */}
+                        <div className="flex flex-col items-center justify-center bg-white rounded-lg px-3 py-2 border border-gray-300 min-w-[70px]">
+                          <Clock className="h-4 w-4 text-gray-500 mb-1" />
+                          <span className="text-xs font-semibold text-gray-700">
+                            {cls.startTime}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {cls.endTime}
                           </span>
                         </div>
                         
                         {/* Barra colorida da disciplina */}
                         <div
-                          className="w-1 h-14 rounded-full"
-                          style={{ backgroundColor: cls.subjectColor }}
+                          className="w-1 h-16 rounded-full"
+                          style={{ backgroundColor: cls.subjectColor || '#6B7280' }}
                         />
                         
                         {/* Informações da aula */}
@@ -219,6 +226,12 @@ export default function Dashboard() {
                           <p className="text-sm text-gray-600">
                             Turma: {cls.className}
                           </p>
+                          {cls.isHoliday && (
+                            <p className="text-xs text-red-600 font-semibold mt-1 flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3" />
+                              Feriado: {cls.holidayName}
+                            </p>
+                          )}
                         </div>
                         
                         <div className="text-right">

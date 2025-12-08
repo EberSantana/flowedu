@@ -204,6 +204,69 @@ export const appRouter = router({
       }),
   }),
 
+  dashboard: router({
+    getUpcomingClasses: protectedProcedure.query(async ({ ctx }) => {
+      const [scheduledClasses, subjects, classes, timeSlots, calendarEvents] = await Promise.all([
+        db.getScheduledClassesByUserId(ctx.user.id),
+        db.getSubjectsByUserId(ctx.user.id),
+        db.getClassesByUserId(ctx.user.id),
+        db.getTimeSlotsByUserId(ctx.user.id),
+        db.getCalendarEventsByUser(ctx.user.id),
+      ]);
+
+      const today = new Date();
+      const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+      
+      // Calcular próximas ocorrências das aulas (próximos 14 dias)
+      const upcomingClasses = [];
+      
+      for (let i = 0; i < 14; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() + i);
+        const dayOfWeek = checkDate.getDay();
+        const dateStr = checkDate.toISOString().split('T')[0];
+        
+        // Verificar se é feriado
+        const holiday = calendarEvents.find(
+          e => e.eventDate === dateStr && e.eventType === 'holiday'
+        );
+        
+        // Buscar aulas agendadas para este dia da semana
+        const dayClasses = scheduledClasses.filter(sc => sc.dayOfWeek === dayOfWeek);
+        
+        for (const sc of dayClasses) {
+          const subject = subjects.find(s => s.id === sc.subjectId);
+          const classInfo = classes.find(c => c.id === sc.classId);
+          const timeSlot = timeSlots.find(ts => ts.id === sc.timeSlotId);
+          
+          if (subject && classInfo && timeSlot) {
+            upcomingClasses.push({
+              id: sc.id,
+              date: dateStr,
+              dayOfWeek: daysOfWeek[dayOfWeek],
+              startTime: timeSlot.startTime,
+              endTime: timeSlot.endTime,
+              subjectName: subject.name,
+              subjectColor: subject.color,
+              className: classInfo.name,
+              isHoliday: !!holiday,
+              holidayName: holiday?.title || null,
+              notes: sc.notes,
+            });
+          }
+        }
+      }
+      
+      // Ordenar por data e horário
+      upcomingClasses.sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.startTime.localeCompare(b.startTime);
+      });
+      
+      return upcomingClasses.slice(0, 10);
+    }),
+  }),
+
   schedule: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return await db.getScheduledClassesByUserId(ctx.user.id);
