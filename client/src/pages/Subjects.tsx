@@ -146,27 +146,27 @@ export default function Subjects() {
         {isLoading ? (
           <div className="text-center py-12">Carregando...</div>
         ) : subjects && subjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {subjects.map((subject) => (
-              <Card key={subject.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: subject.color || "#3b82f6" }}
-                      />
-                      <div>
-                        <CardTitle>{subject.name}</CardTitle>
-                        <CardDescription>Código: {subject.code}</CardDescription>
-                      </div>
+              <Card key={subject.id} className="bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
+                      style={{ backgroundColor: subject.color || "#3b82f6" }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-lg truncate">{subject.name}</CardTitle>
+                      <CardDescription className="text-xs">Código: {subject.code}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  {subject.description && (
-                    <p className="text-sm text-gray-600 mb-4">{subject.description}</p>
-                  )}
+                <CardContent className="flex-1 flex flex-col">
+                  <div className="flex-1">
+                    {subject.description && (
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{subject.description}</p>
+                    )}
+                  </div>
                   {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (
                     <button
                       onClick={() => setViewingCoursePlan(subject)}
@@ -214,7 +214,7 @@ export default function Subjects() {
                     </div>
                   )}
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-auto pt-3">
                     <Button
                       variant="outline"
                       size="sm"

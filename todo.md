@@ -265,3 +265,13 @@
 - [x] Botão verde "Novo Usuário" no header
 - [x] Formulário colapsável com fundo verde
 - [x] Limpar formulário após sucesso
+
+## Ajuste de Layout - Gerenciar Disciplinas
+- [x] Analisar layout atual da página Subjects.tsx
+- [x] Melhorar organização das grades/cards (grid responsivo 1-2-3 colunas)
+- [x] Ajustar espaçamento e alinhamento (flex-col, h-full para cards uniformes)
+- [x] Melhorar responsividade (md:grid-cols-2 xl:grid-cols-3)
+- [x] Adicionar truncate para títulos longos
+- [x] Adicionar line-clamp-2 para descrições
+- [x] Melhorar hierarquia visual (tamanhos de fonte ajustados)
+- [x] Adicionar transições suaves (transition-all duration-200)
