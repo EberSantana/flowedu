@@ -419,3 +419,26 @@ export async function deleteCalendarEvent(id: number, userId: number) {
     .delete(calendarEvents)
     .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId)));
 }
+
+
+// ========== USER MANAGEMENT ==========
+
+export async function updateUserProfile(userId: number, data: { name?: string; email?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(data).where(eq(users.id, userId));
+  return { success: true };
+}
+
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(users).orderBy(users.createdAt);
+}
+
+export async function updateUserRole(userId: number, role: "admin" | "user") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ role }).where(eq(users.id, userId));
+  return { success: true };
+}

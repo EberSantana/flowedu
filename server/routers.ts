@@ -344,6 +344,37 @@ export const appRouter = router({
         return db.deleteCalendarEvent(input.id, ctx.user.id);
       }),
   }),
+
+  user: router({    updateProfile: protectedProcedure
+      .input(z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.updateUserProfile(ctx.user.id, input);
+      }),
+  }),
+
+  admin: router({
+    listUsers: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getAllUsers();
+    }),
+
+    updateUserRole: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+        role: z.enum(['admin', 'user']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.updateUserRole(input.userId, input.role);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

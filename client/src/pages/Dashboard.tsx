@@ -1,7 +1,8 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Calendar, Clock, CalendarDays } from "lucide-react";
+import { BookOpen, Users, Calendar, Clock, CalendarDays, User, Shield, LogOut } from "lucide-react";
+import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -14,13 +15,40 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="container mx-auto py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Bem-vindo, {user?.name || "Professor"}!
-          </h1>
-          <p className="text-gray-600">
-            Sistema de Gestão de Tempo para Professores
-          </p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Bem-vindo, {user?.name || "Professor"}!
+            </h1>
+            <p className="text-gray-600">
+              Sistema de Gestão de Tempo para Professores
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {!user ? (
+              <Button onClick={() => window.location.href = getLoginUrl()}>
+                <User className="mr-2 h-4 w-4" />
+                Fazer Login
+              </Button>
+            ) : (
+              <>
+                <Link href="/profile">
+                  <Button variant="outline">
+                    <User className="mr-2 h-4 w-4" />
+                    Meu Perfil
+                  </Button>
+                </Link>
+                {user.role === "admin" && (
+                  <Link href="/admin/users">
+                    <Button variant="outline" className="bg-purple-50 border-purple-200 hover:bg-purple-100">
+                      <Shield className="mr-2 h-4 w-4 text-purple-600" />
+                      Gerenciar Usuários
+                    </Button>
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

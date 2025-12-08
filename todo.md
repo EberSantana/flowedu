@@ -141,3 +141,29 @@
 - [x] Adicionar botões de acesso rápido aos recursos do Google
 - [x] Implementar validação de URLs do Google
 - [x] Adicionar ícones e indicadores visuais para recursos vinculados
+
+## Sistema de Exportação de Dados
+- [x] Criar script de exportação automatizado para backup
+- [x] Exportar disciplinas em CSV
+- [x] Exportar turmas em CSV
+- [x] Exportar planos de curso em CSV
+- [ ] Adicionar interface de exportação no sistema
+
+## Sistema Administrativo e Multiusuário
+- [x] Criar página de gerenciamento de usuários (admin)
+- [x] Implementar listagem de todos os usuários cadastrados
+- [x] Adicionar funcionalidade de editar papel do usuário (admin/user)
+- [ ] Implementar desativação/ativação de contas
+- [x] Criar página de perfil do usuário
+- [x] Adicionar edição de informações pessoais
+- [x] Criar dashboard administrativo com estatísticas gerais
+- [x] Implementar isolamento completo de dados por userId
+- [x] Adicionar filtros automáticos em todas as queries
+- [x] Criar menu administrativo no Dashboard
+- [x] Implementar controle de acesso baseado em papel
+- [x] Adicionar proteção de rotas administrativas
+- [x] Integrar rotas administrativas ao App.tsx
+- [x] Adicionar botões de navegação no header do Dashboard
+- [x] Implementar botão de logout na página de perfil
+- [ ] Criar sistema de convites por e-mail (futuro)
+- [ ] Implementar auditoria de ações (futuro)
