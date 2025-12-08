@@ -9,6 +9,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { toast } from "sonner";
 import { Plus, ExternalLink, Pencil, Trash2, Search, Star, StarOff, BookOpen } from "lucide-react";
+import Sidebar from "../components/Sidebar";
 
 const CATEGORIES = [
   "Quiz e Avaliação",
@@ -140,7 +141,10 @@ export default function ActiveMethodologies() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="flex min-h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1 lg:ml-64">
+        <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -274,6 +278,8 @@ export default function ActiveMethodologies() {
           ))}
         </div>
       )}
+        </div>
+      </div>
 
       {/* Dialog de Criação */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

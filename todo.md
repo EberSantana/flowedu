@@ -909,3 +909,10 @@
    - Escolha clara entre Classroom e Drive
    - Feedback visual imediato (habilitado/desabilitado)
    - Todos os 36 testes passando (100%)
+
+## Correção de Layout - Metodologias Ativas
+- [x] Aplicar DashboardLayout na página de Metodologias Ativas
+- [x] Adicionar sidebar de navegação para voltar ao Dashboard
+- [x] Ajustar padding/margin para considerar sidebar (lg:ml-64)
+- [x] Padronizar espaçamento e estrutura com outras páginas
+- [x] Testar navegação entre páginas
