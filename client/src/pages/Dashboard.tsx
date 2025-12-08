@@ -193,22 +193,36 @@ export default function Dashboard() {
                     {upcomingClasses.map((cls, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
                       >
+                        {/* Indicador de Dia da Semana */}
+                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg px-4 py-2.5 min-w-[80px] shadow-sm">
+                          <span className="text-xs font-medium text-blue-100 uppercase tracking-wide">
+                            {cls.dayName.substring(0, 3)}
+                          </span>
+                          <span className="text-sm font-bold text-white mt-0.5">
+                            {cls.dayName}
+                          </span>
+                        </div>
+                        
+                        {/* Barra colorida da disciplina */}
                         <div
-                          className="w-1 h-12 rounded-full"
+                          className="w-1 h-14 rounded-full"
                           style={{ backgroundColor: cls.subjectColor }}
                         />
+                        
+                        {/* Informações da aula */}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">
+                          <p className="font-semibold text-gray-900 truncate text-base">
                             {cls.subjectName}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {cls.className} • {cls.dayName}
+                            Turma: {cls.className}
                           </p>
                         </div>
+                        
                         <div className="text-right">
-                          <ArrowRight className="h-4 w-4 text-gray-400" />
+                          <ArrowRight className="h-5 w-5 text-gray-400" />
                         </div>
                       </div>
                     ))}

@@ -400,3 +400,19 @@
 - Dicas práticas para configurar os links
 - Aviso informativo sobre botões de acesso rápido
 - Interface muito mais organizada e fácil de usar
+
+## Melhoria no Widget Próximas Aulas - Dashboard
+- [x] Analisar estrutura atual do widget
+- [x] Adicionar exibição do dia da semana para cada aula
+- [x] Melhorar layout visual com indicador de dia (badge azul com gradiente)
+- [x] Ordenar aulas por dia da semana e horário (já estava implementado)
+- [x] Testar exibição com dados reais (todos os 28 testes passando)
+- [x] Validar responsividade (layout flex responsível)
+
+**Melhorias Implementadas:**
+- Badge destacado com gradiente azul para cada dia da semana
+- Exibição de abreviação (SEG, TER, etc.) e nome completo (Segunda, Terça, etc.)
+- Barra colorida da disciplina mantida para identificação visual
+- Layout mais espaçado e organizado
+- Bordas e sombras para melhor hierarquia visual
+- Hover effect para feedback interativo
