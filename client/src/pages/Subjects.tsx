@@ -90,10 +90,27 @@ export default function Subjects() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Converter strings vazias para undefined para campos opcionais
+    const cleanedData = {
+      name: formData.name,
+      code: formData.code,
+      description: formData.description || undefined,
+      color: formData.color,
+      ementa: formData.ementa || undefined,
+      generalObjective: formData.generalObjective || undefined,
+      specificObjectives: formData.specificObjectives || undefined,
+      programContent: formData.programContent || undefined,
+      basicBibliography: formData.basicBibliography || undefined,
+      complementaryBibliography: formData.complementaryBibliography || undefined,
+      googleDriveUrl: formData.googleDriveUrl || undefined,
+      googleClassroomUrl: formData.googleClassroomUrl || undefined,
+    };
+    
     if (editingSubject) {
-      updateMutation.mutate({ id: editingSubject.id, ...formData });
+      updateMutation.mutate({ id: editingSubject.id, ...cleanedData });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(cleanedData);
     }
   };
 

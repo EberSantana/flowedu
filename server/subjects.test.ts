@@ -47,7 +47,7 @@ describe("subjects router", () => {
 
     const result = await caller.subjects.create({
       name: "Matemática",
-      code: "MAT101",
+      code: `MAT${Date.now()}`,
       description: "Disciplina de matemática básica",
       color: "#3b82f6",
     });
@@ -62,7 +62,7 @@ describe("subjects router", () => {
     await expect(
       caller.subjects.create({
         name: "",
-        code: "MAT101",
+        code: `MAT${Date.now()}`,
       })
     ).rejects.toThrow();
   });

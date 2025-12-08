@@ -370,3 +370,14 @@
 - [x] Melhorar hierarquia tipográfica (tamanhos consistentes)
 - [x] Testar novo layout (funcionando perfeitamente)
 - [x] Adicionar estado vazio com CTA para criar disciplinas
+
+## Correção de Bug - Strings Vazias em Campos Opcionais
+- [x] Identificado erro ao criar disciplina: campos opcionais enviados como strings vazias
+- [x] Corrigido handleSubmit em Subjects.tsx para converter strings vazias em undefined
+- [x] Corrigidos testes com códigos duplicados (TST001, TST002, MAT101, 1A) usando timestamps
+- [x] Todos os 28 testes passando (100%)
+- [x] Sistema funcionando corretamente
+
+**Problema:** Campos opcionais do plano de curso (ementa, generalObjective, etc.) estavam sendo enviados como strings vazias ("") ao invés de undefined/null, causando erro no banco de dados ao tentar inserir valores default.
+
+**Solução:** Adicionada lógica no handleSubmit para converter strings vazias em undefined antes de enviar ao backend, usando operador || undefined. Isso permite que o banco use os valores default (null) corretamente.

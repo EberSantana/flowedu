@@ -46,7 +46,7 @@ describe("classes router", () => {
 
     const result = await caller.classes.create({
       name: "1º Ano A",
-      code: "1A",
+      code: `1A${Date.now()}`,
       description: "Turma do primeiro ano",
     });
 
@@ -60,7 +60,7 @@ describe("classes router", () => {
     await expect(
       caller.classes.create({
         name: "",
-        code: "1A",
+        code: `1A${Date.now()}`,
       })
     ).rejects.toThrow();
   });
