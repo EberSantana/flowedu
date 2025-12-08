@@ -43,15 +43,32 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
+  /* Primary - Azul profissional */
+  --primary: oklch(0.55 0.22 250);
+  --primary-foreground: oklch(0.99 0 0);
+  
+  /* Success - Verde */
+  --success: oklch(0.65 0.18 145);
+  --success-foreground: oklch(0.99 0 0);
+  
+  /* Warning - Amarelo/Laranja */
+  --warning: oklch(0.75 0.15 75);
+  --warning-foreground: oklch(0.2 0 0);
+  
+  /* Info - Azul claro */
+  --info: oklch(0.65 0.18 230);
+  --info-foreground: oklch(0.99 0 0);
+  
+  /* Sidebar */
+  --sidebar-primary: oklch(0.5 0.22 250);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  
+  /* Charts - Paleta harmoniosa */
+  --chart-1: oklch(0.65 0.22 250);
+  --chart-2: oklch(0.65 0.18 145);
+  --chart-3: oklch(0.75 0.15 75);
+  --chart-4: oklch(0.65 0.22 320);
+  --chart-5: oklch(0.65 0.18 180);
   --radius: 0.65rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.235 0.015 65);
@@ -79,10 +96,25 @@
 }
 
 .dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
+  /* Primary - Azul mais claro para dark mode */
+  --primary: oklch(0.65 0.22 250);
+  --primary-foreground: oklch(0.15 0 0);
+  
+  /* Success - Verde */
+  --success: oklch(0.7 0.18 145);
+  --success-foreground: oklch(0.15 0 0);
+  
+  /* Warning - Amarelo/Laranja */
+  --warning: oklch(0.8 0.15 75);
+  --warning-foreground: oklch(0.15 0 0);
+  
+  /* Info - Azul claro */
+  --info: oklch(0.7 0.18 230);
+  --info-foreground: oklch(0.15 0 0);
+  
+  /* Sidebar */
+  --sidebar-primary: oklch(0.6 0.22 250);
+  --sidebar-foreground: oklch(0.85 0.005 65);
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.85 0.005 65);
   --card: oklch(0.21 0.006 285.885);
@@ -173,5 +205,41 @@
       padding-right: 2rem;
       max-width: 1280px; /* Standard content width */
     }
+  }
+  
+  /* Cores semânticas - Success */
+  .bg-success {
+    background-color: var(--success);
+    color: var(--success-foreground);
+  }
+  .text-success {
+    color: var(--success);
+  }
+  .border-success {
+    border-color: var(--success);
+  }
+  
+  /* Cores semânticas - Warning */
+  .bg-warning {
+    background-color: var(--warning);
+    color: var(--warning-foreground);
+  }
+  .text-warning {
+    color: var(--warning);
+  }
+  .border-warning {
+    border-color: var(--warning);
+  }
+  
+  /* Cores semânticas - Info */
+  .bg-info {
+    background-color: var(--info);
+    color: var(--info-foreground);
+  }
+  .text-info {
+    color: var(--info);
+  }
+  .border-info {
+    border-color: var(--info);
   }
 }

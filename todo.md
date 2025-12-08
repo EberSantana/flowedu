@@ -275,3 +275,68 @@
 - [x] Adicionar line-clamp-2 para descrições
 - [x] Melhorar hierarquia visual (tamanhos de fonte ajustados)
 - [x] Adicionar transições suaves (transition-all duration-200)
+
+## Melhorias Completas de UX/UI
+
+### 1. Sistema de Cores e Identidade Visual
+- [x] Definir paleta de cores profissional (OKLCH)
+- [x] Implementar cores semânticas (success, warning, info)
+- [x] Melhorar contraste para acessibilidade
+- [x] Atualizar CSS variables no index.css
+- [x] Criar classes utilitárias para cores semânticas
+- [x] Paleta de charts harmoniosa
+
+### 2. Navegação e Menu Lateral
+- [x] Criar componente de sidebar fixo (Sidebar.tsx)
+- [x] Adicionar ícones + texto no menu
+- [x] Implementar indicador de página ativa (background primary)
+- [x] Menu responsivo (hambúrguer em mobile)
+- [x] Seção de perfil do usuário na sidebar
+- [x] Botão de logout integrado
+- [x] Overlay para fechar menu em mobile
+- [ ] Adicionar breadcrumbs (futuro)
+
+### 3. Dashboard Redesign
+- [x] Instalar Chart.js e react-chartjs-2
+- [x] Criar cards de métricas principais com gradientes coloridos
+- [x] Adicionar gráfico Doughnut (distribuição por dia da semana)
+- [x] Adicionar gráfico Bar (Top 5 disciplinas por carga horária)
+- [x] Adicionar gráfico Line (distribuição semanal)
+- [x] Integrar sidebar no Dashboard
+- [x] Card de aviso quando não há disciplinas
+- [ ] Seção de ações rápidas (futuro)
+- [ ] Últimas atividades/notificações (futuro)
+
+### 4. Tabelas e Listas Melhoradas
+- [ ] Adicionar paginação em todas as listas
+- [ ] Implementar filtros avançados
+- [ ] Adicionar ordenação por colunas
+- [ ] Seleção múltipla (checkboxes)
+- [ ] Ações em massa
+- [ ] Exportar para CSV/PDF
+
+### 5. Formulários Otimizados
+- [ ] Implementar validação em tempo real
+- [ ] Mensagens de erro inline
+- [ ] Labels flutuantes (floating labels)
+- [ ] Auto-save em formulários longos
+- [ ] Indicador de campos obrigatórios
+
+### 6. Estados e Feedback Visual
+- [ ] Criar skeleton loaders
+- [ ] Adicionar micro-animações
+- [ ] Melhorar toasts (posição, duração, ícones)
+- [ ] Estados vazios com ilustrações
+- [ ] Progress bars para operações longas
+
+### 7. Dark Mode
+- [ ] Implementar toggle dark/light
+- [ ] Criar paleta de cores dark
+- [ ] Persistir preferência do usuário
+- [ ] Aplicar em todos os componentes
+
+### 8. Responsividade Mobile
+- [ ] Otimizar todos os cards para mobile
+- [ ] Ajustar tamanho de botões (min 44px)
+- [ ] Melhorar formulários em mobile
+- [ ] Testar em diferentes resoluções
