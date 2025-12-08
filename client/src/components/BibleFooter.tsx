@@ -53,8 +53,8 @@ export default function BibleFooter() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 border-t border-slate-200 py-6 mt-12">
-      <div className="container mx-auto px-4">
+    <footer className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 border-t border-slate-200 py-6 mt-12 lg:ml-64">
+      <div className="container mx-auto px-4 max-w-4xl">
         <div className="flex flex-col items-center justify-center space-y-3">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-600" />
