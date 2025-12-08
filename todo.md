@@ -265,3 +265,10 @@
 - [x] Botão verde "Novo Usuário" no header
 - [x] Formulário colapsável com fundo verde
 - [x] Limpar formulário após sucesso
+
+## Correção de Erros de Testes
+- [x] Corrigir teste admin.test.ts (TST001, TST002 duplicados)
+- [x] Corrigir teste classes.test.ts (1A duplicado)
+- [x] Corrigir teste subjects.test.ts (MAT101 duplicado)
+- [x] Usar timestamps para garantir códigos únicos (Date.now())
+- [x] Executar todos os testes para validar correções (28/28 passando)

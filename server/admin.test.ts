@@ -191,7 +191,7 @@ describe("Admin System Tests", () => {
 
       await regularCaller.subjects.create({
         name: "Test Subject Regular",
-        code: "TST001",
+        code: `TST${Date.now()}`,
         description: "Test subject for regular user",
         color: "#3b82f6",
       });
@@ -214,7 +214,7 @@ describe("Admin System Tests", () => {
 
       await adminCaller.subjects.create({
         name: "Test Subject Admin",
-        code: "TST002",
+        code: `TST${Date.now() + 1}`,
         description: "Test subject for admin user",
         color: "#ef4444",
       });
