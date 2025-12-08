@@ -522,3 +522,47 @@
    - Formato profissional pronto para impressão
    - Todas as 6 seções visíveis (Ementa, Objetivos, Conteúdo, Bibliografias)
    - Todos os 28 testes passando (100%)
+
+## Exportar Plano de Curso para PDF
+- [x] Instalar biblioteca jsPDF para geração de PDF no cliente (jsPDF 3.0.4)
+- [x] Criar função de exportação com formatação profissional (exportToPDF)
+- [x] Adicionar cabeçalho com título e código da disciplina (fundo azul, texto branco)
+- [x] Formatar seções com bordas coloridas e espaçamento adequado (6 cores diferentes)
+- [x] Adicionar botão "Exportar PDF" ao lado do botão Imprimir (ícone Download)
+- [x] Implementar download automático do arquivo PDF (nome: Plano_de_Curso_[CÓDIGO].pdf)
+- [x] Testar geração com conteúdo longo (3 páginas geradas com sucesso)
+- [x] Validar formatação e quebras de página (quebras automáticas funcionando)
+
+**Implementações Realizadas:**
+
+1. **Biblioteca jsPDF**:
+   - Instalada versão 3.0.4
+   - Importada no componente Subjects.tsx
+   - Configuração A4 com margens de 20mm
+
+2. **Função exportToPDF**:
+   - Cabeçalho azul (#3B82F6) com "Plano de Curso"
+   - Nome da disciplina e código no cabeçalho
+   - 6 seções com cores distintas:
+     * Ementa - Azul (#3B82F6)
+     * Objetivo Geral - Verde (#22C55E)
+     * Objetivos Específicos - Roxo (#A855F7)
+     * Conteúdo Programático - Laranja (#F97316)
+     * Bibliografia Básica - Vermelho (#EF4444)
+     * Bibliografia Complementar - Rosa (#EC4899)
+   - Linhas coloridas decorativas sob cada título
+   - Quebras de linha automáticas (splitTextToSize)
+   - Quebras de página automáticas quando necessário
+   - Toast de confirmação "PDF exportado com sucesso!"
+
+3. **Interface**:
+   - Botão "Exportar PDF" com ícone Download
+   - Posicionado entre "Imprimir" e "Fechar"
+   - Estilo consistente com outros botões (variant="outline")
+
+4. **Resultado**:
+   - PDF profissional de 3 páginas (~14KB)
+   - Formatação limpa e legível
+   - Cores preservadas para impressão
+   - Nome de arquivo descritivo
+   - Todos os 28 testes passando (100%)

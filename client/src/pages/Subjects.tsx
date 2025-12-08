@@ -9,7 +9,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download } from "lucide-react";
+import { jsPDF } from "jspdf";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 
@@ -32,6 +33,87 @@ export default function Subjects() {
   });
   const [showCoursePlan, setShowCoursePlan] = useState(false);
   const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
+
+  const exportToPDF = () => {
+    if (!viewingCoursePlan) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    const maxWidth = pageWidth - 2 * margin;
+    let yPosition = margin;
+
+    // Função auxiliar para adicionar texto com quebra de linha
+    const addText = (text: string, fontSize: number, isBold: boolean = false, color: number[] = [0, 0, 0]) => {
+      doc.setFontSize(fontSize);
+      doc.setFont("helvetica", isBold ? "bold" : "normal");
+      doc.setTextColor(color[0], color[1], color[2]);
+      
+      const lines = doc.splitTextToSize(text, maxWidth);
+      
+      lines.forEach((line: string) => {
+        if (yPosition > pageHeight - margin) {
+          doc.addPage();
+          yPosition = margin;
+        }
+        doc.text(line, margin, yPosition);
+        yPosition += fontSize * 0.5;
+      });
+      
+      yPosition += 5;
+    };
+
+    // Cabeçalho
+    doc.setFillColor(59, 130, 246);
+    doc.rect(0, 0, pageWidth, 30, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Plano de Curso", pageWidth / 2, 15, { align: "center" });
+    doc.setFontSize(12);
+    doc.text(viewingCoursePlan.name, pageWidth / 2, 23, { align: "center" });
+    
+    yPosition = 40;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Código: ${viewingCoursePlan.code}`, margin, yPosition);
+    yPosition += 15;
+
+    // Seções do plano de curso
+    const sections = [
+      { title: "Ementa", content: viewingCoursePlan.ementa, color: [59, 130, 246] },
+      { title: "Objetivo Geral", content: viewingCoursePlan.generalObjective, color: [34, 197, 94] },
+      { title: "Objetivos Específicos", content: viewingCoursePlan.specificObjectives, color: [168, 85, 247] },
+      { title: "Conteúdo Programático", content: viewingCoursePlan.programContent, color: [249, 115, 22] },
+      { title: "Bibliografia Básica", content: viewingCoursePlan.basicBibliography, color: [239, 68, 68] },
+      { title: "Bibliografia Complementar", content: viewingCoursePlan.complementaryBibliography, color: [236, 72, 153] },
+    ];
+
+    sections.forEach(section => {
+      if (section.content) {
+        // Título da seção com cor
+        addText(section.title, 14, true, section.color);
+        yPosition -= 3;
+        
+        // Linha colorida
+        doc.setDrawColor(section.color[0], section.color[1], section.color[2]);
+        doc.setLineWidth(1);
+        doc.line(margin, yPosition, margin + 40, yPosition);
+        yPosition += 8;
+        
+        // Conteúdo
+        addText(section.content, 10, false);
+        yPosition += 5;
+      }
+    });
+
+    // Salvar PDF
+    const fileName = `Plano_de_Curso_${viewingCoursePlan.code.replace(/\s+/g, '_')}.pdf`;
+    doc.save(fileName);
+    toast.success("PDF exportado com sucesso!");
+  };
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
   const utils = trpc.useUtils();
@@ -570,6 +652,15 @@ export default function Subjects() {
               >
                 <FileText className="h-4 w-4" />
                 Imprimir
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={exportToPDF}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Exportar PDF
               </Button>
               <Button type="button" onClick={() => setViewingCoursePlan(null)}>
                 Fechar
