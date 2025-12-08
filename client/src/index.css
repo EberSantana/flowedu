@@ -243,3 +243,82 @@
     border-color: var(--info);
   }
 }
+
+/* ===== ESTILOS DE IMPRESSÃO ===== */
+@media print {
+  /* Ocultar elementos desnecessários */
+  nav, aside, header, footer, 
+  button, .sidebar, 
+  [role="dialog"] > div:first-child, /* Overlay do modal */
+  [data-radix-scroll-area-viewport] {
+    display: none !important;
+  }
+  
+  /* Mostrar apenas o conteúdo do modal */
+  [role="dialog"] {
+    position: static !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Remover limitações de altura do ScrollArea */
+  [data-radix-scroll-area-root] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Garantir que o conteúdo seja exibido completamente */
+  .space-y-6 {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Permitir quebras de página naturais */
+  .border-l-4 {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Ajustar margens para impressão */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+  
+  /* Garantir que o corpo do documento use toda a página */
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+  
+  /* Estilizar cabeçalho do plano de curso para impressão */
+  h1, h2, h3 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+  
+  /* Melhorar legibilidade do texto impresso */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  /* Garantir que bordas coloridas sejam impressas */
+  .border-blue-500,
+  .border-green-500,
+  .border-purple-500,
+  .border-orange-500,
+  .border-red-500,
+  .border-pink-500 {
+    border-left-width: 4px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

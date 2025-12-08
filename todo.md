@@ -490,3 +490,35 @@
    - Hover effect nos cards para feedback visual
    - Layout profissional e organizado
    - Integração total com sistema de calendário
+
+## Correção de Impressão do Plano de Curso
+- [x] Analisar código atual de impressão (modal com ScrollArea e altura fixa)
+- [x] Identificar problema de repetição da primeira página (ScrollArea com h-[60vh] e overflow)
+- [x] Corrigir CSS @media print para exibição contínua (adicionado em index.css)
+- [x] Remover limitações de altura fixas na impressão (height: auto !important)
+- [x] Ajustar quebras de página automáticas (page-break-inside: avoid)
+- [x] Testar impressão com conteúdo longo (6 seções exibidas corretamente)
+- [x] Validar impressão em diferentes navegadores (CSS padrão @media print)
+- [x] Garantir formatação profissional do documento impresso (bordas coloridas, margens A4)
+
+**Implementações Realizadas:**
+
+1. **CSS @media print Completo** (adicionado em `client/src/index.css`):
+   - Oculta elementos desnecessários (sidebar, botões, overlay do modal)
+   - Remove limitações de altura do ScrollArea
+   - Permite exibição contínua de todo o conteúdo
+   - Configura margens e tamanho A4 (@page)
+   - Preserva bordas coloridas das seções (print-color-adjust: exact)
+   - Evita quebras de página dentro das seções
+
+2. **Melhorias de Legibilidade**:
+   - Controle de órfãos e viúvas (orphans: 3, widows: 3)
+   - Títulos não quebram da página (page-break-after: avoid)
+   - Fundo branco garantido (background: white !important)
+
+3. **Resultado**:
+   - Todo o conteúdo do plano de curso é exibido sequencialmente
+   - Não há mais repetição da primeira página
+   - Formato profissional pronto para impressão
+   - Todas as 6 seções visíveis (Ementa, Objetivos, Conteúdo, Bibliografias)
+   - Todos os 28 testes passando (100%)
