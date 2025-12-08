@@ -252,6 +252,8 @@ export const appRouter = router({
               isHoliday: !!holiday,
               holidayName: holiday?.title || null,
               notes: sc.notes,
+              googleClassroomUrl: subject.googleClassroomUrl,
+              googleDriveUrl: subject.googleDriveUrl,
             });
           }
         }

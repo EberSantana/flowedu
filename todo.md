@@ -749,3 +749,41 @@
    - Mensagens personalizadas e motivacionais
    - Todos os 28 testes passando (100%)
    - Interface profissional e intuitiva
+
+## Botão "Ir para Próxima Aula"
+- [x] Criar lógica para identificar próxima aula (usa upcomingClasses[0])
+- [x] Buscar links do Google Classroom e Drive da disciplina (adicionado no backend)
+- [x] Adicionar botão nas Ações Rápidas do Dashboard (em destaque no topo)
+- [x] Implementar função de abertura de link (prioridade: Classroom > Drive)
+- [x] Adicionar estados: desabilitado (sem aula), tooltip informativo
+- [x] Testar com diferentes cenários (sem aulas testado - botão cinza)
+- [x] Validar abertura em nova aba (window.open com _blank)
+
+**Implementações Realizadas:**
+
+1. **Backend (server/routers.ts)**:
+   - Adicionado campos `googleClassroomUrl` e `googleDriveUrl` no retorno de `getUpcomingClasses`
+   - Dados vem da tabela `subjects` via join
+   - Permite acesso direto aos links de integração Google
+
+2. **Frontend (client/src/pages/Dashboard.tsx)**:
+   - Botão em destaque no topo das Ações Rápidas
+   - Layout horizontal: ícone ExternalLink + texto + info da aula
+   - Estados dinâmicos:
+     * **Com aula**: Gradiente teal (from-teal-500 to-teal-600), hover scale, cursor pointer
+     * **Sem aula**: Gradiente cinza (from-gray-400 to-gray-500), opacity 60%, cursor not-allowed
+   - Exibe nome da disciplina e horário quando há aula
+   - Tooltip informativo no hover
+
+3. **Lógica de Abertura**:
+   - Prioridade: Google Classroom > Google Drive
+   - Abre em nova aba (window.open com _blank)
+   - Alerta amigável se não houver links cadastrados
+   - Orienta usuário a acessar "Disciplinas" para configurar
+
+4. **Resultado**:
+   - Botão destacado e fácil de encontrar
+   - Acesso rápido à próxima aula com 1 clique
+   - Feedback visual claro (habilitado/desabilitado)
+   - Todos os 28 testes passando (100%)
+   - UX intuitiva e profissional

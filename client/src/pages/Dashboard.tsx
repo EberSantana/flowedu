@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import { Link } from "wouter";
@@ -164,7 +164,45 @@ export default function Dashboard() {
                 <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
                 <CardDescription className="text-gray-600">Acesso rápido às funcionalidades principais</CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-4 p-6">
+              <CardContent className="p-6">
+                {/* Botão Próxima Aula em Destaque */}
+                <div className="mb-4">
+                  <div
+                    onClick={() => {
+                      if (upcomingClasses && upcomingClasses.length > 0) {
+                        const nextClass = upcomingClasses[0];
+                        const url = nextClass.googleClassroomUrl || nextClass.googleDriveUrl;
+                        if (url) {
+                          window.open(url, '_blank');
+                        } else {
+                          alert('⚠️ Nenhum link do Google Classroom ou Drive cadastrado para esta disciplina.\n\nAcesse "Disciplinas" para adicionar os links de integração.');
+                        }
+                      }
+                    }}
+                    className={`group relative overflow-hidden rounded-xl bg-gradient-to-br p-4 shadow-lg transition-all duration-300 ${
+                      upcomingClasses && upcomingClasses.length > 0
+                        ? 'from-teal-500 to-teal-600 hover:shadow-xl hover:scale-[1.02] cursor-pointer'
+                        : 'from-gray-400 to-gray-500 cursor-not-allowed opacity-60'
+                    }`}
+                    title={upcomingClasses && upcomingClasses.length > 0 ? 'Clique para abrir a próxima aula' : 'Nenhuma aula agendada para hoje'}
+                  >
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex items-center gap-3 text-white">
+                      <ExternalLink className="h-6 w-6 group-hover:scale-110 transition-transform flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="text-sm font-bold block">Ir para Próxima Aula</span>
+                        {upcomingClasses && upcomingClasses.length > 0 && (
+                          <span className="text-xs opacity-90">
+                            {upcomingClasses[0].subjectName} - {upcomingClasses[0].startTime}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grid de Ações */}
+                <div className="grid grid-cols-2 gap-4">
                 <Link href="/subjects">
                   <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -204,6 +242,8 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </Link>
+
+                </div>
               </CardContent>
             </Card>
 
