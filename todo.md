@@ -381,3 +381,22 @@
 **Problema:** Campos opcionais do plano de curso (ementa, generalObjective, etc.) estavam sendo enviados como strings vazias ("") ao invés de undefined/null, causando erro no banco de dados ao tentar inserir valores default.
 
 **Solução:** Adicionada lógica no handleSubmit para converter strings vazias em undefined antes de enviar ao backend, usando operador || undefined. Isso permite que o banco use os valores default (null) corretamente.
+
+## Melhoria na Interface de Disciplinas - Aba Integração Google
+- [x] Verificar erros no código (0 erros LSP, 0 erros TypeScript)
+- [x] Criar aba separada "Integração Google" no formulário de disciplinas (3 abas: Básicas, Plano de Curso, Integração Google)
+- [x] Mover campos googleDriveUrl e googleClassroomUrl para nova aba
+- [x] Remover campos de integração da aba "Plano de Curso"
+- [x] Melhorar layout e instruções na aba de Integração Google (cards coloridos com gradientes)
+- [x] Adicionar ícones e descrições para cada serviço (Google Drive e Classroom)
+- [x] Testar salvamento e edição dos links (todos os 28 testes passando)
+- [x] Validar visualização nos cards de disciplinas (botões de acesso rápido funcionando)
+
+**Melhorias Implementadas:**
+- Aba dedicada "Integração Google" com layout profissional
+- Cards separados para Drive (azul-verde) e Classroom (verde-amarelo)
+- Ícones do Google em cada seção
+- Descrições detalhadas de cada serviço
+- Dicas práticas para configurar os links
+- Aviso informativo sobre botões de acesso rápido
+- Interface muito mais organizada e fácil de usar
