@@ -647,15 +647,6 @@ export default function Subjects() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => window.print()}
-                className="flex items-center gap-2"
-              >
-                <FileText className="h-4 w-4" />
-                Imprimir
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
                 onClick={exportToPDF}
                 className="flex items-center gap-2"
               >

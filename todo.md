@@ -566,3 +566,16 @@
    - Cores preservadas para impressão
    - Nome de arquivo descritivo
    - Todos os 28 testes passando (100%)
+
+## Remover Botão Imprimir do Plano de Curso
+- [x] Remover botão "Imprimir" do DialogFooter do modal
+- [x] Manter apenas botões "Exportar PDF" e "Fechar"
+- [x] Testar visualização do modal
+- [x] Validar que exportação PDF continua funcionando
+
+**Implementação:**
+- Removido botão "Imprimir" (com ícone FileText)
+- Modal agora possui apenas 2 botões: "Exportar PDF" (outline) e "Fechar" (primary)
+- Funcionalidade de exportação PDF mantida intacta
+- Todos os 28 testes passando (100%)
+- Interface mais limpa e focada na exportação digital
