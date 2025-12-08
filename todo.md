@@ -165,5 +165,22 @@
 - [x] Integrar rotas administrativas ao App.tsx
 - [x] Adicionar botões de navegação no header do Dashboard
 - [x] Implementar botão de logout na página de perfil
-- [ ] Criar sistema de convites por e-mail (futuro)
 - [ ] Implementar auditoria de ações (futuro)
+
+## Sistema de Convites por E-mail
+- [x] Criar tabela de convites no banco de dados
+- [x] Adicionar campos: email, token, role, status, createdBy, expiresAt
+- [x] Implementar geração de tokens únicos e seguros
+- [x] Criar rotas tRPC para administradores gerenciarem convites
+- [x] Implementar envio de notificação com link de convite (via notifyOwner)
+- [x] Criar interface administrativa para enviar convites
+- [x] Implementar listagem de convites (pendentes, aceitos, expirados, cancelados)
+- [x] Criar página pública de aceite de convite
+- [x] Implementar validação de token e criação automática de conta
+- [x] Adicionar opção de reenviar convite
+- [x] Adicionar opção de cancelar convite pendente
+- [x] Criar testes automatizados para sistema de convites (11 testes passando)
+- [x] Adicionar botão de Convites no Dashboard para administradores
+- [x] Implementar estatísticas de convites (pendentes, aceitos, total)
+- [x] Adicionar badges visuais de status (pendente, aceito, expirado, cancelado)
+- [x] Implementar cópia de link de convite para área de transferência

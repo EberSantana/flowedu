@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Calendar, Clock, CalendarDays, User, Shield, LogOut } from "lucide-react";
+import { BookOpen, Users, Calendar, Clock, CalendarDays, User, Shield, LogOut, Mail } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -39,12 +39,20 @@ export default function Dashboard() {
                   </Button>
                 </Link>
                 {user.role === "admin" && (
-                  <Link href="/admin/users">
-                    <Button variant="outline" className="bg-purple-50 border-purple-200 hover:bg-purple-100">
-                      <Shield className="mr-2 h-4 w-4 text-purple-600" />
-                      Gerenciar Usuários
-                    </Button>
-                  </Link>
+                  <>
+                    <Link href="/admin/invitations">
+                      <Button variant="outline" className="bg-indigo-50 border-indigo-200 hover:bg-indigo-100">
+                        <Mail className="mr-2 h-4 w-4 text-indigo-600" />
+                        Convites
+                      </Button>
+                    </Link>
+                    <Link href="/admin/users">
+                      <Button variant="outline" className="bg-purple-50 border-purple-200 hover:bg-purple-100">
+                        <Shield className="mr-2 h-4 w-4 text-purple-600" />
+                        Gerenciar Usuários
+                      </Button>
+                    </Link>
+                  </>
                 )}
               </>
             )}

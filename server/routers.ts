@@ -374,6 +374,195 @@ export const appRouter = router({
         }
         return db.updateUserRole(input.userId, input.role);
       }),
+
+    // Rotas de convites
+    createInvitation: protectedProcedure
+      .input(z.object({
+        email: z.string().email(),
+        role: z.enum(['admin', 'user']).default('user'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+
+        // Verificar se email já está registrado
+        const alreadyRegistered = await db.checkEmailAlreadyRegistered(input.email);
+        if (alreadyRegistered) {
+          throw new Error('Este e-mail já está cadastrado no sistema');
+        }
+
+        // Verificar se já existe convite pendente
+        const alreadyInvited = await db.checkEmailAlreadyInvited(input.email);
+        if (alreadyInvited) {
+          throw new Error('Já existe um convite pendente para este e-mail');
+        }
+
+        // Gerar token único
+        const crypto = await import('crypto');
+        const token = crypto.randomBytes(32).toString('hex');
+
+        // Definir expiração (7 dias)
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+
+        // Criar convite
+        await db.createInvitation({
+          email: input.email,
+          token,
+          role: input.role,
+          status: 'pending',
+          createdBy: ctx.user.id,
+          expiresAt,
+        });
+
+        // Enviar notificação ao owner
+        const inviteUrl = `${process.env.VITE_OAUTH_PORTAL_URL || 'http://localhost:3000'}/accept-invite/${token}`;
+        await import('./_core/notification').then(m => 
+          m.notifyOwner({
+            title: 'Novo Convite Enviado',
+            content: `Um convite foi enviado para ${input.email} com papel de ${input.role === 'admin' ? 'Administrador' : 'Professor'}.\n\nLink do convite: ${inviteUrl}\n\nO convite expira em 7 dias.`
+          })
+        );
+
+        return { success: true, token, inviteUrl };
+      }),
+
+    listInvitations: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getAllInvitations();
+    }),
+
+    cancelInvitation: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.updateInvitationStatus(input.id, 'cancelled');
+      }),
+
+    resendInvitation: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+
+        // Buscar convite
+        const invitations = await db.getAllInvitations();
+        const invitation = invitations.find(inv => inv.id === input.id);
+        
+        if (!invitation) {
+          throw new Error('Convite não encontrado');
+        }
+
+        if (invitation.status !== 'pending') {
+          throw new Error('Apenas convites pendentes podem ser reenviados');
+        }
+
+        // Reenviar notificação
+        const inviteUrl = `${process.env.VITE_OAUTH_PORTAL_URL || 'http://localhost:3000'}/accept-invite/${invitation.token}`;
+        await import('./_core/notification').then(m => 
+          m.notifyOwner({
+            title: 'Convite Reenviado',
+            content: `O convite para ${invitation.email} foi reenviado.\n\nLink do convite: ${inviteUrl}\n\nO convite expira em ${new Date(invitation.expiresAt).toLocaleDateString('pt-BR')}.`
+          })
+        );
+
+        return { success: true, inviteUrl };
+      }),
+  }),
+
+  invitations: router({
+    validateToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        const invitation = await db.getInvitationByToken(input.token);
+        
+        if (!invitation) {
+          return { valid: false, reason: 'Convite não encontrado' };
+        }
+
+        if (invitation.status !== 'pending') {
+          return { valid: false, reason: 'Este convite já foi utilizado ou cancelado' };
+        }
+
+        if (new Date() > new Date(invitation.expiresAt)) {
+          await db.updateInvitationStatus(invitation.id, 'expired');
+          return { valid: false, reason: 'Este convite expirou' };
+        }
+
+        return { 
+          valid: true, 
+          invitation: {
+            email: invitation.email,
+            role: invitation.role,
+          }
+        };
+      }),
+
+    acceptInvite: publicProcedure
+      .input(z.object({ 
+        token: z.string(),
+        name: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        const invitation = await db.getInvitationByToken(input.token);
+        
+        if (!invitation) {
+          throw new Error('Convite não encontrado');
+        }
+
+        if (invitation.status !== 'pending') {
+          throw new Error('Este convite já foi utilizado ou cancelado');
+        }
+
+        if (new Date() > new Date(invitation.expiresAt)) {
+          await db.updateInvitationStatus(invitation.id, 'expired');
+          throw new Error('Este convite expirou');
+        }
+
+        // Verificar se email já foi registrado
+        const alreadyRegistered = await db.checkEmailAlreadyRegistered(invitation.email);
+        if (alreadyRegistered) {
+          throw new Error('Este e-mail já está cadastrado no sistema');
+        }
+
+        // Criar usuário com openId temporário (será substituído no primeiro login)
+        const crypto = await import('crypto');
+        const tempOpenId = `invite-${crypto.randomBytes(16).toString('hex')}`;
+        
+        await db.upsertUser({
+          openId: tempOpenId,
+          name: input.name,
+          email: invitation.email,
+          role: invitation.role,
+          loginMethod: 'invitation',
+          lastSignedIn: new Date(),
+        });
+
+        // Buscar ID do usuário criado
+        const users = await db.getAllUsers();
+        const newUser = users.find(u => u.email === invitation.email);
+
+        // Marcar convite como aceito
+        if (newUser) {
+          await db.updateInvitationStatus(invitation.id, 'accepted', newUser.id);
+        }
+
+        // Notificar owner
+        await import('./_core/notification').then(m => 
+          m.notifyOwner({
+            title: 'Convite Aceito',
+            content: `${input.name} (${invitation.email}) aceitou o convite e foi cadastrado como ${invitation.role === 'admin' ? 'Administrador' : 'Professor'}.`
+          })
+        );
+
+        return { success: true, message: 'Conta criada com sucesso! Faça login para acessar o sistema.' };
+      }),
   }),
 });
 
