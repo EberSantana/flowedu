@@ -358,3 +358,15 @@
 - [x] Ajustar padding/margin para considerar sidebar (lg:ml-64)
 - [x] Testar navegação em todas as páginas (Dashboard funcionando perfeitamente)
 - [x] Verificar responsividade mobile (sidebar colapsável com menu hambúrguer)
+
+## Redesign do Dashboard - Layout Clean
+- [x] Reduzir cards de métricas para 3 principais (Disciplinas, Turmas, Aulas Agendadas)
+- [x] Manter apenas 1 gráfico principal (Distribuição Semanal - Line Chart)
+- [x] Remover gráficos secundários (Doughnut, Bar)
+- [x] Adicionar seção de Ações Rápidas com 4 botões grandes
+- [x] Criar widget de Próximas Aulas (lista compacta com 5 itens)
+- [x] Simplificar cores (bordas coloridas sutis, sem gradientes chamativos)
+- [x] Aumentar espaçamento entre elementos (gap-6, gap-8)
+- [x] Melhorar hierarquia tipográfica (tamanhos consistentes)
+- [x] Testar novo layout (funcionando perfeitamente)
+- [x] Adicionar estado vazio com CTA para criar disciplinas

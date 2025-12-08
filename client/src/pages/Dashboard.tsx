@@ -1,34 +1,36 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Calendar, Clock, TrendingUp, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
+import { Link } from "wouter";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement,
-  PointElement,
-  LineElement,
+  Filler,
 } from 'chart.js';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 // Registrar componentes do Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement,
-  PointElement,
-  LineElement
+  Filler
 );
+
+const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -36,59 +38,12 @@ export default function Dashboard() {
   const { data: classes } = trpc.classes.list.useQuery();
   const { data: scheduledClasses } = trpc.schedule.list.useQuery();
 
-  // Calcular carga horária total
-  const totalHours = scheduledClasses?.length || 0;
+  // Calcular total de aulas agendadas
+  const totalScheduledClasses = scheduledClasses?.length || 0;
 
-  // Dados para gráfico de distribuição por dia da semana
-  const dayDistribution = {
-    labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'],
-    datasets: [{
-      label: 'Aulas por Dia',
-      data: [
-        scheduledClasses?.filter(c => c.dayOfWeek === 0).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 1).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 2).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 3).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 4).length || 0,
-      ],
-      backgroundColor: [
-        'rgba(59, 130, 246, 0.8)',
-        'rgba(16, 185, 129, 0.8)',
-        'rgba(139, 92, 246, 0.8)',
-        'rgba(249, 115, 22, 0.8)',
-        'rgba(236, 72, 153, 0.8)',
-      ],
-      borderColor: [
-        'rgb(59, 130, 246)',
-        'rgb(16, 185, 129)',
-        'rgb(139, 92, 246)',
-        'rgb(249, 115, 22)',
-        'rgb(236, 72, 153)',
-      ],
-      borderWidth: 2,
-    }],
-  };
-
-  // Dados para gráfico de carga horária por disciplina (top 5)
-  const subjectHours = subjects?.map(subject => ({
-    name: subject.name,
-    hours: scheduledClasses?.filter(c => c.subjectId === subject.id).length || 0,
-  })).sort((a, b) => b.hours - a.hours).slice(0, 5) || [];
-
-  const subjectHoursData = {
-    labels: subjectHours.map(s => s.name),
-    datasets: [{
-      label: 'Horas Semanais',
-      data: subjectHours.map(s => s.hours),
-      backgroundColor: 'rgba(59, 130, 246, 0.8)',
-      borderColor: 'rgb(59, 130, 246)',
-      borderWidth: 2,
-    }],
-  };
-
-  // Dados para gráfico de evolução semanal (simulado)
-  const weeklyData = {
-    labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
+  // Dados para gráfico de distribuição semanal
+  const weeklyDistribution = {
+    labels: DAYS_OF_WEEK,
     datasets: [{
       label: 'Aulas por Dia',
       data: [
@@ -100,157 +55,237 @@ export default function Dashboard() {
       ],
       borderColor: 'rgb(59, 130, 246)',
       backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      tension: 0.4,
       fill: true,
-    }],
+      tension: 0.4,
+    }]
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-  };
+  // Obter próximas aulas (hoje e próximos dias)
+  const today = new Date().getDay(); // 0 = Domingo, 1 = Segunda, etc
+  const todayIndex = today === 0 ? -1 : today - 1; // Ajustar para índice 0-4
+  
+  const upcomingClasses = scheduledClasses
+    ?.filter(sc => sc.dayOfWeek >= todayIndex)
+    ?.slice(0, 5)
+    ?.map(sc => {
+      const subject = subjects?.find(s => s.id === sc.subjectId);
+      const classInfo = classes?.find(c => c.id === sc.classId);
+      return {
+        ...sc,
+        subjectName: subject?.name || 'Disciplina',
+        subjectColor: subject?.color || '#6B7280',
+        className: classInfo?.name || 'Turma',
+        dayName: DAYS_OF_WEEK[sc.dayOfWeek] || 'Dia',
+      };
+    }) || [];
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <>
       <Sidebar />
-      
-      <main className="flex-1 lg:ml-64">
+      <div className="min-h-screen bg-gray-50 lg:ml-64">
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Bem-vindo, {user?.name || "Professor"}!
+            <h1 className="text-3xl font-bold text-gray-900">
+              Bem-vindo, {user?.name || 'Professor'}!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 mt-1">
               Visão geral do seu sistema de gestão de tempo
             </p>
           </div>
 
-          {/* Métricas Principais */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Disciplinas</CardTitle>
-                <BookOpen className="h-5 w-5 opacity-80" />
+          {/* Cards de Métricas Principais */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Disciplinas
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{subjects?.length || 0}</div>
-                <p className="text-xs opacity-80 mt-1">disciplinas cadastradas</p>
+                <div className="text-3xl font-bold text-gray-900">
+                  {subjects?.length || 0}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">disciplinas cadastradas</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Turmas</CardTitle>
-                <Users className="h-5 w-5 opacity-80" />
+            <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Turmas
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{classes?.length || 0}</div>
-                <p className="text-xs opacity-80 mt-1">turmas cadastradas</p>
+                <div className="text-3xl font-bold text-gray-900">
+                  {classes?.length || 0}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">turmas cadastradas</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Aulas Agendadas</CardTitle>
-                <Calendar className="h-5 w-5 opacity-80" />
+            <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Carga Horária
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{scheduledClasses?.length || 0}</div>
-                <p className="text-xs opacity-80 mt-1">aulas na grade</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Carga Horária</CardTitle>
-                <Clock className="h-5 w-5 opacity-80" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{totalHours}h</div>
-                <p className="text-xs opacity-80 mt-1">horas semanais</p>
+                <div className="text-3xl font-bold text-gray-900">
+                  {totalScheduledClasses}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">aulas agendadas</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Gráficos */}
+          {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Distribuição por Dia */}
+            {/* Ações Rápidas */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  Distribuição por Dia da Semana
-                </CardTitle>
-                <CardDescription>
-                  Quantidade de aulas em cada dia da semana
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold">Ações Rápidas</CardTitle>
+                <CardDescription>Acesso rápido às funcionalidades principais</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <Doughnut data={dayDistribution} options={chartOptions} />
-                </div>
+              <CardContent className="grid grid-cols-2 gap-3">
+                <Link href="/subjects">
+                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 hover:border-blue-300">
+                    <Plus className="h-5 w-5 text-blue-600" />
+                    <span className="text-sm font-medium">Nova Disciplina</span>
+                  </Button>
+                </Link>
+                
+                <Link href="/schedule">
+                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-purple-50 hover:border-purple-300">
+                    <CalendarIcon className="h-5 w-5 text-purple-600" />
+                    <span className="text-sm font-medium">Grade Completa</span>
+                  </Button>
+                </Link>
+
+                <Link href="/classes">
+                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-green-50 hover:border-green-300">
+                    <Users className="h-5 w-5 text-green-600" />
+                    <span className="text-sm font-medium">Gerenciar Turmas</span>
+                  </Button>
+                </Link>
+
+                <Link href="/calendar">
+                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-orange-50 hover:border-orange-300">
+                    <BarChart3 className="h-5 w-5 text-orange-600" />
+                    <span className="text-sm font-medium">Calendário</span>
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
-            {/* Carga Horária por Disciplina */}
+            {/* Próximas Aulas */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  Top 5 Disciplinas
-                </CardTitle>
-                <CardDescription>
-                  Disciplinas com maior carga horária semanal
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold">Próximas Aulas</CardTitle>
+                <CardDescription>Suas aulas programadas para esta semana</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-64">
-                  <Bar data={subjectHoursData} options={chartOptions} />
-                </div>
+                {upcomingClasses.length > 0 ? (
+                  <div className="space-y-3">
+                    {upcomingClasses.map((cls, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div
+                          className="w-1 h-12 rounded-full"
+                          style={{ backgroundColor: cls.subjectColor }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">
+                            {cls.subjectName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {cls.className} • {cls.dayName}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <ArrowRight className="h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <CalendarIcon className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                    <p className="text-sm">Nenhuma aula agendada</p>
+                    <Link href="/schedule">
+                      <Button variant="link" className="mt-2 text-blue-600">
+                        Criar grade de horários <ArrowRight className="ml-1 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Gráfico de Linha - Distribuição Semanal */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Distribuição Semanal
-              </CardTitle>
-              <CardDescription>
-                Quantidade de aulas por dia da semana
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <Line data={weeklyData} options={chartOptions} />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Avisos e Notificações */}
-          {(!subjects || subjects.length === 0) && (
-            <Card className="border-warning bg-warning/10">
+          {/* Gráfico de Distribuição Semanal */}
+          {scheduledClasses && scheduledClasses.length > 0 && (
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-warning">
+                <CardTitle className="text-lg font-semibold">Distribuição Semanal</CardTitle>
+                <CardDescription>Quantidade de aulas em cada dia da semana</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <Line
+                    data={weeklyDistribution}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false,
+                        },
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          ticks: {
+                            stepSize: 1,
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Aviso quando não há disciplinas */}
+          {(!subjects || subjects.length === 0) && (
+            <Card className="border-l-4 border-l-yellow-500 bg-yellow-50">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-yellow-900 flex items-center gap-2">
                   <AlertCircle className="h-5 w-5" />
-                  Comece Cadastrando Disciplinas
+                  Comece Criando Disciplinas
                 </CardTitle>
-                <CardDescription>
-                  Você ainda não possui disciplinas cadastradas. Comece criando suas primeiras disciplinas para organizar seu tempo.
+                <CardDescription className="text-yellow-700">
+                  Você ainda não possui disciplinas cadastradas. Comece criando suas primeiras disciplinas para organizar sua grade de horários.
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <Link href="/subjects">
+                  <Button className="bg-yellow-600 hover:bg-yellow-700">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Criar Primeira Disciplina
+                  </Button>
+                </Link>
+              </CardContent>
             </Card>
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
