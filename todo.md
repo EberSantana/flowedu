@@ -248,3 +248,20 @@
 - [x] Atualizar todo.md removendo tarefas de convites
 - [x] Remover imports de invitations do db.ts
 - [x] Reiniciar servidor para limpar cache
+
+## Cadastro Manual de Professores
+- [x] Criar rota tRPC admin.createUser
+- [x] Validar e-mail único (rejeita duplicados)
+- [x] Gerar openId temporário para novo usuário (manual-{random})
+- [x] Implementar formulário de cadastro na página AdminUsers
+- [x] Adicionar campos: nome, e-mail, papel (Professor/Administrador)
+- [x] Implementar validação de formulário (campos obrigatórios)
+- [x] Adicionar feedback visual de sucesso/erro (toasts)
+- [x] Enviar e-mail de boas-vindas com instruções de acesso
+- [x] Criar template de e-mail profissional para cadastro manual
+- [x] Criar testes automatizados para cadastro manual (6 testes passando)
+- [x] Atualizar lista de usuários após cadastro (refetch automático)
+- [x] Registrar log de auditoria ao criar usuário
+- [x] Botão verde "Novo Usuário" no header
+- [x] Formulário colapsável com fundo verde
+- [x] Limpar formulário após sucesso

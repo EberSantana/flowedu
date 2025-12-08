@@ -435,6 +435,74 @@ export const appRouter = router({
       return db.getInactiveUsers();
     }),
 
+    // Cadastro manual de usuários
+    createUser: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1, 'Nome é obrigatório'),
+        email: z.string().email('E-mail inválido'),
+        role: z.enum(['admin', 'user']).default('user'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+
+        // Verificar se email já está registrado
+        const alreadyRegistered = await db.checkEmailAlreadyRegistered(input.email);
+        if (alreadyRegistered) {
+          throw new Error('Este e-mail já está cadastrado no sistema');
+        }
+
+        // Gerar openId temporário (será substituído no primeiro login OAuth)
+        const crypto = await import('crypto');
+        const tempOpenId = `manual-${crypto.randomBytes(16).toString('hex')}`;
+        
+        // Criar usuário
+        await db.upsertUser({
+          openId: tempOpenId,
+          name: input.name,
+          email: input.email,
+          role: input.role,
+          loginMethod: 'manual',
+          lastSignedIn: new Date(),
+        });
+
+        // Buscar usuário criado
+        const users = await db.getAllUsers();
+        const newUser = users.find(u => u.email === input.email);
+
+        if (!newUser) {
+          throw new Error('Erro ao criar usuário');
+        }
+
+        // Enviar e-mail de boas-vindas
+        const { sendEmail, getManualRegistrationEmailTemplate } = await import('./_core/email');
+        const emailHtml = getManualRegistrationEmailTemplate(input.name, input.role);
+        
+        const emailResult = await sendEmail({
+          to: input.email,
+          subject: 'Bem-vindo ao Sistema de Gestão de Tempo para Professores',
+          html: emailHtml,
+        });
+
+        // Registrar log de auditoria
+        await db.createAuditLog({
+          adminId: ctx.user.id,
+          adminName: ctx.user.name || 'Administrador',
+          action: 'CREATE_USER',
+          targetUserId: newUser.id,
+          targetUserName: newUser.name || '',
+          newData: JSON.stringify({ email: input.email, role: input.role }),
+          ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for'] as string || 'unknown',
+        });
+
+        return { 
+          success: true, 
+          user: newUser,
+          emailSent: emailResult.success,
+          emailError: emailResult.error 
+        };
+      }),
 
   }),
 

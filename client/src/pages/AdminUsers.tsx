@@ -31,6 +31,12 @@ export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   
+  // Estado do formulário de cadastro
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newUserName, setNewUserName] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserRole, setNewUserRole] = useState<"admin" | "user">("user");
+  
   const { data: activeUsers, isLoading: activeLoading, refetch: refetchActive } = trpc.admin.listActiveUsers.useQuery();
   const { data: inactiveUsers, isLoading: inactiveLoading, refetch: refetchInactive } = trpc.admin.listInactiveUsers.useQuery();
   
@@ -81,6 +87,26 @@ export default function AdminUsers() {
   const reactivateUserMutation = trpc.admin.reactivateUser.useMutation({
     onSuccess: () => {
       toast.success("Usuário reativado com sucesso!");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+
+  const createUserMutation = trpc.admin.createUser.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Usuário ${data.user.name} criado com sucesso!`);
+      if (data.emailSent) {
+        toast.success("E-mail de boas-vindas enviado!");
+      } else if (data.emailError) {
+        toast.warning(`E-mail não enviado: ${data.emailError}`);
+      }
+      // Limpar formulário
+      setNewUserName("");
+      setNewUserEmail("");
+      setNewUserRole("user");
+      setShowCreateForm(false);
       refetch();
     },
     onError: (error: any) => {
@@ -185,8 +211,104 @@ export default function AdminUsers() {
                 </>
               )}
             </Button>
+            
+            <Button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              {showCreateForm ? "Cancelar" : "Novo Usuário"}
+            </Button>
           </div>
         </div>
+        
+        {/* Formulário de Cadastro */}
+        {showCreateForm && (
+          <Card className="mb-8 border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="text-green-800">Cadastrar Novo Usuário</CardTitle>
+              <CardDescription>Preencha os dados para criar um novo professor ou administrador</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!newUserName || !newUserEmail) {
+                    toast.error("Preencha todos os campos obrigatórios");
+                    return;
+                  }
+                  createUserMutation.mutate({
+                    name: newUserName,
+                    email: newUserEmail,
+                    role: newUserRole,
+                  });
+                }}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Nome Completo *</label>
+                    <input
+                      type="text"
+                      value={newUserName}
+                      onChange={(e) => setNewUserName(e.target.value)}
+                      placeholder="Ex: João Silva"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">E-mail *</label>
+                    <input
+                      type="email"
+                      value={newUserEmail}
+                      onChange={(e) => setNewUserEmail(e.target.value)}
+                      placeholder="Ex: joao@email.com"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Papel *</label>
+                    <Select value={newUserRole} onValueChange={(value: "admin" | "user") => setNewUserRole(value)}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Professor</SelectItem>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowCreateForm(false);
+                      setNewUserName("");
+                      setNewUserEmail("");
+                      setNewUserRole("user");
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700"
+                    disabled={createUserMutation.isPending}
+                  >
+                    {createUserMutation.isPending ? "Criando..." : "Criar Usuário"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
