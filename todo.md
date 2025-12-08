@@ -916,3 +916,13 @@
 - [x] Ajustar padding/margin para considerar sidebar (lg:ml-64)
 - [x] Padronizar espaçamento e estrutura com outras páginas
 - [x] Testar navegação entre páginas
+
+## Melhoria: Botão "Ir para Próxima Aula" Inteligente
+- [x] Analisar lógica atual do widget de próximas aulas
+- [x] Implementar detecção de horário atual (hora e minuto)
+- [x] Filtrar apenas aulas futuras do dia (após horário atual)
+- [x] Ordenar aulas por horário de início (cronológico)
+- [x] Mostrar primeira aula futura se não houver mais aulas hoje
+- [x] Atualizar interface do botão com informações da próxima aula real
+- [x] Testar com diferentes horários do dia
+- [x] Validar comportamento em finais de semana

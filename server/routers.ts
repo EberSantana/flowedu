@@ -214,15 +214,16 @@ export const appRouter = router({
         db.getCalendarEventsByUser(ctx.user.id),
       ]);
 
-      const today = new Date();
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
       
-      // Calcular aulas do dia atual apenas (i = 0)
+      // Calcular aulas dos próximos 7 dias para garantir que sempre há uma próxima aula
       const upcomingClasses = [];
       
-      for (let i = 0; i < 1; i++) {
-        const checkDate = new Date(today);
-        checkDate.setDate(today.getDate() + i);
+      for (let i = 0; i < 7; i++) {
+        const checkDate = new Date(now);
+        checkDate.setDate(now.getDate() + i);
         const dayOfWeek = checkDate.getDay();
         const dateStr = checkDate.toISOString().split('T')[0];
         
@@ -265,7 +266,19 @@ export const appRouter = router({
         return a.startTime.localeCompare(b.startTime);
       });
       
-      return upcomingClasses.slice(0, 10);
+      // Filtrar apenas aulas futuras (após o horário atual)
+      const todayStr = now.toISOString().split('T')[0];
+      const futureClasses = upcomingClasses.filter(c => {
+        // Se for dia futuro, incluir
+        if (c.date > todayStr) return true;
+        // Se for hoje, incluir apenas se ainda não começou
+        if (c.date === todayStr) {
+          return c.startTime > currentTime;
+        }
+        return false;
+      });
+      
+      return futureClasses.slice(0, 10);
     }),
     
     getUpcomingEvents: protectedProcedure.query(async ({ ctx }) => {
