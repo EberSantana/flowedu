@@ -451,3 +451,42 @@
    - Datas reais calculadas dinamicamente
    - Ordenação cronológica precisa
    - Detecção de feriados integrada ao calendário
+
+## Widget de Eventos do Calendário no Dashboard
+- [x] Analisar layout atual do Dashboard
+- [x] Definir melhor posição para o widget (abaixo do gráfico de Distribuição Semanal)
+- [x] Criar rota tRPC para buscar próximos eventos (dashboard.getUpcomingEvents)
+- [x] Implementar widget com cards de eventos coloridos
+- [x] Adicionar ícones por tipo de evento (🏫 escolar, 🎉 feriado, 🎂 comemorativo, 📄 pessoal)
+- [x] Exibir data, título e tipo de cada evento
+- [x] Ordenar eventos por data (próximos 60 dias)
+- [x] Adicionar link para página de Calendário (botão "Ver Calendário")
+- [x] Testar exibição com dados reais (4 eventos criados)
+- [x] Validar responsividade (grid 1-4 colunas)
+
+**Implementações Realizadas:**
+
+1. **Nova Rota tRPC**: `dashboard.getUpcomingEvents`
+   - Busca eventos dos próximos 60 dias
+   - Filtra por usuário logado
+   - Ordena cronologicamente por data
+   - Retorna até 10 próximos eventos
+
+2. **Widget Visual**:
+   - Cards coloridos por tipo:
+     * Azul (🏫) - Eventos Escolares
+     * Vermelho (🎉) - Feriados
+     * Roxo (🎂) - Datas Comemorativas
+     * Cinza (📄) - Observações Pessoais
+   - Badge com dia da semana (SEX, SEG, QUA, etc.)
+   - Data destacada (número grande + mês abreviado)
+   - Título do evento
+   - Tipo do evento com ícone
+
+3. **Funcionalidades**:
+   - Grid responsível (1-4 colunas conforme tamanho da tela)
+   - Botão "Ver Calendário" para acesso rápido
+   - Mensagem informativa quando não há eventos
+   - Hover effect nos cards para feedback visual
+   - Layout profissional e organizado
+   - Integração total com sistema de calendário

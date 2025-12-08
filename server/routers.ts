@@ -265,6 +265,26 @@ export const appRouter = router({
       
       return upcomingClasses.slice(0, 10);
     }),
+    
+    getUpcomingEvents: protectedProcedure.query(async ({ ctx }) => {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      // Buscar eventos dos próximos 60 dias
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + 60);
+      const endDateStr = endDate.toISOString().split('T')[0];
+      
+      const events = await db.getCalendarEventsByUser(ctx.user.id);
+      
+      // Filtrar eventos futuros e ordenar por data
+      const upcomingEvents = events
+        .filter(e => e.eventDate >= todayStr && e.eventDate <= endDateStr)
+        .sort((a, b) => a.eventDate.localeCompare(b.eventDate))
+        .slice(0, 8);
+      
+      return upcomingEvents;
+    }),
   }),
 
   schedule: router({
