@@ -184,3 +184,14 @@
 - [x] Implementar estatísticas de convites (pendentes, aceitos, total)
 - [x] Adicionar badges visuais de status (pendente, aceito, expirado, cancelado)
 - [x] Implementar cópia de link de convite para área de transferência
+
+## Funcionalidade de Deletar Usuários
+- [x] Criar função deleteUser no db.ts
+- [x] Implementar rota tRPC admin.deleteUser
+- [x] Adicionar validação para impedir admin deletar a si mesmo
+- [x] Adicionar botão de deletar na tabela de usuários
+- [x] Implementar confirmação antes de deletar (usando confirm nativo)
+- [x] Criar testes para deleção de usuários (4 testes passando)
+- [x] Testar que admin não pode deletar a si mesmo
+- [x] Botão vermelho com ícone de lixeira para feedback visual
+- [x] Desabilitar botão durante processo de deleção

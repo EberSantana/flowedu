@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft } from "lucide-react";
+import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
@@ -31,6 +31,16 @@ export default function AdminUsers() {
   const updateRoleMutation = trpc.admin.updateUserRole.useMutation({
     onSuccess: () => {
       toast.success("Papel do usuário atualizado com sucesso!");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+
+  const deleteUserMutation = trpc.admin.deleteUser.useMutation({
+    onSuccess: () => {
+      toast.success("Usuário deletado com sucesso!");
       refetch();
     },
     onError: (error: any) => {
@@ -212,8 +222,19 @@ export default function AdminUsers() {
                     </TableCell>
                     <TableCell>
                       {u.id !== user.id && (
-                        <Button variant="outline" size="sm" disabled>
-                          Gerenciar
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            if (confirm(`Tem certeza que deseja deletar o usuário ${u.name}? Esta ação não pode ser desfeita.`)) {
+                              deleteUserMutation.mutate({ userId: u.id });
+                            }
+                          }}
+                          disabled={deleteUserMutation.isPending}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Deletar
                         </Button>
                       )}
                     </TableCell>

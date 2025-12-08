@@ -513,3 +513,11 @@ export async function checkEmailAlreadyRegistered(email: string) {
   const result = await db.select().from(users).where(eq(users.email, email));
   return result.length > 0;
 }
+
+
+export async function deleteUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(users).where(eq(users.id, userId));
+  return { success: true };
+}

@@ -375,6 +375,23 @@ export const appRouter = router({
         return db.updateUserRole(input.userId, input.role);
       }),
 
+    deleteUser: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        
+        // Impedir que admin delete a si mesmo
+        if (ctx.user.id === input.userId) {
+          throw new Error('Você não pode deletar sua própria conta');
+        }
+        
+        return db.deleteUser(input.userId);
+      }),
+
     // Rotas de convites
     createInvitation: protectedProcedure
       .input(z.object({
