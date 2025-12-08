@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -17,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
+import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft, Trash2, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
@@ -26,7 +27,18 @@ export default function AdminUsers() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
 
-  const { data: allUsers, isLoading: usersLoading, refetch } = trpc.admin.listUsers.useQuery();
+  const [showInactive, setShowInactive] = useState(false);
+  
+  const { data: activeUsers, isLoading: activeLoading, refetch: refetchActive } = trpc.admin.listActiveUsers.useQuery();
+  const { data: inactiveUsers, isLoading: inactiveLoading, refetch: refetchInactive } = trpc.admin.listInactiveUsers.useQuery();
+  
+  const allUsers = showInactive ? inactiveUsers : activeUsers;
+  const usersLoading = showInactive ? inactiveLoading : activeLoading;
+  
+  const refetch = () => {
+    refetchActive();
+    refetchInactive();
+  };
 
   const updateRoleMutation = trpc.admin.updateUserRole.useMutation({
     onSuccess: () => {
@@ -40,7 +52,17 @@ export default function AdminUsers() {
 
   const deleteUserMutation = trpc.admin.deleteUser.useMutation({
     onSuccess: () => {
-      toast.success("Usuário deletado com sucesso!");
+      toast.success("Usuário desativado com sucesso!");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+
+  const reactivateUserMutation = trpc.admin.reactivateUser.useMutation({
+    onSuccess: () => {
+      toast.success("Usuário reativado com sucesso!");
       refetch();
     },
     onError: (error: any) => {
@@ -110,21 +132,51 @@ export default function AdminUsers() {
               Voltar ao Dashboard
             </Button>
           </Link>
-          <h1 className="text-4xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-            <Users className="w-10 h-10 text-purple-600" />
-            Gerenciamento de Usuários
-          </h1>
-          <p className="text-slate-600">Administre contas e permissões do sistema</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+                <Users className="w-10 h-10 text-purple-600" />
+                Gerenciamento de Usuários
+              </h1>
+              <p className="text-slate-600">Administre contas e permissões do sistema</p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowInactive(!showInactive)}
+              className="flex items-center gap-2"
+            >
+              {showInactive ? (
+                <>
+                  <Eye className="w-4 h-4" />
+                  Ver Usuários Ativos
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-4 h-4" />
+                  Ver Usuários Inativos
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Total de Usuários</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-600">Usuários Ativos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-slate-800">{allUsers?.length || 0}</div>
+              <div className="text-3xl font-bold text-green-600">{activeUsers?.length || 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-slate-600">Usuários Inativos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-gray-600">{inactiveUsers?.length || 0}</div>
             </CardContent>
           </Card>
 
@@ -134,7 +186,7 @@ export default function AdminUsers() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-purple-600">
-                {allUsers?.filter((u) => u.role === "admin").length || 0}
+                {activeUsers?.filter((u) => u.role === "admin").length || 0}
               </div>
             </CardContent>
           </Card>
@@ -145,7 +197,7 @@ export default function AdminUsers() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-blue-600">
-                {allUsers?.filter((u) => u.role === "user").length || 0}
+                {activeUsers?.filter((u) => u.role === "user").length || 0}
               </div>
             </CardContent>
           </Card>
@@ -222,20 +274,37 @@ export default function AdminUsers() {
                     </TableCell>
                     <TableCell>
                       {u.id !== user.id && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            if (confirm(`Tem certeza que deseja deletar o usuário ${u.name}? Esta ação não pode ser desfeita.`)) {
-                              deleteUserMutation.mutate({ userId: u.id });
-                            }
-                          }}
-                          disabled={deleteUserMutation.isPending}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Deletar
-                        </Button>
+                        showInactive ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              if (confirm(`Tem certeza que deseja reativar o usuário ${u.name}?`)) {
+                                reactivateUserMutation.mutate({ userId: u.id });
+                              }
+                            }}
+                            disabled={reactivateUserMutation.isPending}
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                          >
+                            <RefreshCw className="w-4 h-4 mr-1" />
+                            Reativar
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
+                                deleteUserMutation.mutate({ userId: u.id });
+                              }
+                            }}
+                            disabled={deleteUserMutation.isPending}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Desativar
+                          </Button>
+                        )
                       )}
                     </TableCell>
                   </TableRow>

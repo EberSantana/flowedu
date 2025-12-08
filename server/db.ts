@@ -515,9 +515,28 @@ export async function checkEmailAlreadyRegistered(email: string) {
 }
 
 
-export async function deleteUser(userId: number) {
+export async function deactivateUser(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(users).where(eq(users.id, userId));
+  await db.update(users).set({ active: false }).where(eq(users.id, userId));
   return { success: true };
+}
+
+export async function reactivateUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ active: true }).where(eq(users.id, userId));
+  return { success: true };
+}
+
+export async function getActiveUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(users).where(eq(users.active, true)).orderBy(desc(users.createdAt));
+}
+
+export async function getInactiveUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(users).where(eq(users.active, false)).orderBy(desc(users.createdAt));
 }

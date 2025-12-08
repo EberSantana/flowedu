@@ -384,13 +384,39 @@ export const appRouter = router({
           throw new Error('Acesso negado: apenas administradores');
         }
         
-        // Impedir que admin delete a si mesmo
+        // Impedir que admin desative a si mesmo
         if (ctx.user.id === input.userId) {
-          throw new Error('Você não pode deletar sua própria conta');
+          throw new Error('Você não pode desativar sua própria conta');
         }
         
-        return db.deleteUser(input.userId);
+        return db.deactivateUser(input.userId);
       }),
+
+    reactivateUser: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        
+        return db.reactivateUser(input.userId);
+      }),
+
+    listActiveUsers: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getActiveUsers();
+    }),
+
+    listInactiveUsers: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getInactiveUsers();
+    }),
 
     // Rotas de convites
     createInvitation: protectedProcedure

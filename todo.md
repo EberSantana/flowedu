@@ -195,3 +195,20 @@
 - [x] Testar que admin não pode deletar a si mesmo
 - [x] Botão vermelho com ícone de lixeira para feedback visual
 - [x] Desabilitar botão durante processo de deleção
+
+## Soft Delete de Usuários
+- [x] Adicionar campo `active` (boolean, default true) na tabela users
+- [x] Migrar banco de dados com novo campo via SQL
+- [x] Modificar função deleteUser para deactivateUser (active = false)
+- [x] Criar função reactivateUser no db.ts
+- [x] Criar funções getActiveUsers e getInactiveUsers
+- [x] Implementar rota tRPC admin.reactivateUser
+- [x] Implementar rotas admin.listActiveUsers e admin.listInactiveUsers
+- [x] Adicionar botão toggle para visualizar usuários ativos/inativos
+- [x] Modificar botão "Deletar" para "Desativar"
+- [x] Adicionar botão "Reativar" (verde) para usuários inativos
+- [x] Atualizar estatísticas com contadores de ativos/inativos
+- [x] Adicionar confirmação explicativa ao desativar
+- [x] Criar testes para soft delete e reativação (8 testes passando)
+- [x] Testar preservação de dados após desativação
+- [x] Testar listagens separadas de ativos e inativos
