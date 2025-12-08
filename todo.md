@@ -787,3 +787,79 @@
    - Feedback visual claro (habilitado/desabilitado)
    - Todos os 28 testes passando (100%)
    - UX intuitiva e profissional
+
+## Página de Metodologias Ativas
+- [ ] Criar tabela activeMethodologies no schema do banco
+- [ ] Implementar rotas tRPC (list, create, update, delete)
+- [ ] Criar página frontend com grid de cards
+- [ ] Adicionar busca e filtros por categoria
+- [ ] Implementar modal de criação/edição
+- [ ] Adicionar botão de exclusão com confirmação
+- [ ] Criar menu "Metodologias Ativas" na sidebar
+- [ ] Adicionar botão de ação rápida no Dashboard
+- [ ] Popular banco com ferramentas pré-cadastradas
+- [ ] Escrever testes unitários
+- [ ] Validar funcionalidades completas
+
+## Página de Metodologias Ativas
+- [x] Criar schema do banco (tabela active_methodologies com 10 campos)
+- [x] Implementar rotas tRPC para CRUD (list, create, update, delete)
+- [x] Criar página frontend com interface moderna (cards, busca, filtros)
+- [x] Adicionar menu na sidebar (ícone Lightbulb)
+- [x] Adicionar botão no Dashboard (gradiente amarelo)
+- [x] Popular banco com ferramentas pré-cadastradas (8 metodologias)
+- [x] Escrever testes unitários (8 testes, todos passando)
+- [x] Validar funcionalidades completas (36 testes passando 100%)
+
+**Implementações Realizadas:**
+
+1. **Schema do Banco** (`active_methodologies`):
+   - id (auto increment)
+   - name (varchar 255)
+   - description (text)
+   - category (varchar 100)
+   - url (varchar 500)
+   - tips (text nullable)
+   - logoUrl (varchar 500 nullable)
+   - isFavorite (boolean default false)
+   - userId (int, foreign key)
+   - createdAt, updatedAt (timestamps)
+
+2. **Rotas tRPC** (`activeMethodologies`):
+   - `list`: Lista metodologias do usuário
+   - `create`: Cria nova metodologia com validação
+   - `update`: Atualiza metodologia existente
+   - `delete`: Remove metodologia
+   - Validações: URL obrigatória e válida, campos obrigatórios
+
+3. **Página Frontend** (`ActiveMethodologies.tsx`):
+   - Grid responsivo de cards coloridos
+   - Busca em tempo real (nome/descrição)
+   - Filtro por categoria (dropdown)
+   - Badge de favorito (estrela dourada)
+   - Botões de ação (Editar, Deletar, Acessar)
+   - Modal de criação/edição
+   - Confirmação de deleção
+   - Toast de feedback
+   - Design moderno com gradientes
+
+4. **Ferramentas Pré-cadastradas**:
+   - Kahoot (Quiz e Avaliação)
+   - Mentimeter (Colaboração) ⭐
+   - Padlet (Colaboração) ⭐
+   - Canva (Apresentação)
+   - Quizizz (Quiz e Avaliação)
+   - Google Forms (Formulários)
+   - Jamboard (Quadro Branco)
+   - Edpuzzle (Vídeo e Áudio)
+
+5. **Testes** (`active-methodologies.test.ts`):
+   - Listar metodologias
+   - Criar metodologia
+   - Atualizar metodologia
+   - Deletar metodologia
+   - Validar campos obrigatórios
+   - Validar URL
+   - Permitir campos opcionais
+   - Filtrar por usuário
+   - **Todos os 36 testes passando (100%)**

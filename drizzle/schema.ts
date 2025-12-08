@@ -149,3 +149,23 @@ export const scheduledClasses = mysqlTable("scheduled_classes", {
 
 export type ScheduledClass = typeof scheduledClasses.$inferSelect;
 export type InsertScheduledClass = typeof scheduledClasses.$inferInsert;
+
+/**
+ * Metodologias Ativas - Ferramentas pedagógicas
+ */
+export const activeMethodologies = mysqlTable("active_methodologies", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // Quiz, Colaboração, Apresentação, etc.
+  url: text("url").notNull(),
+  tips: text("tips"), // Dicas de uso pedagógico
+  logoUrl: text("logoUrl"), // URL do logo/ícone da ferramenta
+  isFavorite: boolean("isFavorite").default(false).notNull(),
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActiveMethodology = typeof activeMethodologies.$inferSelect;
+export type InsertActiveMethodology = typeof activeMethodologies.$inferInsert;

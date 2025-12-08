@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import { Link } from "wouter";
@@ -202,7 +202,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Grid de Ações */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <Link href="/subjects">
                   <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -239,6 +239,16 @@ export default function Dashboard() {
                     <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
                       <BarChart3 className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
                       <span className="text-sm font-semibold text-center">Calendário</span>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link href="/active-methodologies">
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <Lightbulb className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Metodologias</span>
                     </div>
                   </div>
                 </Link>

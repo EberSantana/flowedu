@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `active_methodologies` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `description` text NOT NULL,\n  `category` varchar(100) NOT NULL,\n  `url` text NOT NULL,\n  `tips` text,\n  `logoUrl` text,\n  `isFavorite` boolean NOT NULL DEFAULT false,\n  `userId` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `active_methodologies_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `active_methodologies` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `description` text NOT NULL,\n  `category` varchar(100) NOT NULL,\n  `url` text NOT NULL,\n  `tips` text,\n  `logoUrl` text,\n  `isFavorite` boolean NOT NULL DEFAULT false,\n  `userId` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `active_methodologies_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 79
+}

@@ -11,7 +11,8 @@ import {
   Shield,
   LogOut,
   Menu,
-  X
+  X,
+  Lightbulb
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,6 +57,11 @@ const navItems: NavItem[] = [
     label: "Calendário Anual",
     icon: <CalendarDays className="h-5 w-5" />,
     href: "/calendar",
+  },
+  {
+    label: "Metodologias Ativas",
+    icon: <Lightbulb className="h-5 w-5" />,
+    href: "/active-methodologies",
   },
   {
     label: "Gerenciar Usuários",

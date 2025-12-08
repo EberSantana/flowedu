@@ -10,12 +10,14 @@ import {
   scheduledClasses,
   calendarEvents,
   auditLogs,
+  activeMethodologies,
   InsertSubject,
   InsertClass,
   InsertShift,
   InsertTimeSlot,
   InsertScheduledClass,
-  InsertCalendarEvent
+  InsertCalendarEvent,
+  InsertActiveMethodology
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -531,4 +533,41 @@ export async function getAuditLogsByUser(userId: number) {
   
   const logs = await db.select().from(auditLogs).where(eq(auditLogs.targetUserId, userId)).orderBy(desc(auditLogs.timestamp));
   return logs;
+}
+
+
+// Active Methodologies
+export async function getActiveMethodologiesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const methodologies = await db.select().from(activeMethodologies).where(eq(activeMethodologies.userId, userId)).orderBy(desc(activeMethodologies.createdAt));
+  return methodologies;
+}
+
+export async function createActiveMethodology(methodology: InsertActiveMethodology) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(activeMethodologies).values(methodology);
+  return result;
+}
+
+export async function updateActiveMethodology(id: number, userId: number, data: Partial<InsertActiveMethodology>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(activeMethodologies)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(activeMethodologies.id, id), eq(activeMethodologies.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function deleteActiveMethodology(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(activeMethodologies).where(and(eq(activeMethodologies.id, id), eq(activeMethodologies.userId, userId)));
+  return { success: true };
 }

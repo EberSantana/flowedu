@@ -591,6 +591,52 @@ export const appRouter = router({
 
   }),
 
+  // Metodologias Ativas
+  activeMethodologies: router({
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getActiveMethodologiesByUserId(ctx.user.id);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1, "Nome é obrigatório"),
+        description: z.string().min(1, "Descrição é obrigatória"),
+        category: z.string().min(1, "Categoria é obrigatória"),
+        url: z.string().url("URL inválida"),
+        tips: z.string().optional(),
+        logoUrl: z.string().url().optional(),
+        isFavorite: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createActiveMethodology({
+          ...input,
+          userId: ctx.user.id,
+        });
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        description: z.string().min(1).optional(),
+        category: z.string().min(1).optional(),
+        url: z.string().url().optional(),
+        tips: z.string().optional(),
+        logoUrl: z.string().url().optional(),
+        isFavorite: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateActiveMethodology(id, ctx.user.id, data);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteActiveMethodology(input.id, ctx.user.id);
+      }),
+  }),
 
 });
 
