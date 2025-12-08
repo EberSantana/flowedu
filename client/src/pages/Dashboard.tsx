@@ -134,109 +134,125 @@ export default function Dashboard() {
           {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Ações Rápidas */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Ações Rápidas</CardTitle>
-                <CardDescription>Acesso rápido às funcionalidades principais</CardDescription>
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+                <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
+                <CardDescription className="text-gray-600">Acesso rápido às funcionalidades principais</CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-3">
+              <CardContent className="grid grid-cols-2 gap-4 p-6">
                 <Link href="/subjects">
-                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 hover:border-blue-300">
-                    <Plus className="h-5 w-5 text-blue-600" />
-                    <span className="text-sm font-medium">Nova Disciplina</span>
-                  </Button>
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <Plus className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Nova Disciplina</span>
+                    </div>
+                  </div>
                 </Link>
                 
                 <Link href="/schedule">
-                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-purple-50 hover:border-purple-300">
-                    <CalendarIcon className="h-5 w-5 text-purple-600" />
-                    <span className="text-sm font-medium">Grade Completa</span>
-                  </Button>
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <CalendarIcon className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Grade Completa</span>
+                    </div>
+                  </div>
                 </Link>
 
                 <Link href="/classes">
-                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-green-50 hover:border-green-300">
-                    <Users className="h-5 w-5 text-green-600" />
-                    <span className="text-sm font-medium">Gerenciar Turmas</span>
-                  </Button>
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500 to-green-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <Users className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Gerenciar Turmas</span>
+                    </div>
+                  </div>
                 </Link>
 
                 <Link href="/calendar">
-                  <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-orange-50 hover:border-orange-300">
-                    <BarChart3 className="h-5 w-5 text-orange-600" />
-                    <span className="text-sm font-medium">Calendário</span>
-                  </Button>
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <BarChart3 className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Calendário</span>
+                    </div>
+                  </div>
                 </Link>
               </CardContent>
             </Card>
 
             {/* Próximas Aulas */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Próximas Aulas</CardTitle>
-                <CardDescription>Suas aulas programadas para esta semana</CardDescription>
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
+                <CardTitle className="text-xl font-bold text-gray-900">Próximas Aulas</CardTitle>
+                <CardDescription className="text-gray-600">Suas aulas programadas para esta semana</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 {upcomingClasses && upcomingClasses.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {upcomingClasses.map((cls, idx) => (
                       <div
                         key={idx}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors border-2 ${
+                        className={`group relative overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg ${
                           cls.isHoliday 
-                            ? 'bg-red-50 border-red-300 opacity-75' 
-                            : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+                            ? 'bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-300' 
+                            : 'bg-white border-2 border-gray-200 hover:border-blue-300'
                         }`}
                       >
-                        {/* Indicador de Data e Dia */}
-                        <div className={`flex flex-col items-center justify-center rounded-lg px-3 py-2 min-w-[85px] shadow-sm ${
-                          cls.isHoliday
-                            ? 'bg-gradient-to-br from-red-500 to-red-600'
-                            : 'bg-gradient-to-br from-blue-500 to-blue-600'
-                        }`}>
-                          <span className="text-xs font-medium text-white uppercase tracking-wide">
-                            {cls.dayOfWeek.substring(0, 3)}
-                          </span>
-                          <span className="text-lg font-bold text-white">
-                            {formatDate(cls.date)}
-                          </span>
-                        </div>
-                        
-                        {/* Horário */}
-                        <div className="flex flex-col items-center justify-center bg-white rounded-lg px-3 py-2 border border-gray-300 min-w-[70px]">
-                          <Clock className="h-4 w-4 text-gray-500 mb-1" />
-                          <span className="text-xs font-semibold text-gray-700">
-                            {cls.startTime}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {cls.endTime}
-                          </span>
-                        </div>
-                        
-                        {/* Barra colorida da disciplina */}
+                        {/* Barra lateral colorida */}
                         <div
-                          className="w-1 h-16 rounded-full"
+                          className="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300 group-hover:w-2"
                           style={{ backgroundColor: cls.subjectColor || '#6B7280' }}
                         />
                         
-                        {/* Informações da aula */}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 truncate text-base">
-                            {cls.subjectName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Turma: {cls.className}
-                          </p>
-                          {cls.isHoliday && (
-                            <p className="text-xs text-red-600 font-semibold mt-1 flex items-center gap-1">
-                              <AlertCircle className="h-3 w-3" />
-                              Feriado: {cls.holidayName}
+                        <div className="flex items-center gap-4 p-4 pl-6">
+                          {/* Indicador de Data e Dia */}
+                          <div className={`flex flex-col items-center justify-center rounded-xl px-4 py-3 min-w-[90px] shadow-md transition-transform duration-300 group-hover:scale-105 ${
+                            cls.isHoliday
+                              ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700'
+                              : 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
+                          }`}>
+                            <span className="text-xs font-bold text-white uppercase tracking-wider">
+                              {cls.dayOfWeek.substring(0, 3)}
+                            </span>
+                            <span className="text-2xl font-extrabold text-white mt-1">
+                              {formatDate(cls.date)}
+                            </span>
+                          </div>
+                          
+                          {/* Horário */}
+                          <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl px-4 py-3 border-2 border-gray-200 min-w-[80px] shadow-sm">
+                            <Clock className="h-5 w-5 text-blue-600 mb-1" />
+                            <span className="text-sm font-bold text-gray-900">
+                              {cls.startTime}
+                            </span>
+                            <span className="text-xs text-gray-500 font-medium">
+                              {cls.endTime}
+                            </span>
+                          </div>
+                          
+                          {/* Informações da aula */}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-gray-900 truncate text-lg mb-1">
+                              {cls.subjectName}
                             </p>
-                          )}
-                        </div>
-                        
-                        <div className="text-right">
-                          <ArrowRight className="h-5 w-5 text-gray-400" />
+                            <p className="text-sm text-gray-600 font-medium">
+                              Turma: <span className="text-blue-600 font-semibold">{cls.className}</span>
+                            </p>
+                            {cls.isHoliday && (
+                              <div className="flex items-center gap-2 mt-2 bg-red-100 border border-red-300 rounded-lg px-3 py-1.5">
+                                <AlertCircle className="h-4 w-4 text-red-600" />
+                                <p className="text-xs text-red-700 font-bold">
+                                  Feriado: {cls.holidayName}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <ArrowRight className="h-5 w-5 text-gray-400 transition-transform duration-300 group-hover:translate-x-1" />
+                          </div>
                         </div>
                       </div>
                     ))}
