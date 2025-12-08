@@ -863,3 +863,49 @@
    - Permitir campos opcionais
    - Filtrar por usuário
    - **Todos os 36 testes passando (100%)**
+
+## Dropdown Menu no Botão "Ir para Próxima Aula"
+- [x] Transformar botão em dropdown menu (2 botões lado a lado)
+- [x] Adicionar opção "Google Classroom" (com ícone de fone)
+- [x] Adicionar opção "Google Drive" (com ícone de triângulos)
+- [x] Implementar lógica de abertura de links (window.open em nova aba)
+- [x] Adicionar ícones SVG para cada opção
+- [x] Desabilitar opções quando links não estiverem cadastrados (bg-white/10, cursor-not-allowed)
+- [x] Testar usabilidade do dropdown (todos os 36 testes passando)
+- [x] Validar com diferentes cenários (sem aulas hoje - botões visíveis)
+
+**Implementações Realizadas:**
+
+1. **Layout do Dropdown**:
+   - Card teal com gradiente mantido
+   - Título "Ir para Próxima Aula" + nome da disciplina + horário
+   - 2 botões lado a lado (flex gap-2)
+   - Fundo semi-transparente branco (bg-white/20)
+   - Hover effect (bg-white/30)
+   - Bordas arredondadas (rounded-lg)
+
+2. **Botão Classroom**:
+   - Ícone SVG de fone de ouvido (Google Classroom)
+   - Texto "Classroom"
+   - Habilitado quando googleClassroomUrl existe
+   - Desabilitado (bg-white/10, text-white/50) quando não há link
+   - Toast de erro amigável quando clicado sem link
+
+3. **Botão Drive**:
+   - Ícone SVG de triângulos coloridos (Google Drive)
+   - Texto "Drive"
+   - Habilitado quando googleDriveUrl existe
+   - Desabilitado (bg-white/10, text-white/50) quando não há link
+   - Toast de erro amigável quando clicado sem link
+
+4. **Estados**:
+   - Com aula: botões visíveis e funcionais
+   - Sem aula: mensagem "Nenhuma aula agendada para hoje"
+   - Link não cadastrado: botão desabilitado com tooltip
+   - Link cadastrado: botão habilitado, abre em nova aba
+
+5. **Resultado**:
+   - Usabilidade muito melhorada
+   - Escolha clara entre Classroom e Drive
+   - Feedback visual imediato (habilitado/desabilitado)
+   - Todos os 36 testes passando (100%)

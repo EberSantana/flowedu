@@ -5,6 +5,7 @@ import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, Arro
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import { Link } from "wouter";
+import { toast } from "sonner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -165,38 +166,82 @@ export default function Dashboard() {
                 <CardDescription className="text-gray-600">Acesso rápido às funcionalidades principais</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                {/* Botão Próxima Aula em Destaque */}
+                {/* Botão Próxima Aula em Destaque com Dropdown */}
                 <div className="mb-4">
                   <div
-                    onClick={() => {
-                      if (upcomingClasses && upcomingClasses.length > 0) {
-                        const nextClass = upcomingClasses[0];
-                        const url = nextClass.googleClassroomUrl || nextClass.googleDriveUrl;
-                        if (url) {
-                          window.open(url, '_blank');
-                        } else {
-                          alert('⚠️ Nenhum link do Google Classroom ou Drive cadastrado para esta disciplina.\n\nAcesse "Disciplinas" para adicionar os links de integração.');
-                        }
-                      }
-                    }}
                     className={`group relative overflow-hidden rounded-xl bg-gradient-to-br p-4 shadow-lg transition-all duration-300 ${
                       upcomingClasses && upcomingClasses.length > 0
-                        ? 'from-teal-500 to-teal-600 hover:shadow-xl hover:scale-[1.02] cursor-pointer'
-                        : 'from-gray-400 to-gray-500 cursor-not-allowed opacity-60'
+                        ? 'from-teal-500 to-teal-600 hover:shadow-xl'
+                        : 'from-gray-400 to-gray-500 opacity-60'
                     }`}
-                    title={upcomingClasses && upcomingClasses.length > 0 ? 'Clique para abrir a próxima aula' : 'Nenhuma aula agendada para hoje'}
                   >
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex items-center gap-3 text-white">
-                      <ExternalLink className="h-6 w-6 group-hover:scale-110 transition-transform flex-shrink-0" />
-                      <div className="flex-1">
-                        <span className="text-sm font-bold block">Ir para Próxima Aula</span>
-                        {upcomingClasses && upcomingClasses.length > 0 && (
-                          <span className="text-xs opacity-90">
-                            {upcomingClasses[0].subjectName} - {upcomingClasses[0].startTime}
-                          </span>
-                        )}
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-3 text-white mb-2">
+                        <ExternalLink className="h-6 w-6 flex-shrink-0" />
+                        <div className="flex-1">
+                          <span className="text-sm font-bold block">Ir para Próxima Aula</span>
+                          {upcomingClasses && upcomingClasses.length > 0 && (
+                            <span className="text-xs opacity-90">
+                              {upcomingClasses[0].subjectName} - {upcomingClasses[0].startTime}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      
+                      {/* Opções de Acesso */}
+                      {upcomingClasses && upcomingClasses.length > 0 && (
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={() => {
+                              const url = upcomingClasses[0].googleClassroomUrl;
+                              if (url) {
+                                window.open(url, '_blank');
+                              } else {
+                                toast.error('⚠️ Link do Google Classroom não cadastrado para esta disciplina.');
+                              }
+                            }}
+                            disabled={!upcomingClasses[0].googleClassroomUrl}
+                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                              upcomingClasses[0].googleClassroomUrl
+                                ? 'bg-white/20 hover:bg-white/30 text-white cursor-pointer'
+                                : 'bg-white/10 text-white/50 cursor-not-allowed'
+                            }`}
+                            title={upcomingClasses[0].googleClassroomUrl ? 'Abrir Google Classroom' : 'Link não cadastrado'}
+                          >
+                            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M1.636 11.636v-.727C1.636 6.073 5.709 2 10.545 2h2.91c4.836 0 8.909 4.073 8.909 8.909v.727c0 .4-.328.728-.728.728h-1.454c-.4 0-.727-.327-.727-.728v-.727c0-3.636-2.982-6.618-6.618-6.618h-2.182c-3.636 0-6.618 2.982-6.618 6.618v.727c0 .4-.327.728-.727.728H2.364c-.4 0-.728-.328-.728-.728zm8.91 10.546c-2.018 0-3.637-1.637-3.637-3.637v-2.181c0-2.018 1.619-3.637 3.637-3.637s3.636 1.619 3.636 3.637v2.181c0 2-1.618 3.637-3.636 3.637zm0-7.273c-1.2 0-2.182.982-2.182 2.182v2.181c0 1.2.982 2.182 2.182 2.182s2.181-.982 2.181-2.182v-2.181c0-1.2-.981-2.182-2.181-2.182z"/>
+                            </svg>
+                            Classroom
+                          </button>
+                          <button
+                            onClick={() => {
+                              const url = upcomingClasses[0].googleDriveUrl;
+                              if (url) {
+                                window.open(url, '_blank');
+                              } else {
+                                toast.error('⚠️ Link do Google Drive não cadastrado para esta disciplina.');
+                              }
+                            }}
+                            disabled={!upcomingClasses[0].googleDriveUrl}
+                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                              upcomingClasses[0].googleDriveUrl
+                                ? 'bg-white/20 hover:bg-white/30 text-white cursor-pointer'
+                                : 'bg-white/10 text-white/50 cursor-not-allowed'
+                            }`}
+                            title={upcomingClasses[0].googleDriveUrl ? 'Abrir Google Drive' : 'Link não cadastrado'}
+                          >
+                            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M7.71 3.5L1.15 15l3.58 6.5L11.29 9.5 7.71 3.5zM2.73 15l5.58-9.5h5.58l-5.58 9.5H2.73zm9.56 6.5L8.71 15h11.58l3.58 6.5H12.29zm6.29-6.5l-5.58-9.5h5.58L22.15 15h-3.57z"/>
+                            </svg>
+                            Drive
+                          </button>
+                        </div>
+                      )}
+                      
+                      {(!upcomingClasses || upcomingClasses.length === 0) && (
+                        <p className="text-xs text-white/70 text-center">Nenhuma aula agendada para hoje</p>
+                      )}
                     </div>
                   </div>
                 </div>
