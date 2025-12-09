@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Calendar, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 const DAYS_OF_WEEK = [
   { id: 1, name: "Segunda-Feira", short: "Seg" },
@@ -190,7 +191,7 @@ export default function Schedule() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
         <div className="container mx-auto py-8">
           <div className="mb-6">
             <div className="flex items-center justify-between">
@@ -451,8 +452,8 @@ export default function Schedule() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }

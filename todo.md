@@ -968,3 +968,14 @@
 - [x] Investigar qual mutation está causando erro de logoUrl
 - [x] Tornar campo logoUrl opcional ou remover validação de URL
 - [x] Testar página de Metodologias Ativas sem erros
+
+## Ajuste Global: Todas as Páginas com PageWrapper
+- [x] Aplicar PageWrapper em Subjects.tsx (Disciplinas)
+- [x] Aplicar PageWrapper em Classes.tsx (Turmas)
+- [x] Aplicar PageWrapper em Shifts.tsx (Turnos)
+- [x] Aplicar PageWrapper em Schedule.tsx (Grade Semanal)
+- [x] Aplicar PageWrapper em Calendar.tsx (Calendário)
+- [x] Aplicar PageWrapper em ActiveMethodologies.tsx (Metodologias)
+- [x] Aplicar PageWrapper em Profile.tsx (Perfil)
+- [x] Aplicar PageWrapper em AdminUsers.tsx (Gerenciar Usuários)
+- [x] Testar todas as páginas em modo compacto/expandido

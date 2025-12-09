@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function AdminUsers() {
   const { user, loading } = useAuth();
@@ -179,7 +180,7 @@ export default function AdminUsers() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
         <div className="container max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -514,8 +515,8 @@ export default function AdminUsers() {
             </Table>
           </CardContent>
         </Card>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }

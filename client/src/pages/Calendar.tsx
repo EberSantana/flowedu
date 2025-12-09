@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { CalendarDays, ArrowLeft, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -142,7 +143,7 @@ export default function Calendar() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="container mx-auto py-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -353,8 +354,8 @@ export default function Calendar() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }

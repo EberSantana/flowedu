@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Clock, Plus, Pencil, Trash2, ArrowLeft, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function Shifts() {
   const [, setLocation] = useLocation();
@@ -93,7 +94,7 @@ export default function Shifts() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
         <div className="container mx-auto py-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -240,8 +241,8 @@ export default function Shifts() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }

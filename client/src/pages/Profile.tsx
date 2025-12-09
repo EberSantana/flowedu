@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function Profile() {
   const { user, loading, logout } = useAuth();
@@ -70,7 +71,7 @@ export default function Profile() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
         <div className="container max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -198,8 +199,8 @@ export default function Profile() {
             </CardContent>
           </Card>
         </div>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }

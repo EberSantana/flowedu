@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Users, Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function Classes() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -89,7 +90,7 @@ export default function Classes() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
         <div className="container mx-auto py-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -207,8 +208,8 @@ export default function Classes() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }

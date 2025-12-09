@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { toast } from "sonner";
 import { Plus, ExternalLink, Pencil, Trash2, Search, Star, StarOff, BookOpen } from "lucide-react";
 import Sidebar from "../components/Sidebar";
+import PageWrapper from "../components/PageWrapper";
 
 const CATEGORIES = [
   "Quiz e Avaliação",
@@ -143,7 +144,7 @@ export default function ActiveMethodologies() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <div className="flex-1 lg:ml-64">
+      <PageWrapper className="flex-1">
         <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -279,7 +280,7 @@ export default function ActiveMethodologies() {
         </div>
       )}
         </div>
-      </div>
+      </PageWrapper>
 
       {/* Dialog de Criação */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

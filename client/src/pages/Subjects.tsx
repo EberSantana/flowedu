@@ -13,6 +13,7 @@ import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, Chevr
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function Subjects() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -224,7 +225,7 @@ export default function Subjects() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         <div className="container mx-auto py-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -659,8 +660,8 @@ export default function Subjects() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
-      </div>
+        </div>
+      </PageWrapper>
     </>
   );
 }
