@@ -934,3 +934,10 @@
 - [x] Manter getUpcomingClasses apenas no botão "Ir para Próxima Aula"
 - [x] Adicionar indicador visual de aulas passadas vs futuras (badge "Concluída")
 - [x] Testar comportamento em diferentes horários do dia
+
+## Ajuste de Nomes do Menu Lateral
+- [x] Revisar nomes atuais dos itens do menu
+- [x] Definir versões mais curtas e claras
+- [x] Atualizar componente Sidebar.tsx
+- [x] Testar visualmente em diferentes resoluções
+- [x] Garantir que todos os nomes cabem sem quebrar linha

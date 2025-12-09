@@ -44,27 +44,27 @@ const navItems: NavItem[] = [
     href: "/classes",
   },
   {
-    label: "Turnos e Horários",
+    label: "Turnos",
     icon: <Clock className="h-5 w-5" />,
     href: "/shifts",
   },
   {
-    label: "Grade de Horários",
+    label: "Grade Semanal",
     icon: <Calendar className="h-5 w-5" />,
     href: "/schedule",
   },
   {
-    label: "Calendário Anual",
+    label: "Calendário",
     icon: <CalendarDays className="h-5 w-5" />,
     href: "/calendar",
   },
   {
-    label: "Metodologias Ativas",
+    label: "Metodologias",
     icon: <Lightbulb className="h-5 w-5" />,
     href: "/active-methodologies",
   },
   {
-    label: "Gerenciar Usuários",
+    label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",
     adminOnly: true,
