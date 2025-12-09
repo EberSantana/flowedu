@@ -979,3 +979,8 @@
 - [x] Aplicar PageWrapper em Profile.tsx (Perfil)
 - [x] Aplicar PageWrapper em AdminUsers.tsx (Gerenciar Usuários)
 - [x] Testar todas as páginas em modo compacto/expandido
+
+## Remoção de Campo: URL do Logo em Metodologias Ativas
+- [x] Remover campo logoUrl do formulário de edição (Dialog de Edição)
+- [x] Manter campo logoUrl no formulário de criação
+- [x] Testar edição de metodologias sem o campo

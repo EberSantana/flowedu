@@ -424,15 +424,6 @@ export default function ActiveMethodologies() {
                 rows={2}
               />
             </div>
-            <div>
-              <Label htmlFor="edit-logoUrl">URL do Logo (opcional)</Label>
-              <Input
-                id="edit-logoUrl"
-                type="url"
-                value={formData.logoUrl}
-                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-              />
-            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
