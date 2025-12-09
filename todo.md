@@ -963,3 +963,8 @@
 - [x] Adicionar cores mais vibrantes no hover
 - [x] Otimizar espaçamento entre itens
 - [x] Testar visual em ambos os modos (compacto/expandido)
+
+## Correção de Erro: logoUrl na Página Metodologias Ativas
+- [x] Investigar qual mutation está causando erro de logoUrl
+- [x] Tornar campo logoUrl opcional ou remover validação de URL
+- [x] Testar página de Metodologias Ativas sem erros

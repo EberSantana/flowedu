@@ -676,7 +676,7 @@ export const appRouter = router({
         category: z.string().min(1, "Categoria é obrigatória"),
         url: z.string().url("URL inválida"),
         tips: z.string().optional(),
-        logoUrl: z.string().url().optional(),
+        logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
         isFavorite: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -694,7 +694,7 @@ export const appRouter = router({
         category: z.string().min(1).optional(),
         url: z.string().url().optional(),
         tips: z.string().optional(),
-        logoUrl: z.string().url().optional(),
+        logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
         isFavorite: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
