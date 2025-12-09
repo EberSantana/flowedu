@@ -39,6 +39,7 @@ export default function Dashboard() {
   const { data: classes } = trpc.classes.list.useQuery();
   const { data: scheduledClasses } = trpc.schedule.list.useQuery();
   const { data: upcomingClasses } = trpc.dashboard.getUpcomingClasses.useQuery();
+  const { data: todayClasses } = trpc.dashboard.getTodayClasses.useQuery();
   const { data: upcomingEvents } = trpc.dashboard.getUpcomingEvents.useQuery();
 
   // Calcular total de aulas agendadas
@@ -309,9 +310,9 @@ export default function Dashboard() {
                 <CardDescription className="text-gray-600">Sua programação de aulas para hoje</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                {upcomingClasses && upcomingClasses.length > 0 ? (
+                {todayClasses && todayClasses.length > 0 ? (
                   <div className="space-y-4">
-                    {upcomingClasses.map((cls, idx) => (
+                    {todayClasses.map((cls, idx) => (
                       <div
                         key={idx}
                         className={`group relative overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg ${
@@ -365,6 +366,11 @@ export default function Dashboard() {
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                                   </span>
                                   AGORA
+                                </span>
+                              )}
+                              {cls.isPast && !isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
+                                  Concluída
                                 </span>
                               )}
                             </div>

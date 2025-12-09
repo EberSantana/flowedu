@@ -926,3 +926,11 @@
 - [x] Atualizar interface do botão com informações da próxima aula real
 - [x] Testar com diferentes horários do dia
 - [x] Validar comportamento em finais de semana
+
+## Separação de Widgets: Aulas de Hoje vs Próxima Aula
+- [x] Criar nova rota tRPC getTodayClasses (todas as aulas do dia)
+- [x] Manter rota getUpcomingClasses (apenas próximas aulas futuras)
+- [x] Atualizar Dashboard para usar getTodayClasses no widget "Aulas de Hoje"
+- [x] Manter getUpcomingClasses apenas no botão "Ir para Próxima Aula"
+- [x] Adicionar indicador visual de aulas passadas vs futuras (badge "Concluída")
+- [x] Testar comportamento em diferentes horários do dia

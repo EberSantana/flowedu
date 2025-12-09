@@ -281,6 +281,64 @@ export const appRouter = router({
       return futureClasses.slice(0, 10);
     }),
     
+    getTodayClasses: protectedProcedure.query(async ({ ctx }) => {
+      const [scheduledClasses, subjects, classes, timeSlots, calendarEvents] = await Promise.all([
+        db.getScheduledClassesByUserId(ctx.user.id),
+        db.getSubjectsByUserId(ctx.user.id),
+        db.getClassesByUserId(ctx.user.id),
+        db.getTimeSlotsByUserId(ctx.user.id),
+        db.getCalendarEventsByUser(ctx.user.id),
+      ]);
+
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+      
+      // Buscar apenas aulas do dia atual (todas, passadas e futuras)
+      const todayClasses = [];
+      const checkDate = new Date(now);
+      const dayOfWeek = checkDate.getDay();
+      const dateStr = checkDate.toISOString().split('T')[0];
+      
+      // Verificar se é feriado
+      const holiday = calendarEvents.find(
+        e => e.eventDate === dateStr && e.eventType === 'holiday'
+      );
+      
+      // Buscar aulas agendadas para hoje
+      const dayClasses = scheduledClasses.filter(sc => sc.dayOfWeek === dayOfWeek);
+      
+      for (const sc of dayClasses) {
+        const subject = subjects.find(s => s.id === sc.subjectId);
+        const classInfo = classes.find(c => c.id === sc.classId);
+        const timeSlot = timeSlots.find(ts => ts.id === sc.timeSlotId);
+        
+        if (subject && classInfo && timeSlot) {
+          todayClasses.push({
+            id: sc.id,
+            date: dateStr,
+            dayOfWeek: daysOfWeek[dayOfWeek],
+            startTime: timeSlot.startTime,
+            endTime: timeSlot.endTime,
+            subjectName: subject.name,
+            subjectColor: subject.color,
+            className: classInfo.name,
+            isHoliday: !!holiday,
+            holidayName: holiday?.title || null,
+            notes: sc.notes,
+            googleClassroomUrl: subject.googleClassroomUrl,
+            googleDriveUrl: subject.googleDriveUrl,
+            isPast: timeSlot.endTime < currentTime, // Marcar se a aula já passou
+          });
+        }
+      }
+      
+      // Ordenar por horário
+      todayClasses.sort((a, b) => a.startTime.localeCompare(b.startTime));
+      
+      return todayClasses;
+    }),
+    
     getUpcomingEvents: protectedProcedure.query(async ({ ctx }) => {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
