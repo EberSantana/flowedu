@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 // Versículos inspiradores da Bíblia NVI para cada dia do ano
 const DAILY_VERSES = [
@@ -38,6 +39,7 @@ const DAILY_VERSES = [
 
 export default function BibleFooter() {
   const [verse, setVerse] = useState(DAILY_VERSES[0]);
+  const { isCompact } = useSidebarContext();
 
   useEffect(() => {
     // Calcula o dia do ano (1-365) para selecionar o versículo
@@ -53,7 +55,9 @@ export default function BibleFooter() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 border-t border-slate-200 py-6 mt-12 lg:ml-64">
+    <footer className={`bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 border-t border-slate-200 py-6 mt-12 transition-all duration-300 ${
+      isCompact ? 'lg:ml-16' : 'lg:ml-64'
+    }`}>
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="flex flex-col items-center justify-center space-y-3">
           <div className="flex items-center gap-2">

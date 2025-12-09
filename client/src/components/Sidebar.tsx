@@ -126,7 +126,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-screen bg-card border-r border-border z-40
+          fixed top-0 left-0 h-screen bg-gradient-to-b from-card via-card to-card/95 border-r border-border/50 shadow-xl z-40
           transition-all duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
@@ -135,17 +135,21 @@ export default function Sidebar() {
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className={`border-b border-border transition-all duration-300 ${
+          <div className={`border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent transition-all duration-300 ${
             isCompact ? 'p-3' : 'p-6'
           }`}>
             {isCompact ? (
               <div className="flex justify-center">
-                <Sun className="h-6 w-6 text-primary" />
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Sun className="h-6 w-6 text-primary" />
+                </div>
               </div>
             ) : (
               <>
                 <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <Sun className="h-6 w-6 text-primary" />
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Sun className="h-5 w-5 text-primary" />
+                  </div>
                   Sistema de Gestão
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -156,22 +160,22 @@ export default function Sidebar() {
           </div>
           
           {/* Toggle Button */}
-          <div className={`border-b border-border ${
+          <div className={`border-b border-border/50 ${
             isCompact ? 'p-2' : 'p-4'
           }`}>
             <button
               onClick={() => setIsCompact(!isCompact)}
-              className={`hidden lg:flex items-center justify-center w-full py-2 rounded-lg hover:bg-accent transition-colors ${
+              className={`hidden lg:flex items-center justify-center w-full py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-sm transition-all duration-200 ${
                 isCompact ? 'px-0' : 'px-4 gap-2'
               }`}
               title={isCompact ? 'Expandir menu' : 'Compactar menu'}
             >
               {isCompact ? (
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
               ) : (
                 <>
-                  <ChevronLeft className="h-5 w-5" />
-                  <span className="text-sm font-medium">Compactar</span>
+                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Compactar</span>
                 </>
               )}
             </button>
@@ -190,12 +194,12 @@ export default function Sidebar() {
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`
-                        flex items-center rounded-lg
+                        flex items-center rounded-xl
                         transition-all duration-200
                         ${
                           isActive
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-foreground hover:bg-accent hover:text-accent-foreground"
+                            ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+                            : "text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md"
                         }
                         ${
                           isCompact 
@@ -233,7 +237,7 @@ export default function Sidebar() {
           </TooltipProvider>
 
           {/* User Section */}
-          <div className={`border-t border-border transition-all duration-300 ${
+          <div className={`border-t border-border/50 bg-gradient-to-r from-primary/5 to-transparent transition-all duration-300 ${
             isCompact ? 'p-2' : 'p-4'
           }`}>
             {isCompact ? (
@@ -258,7 +262,7 @@ export default function Sidebar() {
                       <Link
                         href="/profile"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="p-2 rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground transition-colors group"
+                        className="p-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200 group"
                       >
                         <span className="inline-block transition-transform duration-200 group-hover:scale-110">
                           <User className="h-4 w-4" />
@@ -274,7 +278,7 @@ export default function Sidebar() {
                     <TooltipTrigger asChild>
                       <button
                         onClick={handleLogout}
-                        className="p-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors group"
+                        className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
                       >
                         <span className="inline-block transition-transform duration-200 group-hover:scale-110">
                           <LogOut className="h-4 w-4" />
@@ -307,7 +311,7 @@ export default function Sidebar() {
                   <Link
                     href="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                    className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200"
                   >
                     <User className="h-4 w-4" />
                     <span className="text-sm">Meu Perfil</span>
@@ -315,7 +319,7 @@ export default function Sidebar() {
                   
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200"
                   >
                     <LogOut className="h-4 w-4" />
                     <span className="text-sm">Sair</span>

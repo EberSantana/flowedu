@@ -955,3 +955,11 @@
 - [x] Adicionar classe CSS com animação pulse (scale 1.1)
 - [x] Aplicar animação apenas no hover do modo compacto
 - [x] Testar suavidade e profissionalismo da animação
+
+## Ajuste do Devocional (BibleFooter) e Embelezamento do Menu
+- [x] Fazer BibleFooter usar contexto da sidebar para ajustar padding
+- [x] Adicionar gradientes sutis nos itens ativos do menu
+- [x] Melhorar sombras e border radius
+- [x] Adicionar cores mais vibrantes no hover
+- [x] Otimizar espaçamento entre itens
+- [x] Testar visual em ambos os modos (compacto/expandido)
