@@ -950,3 +950,8 @@
 - [x] Salvar preferência no localStorage
 - [x] Ajustar padding do conteúdo principal (lg:ml-64 vs lg:ml-16)
 - [x] Testar responsividade em diferentes resoluções
+
+## Animação Pulse nos Ícones (Modo Compacto)
+- [x] Adicionar classe CSS com animação pulse (scale 1.1)
+- [x] Aplicar animação apenas no hover do modo compacto
+- [x] Testar suavidade e profissionalismo da animação

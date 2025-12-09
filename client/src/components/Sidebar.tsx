@@ -199,12 +199,14 @@ export default function Sidebar() {
                         }
                         ${
                           isCompact 
-                            ? 'justify-center p-3' 
+                            ? 'justify-center p-3 group' 
                             : 'gap-3 px-4 py-3'
                         }
                       `}
                     >
-                      {item.icon}
+                      <span className={isCompact ? 'transition-transform duration-200 group-hover:scale-110' : ''}>
+                        {item.icon}
+                      </span>
                       {!isCompact && <span className="font-medium">{item.label}</span>}
                     </Link>
                   );
@@ -256,9 +258,11 @@ export default function Sidebar() {
                       <Link
                         href="/profile"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="p-2 rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                        className="p-2 rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground transition-colors group"
                       >
-                        <User className="h-4 w-4" />
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                          <User className="h-4 w-4" />
+                        </span>
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent side="right">
@@ -270,9 +274,11 @@ export default function Sidebar() {
                     <TooltipTrigger asChild>
                       <button
                         onClick={handleLogout}
-                        className="p-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+                        className="p-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors group"
                       >
-                        <LogOut className="h-4 w-4" />
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                          <LogOut className="h-4 w-4" />
+                        </span>
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
