@@ -941,3 +941,12 @@
 - [x] Atualizar componente Sidebar.tsx
 - [x] Testar visualmente em diferentes resoluções
 - [x] Garantir que todos os nomes cabem sem quebrar linha
+
+## Modo Compacto para Sidebar
+- [x] Adicionar estado isCompact e botão de toggle
+- [x] Implementar estilos CSS para modo compacto (64px) vs expandido (256px)
+- [x] Adicionar animações suaves de transição
+- [x] Implementar tooltips para mostrar nomes no modo compacto
+- [x] Salvar preferência no localStorage
+- [x] Ajustar padding do conteúdo principal (lg:ml-64 vs lg:ml-16)
+- [x] Testar responsividade em diferentes resoluções

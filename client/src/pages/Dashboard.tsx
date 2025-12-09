@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import {
@@ -98,7 +99,7 @@ export default function Dashboard() {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen bg-gray-50 lg:ml-64">
+      <PageWrapper className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
           <div className="mb-8">
@@ -547,7 +548,7 @@ export default function Dashboard() {
             </Card>
           )}
         </div>
-      </div>
+      </PageWrapper>
     </>
   );
 }
