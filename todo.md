@@ -1073,3 +1073,15 @@
 - [x] Gerar eventos para 16 semanas (1 semestre)
 - [x] Incluir campos obrigatórios (SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION)
 - [x] Adicionar compatibilidade com Microsoft Outlook (BUSYSTATUS)
+
+## Widgets Móveis/Arrastáveis e Melhorias de Visualização
+- [ ] Implementar sistema de drag & drop nativo (HTML5 API)
+- [ ] Adicionar botões de reordenar widgets (setas)
+- [ ] Salvar ordem/posição dos widgets no localStorage
+- [x] Melhorar espaçamento interno dos widgets (padding pb-4)
+- [x] Aumentar tamanho das fontes (text-xl títulos, text-5xl contador, text-base conteúdo)
+- [x] Melhorar contraste de cores (text-gray-900/700)
+- [x] Adicionar sombras suaves (shadow-md padrão, hover:shadow-xl)
+- [x] Adicionar gradientes nos cabeçalhos (from-color-50 to-white)
+- [x] Aumentar tamanho dos ícones (h-6 w-6)
+- [x] Melhorar destaque da informação da próxima aula (gradiente teal)
