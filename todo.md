@@ -1172,3 +1172,10 @@
 - [x] Ajustar contraste de textos para melhor legibilidade
 - [x] Garantir harmonia visual entre todos os widgets
 - [x] Testar acessibilidade e contraste de cores
+
+
+## Ajuste de Espaçamento Vertical entre Widgets
+- [x] Aumentar gap vertical entre seções de widgets (gap-4 → gap-6)
+- [x] Ajustar margin-bottom entre grupos de widgets (mb-6 md:mb-8 → mb-8)
+- [x] Melhorar respiração visual geral do Dashboard
+- [x] Testar em diferentes resoluções de tela

@@ -520,7 +520,7 @@ export default function Dashboard() {
 
           {/* Cards de Métricas Principais */}
           {widgetVisibility.stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
             {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
@@ -605,7 +605,7 @@ export default function Dashboard() {
           )}
 
           {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-8">
             {/* Ações Rápidas */}
             {widgetVisibility.quickActions && (
             <Card className="overflow-hidden">
@@ -993,7 +993,7 @@ export default function Dashboard() {
           {/* ===== NOVOS WIDGETS ===== */}
           
           {/* Grid dos Novos Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
