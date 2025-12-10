@@ -1215,3 +1215,28 @@
 - [x] Adicionar tooltips nos botões (title attribute)
 - [x] Aplicar em todos os 4 widgets (Próxima Aula, Tarefas, Prazos, Progresso)
 - [ ] Testar em dispositivos móveis
+
+
+## Refatoração Completa: Drag-and-Drop Funcional
+- [ ] Criar função renderWidget() que retorna JSX de cada widget
+- [ ] Refatorar Dashboard para mapear widgetOrder.map()
+- [ ] Envolver cada widget com Draggable do @hello-pangea/dnd
+- [ ] Adicionar DragDropContext e Droppable no grid
+- [ ] Implementar onDragEnd para reordenar array
+- [ ] Remover TODOS os botões de setas (←, →, ↓)
+- [ ] Adicionar ícone de arraste (GripVertical) em cada widget
+- [ ] Testar drag-and-drop em desktop
+- [ ] Testar drag-and-drop em mobile/touch
+- [ ] Adicionar feedback visual durante arraste
+
+
+## Melhoria Visual dos Botões de Reordenação
+- [x] Aumentar tamanho dos ícones (h-4 w-4 → h-5 w-5)
+- [x] Melhorar posicionamento (grupo de botões com fundo semi-transparente)
+- [x] Adicionar cores aos botões baseadas no tema do widget (teal, purple, orange, indigo)
+- [x] Implementar animações suaves (transition-all duration-200)
+- [x] Adicionar tooltips mais descritivos
+- [x] Melhorar espaçamento entre botões (gap-2)
+- [x] Adicionar sombra sutil e backdrop-blur nos botões
+- [x] Aplicar em todos os 4 widgets personalizáveis
+- [ ] Testar usabilidade em mobile

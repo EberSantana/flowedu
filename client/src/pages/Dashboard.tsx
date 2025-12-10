@@ -1027,45 +1027,45 @@ export default function Dashboard() {
                       <Timer className="h-4 w-4 text-teal-600" />
                       Próxima Aula
                     </CardTitle>
-                    <div className="flex gap-1">
+                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetLeft('timeToNextClass')}
                         disabled={widgetOrder.indexOf('timeToNextClass') === 0}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
-                        title="Mover para esquerda"
+                        className="h-8 w-8 p-0 hover:bg-teal-50 hover:text-teal-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Mover para esquerda (Shift + ←)"
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-5 w-5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetRight('timeToNextClass')}
                         disabled={widgetOrder.indexOf('timeToNextClass') === widgetOrder.length - 1}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
-                        title="Mover para direita"
+                        className="h-8 w-8 p-0 hover:bg-teal-50 hover:text-teal-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Mover para direita (Shift + →)"
                       >
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-5 w-5" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
-                            title="Mais opções"
+                            className="h-8 w-8 p-0 hover:bg-teal-50 hover:text-teal-600 transition-all duration-200"
+                            title="Mais opções de reordenação"
                           >
-                            <ArrowDown className="h-4 w-4" />
+                            <ArrowDown className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('timeToNextClass')}>
-                            <ChevronsLeft className="h-4 w-4 mr-2" />
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => moveWidgetToStart('timeToNextClass')} className="cursor-pointer">
+                            <ChevronsLeft className="h-4 w-4 mr-2 text-teal-600" />
                             Mover para início
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('timeToNextClass')}>
-                            <ChevronsRight className="h-4 w-4 mr-2" />
+                          <DropdownMenuItem onClick={() => moveWidgetToEnd('timeToNextClass')} className="cursor-pointer">
+                            <ChevronsRight className="h-4 w-4 mr-2 text-teal-600" />
                             Mover para fim
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1148,45 +1148,45 @@ export default function Dashboard() {
                       <CheckSquare className="h-4 w-4 text-purple-600" />
                       Tarefas Pendentes
                     </CardTitle>
-                    <div className="flex gap-1">
+                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetLeft('todoList')}
                         disabled={widgetOrder.indexOf('todoList') === 0}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                        className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Mover para esquerda"
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-5 w-5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetRight('todoList')}
                         disabled={widgetOrder.indexOf('todoList') === widgetOrder.length - 1}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                        className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Mover para direita"
                       >
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-5 w-5" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                            className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200"
                             title="Mais opções"
                           >
-                            <ArrowDown className="h-4 w-4" />
+                            <ArrowDown className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('todoList')}>
-                            <ChevronsLeft className="h-4 w-4 mr-2" />
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => moveWidgetToStart('todoList')} className="cursor-pointer">
+                            <ChevronsLeft className="h-4 w-4 mr-2 text-purple-600" />
                             Mover para início
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('todoList')}>
-                            <ChevronsRight className="h-4 w-4 mr-2" />
+                          <DropdownMenuItem onClick={() => moveWidgetToEnd('todoList')} className="cursor-pointer">
+                            <ChevronsRight className="h-4 w-4 mr-2 text-purple-600" />
                             Mover para fim
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1274,45 +1274,45 @@ export default function Dashboard() {
                       <Bell className="h-4 w-4 text-orange-600" />
                       Prazos Importantes
                     </CardTitle>
-                    <div className="flex gap-1">
+                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetLeft('importantDeadlines')}
                         disabled={widgetOrder.indexOf('importantDeadlines') === 0}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                        className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Mover para esquerda"
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-5 w-5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetRight('importantDeadlines')}
                         disabled={widgetOrder.indexOf('importantDeadlines') === widgetOrder.length - 1}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                        className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Mover para direita"
                       >
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-5 w-5" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                            className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200"
                             title="Mais opções"
                           >
-                            <ArrowDown className="h-4 w-4" />
+                            <ArrowDown className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('importantDeadlines')}>
-                            <ChevronsLeft className="h-4 w-4 mr-2" />
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => moveWidgetToStart('importantDeadlines')} className="cursor-pointer">
+                            <ChevronsLeft className="h-4 w-4 mr-2 text-orange-600" />
                             Mover para início
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('importantDeadlines')}>
-                            <ChevronsRight className="h-4 w-4 mr-2" />
+                          <DropdownMenuItem onClick={() => moveWidgetToEnd('importantDeadlines')} className="cursor-pointer">
+                            <ChevronsRight className="h-4 w-4 mr-2 text-orange-600" />
                             Mover para fim
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1408,45 +1408,45 @@ export default function Dashboard() {
                       <TrendingUp className="h-4 w-4 text-indigo-600" />
                       Progresso Semanal
                     </CardTitle>
-                    <div className="flex gap-1">
+                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetLeft('weeklyProgress')}
                         disabled={widgetOrder.indexOf('weeklyProgress') === 0}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                        className="h-8 w-8 p-0 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Mover para esquerda"
                       >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-5 w-5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => moveWidgetRight('weeklyProgress')}
                         disabled={widgetOrder.indexOf('weeklyProgress') === widgetOrder.length - 1}
-                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                        className="h-8 w-8 p-0 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Mover para direita"
                       >
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-5 w-5" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
+                            className="h-8 w-8 p-0 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200"
                             title="Mais opções"
                           >
-                            <ArrowDown className="h-4 w-4" />
+                            <ArrowDown className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('weeklyProgress')}>
-                            <ChevronsLeft className="h-4 w-4 mr-2" />
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => moveWidgetToStart('weeklyProgress')} className="cursor-pointer">
+                            <ChevronsLeft className="h-4 w-4 mr-2 text-indigo-600" />
                             Mover para início
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('weeklyProgress')}>
-                            <ChevronsRight className="h-4 w-4 mr-2" />
+                          <DropdownMenuItem onClick={() => moveWidgetToEnd('weeklyProgress')} className="cursor-pointer">
+                            <ChevronsRight className="h-4 w-4 mr-2 text-indigo-600" />
                             Mover para fim
                           </DropdownMenuItem>
                         </DropdownMenuContent>
