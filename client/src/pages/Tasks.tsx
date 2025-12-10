@@ -5,7 +5,6 @@ import PageWrapper from "../components/PageWrapper";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import {
   Select,
   SelectContent,
@@ -19,10 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogDescription,
 } from "../components/ui/dialog";
-import { Label } from "../components/ui/label";
+
 import {
   Plus,
   Search,
@@ -32,7 +29,8 @@ import {
   Circle,
   Trash2,
   Edit,
-  CheckSquare,
+  Filter,
+  X,
 } from "lucide-react";
 
 type Priority = "low" | "medium" | "high";
@@ -254,192 +252,194 @@ export default function Tasks() {
   };
 
   return (
-    <>
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50">
-        <div className="container mx-auto py-8">
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 py-6">
           {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <CheckSquare className="h-8 w-8 text-teal-600" />
-                Gerenciar Tarefas
-              </h1>
-            </div>
-            <Dialog
-              open={isCreateDialogOpen}
-              onOpenChange={(open) => {
-                setIsCreateDialogOpen(open);
-                if (!open) {
-                  setEditingTask(null);
-                  resetForm();
-                }
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button size="lg">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nova Tarefa
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingTask ? "Editar Tarefa" : "Nova Tarefa"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {editingTask ? "Atualize as informações da tarefa" : "Crie uma nova tarefa para organizar suas atividades"}
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">Título *</Label>
-                    <Input
-                      id="title"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Ex: Preparar aula de matemática"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="description">Descrição</Label>
-                    <Textarea
-                      id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Detalhes adicionais sobre a tarefa..."
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="priority">Prioridade</Label>
-                      <Select
-                        value={priority}
-                        onValueChange={(value) => setPriority(value as Priority)}
-                      >
-                        <SelectTrigger id="priority">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">Baixa</SelectItem>
-                          <SelectItem value="medium">Média</SelectItem>
-                          <SelectItem value="high">Alta</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="category">Categoria</Label>
-                      <Input
-                        id="category"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        placeholder="Ex: Aulas, Administrativo"
-                        list="categories-list"
-                      />
-                      <datalist id="categories-list">
-                        {categories.map((cat) => (
-                          <option key={cat} value={cat} />
-                        ))}
-                      </datalist>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="dueDate">Prazo</Label>
-                      <Input
-                        id="dueDate"
-                        type="date"
-                        value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setIsCreateDialogOpen(false);
-                        setEditingTask(null);
-                        resetForm();
-                      }}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={createTask.isPending || updateTask.isPending}
-                    >
-                      {editingTask ? "Salvar" : "Criar"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Gerenciamento de Tarefas
+            </h1>
+            <p className="text-sm text-gray-600">
+              Organize suas atividades e acompanhe seu progresso
+            </p>
           </div>
 
-          {/* Barra de Filtros e Busca */}
-          <Card className="mb-6 bg-white shadow-md">
-            <CardContent className="p-4">
+          {/* Barra de Ações */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+            <div className="flex flex-col lg:flex-row gap-4">
               {/* Busca */}
-              <div className="mb-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Buscar tarefas..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar tarefas..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
               </div>
 
-              {/* Filtros Rápidos */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Button
-                  variant={filter === "all" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter("all")}
-                >
-                  Todas
-                </Button>
-                <Button
-                  variant={filter === "today" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter("today")}
-                >
-                  Hoje
-                </Button>
-                <Button
-                  variant={filter === "week" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter("week")}
-                >
-                  Esta Semana
-                </Button>
-                <Button
-                  variant={filter === "pending" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter("pending")}
-                >
-                  Pendentes
-                </Button>
-                <Button
-                  variant={filter === "completed" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter("completed")}
-                >
-                  Concluídas
-                </Button>
-              </div>
+              {/* Botão Criar */}
+              <Dialog
+                open={isCreateDialogOpen}
+                onOpenChange={(open) => {
+                  setIsCreateDialogOpen(open);
+                  if (!open) {
+                    setEditingTask(null);
+                    resetForm();
+                  }
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Tarefa
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingTask ? "Editar Tarefa" : "Nova Tarefa"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                        Título *
+                      </label>
+                      <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Ex: Preparar aula de matemática"
+                        required
+                      />
+                    </div>
 
-              {/* Filtros Avançados */}
-              <div className="flex flex-wrap gap-2">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                        Descrição
+                      </label>
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Detalhes adicionais sobre a tarefa..."
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          Prioridade
+                        </label>
+                        <Select
+                          value={priority}
+                          onValueChange={(value) => setPriority(value as Priority)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">Baixa</SelectItem>
+                            <SelectItem value="medium">Média</SelectItem>
+                            <SelectItem value="high">Alta</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          Categoria
+                        </label>
+                        <Input
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          placeholder="Ex: Aulas, Administrativo"
+                          list="categories-list"
+                        />
+                        <datalist id="categories-list">
+                          {categories.map((cat) => (
+                            <option key={cat} value={cat} />
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          Prazo
+                        </label>
+                        <Input
+                          type="date"
+                          value={dueDate}
+                          onChange={(e) => setDueDate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setIsCreateDialogOpen(false);
+                          setEditingTask(null);
+                          resetForm();
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={createTask.isPending || updateTask.isPending}
+                      >
+                        {editingTask ? "Salvar" : "Criar"}
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Filtros */}
+            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200">
+              <Button
+                variant={filter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter("all")}
+              >
+                Todas
+              </Button>
+              <Button
+                variant={filter === "today" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter("today")}
+              >
+                Hoje
+              </Button>
+              <Button
+                variant={filter === "week" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter("week")}
+              >
+                Esta Semana
+              </Button>
+              <Button
+                variant={filter === "pending" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter("pending")}
+              >
+                Pendentes
+              </Button>
+              <Button
+                variant={filter === "completed" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter("completed")}
+              >
+                Concluídas
+              </Button>
+
+              <div className="ml-auto flex gap-2">
                 <Select
                   value={selectedPriority}
                   onValueChange={(value) =>
@@ -474,148 +474,138 @@ export default function Tasks() {
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Lista de Tarefas */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-teal-600 border-r-transparent"></div>
-              <p className="mt-2 text-sm text-gray-600">Carregando tarefas...</p>
-            </div>
-          ) : filteredTasks.length === 0 ? (
-            <Card className="bg-white shadow-lg">
-              <CardContent className="py-12 text-center">
-                <CheckCircle2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-base font-medium text-gray-900 mb-2">
+          <div className="space-y-3">
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+                <p className="mt-2 text-sm text-gray-600">Carregando tarefas...</p>
+              </div>
+            ) : filteredTasks.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <CheckCircle2 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                <h3 className="text-base font-medium text-gray-900 mb-1">
                   Nenhuma tarefa encontrada
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-600">
                   {searchQuery || selectedPriority !== "all" || selectedCategory !== "all"
                     ? "Tente ajustar os filtros ou criar uma nova tarefa"
                     : "Comece criando sua primeira tarefa"}
                 </p>
-                {!searchQuery && selectedPriority === "all" && selectedCategory === "all" && (
-                  <Button onClick={() => setIsCreateDialogOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Criar Primeira Tarefa
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              <div className="space-y-3">
-                {filteredTasks.map((task) => (
-                  <Card
-                    key={task.id}
-                    className={`bg-white shadow-md hover:shadow-lg transition-all duration-200 border-l-4 ${
-                      task.completed
-                        ? "border-l-gray-300 opacity-60"
-                        : getPriorityColor(task.priority).split(" ")[2].replace("border-", "border-l-")
-                    }`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        {/* Checkbox */}
-                        <button
-                          onClick={() => handleToggleComplete(task.id)}
-                          className="mt-1 flex-shrink-0 transition-transform hover:scale-110"
-                        >
-                          {task.completed ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <Circle className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                          )}
-                        </button>
+              </div>
+            ) : (
+              filteredTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`bg-white rounded-lg shadow-sm border-l-4 p-4 transition-all duration-200 hover:shadow-md ${
+                    task.completed
+                      ? "border-gray-300 opacity-60"
+                      : getPriorityColor(task.priority).split(" ")[2].replace("border-", "border-l-")
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Checkbox */}
+                    <button
+                      onClick={() => handleToggleComplete(task.id)}
+                      className="mt-1 flex-shrink-0 transition-transform hover:scale-110"
+                    >
+                      {task.completed ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
 
-                        {/* Conteúdo */}
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            className={`text-base font-medium mb-1 ${
-                              task.completed
-                                ? "line-through text-gray-500"
-                                : "text-gray-900"
+                    {/* Conteúdo */}
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className={`text-base font-medium mb-1 ${
+                          task.completed
+                            ? "line-through text-gray-500"
+                            : "text-gray-900"
+                        }`}
+                      >
+                        {task.title}
+                      </h3>
+
+                      {task.description && (
+                        <p className="text-sm text-gray-600 mb-2">
+                          {task.description}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap gap-2 items-center">
+                        {/* Prioridade */}
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityColor(
+                            task.priority
+                          )}`}
+                        >
+                          {getPriorityLabel(task.priority)}
+                        </span>
+
+                        {/* Categoria */}
+                        {task.category && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                            <Tag className="h-3 w-3" />
+                            {task.category}
+                          </span>
+                        )}
+
+                        {/* Data */}
+                        {task.dueDate && (
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                              isOverdue(task.dueDate) && !task.completed
+                                ? "bg-red-50 text-red-700 border border-red-200"
+                                : "bg-gray-50 text-gray-700 border border-gray-200"
                             }`}
                           >
-                            {task.title}
-                          </h3>
-
-                          {task.description && (
-                            <p className="text-sm text-gray-600 mb-2">
-                              {task.description}
-                            </p>
-                          )}
-
-                          <div className="flex flex-wrap gap-2 items-center">
-                            {/* Prioridade */}
-                            <span
-                              className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityColor(
-                                task.priority
-                              )}`}
-                            >
-                              {getPriorityLabel(task.priority)}
-                            </span>
-
-                            {/* Categoria */}
-                            {task.category && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                <Tag className="h-3 w-3" />
-                                {task.category}
-                              </span>
-                            )}
-
-                            {/* Data */}
-                            {task.dueDate && (
-                              <span
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
-                                  isOverdue(task.dueDate) && !task.completed
-                                    ? "bg-red-50 text-red-700 border border-red-200"
-                                    : "bg-gray-50 text-gray-700 border border-gray-200"
-                                }`}
-                              >
-                                <Calendar className="h-3 w-3" />
-                                {formatDate(task.dueDate)}
-                                {isOverdue(task.dueDate) && !task.completed && " (Atrasada)"}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Ações */}
-                        <div className="flex gap-1 flex-shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(task)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Edit className="h-4 w-4 text-gray-600" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(task.id, task.title)}
-                            className="h-8 w-8 p-0 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </div>
+                            <Calendar className="h-3 w-3" />
+                            {formatDate(task.dueDate)}
+                            {isOverdue(task.dueDate) && !task.completed && " (Atrasada)"}
+                          </span>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    </div>
 
-              {/* Contador */}
-              <div className="mt-6 text-center text-sm text-gray-600">
-                {filteredTasks.filter((t) => !t.completed).length} pendente(s) de{" "}
-                {filteredTasks.length} tarefa(s)
-              </div>
-            </>
+                    {/* Ações */}
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(task)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit className="h-4 w-4 text-gray-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(task.id, task.title)}
+                        className="h-8 w-8 p-0 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Contador */}
+          {filteredTasks.length > 0 && (
+            <div className="mt-6 text-center text-sm text-gray-600">
+              {filteredTasks.filter((t) => !t.completed).length} pendente(s) de{" "}
+              {filteredTasks.length} tarefa(s)
+            </div>
           )}
         </div>
       </PageWrapper>
-    </>
+    </div>
   );
 }
