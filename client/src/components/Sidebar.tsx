@@ -14,7 +14,8 @@ import {
   X,
   Lightbulb,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -71,6 +72,11 @@ const navItems: NavItem[] = [
     label: "Metodologias",
     icon: <Lightbulb className="h-5 w-5" />,
     href: "/active-methodologies",
+  },
+  {
+    label: "Tarefas",
+    icon: <CheckSquare className="h-5 w-5" />,
+    href: "/tasks",
   },
   {
     label: "Usuários",

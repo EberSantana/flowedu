@@ -15,6 +15,7 @@ import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import AdminUsers from "./pages/AdminUsers";
 import ActiveMethodologies from "./pages/ActiveMethodologies";
+import Tasks from "./pages/Tasks";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 
@@ -30,6 +31,7 @@ function Router() {
         <Route path={"/schedule"} component={Schedule} />
         <Route path={"/calendar"} component={Calendar} />
         <Route path={"/active-methodologies"} component={ActiveMethodologies} />
+        <Route path={"/tasks"} component={Tasks} />
         <Route path={"/profile"} component={Profile} />
         <Route path={"/admin/users"} component={AdminUsers} />
         <Route path={"/404"} component={NotFound} />

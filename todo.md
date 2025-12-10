@@ -1260,3 +1260,47 @@
 - [ ] Simplificar CardHeader dos widgets
 - [ ] Remover seção de reordenação do painel de personalização
 - [ ] Definir ordem fixa padrão dos widgets
+
+
+## Sistema de Gerenciamento de Tarefas (Todoist-style) ✅ CONCLUÍDO
+- [x] Criar tabela tasks no banco de dados
+- [x] Adicionar schema tasks no Drizzle (id, userId, title, description, priority, category, dueDate, completed, completedAt, orderIndex, createdAt, updatedAt)
+- [x] Criar funções CRUD no db.ts (createTask, getAllTasks, getTasksByFilter, updateTask, toggleTaskComplete, deleteTask, getTaskCategories)
+- [x] Implementar rotas tRPC completas (create, getAll, getByFilter, update, toggleComplete, delete, getCategories)
+- [x] Criar página Tasks.tsx com interface moderna estilo Todoist
+- [x] Implementar filtros (Todas, Hoje, Esta Semana, Pendentes, Concluídas)
+- [x] Adicionar filtros por prioridade (Alta/Média/Baixa) e categoria
+- [x] Implementar busca em tempo real por título e descrição
+- [x] Adicionar prioridades coloridas (Alta=vermelho, Média=amarelo, Baixa=verde)
+- [x] Implementar badges de categoria e prazo
+- [x] Adicionar indicadores de tarefas atrasadas
+- [x] Implementar toggle de conclusão com animação
+- [x] Criar formulário completo de criação/edição
+- [x] Adicionar validações de campos obrigatórios
+- [x] Implementar feedback visual (alerts)
+- [x] Adicionar contador de tarefas pendentes
+- [x] Implementar isolamento de dados por usuário
+- [x] Adicionar rota /tasks no App.tsx
+- [x] Adicionar botão "Tarefas" nas Ações Rápidas do Dashboard
+- [x] Adicionar item "Tarefas" no menu da Sidebar
+- [x] Criar 20 testes automatizados cobrindo todas as funcionalidades
+- [x] Validar criação, leitura, atualização e deleção de tarefas
+- [x] Testar filtros por status, prioridade e categoria
+- [x] Testar toggle de conclusão e timestamps
+- [x] Testar isolamento de dados entre usuários
+- [x] Todos os testes passando (20/20 - 100%)
+
+**Funcionalidades Implementadas:**
+- Interface limpa e moderna com design profissional
+- Filtros rápidos (Todas, Hoje, Esta Semana, Pendentes, Concluídas)
+- Filtros avançados por prioridade e categoria
+- Busca em tempo real
+- Prioridades visuais coloridas (vermelho/amarelo/verde)
+- Badges de categoria e prazo
+- Indicadores de tarefas atrasadas
+- Toggle rápido de conclusão
+- Formulário completo com validação
+- Contador de tarefas pendentes
+- Isolamento total de dados por usuário
+- Integração completa com Dashboard e Sidebar
+- 20 testes automatizados (100% passando)
