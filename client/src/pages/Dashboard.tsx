@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useWidgetTheme } from "@/contexts/WidgetThemeContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ArrowLeft, ArrowUp, ArrowDown, ChevronsLeft, ChevronsRight, TrendingUp } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ArrowLeft, ArrowUp, ArrowDown, ChevronsLeft, ChevronsRight, TrendingUp, Palette } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -44,6 +45,7 @@ const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { theme, setTheme, getAllThemes } = useWidgetTheme();
   const { data: subjects, isLoading: isLoadingSubjects } = trpc.subjects.list.useQuery();
   const { data: classes, isLoading: isLoadingClasses } = trpc.classes.list.useQuery();
   const { data: scheduledClasses, isLoading: isLoadingSchedule } = trpc.schedule.list.useQuery();
@@ -407,6 +409,40 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Seletor de Tema */}
+                <div className="mb-6 pb-6 border-b">
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <Palette className="h-4 w-4" />
+                    Tema de Cores
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {getAllThemes().map(({ key, colors }) => (
+                      <button
+                        key={key}
+                        onClick={() => setTheme(key)}
+                        className={`p-3 rounded-lg border-2 transition-all text-left ${
+                          theme === key
+                            ? `bg-${key === 'blue' ? 'blue' : key === 'green' ? 'green' : key === 'purple' ? 'purple' : 'orange'}-50 ${colors.border} ${colors.icon}`
+                            : 'bg-gray-50 border-gray-300 text-gray-600 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`w-4 h-4 rounded-full ${
+                            key === 'blue' ? 'bg-blue-500' :
+                            key === 'green' ? 'bg-green-500' :
+                            key === 'purple' ? 'bg-purple-500' :
+                            'bg-orange-500'
+                          }`} />
+                          <span className="text-sm font-medium">{colors.name}</span>
+                        </div>
+                        <p className="text-xs opacity-75">{colors.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Visibilidade de Widgets */}
+                <h3 className="text-sm font-semibold mb-3">Visibilidade de Widgets</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   <button
                     onClick={() => toggleWidget('stats')}
@@ -1018,13 +1054,23 @@ export default function Dashboard() {
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
               <Card 
-                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
+                className={`border-l-4 ${
+                  theme === 'blue' ? 'border-l-blue-500' :
+                  theme === 'green' ? 'border-l-green-500' :
+                  theme === 'purple' ? 'border-l-purple-500' :
+                  'border-l-orange-500'
+                } hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]`}
                 style={{ order: widgetOrder.indexOf('timeToNextClass') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <Timer className="h-4 w-4 text-teal-600" />
+                      <Timer className={`h-4 w-4 ${
+                        theme === 'blue' ? 'text-blue-600' :
+                        theme === 'green' ? 'text-green-600' :
+                        theme === 'purple' ? 'text-purple-600' :
+                        'text-orange-600'
+                      }`} />
                       Próxima Aula
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1139,13 +1185,23 @@ export default function Dashboard() {
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
               <Card 
-                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
+                className={`border-l-4 ${
+                  theme === 'blue' ? 'border-l-blue-500' :
+                  theme === 'green' ? 'border-l-green-500' :
+                  theme === 'purple' ? 'border-l-purple-500' :
+                  'border-l-orange-500'
+                } hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]`}
                 style={{ order: widgetOrder.indexOf('todoList') }}
               >
                 <CardHeader className="pb-2 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <CheckSquare className="h-4 w-4 text-purple-600" />
+                      <CheckSquare className={`h-4 w-4 ${
+                        theme === 'blue' ? 'text-blue-600' :
+                        theme === 'green' ? 'text-green-600' :
+                        theme === 'purple' ? 'text-purple-600' :
+                        'text-orange-600'
+                      }`} />
                       Tarefas Pendentes
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1265,13 +1321,23 @@ export default function Dashboard() {
             {/* Widget 3: Prazos Importantes */}
             {widgetVisibility.importantDeadlines && (
               <Card 
-                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
+                className={`border-l-4 ${
+                  theme === 'blue' ? 'border-l-blue-500' :
+                  theme === 'green' ? 'border-l-green-500' :
+                  theme === 'purple' ? 'border-l-purple-500' :
+                  'border-l-orange-500'
+                } hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]`}
                 style={{ order: widgetOrder.indexOf('importantDeadlines') }}
               >
                 <CardHeader className="pb-2 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <Bell className="h-4 w-4 text-orange-600" />
+                      <Bell className={`h-4 w-4 ${
+                        theme === 'blue' ? 'text-blue-600' :
+                        theme === 'green' ? 'text-green-600' :
+                        theme === 'purple' ? 'text-purple-600' :
+                        'text-orange-600'
+                      }`} />
                       Prazos Importantes
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1399,13 +1465,23 @@ export default function Dashboard() {
             {/* Widget 4: Progresso Semanal */}
             {widgetVisibility.weeklyProgress && (
               <Card 
-                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
+                className={`border-l-4 ${
+                  theme === 'blue' ? 'border-l-blue-500' :
+                  theme === 'green' ? 'border-l-green-500' :
+                  theme === 'purple' ? 'border-l-purple-500' :
+                  'border-l-orange-500'
+                } hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]`}
                 style={{ order: widgetOrder.indexOf('weeklyProgress') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-indigo-600" />
+                      <TrendingUp className={`h-4 w-4 ${
+                        theme === 'blue' ? 'text-blue-600' :
+                        theme === 'green' ? 'text-green-600' :
+                        theme === 'purple' ? 'text-purple-600' :
+                        'text-orange-600'
+                      }`} />
                       Progresso Semanal
                     </CardTitle>
                     <div className="flex gap-1">

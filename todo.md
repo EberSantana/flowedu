@@ -1215,3 +1215,15 @@
 - [x] Adicionar tooltips nos botões (title attribute)
 - [x] Aplicar em todos os 4 widgets (Próxima Aula, Tarefas, Prazos, Progresso)
 - [ ] Testar em dispositivos móveis
+
+
+## Sistema de Temas Personalizados
+- [x] Criar contexto WidgetThemeContext para gerenciar tema selecionado
+- [x] Definir 4 paletas de cores (Azul Profissional, Verde Educação, Roxo Criativo, Laranja Energético)
+- [x] Adicionar seletor de tema no painel de personalização
+- [x] Aplicar cores de tema nas bordas dos widgets (border-l-4)
+- [x] Aplicar cores de tema nos ícones dos widgets (Timer, CheckSquare, Bell, TrendingUp)
+- [x] Salvar preferência de tema no localStorage
+- [x] Integrar WidgetThemeProvider no App.tsx
+- [x] Aplicar tema nos 4 widgets personalizáveis
+- [ ] Testar transição entre temas
