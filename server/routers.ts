@@ -461,6 +461,21 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return db.getCalendarEventsByYear(ctx.user.id, input.year);
       }),
+    getUpcomingEvents: protectedProcedure
+      .query(async ({ ctx }) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const threeDaysLater = new Date(today);
+        threeDaysLater.setDate(today.getDate() + 3);
+        
+        const allEvents = await db.getCalendarEventsByYear(ctx.user.id, today.getFullYear());
+        
+        return allEvents.filter((event: any) => {
+          const eventDate = new Date(event.eventDate);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate >= today && eventDate < threeDaysLater;
+        }).sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      }),
     create: protectedProcedure
       .input(
         z.object({

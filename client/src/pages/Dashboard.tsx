@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -42,6 +43,23 @@ export default function Dashboard() {
   const { data: upcomingClasses } = trpc.dashboard.getUpcomingClasses.useQuery();
   const { data: todayClasses } = trpc.dashboard.getTodayClasses.useQuery();
   const { data: upcomingEvents } = trpc.dashboard.getUpcomingEvents.useQuery();
+  const { data: calendarUpcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery();
+  const hasShownToast = useRef(false);
+  
+  // Toast automático para eventos próximos
+  useEffect(() => {
+    if (calendarUpcomingEvents && calendarUpcomingEvents.length > 0 && !hasShownToast.current) {
+      hasShownToast.current = true;
+      const count = calendarUpcomingEvents.length;
+      toast.info(
+        `📢 Você tem ${count} evento${count > 1 ? 's' : ''} nos próximos 3 dias!`,
+        {
+          description: calendarUpcomingEvents.slice(0, 2).map((e: any) => e.title).join(', ') + (count > 2 ? '...' : ''),
+          duration: 5000,
+        }
+      );
+    }
+  }, [calendarUpcomingEvents]);
 
   // Calcular total de aulas agendadas
   const totalScheduledClasses = scheduledClasses?.length || 0;
@@ -410,6 +428,102 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Widget: Eventos Próximos do Calendário (3 dias) */}
+          {calendarUpcomingEvents && calendarUpcomingEvents.length > 0 && (
+            <Card className="mb-8 overflow-hidden border-2 border-amber-200 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 border-b-2 border-amber-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5 text-amber-600" />
+                      Eventos Próximos
+                    </CardTitle>
+                    <CardDescription className="text-gray-600">Eventos nos próximos 3 dias</CardDescription>
+                  </div>
+                  <Link href="/calendar">
+                    <Button variant="outline" size="sm" className="border-amber-300 hover:bg-amber-50">
+                      Ver Calendário <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {calendarUpcomingEvents.map((event: any) => {
+                    const eventDate = new Date(event.eventDate + 'T00:00:00');
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(today.getDate() + 1);
+                    const dayAfterTomorrow = new Date(today);
+                    dayAfterTomorrow.setDate(today.getDate() + 2);
+                    
+                    // Determinar urgência
+                    let urgencyColor = 'bg-yellow-500';
+                    let urgencyText = 'Em 2-3 dias';
+                    if (eventDate.getTime() === today.getTime()) {
+                      urgencyColor = 'bg-red-500';
+                      urgencyText = 'HOJE';
+                    } else if (eventDate.getTime() === tomorrow.getTime()) {
+                      urgencyColor = 'bg-orange-500';
+                      urgencyText = 'AMANHÃ';
+                    }
+                    
+                    const dayMonth = eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                    const dayOfWeek = eventDate.toLocaleDateString('pt-BR', { weekday: 'short' });
+                    
+                    // Estilos por tipo de evento
+                    const eventStyles: any = {
+                      holiday: { icon: '🎉', label: 'Feriado', borderColor: 'border-red-300', bgColor: 'bg-red-50' },
+                      commemorative: { icon: '🎂', label: 'Data Comemorativa', borderColor: 'border-amber-300', bgColor: 'bg-amber-50' },
+                      school_event: { icon: '🏫', label: 'Evento Escolar', borderColor: 'border-blue-300', bgColor: 'bg-blue-50' },
+                      personal: { icon: '📌', label: 'Observação', borderColor: 'border-purple-300', bgColor: 'bg-purple-50' },
+                    };
+                    
+                    const style = eventStyles[event.eventType] || eventStyles.personal;
+                    
+                    return (
+                      <div
+                        key={event.id}
+                        className={`relative p-4 rounded-xl border-2 ${style.borderColor} ${style.bgColor} hover:shadow-lg transition-all duration-300`}
+                      >
+                        {/* Badge de Urgência */}
+                        <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
+                          {urgencyText}
+                        </div>
+                        
+                        <div className="flex items-start gap-3">
+                          {/* Ícone */}
+                          <div className="text-3xl">
+                            {style.icon}
+                          </div>
+                          
+                          {/* Conteúdo */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">
+                              {event.title}
+                            </h4>
+                            <p className="text-xs text-gray-600 mb-2">
+                              {dayOfWeek}, {dayMonth}
+                            </p>
+                            <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/50 border border-gray-300">
+                              {style.label}
+                            </span>
+                            {event.description && (
+                              <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                                {event.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Gráfico de Distribuição Semanal */}
           {scheduledClasses && scheduledClasses.length > 0 && (

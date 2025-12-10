@@ -995,3 +995,11 @@
 - [x] Adicionar estatísticas no header (X eventos este mês)
 - [x] Implementar navegação mês anterior/próximo
 - [x] Testar responsividade e usabilidade
+
+## Sistema de Notificação: Eventos Próximos (3 dias)
+- [x] Criar rota tRPC getUpcomingEvents (próximos 3 dias)
+- [x] Adicionar badge vermelho no menu Calendário da sidebar
+- [x] Criar widget "Eventos Próximos" no Dashboard
+- [x] Implementar cores por urgência (hoje=vermelho, amanhã=laranja, 2-3 dias=amarelo)
+- [x] Adicionar toast automático ao carregar Dashboard
+- [x] Testar contagem e exibição de eventos

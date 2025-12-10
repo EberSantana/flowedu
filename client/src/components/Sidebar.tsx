@@ -86,6 +86,11 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
   
+  // Query para eventos próximos (badge de notificação)
+  const { data: upcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery(undefined, {
+    refetchInterval: 60000, // Atualiza a cada 1 minuto
+  });
+  
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       window.location.href = "/";
@@ -189,12 +194,15 @@ export default function Sidebar() {
               <ul className="space-y-1">
                 {filteredNavItems.map((item) => {
                   const isActive = location === item.href;
+                  const isCalendar = item.href === '/calendar';
+                  const notificationCount = isCalendar && upcomingEvents ? upcomingEvents.length : 0;
+                  
                   const linkContent = (
                     <Link
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`
-                        flex items-center rounded-xl
+                        flex items-center rounded-xl relative
                         transition-all duration-200
                         ${
                           isActive
@@ -212,6 +220,15 @@ export default function Sidebar() {
                         {item.icon}
                       </span>
                       {!isCompact && <span className="font-medium">{item.label}</span>}
+                      {isCalendar && notificationCount > 0 && (
+                        <span className={`
+                          absolute flex items-center justify-center
+                          bg-red-500 text-white text-[10px] font-bold rounded-full
+                          ${isCompact ? 'w-4 h-4 -top-1 -right-1' : 'w-5 h-5 ml-auto'}
+                        `}>
+                          {notificationCount}
+                        </span>
+                      )}
                     </Link>
                   );
                   
