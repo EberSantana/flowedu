@@ -1061,3 +1061,15 @@
 - [x] Ajustar alinhamento vertical dos elementos (flex-col)
 - [x] Campo de input fixo no rodapé do widget de tarefas
 - [x] Overflow controlado com scrollbar elegante
+
+## Exportação de Calendário para .ics (Google Calendar/Outlook)
+- [x] Instalar biblioteca ics para geração de arquivos .ics (v3.8.1)
+- [x] Criar função de geração de eventos .ics a partir das aulas agendadas
+- [x] Implementar conversão de horários para formato iCalendar (DTSTART, DTEND)
+- [x] Adicionar informações completas (disciplina, turma, local, descrição)
+- [x] Criar botão "Exportar para Calendário" na página de Grade Semanal
+- [x] Implementar download automático do arquivo .ics (72KB, 208 eventos)
+- [x] Validar formato iCalendar RFC 5545
+- [x] Gerar eventos para 16 semanas (1 semestre)
+- [x] Incluir campos obrigatórios (SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION)
+- [x] Adicionar compatibilidade com Microsoft Outlook (BUSYSTATUS)

@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Calendar, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { Calendar, ArrowLeft, Plus, Trash2, Download } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
+import { createEvents, EventAttributes, DateArray } from "ics";
 
 const DAYS_OF_WEEK = [
   { id: 1, name: "Segunda-Feira", short: "Seg" },
@@ -118,6 +119,99 @@ export default function Schedule() {
     setFilterShiftId("all");
   };
 
+  const exportToCalendar = () => {
+    if (!fullSchedule) {
+      toast.error("Nenhuma aula para exportar");
+      return;
+    }
+
+    const events: EventAttributes[] = [];
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    // Encontrar a próxima segunda-feira
+    const getNextMonday = () => {
+      const date = new Date();
+      const day = date.getDay();
+      const diff = day === 0 ? 1 : (8 - day); // Se domingo, próxima segunda; senão, dias até segunda
+      date.setDate(date.getDate() + diff);
+      return date;
+    };
+
+    const startDate = getNextMonday();
+
+    // Gerar eventos para as próximas 16 semanas (1 semestre)
+    for (let week = 0; week < 16; week++) {
+      fullSchedule.scheduledClasses.forEach((sc) => {
+        const subject = fullSchedule.subjects.find(s => s.id === sc.subjectId);
+        const classInfo = fullSchedule.classes.find(c => c.id === sc.classId);
+        const timeSlot = fullSchedule.timeSlots.find(ts => ts.id === sc.timeSlotId);
+        
+        if (!subject || !classInfo || !timeSlot) return;
+
+        // Calcular data do evento (dia da semana + semana)
+        const eventDate = new Date(startDate);
+        eventDate.setDate(startDate.getDate() + (week * 7) + (sc.dayOfWeek - 1));
+
+        // Parsear horários (formato "HH:MM")
+        const [startHour, startMinute] = timeSlot.startTime.split(':').map(Number);
+        const [endHour, endMinute] = timeSlot.endTime.split(':').map(Number);
+
+        const start: DateArray = [
+          eventDate.getFullYear(),
+          eventDate.getMonth() + 1,
+          eventDate.getDate(),
+          startHour,
+          startMinute
+        ];
+
+        const end: DateArray = [
+          eventDate.getFullYear(),
+          eventDate.getMonth() + 1,
+          eventDate.getDate(),
+          endHour,
+          endMinute
+        ];
+
+        events.push({
+          start,
+          end,
+          title: `${subject.name} - ${classInfo.name}`,
+          description: sc.notes || `Aula de ${subject.name} para a turma ${classInfo.name}`,
+          location: classInfo.name,
+          status: 'CONFIRMED',
+          busyStatus: 'BUSY',
+          categories: ['Aula', subject.name],
+        });
+      });
+    }
+
+    if (events.length === 0) {
+      toast.error("Nenhuma aula agendada para exportar");
+      return;
+    }
+
+    createEvents(events, (error, value) => {
+      if (error) {
+        console.error(error);
+        toast.error("Erro ao gerar arquivo de calendário");
+        return;
+      }
+
+      // Download do arquivo .ics
+      const blob = new Blob([value], { type: 'text/calendar;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `calendario_aulas_${new Date().toISOString().split('T')[0]}.ics`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success(`Calendário exportado com sucesso! (${events.length} aulas)`);
+    });
+  };
+
   const hasActiveFilters = (filterSubjectId !== "" && filterSubjectId !== "all") || (filterClassId !== "" && filterClassId !== "all") || (filterShiftId !== "" && filterShiftId !== "all");
 
   const getShiftStats = (shiftId: number) => {
@@ -199,6 +293,14 @@ export default function Schedule() {
                 <Calendar className="h-8 w-8 text-purple-600" />
                 Grade de Horários
               </h1>
+              <Button
+                onClick={exportToCalendar}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                size="lg"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Exportar para Calendário
+              </Button>
             </div>
           </div>
 
