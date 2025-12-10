@@ -11,13 +11,15 @@ import {
   calendarEvents,
   auditLogs,
   activeMethodologies,
+  classStatuses,
   InsertSubject,
   InsertClass,
   InsertShift,
   InsertTimeSlot,
   InsertScheduledClass,
   InsertCalendarEvent,
-  InsertActiveMethodology
+  InsertActiveMethodology,
+  InsertClassStatus
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -593,5 +595,93 @@ export async function deleteActiveMethodology(id: number, userId: number) {
   if (!db) throw new Error("Database not available");
   
   await db.delete(activeMethodologies).where(and(eq(activeMethodologies.id, id), eq(activeMethodologies.userId, userId)));
+  return { success: true };
+}
+
+
+// Class Status Management
+export async function setClassStatus(
+  scheduledClassId: number,
+  weekNumber: number,
+  year: number,
+  status: 'given' | 'not_given' | 'cancelled',
+  userId: number,
+  reason?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se já existe um status para esta aula nesta semana
+  const existing = await db.select().from(classStatuses)
+    .where(and(
+      eq(classStatuses.scheduledClassId, scheduledClassId),
+      eq(classStatuses.weekNumber, weekNumber),
+      eq(classStatuses.year, year),
+      eq(classStatuses.userId, userId)
+    ));
+  
+  if (existing.length > 0) {
+    // Atualizar status existente
+    await db.update(classStatuses)
+      .set({ status, reason, updatedAt: new Date() })
+      .where(eq(classStatuses.id, existing[0].id));
+    return { success: true, id: existing[0].id };
+  } else {
+    // Criar novo status
+    const [result] = await db.insert(classStatuses).values({
+      scheduledClassId,
+      weekNumber,
+      year,
+      status,
+      reason,
+      userId
+    });
+    return { success: true, id: result.insertId };
+  }
+}
+
+export async function getClassStatus(
+  scheduledClassId: number,
+  weekNumber: number,
+  year: number,
+  userId: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [status] = await db.select().from(classStatuses)
+    .where(and(
+      eq(classStatuses.scheduledClassId, scheduledClassId),
+      eq(classStatuses.weekNumber, weekNumber),
+      eq(classStatuses.year, year),
+      eq(classStatuses.userId, userId)
+    ));
+  
+  return status || null;
+}
+
+export async function getWeekClassStatuses(weekNumber: number, year: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const statuses = await db.select().from(classStatuses)
+    .where(and(
+      eq(classStatuses.weekNumber, weekNumber),
+      eq(classStatuses.year, year),
+      eq(classStatuses.userId, userId)
+    ));
+  
+  return statuses;
+}
+
+export async function deleteClassStatus(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(classStatuses).where(and(
+    eq(classStatuses.id, id),
+    eq(classStatuses.userId, userId)
+  ));
+  
   return { success: true };
 }

@@ -1120,3 +1120,17 @@
 - [x] Otimizar cards de estatísticas para mobile (gap-4 em mobile)
 - [x] Otimizar grid de ações rápidas (grid-cols-1 em mobile, grid-cols-2 sm, grid-cols-3 md)
 - [ ] Testar em diferentes resoluções (320px, 375px, 768px, 1024px)
+
+
+## Sistema de Status de Aulas (Dada/Não Dada/Cancelada)
+- [x] Criar tabela `class_statuses` no schema (id, scheduledClassId, weekNumber, year, status, reason, userId, createdAt, updatedAt)
+- [x] Adicionar enum de status (given, not_given, cancelled)
+- [x] Criar função `setClassStatus` no db.ts
+- [x] Criar função `getClassStatus` no db.ts
+- [x] Criar função `getWeekClassStatuses` no db.ts
+- [x] Criar função `deleteClassStatus` no db.ts
+- [x] Criar router tRPC `classStatus` com procedures (set, get, getWeek, delete)
+- [ ] Implementar UI para marcar status (futuro: página de Grade Semanal)
+- [ ] Ajustar cálculo do Progresso Semanal para considerar aulas não dadas
+- [ ] Adicionar indicador visual de status nas aulas
+- [ ] Criar testes para procedures de status

@@ -169,3 +169,21 @@ export const activeMethodologies = mysqlTable("active_methodologies", {
 
 export type ActiveMethodology = typeof activeMethodologies.$inferSelect;
 export type InsertActiveMethodology = typeof activeMethodologies.$inferInsert;
+
+/**
+ * Status de aulas (para controle de aulas dadas, não dadas, canceladas)
+ */
+export const classStatuses = mysqlTable("class_statuses", {
+  id: int("id").autoincrement().primaryKey(),
+  scheduledClassId: int("scheduledClassId").notNull(),
+  weekNumber: int("weekNumber").notNull(), // Semana do ano (1-53)
+  year: int("year").notNull(),
+  status: mysqlEnum("status", ["given", "not_given", "cancelled"]).notNull(),
+  reason: text("reason"), // Motivo opcional (falta, evento pessoal, etc.)
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ClassStatus = typeof classStatuses.$inferSelect;
+export type InsertClassStatus = typeof classStatuses.$inferInsert;

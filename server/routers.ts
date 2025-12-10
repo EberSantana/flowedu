@@ -889,6 +889,61 @@ Regras:
       }),
   }),
 
+  classStatus: router({
+    set: protectedProcedure
+      .input(z.object({
+        scheduledClassId: z.number(),
+        weekNumber: z.number(),
+        year: z.number(),
+        status: z.enum(['given', 'not_given', 'cancelled']),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.setClassStatus(
+          input.scheduledClassId,
+          input.weekNumber,
+          input.year,
+          input.status,
+          ctx.user.id,
+          input.reason
+        );
+      }),
+
+    get: protectedProcedure
+      .input(z.object({
+        scheduledClassId: z.number(),
+        weekNumber: z.number(),
+        year: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.getClassStatus(
+          input.scheduledClassId,
+          input.weekNumber,
+          input.year,
+          ctx.user.id
+        );
+      }),
+
+    getWeek: protectedProcedure
+      .input(z.object({
+        weekNumber: z.number(),
+        year: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.getWeekClassStatuses(
+          input.weekNumber,
+          input.year,
+          ctx.user.id
+        );
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteClassStatus(input.id, ctx.user.id);
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;
