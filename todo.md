@@ -1003,3 +1003,7 @@
 - [x] Implementar cores por urgência (hoje=vermelho, amanhã=laranja, 2-3 dias=amarelo)
 - [x] Adicionar toast automático ao carregar Dashboard
 - [x] Testar contagem e exibição de eventos
+
+## Remoção de Widget Duplicado
+- [x] Remover widget antigo "Próximos Eventos" do Dashboard
+- [x] Manter apenas novo widget "Eventos Próximos (3 dias)"
