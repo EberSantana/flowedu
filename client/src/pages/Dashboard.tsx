@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ArrowLeft, ArrowUp, ArrowDown, ChevronsLeft, ChevronsRight, TrendingUp } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -108,55 +108,12 @@ export default function Dashboard() {
       weeklyProgress: true,
     };
     setWidgetVisibility(defaultVisibility);
-    setWidgetOrder(['timeToNextClass', 'todoList', 'importantDeadlines', 'weeklyProgress']);
     toast.success('Layout restaurado para o padrão!');
   };
   
-  // Estado para ordem dos widgets
-  const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
-    const saved = localStorage.getItem('dashboardWidgetOrder');
-    return saved ? JSON.parse(saved) : ['timeToNextClass', 'todoList', 'importantDeadlines', 'weeklyProgress'];
-  });
+
   
-  // Salvar ordem no localStorage
-  useEffect(() => {
-    localStorage.setItem('dashboardWidgetOrder', JSON.stringify(widgetOrder));
-  }, [widgetOrder]);
-  
-  // Funções de reordenação
-  const moveWidgetLeft = (widgetKey: string) => {
-    const currentIndex = widgetOrder.indexOf(widgetKey);
-    if (currentIndex > 0) {
-      const newOrder = [...widgetOrder];
-      [newOrder[currentIndex - 1], newOrder[currentIndex]] = [newOrder[currentIndex], newOrder[currentIndex - 1]];
-      setWidgetOrder(newOrder);
-      toast.success('Widget movido para esquerda!');
-    }
-  };
-  
-  const moveWidgetRight = (widgetKey: string) => {
-    const currentIndex = widgetOrder.indexOf(widgetKey);
-    if (currentIndex < widgetOrder.length - 1) {
-      const newOrder = [...widgetOrder];
-      [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
-      setWidgetOrder(newOrder);
-      toast.success('Widget movido para direita!');
-    }
-  };
-  
-  const moveWidgetToStart = (widgetKey: string) => {
-    const newOrder = widgetOrder.filter(key => key !== widgetKey);
-    newOrder.unshift(widgetKey);
-    setWidgetOrder(newOrder);
-    toast.success('Widget movido para o início!');
-  };
-  
-  const moveWidgetToEnd = (widgetKey: string) => {
-    const newOrder = widgetOrder.filter(key => key !== widgetKey);
-    newOrder.push(widgetKey);
-    setWidgetOrder(newOrder);
-    toast.success('Widget movido para o fim!');
-  };
+
   
   // Toast automático para eventos próximos
   useEffect(() => {
@@ -1019,59 +976,12 @@ export default function Dashboard() {
             {widgetVisibility.timeToNextClass && (
               <Card 
                 className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-                style={{ order: widgetOrder.indexOf('timeToNextClass') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <Timer className="h-4 w-4 text-teal-600" />
-                      Próxima Aula
-                    </CardTitle>
-                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetLeft('timeToNextClass')}
-                        disabled={widgetOrder.indexOf('timeToNextClass') === 0}
-                        className="h-8 w-8 p-0 hover:bg-teal-50 hover:text-teal-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para esquerda (Shift + ←)"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetRight('timeToNextClass')}
-                        disabled={widgetOrder.indexOf('timeToNextClass') === widgetOrder.length - 1}
-                        className="h-8 w-8 p-0 hover:bg-teal-50 hover:text-teal-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para direita (Shift + →)"
-                      >
-                        <ArrowRight className="h-5 w-5" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-teal-50 hover:text-teal-600 transition-all duration-200"
-                            title="Mais opções de reordenação"
-                          >
-                            <ArrowDown className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('timeToNextClass')} className="cursor-pointer">
-                            <ChevronsLeft className="h-4 w-4 mr-2 text-teal-600" />
-                            Mover para início
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('timeToNextClass')} className="cursor-pointer">
-                            <ChevronsRight className="h-4 w-4 mr-2 text-teal-600" />
-                            Mover para fim
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <Timer className="h-4 w-4 text-teal-600" />
+                    Próxima Aula
+                  </CardTitle>
                   <CardDescription className="text-xs">Tempo restante até sua próxima aula</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-center">
@@ -1140,59 +1050,12 @@ export default function Dashboard() {
             {widgetVisibility.todoList && (
               <Card 
                 className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-                style={{ order: widgetOrder.indexOf('todoList') }}
               >
                 <CardHeader className="pb-2 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <CheckSquare className="h-4 w-4 text-purple-600" />
-                      Tarefas Pendentes
-                    </CardTitle>
-                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetLeft('todoList')}
-                        disabled={widgetOrder.indexOf('todoList') === 0}
-                        className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para esquerda"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetRight('todoList')}
-                        disabled={widgetOrder.indexOf('todoList') === widgetOrder.length - 1}
-                        className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para direita"
-                      >
-                        <ArrowRight className="h-5 w-5" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600 transition-all duration-200"
-                            title="Mais opções"
-                          >
-                            <ArrowDown className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('todoList')} className="cursor-pointer">
-                            <ChevronsLeft className="h-4 w-4 mr-2 text-purple-600" />
-                            Mover para início
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('todoList')} className="cursor-pointer">
-                            <ChevronsRight className="h-4 w-4 mr-2 text-purple-600" />
-                            Mover para fim
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <CheckSquare className="h-4 w-4 text-purple-600" />
+                    Tarefas Pendentes
+                  </CardTitle>
                   <CardDescription className="text-xs">
                     {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
                   </CardDescription>
@@ -1266,59 +1129,12 @@ export default function Dashboard() {
             {widgetVisibility.importantDeadlines && (
               <Card 
                 className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-                style={{ order: widgetOrder.indexOf('importantDeadlines') }}
               >
                 <CardHeader className="pb-2 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <Bell className="h-4 w-4 text-orange-600" />
-                      Prazos Importantes
-                    </CardTitle>
-                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetLeft('importantDeadlines')}
-                        disabled={widgetOrder.indexOf('importantDeadlines') === 0}
-                        className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para esquerda"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetRight('importantDeadlines')}
-                        disabled={widgetOrder.indexOf('importantDeadlines') === widgetOrder.length - 1}
-                        className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para direita"
-                      >
-                        <ArrowRight className="h-5 w-5" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200"
-                            title="Mais opções"
-                          >
-                            <ArrowDown className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('importantDeadlines')} className="cursor-pointer">
-                            <ChevronsLeft className="h-4 w-4 mr-2 text-orange-600" />
-                            Mover para início
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('importantDeadlines')} className="cursor-pointer">
-                            <ChevronsRight className="h-4 w-4 mr-2 text-orange-600" />
-                            Mover para fim
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-orange-600" />
+                    Prazos Importantes
+                  </CardTitle>
                   <CardDescription className="text-xs">Próximos 7 dias</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto custom-scrollbar p-4">
@@ -1400,59 +1216,12 @@ export default function Dashboard() {
             {widgetVisibility.weeklyProgress && (
               <Card 
                 className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-                style={{ order: widgetOrder.indexOf('weeklyProgress') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-indigo-600" />
-                      Progresso Semanal
-                    </CardTitle>
-                    <div className="flex gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-sm">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetLeft('weeklyProgress')}
-                        disabled={widgetOrder.indexOf('weeklyProgress') === 0}
-                        className="h-8 w-8 p-0 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para esquerda"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveWidgetRight('weeklyProgress')}
-                        disabled={widgetOrder.indexOf('weeklyProgress') === widgetOrder.length - 1}
-                        className="h-8 w-8 p-0 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        title="Mover para direita"
-                      >
-                        <ArrowRight className="h-5 w-5" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200"
-                            title="Mais opções"
-                          >
-                            <ArrowDown className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => moveWidgetToStart('weeklyProgress')} className="cursor-pointer">
-                            <ChevronsLeft className="h-4 w-4 mr-2 text-indigo-600" />
-                            Mover para início
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => moveWidgetToEnd('weeklyProgress')} className="cursor-pointer">
-                            <ChevronsRight className="h-4 w-4 mr-2 text-indigo-600" />
-                            Mover para fim
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-indigo-600" />
+                    Progresso Semanal
+                  </CardTitle>
                   <CardDescription>Aulas concluídas esta semana</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-center items-center">

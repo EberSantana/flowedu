@@ -1240,3 +1240,23 @@
 - [x] Adicionar sombra sutil e backdrop-blur nos botões
 - [x] Aplicar em todos os 4 widgets personalizáveis
 - [ ] Testar usabilidade em mobile
+
+
+## Remoção Completa da Funcionalidade de Reordenação
+- [x] Remover todos os botões de setas dos 4 widgets personalizáveis
+- [x] Remover funções moveWidgetLeft, moveWidgetRight, moveWidgetToStart, moveWidgetToEnd
+- [x] Remover estado widgetOrder e useEffect relacionado
+- [x] Remover imports de ícones não utilizados (ArrowLeft, ArrowRight, ArrowDown, ChevronsLeft, ChevronsRight)
+- [x] Remover style order dos Cards
+- [x] Remover referências a widgetOrder no resetLayout
+- [x] Interface simplificada e limpa
+
+## Remoção Completa da Funcionalidade de Reordenação (ANTIGO - MANTER PARA REFERÊNCIA)
+- [ ] Remover todos os botões de setas (←, →, ↓) dos 4 widgets
+- [ ] Remover funções moveWidgetLeft, moveWidgetRight, moveWidgetToStart, moveWidgetToEnd
+- [ ] Remover estado widgetOrder do localStorage
+- [ ] Remover imports de ícones de setas (ArrowLeft, ArrowRight, ArrowDown, ChevronsLeft, ChevronsRight)
+- [ ] Remover DropdownMenu de reordenação
+- [ ] Simplificar CardHeader dos widgets
+- [ ] Remover seção de reordenação do painel de personalização
+- [ ] Definir ordem fixa padrão dos widgets
