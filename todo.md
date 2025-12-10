@@ -984,3 +984,14 @@
 - [x] Remover campo logoUrl do formulário de edição (Dialog de Edição)
 - [x] Manter campo logoUrl no formulário de criação
 - [x] Testar edição de metodologias sem o campo
+
+## Redesign Completo: Calendário Anual
+- [x] Criar vista mensal tradicional (grade 7x5 com dias da semana)
+- [x] Adicionar dots coloridos nos dias com eventos
+- [x] Implementar painel lateral com lista de eventos do mês
+- [x] Adicionar hover preview nos dias com eventos
+- [x] Melhorar cores (tons mais suaves e profissionais)
+- [x] Destacar dia atual com borda/background diferente
+- [x] Adicionar estatísticas no header (X eventos este mês)
+- [x] Implementar navegação mês anterior/próximo
+- [x] Testar responsividade e usabilidade
