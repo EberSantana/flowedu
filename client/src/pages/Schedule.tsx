@@ -2,12 +2,13 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Calendar, ArrowLeft, Plus, Trash2, Download } from "lucide-react";
+import { Calendar, ArrowLeft, Plus, Trash2, Download, CheckCircle2, XCircle, Ban, MoreVertical } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -35,8 +36,27 @@ export default function Schedule() {
     dayOfWeek: "",
     notes: "",
   });
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [selectedClassForStatus, setSelectedClassForStatus] = useState<any>(null);
+  const [statusReason, setStatusReason] = useState("");
 
   const { data: fullSchedule, isLoading } = trpc.schedule.getFullSchedule.useQuery();
+  
+  // Obter semana e ano atuais
+  const currentWeek = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const diff = now.getTime() - start.getTime();
+    const oneWeek = 1000 * 60 * 60 * 24 * 7;
+    return Math.ceil(diff / oneWeek);
+  }, []);
+  const currentYear = new Date().getFullYear();
+  
+  // Carregar status das aulas da semana
+  const { data: weekStatuses } = trpc.classStatus.getWeek.useQuery({
+    weekNumber: currentWeek,
+    year: currentYear,
+  });
   const utils = trpc.useUtils();
 
   const createMutation = trpc.schedule.create.useMutation({
@@ -59,6 +79,50 @@ export default function Schedule() {
       toast.error("Erro ao remover aula: " + error.message);
     },
   });
+
+  const setStatusMutation = trpc.classStatus.set.useMutation({
+    onSuccess: () => {
+      utils.classStatus.getWeek.invalidate();
+      toast.success("Status da aula atualizado!");
+      setIsStatusDialogOpen(false);
+      setStatusReason("");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar status: " + error.message);
+    },
+  });
+
+  const handleSetStatus = (scheduledClass: any, status: 'given' | 'not_given' | 'cancelled') => {
+    if (status === 'given') {
+      // Marcar como dada diretamente
+      setStatusMutation.mutate({
+        scheduledClassId: scheduledClass.id,
+        weekNumber: currentWeek,
+        year: currentYear,
+        status: 'given',
+      });
+    } else {
+      // Abrir dialog para adicionar motivo
+      setSelectedClassForStatus({ ...scheduledClass, status });
+      setIsStatusDialogOpen(true);
+    }
+  };
+
+  const handleConfirmStatus = () => {
+    if (!selectedClassForStatus) return;
+    
+    setStatusMutation.mutate({
+      scheduledClassId: selectedClassForStatus.id,
+      weekNumber: currentWeek,
+      year: currentYear,
+      status: selectedClassForStatus.status,
+      reason: statusReason || undefined,
+    });
+  };
+
+  const getClassStatus = (scheduledClassId: number) => {
+    return weekStatuses?.find(s => s.scheduledClassId === scheduledClassId);
+  };
 
   const resetForm = () => {
     setFormData({ subjectId: "", classId: "", timeSlotId: "", dayOfWeek: "", notes: "" });
@@ -458,12 +522,64 @@ export default function Schedule() {
                                       {scheduledClass.notes && (
                                         <div className="text-xs opacity-80 mt-1">{scheduledClass.notes}</div>
                                       )}
-                                      <button
-                                        onClick={() => handleDelete(scheduledClass.id)}
-                                        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 rounded p-1 transition-opacity"
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </button>
+                                      
+                                      {/* Indicador de Status */}
+                                      {(() => {
+                                        const status = getClassStatus(scheduledClass.id);
+                                        if (status) {
+                                          return (
+                                            <div className="absolute top-1 left-1 flex items-center gap-1">
+                                              {status.status === 'given' && (
+                                                <div className="bg-green-500 rounded-full p-1" title="Aula Dada">
+                                                  <CheckCircle2 className="h-3 w-3" />
+                                                </div>
+                                              )}
+                                              {status.status === 'not_given' && (
+                                                <div className="bg-yellow-500 rounded-full p-1" title={`Não Dada${status.reason ? ': ' + status.reason : ''}`}>
+                                                  <XCircle className="h-3 w-3" />
+                                                </div>
+                                              )}
+                                              {status.status === 'cancelled' && (
+                                                <div className="bg-red-500 rounded-full p-1" title={`Cancelada${status.reason ? ': ' + status.reason : ''}`}>
+                                                  <Ban className="h-3 w-3" />
+                                                </div>
+                                              )}
+                                            </div>
+                                          );
+                                        }
+                                        return null;
+                                      })()}
+                                      
+                                      {/* Botões de Ação */}
+                                      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex gap-1">
+                                        <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                            <button className="bg-blue-500 hover:bg-blue-600 rounded p-1 transition-colors">
+                                              <MoreVertical className="h-3 w-3" />
+                                            </button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => handleSetStatus(scheduledClass, 'given')}>
+                                              <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />
+                                              Marcar como Dada
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleSetStatus(scheduledClass, 'not_given')}>
+                                              <XCircle className="h-4 w-4 mr-2 text-yellow-600" />
+                                              Marcar como Não Dada
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleSetStatus(scheduledClass, 'cancelled')}>
+                                              <Ban className="h-4 w-4 mr-2 text-red-600" />
+                                              Marcar como Cancelada
+                                            </DropdownMenuItem>
+                                          </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <button
+                                          onClick={() => handleDelete(scheduledClass.id)}
+                                          className="bg-red-500 hover:bg-red-600 rounded p-1 transition-colors"
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </button>
+                                      </div>
                                     </div>
                                   ) : (
                                     <button
@@ -552,6 +668,40 @@ export default function Schedule() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog de Status de Aula */}
+        <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {selectedClassForStatus?.status === 'not_given' ? 'Marcar Aula como Não Dada' : 'Marcar Aula como Cancelada'}
+              </DialogTitle>
+              <DialogDescription>
+                Adicione um motivo opcional para esta marcação.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="reason">Motivo (opcional)</Label>
+                <Textarea
+                  id="reason"
+                  placeholder="Ex: Falta por motivo de saúde, Reunião pedagógica, Feriado municipal..."
+                  value={statusReason}
+                  onChange={(e) => setStatusReason(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsStatusDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="button" onClick={handleConfirmStatus}>
+                Confirmar
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
         </div>

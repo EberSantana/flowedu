@@ -1134,3 +1134,14 @@
 - [ ] Ajustar cálculo do Progresso Semanal para considerar aulas não dadas
 - [ ] Adicionar indicador visual de status nas aulas
 - [ ] Criar testes para procedures de status
+
+
+## UI de Gerenciamento de Status de Aulas - Grade Semanal
+- [x] Adicionar dropdown menu de status em cada célula de aula da grade
+- [x] Criar dialog para confirmar status e adicionar motivo opcional
+- [x] Integrar com procedures tRPC classStatus.set
+- [x] Adicionar indicador visual de status (ícone/badge circular verde/amarelo/vermelho)
+- [x] Atualizar UI após marcar status (invalidate classStatus.getWeek)
+- [x] Adicionar toast de confirmação
+- [x] Carregar status existentes ao renderizar grade (classStatus.getWeek)
+- [x] Mostrar motivo no tooltip do indicador de status
