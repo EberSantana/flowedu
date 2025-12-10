@@ -1082,3 +1082,13 @@
 - [x] Adicionar botões de seta (↑↓) nos cabeçalhos dos widgets
 - [x] Desabilitar seta ↑ no primeiro widget e ↓ no último
 - [x] Renderizar widgets na ordem definida pelo estado (CSS order)
+
+## Melhorias de Visualização do Widget de Prazos Importantes
+- [x] Aumentar tamanho da fonte do título do evento (text-sm → text-lg)
+- [x] Aumentar tamanho da fonte da data (text-xs → text-base)
+- [x] Melhorar contraste do texto (text-gray-600 → text-gray-700/900)
+- [x] Aumentar espaçamento entre eventos (space-y-3 → space-y-4)
+- [x] Aumentar padding interno dos cards (p-3 → p-4)
+- [x] Melhorar legibilidade da descrição (text-xs → text-base)
+- [x] Aumentar tamanho do badge de urgência (text-[10px] → text-xs)
+- [x] Adicionar leading-tight e leading-relaxed para melhor espaçamento de linhas

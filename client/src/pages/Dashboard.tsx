@@ -1083,11 +1083,11 @@ export default function Dashboard() {
                   <CardDescription>Próximos 7 dias</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {importantDeadlines.length === 0 ? (
                       <div className="text-center py-6">
                         <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">Nenhum prazo nos próximos 7 dias</p>
+                        <p className="text-base text-gray-500">Nenhum prazo nos próximos 7 dias</p>
                       </div>
                     ) : (
                       importantDeadlines.map((event: any) => {
@@ -1104,20 +1104,20 @@ export default function Dashboard() {
                         return (
                           <div
                             key={event.id}
-                            className="relative p-3 rounded-lg border-2 border-orange-200 bg-orange-50 hover:shadow-md transition-shadow"
+                            className="relative p-4 rounded-lg border-2 border-orange-200 bg-orange-50 hover:shadow-md transition-shadow"
                           >
-                            <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
+                            <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md`}>
                               {urgencyText}
                             </div>
                             
-                            <h4 className="font-bold text-gray-900 text-sm mb-1 pr-8">
+                            <h4 className="font-bold text-gray-900 text-lg mb-2 pr-10 leading-tight">
                               {event.title}
                             </h4>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-base text-gray-700 font-medium">
                               {dayOfWeek}, {dayMonth}
                             </p>
                             {event.description && (
-                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                              <p className="text-base text-gray-700 mt-2 line-clamp-2 leading-relaxed">
                                 {event.description}
                               </p>
                             )}
