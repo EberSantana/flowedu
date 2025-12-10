@@ -1043,3 +1043,12 @@
 - [ ] Implementar fluxo completo: deletar → importar → feedback
 - [ ] Adicionar relatório de mudanças (X removidos, Y adicionados)
 - [ ] Testar com PDFs de anos diferentes
+
+## Novos Widgets para Dashboard
+- [x] Implementar widget "Contador de Tempo até Próxima Aula"
+- [x] Implementar widget "Lista de Tarefas Pendentes"
+- [x] Implementar widget "Prazos Importantes"
+- [x] Adicionar widgets ao sistema de personalização do Dashboard
+- [x] Garantir persistência no localStorage
+- [x] Adaptar widgets ao modo compacto da sidebar
+- [ ] Criar testes para novos widgets

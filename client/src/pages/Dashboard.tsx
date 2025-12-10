@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -56,6 +56,9 @@ export default function Dashboard() {
       todayClasses: true,
       upcomingEvents: true,
       weeklyChart: true,
+      timeToNextClass: true,
+      todoList: true,
+      importantDeadlines: true,
     };
   });
   
@@ -75,6 +78,9 @@ export default function Dashboard() {
       todayClasses: true,
       upcomingEvents: true,
       weeklyChart: true,
+      timeToNextClass: true,
+      todoList: true,
+      importantDeadlines: true,
     };
     setWidgetVisibility(defaultVisibility);
     toast.success('Layout restaurado para o padrão!');
@@ -97,6 +103,78 @@ export default function Dashboard() {
 
   // Calcular total de aulas agendadas
   const totalScheduledClasses = scheduledClasses?.length || 0;
+  
+  // ===== NOVOS WIDGETS =====
+  
+  // Estado da lista de tarefas
+  const [todoItems, setTodoItems] = useState<Array<{id: string, text: string, completed: boolean}>>(() => {
+    const saved = localStorage.getItem('dashboardTodoList');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [newTodoText, setNewTodoText] = useState('');
+  
+  // Salvar tarefas no localStorage
+  useEffect(() => {
+    localStorage.setItem('dashboardTodoList', JSON.stringify(todoItems));
+  }, [todoItems]);
+  
+  const addTodoItem = () => {
+    if (newTodoText.trim()) {
+      setTodoItems([...todoItems, { id: Date.now().toString(), text: newTodoText.trim(), completed: false }]);
+      setNewTodoText('');
+    }
+  };
+  
+  const toggleTodoItem = (id: string) => {
+    setTodoItems(todoItems.map(item => 
+      item.id === id ? { ...item, completed: !item.completed } : item
+    ));
+  };
+  
+  const deleteTodoItem = (id: string) => {
+    setTodoItems(todoItems.filter(item => item.id !== id));
+  };
+  
+  // Calcular tempo até próxima aula
+  const [timeToNextClass, setTimeToNextClass] = useState<{hours: number, minutes: number, seconds: number} | null>(null);
+  
+  useEffect(() => {
+    const calculateTimeToNextClass = () => {
+      if (!upcomingClasses || upcomingClasses.length === 0) {
+        setTimeToNextClass(null);
+        return;
+      }
+      
+      const nextClass = upcomingClasses[0];
+      const now = new Date();
+      const classDateTime = new Date(`${nextClass.date}T${nextClass.startTime}`);
+      const diff = classDateTime.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        setTimeToNextClass(null);
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      setTimeToNextClass({ hours, minutes, seconds });
+    };
+    
+    calculateTimeToNextClass();
+    const interval = setInterval(calculateTimeToNextClass, 1000);
+    
+    return () => clearInterval(interval);
+  }, [upcomingClasses]);
+  
+  // Prazos importantes (eventos dos próximos 7 dias)
+  const importantDeadlines = calendarUpcomingEvents?.filter((event: any) => {
+    const eventDate = new Date(event.eventDate);
+    const now = new Date();
+    const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= 7 && (event.eventType === 'school_event' || event.eventType === 'holiday');
+  }).slice(0, 5) || [];
 
   // Dados para gráfico de distribuição semanal
   const weeklyDistribution = {
@@ -269,6 +347,48 @@ export default function Dashboard() {
                       {widgetVisibility.weeklyChart ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </div>
                     <p className="text-sm font-medium">Gráfico Semanal</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('timeToNextClass')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.timeToNextClass
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.timeToNextClass ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Contador de Tempo</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('todoList')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.todoList
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.todoList ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Lista de Tarefas</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('importantDeadlines')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.importantDeadlines
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.importantDeadlines ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Prazos Importantes</p>
                   </button>
                 </div>
               </CardContent>
@@ -710,6 +830,199 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           )}
+          
+          {/* ===== NOVOS WIDGETS ===== */}
+          
+          {/* Grid dos Novos Widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            {/* Widget 1: Contador de Tempo até Próxima Aula */}
+            {widgetVisibility.timeToNextClass && (
+              <Card className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Timer className="h-5 w-5 text-teal-600" />
+                    Próxima Aula
+                  </CardTitle>
+                  <CardDescription>Tempo restante até sua próxima aula</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {timeToNextClass && upcomingClasses && upcomingClasses.length > 0 ? (
+                    <>
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <div className="text-center">
+                          <div className={`text-4xl font-bold ${
+                            timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 
+                              ? 'text-red-600 animate-pulse' 
+                              : 'text-teal-600'
+                          }`}>
+                            {String(timeToNextClass.hours).padStart(2, '0')}:{String(timeToNextClass.minutes).padStart(2, '0')}:{String(timeToNextClass.seconds).padStart(2, '0')}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">horas:minutos:segundos</p>
+                        </div>
+                      </div>
+                      
+                      {timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                          <p className="text-sm text-red-700 font-medium flex items-center gap-2">
+                            <Bell className="h-4 w-4" />
+                            Alerta: Aula começa em breve!
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-sm font-medium text-gray-900 mb-1">
+                          {upcomingClasses[0].subjectName}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {upcomingClasses[0].className} • {upcomingClasses[0].startTime} - {upcomingClasses[0].endTime}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-6">
+                      <Clock className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Nenhuma aula agendada</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Widget 2: Lista de Tarefas Pendentes */}
+            {widgetVisibility.todoList && (
+              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <CheckSquare className="h-5 w-5 text-purple-600" />
+                    Tarefas Pendentes
+                  </CardTitle>
+                  <CardDescription>
+                    {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
+                    {todoItems.length === 0 ? (
+                      <div className="text-center py-6">
+                        <CheckSquare className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">Nenhuma tarefa adicionada</p>
+                      </div>
+                    ) : (
+                      todoItems.map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
+                        >
+                          <button
+                            onClick={() => toggleTodoItem(item.id)}
+                            className="flex-shrink-0"
+                          >
+                            {item.completed ? (
+                              <CheckSquare className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <Square className="h-5 w-5 text-gray-400" />
+                            )}
+                          </button>
+                          <span className={`flex-1 text-sm ${
+                            item.completed 
+                              ? 'line-through text-gray-400' 
+                              : 'text-gray-900'
+                          }`}>
+                            {item.text}
+                          </span>
+                          <button
+                            onClick={() => deleteTodoItem(item.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newTodoText}
+                      onChange={(e) => setNewTodoText(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addTodoItem()}
+                      placeholder="Nova tarefa..."
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <Button
+                      onClick={addTodoItem}
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Widget 3: Prazos Importantes */}
+            {widgetVisibility.importantDeadlines && (
+              <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Bell className="h-5 w-5 text-orange-600" />
+                    Prazos Importantes
+                  </CardTitle>
+                  <CardDescription>Próximos 7 dias</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {importantDeadlines.length === 0 ? (
+                      <div className="text-center py-6">
+                        <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">Nenhum prazo nos próximos 7 dias</p>
+                      </div>
+                    ) : (
+                      importantDeadlines.map((event: any) => {
+                        const eventDate = new Date(event.eventDate);
+                        const now = new Date();
+                        const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                        
+                        const urgencyColor = diffDays <= 2 ? 'bg-red-500' : diffDays <= 5 ? 'bg-yellow-500' : 'bg-green-500';
+                        const urgencyText = diffDays === 0 ? 'HOJE' : diffDays === 1 ? 'AMANHÃ' : `${diffDays}d`;
+                        
+                        const dayOfWeek = eventDate.toLocaleDateString('pt-BR', { weekday: 'short' });
+                        const dayMonth = eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                        
+                        return (
+                          <div
+                            key={event.id}
+                            className="relative p-3 rounded-lg border-2 border-orange-200 bg-orange-50 hover:shadow-md transition-shadow"
+                          >
+                            <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
+                              {urgencyText}
+                            </div>
+                            
+                            <h4 className="font-bold text-gray-900 text-sm mb-1 pr-8">
+                              {event.title}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {dayOfWeek}, {dayMonth}
+                            </p>
+                            {event.description && (
+                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                {event.description}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
+          </div>
 
 
 
