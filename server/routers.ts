@@ -514,6 +514,111 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         return db.deleteCalendarEvent(input.id, ctx.user.id);
       }),
+    
+    importFromPDF: protectedProcedure
+      .input(z.object({
+        pdfBase64: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import("./_core/llm");
+        const { PDFParse } = await import("pdf-parse");
+        
+        // Converter base64 para buffer
+        const pdfBuffer = Buffer.from(input.pdfBase64, 'base64');
+        
+        // Extrair texto do PDF
+        const parser = new PDFParse({ data: pdfBuffer });
+        const textResult = await parser.getText();
+        const pdfText = textResult.text;
+        
+        // Usar LLM para extrair eventos
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: `Você é um assistente especializado em extrair eventos de calendários acadêmicos. 
+Analise o texto fornecido e extraia TODOS os eventos com suas datas.
+Retorne um JSON com array de eventos no formato:
+{
+  "events": [
+    {
+      "title": "Nome do evento",
+      "description": "Descrição completa",
+      "eventDate": "YYYY-MM-DD",
+      "eventType": "holiday" | "commemorative" | "school_event" | "personal"
+    }
+  ]
+}
+
+Regras:
+- Identifique feriados como "holiday"
+- Datas comemorativas como "commemorative"
+- Eventos escolares/acadêmicos como "school_event"
+- Se houver períodos (ex: "01 a 18 - Férias"), crie evento para o primeiro dia
+- Ignore informações de dias letivos/sábados letivos
+- IMPORTANTE: Retorne APENAS o JSON, sem texto adicional`
+            },
+            {
+              role: "user",
+              content: `Extraia todos os eventos deste calendário escolar:\n\n${pdfText.slice(0, 15000)}`
+            }
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "calendar_events",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  events: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        title: { type: "string" },
+                        description: { type: "string" },
+                        eventDate: { type: "string" },
+                        eventType: { type: "string", enum: ["holiday", "commemorative", "school_event", "personal"] }
+                      },
+                      required: ["title", "description", "eventDate", "eventType"],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ["events"],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const content = response.choices[0].message.content;
+        const parsedResult = JSON.parse(typeof content === 'string' ? content : '{ "events": [] }');
+        return parsedResult.events;
+      }),
+    
+    bulkCreate: protectedProcedure
+      .input(z.object({
+        events: z.array(z.object({
+          title: z.string(),
+          description: z.string(),
+          eventDate: z.string(),
+          eventType: z.enum(["holiday", "commemorative", "school_event", "personal"])
+        }))
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const results = [];
+        for (const event of input.events) {
+          const created = await db.createCalendarEvent({
+            userId: ctx.user.id,
+            ...event,
+            isRecurring: 0
+          });
+          results.push(created);
+        }
+        return { success: true, count: results.length };
+      }),
   }),
 
   user: router({    updateProfile: protectedProcedure

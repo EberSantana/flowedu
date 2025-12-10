@@ -1021,3 +1021,13 @@
 ## Correções de Interface
 - [x] Ajustar posicionamento do badge "2" no Calendário para não sobrepor texto quando menu expandir
 - [x] Corrigir texto "Coes Rápidas" para "Ações Rápidas" no painel de personalização
+
+## Importação Inteligente de Calendário via PDF
+- [ ] Criar rota tRPC para upload de arquivo PDF
+- [ ] Implementar extração de texto do PDF (pdf-parse ou similar)
+- [ ] Criar função de parsing com LLM (invokeLLM) para extrair eventos
+- [ ] Criar interface de upload na página Calendário
+- [ ] Implementar preview de eventos extraídos (tabela)
+- [ ] Criar rota tRPC para importação em massa de eventos
+- [ ] Adicionar feedback visual (loading, sucesso, erros)
+- [ ] Testar com PDF real do calendário escolar 2025

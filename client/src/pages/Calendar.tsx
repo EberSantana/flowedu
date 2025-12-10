@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { CalendarDays, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { CalendarDays, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Clock, Upload, FileText, Check, X } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 
@@ -41,6 +41,12 @@ export default function Calendar() {
     isRecurring: 0,
     color: "#8b5cf6",
   });
+  
+  // Estados para importação de PDF
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [extractedEvents, setExtractedEvents] = useState<any[]>([]);
+  const [selectedEvents, setSelectedEvents] = useState<Set<number>>(new Set());
 
   const { data: events, isLoading } = trpc.calendar.listByYear.useQuery({ year: selectedYear });
   const utils = trpc.useUtils();
@@ -74,6 +80,32 @@ export default function Calendar() {
     },
     onError: (error) => {
       toast.error("Erro ao excluir evento: " + error.message);
+    },
+  });
+  
+  const importMutation = trpc.calendar.importFromPDF.useMutation({
+    onSuccess: (events) => {
+      setExtractedEvents(events);
+      setSelectedEvents(new Set(events.map((_: any, i: number) => i)));
+      setIsProcessing(false);
+      toast.success(`${events.length} eventos extraídos com sucesso!`);
+    },
+    onError: (error) => {
+      setIsProcessing(false);
+      toast.error("Erro ao processar PDF: " + error.message);
+    },
+  });
+  
+  const bulkCreateMutation = trpc.calendar.bulkCreate.useMutation({
+    onSuccess: (result) => {
+      utils.calendar.listByYear.invalidate();
+      toast.success(`${result.count} eventos importados com sucesso!`);
+      setIsImportDialogOpen(false);
+      setExtractedEvents([]);
+      setSelectedEvents(new Set());
+    },
+    onError: (error) => {
+      toast.error("Erro ao importar eventos: " + error.message);
     },
   });
 
@@ -166,6 +198,43 @@ export default function Calendar() {
       deleteMutation.mutate({ id });
     }
   };
+  
+  const handlePDFUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.type !== 'application/pdf') {
+      toast.error('Por favor, selecione um arquivo PDF');
+      return;
+    }
+    
+    setIsProcessing(true);
+    
+    // Converter para base64
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result?.toString().split(',')[1];
+      if (base64) {
+        importMutation.mutate({ pdfBase64: base64 });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const toggleEventSelection = (index: number) => {
+    const newSelection = new Set(selectedEvents);
+    if (newSelection.has(index)) {
+      newSelection.delete(index);
+    } else {
+      newSelection.add(index);
+    }
+    setSelectedEvents(newSelection);
+  };
+  
+  const handleConfirmImport = () => {
+    const eventsToImport = extractedEvents.filter((_, i) => selectedEvents.has(i));
+    bulkCreateMutation.mutate({ events: eventsToImport });
+  };
 
   const handleDayClick = (date: Date) => {
     setSelectedDate(date);
@@ -221,6 +290,13 @@ export default function Calendar() {
                 {monthEvents.length} {monthEvents.length === 1 ? 'evento' : 'eventos'} em {MONTHS[selectedMonth]}
               </p>
             </div>
+            <Button
+              onClick={() => setIsImportDialogOpen(true)}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Importar Calendário PDF
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -494,6 +570,135 @@ export default function Calendar() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Dialog de Importação de PDF */}
+        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-green-600" />
+                Importar Calendário Escolar (PDF)
+              </DialogTitle>
+              <DialogDescription>
+                Faça upload do PDF do calendário escolar para extrair automaticamente todos os eventos.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {extractedEvents.length === 0 ? (
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-500 transition-colors">
+                  <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <Label htmlFor="pdf-upload" className="cursor-pointer">
+                    <span className="text-lg font-medium text-gray-700">Clique para selecionar o PDF</span>
+                    <p className="text-sm text-gray-500 mt-2">ou arraste e solte aqui</p>
+                  </Label>
+                  <Input
+                    id="pdf-upload"
+                    type="file"
+                    accept=".pdf"
+                    onChange={handlePDFUpload}
+                    className="hidden"
+                    disabled={isProcessing}
+                  />
+                </div>
+                
+                {isProcessing && (
+                  <div className="text-center py-8">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+                    <p className="text-gray-600">Processando PDF e extraindo eventos...</p>
+                    <p className="text-sm text-gray-500 mt-2">Isso pode levar alguns segundos</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between bg-green-50 p-4 rounded-lg">
+                  <div>
+                    <p className="font-medium text-green-900">{extractedEvents.length} eventos extraídos</p>
+                    <p className="text-sm text-green-700">{selectedEvents.size} selecionados para importar</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedEvents(new Set(extractedEvents.map((_: any, i: number) => i)))}
+                    >
+                      <Check className="w-4 h-4 mr-1" />
+                      Selecionar Todos
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedEvents(new Set())}
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Limpar Seleção
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="max-h-96 overflow-y-auto space-y-2">
+                  {extractedEvents.map((event, index) => (
+                    <div
+                      key={index}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        selectedEvents.has(index)
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => toggleEventSelection(index)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1">
+                          {selectedEvents.has(index) ? (
+                            <Check className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <div className="w-5 h-5 border-2 border-gray-300 rounded"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">{event.title}</span>
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${
+                              EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES].color
+                            } text-white`}>
+                              {EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES].label}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-1">{event.description}</p>
+                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(event.eventDate).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setExtractedEvents([]);
+                      setSelectedEvents(new Set());
+                      setIsImportDialogOpen(false);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleConfirmImport}
+                    disabled={selectedEvents.size === 0 || bulkCreateMutation.isPending}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                  >
+                    {bulkCreateMutation.isPending ? 'Importando...' : `Importar ${selectedEvents.size} Eventos`}
+                  </Button>
+                </DialogFooter>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </PageWrapper>
