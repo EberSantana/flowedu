@@ -1007,3 +1007,13 @@
 ## Remoção de Widget Duplicado
 - [x] Remover widget antigo "Próximos Eventos" do Dashboard
 - [x] Manter apenas novo widget "Eventos Próximos (3 dias)"
+
+## Personalização do Dashboard
+- [x] Instalar biblioteca dnd-kit para drag-and-drop
+- [x] Criar estado para gerenciar ordem e visibilidade dos widgets
+- [x] Implementar botão "Personalizar Dashboard" e modo de edição
+- [x] Adicionar controles de mostrar/ocultar para cada widget
+- [x] Implementar visibilidade condicional para widgets
+- [x] Salvar preferências no localStorage
+- [x] Adicionar botão "Restaurar Padrão"
+- [x] Testar persistência entre sessões

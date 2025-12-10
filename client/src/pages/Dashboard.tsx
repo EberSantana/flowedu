@@ -1,13 +1,13 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -45,6 +45,40 @@ export default function Dashboard() {
   const { data: upcomingEvents } = trpc.dashboard.getUpcomingEvents.useQuery();
   const { data: calendarUpcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery();
   const hasShownToast = useRef(false);
+  
+  // Estado de personalização do Dashboard
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [widgetVisibility, setWidgetVisibility] = useState(() => {
+    const saved = localStorage.getItem('dashboardWidgetVisibility');
+    return saved ? JSON.parse(saved) : {
+      stats: true,
+      quickActions: true,
+      todayClasses: true,
+      upcomingEvents: true,
+      weeklyChart: true,
+    };
+  });
+  
+  // Salvar preferências no localStorage
+  useEffect(() => {
+    localStorage.setItem('dashboardWidgetVisibility', JSON.stringify(widgetVisibility));
+  }, [widgetVisibility]);
+  
+  const toggleWidget = (widgetKey: string) => {
+    setWidgetVisibility((prev: any) => ({ ...prev, [widgetKey]: !prev[widgetKey] }));
+  };
+  
+  const resetToDefault = () => {
+    const defaultVisibility = {
+      stats: true,
+      quickActions: true,
+      todayClasses: true,
+      upcomingEvents: true,
+      weeklyChart: true,
+    };
+    setWidgetVisibility(defaultVisibility);
+    toast.success('Layout restaurado para o padrão!');
+  };
   
   // Toast automático para eventos próximos
   useEffect(() => {
@@ -120,16 +154,129 @@ export default function Dashboard() {
       <PageWrapper className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Bem-vindo, {user?.name || 'Professor'}!
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Visão geral do seu sistema de gestão de tempo
-            </p>
+          <div className="mb-8 flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Bem-vindo, {user?.name || 'Professor'}!
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Visão geral do seu sistema de gestão de tempo
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {isCustomizing && (
+                <Button
+                  onClick={resetToDefault}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Restaurar Padrão
+                </Button>
+              )}
+              <Button
+                onClick={() => setIsCustomizing(!isCustomizing)}
+                variant={isCustomizing ? "default" : "outline"}
+                size="sm"
+                className="gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                {isCustomizing ? 'Concluir' : 'Personalizar'}
+              </Button>
+            </div>
           </div>
+          
+          {/* Painel de Controle de Widgets */}
+          {isCustomizing && (
+            <Card className="mb-6 bg-blue-50 border-2 border-blue-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Personalizar Dashboard
+                </CardTitle>
+                <CardDescription>
+                  Escolha quais widgets você deseja exibir
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  <button
+                    onClick={() => toggleWidget('stats')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.stats
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.stats ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Estatísticas</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('quickActions')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.quickActions
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.quickActions ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Ções Rápidas</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('todayClasses')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.todayClasses
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.todayClasses ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Aulas de Hoje</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('upcomingEvents')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.upcomingEvents
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.upcomingEvents ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Eventos Próximos</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('weeklyChart')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.weeklyChart
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.weeklyChart ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Gráfico Semanal</p>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Cards de Métricas Principais */}
+          {widgetVisibility.stats && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
@@ -176,10 +323,12 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+          )}
 
           {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Ações Rápidas */}
+            {widgetVisibility.quickActions && (
             <Card className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
                 <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
@@ -321,8 +470,10 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Aulas de Hoje */}
+            {widgetVisibility.todayClasses && (
             <Card className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
                 <CardTitle className="text-xl font-bold text-gray-900">Aulas de Hoje</CardTitle>
@@ -427,10 +578,11 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+            )}
           </div>
 
           {/* Widget: Eventos Próximos do Calendário (3 dias) */}
-          {calendarUpcomingEvents && calendarUpcomingEvents.length > 0 && (
+          {widgetVisibility.upcomingEvents && calendarUpcomingEvents && calendarUpcomingEvents.length > 0 && (
             <Card className="mb-8 overflow-hidden border-2 border-amber-200 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 border-b-2 border-amber-200">
                 <div className="flex items-center justify-between">
@@ -526,7 +678,7 @@ export default function Dashboard() {
           )}
 
           {/* Gráfico de Distribuição Semanal */}
-          {scheduledClasses && scheduledClasses.length > 0 && (
+          {widgetVisibility.weeklyChart && scheduledClasses && scheduledClasses.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Distribuição Semanal</CardTitle>
