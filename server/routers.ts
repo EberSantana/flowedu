@@ -4,6 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { tasks } from "../drizzle/schema";
+import { and, eq, sql } from "drizzle-orm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -941,6 +943,70 @@ Regras:
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
         return await db.deleteClassStatus(input.id, ctx.user.id);
+      }),
+  }),
+
+  // ============================================
+  // TASKS (TO-DO LIST)
+  // ============================================
+  tasks: router({
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(1).max(500),
+        description: z.string().optional(),
+        priority: z.enum(["low", "medium", "high"]).default("medium"),
+        category: z.string().max(100).optional(),
+        dueDate: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createTask({ ...input, userId: ctx.user.id });
+      }),
+
+    getAll: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getAllTasks(ctx.user.id);
+      }),
+
+    getByFilter: protectedProcedure
+      .input(z.object({
+        completed: z.boolean().optional(),
+        priority: z.enum(["low", "medium", "high"]).optional(),
+        category: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.getTasksByFilter(ctx.user.id, input);
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().min(1).max(500).optional(),
+        description: z.string().optional(),
+        priority: z.enum(["low", "medium", "high"]).optional(),
+        category: z.string().max(100).optional(),
+        dueDate: z.string().optional(),
+        orderIndex: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateTask(id, ctx.user.id, data);
+      }),
+
+    toggleComplete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.toggleTaskComplete(input.id, ctx.user.id);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteTask(input.id, ctx.user.id);
+      }),
+
+    getCategories: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getTaskCategories(ctx.user.id);
       }),
   }),
 

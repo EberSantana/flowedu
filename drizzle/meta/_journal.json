@@ -43,6 +43,13 @@
       "when": 1765393264783,
       "tag": "0005_misty_jazinda",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1765403001181,
+      "tag": "0006_curvy_clint_barton",
+      "breakpoints": true
     }
   ]
 }

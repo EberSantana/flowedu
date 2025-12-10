@@ -1,4 +1,4 @@
-import { and, desc, eq, ne, gte, lte, inArray } from "drizzle-orm";
+import { and, desc, eq, ne, gte, lte, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -12,6 +12,7 @@ import {
   auditLogs,
   activeMethodologies,
   classStatuses,
+  tasks,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -684,4 +685,99 @@ export async function deleteClassStatus(id: number, userId: number) {
   ));
   
   return { success: true };
+}
+
+
+// ============================================
+// TASKS (TO-DO LIST)
+// ============================================
+
+export async function createTask(data: { title: string; description?: string; priority?: "low" | "medium" | "high"; category?: string; dueDate?: string; userId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(tasks).values(data);
+  return { success: true, id: result.insertId };
+}
+
+export async function getAllTasks(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(tasks)
+    .where(eq(tasks.userId, userId))
+    .orderBy(tasks.orderIndex, tasks.createdAt);
+}
+
+export async function getTasksByFilter(userId: number, filter: { completed?: boolean; priority?: string; category?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const conditions = [eq(tasks.userId, userId)];
+  
+  if (filter.completed !== undefined) {
+    conditions.push(eq(tasks.completed, filter.completed));
+  }
+  if (filter.priority) {
+    conditions.push(eq(tasks.priority, filter.priority as any));
+  }
+  if (filter.category) {
+    conditions.push(eq(tasks.category, filter.category));
+  }
+  
+  return await db.select().from(tasks)
+    .where(and(...conditions))
+    .orderBy(tasks.orderIndex, tasks.createdAt);
+}
+
+export async function updateTask(id: number, userId: number, data: Partial<{ title: string; description: string; priority: string; category: string; dueDate: string; orderIndex: number }>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(tasks)
+    .set(data as any)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function toggleTaskComplete(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [task] = await db.select().from(tasks)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)));
+  
+  if (!task) throw new Error("Task not found");
+  
+  const newCompleted = !task.completed;
+  await db.update(tasks)
+    .set({ 
+      completed: newCompleted, 
+      completedAt: newCompleted ? new Date() : null 
+    })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)));
+  
+  return { success: true, completed: newCompleted };
+}
+
+export async function deleteTask(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(tasks)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function getTaskCategories(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.selectDistinct({ category: tasks.category })
+    .from(tasks)
+    .where(and(eq(tasks.userId, userId), sql`${tasks.category} IS NOT NULL`));
+  
+  return result.map((r: any) => r.category).filter(Boolean);
 }

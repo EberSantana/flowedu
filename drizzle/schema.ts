@@ -187,3 +187,24 @@ export const classStatuses = mysqlTable("class_statuses", {
 
 export type ClassStatus = typeof classStatuses.$inferSelect;
 export type InsertClassStatus = typeof classStatuses.$inferInsert;
+
+/**
+ * Tarefas (To-Do List estilo Todoist)
+ */
+export const tasks = mysqlTable("tasks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 500 }).notNull(),
+  description: text("description"),
+  priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
+  category: varchar("category", { length: 100 }),
+  dueDate: varchar("dueDate", { length: 10 }), // Formato: YYYY-MM-DD
+  completed: boolean("completed").default(false).notNull(),
+  completedAt: timestamp("completedAt"),
+  orderIndex: int("orderIndex").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = typeof tasks.$inferInsert;
