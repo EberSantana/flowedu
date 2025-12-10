@@ -1190,3 +1190,16 @@
 - [x] Ajustar tamanhos de fontes internas (text-base → text-sm, text-5xl → text-3xl)
 - [x] Reduzir círculo de progresso (w-48 h-48 → w-36 h-36)
 - [x] Garantir proporção visual entre todos os widgets
+
+
+## Implementação de PWA (Progressive Web App)
+- [x] Gerar ícones do app em múltiplos tamanhos (192x192, 512x512)
+- [x] Criar arquivo manifest.json com metadados do app
+- [x] Implementar service worker para cache offline (Network First + Cache Fallback)
+- [x] Registrar service worker no main.tsx
+- [x] Adicionar link do manifest no index.html
+- [x] Configurar tema e cores do app (theme-color #3B82F6)
+- [x] Adicionar meta tags para iOS (apple-mobile-web-app)
+- [x] Adicionar prompt de instalação customizado (InstallPWA component)
+- [x] Configurar atalhos rápidos (Dashboard, Grade, Calendário)
+- [ ] Testar instalação no Android e iOS

@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import AdminUsers from "./pages/AdminUsers";
 import ActiveMethodologies from "./pages/ActiveMethodologies";
 import BibleFooter from "./components/BibleFooter";
+import { InstallPWA } from "./components/InstallPWA";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       <BibleFooter />
+      <InstallPWA />
     </>
   );
 }
