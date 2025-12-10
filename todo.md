@@ -1163,3 +1163,12 @@
 - [x] Diminuir tamanhos de fonte mantendo legibilidade (text-lg → text-sm, text-base → text-xs)
 - [x] Ajustar padding e gaps para layout mais limpo (p-4 → p-2.5, gap-2)
 - [x] Testar harmonia visual entre todos os widgets
+
+
+## Padronização de Cores dos Widgets do Dashboard
+- [x] Remover fundos coloridos dos cards internos (orange-50, purple-50, teal-50, etc.)
+- [x] Aplicar fundo branco/cinza claro uniforme em todos os widgets
+- [x] Manter apenas bordas coloridas para identificação visual
+- [x] Ajustar contraste de textos para melhor legibilidade
+- [x] Garantir harmonia visual entre todos os widgets
+- [x] Testar acessibilidade e contraste de cores

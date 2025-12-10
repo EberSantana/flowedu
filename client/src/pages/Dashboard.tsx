@@ -376,7 +376,7 @@ export default function Dashboard() {
           
           {/* Painel de Controle de Widgets */}
           {isCustomizing && (
-            <Card className="mb-6 bg-blue-50 border-2 border-blue-200">
+            <Card className="mb-6 bg-white border-2 border-blue-400">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Settings className="h-5 w-5" />
@@ -906,10 +906,10 @@ export default function Dashboard() {
                     
                     // Estilos por tipo de evento
                     const eventStyles: any = {
-                      holiday: { icon: '🎉', label: 'Feriado', borderColor: 'border-red-300', bgColor: 'bg-red-50' },
-                      commemorative: { icon: '🎂', label: 'Data Comemorativa', borderColor: 'border-amber-300', bgColor: 'bg-amber-50' },
-                      school_event: { icon: '🏫', label: 'Evento Escolar', borderColor: 'border-blue-300', bgColor: 'bg-blue-50' },
-                      personal: { icon: '📌', label: 'Observação', borderColor: 'border-purple-300', bgColor: 'bg-purple-50' },
+                      holiday: { icon: '🎉', label: 'Feriado', borderColor: 'border-red-300', bgColor: 'bg-white' },
+                      commemorative: { icon: '🎂', label: 'Data Comemorativa', borderColor: 'border-amber-300', bgColor: 'bg-white' },
+                      school_event: { icon: '🏫', label: 'Evento Escolar', borderColor: 'border-blue-300', bgColor: 'bg-white' },
+                      personal: { icon: '📌', label: 'Observação', borderColor: 'border-purple-300', bgColor: 'bg-white' },
                     };
                     
                     const style = eventStyles[event.eventType] || eventStyles.personal;
@@ -1056,7 +1056,7 @@ export default function Dashboard() {
                       </div>
                       
                       {timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                        <div className="bg-white border-2 border-red-400 rounded-lg p-3 mb-3">
                           <p className="text-sm text-red-700 font-medium flex items-center gap-2">
                             <Bell className="h-4 w-4" />
                             Alerta: Aula começa em breve!
@@ -1075,8 +1075,8 @@ export default function Dashboard() {
                     </>
                   ) : (
                     <div className="text-center py-8">
-                      <div className="bg-teal-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                        <Clock className="h-10 w-10 text-teal-400" />
+                      <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                        <Clock className="h-10 w-10 text-gray-400" />
                       </div>
                       <p className="text-base font-medium text-gray-900 mb-2">🎉 Nenhuma aula hoje!</p>
                       <p className="text-sm text-gray-500 mb-4">Aproveite seu tempo livre</p>
@@ -1133,8 +1133,8 @@ export default function Dashboard() {
                   <div className="space-y-1.5 mb-2 flex-1 overflow-y-auto custom-scrollbar">
                     {todoItems.length === 0 ? (
                       <div className="text-center py-4">
-                        <div className="bg-purple-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
-                          <CheckSquare className="h-7 w-7 text-purple-400" />
+                        <div className="bg-gray-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
+                          <CheckSquare className="h-7 w-7 text-gray-400" />
                         </div>
                         <p className="text-sm font-medium text-gray-900 mb-1">✨ Lista vazia!</p>
                         <p className="text-xs text-gray-500">Adicione suas tarefas abaixo</p>
@@ -1234,14 +1234,14 @@ export default function Dashboard() {
                     {isLoadingCalendar ? (
                       // Skeleton Loading
                       <>
-                        <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
                           <Skeleton className="h-10 w-10 rounded-full" />
                           <div className="flex-1 space-y-2">
                             <Skeleton className="h-5 w-3/4" />
                             <Skeleton className="h-4 w-1/2" />
                           </div>
                         </div>
-                        <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
                           <Skeleton className="h-10 w-10 rounded-full" />
                           <div className="flex-1 space-y-2">
                             <Skeleton className="h-5 w-3/4" />
@@ -1251,8 +1251,8 @@ export default function Dashboard() {
                       </>
                     ) : importantDeadlines.length === 0 ? (
                       <div className="text-center py-4">
-                        <div className="bg-orange-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
-                          <CalendarIcon className="h-7 w-7 text-orange-400" />
+                        <div className="bg-gray-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
+                          <CalendarIcon className="h-7 w-7 text-gray-400" />
                         </div>
                         <p className="text-sm font-medium text-gray-900 mb-1">👍 Tudo tranquilo!</p>
                         <p className="text-xs text-gray-500 mb-3">Nenhum prazo nos próximos 7 dias</p>
@@ -1278,7 +1278,7 @@ export default function Dashboard() {
                         return (
                           <div
                             key={event.id}
-                            className="relative p-2.5 rounded-lg border border-orange-200 bg-orange-50 hover:shadow-md transition-shadow"
+                            className="relative p-2.5 rounded-lg border border-gray-200 bg-white hover:shadow-md transition-shadow"
                           >
                             <div className={`absolute -top-1.5 -right-1.5 ${urgencyColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md`}>
                               {urgencyText}
