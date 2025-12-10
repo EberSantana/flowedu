@@ -998,13 +998,13 @@ export default function Dashboard() {
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
               <Card 
-                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
+                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
                 style={{ order: widgetOrder.indexOf('timeToNextClass') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <Timer className="h-5 w-5 text-teal-600" />
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <Timer className="h-4 w-4 text-teal-600" />
                       Próxima Aula
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1028,7 +1028,7 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   </div>
-                  <CardDescription>Tempo restante até sua próxima aula</CardDescription>
+                  <CardDescription className="text-xs">Tempo restante até sua próxima aula</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-center">
                   {isLoadingUpcoming ? (
@@ -1044,14 +1044,14 @@ export default function Dashboard() {
                     <>
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <div className="text-center">
-                          <div className={`text-3xl font-bold ${
+                          <div className={`text-2xl font-bold ${
                             timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 
                               ? 'text-red-600 animate-pulse' 
                               : 'text-teal-600'
                           }`}>
                             {String(timeToNextClass.hours).padStart(2, '0')}:{String(timeToNextClass.minutes).padStart(2, '0')}:{String(timeToNextClass.seconds).padStart(2, '0')}
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">horas:minutos:segundos</p>
+                          <p className="text-[10px] text-gray-500 mt-1">horas:minutos:segundos</p>
                         </div>
                       </div>
                       
@@ -1078,8 +1078,8 @@ export default function Dashboard() {
                       <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                         <Clock className="h-10 w-10 text-gray-400" />
                       </div>
-                      <p className="text-base font-medium text-gray-900 mb-2">🎉 Nenhuma aula hoje!</p>
-                      <p className="text-sm text-gray-500 mb-4">Aproveite seu tempo livre</p>
+                      <p className="text-sm font-medium text-gray-900 mb-2">🎉 Nenhuma aula hoje!</p>
+                      <p className="text-xs text-gray-500 mb-4">Aproveite seu tempo livre</p>
                       <Link href="/schedule">
                         <Button variant="outline" size="sm" className="gap-2">
                           <CalendarIcon className="h-4 w-4" />
@@ -1307,13 +1307,13 @@ export default function Dashboard() {
             {/* Widget 4: Progresso Semanal */}
             {widgetVisibility.weeklyProgress && (
               <Card 
-                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
+                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
                 style={{ order: widgetOrder.indexOf('weeklyProgress') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-indigo-600" />
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-indigo-600" />
                       Progresso Semanal
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1353,8 +1353,8 @@ export default function Dashboard() {
                       <div className="bg-indigo-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                         <CalendarIcon className="h-10 w-10 text-indigo-400" />
                       </div>
-                      <p className="text-base font-medium text-gray-900 mb-2">📅 Nenhuma aula agendada</p>
-                      <p className="text-sm text-gray-500 mb-4">Configure sua grade semanal</p>
+                      <p className="text-sm font-medium text-gray-900 mb-2">📅 Nenhuma aula agendada</p>
+                      <p className="text-xs text-gray-500 mb-4">Configure sua grade semanal</p>
                       <Link href="/schedule">
                         <Button variant="outline" size="sm" className="gap-2">
                           <CalendarIcon className="h-4 w-4" />
@@ -1366,7 +1366,7 @@ export default function Dashboard() {
                     // Barra Circular de Progresso
                     <div className="flex flex-col items-center gap-4">
                       {/* SVG Circular Progress */}
-                      <div className="relative w-48 h-48">
+                      <div className="relative w-36 h-36">
                         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
                           {/* Background Circle */}
                           <circle
@@ -1398,7 +1398,7 @@ export default function Dashboard() {
                         {/* Texto Central */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                           <span className={
-                            `text-5xl font-bold ${
+                            `text-3xl font-bold ${
                               weeklyProgress.percentage >= 70 ? 'text-green-600' :
                               weeklyProgress.percentage >= 40 ? 'text-yellow-600' :
                               'text-red-600'
@@ -1414,7 +1414,7 @@ export default function Dashboard() {
                       
                       {/* Legenda */}
                       <div className="text-center">
-                        <p className="text-base font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900">
                           {weeklyProgress.percentage >= 70 ? '🎉 Ótimo progresso!' :
                            weeklyProgress.percentage >= 40 ? '💪 Continue assim!' :
                            '🚀 Vamos lá!'}

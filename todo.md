@@ -1179,3 +1179,14 @@
 - [x] Ajustar margin-bottom entre grupos de widgets (mb-6 md:mb-8 → mb-8)
 - [x] Melhorar respiração visual geral do Dashboard
 - [x] Testar em diferentes resoluções de tela
+
+
+## Padronização de Tamanhos dos Widgets
+- [x] Padronizar títulos de todos os widgets (text-lg → text-base, h-5 w-5 → h-4 w-4)
+- [x] Padronizar descrições (text-xs)
+- [x] Reduzir tamanho do relógio de Próxima Aula (text-3xl → text-2xl)
+- [x] Uniformizar altura dos cards (h-[420px] → h-[320px])
+- [x] Padronizar tamanhos de ícones (h-5 w-5 → h-4 w-4)
+- [x] Ajustar tamanhos de fontes internas (text-base → text-sm, text-5xl → text-3xl)
+- [x] Reduzir círculo de progresso (w-48 h-48 → w-36 h-36)
+- [x] Garantir proporção visual entre todos os widgets
