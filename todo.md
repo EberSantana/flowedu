@@ -1154,3 +1154,12 @@
 - [x] Ajustar cálculo de completedClasses (excluir aulas não dadas/canceladas)
 - [x] Atualizar tooltip/legenda explicando o cálculo ajustado
 - [x] Testar cenários: sem status, com aulas canceladas, com aulas não dadas
+
+
+## Otimização de Layout dos Widgets do Dashboard
+- [x] Reduzir altura dos widgets Tarefas Pendentes e Prazos Importantes (420px → 320px)
+- [x] Tornar cards de eventos mais compactos (p-4 → p-2.5, border-2 → border)
+- [x] Reduzir espaçamentos internos (space-y-4 → space-y-2, pb-3 → pb-2)
+- [x] Diminuir tamanhos de fonte mantendo legibilidade (text-lg → text-sm, text-base → text-xs)
+- [x] Ajustar padding e gaps para layout mais limpo (p-4 → p-2.5, gap-2)
+- [x] Testar harmonia visual entre todos os widgets

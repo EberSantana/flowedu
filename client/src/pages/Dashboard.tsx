@@ -1095,13 +1095,13 @@ export default function Dashboard() {
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
               <Card 
-                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
+                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
                 style={{ order: widgetOrder.indexOf('todoList') }}
               >
-                <CardHeader className="pb-3 flex-shrink-0">
+                <CardHeader className="pb-2 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <CheckSquare className="h-5 w-5 text-purple-600" />
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <CheckSquare className="h-4 w-4 text-purple-600" />
                       Tarefas Pendentes
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1125,37 +1125,37 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   </div>
-                  <CardDescription>
+                  <CardDescription className="text-xs">
                     {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex-1 flex flex-col overflow-hidden">
-                  <div className="space-y-2 mb-3 flex-1 overflow-y-auto custom-scrollbar">
+                <CardContent className="flex-1 flex flex-col overflow-hidden p-4">
+                  <div className="space-y-1.5 mb-2 flex-1 overflow-y-auto custom-scrollbar">
                     {todoItems.length === 0 ? (
-                      <div className="text-center py-8">
-                        <div className="bg-purple-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                          <CheckSquare className="h-10 w-10 text-purple-400" />
+                      <div className="text-center py-4">
+                        <div className="bg-purple-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
+                          <CheckSquare className="h-7 w-7 text-purple-400" />
                         </div>
-                        <p className="text-base font-medium text-gray-900 mb-2">✨ Lista vazia!</p>
-                        <p className="text-sm text-gray-500">Adicione suas tarefas abaixo</p>
+                        <p className="text-sm font-medium text-gray-900 mb-1">✨ Lista vazia!</p>
+                        <p className="text-xs text-gray-500">Adicione suas tarefas abaixo</p>
                       </div>
                     ) : (
                       todoItems.map(item => (
                         <div
                           key={item.id}
-                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
+                          className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors group"
                         >
                           <button
                             onClick={() => toggleTodoItem(item.id)}
                             className="flex-shrink-0"
                           >
                             {item.completed ? (
-                              <CheckSquare className="h-5 w-5 text-green-600" />
+                              <CheckSquare className="h-4 w-4 text-green-600" />
                             ) : (
-                              <Square className="h-5 w-5 text-gray-400" />
+                              <Square className="h-4 w-4 text-gray-400" />
                             )}
                           </button>
-                          <span className={`flex-1 text-sm ${
+                          <span className={`flex-1 text-xs ${
                             item.completed 
                               ? 'line-through text-gray-400' 
                               : 'text-gray-900'
@@ -1173,21 +1173,21 @@ export default function Dashboard() {
                     )}
                   </div>
                   
-                  <div className="flex gap-2 flex-shrink-0 mt-auto pt-3 border-t">
+                  <div className="flex gap-2 flex-shrink-0 mt-auto pt-2 border-t">
                     <input
                       type="text"
                       value={newTodoText}
                       onChange={(e) => setNewTodoText(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && addTodoItem()}
                       placeholder="Nova tarefa..."
-                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <Button
                       onClick={addTodoItem}
                       size="sm"
-                      className="bg-purple-600 hover:bg-purple-700"
+                      className="bg-purple-600 hover:bg-purple-700 h-7 w-7 p-0"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-3 w-3" />
                     </Button>
                   </div>
                 </CardContent>
@@ -1197,13 +1197,13 @@ export default function Dashboard() {
             {/* Widget 3: Prazos Importantes */}
             {widgetVisibility.importantDeadlines && (
               <Card 
-                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
+                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
                 style={{ order: widgetOrder.indexOf('importantDeadlines') }}
               >
-                <CardHeader className="pb-3 flex-shrink-0">
+                <CardHeader className="pb-2 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <Bell className="h-5 w-5 text-orange-600" />
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-orange-600" />
                       Prazos Importantes
                     </CardTitle>
                     <div className="flex gap-1">
@@ -1227,10 +1227,10 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   </div>
-                  <CardDescription>Próximos 7 dias</CardDescription>
+                  <CardDescription className="text-xs">Próximos 7 dias</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
-                  <div className="space-y-4">
+                <CardContent className="flex-1 overflow-y-auto custom-scrollbar p-4">
+                  <div className="space-y-2">
                     {isLoadingCalendar ? (
                       // Skeleton Loading
                       <>
@@ -1250,16 +1250,16 @@ export default function Dashboard() {
                         </div>
                       </>
                     ) : importantDeadlines.length === 0 ? (
-                      <div className="text-center py-8">
-                        <div className="bg-orange-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                          <CalendarIcon className="h-10 w-10 text-orange-400" />
+                      <div className="text-center py-4">
+                        <div className="bg-orange-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
+                          <CalendarIcon className="h-7 w-7 text-orange-400" />
                         </div>
-                        <p className="text-base font-medium text-gray-900 mb-2">👍 Tudo tranquilo!</p>
-                        <p className="text-sm text-gray-500 mb-4">Nenhum prazo nos próximos 7 dias</p>
+                        <p className="text-sm font-medium text-gray-900 mb-1">👍 Tudo tranquilo!</p>
+                        <p className="text-xs text-gray-500 mb-3">Nenhum prazo nos próximos 7 dias</p>
                         <Link href="/calendar">
-                          <Button variant="outline" size="sm" className="gap-2">
-                            <CalendarIcon className="h-4 w-4" />
-                            Ver Calendário Completo
+                          <Button variant="outline" size="sm" className="gap-1 text-xs h-7">
+                            <CalendarIcon className="h-3 w-3" />
+                            Ver Calendário
                           </Button>
                         </Link>
                       </div>
@@ -1278,20 +1278,20 @@ export default function Dashboard() {
                         return (
                           <div
                             key={event.id}
-                            className="relative p-4 rounded-lg border-2 border-orange-200 bg-orange-50 hover:shadow-md transition-shadow"
+                            className="relative p-2.5 rounded-lg border border-orange-200 bg-orange-50 hover:shadow-md transition-shadow"
                           >
-                            <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md`}>
+                            <div className={`absolute -top-1.5 -right-1.5 ${urgencyColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md`}>
                               {urgencyText}
                             </div>
                             
-                            <h4 className="font-bold text-gray-900 text-lg mb-2 pr-10 leading-tight">
+                            <h4 className="font-bold text-gray-900 text-sm mb-1 pr-8 leading-tight">
                               {event.title}
                             </h4>
-                            <p className="text-base text-gray-700 font-medium">
+                            <p className="text-xs text-gray-700 font-medium">
                               {dayOfWeek}, {dayMonth}
                             </p>
                             {event.description && (
-                              <p className="text-base text-gray-700 mt-2 line-clamp-2 leading-relaxed">
+                              <p className="text-xs text-gray-600 mt-1 line-clamp-1">
                                 {event.description}
                               </p>
                             )}
