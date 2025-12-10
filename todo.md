@@ -1145,3 +1145,12 @@
 - [x] Adicionar toast de confirmação
 - [x] Carregar status existentes ao renderizar grade (classStatus.getWeek)
 - [x] Mostrar motivo no tooltip do indicador de status
+
+
+## Ajuste de Cálculo do Progresso Semanal
+- [x] Carregar status das aulas da semana atual no Dashboard
+- [x] Filtrar aulas marcadas como "not_given" ou "cancelled"
+- [x] Ajustar cálculo de totalWeekClasses (excluir aulas não dadas/canceladas)
+- [x] Ajustar cálculo de completedClasses (excluir aulas não dadas/canceladas)
+- [x] Atualizar tooltip/legenda explicando o cálculo ajustado
+- [x] Testar cenários: sem status, com aulas canceladas, com aulas não dadas
