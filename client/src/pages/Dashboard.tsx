@@ -838,27 +838,27 @@ export default function Dashboard() {
             
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
-              <Card className="border-l-4 border-l-teal-500 hover:shadow-xl transition-all flex flex-col h-[420px] shadow-md">
-                <CardHeader className="pb-4 flex-shrink-0 bg-gradient-to-r from-teal-50 to-white">
-                  <CardTitle className="text-xl font-bold flex items-center gap-2 text-gray-900">
-                    <Timer className="h-6 w-6 text-teal-600" />
+              <Card className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+                <CardHeader className="pb-3 flex-shrink-0">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Timer className="h-5 w-5 text-teal-600" />
                     Próxima Aula
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-600 mt-1">Tempo restante até sua próxima aula</CardDescription>
+                  <CardDescription>Tempo restante até sua próxima aula</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-center">
                   {timeToNextClass && upcomingClasses && upcomingClasses.length > 0 ? (
                     <>
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <div className="text-center">
-                          <div className={`text-5xl font-bold ${
+                          <div className={`text-3xl font-bold ${
                             timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 
                               ? 'text-red-600 animate-pulse' 
                               : 'text-teal-600'
                           }`}>
                             {String(timeToNextClass.hours).padStart(2, '0')}:{String(timeToNextClass.minutes).padStart(2, '0')}:{String(timeToNextClass.seconds).padStart(2, '0')}
                           </div>
-                          <p className="text-sm text-gray-600 mt-2 font-medium">horas:minutos:segundos</p>
+                          <p className="text-xs text-gray-500 mt-1">horas:minutos:segundos</p>
                         </div>
                       </div>
                       
@@ -871,11 +871,11 @@ export default function Dashboard() {
                         </div>
                       )}
                       
-                      <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg p-4 border border-teal-200">
-                        <p className="text-base font-bold text-gray-900 mb-2">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-sm font-medium text-gray-900 mb-1">
                           {upcomingClasses[0].subjectName}
                         </p>
-                        <p className="text-sm text-gray-700 font-medium">
+                        <p className="text-xs text-gray-600">
                           {upcomingClasses[0].className} • {upcomingClasses[0].startTime} - {upcomingClasses[0].endTime}
                         </p>
                       </div>
@@ -892,13 +892,13 @@ export default function Dashboard() {
             
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
-              <Card className="border-l-4 border-l-purple-500 hover:shadow-xl transition-all flex flex-col h-[420px] shadow-md">
-                <CardHeader className="pb-4 flex-shrink-0 bg-gradient-to-r from-purple-50 to-white">
-                  <CardTitle className="text-xl font-bold flex items-center gap-2 text-gray-900">
-                    <CheckSquare className="h-6 w-6 text-purple-600" />
+              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+                <CardHeader className="pb-3 flex-shrink-0">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <CheckSquare className="h-5 w-5 text-purple-600" />
                     Tarefas Pendentes
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-600 mt-1">
+                  <CardDescription>
                     {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
                   </CardDescription>
                 </CardHeader>
@@ -925,7 +925,7 @@ export default function Dashboard() {
                               <Square className="h-5 w-5 text-gray-400" />
                             )}
                           </button>
-                          <span className={`flex-1 text-base ${
+                          <span className={`flex-1 text-sm ${
                             item.completed 
                               ? 'line-through text-gray-400' 
                               : 'text-gray-900'
@@ -966,13 +966,13 @@ export default function Dashboard() {
             
             {/* Widget 3: Prazos Importantes */}
             {widgetVisibility.importantDeadlines && (
-              <Card className="border-l-4 border-l-orange-500 hover:shadow-xl transition-all flex flex-col h-[420px] shadow-md">
-                <CardHeader className="pb-4 flex-shrink-0 bg-gradient-to-r from-orange-50 to-white">
-                  <CardTitle className="text-xl font-bold flex items-center gap-2 text-gray-900">
-                    <Bell className="h-6 w-6 text-orange-600" />
+              <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+                <CardHeader className="pb-3 flex-shrink-0">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Bell className="h-5 w-5 text-orange-600" />
                     Prazos Importantes
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-600 mt-1">Próximos 7 dias</CardDescription>
+                  <CardDescription>Próximos 7 dias</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
                   <div className="space-y-3">
@@ -1002,14 +1002,14 @@ export default function Dashboard() {
                               {urgencyText}
                             </div>
                             
-                            <h4 className="font-bold text-gray-900 text-base mb-2 pr-8">
+                            <h4 className="font-bold text-gray-900 text-sm mb-1 pr-8">
                               {event.title}
                             </h4>
-                            <p className="text-sm text-gray-700 font-medium">
+                            <p className="text-xs text-gray-600">
                               {dayOfWeek}, {dayMonth}
                             </p>
                             {event.description && (
-                              <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                                 {event.description}
                               </p>
                             )}
