@@ -489,7 +489,7 @@ export default function Dashboard() {
 
           {/* Cards de Métricas Principais */}
           {widgetVisibility.stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
             {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
@@ -574,7 +574,7 @@ export default function Dashboard() {
           )}
 
           {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
             {/* Ações Rápidas */}
             {widgetVisibility.quickActions && (
             <Card className="overflow-hidden">
@@ -664,7 +664,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Grid de Ações */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 <Link href="/subjects">
                   <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -849,7 +849,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {calendarUpcomingEvents.map((event: any) => {
                     const eventDate = new Date(event.eventDate + 'T00:00:00');
                     const today = new Date();
@@ -962,12 +962,12 @@ export default function Dashboard() {
           {/* ===== NOVOS WIDGETS ===== */}
           
           {/* Grid dos Novos Widgets */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
             
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
               <Card 
-                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
                 style={{ order: widgetOrder.indexOf('timeToNextClass') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
@@ -982,7 +982,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetUp('timeToNextClass')}
                         disabled={widgetOrder.indexOf('timeToNextClass') === 0}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronUp className="h-4 w-4" />
                       </Button>
@@ -991,7 +991,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetDown('timeToNextClass')}
                         disabled={widgetOrder.indexOf('timeToNextClass') === widgetOrder.length - 1}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
@@ -1064,7 +1064,7 @@ export default function Dashboard() {
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
               <Card 
-                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
                 style={{ order: widgetOrder.indexOf('todoList') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
@@ -1079,7 +1079,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetUp('todoList')}
                         disabled={widgetOrder.indexOf('todoList') === 0}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronUp className="h-4 w-4" />
                       </Button>
@@ -1088,7 +1088,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetDown('todoList')}
                         disabled={widgetOrder.indexOf('todoList') === widgetOrder.length - 1}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
@@ -1166,7 +1166,7 @@ export default function Dashboard() {
             {/* Widget 3: Prazos Importantes */}
             {widgetVisibility.importantDeadlines && (
               <Card 
-                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
                 style={{ order: widgetOrder.indexOf('importantDeadlines') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
@@ -1181,7 +1181,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetUp('importantDeadlines')}
                         disabled={widgetOrder.indexOf('importantDeadlines') === 0}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronUp className="h-4 w-4" />
                       </Button>
@@ -1190,7 +1190,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetDown('importantDeadlines')}
                         disabled={widgetOrder.indexOf('importantDeadlines') === widgetOrder.length - 1}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
@@ -1276,7 +1276,7 @@ export default function Dashboard() {
             {/* Widget 4: Progresso Semanal */}
             {widgetVisibility.weeklyProgress && (
               <Card 
-                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[420px]"
                 style={{ order: widgetOrder.indexOf('weeklyProgress') }}
               >
                 <CardHeader className="pb-3 flex-shrink-0">
@@ -1291,7 +1291,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetUp('weeklyProgress')}
                         disabled={widgetOrder.indexOf('weeklyProgress') === 0}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronUp className="h-4 w-4" />
                       </Button>
@@ -1300,7 +1300,7 @@ export default function Dashboard() {
                         size="sm"
                         onClick={() => moveWidgetDown('weeklyProgress')}
                         disabled={widgetOrder.indexOf('weeklyProgress') === widgetOrder.length - 1}
-                        className="h-7 w-7 p-0"
+                        className="h-7 w-7 md:h-7 md:w-7 p-0 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
