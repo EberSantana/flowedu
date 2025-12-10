@@ -1073,3 +1073,12 @@
 - [x] Gerar eventos para 16 semanas (1 semestre)
 - [x] Incluir campos obrigatórios (SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION)
 - [x] Adicionar compatibilidade com Microsoft Outlook (BUSYSTATUS)
+
+## Reordenação de Widgets com Botões
+- [x] Adicionar estado para ordem dos widgets (widgetOrder)
+- [x] Criar funções moveWidgetUp e moveWidgetDown
+- [x] Salvar ordem dos widgets no localStorage
+- [x] Carregar ordem salva ao inicializar Dashboard
+- [x] Adicionar botões de seta (↑↓) nos cabeçalhos dos widgets
+- [x] Desabilitar seta ↑ no primeiro widget e ↓ no último
+- [x] Renderizar widgets na ordem definida pelo estado (CSS order)

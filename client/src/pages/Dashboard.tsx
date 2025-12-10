@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ChevronUp, ChevronDown } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -83,7 +83,40 @@ export default function Dashboard() {
       importantDeadlines: true,
     };
     setWidgetVisibility(defaultVisibility);
+    setWidgetOrder(['timeToNextClass', 'todoList', 'importantDeadlines']);
     toast.success('Layout restaurado para o padrão!');
+  };
+  
+  // Estado para ordem dos widgets
+  const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
+    const saved = localStorage.getItem('dashboardWidgetOrder');
+    return saved ? JSON.parse(saved) : ['timeToNextClass', 'todoList', 'importantDeadlines'];
+  });
+  
+  // Salvar ordem no localStorage
+  useEffect(() => {
+    localStorage.setItem('dashboardWidgetOrder', JSON.stringify(widgetOrder));
+  }, [widgetOrder]);
+  
+  // Funções de reordenação
+  const moveWidgetUp = (widgetKey: string) => {
+    const currentIndex = widgetOrder.indexOf(widgetKey);
+    if (currentIndex > 0) {
+      const newOrder = [...widgetOrder];
+      [newOrder[currentIndex - 1], newOrder[currentIndex]] = [newOrder[currentIndex], newOrder[currentIndex - 1]];
+      setWidgetOrder(newOrder);
+      toast.success('Widget movido para cima!');
+    }
+  };
+  
+  const moveWidgetDown = (widgetKey: string) => {
+    const currentIndex = widgetOrder.indexOf(widgetKey);
+    if (currentIndex < widgetOrder.length - 1) {
+      const newOrder = [...widgetOrder];
+      [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
+      setWidgetOrder(newOrder);
+      toast.success('Widget movido para baixo!');
+    }
   };
   
   // Toast automático para eventos próximos
@@ -838,12 +871,37 @@ export default function Dashboard() {
             
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
-              <Card className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+              <Card 
+                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                style={{ order: widgetOrder.indexOf('timeToNextClass') }}
+              >
                 <CardHeader className="pb-3 flex-shrink-0">
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Timer className="h-5 w-5 text-teal-600" />
-                    Próxima Aula
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <Timer className="h-5 w-5 text-teal-600" />
+                      Próxima Aula
+                    </CardTitle>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetUp('timeToNextClass')}
+                        disabled={widgetOrder.indexOf('timeToNextClass') === 0}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetDown('timeToNextClass')}
+                        disabled={widgetOrder.indexOf('timeToNextClass') === widgetOrder.length - 1}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                   <CardDescription>Tempo restante até sua próxima aula</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-center">
@@ -892,12 +950,37 @@ export default function Dashboard() {
             
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
-              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+              <Card 
+                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                style={{ order: widgetOrder.indexOf('todoList') }}
+              >
                 <CardHeader className="pb-3 flex-shrink-0">
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <CheckSquare className="h-5 w-5 text-purple-600" />
-                    Tarefas Pendentes
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <CheckSquare className="h-5 w-5 text-purple-600" />
+                      Tarefas Pendentes
+                    </CardTitle>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetUp('todoList')}
+                        disabled={widgetOrder.indexOf('todoList') === 0}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetDown('todoList')}
+                        disabled={widgetOrder.indexOf('todoList') === widgetOrder.length - 1}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                   <CardDescription>
                     {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
                   </CardDescription>
@@ -966,12 +1049,37 @@ export default function Dashboard() {
             
             {/* Widget 3: Prazos Importantes */}
             {widgetVisibility.importantDeadlines && (
-              <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+              <Card 
+                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                style={{ order: widgetOrder.indexOf('importantDeadlines') }}
+              >
                 <CardHeader className="pb-3 flex-shrink-0">
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Bell className="h-5 w-5 text-orange-600" />
-                    Prazos Importantes
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <Bell className="h-5 w-5 text-orange-600" />
+                      Prazos Importantes
+                    </CardTitle>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetUp('importantDeadlines')}
+                        disabled={widgetOrder.indexOf('importantDeadlines') === 0}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetDown('importantDeadlines')}
+                        disabled={widgetOrder.indexOf('importantDeadlines') === widgetOrder.length - 1}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                   <CardDescription>Próximos 7 dias</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
