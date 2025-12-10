@@ -838,20 +838,20 @@ export default function Dashboard() {
             
             {/* Widget 1: Contador de Tempo até Próxima Aula */}
             {widgetVisibility.timeToNextClass && (
-              <Card className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
+              <Card className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+                <CardHeader className="pb-3 flex-shrink-0">
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <Timer className="h-5 w-5 text-teal-600" />
                     Próxima Aula
                   </CardTitle>
                   <CardDescription>Tempo restante até sua próxima aula</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 flex flex-col justify-center">
                   {timeToNextClass && upcomingClasses && upcomingClasses.length > 0 ? (
                     <>
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <div className="text-center">
-                          <div className={`text-4xl font-bold ${
+                          <div className={`text-3xl font-bold ${
                             timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 
                               ? 'text-red-600 animate-pulse' 
                               : 'text-teal-600'
@@ -892,8 +892,8 @@ export default function Dashboard() {
             
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
-              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
+              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+                <CardHeader className="pb-3 flex-shrink-0">
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <CheckSquare className="h-5 w-5 text-purple-600" />
                     Tarefas Pendentes
@@ -902,8 +902,8 @@ export default function Dashboard() {
                     {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
+                <CardContent className="flex-1 flex flex-col overflow-hidden">
+                  <div className="space-y-2 mb-3 flex-1 overflow-y-auto custom-scrollbar">
                     {todoItems.length === 0 ? (
                       <div className="text-center py-6">
                         <CheckSquare className="h-12 w-12 text-gray-300 mx-auto mb-2" />
@@ -943,7 +943,7 @@ export default function Dashboard() {
                     )}
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-shrink-0 mt-auto pt-3 border-t">
                     <input
                       type="text"
                       value={newTodoText}
@@ -966,16 +966,16 @@ export default function Dashboard() {
             
             {/* Widget 3: Prazos Importantes */}
             {widgetVisibility.importantDeadlines && (
-              <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
+              <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]">
+                <CardHeader className="pb-3 flex-shrink-0">
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <Bell className="h-5 w-5 text-orange-600" />
                     Prazos Importantes
                   </CardTitle>
                   <CardDescription>Próximos 7 dias</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
+                  <div className="space-y-3">
                     {importantDeadlines.length === 0 ? (
                       <div className="text-center py-6">
                         <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />

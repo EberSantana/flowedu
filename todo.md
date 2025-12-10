@@ -1052,3 +1052,12 @@
 - [x] Garantir persistência no localStorage
 - [x] Adaptar widgets ao modo compacto da sidebar
 - [ ] Criar testes para novos widgets
+
+## Melhorias de Layout dos Widgets do Dashboard
+- [x] Ajustar altura dos cards para ficarem uniformes (h-[420px])
+- [x] Melhorar espaçamento interno dos widgets (padding consistente)
+- [x] Reduzir tamanho da fonte do contador de tempo (text-3xl)
+- [x] Melhorar scroll do widget de Prazos Importantes (barra customizada 6px)
+- [x] Ajustar alinhamento vertical dos elementos (flex-col)
+- [x] Campo de input fixo no rodapé do widget de tarefas
+- [x] Overflow controlado com scrollbar elegante
