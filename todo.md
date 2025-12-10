@@ -1017,3 +1017,7 @@
 - [x] Salvar preferências no localStorage
 - [x] Adicionar botão "Restaurar Padrão"
 - [x] Testar persistência entre sessões
+
+## Correções de Interface
+- [x] Ajustar posicionamento do badge "2" no Calendário para não sobrepor texto quando menu expandir
+- [x] Corrigir texto "Coes Rápidas" para "Ações Rápidas" no painel de personalização

@@ -226,7 +226,7 @@ export default function Dashboard() {
                     <div className="flex items-center justify-center gap-2 mb-1">
                       {widgetVisibility.quickActions ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </div>
-                    <p className="text-sm font-medium">Ções Rápidas</p>
+                    <p className="text-sm font-medium">Ações Rápidas</p>
                   </button>
                   
                   <button

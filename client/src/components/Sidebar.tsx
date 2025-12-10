@@ -222,9 +222,9 @@ export default function Sidebar() {
                       {!isCompact && <span className="font-medium">{item.label}</span>}
                       {isCalendar && notificationCount > 0 && (
                         <span className={`
-                          absolute flex items-center justify-center
+                          flex items-center justify-center
                           bg-red-500 text-white text-[10px] font-bold rounded-full
-                          ${isCompact ? 'w-4 h-4 -top-1 -right-1' : 'w-5 h-5 ml-auto'}
+                          ${isCompact ? 'absolute w-4 h-4 -top-1 -right-1' : 'w-5 h-5 ml-auto'}
                         `}>
                           {notificationCount}
                         </span>
