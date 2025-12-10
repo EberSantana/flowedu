@@ -1203,3 +1203,15 @@
 - [x] Adicionar prompt de instalação customizado (InstallPWA component)
 - [x] Configurar atalhos rápidos (Dashboard, Grade, Calendário)
 - [ ] Testar instalação no Android e iOS
+
+
+## Melhoria do Sistema de Reordenação de Widgets
+- [x] Remover sistema de drag-and-drop (não funciona bem)
+- [x] Adicionar botões de setas (← →) em cada widget
+- [x] Implementar função moveLeft e moveRight
+- [x] Adicionar funções moveToStart e moveToEnd
+- [x] Adicionar menu dropdown com opções rápidas (Início, Fim)
+- [x] Melhorar feedback visual com toasts ao mover widgets
+- [x] Adicionar tooltips nos botões (title attribute)
+- [x] Aplicar em todos os 4 widgets (Próxima Aula, Tarefas, Prazos, Progresso)
+- [ ] Testar em dispositivos móveis
