@@ -1098,3 +1098,14 @@
 - [x] Melhorar estados vazios com ilustrações e CTAs
 - [x] Adicionar feedback visual de ações com toasts (já implementado)
 - [ ] Adicionar loading spinner nos botões durante ações (não aplicável no Dashboard)
+
+
+## Widget de Progresso Semanal
+- [x] Calcular total de aulas da semana atual
+- [x] Calcular aulas já concluídas (baseado em data/hora atual)
+- [x] Criar componente de barra circular (SVG)
+- [x] Implementar cores graduais (verde > 70%, amarelo 40-70%, vermelho < 40%)
+- [x] Adicionar widget ao Dashboard com personalização
+- [x] Adicionar ao sistema de reordenação de widgets
+- [x] Salvar visibilidade no localStorage
+- [x] Skeleton loading e estado vazio implementados

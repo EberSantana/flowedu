@@ -2,13 +2,13 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ChevronUp, ChevronDown } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ChevronUp, ChevronDown, TrendingUp } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -82,16 +82,17 @@ export default function Dashboard() {
       timeToNextClass: true,
       todoList: true,
       importantDeadlines: true,
+      weeklyProgress: true,
     };
     setWidgetVisibility(defaultVisibility);
-    setWidgetOrder(['timeToNextClass', 'todoList', 'importantDeadlines']);
+    setWidgetOrder(['timeToNextClass', 'todoList', 'importantDeadlines', 'weeklyProgress']);
     toast.success('Layout restaurado para o padrão!');
   };
   
   // Estado para ordem dos widgets
   const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
     const saved = localStorage.getItem('dashboardWidgetOrder');
-    return saved ? JSON.parse(saved) : ['timeToNextClass', 'todoList', 'importantDeadlines'];
+    return saved ? JSON.parse(saved) : ['timeToNextClass', 'todoList', 'importantDeadlines', 'weeklyProgress'];
   });
   
   // Salvar ordem no localStorage
@@ -137,6 +138,49 @@ export default function Dashboard() {
 
   // Calcular total de aulas agendadas
   const totalScheduledClasses = scheduledClasses?.length || 0;
+  
+  // Calcular progresso semanal (aulas concluídas vs. total da semana)
+  const weeklyProgress = useMemo(() => {
+    if (!scheduledClasses || scheduledClasses.length === 0) {
+      return { completed: 0, total: 0, percentage: 0 };
+    }
+    
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // Minutos desde meia-noite
+    
+    // Contar total de aulas da semana (segunda a sexta)
+    const totalWeekClasses = scheduledClasses.filter(c => c.dayOfWeek >= 0 && c.dayOfWeek <= 4).length;
+    
+    // Contar aulas já concluídas (dias passados + aulas concluídas hoje)
+    let completedClasses = 0;
+    
+    scheduledClasses.forEach(classItem => {
+      const classDayOfWeek = classItem.dayOfWeek;
+      
+      // Se a aula é de um dia anterior da semana
+      if (classDayOfWeek < currentDay) {
+        completedClasses++;
+      }
+      // Se a aula é hoje, verificar se já passou
+      else if (classDayOfWeek === currentDay && classItem.endTime) {
+        const [endHour, endMinute] = classItem.endTime.split(':').map(Number);
+        const classEndTime = endHour * 60 + endMinute;
+        
+        if (currentTime >= classEndTime) {
+          completedClasses++;
+        }
+      }
+    });
+    
+    const percentage = totalWeekClasses > 0 ? Math.round((completedClasses / totalWeekClasses) * 100) : 0;
+    
+    return {
+      completed: completedClasses,
+      total: totalWeekClasses,
+      percentage
+    };
+  }, [scheduledClasses]);
   
   // ===== NOVOS WIDGETS =====
   
@@ -423,6 +467,20 @@ export default function Dashboard() {
                       {widgetVisibility.importantDeadlines ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </div>
                     <p className="text-sm font-medium">Prazos Importantes</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleWidget('weeklyProgress')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      widgetVisibility.weeklyProgress
+                        ? 'bg-blue-100 border-blue-500 text-blue-900'
+                        : 'bg-gray-100 border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      {widgetVisibility.weeklyProgress ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <p className="text-sm font-medium">Progresso Semanal</p>
                   </button>
                 </div>
               </CardContent>
@@ -1211,6 +1269,131 @@ export default function Dashboard() {
                       })
                     )}
                   </div>
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Widget 4: Progresso Semanal */}
+            {widgetVisibility.weeklyProgress && (
+              <Card 
+                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-[420px]"
+                style={{ order: widgetOrder.indexOf('weeklyProgress') }}
+              >
+                <CardHeader className="pb-3 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-indigo-600" />
+                      Progresso Semanal
+                    </CardTitle>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetUp('weeklyProgress')}
+                        disabled={widgetOrder.indexOf('weeklyProgress') === 0}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => moveWidgetDown('weeklyProgress')}
+                        disabled={widgetOrder.indexOf('weeklyProgress') === widgetOrder.length - 1}
+                        className="h-7 w-7 p-0"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <CardDescription>Aulas concluídas esta semana</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col justify-center items-center">
+                  {isLoadingSchedule ? (
+                    // Skeleton Loading
+                    <div className="space-y-4 w-full">
+                      <Skeleton className="h-40 w-40 rounded-full mx-auto" />
+                      <Skeleton className="h-6 w-32 mx-auto" />
+                      <Skeleton className="h-4 w-48 mx-auto" />
+                    </div>
+                  ) : weeklyProgress.total === 0 ? (
+                    // Estado Vazio
+                    <div className="text-center py-8">
+                      <div className="bg-indigo-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                        <CalendarIcon className="h-10 w-10 text-indigo-400" />
+                      </div>
+                      <p className="text-base font-medium text-gray-900 mb-2">📅 Nenhuma aula agendada</p>
+                      <p className="text-sm text-gray-500 mb-4">Configure sua grade semanal</p>
+                      <Link href="/schedule">
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <CalendarIcon className="h-4 w-4" />
+                          Configurar Grade
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    // Barra Circular de Progresso
+                    <div className="flex flex-col items-center gap-4">
+                      {/* SVG Circular Progress */}
+                      <div className="relative w-48 h-48">
+                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+                          {/* Background Circle */}
+                          <circle
+                            cx="100"
+                            cy="100"
+                            r="85"
+                            stroke="#e5e7eb"
+                            strokeWidth="16"
+                            fill="none"
+                          />
+                          {/* Progress Circle */}
+                          <circle
+                            cx="100"
+                            cy="100"
+                            r="85"
+                            stroke={
+                              weeklyProgress.percentage >= 70 ? '#10b981' : // Verde
+                              weeklyProgress.percentage >= 40 ? '#f59e0b' : // Amarelo
+                              '#ef4444' // Vermelho
+                            }
+                            strokeWidth="16"
+                            fill="none"
+                            strokeDasharray={`${2 * Math.PI * 85}`}
+                            strokeDashoffset={`${2 * Math.PI * 85 * (1 - weeklyProgress.percentage / 100)}`}
+                            strokeLinecap="round"
+                            className="transition-all duration-1000 ease-out"
+                          />
+                        </svg>
+                        {/* Texto Central */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className={
+                            `text-5xl font-bold ${
+                              weeklyProgress.percentage >= 70 ? 'text-green-600' :
+                              weeklyProgress.percentage >= 40 ? 'text-yellow-600' :
+                              'text-red-600'
+                            }`
+                          }>
+                            {weeklyProgress.percentage}%
+                          </span>
+                          <span className="text-sm text-gray-500 mt-1">
+                            {weeklyProgress.completed}/{weeklyProgress.total} aulas
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Legenda */}
+                      <div className="text-center">
+                        <p className="text-base font-medium text-gray-900">
+                          {weeklyProgress.percentage >= 70 ? '🎉 Ótimo progresso!' :
+                           weeklyProgress.percentage >= 40 ? '💪 Continue assim!' :
+                           '🚀 Vamos lá!'}
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {weeklyProgress.total - weeklyProgress.completed} aula{weeklyProgress.total - weeklyProgress.completed !== 1 ? 's' : ''} restante{weeklyProgress.total - weeklyProgress.completed !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
