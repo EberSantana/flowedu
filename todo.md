@@ -1092,3 +1092,9 @@
 - [x] Melhorar legibilidade da descrição (text-xs → text-base)
 - [x] Aumentar tamanho do badge de urgência (text-[10px] → text-xs)
 - [x] Adicionar leading-tight e leading-relaxed para melhor espaçamento de linhas
+
+## Melhorias de UX/UI - Dashboard (Prioridade Alta)
+- [x] Implementar Skeleton Loading nos widgets durante carregamento
+- [x] Melhorar estados vazios com ilustrações e CTAs
+- [x] Adicionar feedback visual de ações com toasts (já implementado)
+- [ ] Adicionar loading spinner nos botões durante ações (não aplicável no Dashboard)

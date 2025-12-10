@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, ChevronUp, ChevronDown } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
@@ -37,13 +38,13 @@ const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { data: subjects } = trpc.subjects.list.useQuery();
-  const { data: classes } = trpc.classes.list.useQuery();
-  const { data: scheduledClasses } = trpc.schedule.list.useQuery();
-  const { data: upcomingClasses } = trpc.dashboard.getUpcomingClasses.useQuery();
-  const { data: todayClasses } = trpc.dashboard.getTodayClasses.useQuery();
-  const { data: upcomingEvents } = trpc.dashboard.getUpcomingEvents.useQuery();
-  const { data: calendarUpcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery();
+  const { data: subjects, isLoading: isLoadingSubjects } = trpc.subjects.list.useQuery();
+  const { data: classes, isLoading: isLoadingClasses } = trpc.classes.list.useQuery();
+  const { data: scheduledClasses, isLoading: isLoadingSchedule } = trpc.schedule.list.useQuery();
+  const { data: upcomingClasses, isLoading: isLoadingUpcoming } = trpc.dashboard.getUpcomingClasses.useQuery();
+  const { data: todayClasses, isLoading: isLoadingToday } = trpc.dashboard.getTodayClasses.useQuery();
+  const { data: upcomingEvents, isLoading: isLoadingEvents } = trpc.dashboard.getUpcomingEvents.useQuery();
+  const { data: calendarUpcomingEvents, isLoading: isLoadingCalendar } = trpc.calendar.getUpcomingEvents.useQuery();
   const hasShownToast = useRef(false);
   
   // Estado de personalização do Dashboard
@@ -431,50 +432,86 @@ export default function Dashboard() {
           {/* Cards de Métricas Principais */}
           {widgetVisibility.stats && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Disciplinas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
-                  {subjects?.length || 0}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">disciplinas cadastradas</p>
-              </CardContent>
-            </Card>
+            {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
+              // Skeleton Loading
+              <>
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardHeader className="pb-3">
+                    <Skeleton className="h-4 w-24" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-9 w-16 mb-2" />
+                    <Skeleton className="h-3 w-40" />
+                  </CardContent>
+                </Card>
+                <Card className="border-l-4 border-l-green-500">
+                  <CardHeader className="pb-3">
+                    <Skeleton className="h-4 w-24" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-9 w-16 mb-2" />
+                    <Skeleton className="h-3 w-40" />
+                  </CardContent>
+                </Card>
+                <Card className="border-l-4 border-l-orange-500">
+                  <CardHeader className="pb-3">
+                    <Skeleton className="h-4 w-24" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-9 w-16 mb-2" />
+                    <Skeleton className="h-3 w-40" />
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              // Conteúdo Real
+              <>
+                <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Disciplinas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-gray-900">
+                      {subjects?.length || 0}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">disciplinas cadastradas</p>
+                  </CardContent>
+                </Card>
 
-            <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Turmas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
-                  {classes?.length || 0}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">turmas cadastradas</p>
-              </CardContent>
-            </Card>
+                <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Turmas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-gray-900">
+                      {classes?.length || 0}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">turmas cadastradas</p>
+                  </CardContent>
+                </Card>
 
-            <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Carga Horária
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
-                  {totalScheduledClasses}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">aulas agendadas</p>
-              </CardContent>
-            </Card>
+                <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Carga Horária
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-gray-900">
+                      {totalScheduledClasses}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">aulas agendadas</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
           )}
 
@@ -905,7 +942,16 @@ export default function Dashboard() {
                   <CardDescription>Tempo restante até sua próxima aula</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col justify-center">
-                  {timeToNextClass && upcomingClasses && upcomingClasses.length > 0 ? (
+                  {isLoadingUpcoming ? (
+                    // Skeleton Loading
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-center">
+                        <Skeleton className="h-12 w-48" />
+                      </div>
+                      <Skeleton className="h-3 w-40 mx-auto" />
+                      <Skeleton className="h-20 w-full" />
+                    </div>
+                  ) : timeToNextClass && upcomingClasses && upcomingClasses.length > 0 ? (
                     <>
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <div className="text-center">
@@ -939,9 +985,18 @@ export default function Dashboard() {
                       </div>
                     </>
                   ) : (
-                    <div className="text-center py-6">
-                      <Clock className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Nenhuma aula agendada</p>
+                    <div className="text-center py-8">
+                      <div className="bg-teal-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                        <Clock className="h-10 w-10 text-teal-400" />
+                      </div>
+                      <p className="text-base font-medium text-gray-900 mb-2">🎉 Nenhuma aula hoje!</p>
+                      <p className="text-sm text-gray-500 mb-4">Aproveite seu tempo livre</p>
+                      <Link href="/schedule">
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <CalendarIcon className="h-4 w-4" />
+                          Ver Grade Completa
+                        </Button>
+                      </Link>
                     </div>
                   )}
                 </CardContent>
@@ -988,9 +1043,12 @@ export default function Dashboard() {
                 <CardContent className="flex-1 flex flex-col overflow-hidden">
                   <div className="space-y-2 mb-3 flex-1 overflow-y-auto custom-scrollbar">
                     {todoItems.length === 0 ? (
-                      <div className="text-center py-6">
-                        <CheckSquare className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">Nenhuma tarefa adicionada</p>
+                      <div className="text-center py-8">
+                        <div className="bg-purple-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                          <CheckSquare className="h-10 w-10 text-purple-400" />
+                        </div>
+                        <p className="text-base font-medium text-gray-900 mb-2">✨ Lista vazia!</p>
+                        <p className="text-sm text-gray-500">Adicione suas tarefas abaixo</p>
                       </div>
                     ) : (
                       todoItems.map(item => (
@@ -1084,10 +1142,37 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
                   <div className="space-y-4">
-                    {importantDeadlines.length === 0 ? (
-                      <div className="text-center py-6">
-                        <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                        <p className="text-base text-gray-500">Nenhum prazo nos próximos 7 dias</p>
+                    {isLoadingCalendar ? (
+                      // Skeleton Loading
+                      <>
+                        <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-5 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-5 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </div>
+                        </div>
+                      </>
+                    ) : importantDeadlines.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="bg-orange-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                          <CalendarIcon className="h-10 w-10 text-orange-400" />
+                        </div>
+                        <p className="text-base font-medium text-gray-900 mb-2">👍 Tudo tranquilo!</p>
+                        <p className="text-sm text-gray-500 mb-4">Nenhum prazo nos próximos 7 dias</p>
+                        <Link href="/calendar">
+                          <Button variant="outline" size="sm" className="gap-2">
+                            <CalendarIcon className="h-4 w-4" />
+                            Ver Calendário Completo
+                          </Button>
+                        </Link>
                       </div>
                     ) : (
                       importantDeadlines.map((event: any) => {
