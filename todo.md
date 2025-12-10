@@ -1031,3 +1031,15 @@
 - [ ] Criar rota tRPC para importação em massa de eventos
 - [ ] Adicionar feedback visual (loading, sucesso, erros)
 - [ ] Testar com PDF real do calendário escolar 2025
+
+## Atualização Anual Inteligente de Calendário
+- [ ] Criar rota tRPC calendar.deleteEventsByYearAndType
+- [ ] Implementar lógica para detectar ano dos eventos no PDF
+- [ ] Adicionar botão "Atualizar Calendário Anual" na página
+- [ ] Criar dialog de confirmação com preview de mudanças
+- [ ] Mostrar eventos a serem removidos (ano anterior)
+- [ ] Mostrar eventos a serem adicionados (novo ano)
+- [ ] Preservar eventos do tipo "Observação Pessoal"
+- [ ] Implementar fluxo completo: deletar → importar → feedback
+- [ ] Adicionar relatório de mudanças (X removidos, Y adicionados)
+- [ ] Testar com PDFs de anos diferentes

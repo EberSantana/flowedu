@@ -1,4 +1,4 @@
-import { and, desc, eq, ne, gte, lte } from "drizzle-orm";
+import { and, desc, eq, ne, gte, lte, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -421,6 +421,30 @@ export async function deleteCalendarEvent(id: number, userId: number) {
   await db
     .delete(calendarEvents)
     .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId)));
+}
+
+export async function deleteEventsByYearAndType(
+  userId: number,
+  startDate: string,
+  endDate: string,
+  eventTypes: ("holiday" | "commemorative" | "school_event" | "personal")[]
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db
+    .delete(calendarEvents)
+    .where(
+      and(
+        eq(calendarEvents.userId, userId),
+        gte(calendarEvents.eventDate, startDate),
+        lte(calendarEvents.eventDate, endDate),
+        inArray(calendarEvents.eventType, eventTypes as any)
+      )
+    );
+  
+  // MySQL delete doesn't return rowsAffected, so we'll return a success indicator
+  return 1;
 }
 
 

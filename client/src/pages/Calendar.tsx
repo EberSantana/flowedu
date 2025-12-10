@@ -47,6 +47,12 @@ export default function Calendar() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedEvents, setExtractedEvents] = useState<any[]>([]);
   const [selectedEvents, setSelectedEvents] = useState<Set<number>>(new Set());
+  
+  // Estados para atualização anual
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [updateYear, setUpdateYear] = useState<number>(new Date().getFullYear() - 1);
+  const [newYearEvents, setNewYearEvents] = useState<any[]>([]);
+  const [eventsToDelete, setEventsToDelete] = useState<any[]>([]);
 
   const { data: events, isLoading } = trpc.calendar.listByYear.useQuery({ year: selectedYear });
   const utils = trpc.useUtils();
@@ -106,6 +112,19 @@ export default function Calendar() {
     },
     onError: (error) => {
       toast.error("Erro ao importar eventos: " + error.message);
+    },
+  });
+  
+  const updateAnnualMutation = trpc.calendar.updateCalendarAnnually.useMutation({
+    onSuccess: (result) => {
+      utils.calendar.listByYear.invalidate();
+      toast.success(`Calendário atualizado! ${result.deletedCount} eventos removidos, ${result.addedCount} novos eventos adicionados.`);
+      setIsUpdateDialogOpen(false);
+      setNewYearEvents([]);
+      setEventsToDelete([]);
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar calendário: " + error.message);
     },
   });
 
@@ -235,6 +254,57 @@ export default function Calendar() {
     const eventsToImport = extractedEvents.filter((_, i) => selectedEvents.has(i));
     bulkCreateMutation.mutate({ events: eventsToImport });
   };
+  
+  const handleUpdatePDFUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.type !== 'application/pdf') {
+      toast.error('Por favor, selecione um arquivo PDF');
+      return;
+    }
+    
+    setIsProcessing(true);
+    toast.info('Processando PDF...');
+    
+    // Converter para base64
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result?.toString().split(',')[1];
+      if (base64) {
+        try {
+          const extractedEventsData = await importMutation.mutateAsync({ pdfBase64: base64 });
+          setNewYearEvents(extractedEventsData);
+          
+          // Calcular eventos a deletar (apenas institucionais do ano selecionado)
+          const yearEvents = events?.filter(e => {
+            const eventYear = new Date(e.eventDate).getFullYear();
+            return eventYear === updateYear && e.eventType !== 'personal';
+          }) || [];
+          setEventsToDelete(yearEvents);
+          
+          setIsProcessing(false);
+          toast.success(`Preview pronto! ${yearEvents.length} eventos serão removidos, ${extractedEventsData.length} serão adicionados.`);
+        } catch (error: any) {
+          setIsProcessing(false);
+          toast.error('Erro ao processar PDF: ' + error.message);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const handleConfirmUpdate = () => {
+    if (newYearEvents.length === 0) {
+      toast.error('Por favor, faça upload do novo calendário PDF primeiro');
+      return;
+    }
+    
+    updateAnnualMutation.mutate({
+      year: updateYear,
+      newEvents: newYearEvents
+    });
+  };
 
   const handleDayClick = (date: Date) => {
     setSelectedDate(date);
@@ -290,13 +360,22 @@ export default function Calendar() {
                 {monthEvents.length} {monthEvents.length === 1 ? 'evento' : 'eventos'} em {MONTHS[selectedMonth]}
               </p>
             </div>
-            <Button
-              onClick={() => setIsImportDialogOpen(true)}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Importar Calendário PDF
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setIsUpdateDialogOpen(true)}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Atualizar Calendário Anual
+              </Button>
+              <Button
+                onClick={() => setIsImportDialogOpen(true)}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Importar Calendário PDF
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -699,6 +778,112 @@ export default function Calendar() {
                 </DialogFooter>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+        
+        {/* Dialog de Atualização Anual */}
+        <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-2xl">
+                <Clock className="w-6 h-6 text-purple-600" />
+                Atualizar Calendário Anual
+              </DialogTitle>
+              <DialogDescription>
+                Substitua os eventos institucionais do ano anterior pelo novo calendário escolar.
+                Suas observações pessoais serão preservadas.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Seleção de ano e upload */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Ano a ser substituído</Label>
+                  <Select
+                    value={updateYear.toString()}
+                    onValueChange={(v) => setUpdateYear(parseInt(v))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[2024, 2025, 2026, 2027].map(year => (
+                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Novo calendário (PDF)</Label>
+                  <Input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleUpdatePDFUpload}
+                    disabled={isProcessing}
+                  />
+                </div>
+              </div>
+              
+              {/* Preview de mudanças */}
+              <div className="border rounded-lg p-4 bg-slate-50">
+                <h3 className="font-semibold mb-3 text-lg">Resumo das Alterações</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="border-red-200 bg-red-50">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm text-red-700">Eventos a Remover</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-2xl font-bold text-red-600">{eventsToDelete.length}</p>
+                      <p className="text-xs text-red-600 mt-1">Feriados, datas comemorativas e eventos escolares de {updateYear}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-green-200 bg-green-50">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm text-green-700">Eventos a Adicionar</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-2xl font-bold text-green-600">{newYearEvents.length}</p>
+                      <p className="text-xs text-green-600 mt-1">Novos eventos do calendário escolar</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+              
+              {/* Aviso sobre preservação */}
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex gap-3">
+                  <div className="text-purple-600 mt-1">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-purple-900 mb-1">Observações Pessoais Preservadas</h4>
+                    <p className="text-sm text-purple-700">
+                      Todos os eventos do tipo "Observação Pessoal" serão mantidos intactos.
+                      Apenas eventos institucionais (feriados, datas comemorativas e eventos escolares) serão substituídos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsUpdateDialogOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleConfirmUpdate}
+                disabled={newYearEvents.length === 0 || updateAnnualMutation.isPending}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                {updateAnnualMutation.isPending ? 'Aplicando...' : 'Aplicar Atualização'}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </PageWrapper>

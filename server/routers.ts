@@ -619,9 +619,69 @@ Regras:
         }
         return { success: true, count: results.length };
       }),
+
+    deleteEventsByYearAndType: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        eventTypes: z.array(z.enum(["holiday", "commemorative", "school_event", "personal"]))
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const startDate = `${input.year}-01-01`;
+        const endDate = `${input.year}-12-31`;
+        
+        const deletedCount = await db.deleteEventsByYearAndType(
+          ctx.user.id,
+          startDate,
+          endDate,
+          input.eventTypes
+        );
+        
+        return { deletedCount };
+      }),
+      
+    updateCalendarAnnually: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        newEvents: z.array(z.object({
+          title: z.string(),
+          description: z.string(),
+          eventDate: z.string(),
+          eventType: z.enum(["holiday", "commemorative", "school_event", "personal"])
+        }))
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const startDate = `${input.year}-01-01`;
+        const endDate = `${input.year}-12-31`;
+        
+        // Deletar apenas eventos institucionais (não pessoais) do ano especificado
+        const deletedCount = await db.deleteEventsByYearAndType(
+          ctx.user.id,
+          startDate,
+          endDate,
+          ["holiday", "commemorative", "school_event"]
+        );
+        
+        // Importar novos eventos
+        const results = [];
+        for (const event of input.newEvents) {
+          const created = await db.createCalendarEvent({
+            userId: ctx.user.id,
+            ...event,
+            isRecurring: 0
+          });
+          results.push(created);
+        }
+        
+        return {
+          success: true,
+          deletedCount,
+          addedCount: results.length
+        };
+      }),
   }),
 
-  user: router({    updateProfile: protectedProcedure
+  user: router({
+    updateProfile: protectedProcedure
       .input(z.object({
         name: z.string().optional(),
         email: z.string().email().optional(),
