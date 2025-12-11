@@ -109,7 +109,6 @@ export default function Dashboard() {
       todayClasses: true,
       upcomingEvents: true,
       weeklyChart: true,
-      todoList: true,
     };
   });
   
@@ -129,8 +128,6 @@ export default function Dashboard() {
       todayClasses: true,
       upcomingEvents: true,
       weeklyChart: true,
-      todoList: true,
-
     };
     setWidgetVisibility(defaultVisibility);
     toast.success('Layout restaurado para o padrão!');
@@ -214,37 +211,6 @@ export default function Dashboard() {
       percentage
     };
   }, [scheduledClasses, weekClassStatuses]);
-  
-  // ===== NOVOS WIDGETS =====
-  
-  // Estado da lista de tarefas
-  const [todoItems, setTodoItems] = useState<Array<{id: string, text: string, completed: boolean}>>(() => {
-    const saved = localStorage.getItem('dashboardTodoList');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [newTodoText, setNewTodoText] = useState('');
-  
-  // Salvar tarefas no localStorage
-  useEffect(() => {
-    localStorage.setItem('dashboardTodoList', JSON.stringify(todoItems));
-  }, [todoItems]);
-  
-  const addTodoItem = () => {
-    if (newTodoText.trim()) {
-      setTodoItems([...todoItems, { id: Date.now().toString(), text: newTodoText.trim(), completed: false }]);
-      setNewTodoText('');
-    }
-  };
-  
-  const toggleTodoItem = (id: string) => {
-    setTodoItems(todoItems.map(item => 
-      item.id === id ? { ...item, completed: !item.completed } : item
-    ));
-  };
-  
-  const deleteTodoItem = (id: string) => {
-    setTodoItems(todoItems.filter(item => item.id !== id));
-  };
   
   // Calcular tempo até próxima aula
   const [timeToNextClass, setTimeToNextClass] = useState<{hours: number, minutes: number, seconds: number} | null>(null);
@@ -493,20 +459,6 @@ export default function Dashboard() {
                     <p className="text-sm font-medium">Gráfico Semanal</p>
                   </button>
                   
-                  <button
-                    onClick={() => toggleWidget('todoList')}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      widgetVisibility.todoList
-                        ? 'bg-blue-100 border-blue-500 text-blue-900'
-                        : 'bg-gray-100 border-gray-300 text-gray-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      {widgetVisibility.todoList ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </div>
-                    <p className="text-sm font-medium">Lista de Tarefas</p>
-                  </button>
-
                 </div>
               </CardContent>
             </Card>
@@ -1064,92 +1016,7 @@ export default function Dashboard() {
             </Card>
           )}
           
-          {/* ===== NOVOS WIDGETS ===== */}
-          
-          {/* Grid dos Novos Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            
-            {/* Widget 2: Lista de Tarefas Pendentes */}
-            {widgetVisibility.todoList && (
-              <Card 
-                className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-              >
-                <CardHeader className="pb-2 flex-shrink-0">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <CheckSquare className="h-4 w-4 text-purple-600" />
-                    Tarefas Pendentes
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    {todoItems.filter(t => !t.completed).length} de {todoItems.length} tarefas
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col overflow-hidden p-4">
-                  <div className="space-y-1.5 mb-2 flex-1 overflow-y-auto custom-scrollbar">
-                    {todoItems.length === 0 ? (
-                      <div className="text-center py-4">
-                        <div className="bg-gray-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
-                          <CheckSquare className="h-7 w-7 text-gray-400" />
-                        </div>
-                        <p className="text-sm font-medium text-gray-900 mb-1">✨ Lista vazia!</p>
-                        <p className="text-xs text-gray-500">Adicione suas tarefas abaixo</p>
-                      </div>
-                    ) : (
-                      todoItems.map(item => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors group"
-                        >
-                          <button
-                            onClick={() => toggleTodoItem(item.id)}
-                            className="flex-shrink-0"
-                          >
-                            {item.completed ? (
-                              <CheckSquare className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <Square className="h-4 w-4 text-gray-400" />
-                            )}
-                          </button>
-                          <span className={`flex-1 text-xs ${
-                            item.completed 
-                              ? 'line-through text-gray-400' 
-                              : 'text-gray-900'
-                          }`}>
-                            {item.text}
-                          </span>
-                          <button
-                            onClick={() => deleteTodoItem(item.id)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500 hover:text-red-700" />
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  
-                  <div className="flex gap-2 flex-shrink-0 mt-auto pt-2 border-t">
-                    <input
-                      type="text"
-                      value={newTodoText}
-                      onChange={(e) => setNewTodoText(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && addTodoItem()}
-                      placeholder="Nova tarefa..."
-                      className="flex-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                    <Button
-                      onClick={addTodoItem}
-                      size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 h-7 w-7 p-0"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            
 
-          </div>
 
 
 

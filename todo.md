@@ -1405,4 +1405,13 @@
 - [x] Adicionar link "Relatórios" no menu lateral (Sidebar)
 - [x] Testar funcionalidade completa
 - [x] Executar testes automatizados
+- [x] Salvar checkpoint final
+
+## Remover Widget Lista de Tarefas (11/12/2025)
+
+- [x] Remover botão "Lista de Tarefas" do painel de personalização
+- [x] Remover widget visual de Lista de Tarefas do Dashboard
+- [x] Remover estados e funções relacionadas (todoItems, setTodoItems, etc.)
+- [x] Remover localStorage de tarefas
+- [x] Testar Dashboard após remoção
 - [ ] Salvar checkpoint final
