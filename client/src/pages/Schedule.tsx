@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Calendar, ArrowLeft, Plus, Trash2, Download, CheckCircle2, XCircle, Ban } from "lucide-react";
+import { Calendar, ArrowLeft, Plus, Trash2, Download } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -523,33 +523,7 @@ export default function Schedule() {
                                         <div className="text-xs opacity-80 mt-1">{scheduledClass.notes}</div>
                                       )}
                                       
-                                      {/* Indicador de Status */}
-                                      {(() => {
-                                        const status = getClassStatus(scheduledClass.id);
-                                        if (status) {
-                                          return (
-                                            <div className="absolute top-1 left-1 flex items-center gap-1">
-                                              {status.status === 'given' && (
-                                                <div className="bg-green-500 rounded-full p-1" title="Aula Dada">
-                                                  <CheckCircle2 className="h-3 w-3" />
-                                                </div>
-                                              )}
-                                              {status.status === 'not_given' && (
-                                                <div className="bg-yellow-500 rounded-full p-1" title={`Não Dada${status.reason ? ': ' + status.reason : ''}`}>
-                                                  <XCircle className="h-3 w-3" />
-                                                </div>
-                                              )}
-                                              {status.status === 'cancelled' && (
-                                                <div className="bg-red-500 rounded-full p-1" title={`Cancelada${status.reason ? ': ' + status.reason : ''}`}>
-                                                  <Ban className="h-3 w-3" />
-                                                </div>
-                                              )}
-                                            </div>
-                                          );
-                                        }
-                                        return null;
-                                      })()}
-                                      
+
                                       {/* Botão de Deletar */}
                                       <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100">
                                         <button

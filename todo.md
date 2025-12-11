@@ -1387,3 +1387,22 @@
 - [x] Remover widget "Progresso Semanal" (redundante com Estatísticas)
 - [x] Atualizar sistema de personalização removendo essas opções
 - [x] Testar Dashboard após remoção (60 testes passando - 100%)
+
+
+## Melhorias Solicitadas - Dashboard e Relatórios (11/12/2025)
+
+### Remover Funcionalidades Desnecessárias
+- [x] Remover indicadores visuais de status (círculos coloridos) da Grade de Horários
+- [ ] (Opcional) Remover widget "Lista de Tarefas" do Dashboard
+- [ ] (Opcional) Remover botão "Personalizar Dashboard" e todo sistema de personalização
+
+### Sistema de Relatórios
+- [x] Criar rotas tRPC para estatísticas de aulas (getMonthlyReport, getByDiscipline, etc.)
+- [x] Criar página Reports.tsx com interface completa
+- [x] Implementar filtros por período (mês/semestre/ano)
+- [x] Adicionar gráficos visuais com Chart.js (barras, pizza, linha)
+- [x] Implementar exportação para PDF com jsPDF
+- [x] Adicionar link "Relatórios" no menu lateral (Sidebar)
+- [x] Testar funcionalidade completa
+- [x] Executar testes automatizados
+- [ ] Salvar checkpoint final

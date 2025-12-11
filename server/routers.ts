@@ -1033,6 +1033,139 @@ Regras:
       }),
   }),
 
+  reports: router({
+    getStats: protectedProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { startDate, endDate, subjectId } = input;
+        
+        const scheduledClasses = await db.getScheduledClassesByUserId(ctx.user.id);
+        const subjects = await db.getSubjectsByUserId(ctx.user.id);
+        const classes = await db.getClassesByUserId(ctx.user.id);
+        const timeSlots = await db.getTimeSlotsByUserId(ctx.user.id);
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        const allStatuses: any[] = [];
+        for (let year = start.getFullYear(); year <= end.getFullYear(); year++) {
+          for (let week = 1; week <= 53; week++) {
+            const weekStatuses = await db.getWeekClassStatuses(week, year, ctx.user.id);
+            allStatuses.push(...weekStatuses);
+          }
+        }
+        
+        const statusMap = new Map(
+          allStatuses.map((s: any) => [s.scheduledClassId, s])
+        );
+        
+        let given = 0;
+        let notGiven = 0;
+        let cancelled = 0;
+        let pending = 0;
+        
+        const bySubject: Record<number, {
+          subjectId: number;
+          subjectName: string;
+          subjectColor: string;
+          given: number;
+          notGiven: number;
+          cancelled: number;
+          pending: number;
+          total: number;
+        }> = {};
+        
+        const byMonth: Record<string, {
+          month: string;
+          given: number;
+          notGiven: number;
+          cancelled: number;
+          pending: number;
+          total: number;
+        }> = {};
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const dayOfWeek = d.getDay();
+          const dateStr = d.toISOString().split('T')[0];
+          const monthKey = dateStr.substring(0, 7);
+          
+          if (!byMonth[monthKey]) {
+            byMonth[monthKey] = {
+              month: monthKey,
+              given: 0,
+              notGiven: 0,
+              cancelled: 0,
+              pending: 0,
+              total: 0,
+            };
+          }
+          
+          const dayClasses = scheduledClasses.filter(sc => {
+            if (sc.dayOfWeek !== dayOfWeek) return false;
+            if (subjectId && sc.subjectId !== subjectId) return false;
+            return true;
+          });
+          
+          for (const scheduledClass of dayClasses) {
+            const subject = subjects.find(s => s.id === scheduledClass.subjectId);
+            if (!subject) continue;
+            
+            if (!bySubject[scheduledClass.subjectId]) {
+              bySubject[scheduledClass.subjectId] = {
+                subjectId: scheduledClass.subjectId,
+                subjectName: subject.name,
+                subjectColor: subject.color || '#3b82f6',
+                given: 0,
+                notGiven: 0,
+                cancelled: 0,
+                pending: 0,
+                total: 0,
+              };
+            }
+            
+            bySubject[scheduledClass.subjectId].total++;
+            byMonth[monthKey].total++;
+            
+            const status = statusMap.get(scheduledClass.id) as any;
+            
+            if (status) {
+              if (status.status === 'given') {
+                given++;
+                bySubject[scheduledClass.subjectId].given++;
+                byMonth[monthKey].given++;
+              } else if (status.status === 'not_given') {
+                notGiven++;
+                bySubject[scheduledClass.subjectId].notGiven++;
+                byMonth[monthKey].notGiven++;
+              } else if (status.status === 'cancelled') {
+                cancelled++;
+                bySubject[scheduledClass.subjectId].cancelled++;
+                byMonth[monthKey].cancelled++;
+              }
+            } else {
+              pending++;
+              bySubject[scheduledClass.subjectId].pending++;
+              byMonth[monthKey].pending++;
+            }
+          }
+        }
+        
+        return {
+          total: given + notGiven + cancelled + pending,
+          given,
+          notGiven,
+          cancelled,
+          pending,
+          bySubject: Object.values(bySubject),
+          byMonth: Object.values(byMonth).sort((a, b) => a.month.localeCompare(b.month)),
+        };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

@@ -15,7 +15,8 @@ import {
   Lightbulb,
   ChevronLeft,
   ChevronRight,
-  CheckSquare
+  CheckSquare,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -67,6 +68,11 @@ const navItems: NavItem[] = [
     label: "Calendário",
     icon: <CalendarDays className="h-5 w-5" />,
     href: "/calendar",
+  },
+  {
+    label: "Relatórios",
+    icon: <BarChart3 className="h-5 w-5" />,
+    href: "/reports",
   },
   {
     label: "Metodologias",
