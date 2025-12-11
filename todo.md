@@ -1321,3 +1321,12 @@
 - [x] Verificar outros erros no sistema (console limpo)
 - [x] Testar todas as correções (página de usuários funcionando)
 - [x] Executar testes automatizados (60 testes passando - 100%)
+
+
+## Botão de Limpeza de Usuários Inválidos
+- [x] Adicionar botão "Limpar Inválidos" na página AdminUsers
+- [x] Implementar diálogo de confirmação antes da limpeza (confirm nativo)
+- [x] Adicionar feedback visual (spinner durante loading, toast de sucesso)
+- [x] Recarregar lista de usuários após limpeza (refetch automático)
+- [x] Adicionar mutation cleanInvalidUsersMutation
+- [x] Testar funcionalidade completa (botão visível e operacional)
