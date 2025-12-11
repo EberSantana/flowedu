@@ -1352,3 +1352,9 @@
 - [x] Testar todas as operações de usuários (página funcionando perfeitamente)
 - [x] Executar testes automatizados (60 testes passando - 100%)
 - [x] Limpar usuários de teste restantes (3 removidos)
+
+
+## Remover Botão "Limpar Inválidos"
+- [x] Remover botão da página AdminUsers.tsx
+- [x] Remover mutation cleanInvalidUsersMutation
+- [x] Analisar interface e sugerir melhorias

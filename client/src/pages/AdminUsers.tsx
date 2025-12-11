@@ -96,15 +96,7 @@ export default function AdminUsers() {
     },
   });
 
-  const cleanInvalidUsersMutation = trpc.admin.cleanInvalidUsers.useMutation({
-    onSuccess: (result) => {
-      toast.success(`${result.deletedCount} usuário(s) inválido(s) removido(s) com sucesso!`);
-      refetch();
-    },
-    onError: (error: any) => {
-      toast.error(`Erro ao limpar usuários: ${error.message}`);
-    },
-  });
+
 
   const createUserMutation = trpc.admin.createUser.useMutation({
     onSuccess: (data) => {
@@ -220,24 +212,7 @@ export default function AdminUsers() {
               )}
             </Button>
             
-            <Button
-              onClick={() => {
-                if (confirm('⚠️ Tem certeza que deseja remover todos os usuários inválidos (sem nome e sem email)?\n\nEsta ação não pode ser desfeita.')) {
-                  cleanInvalidUsersMutation.mutate();
-                }
-              }}
-              variant="outline"
-              disabled={cleanInvalidUsersMutation.isPending}
-              className="border-orange-300 text-orange-700 hover:bg-orange-50"
-            >
-              {cleanInvalidUsersMutation.isPending ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Trash2 className="w-4 h-4 mr-2" />
-              )}
-              Limpar Inválidos
-            </Button>
-            
+
             <Button
               onClick={() => setShowCreateForm(!showCreateForm)}
               className="bg-green-600 hover:bg-green-700 text-white"
