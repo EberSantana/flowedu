@@ -1330,3 +1330,13 @@
 - [x] Recarregar lista de usuários após limpeza (refetch automático)
 - [x] Adicionar mutation cleanInvalidUsersMutation
 - [x] Testar funcionalidade completa (botão visível e operacional)
+
+
+## Limpeza de Usuários de Teste
+- [x] Identificar todos os arquivos de teste que criam usuários
+- [x] Adicionar hooks afterAll para limpar usuários de teste
+- [x] Garantir que apenas usuários de teste sejam removidos (filtro por @test.com)
+- [x] Adicionar limpeza em admin.test.ts, soft-delete.test.ts, create-user.test.ts, calendar-update.test.ts
+- [x] Executar testes e verificar limpeza (60 testes passando)
+- [x] Criar script manual de limpeza (scripts/clean-test-users.ts)
+- [x] Validar que usuários reais não são afetados (filtro por @test.com)

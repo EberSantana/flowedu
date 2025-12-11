@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { appRouter } from "./routers";
 import * as db from "./db";
 import type { TrpcContext } from "./_core/context";
@@ -34,6 +34,15 @@ describe("Calendar Annual Update", () => {
     };
 
     caller = appRouter.createCaller(ctx);
+  });
+
+  afterAll(async () => {
+    // Limpar usuário de teste e seus dados
+    try {
+      await db.permanentDeleteUser(userId);
+    } catch (error) {
+      console.warn('[Test Cleanup] Failed to delete test user:', error);
+    }
   });
 
   it("should delete only institutional events from specified year", async () => {

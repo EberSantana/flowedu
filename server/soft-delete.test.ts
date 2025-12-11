@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { appRouter } from "./routers";
 import * as db from "./db";
 
@@ -51,6 +51,17 @@ describe("Soft Delete Tests", () => {
     adminUserId = adminUser.id;
     regularUserId = regularUser.id;
     testUserId = testUser.id;
+  });
+
+  afterAll(async () => {
+    // Limpar usuários de teste criados
+    try {
+      await db.permanentDeleteUser(adminUserId);
+      await db.permanentDeleteUser(regularUserId);
+      await db.permanentDeleteUser(testUserId);
+    } catch (error) {
+      console.warn('[Test Cleanup] Failed to delete test users:', error);
+    }
   });
 
   describe("Deactivate User (Soft Delete)", () => {

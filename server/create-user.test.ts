@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { appRouter } from './routers';
 import * as db from './db';
 
@@ -39,6 +39,31 @@ describe('Manual User Creation Tests', () => {
       },
       req: { ip: '127.0.0.1', headers: {} } as any,
     };
+  });
+
+  afterAll(async () => {
+    // Limpar todos os usuários de teste criados
+    try {
+      const allUsers = await db.getAllUsers();
+      const testUsers = allUsers.filter(u => 
+        u.email?.includes('@test.com') && 
+        (u.email.includes('new-user-') || 
+         u.email.includes('new-admin-') || 
+         u.email.includes('duplicate-') ||
+         u.email.includes('email-test-') ||
+         u.email.includes('audit-test-'))
+      );
+      
+      for (const user of testUsers) {
+        try {
+          await db.permanentDeleteUser(user.id);
+        } catch (e) {
+          // Ignorar erros
+        }
+      }
+    } catch (error) {
+      console.warn('[Test Cleanup] Failed to delete test users:', error);
+    }
   });
 
   describe('Admin Create User', () => {
