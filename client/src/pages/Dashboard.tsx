@@ -318,21 +318,23 @@ export default function Dashboard() {
   const handleSetStatus = (scheduledClass: any, status: 'given' | 'not_given' | 'cancelled') => {
     const currentStatus = getClassStatus(scheduledClass.id);
     
+    // Se o status clicado já é o status atual, desmarcar (remover status)
+    if (currentStatus?.status === status) {
+      deleteStatusMutation.mutate({ id: currentStatus.id });
+      return;
+    }
+    
+    // Caso contrário, marcar com o novo status
     if (status === 'given') {
-      // Se já está marcada como "Dada", desmarcar (remover status)
-      if (currentStatus?.status === 'given') {
-        deleteStatusMutation.mutate({ id: currentStatus.id });
-      } else {
-        // Marcar como dada diretamente
-        setStatusMutation.mutate({
-          scheduledClassId: scheduledClass.id,
-          weekNumber: currentWeekNumber,
-          year: currentYear,
-          status: 'given',
-        });
-      }
+      // Marcar como dada diretamente (sem dialog)
+      setStatusMutation.mutate({
+        scheduledClassId: scheduledClass.id,
+        weekNumber: currentWeekNumber,
+        year: currentYear,
+        status: 'given',
+      });
     } else {
-      // Abrir dialog para adicionar motivo
+      // Abrir dialog para adicionar motivo (Não Dada e Cancelada)
       setSelectedClassForStatus({ ...scheduledClass, status });
       setIsStatusDialogOpen(true);
     }

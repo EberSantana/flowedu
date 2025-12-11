@@ -1422,4 +1422,12 @@
 - [x] Implementar lógica de toggle: se status atual é "given", remover status ao clicar novamente
 - [x] Atualizar UI para refletir remoção do status
 - [x] Testar funcionalidade no Dashboard
+- [x] Salvar checkpoint final
+
+## Implementar Toggle para Todos os Status (11/12/2025)
+
+- [x] Estender lógica de toggle para status "Não Dada"
+- [x] Estender lógica de toggle para status "Cancelada"
+- [x] Atualizar função handleSetStatus para suportar toggle em todos os status
+- [x] Testar funcionalidade no Dashboard
 - [ ] Salvar checkpoint final
