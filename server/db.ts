@@ -496,6 +496,13 @@ export async function reactivateUser(userId: number) {
   return { success: true };
 }
 
+export async function updateUserLastSignIn(userId: number, lastSignedIn: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ lastSignedIn }).where(eq(users.id, userId));
+  return { success: true };
+}
+
 export async function getActiveUsers() {
   const db = await getDb();
   if (!db) return [];

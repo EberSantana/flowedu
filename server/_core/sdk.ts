@@ -275,10 +275,8 @@ class SDKServer {
       throw ForbiddenError("Usuário não autorizado. Entre em contato com o administrador para obter acesso.");
     }
 
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
-    });
+    // Update last sign-in time for existing user
+    await db.updateUserLastSignIn(user.id, signedInAt);
 
     return user;
   }

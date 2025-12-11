@@ -1340,3 +1340,15 @@
 - [x] Executar testes e verificar limpeza (60 testes passando)
 - [x] Criar script manual de limpeza (scripts/clean-test-users.ts)
 - [x] Validar que usuários reais não são afetados (filtro por @test.com)
+
+
+## Correção de Problemas de Usuários
+- [x] Investigar criação de usuários "Sem nome" (bug no sdk.ts)
+- [x] Corrigir sdk.ts - remover upsertUser após verificação de usuário não existente
+- [x] Criar função updateUserLastSignIn no db.ts
+- [x] Limpar 10 usuários inválidos do banco
+- [x] Verificar lógica de desativação (deactivateUser - OK)
+- [x] Verificar lógica de reativação (reactivateUser - OK)
+- [x] Testar todas as operações de usuários (página funcionando perfeitamente)
+- [x] Executar testes automatizados (60 testes passando - 100%)
+- [x] Limpar usuários de teste restantes (3 removidos)
