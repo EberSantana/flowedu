@@ -1430,4 +1430,13 @@
 - [x] Estender lógica de toggle para status "Cancelada"
 - [x] Atualizar função handleSetStatus para suportar toggle em todos os status
 - [x] Testar funcionalidade no Dashboard
+- [x] Salvar checkpoint final
+
+## Corrigir Erro NotFoundError - removeChild (11/12/2025)
+
+- [x] Investigar causa do erro NotFoundError no Dashboard
+- [x] Adicionar flag isPending para prevenir múltiplos cliques
+- [x] Implementar debounce ou disable nos botões durante mutation
+- [x] Otimizar invalidação de queries para evitar race conditions
+- [x] Testar correção no ambiente de produção
 - [ ] Salvar checkpoint final

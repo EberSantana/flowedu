@@ -64,9 +64,10 @@ export default function Dashboard() {
   // Mutation para atualizar status de aulas
   const utils = trpc.useUtils();
   const setStatusMutation = trpc.classStatus.set.useMutation({
-    onSuccess: () => {
-      utils.dashboard.getTodayClasses.invalidate();
-      utils.classStatus.getWeek.invalidate();
+    onSuccess: async () => {
+      // Invalidar queries de forma sequencial para evitar race conditions
+      await utils.classStatus.getWeek.invalidate();
+      await utils.dashboard.getTodayClasses.invalidate();
       toast.success("Status da aula atualizado!");
       setIsStatusDialogOpen(false);
       setStatusReason("");
@@ -77,9 +78,10 @@ export default function Dashboard() {
   });
   
   const deleteStatusMutation = trpc.classStatus.delete.useMutation({
-    onSuccess: () => {
-      utils.dashboard.getTodayClasses.invalidate();
-      utils.classStatus.getWeek.invalidate();
+    onSuccess: async () => {
+      // Invalidar queries de forma sequencial para evitar race conditions
+      await utils.classStatus.getWeek.invalidate();
+      await utils.dashboard.getTodayClasses.invalidate();
       toast.success("Status removido!");
     },
     onError: (error) => {
@@ -848,7 +850,7 @@ export default function Dashboard() {
                                     : 'hover:bg-green-50 hover:border-green-500 hover:text-green-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'given')}
-                                disabled={setStatusMutation.isPending}
+                                disabled={setStatusMutation.isPending || deleteStatusMutation.isPending}
                               >
                                 <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
                                 Dada
@@ -863,7 +865,7 @@ export default function Dashboard() {
                                     : 'hover:bg-yellow-50 hover:border-yellow-500 hover:text-yellow-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'not_given')}
-                                disabled={setStatusMutation.isPending}
+                                disabled={setStatusMutation.isPending || deleteStatusMutation.isPending}
                               >
                                 <XCircle className="h-3.5 w-3.5 mr-1.5" />
                                 Não Dada
@@ -878,7 +880,7 @@ export default function Dashboard() {
                                     : 'hover:bg-red-50 hover:border-red-500 hover:text-red-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'cancelled')}
-                                disabled={setStatusMutation.isPending}
+                                disabled={setStatusMutation.isPending || deleteStatusMutation.isPending}
                               >
                                 <Ban className="h-3.5 w-3.5 mr-1.5" />
                                 Cancelada
