@@ -1379,3 +1379,11 @@
 - [x] Manter apenas indicadores visuais de status (ícones coloridos)
 - [x] Manter botão de deletar aula
 - [x] Testar Grade de Horários (60 testes passando - 100%)
+
+
+## Remover Widgets Desnecessários do Dashboard
+- [x] Remover widget "Contador de Tempo"
+- [x] Remover widget "Prazos Importantes" (funcionalidade mesclada em Eventos Próximos)
+- [x] Remover widget "Progresso Semanal" (redundante com Estatísticas)
+- [x] Atualizar sistema de personalização removendo essas opções
+- [x] Testar Dashboard após remoção (60 testes passando - 100%)

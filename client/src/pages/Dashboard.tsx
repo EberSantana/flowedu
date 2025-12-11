@@ -109,9 +109,7 @@ export default function Dashboard() {
       todayClasses: true,
       upcomingEvents: true,
       weeklyChart: true,
-      timeToNextClass: true,
       todoList: true,
-      importantDeadlines: true,
     };
   });
   
@@ -131,10 +129,8 @@ export default function Dashboard() {
       todayClasses: true,
       upcomingEvents: true,
       weeklyChart: true,
-      timeToNextClass: true,
       todoList: true,
-      importantDeadlines: true,
-      weeklyProgress: true,
+
     };
     setWidgetVisibility(defaultVisibility);
     toast.success('Layout restaurado para o padrão!');
@@ -498,20 +494,6 @@ export default function Dashboard() {
                   </button>
                   
                   <button
-                    onClick={() => toggleWidget('timeToNextClass')}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      widgetVisibility.timeToNextClass
-                        ? 'bg-blue-100 border-blue-500 text-blue-900'
-                        : 'bg-gray-100 border-gray-300 text-gray-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      {widgetVisibility.timeToNextClass ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </div>
-                    <p className="text-sm font-medium">Contador de Tempo</p>
-                  </button>
-                  
-                  <button
                     onClick={() => toggleWidget('todoList')}
                     className={`p-3 rounded-lg border-2 transition-all ${
                       widgetVisibility.todoList
@@ -524,34 +506,7 @@ export default function Dashboard() {
                     </div>
                     <p className="text-sm font-medium">Lista de Tarefas</p>
                   </button>
-                  
-                  <button
-                    onClick={() => toggleWidget('importantDeadlines')}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      widgetVisibility.importantDeadlines
-                        ? 'bg-blue-100 border-blue-500 text-blue-900'
-                        : 'bg-gray-100 border-gray-300 text-gray-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      {widgetVisibility.importantDeadlines ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </div>
-                    <p className="text-sm font-medium">Prazos Importantes</p>
-                  </button>
-                  
-                  <button
-                    onClick={() => toggleWidget('weeklyProgress')}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      widgetVisibility.weeklyProgress
-                        ? 'bg-blue-100 border-blue-500 text-blue-900'
-                        : 'bg-gray-100 border-gray-300 text-gray-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      {widgetVisibility.weeklyProgress ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </div>
-                    <p className="text-sm font-medium">Progresso Semanal</p>
-                  </button>
+
                 </div>
               </CardContent>
             </Card>
@@ -1114,80 +1069,6 @@ export default function Dashboard() {
           {/* Grid dos Novos Widgets */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             
-            {/* Widget 1: Contador de Tempo até Próxima Aula */}
-            {widgetVisibility.timeToNextClass && (
-              <Card 
-                className="border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-              >
-                <CardHeader className="pb-3 flex-shrink-0">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <Timer className="h-4 w-4 text-teal-600" />
-                    Próxima Aula
-                  </CardTitle>
-                  <CardDescription className="text-xs">Tempo restante até sua próxima aula</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col justify-center">
-                  {isLoadingUpcoming ? (
-                    // Skeleton Loading
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-center">
-                        <Skeleton className="h-12 w-48" />
-                      </div>
-                      <Skeleton className="h-3 w-40 mx-auto" />
-                      <Skeleton className="h-20 w-full" />
-                    </div>
-                  ) : timeToNextClass && upcomingClasses && upcomingClasses.length > 0 ? (
-                    <>
-                      <div className="flex items-center justify-center gap-2 mb-4">
-                        <div className="text-center">
-                          <div className={`text-2xl font-bold ${
-                            timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 
-                              ? 'text-red-600 animate-pulse' 
-                              : 'text-teal-600'
-                          }`}>
-                            {String(timeToNextClass.hours).padStart(2, '0')}:{String(timeToNextClass.minutes).padStart(2, '0')}:{String(timeToNextClass.seconds).padStart(2, '0')}
-                          </div>
-                          <p className="text-[10px] text-gray-500 mt-1">horas:minutos:segundos</p>
-                        </div>
-                      </div>
-                      
-                      {timeToNextClass.hours === 0 && timeToNextClass.minutes < 15 && (
-                        <div className="bg-white border-2 border-red-400 rounded-lg p-3 mb-3">
-                          <p className="text-sm text-red-700 font-medium flex items-center gap-2">
-                            <Bell className="h-4 w-4" />
-                            Alerta: Aula começa em breve!
-                          </p>
-                        </div>
-                      )}
-                      
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-sm font-medium text-gray-900 mb-1">
-                          {upcomingClasses[0].subjectName}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          {upcomingClasses[0].className} • {upcomingClasses[0].startTime} - {upcomingClasses[0].endTime}
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                        <Clock className="h-10 w-10 text-gray-400" />
-                      </div>
-                      <p className="text-sm font-medium text-gray-900 mb-2">🎉 Nenhuma aula hoje!</p>
-                      <p className="text-xs text-gray-500 mb-4">Aproveite seu tempo livre</p>
-                      <Link href="/schedule">
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <CalendarIcon className="h-4 w-4" />
-                          Ver Grade Completa
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-            
             {/* Widget 2: Lista de Tarefas Pendentes */}
             {widgetVisibility.todoList && (
               <Card 
@@ -1267,195 +1148,7 @@ export default function Dashboard() {
               </Card>
             )}
             
-            {/* Widget 3: Prazos Importantes */}
-            {widgetVisibility.importantDeadlines && (
-              <Card 
-                className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-              >
-                <CardHeader className="pb-2 flex-shrink-0">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-orange-600" />
-                    Prazos Importantes
-                  </CardTitle>
-                  <CardDescription className="text-xs">Próximos 7 dias</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 overflow-y-auto custom-scrollbar p-4">
-                  <div className="space-y-2">
-                    {isLoadingCalendar ? (
-                      // Skeleton Loading
-                      <>
-                        <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
-                          <Skeleton className="h-10 w-10 rounded-full" />
-                          <div className="flex-1 space-y-2">
-                            <Skeleton className="h-5 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
-                          <Skeleton className="h-10 w-10 rounded-full" />
-                          <div className="flex-1 space-y-2">
-                            <Skeleton className="h-5 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                          </div>
-                        </div>
-                      </>
-                    ) : importantDeadlines.length === 0 ? (
-                      <div className="text-center py-4">
-                        <div className="bg-gray-50 rounded-full p-3 w-14 h-14 mx-auto mb-2 flex items-center justify-center">
-                          <CalendarIcon className="h-7 w-7 text-gray-400" />
-                        </div>
-                        <p className="text-sm font-medium text-gray-900 mb-1">👍 Tudo tranquilo!</p>
-                        <p className="text-xs text-gray-500 mb-3">Nenhum prazo nos próximos 7 dias</p>
-                        <Link href="/calendar">
-                          <Button variant="outline" size="sm" className="gap-1 text-xs h-7">
-                            <CalendarIcon className="h-3 w-3" />
-                            Ver Calendário
-                          </Button>
-                        </Link>
-                      </div>
-                    ) : (
-                      importantDeadlines.map((event: any) => {
-                        const eventDate = new Date(event.eventDate);
-                        const now = new Date();
-                        const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                        
-                        const urgencyColor = diffDays <= 2 ? 'bg-red-500' : diffDays <= 5 ? 'bg-yellow-500' : 'bg-green-500';
-                        const urgencyText = diffDays === 0 ? 'HOJE' : diffDays === 1 ? 'AMANHÃ' : `${diffDays}d`;
-                        
-                        const dayOfWeek = eventDate.toLocaleDateString('pt-BR', { weekday: 'short' });
-                        const dayMonth = eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-                        
-                        return (
-                          <div
-                            key={event.id}
-                            className="relative p-2.5 rounded-lg border border-gray-200 bg-white hover:shadow-md transition-shadow"
-                          >
-                            <div className={`absolute -top-1.5 -right-1.5 ${urgencyColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md`}>
-                              {urgencyText}
-                            </div>
-                            
-                            <h4 className="font-bold text-gray-900 text-sm mb-1 pr-8 leading-tight">
-                              {event.title}
-                            </h4>
-                            <p className="text-xs text-gray-700 font-medium">
-                              {dayOfWeek}, {dayMonth}
-                            </p>
-                            {event.description && (
-                              <p className="text-xs text-gray-600 mt-1 line-clamp-1">
-                                {event.description}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            
-            {/* Widget 4: Progresso Semanal */}
-            {widgetVisibility.weeklyProgress && (
-              <Card 
-                className="border-l-4 border-l-indigo-500 hover:shadow-lg transition-shadow flex flex-col h-auto md:h-[320px]"
-              >
-                <CardHeader className="pb-3 flex-shrink-0">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-indigo-600" />
-                    Progresso Semanal
-                  </CardTitle>
-                  <CardDescription>Aulas concluídas esta semana</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col justify-center items-center">
-                  {isLoadingSchedule ? (
-                    // Skeleton Loading
-                    <div className="space-y-4 w-full">
-                      <Skeleton className="h-40 w-40 rounded-full mx-auto" />
-                      <Skeleton className="h-6 w-32 mx-auto" />
-                      <Skeleton className="h-4 w-48 mx-auto" />
-                    </div>
-                  ) : weeklyProgress.total === 0 ? (
-                    // Estado Vazio
-                    <div className="text-center py-8">
-                      <div className="bg-indigo-50 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                        <CalendarIcon className="h-10 w-10 text-indigo-400" />
-                      </div>
-                      <p className="text-sm font-medium text-gray-900 mb-2">📅 Nenhuma aula agendada</p>
-                      <p className="text-xs text-gray-500 mb-4">Configure sua grade semanal</p>
-                      <Link href="/schedule">
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <CalendarIcon className="h-4 w-4" />
-                          Configurar Grade
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    // Barra Circular de Progresso
-                    <div className="flex flex-col items-center gap-4">
-                      {/* SVG Circular Progress */}
-                      <div className="relative w-36 h-36">
-                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
-                          {/* Background Circle */}
-                          <circle
-                            cx="100"
-                            cy="100"
-                            r="85"
-                            stroke="#e5e7eb"
-                            strokeWidth="16"
-                            fill="none"
-                          />
-                          {/* Progress Circle */}
-                          <circle
-                            cx="100"
-                            cy="100"
-                            r="85"
-                            stroke={
-                              weeklyProgress.percentage >= 70 ? '#10b981' : // Verde
-                              weeklyProgress.percentage >= 40 ? '#f59e0b' : // Amarelo
-                              '#ef4444' // Vermelho
-                            }
-                            strokeWidth="16"
-                            fill="none"
-                            strokeDasharray={`${2 * Math.PI * 85}`}
-                            strokeDashoffset={`${2 * Math.PI * 85 * (1 - weeklyProgress.percentage / 100)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out"
-                          />
-                        </svg>
-                        {/* Texto Central */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className={
-                            `text-3xl font-bold ${
-                              weeklyProgress.percentage >= 70 ? 'text-green-600' :
-                              weeklyProgress.percentage >= 40 ? 'text-yellow-600' :
-                              'text-red-600'
-                            }`
-                          }>
-                            {weeklyProgress.percentage}%
-                          </span>
-                          <span className="text-sm text-gray-500 mt-1">
-                            {weeklyProgress.completed}/{weeklyProgress.total} aulas
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Legenda */}
-                      <div className="text-center">
-                        <p className="text-sm font-medium text-gray-900">
-                          {weeklyProgress.percentage >= 70 ? '🎉 Ótimo progresso!' :
-                           weeklyProgress.percentage >= 40 ? '💪 Continue assim!' :
-                           '🚀 Vamos lá!'}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {weeklyProgress.total - weeklyProgress.completed} aula{weeklyProgress.total - weeklyProgress.completed !== 1 ? 's' : ''} restante{weeklyProgress.total - weeklyProgress.completed !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-            
+
           </div>
 
 
