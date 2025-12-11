@@ -842,6 +842,29 @@ Regras:
         };
       }),
 
+    // Limpar usuários inválidos (sem nome e sem email)
+    cleanInvalidUsers: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+
+        const result = await db.cleanInvalidUsers();
+        
+        // Registrar log de auditoria
+        await db.createAuditLog({
+          adminId: ctx.user.id,
+          adminName: ctx.user.name || 'Administrador',
+          action: 'CLEAN_INVALID_USERS',
+          targetUserId: undefined,
+          targetUserName: '',
+          newData: JSON.stringify({ deletedCount: result.deletedCount }),
+          ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for'] as string || 'unknown',
+        });
+
+        return result;
+      }),
+
   }),
 
   // Metodologias Ativas

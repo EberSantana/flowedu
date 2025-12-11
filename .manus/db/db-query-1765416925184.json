@@ -1,0 +1,20 @@
+{
+  "query": "SELECT COUNT(*) as total, role, active FROM users GROUP BY role, active",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total, role, active FROM users GROUP BY role, active",
+  "rows": [
+    {
+      "total": "1",
+      "role": "user",
+      "active": "1"
+    },
+    {
+      "total": "1",
+      "role": "admin",
+      "active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\trole\tactive\n1\tuser\t1\n1\tadmin\t1\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

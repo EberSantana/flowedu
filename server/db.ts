@@ -1,4 +1,4 @@
-import { and, desc, eq, ne, gte, lte, inArray, sql } from "drizzle-orm";
+import { and, or, desc, eq, ne, gte, lte, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -517,6 +517,51 @@ export async function permanentDeleteUser(userId: number) {
   await db.delete(users).where(eq(users.id, userId));
   
   return { success: true };
+}
+
+export async function cleanInvalidUsers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar usuários inválidos (sem nome E sem email)
+  const invalidUsers = await db.select()
+    .from(users)
+    .where(
+      and(
+        or(
+          eq(users.name, ''),
+          sql`${users.name} IS NULL`
+        ),
+        or(
+          eq(users.email, ''),
+          sql`${users.email} IS NULL`
+        )
+      )
+    );
+  
+  const invalidCount = invalidUsers.length;
+  
+  if (invalidCount > 0) {
+    // Deletar usuários inválidos
+    await db.delete(users).where(
+      and(
+        or(
+          eq(users.name, ''),
+          sql`${users.name} IS NULL`
+        ),
+        or(
+          eq(users.email, ''),
+          sql`${users.email} IS NULL`
+        )
+      )
+    );
+  }
+  
+  return { 
+    success: true, 
+    deletedCount: invalidCount,
+    message: `${invalidCount} usuário(s) inválido(s) removido(s)` 
+  };
 }
 
 

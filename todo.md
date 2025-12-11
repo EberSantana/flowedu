@@ -1310,3 +1310,14 @@
 - [x] Remover dropdowns de filtro de Prioridade e Categoria
 - [x] Manter apenas os botões de filtro rápido (Todas, Hoje, Esta Semana, Pendentes, Concluídas)
 - [x] Testar funcionalidade
+
+
+## Correções de Bugs
+- [x] Investigar criação automática de usuários sem cadastro
+- [x] Corrigir lógica de autenticação/cadastro (removida criação automática em sdk.ts)
+- [x] Limpar 689+ usuários inválidos do banco de dados
+- [x] Adicionar função cleanInvalidUsers no backend
+- [x] Corrigir erros de TypeScript (import 'or' no db.ts)
+- [x] Verificar outros erros no sistema (console limpo)
+- [x] Testar todas as correções (página de usuários funcionando)
+- [x] Executar testes automatizados (60 testes passando - 100%)
