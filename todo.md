@@ -1372,3 +1372,10 @@
 - [x] Integrar com mutation classStatus.set
 - [x] Testar funcionalidade completa (screenshot validado)
 - [x] Executar testes automatizados (60 testes passando - 100%)
+
+
+## Remover Botões de Status da Grade de Horários
+- [x] Remover menu dropdown (Marcar como Dada/Não Dada/Cancelada) dos cards de aula
+- [x] Manter apenas indicadores visuais de status (ícones coloridos)
+- [x] Manter botão de deletar aula
+- [x] Testar Grade de Horários (60 testes passando - 100%)

@@ -2,13 +2,13 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Calendar, ArrowLeft, Plus, Trash2, Download, CheckCircle2, XCircle, Ban, MoreVertical } from "lucide-react";
+import { Calendar, ArrowLeft, Plus, Trash2, Download, CheckCircle2, XCircle, Ban } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -550,29 +550,8 @@ export default function Schedule() {
                                         return null;
                                       })()}
                                       
-                                      {/* Botões de Ação */}
-                                      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex gap-1">
-                                        <DropdownMenu>
-                                          <DropdownMenuTrigger asChild>
-                                            <button className="bg-blue-500 hover:bg-blue-600 rounded p-1 transition-colors">
-                                              <MoreVertical className="h-3 w-3" />
-                                            </button>
-                                          </DropdownMenuTrigger>
-                                          <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleSetStatus(scheduledClass, 'given')}>
-                                              <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />
-                                              Marcar como Dada
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleSetStatus(scheduledClass, 'not_given')}>
-                                              <XCircle className="h-4 w-4 mr-2 text-yellow-600" />
-                                              Marcar como Não Dada
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleSetStatus(scheduledClass, 'cancelled')}>
-                                              <Ban className="h-4 w-4 mr-2 text-red-600" />
-                                              Marcar como Cancelada
-                                            </DropdownMenuItem>
-                                          </DropdownMenuContent>
-                                        </DropdownMenu>
+                                      {/* Botão de Deletar */}
+                                      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100">
                                         <button
                                           onClick={() => handleDelete(scheduledClass.id)}
                                           className="bg-red-500 hover:bg-red-600 rounded p-1 transition-colors"
