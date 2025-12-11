@@ -1414,4 +1414,12 @@
 - [x] Remover estados e funções relacionadas (todoItems, setTodoItems, etc.)
 - [x] Remover localStorage de tarefas
 - [x] Testar Dashboard após remoção
+- [x] Salvar checkpoint final
+
+## Permitir Desmarcar Status "Dada" (11/12/2025)
+
+- [x] Modificar função handleSetStatus para detectar clique no status já ativo
+- [x] Implementar lógica de toggle: se status atual é "given", remover status ao clicar novamente
+- [x] Atualizar UI para refletir remoção do status
+- [x] Testar funcionalidade no Dashboard
 - [ ] Salvar checkpoint final

@@ -76,6 +76,17 @@ export default function Dashboard() {
     },
   });
   
+  const deleteStatusMutation = trpc.classStatus.delete.useMutation({
+    onSuccess: () => {
+      utils.dashboard.getTodayClasses.invalidate();
+      utils.classStatus.getWeek.invalidate();
+      toast.success("Status removido!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao remover status: " + error.message);
+    },
+  });
+  
   // Função para calcular número da semana no ano
   const getWeekNumber = (date: Date): number => {
     const start = new Date(date.getFullYear(), 0, 1);
@@ -305,14 +316,21 @@ export default function Dashboard() {
   
   // Funções para manipular status de aulas
   const handleSetStatus = (scheduledClass: any, status: 'given' | 'not_given' | 'cancelled') => {
+    const currentStatus = getClassStatus(scheduledClass.id);
+    
     if (status === 'given') {
-      // Marcar como dada diretamente
-      setStatusMutation.mutate({
-        scheduledClassId: scheduledClass.id,
-        weekNumber: currentWeekNumber,
-        year: currentYear,
-        status: 'given',
-      });
+      // Se já está marcada como "Dada", desmarcar (remover status)
+      if (currentStatus?.status === 'given') {
+        deleteStatusMutation.mutate({ id: currentStatus.id });
+      } else {
+        // Marcar como dada diretamente
+        setStatusMutation.mutate({
+          scheduledClassId: scheduledClass.id,
+          weekNumber: currentWeekNumber,
+          year: currentYear,
+          status: 'given',
+        });
+      }
     } else {
       // Abrir dialog para adicionar motivo
       setSelectedClassForStatus({ ...scheduledClass, status });
