@@ -44,8 +44,6 @@ export default function Tasks() {
   // Estados
   const [filter, setFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPriority, setSelectedPriority] = useState<Priority | "all">("all");
-  const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
@@ -187,16 +185,6 @@ export default function Tasks() {
           return taskDate >= today && taskDate <= weekFromNow;
         });
         break;
-    }
-
-    // Filtro por prioridade
-    if (selectedPriority !== "all") {
-      filtered = filtered.filter((t) => t.priority === selectedPriority);
-    }
-
-    // Filtro por categoria
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((t) => t.category === selectedCategory);
     }
 
     // Busca
@@ -437,43 +425,6 @@ export default function Tasks() {
                   Concluídas
                 </Button>
               </div>
-
-              {/* Filtros Avançados */}
-              <div className="flex flex-wrap gap-2">
-                <Select
-                  value={selectedPriority}
-                  onValueChange={(value) =>
-                    setSelectedPriority(value as Priority | "all")
-                  }
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Prioridade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas</SelectItem>
-                    <SelectItem value="high">Alta</SelectItem>
-                    <SelectItem value="medium">Média</SelectItem>
-                    <SelectItem value="low">Baixa</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={selectedCategory}
-                  onValueChange={setSelectedCategory}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas</SelectItem>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </CardContent>
           </Card>
 
@@ -491,11 +442,11 @@ export default function Tasks() {
                   Nenhuma tarefa encontrada
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  {searchQuery || selectedPriority !== "all" || selectedCategory !== "all"
+                  {searchQuery
                     ? "Tente ajustar os filtros ou criar uma nova tarefa"
                     : "Comece criando sua primeira tarefa"}
                 </p>
-                {!searchQuery && selectedPriority === "all" && selectedCategory === "all" && (
+                {!searchQuery && (
                   <Button onClick={() => setIsCreateDialogOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Criar Primeira Tarefa

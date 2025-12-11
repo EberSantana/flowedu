@@ -1304,3 +1304,9 @@
 - Isolamento total de dados por usuário
 - Integração completa com Dashboard e Sidebar
 - 20 testes automatizados (100% passando)
+
+
+## Remover Filtros Duplicados - Página de Tarefas
+- [x] Remover dropdowns de filtro de Prioridade e Categoria
+- [x] Manter apenas os botões de filtro rápido (Todas, Hoje, Esta Semana, Pendentes, Concluídas)
+- [x] Testar funcionalidade
