@@ -7,8 +7,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -52,6 +61,21 @@ export default function Dashboard() {
   const { data: upcomingEvents, isLoading: isLoadingEvents } = trpc.dashboard.getUpcomingEvents.useQuery();
   const { data: calendarUpcomingEvents, isLoading: isLoadingCalendar } = trpc.calendar.getUpcomingEvents.useQuery();
   
+  // Mutation para atualizar status de aulas
+  const utils = trpc.useUtils();
+  const setStatusMutation = trpc.classStatus.set.useMutation({
+    onSuccess: () => {
+      utils.dashboard.getTodayClasses.invalidate();
+      utils.classStatus.getWeek.invalidate();
+      toast.success("Status da aula atualizado!");
+      setIsStatusDialogOpen(false);
+      setStatusReason("");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar status: " + error.message);
+    },
+  });
+  
   // Função para calcular número da semana no ano
   const getWeekNumber = (date: Date): number => {
     const start = new Date(date.getFullYear(), 0, 1);
@@ -72,6 +96,11 @@ export default function Dashboard() {
   
   // Estado de personalização do Dashboard
   const [isCustomizing, setIsCustomizing] = useState(false);
+  
+  // Estados para controle de status de aulas
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [selectedClassForStatus, setSelectedClassForStatus] = useState<any>(null);
+  const [statusReason, setStatusReason] = useState("");
   const [widgetVisibility, setWidgetVisibility] = useState(() => {
     const saved = localStorage.getItem('dashboardWidgetVisibility');
     return saved ? JSON.parse(saved) : {
@@ -310,6 +339,39 @@ export default function Dashboard() {
     const endMinutes = endHour * 60 + endMinute;
     
     return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+  };
+  
+  // Funções para manipular status de aulas
+  const handleSetStatus = (scheduledClass: any, status: 'given' | 'not_given' | 'cancelled') => {
+    if (status === 'given') {
+      // Marcar como dada diretamente
+      setStatusMutation.mutate({
+        scheduledClassId: scheduledClass.id,
+        weekNumber: currentWeekNumber,
+        year: currentYear,
+        status: 'given',
+      });
+    } else {
+      // Abrir dialog para adicionar motivo
+      setSelectedClassForStatus({ ...scheduledClass, status });
+      setIsStatusDialogOpen(true);
+    }
+  };
+
+  const handleConfirmStatus = () => {
+    if (!selectedClassForStatus) return;
+    
+    setStatusMutation.mutate({
+      scheduledClassId: selectedClassForStatus.id,
+      weekNumber: currentWeekNumber,
+      year: currentYear,
+      status: selectedClassForStatus.status,
+      reason: statusReason || undefined,
+    });
+  };
+
+  const getClassStatus = (scheduledClassId: number) => {
+    return weekClassStatuses?.find(s => s.scheduledClassId === scheduledClassId);
   };
 
   return (
@@ -763,69 +825,139 @@ export default function Dashboard() {
                           style={{ backgroundColor: cls.subjectColor || '#6B7280' }}
                         />
                         
-                        <div className="flex items-center gap-2 p-3 pl-5">
-                          {/* Indicador de Data e Dia - Compacto */}
-                          <div className={`flex flex-col items-center justify-center rounded-lg px-2.5 py-2 min-w-[70px] shadow-sm transition-transform duration-300 group-hover:scale-105 ${
-                            cls.isHoliday
-                              ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700'
-                              : 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
-                          }`}>
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wide">
-                              {cls.dayOfWeek.substring(0, 3)}
-                            </span>
-                            <span className="text-xl font-extrabold text-white">
-                              {formatDate(cls.date)}
-                            </span>
-                          </div>
-                          
-                          {/* Horário - Compacto */}
-                          <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg px-2.5 py-2 border border-gray-200 min-w-[65px] shadow-sm">
-                            <Clock className="h-4 w-4 text-blue-600 mb-0.5" />
-                            <span className="text-xs font-bold text-gray-900">
-                              {cls.startTime}
-                            </span>
-                            <span className="text-[10px] text-gray-500 font-medium">
-                              {cls.endTime}
-                            </span>
-                          </div>
-                          
-                          {/* Informações da aula - Flex otimizado */}
-                          <div className="flex-1 min-w-0 pr-2">
-                            <div className="flex items-start gap-2 flex-wrap">
-                              <p className="font-bold text-gray-900 text-base leading-tight break-words max-w-full">
-                                {cls.subjectName}
-                              </p>
-                              {isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
-                                  <span className="relative flex h-1.5 w-1.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                        <div className="p-3 pl-5">
+                          <div className="flex items-center gap-2">
+                            {/* Indicador de Data e Dia - Compacto */}
+                            <div className={`flex flex-col items-center justify-center rounded-lg px-2.5 py-2 min-w-[70px] shadow-sm transition-transform duration-300 group-hover:scale-105 ${
+                              cls.isHoliday
+                                ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700'
+                                : 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
+                            }`}>
+                              <span className="text-[10px] font-bold text-white uppercase tracking-wide">
+                                {cls.dayOfWeek.substring(0, 3)}
+                              </span>
+                              <span className="text-xl font-extrabold text-white">
+                                {formatDate(cls.date)}
+                              </span>
+                            </div>
+                            
+                            {/* Horário - Compacto */}
+                            <div className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg px-2.5 py-2 border border-gray-200 min-w-[65px] shadow-sm">
+                              <Clock className="h-4 w-4 text-blue-600 mb-0.5" />
+                              <span className="text-xs font-bold text-gray-900">
+                                {cls.startTime}
+                              </span>
+                              <span className="text-[10px] text-gray-500 font-medium">
+                                {cls.endTime}
+                              </span>
+                            </div>
+                            
+                            {/* Informações da aula - Flex otimizado */}
+                            <div className="flex-1 min-w-0 pr-2">
+                              <div className="flex items-start gap-2 flex-wrap">
+                                <p className="font-bold text-gray-900 text-base leading-tight break-words max-w-full">
+                                  {cls.subjectName}
+                                </p>
+                                {isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
+                                    <span className="relative flex h-1.5 w-1.5">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                                    </span>
+                                    AGORA
                                   </span>
-                                  AGORA
-                                </span>
-                              )}
-                              {cls.isPast && !isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
-                                  Concluída
-                                </span>
+                                )}
+                                {cls.isPast && !isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
+                                    Concluída
+                                  </span>
+                                )}
+                                
+                                {/* Indicador de Status */}
+                                {(() => {
+                                  const status = getClassStatus(cls.id);
+                                  if (status) {
+                                    return (
+                                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap ${
+                                        status.status === 'given' ? 'bg-green-500' :
+                                        status.status === 'not_given' ? 'bg-yellow-500' :
+                                        'bg-red-500'
+                                      }`}>
+                                        {status.status === 'given' && <CheckCircle2 className="h-3 w-3" />}
+                                        {status.status === 'not_given' && <XCircle className="h-3 w-3" />}
+                                        {status.status === 'cancelled' && <Ban className="h-3 w-3" />}
+                                        {status.status === 'given' ? 'Dada' :
+                                         status.status === 'not_given' ? 'Não Dada' :
+                                         'Cancelada'}
+                                      </span>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+                              </div>
+                              <p className="text-xs text-gray-600 font-medium mt-0.5">
+                                Turma: <span className="text-blue-600 font-semibold">{cls.className}</span>
+                              </p>
+                              {cls.isHoliday && (
+                                <div className="flex items-center gap-1.5 mt-1.5 bg-red-100 border border-red-300 rounded-md px-2 py-1">
+                                  <AlertCircle className="h-3 w-3 text-red-600 flex-shrink-0" />
+                                  <p className="text-[10px] text-red-700 font-bold">
+                                    Feriado: {cls.holidayName}
+                                  </p>
+                                </div>
                               )}
                             </div>
-                            <p className="text-xs text-gray-600 font-medium mt-0.5">
-                              Turma: <span className="text-blue-600 font-semibold">{cls.className}</span>
-                            </p>
-                            {cls.isHoliday && (
-                              <div className="flex items-center gap-1.5 mt-1.5 bg-red-100 border border-red-300 rounded-md px-2 py-1">
-                                <AlertCircle className="h-3 w-3 text-red-600 flex-shrink-0" />
-                                <p className="text-[10px] text-red-700 font-bold">
-                                  Feriado: {cls.holidayName}
-                                </p>
-                              </div>
-                            )}
                           </div>
                           
-                          <div className="flex items-center flex-shrink-0">
-                            <ArrowRight className="h-4 w-4 text-gray-400 transition-transform duration-300 group-hover:translate-x-1" />
-                          </div>
+                          {/* Botões de Status */}
+                          {!cls.isHoliday && (
+                            <div className="mt-3 flex gap-2 flex-wrap">
+                              <Button
+                                size="sm"
+                                variant={getClassStatus(cls.id)?.status === 'given' ? 'default' : 'outline'}
+                                className={`flex-1 min-w-[100px] h-8 text-xs ${
+                                  getClassStatus(cls.id)?.status === 'given'
+                                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                                    : 'hover:bg-green-50 hover:border-green-500 hover:text-green-700'
+                                }`}
+                                onClick={() => handleSetStatus(cls, 'given')}
+                                disabled={setStatusMutation.isPending}
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                                Dada
+                              </Button>
+                              
+                              <Button
+                                size="sm"
+                                variant={getClassStatus(cls.id)?.status === 'not_given' ? 'default' : 'outline'}
+                                className={`flex-1 min-w-[100px] h-8 text-xs ${
+                                  getClassStatus(cls.id)?.status === 'not_given'
+                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                                    : 'hover:bg-yellow-50 hover:border-yellow-500 hover:text-yellow-700'
+                                }`}
+                                onClick={() => handleSetStatus(cls, 'not_given')}
+                                disabled={setStatusMutation.isPending}
+                              >
+                                <XCircle className="h-3.5 w-3.5 mr-1.5" />
+                                Não Dada
+                              </Button>
+                              
+                              <Button
+                                size="sm"
+                                variant={getClassStatus(cls.id)?.status === 'cancelled' ? 'default' : 'outline'}
+                                className={`flex-1 min-w-[100px] h-8 text-xs ${
+                                  getClassStatus(cls.id)?.status === 'cancelled'
+                                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                                    : 'hover:bg-red-50 hover:border-red-500 hover:text-red-700'
+                                }`}
+                                onClick={() => handleSetStatus(cls, 'cancelled')}
+                                disabled={setStatusMutation.isPending}
+                              >
+                                <Ban className="h-3.5 w-3.5 mr-1.5" />
+                                Cancelada
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -1352,6 +1484,46 @@ export default function Dashboard() {
           )}
         </div>
       </PageWrapper>
+      
+      {/* Dialog de Status de Aula */}
+      <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedClassForStatus?.status === 'not_given' ? 'Marcar Aula como Não Dada' : 'Marcar Aula como Cancelada'}
+            </DialogTitle>
+            <DialogDescription>
+              Adicione um motivo opcional para esta marcação.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reason">Motivo (opcional)</Label>
+              <Textarea
+                id="reason"
+                placeholder="Ex: Falta por motivo de saúde, Reunião pedagógica, Feriado municipal..."
+                value={statusReason}
+                onChange={(e) => setStatusReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsStatusDialogOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleConfirmStatus}
+                disabled={setStatusMutation.isPending}
+              >
+                {setStatusMutation.isPending ? 'Salvando...' : 'Confirmar'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

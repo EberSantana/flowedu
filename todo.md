@@ -1358,3 +1358,17 @@
 - [x] Remover botão da página AdminUsers.tsx
 - [x] Remover mutation cleanInvalidUsersMutation
 - [x] Analisar interface e sugerir melhorias
+
+
+## Melhoria do Sistema de Progressão de Aulas
+- [x] Analisar sistema atual (Grade de Horários e Dashboard)
+- [x] Identificar onde estão os botões de status atualmente
+- [x] Propor novo design para "Aulas de Hoje" no Dashboard (Opção A escolhida)
+- [x] Manter botões na Grade de Horários (Opção A - mantidos)
+- [x] Adicionar botões de status (Dada/Não Dada/Cancelada) em Aulas de Hoje
+- [x] Melhorar visual dos cards de aulas com cores por status
+- [x] Adicionar indicadores visuais (ícones, badges coloridos)
+- [x] Implementar Dialog para motivo de Não Dada/Cancelada
+- [x] Integrar com mutation classStatus.set
+- [x] Testar funcionalidade completa (screenshot validado)
+- [x] Executar testes automatizados (60 testes passando - 100%)
