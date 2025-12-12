@@ -908,7 +908,7 @@ export async function deleteLearningModule(id: number, userId: number) {
   return { success: true };
 }
 
-export async function createLearningTopic(data: { moduleId: number; title: string; description?: string; estimatedHours?: number; userId: number }) {
+export async function createLearningTopic(data: { moduleId: number; title: string; description?: string; estimatedHours?: number; theoryHours?: number; practiceHours?: number; individualWorkHours?: number; teamWorkHours?: number; userId: number }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -930,7 +930,7 @@ export async function createLearningTopic(data: { moduleId: number; title: strin
   return { id: result.insertId, ...data, orderIndex: nextOrder, status: 'not_started' };
 }
 
-export async function updateLearningTopic(id: number, data: { title?: string; description?: string; status?: 'not_started' | 'in_progress' | 'completed'; estimatedHours?: number }, userId: number) {
+export async function updateLearningTopic(id: number, data: { title?: string; description?: string; status?: 'not_started' | 'in_progress' | 'completed'; estimatedHours?: number; theoryHours?: number; practiceHours?: number; individualWorkHours?: number; teamWorkHours?: number }, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   

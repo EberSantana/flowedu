@@ -48,6 +48,7 @@ export default function LearningPaths() {
   // AI dialog states
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
   const [syllabusText, setSyllabusText] = useState("");
+  const [workload, setWorkload] = useState<number>(60);
   const [isInfographicDialogOpen, setIsInfographicDialogOpen] = useState(false);
   const [infographicUrl, setInfographicUrl] = useState<string | null>(null);
   const [isLessonPlanDialogOpen, setIsLessonPlanDialogOpen] = useState(false);
@@ -522,12 +523,33 @@ export default function LearningPaths() {
                                     {topic.description}
                                   </p>
                                 )}
-                                <div className="flex items-center gap-3 mt-2">
+                                <div className="flex items-center gap-2 mt-2 flex-wrap">
                                   {getStatusBadge(topic.status)}
                                   {(topic.estimatedHours || 0) > 0 && (
-                                    <span className="text-xs text-muted-foreground">
-                                      {topic.estimatedHours}h estimadas
+                                    <span className="text-xs text-muted-foreground font-medium">
+                                      {topic.estimatedHours}h total
                                     </span>
+                                  )}
+                                  {/* Badges de distribuição de atividades */}
+                                  {(topic.theoryHours || 0) > 0 && (
+                                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                      📚 {topic.theoryHours}h teoria
+                                    </Badge>
+                                  )}
+                                  {(topic.practiceHours || 0) > 0 && (
+                                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                      🔧 {topic.practiceHours}h prática
+                                    </Badge>
+                                  )}
+                                  {(topic.individualWorkHours || 0) > 0 && (
+                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                      👤 {topic.individualWorkHours}h individual
+                                    </Badge>
+                                  )}
+                                  {(topic.teamWorkHours || 0) > 0 && (
+                                    <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                                      👥 {topic.teamWorkHours}h equipe
+                                    </Badge>
                                   )}
                                 </div>
                               </div>
@@ -690,12 +712,26 @@ export default function LearningPaths() {
               Cole a ementa da disciplina abaixo. A IA irá analisar e criar automaticamente módulos e tópicos organizados pedagogicamente.
             </p>
             <div>
+              <label className="text-sm font-medium mb-2 block">Carga Horária Total (horas) *</label>
+              <Input
+                type="number"
+                value={workload}
+                onChange={(e) => setWorkload(parseInt(e.target.value) || 60)}
+                placeholder="60"
+                min={1}
+                max={500}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                A IA distribuirá as horas proporcionalmente entre módulos e tópicos
+              </p>
+            </div>
+            <div>
               <label className="text-sm font-medium mb-2 block">Ementa da Disciplina *</label>
               <Textarea
                 value={syllabusText}
                 onChange={(e) => setSyllabusText(e.target.value)}
                 placeholder="Cole aqui o conteúdo da ementa (objetivos, conteúdo programático, bibliografia, etc.)..."
-                rows={12}
+                rows={10}
                 className="font-mono text-sm"
               />
             </div>
@@ -717,6 +753,7 @@ export default function LearningPaths() {
                 generateFromAIMutation.mutate({
                   subjectId: selectedSubjectId,
                   syllabusText: syllabusText.trim(),
+                  workload: workload,
                 });
               }}
               disabled={generateFromAIMutation.isPending}

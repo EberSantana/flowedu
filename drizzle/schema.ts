@@ -76,6 +76,7 @@ export const subjects = mysqlTable("subjects", {
   coursePlanPdfUrl: text("coursePlanPdfUrl"), // URL do PDF do plano de curso
   googleDriveUrl: text("googleDriveUrl"), // URL da pasta do Google Drive
   googleClassroomUrl: text("googleClassroomUrl"), // URL da turma do Google Classroom
+  workload: int("workload").default(60), // Carga horária total em horas
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -236,6 +237,10 @@ export const learningTopics = mysqlTable("learning_topics", {
   description: text("description"),
   status: mysqlEnum("status", ["not_started", "in_progress", "completed"]).default("not_started").notNull(),
   estimatedHours: int("estimatedHours").default(0), // Horas estimadas para cobrir o tópico
+  theoryHours: int("theoryHours").default(0), // Horas de atividades teóricas
+  practiceHours: int("practiceHours").default(0), // Horas de atividades práticas
+  individualWorkHours: int("individualWorkHours").default(0), // Horas de trabalhos individuais
+  teamWorkHours: int("teamWorkHours").default(0), // Horas de trabalhos em equipe
   orderIndex: int("orderIndex").default(0).notNull(),
   userId: int("userId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

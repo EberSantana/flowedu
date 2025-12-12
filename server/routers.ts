@@ -1240,14 +1240,21 @@ Regras:
       .input(z.object({
         subjectId: z.number(),
         syllabusText: z.string(),
+        workload: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { invokeLLM } = await import('./_core/llm');
         
-        const prompt = `Você é um especialista em design instrucional. Analise a seguinte ementa de disciplina e crie uma trilha de aprendizagem estruturada.
+        // Buscar carga horária da disciplina se não foi fornecida
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        const totalWorkload = input.workload || subject?.workload || 60;
+        
+        const prompt = `Você é um especialista em design instrucional e pedagogia. Analise a seguinte ementa de disciplina e crie uma trilha de aprendizagem estruturada.
 
 EMENTA:
 ${input.syllabusText}
+
+CARGA HORÁRIA TOTAL: ${totalWorkload} horas
 
 Crie uma estrutura de módulos e tópicos seguindo este formato JSON:
 {
@@ -1259,19 +1266,30 @@ Crie uma estrutura de módulos e tópicos seguindo este formato JSON:
         {
           "title": "Nome do Tópico",
           "description": "Descrição detalhada",
-          "estimatedHours": 2
+          "estimatedHours": 2,
+          "theoryHours": 1,
+          "practiceHours": 1,
+          "individualWorkHours": 0,
+          "teamWorkHours": 0
         }
       ]
     }
   ]
 }
 
-Diretrizes:
-- Crie entre 3-6 módulos
-- Cada módulo deve ter 3-8 tópicos
-- Organize de forma pedagógica (do básico ao avançado)
-- Estime horas realistas para cada tópico
-- Use linguagem clara e objetiva`;
+Diretrizes OBRIGATÓRIAS:
+1. A SOMA de todas as horas estimadas dos tópicos DEVE ser EXATAMENTE ${totalWorkload} horas
+2. Crie entre 3-6 módulos
+3. Cada módulo deve ter 3-8 tópicos
+4. Organize de forma pedagógica (do básico ao avançado)
+5. Para cada tópico, distribua as horas entre:
+   - theoryHours: atividades teóricas (aulas expositivas, leituras, discussões)
+   - practiceHours: atividades práticas (laboratórios, exercícios, projetos)
+   - individualWorkHours: trabalhos individuais (pesquisas, relatórios, provas)
+   - teamWorkHours: trabalhos em equipe (projetos colaborativos, seminários)
+6. Analise o conteúdo da ementa para determinar se é mais teórica ou prática
+7. A soma de theoryHours + practiceHours + individualWorkHours + teamWorkHours DEVE ser igual a estimatedHours
+8. Use linguagem clara e objetiva`;
         
         const response = await invokeLLM({
           messages: [
@@ -1300,9 +1318,13 @@ Diretrizes:
                             properties: {
                               title: { type: 'string' },
                               description: { type: 'string' },
-                              estimatedHours: { type: 'number' }
+                              estimatedHours: { type: 'number' },
+                              theoryHours: { type: 'number' },
+                              practiceHours: { type: 'number' },
+                              individualWorkHours: { type: 'number' },
+                              teamWorkHours: { type: 'number' }
                             },
-                            required: ['title', 'description', 'estimatedHours'],
+                            required: ['title', 'description', 'estimatedHours', 'theoryHours', 'practiceHours', 'individualWorkHours', 'teamWorkHours'],
                             additionalProperties: false
                           }
                         }
@@ -1339,6 +1361,10 @@ Diretrizes:
               title: topic.title,
               description: topic.description,
               estimatedHours: topic.estimatedHours,
+              theoryHours: topic.theoryHours,
+              practiceHours: topic.practiceHours,
+              individualWorkHours: topic.individualWorkHours,
+              teamWorkHours: topic.teamWorkHours,
               userId: ctx.user.id,
             });
           }

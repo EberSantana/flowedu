@@ -1508,3 +1508,39 @@
 - [x] Geração de infográfico funcional
 - [x] Sugestões de planos de aula funcional
 - [ ] Salvar checkpoint final
+
+
+## Melhorar Geração de Trilhas com IA - Carga Horária e Atividades (12/12/2025)
+
+### Backend - Carga Horária e Schema
+- [x] Verificar se campo `workload` (carga horária) existe na tabela `subject`
+- [x] Adicionar campo `workload` na tabela `subjects`
+- [x] Adicionar campos de distribuição de atividades na tabela `learning_topics`:
+  - [x] `theoryHours` (horas teóricas)
+  - [x] `practiceHours` (horas práticas)
+  - [x] `individualWorkHours` (trabalhos individuais)
+  - [x] `teamWorkHours` (trabalhos em equipe)
+- [x] Criar tabelas no banco via SQL
+
+### Backend - IA Melhorada
+- [x] Atualizar prompt de `generateFromAI` para:
+  - [x] Receber carga horária total da disciplina
+  - [x] Distribuir horas proporcionalmente entre módulos
+  - [x] Analisar se disciplina é teórica ou prática
+  - [x] Sugerir distribuição de atividades por tópico
+  - [x] Garantir que soma das horas = carga horária total
+- [x] Atualizar schema JSON de resposta da IA
+- [x] Atualizar funções createLearningTopic e updateLearningTopic
+
+### Frontend - Exibição de Atividades
+- [x] Adicionar campo de carga horária no dialog de geração com IA
+- [x] Exibir distribuição de atividades em cada tópico:
+  - [x] Badges coloridos com ícones para teoria/prática/individual/equipe
+  - [x] Exibição de horas por tipo de atividade
+- [ ] (Opcional) Mostrar resumo de distribuição por módulo
+
+### Testes e Entrega
+- [x] Testar geração com diferentes cargas horárias
+- [x] Verificar se soma das horas bate com carga total
+- [x] Todos os 66 testes passando
+- [ ] Salvar checkpoint final
