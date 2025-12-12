@@ -399,26 +399,32 @@ export default function LearningPaths() {
           
           {/* Modules and Topics */}
           <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">Módulos e Tópicos</h2>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsAIDialogOpen(true)}
-                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Gerar com IA
-                </Button>
-                {learningPath && learningPath.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <h2 className="text-xl font-bold">Módulos e Tópicos</h2>
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                {/* Botões de IA */}
+                <div className="flex gap-2 flex-1 sm:flex-initial">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsAIDialogOpen(true)}
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 flex-1 sm:flex-initial"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Gerar com IA
+                  </Button>
                   <Button 
                     variant="outline" 
                     onClick={() => {
                       if (!selectedSubjectId) return;
+                      if (!learningPath || learningPath.length === 0) {
+                        toast.error("Crie módulos primeiro para gerar infográfico");
+                        return;
+                      }
                       generateInfographicMutation.mutate({ subjectId: selectedSubjectId });
                     }}
-                    disabled={generateInfographicMutation.isPending}
-                    className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                    disabled={generateInfographicMutation.isPending || !learningPath || learningPath.length === 0}
+                    className="border-cyan-200 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-300 flex-1 sm:flex-initial"
+                    title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Gerar infográfico visual"}
                   >
                     {generateInfographicMutation.isPending ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -427,8 +433,9 @@ export default function LearningPaths() {
                     )}
                     Infográfico
                   </Button>
-                )}
-                <Button onClick={() => openModuleDialog()}>
+                </div>
+                {/* Botão de criar módulo */}
+                <Button onClick={() => openModuleDialog()} className="w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Módulo
                 </Button>
@@ -436,17 +443,58 @@ export default function LearningPaths() {
             </div>
             
             {isLoadingPath ? (
-              <p className="text-center text-muted-foreground py-8">Carregando trilha...</p>
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <span className="ml-3 text-muted-foreground">Carregando trilha...</span>
+              </div>
             ) : !learningPath || learningPath.length === 0 ? (
-              <div className="text-center py-12">
-                <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  Nenhum módulo criado ainda. Comece criando o primeiro módulo!
-                </p>
-                <Button onClick={() => openModuleDialog()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Criar Primeiro Módulo
-                </Button>
+              <div className="text-center py-16 px-4">
+                <div className="max-w-md mx-auto">
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full opacity-50"></div>
+                    </div>
+                    <BookOpen className="h-16 w-16 mx-auto text-purple-500 relative z-10" />
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold mb-2">Nenhuma trilha criada ainda</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Organize o conteúdo programático da sua disciplina em módulos e tópicos estruturados
+                  </p>
+                  
+                  {/* Destaque da IA */}
+                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-start gap-3">
+                      <Sparkles className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-left">
+                        <p className="font-medium text-purple-900 mb-1">Deixe a IA fazer o trabalho pesado!</p>
+                        <p className="text-sm text-purple-700">
+                          Cole a ementa da disciplina e a IA criará automaticamente módulos, tópicos e distribuição de atividades.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Botões de ação */}
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button 
+                      onClick={() => setIsAIDialogOpen(true)}
+                      className="bg-purple-600 hover:bg-purple-700"
+                      size="lg"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      Gerar com IA
+                    </Button>
+                    <Button 
+                      onClick={() => openModuleDialog()}
+                      variant="outline"
+                      size="lg"
+                    >
+                      <Plus className="h-5 w-5 mr-2" />
+                      Criar Manualmente
+                    </Button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">

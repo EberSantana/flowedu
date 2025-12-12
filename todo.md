@@ -1507,7 +1507,7 @@
 - [x] Geração automática de trilha com IA funcional
 - [x] Geração de infográfico funcional
 - [x] Sugestões de planos de aula funcional
-- [ ] Salvar checkpoint final
+- [x] Salvar checkpoint final
 
 
 ## Melhorar Geração de Trilhas com IA - Carga Horária e Atividades (12/12/2025)
@@ -1543,4 +1543,25 @@
 - [x] Testar geração com diferentes cargas horárias
 - [x] Verificar se soma das horas bate com carga total
 - [x] Todos os 66 testes passando
+- [x] Salvar checkpoint final
+
+
+## Melhorar Layout de Trilhas de Aprendizagem (12/12/2025)
+
+### Layout dos Botões
+- [x] Reorganizar botões do topo em layout responsivo
+- [x] Adicionar botão "Infográfico" visível ao lado de "Gerar com IA"
+- [x] Alinhar "Novo Módulo" à direita
+- [x] Melhorar ícones e cores dos botões (ciano para infográfico)
+
+### Estado Vazio
+- [x] Melhorar visual do estado vazio (sem módulos)
+- [x] Adicionar ilustração mais atrativa com gradiente
+- [x] Texto mais encorajador destacando benefícios da IA
+- [x] Card destacado explicando funcionalidade da IA
+- [x] Dois botões de ação (IA e Manual)
+
+### Responsividade
+- [x] Garantir que botões empilhem corretamente em mobile (flex-col sm:flex-row)
+- [x] Testar layout em diferentes tamanhos de tela
 - [ ] Salvar checkpoint final
