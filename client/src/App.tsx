@@ -21,6 +21,7 @@ import LearningPaths from "./pages/LearningPaths";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentSubjectView from "./pages/StudentSubjectView";
 import ManageEnrollments from "./pages/ManageEnrollments";
+import TopicMaterialsManager from "./pages/TopicMaterialsManager";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 
@@ -44,6 +45,7 @@ function Router() {
         <Route path={"/student/dashboard"} component={StudentDashboard} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
+        <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

@@ -1646,3 +1646,29 @@
 - [ ] Criar testes para materiais didáticos
 - [ ] Criar testes para atividades e entregas
 - [ ] Criar testes para relatórios de professor
+
+## ✅ Interface de Upload de Materiais Didáticos - COMPLETO
+
+### Página de Gerenciamento
+- [x] Criar página TopicMaterialsManager.tsx
+- [x] Implementar listagem de materiais existentes por tópico
+- [x] Adicionar formulário de upload de arquivos (PDF, vídeos, etc)
+- [x] Adicionar formulário de links externos (YouTube, artigos, etc)
+- [x] Adicionar marcação de material obrigatório (switch)
+- [x] Implementar exclusão de materiais
+- [x] Mostrar tamanho de arquivo e tipo
+
+### Upload de Arquivos
+- [x] Integrar com S3 storage para upload de PDFs
+- [x] Adicionar suporte para upload de vídeos
+- [x] Auto-detecção de tipo baseado em extensão
+- [x] Adicionar validação de tamanho e tipo de arquivo
+- [x] Mostrar progresso de upload (barra de progresso)
+- [x] Criar endpoint /api/upload-material no servidor
+- [x] Conversão base64 e upload para S3
+
+### Navegação e Integração
+- [x] Adicionar botão "Gerenciar Materiais" na página de Trilhas
+- [x] Adicionar rota no App.tsx
+- [x] Criar breadcrumb de navegação (Trilhas > Módulo > Tópico > Materiais)
+- [x] Integração completa com backend existente

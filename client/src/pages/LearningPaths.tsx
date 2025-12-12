@@ -20,8 +20,10 @@ import {
   Sparkles,
   Image as ImageIcon,
   Lightbulb,
-  Loader2
+  Loader2,
+  FileText
 } from "lucide-react";
+import { Link } from "wouter";
 import { toast } from "sonner";
 
 type TopicStatus = 'not_started' | 'in_progress' | 'completed';
@@ -602,6 +604,16 @@ export default function LearningPaths() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 flex-shrink-0">
+                                <Link href={`/learning-paths/${selectedSubjectId}/topic/${topic.id}/materials`}>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                    title="Gerenciar Materiais"
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                </Link>
                                 <Button
                                   size="sm"
                                   variant="ghost"
