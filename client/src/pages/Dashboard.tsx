@@ -24,6 +24,7 @@ import PageWrapper from "@/components/PageWrapper";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useOnboardingTour } from "@/components/OnboardingTour";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -53,6 +54,9 @@ const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
 export default function Dashboard() {
   const { user } = useAuth();
+  
+  // Tour interativo para novos usuários
+  useOnboardingTour();
   const { data: subjects, isLoading: isLoadingSubjects } = trpc.subjects.list.useQuery();
   const { data: classes, isLoading: isLoadingClasses } = trpc.classes.list.useQuery();
   const { data: scheduledClasses, isLoading: isLoadingSchedule } = trpc.schedule.list.useQuery();
@@ -486,10 +490,9 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Cards de Métricas Principais */}
+          {/* Cards          {/* Estatísticas */}
           {widgetVisibility.stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-            {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
                 <Card className="border-l-4 border-l-blue-500">
@@ -574,9 +577,9 @@ export default function Dashboard() {
 
           {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-8">
-            {/* Ações Rápidas */}
-            {widgetVisibility.quickActions && (
-            <Card className="overflow-hidden">
+          {/* Ações Rápidas */}
+          {widgetVisibility.quickActions && (
+          <Card className="overflow-hidden" data-tour="quick-actions">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
                 <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
                 <CardDescription className="text-gray-600">Acesso rápido às funcionalidades principais</CardDescription>

@@ -214,6 +214,9 @@ importers:
       resend:
         specifier: ^6.5.2
         version: 6.5.2
+      shepherd.js:
+        specifier: ^14.5.1
+        version: 14.5.1
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -1899,6 +1902,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@scarf/scarf@1.4.0':
+    resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
+
   '@shikijs/core@3.14.0':
     resolution: {integrity: sha512-qRSeuP5vlYHCNUIrpEBQFO7vSkR7jn7Kv+5X3FO/zBKVDGQbcnlScD3XhkrHi/R8Ltz0kEjvFR9Szp/XMRbFMw==}
 
@@ -2897,6 +2903,10 @@ packages:
   deep-eql@5.0.2:
     resolution: {integrity: sha512-h5k/5U50IJJFpzfL6nO9jaaumfjO/f2NjK/oYB2Djzm4p9L+3T9qWpZqZ2hAbLPuuYq9wrU08WQyBTL5GbPk5Q==}
     engines: {node: '>=6'}
+
+  deepmerge-ts@7.1.5:
+    resolution: {integrity: sha512-HOJkrhaYsweh+W+e74Yn7YStZOilkoPb6fycpwNLKzSPtruFs48nYis0zy5yJz1+ktUhHxoRDJ27RQAWLIJVJw==}
+    engines: {node: '>=16.0.0'}
 
   delaunator@5.0.1:
     resolution: {integrity: sha512-8nvh+XBe96aCESrGOqMp/84b13H9cdKbG5P2ejQCh4d4sK9RL4371qou9drQjMhvnPmhWl5hnmqbEE0fXr9Xnw==}
@@ -4142,6 +4152,10 @@ packages:
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
+
+  shepherd.js@14.5.1:
+    resolution: {integrity: sha512-VuvPvLG1QjNOLP7AIm2HGyfmxEIz8QdskvWOHwUcxLDibYWjLRBmCWd8LSL5FlwhBW7D/GU+3gNVC/ASxAWdxg==}
+    engines: {node: 18.* || >= 20}
 
   shiki@3.14.0:
     resolution: {integrity: sha512-J0yvpLI7LSig3Z3acIuDLouV5UCKQqu8qOArwMx+/yPVC3WRMgrP67beaG8F+j4xfEWE0eVC4GeBCIXeOPra1g==}
@@ -6315,6 +6329,8 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.4':
     optional: true
 
+  '@scarf/scarf@1.4.0': {}
+
   '@shikijs/core@3.14.0':
     dependencies:
       '@shikijs/types': 3.14.0
@@ -7500,6 +7516,8 @@ snapshots:
       character-entities: 2.0.2
 
   deep-eql@5.0.2: {}
+
+  deepmerge-ts@7.1.5: {}
 
   delaunator@5.0.1:
     dependencies:
@@ -9063,6 +9081,12 @@ snapshots:
       - supports-color
 
   setprototypeof@1.2.0: {}
+
+  shepherd.js@14.5.1:
+    dependencies:
+      '@floating-ui/dom': 1.7.4
+      '@scarf/scarf': 1.4.0
+      deepmerge-ts: 7.1.5
 
   shiki@3.14.0:
     dependencies:

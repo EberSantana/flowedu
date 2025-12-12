@@ -17,7 +17,8 @@ import {
   ChevronRight,
   CheckSquare,
   BarChart3,
-  Route
+  Route,
+  HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -312,6 +313,25 @@ export default function Sidebar() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
+                        onClick={() => {
+                          localStorage.removeItem('onboarding-tour-completed');
+                          window.location.href = '/';
+                        }}
+                        className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
+                      >
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                          <HelpCircle className="h-4 w-4" />
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Refazer Tour</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
                         onClick={handleLogout}
                         className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
                       >
@@ -351,6 +371,17 @@ export default function Sidebar() {
                     <User className="h-4 w-4" />
                     <span className="text-sm">Meu Perfil</span>
                   </Link>
+                  
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('onboarding-tour-completed');
+                      window.location.href = '/';
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                    <span className="text-sm">Refazer Tour</span>
+                  </button>
                   
                   <button
                     onClick={handleLogout}

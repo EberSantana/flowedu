@@ -346,3 +346,59 @@
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
+
+/* ===== SHEPHERD TOUR CUSTOM STYLES ===== */
+.shepherd-modal-overlay-container {
+  z-index: 9998;
+}
+
+.shepherd-element {
+  z-index: 9999;
+  max-width: 500px;
+}
+
+.shepherd-content-custom {
+  padding: 0.5rem;
+}
+
+.shepherd-content-custom h2,
+.shepherd-content-custom h3 {
+  margin: 0;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+  display: none;
+}
+
+.shepherd-footer {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.shepherd-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.shepherd-button:not(.shepherd-button-secondary) {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.shepherd-button:not(.shepherd-button-secondary):hover {
+  opacity: 0.9;
+}
+
+.shepherd-button-secondary {
+  background-color: transparent;
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.shepherd-button-secondary:hover {
+  background-color: hsl(var(--muted));
+}

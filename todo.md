@@ -1564,4 +1564,30 @@
 ### Responsividade
 - [x] Garantir que botões empilhem corretamente em mobile (flex-col sm:flex-row)
 - [x] Testar layout em diferentes tamanhos de tela
-- [ ] Salvar checkpoint final
+- [x] Salvar checkpoint final
+
+
+## Tour Interativo Inicial (12/12/2025)
+
+### Backend e Dependências
+- [x] Instalar shepherd.js e dependências
+- [x] Adicionar estilos CSS do Shepherd
+
+### Componente de Tour
+- [x] Criar componente `OnboardingTour.tsx`
+- [x] Definir 6 passos do tour:
+  - [x] Passo 1: Boas-vindas ao sistema
+  - [x] Passo 2: Dashboard e estatísticas
+  - [x] Passo 3: Criar disciplina
+  - [x] Passo 4: Trilhas de Aprendizagem com IA
+  - [x] Passo 5: Grade Semanal
+  - [x] Passo 6: Relatórios
+- [x] Implementar controle de localStorage (não mostrar novamente)
+- [x] Adicionar botões de navegação (Anterior, Próximo, Pular)
+
+### Integração
+- [x] Integrar tour no Dashboard (primeira visita)
+- [x] Adicionar data-tour attributes nos elementos
+- [x] Adicionar botão "Refazer Tour" no menu do usuário (sidebar expandida e compacta)
+- [x] Testar funcionalidade completa no navegador
+- [x] Sistema de onboarding tour completo e funcional! 🎉
