@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
@@ -311,24 +311,36 @@ export default function Subjects() {
                     </div>
                   )}
                   
-                  <div className="flex gap-2 mt-auto pt-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(subject)}
-                      className="flex-1"
-                    >
-                      <Pencil className="mr-2 h-3 w-3" />
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(subject.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                  <div className="space-y-2 mt-auto pt-3">
+                    <Link href={`/subjects/${subject.id}/enrollments`}>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="w-full"
+                      >
+                        <Users className="mr-2 h-3 w-3" />
+                        Gerenciar Matrículas
+                      </Button>
+                    </Link>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(subject)}
+                        className="flex-1"
+                      >
+                        <Pencil className="mr-2 h-3 w-3" />
+                        Editar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(subject.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

@@ -18,6 +18,9 @@ import ActiveMethodologies from "./pages/ActiveMethodologies";
 import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
 import LearningPaths from "./pages/LearningPaths";
+import StudentDashboard from "./pages/StudentDashboard";
+import StudentSubjectView from "./pages/StudentSubjectView";
+import ManageEnrollments from "./pages/ManageEnrollments";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 
@@ -38,6 +41,9 @@ function Router() {
         <Route path={"/tasks"} component={Tasks} />
         <Route path={"/profile"} component={Profile} />
         <Route path={"/admin/users"} component={AdminUsers} />
+        <Route path={"/student/dashboard"} component={StudentDashboard} />
+        <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
+        <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

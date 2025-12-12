@@ -1493,6 +1493,252 @@ Crie sugestões no formato JSON:
       }),
   }),
 
+  // Student Portal Routes
+  student: router({
+    getEnrolledSubjects: protectedProcedure
+      .query(async ({ ctx }) => {
+        const enrollments = await db.getStudentEnrollments(ctx.user.id);
+        const subjectsWithDetails = await Promise.all(
+          enrollments.map(async (enrollment) => {
+            const subject = await db.getSubjectById(enrollment.subjectId, enrollment.professorId);
+            const professor = await db.getUserById(enrollment.professorId);
+            return {
+              ...enrollment,
+              subject,
+              professor,
+            };
+          })
+        );
+        return subjectsWithDetails;
+      }),
+    
+    getSubjectLearningPath: protectedProcedure
+      .input(z.object({ subjectId: z.number(), professorId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const learningPath = await db.getLearningPathBySubject(input.subjectId, input.professorId);
+        
+        // Get student progress for each topic
+        const pathWithProgress = await Promise.all(
+          learningPath.map(async (module) => {
+            const topicsWithProgress = await Promise.all(
+              (module.topics || []).map(async (topic: any) => {
+                const progress = await db.getStudentTopicProgress(ctx.user.id, topic.id);
+                return {
+                  ...topic,
+                  studentProgress: progress,
+                };
+              })
+            );
+            return {
+              ...module,
+              topics: topicsWithProgress,
+            };
+          })
+        );
+        
+        return pathWithProgress;
+      }),
+    
+    updateTopicProgress: protectedProcedure
+      .input(z.object({
+        topicId: z.number(),
+        status: z.enum(['not_started', 'in_progress', 'completed']).optional(),
+        selfAssessment: z.enum(['understood', 'have_doubts', 'need_help']).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateStudentTopicProgress({
+          studentId: ctx.user.id,
+          ...input,
+        });
+      }),
+    
+    getTopicMaterials: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getTopicMaterials(input.topicId);
+      }),
+    
+    getTopicAssignments: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getTopicAssignments(input.topicId);
+      }),
+    
+    submitAssignment: protectedProcedure
+      .input(z.object({
+        assignmentId: z.number(),
+        content: z.string().optional(),
+        fileUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createAssignmentSubmission({
+          assignmentId: input.assignmentId,
+          studentId: ctx.user.id,
+          content: input.content,
+          fileUrl: input.fileUrl,
+        });
+      }),
+    
+    getMySubmission: protectedProcedure
+      .input(z.object({ assignmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentSubmission(input.assignmentId, ctx.user.id);
+      }),
+  }),
+
+  // Professor Materials Management
+  materials: router({
+    create: protectedProcedure
+      .input(z.object({
+        topicId: z.number(),
+        title: z.string(),
+        description: z.string().optional(),
+        type: z.enum(['pdf', 'video', 'link', 'presentation', 'document', 'other']),
+        url: z.string(),
+        fileSize: z.number().optional(),
+        isRequired: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createTopicMaterial({
+          ...input,
+          professorId: ctx.user.id,
+        });
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        url: z.string().optional(),
+        isRequired: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateTopicMaterial(id, data, ctx.user.id);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteTopicMaterial(input.id, ctx.user.id);
+      }),
+    
+    getByTopic: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getTopicMaterials(input.topicId);
+      }),
+  }),
+
+  // Professor Enrollment Management
+  enrollments: router({
+    create: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        subjectId: z.number(),
+        classId: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createStudentEnrollment({
+          ...input,
+          professorId: ctx.user.id,
+        });
+      }),
+    
+    getBySubject: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const enrollments = await db.getEnrollmentsBySubject(input.subjectId, ctx.user.id);
+        const enrollmentsWithStudents = await Promise.all(
+          enrollments.map(async (enrollment) => {
+            const student = await db.getUserById(enrollment.studentId);
+            return {
+              ...enrollment,
+              student,
+            };
+          })
+        );
+        return enrollmentsWithStudents;
+      }),
+    
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(['active', 'completed', 'dropped']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateEnrollmentStatus(input.id, input.status, ctx.user.id);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteEnrollment(input.id, ctx.user.id);
+      }),
+  }),
+
+  // Professor Assignment Management
+  assignments: router({
+    create: protectedProcedure
+      .input(z.object({
+        topicId: z.number(),
+        title: z.string(),
+        description: z.string(),
+        type: z.enum(['exercise', 'essay', 'project', 'quiz', 'practical']),
+        dueDate: z.date().optional(),
+        maxScore: z.number().optional(),
+        isRequired: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createTopicAssignment({
+          ...input,
+          professorId: ctx.user.id,
+        });
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        dueDate: z.date().optional(),
+        maxScore: z.number().optional(),
+        isRequired: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateTopicAssignment(id, data, ctx.user.id);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteTopicAssignment(input.id, ctx.user.id);
+      }),
+    
+    getSubmissions: protectedProcedure
+      .input(z.object({ assignmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getAssignmentSubmissions(input.assignmentId, ctx.user.id);
+      }),
+    
+    gradeSubmission: protectedProcedure
+      .input(z.object({
+        submissionId: z.number(),
+        score: z.number(),
+        feedback: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.gradeSubmission(input.submissionId, {
+          score: input.score,
+          feedback: input.feedback,
+          gradedBy: ctx.user.id,
+        });
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

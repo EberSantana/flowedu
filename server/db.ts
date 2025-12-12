@@ -16,6 +16,12 @@ import {
   learningModules,
   learningTopics,
   topicClassLinks,
+  studentEnrollments,
+  studentTopicProgress,
+  topicMaterials,
+  topicAssignments,
+  assignmentSubmissions,
+  topicComments,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -467,6 +473,13 @@ export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(users).orderBy(users.createdAt);
+}
+
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }
 
 export async function updateUserRole(userId: number, role: "admin" | "user") {
@@ -992,4 +1005,361 @@ export async function getLearningTopicById(id: number, userId: number) {
     .where(and(eq(learningTopics.id, id), eq(learningTopics.userId, userId)));
   
   return topics[0] || null;
+}
+
+// ==================== STUDENT ENROLLMENTS ====================
+
+export async function createStudentEnrollment(data: { studentId: number; subjectId: number; classId?: number; professorId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(studentEnrollments).values({
+    ...data,
+    status: 'active',
+  });
+  
+  return { id: result.insertId, ...data, status: 'active' };
+}
+
+export async function getStudentEnrollments(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(studentEnrollments)
+    .where(eq(studentEnrollments.studentId, studentId));
+}
+
+export async function getEnrollmentsBySubject(subjectId: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(studentEnrollments)
+    .where(and(
+      eq(studentEnrollments.subjectId, subjectId),
+      eq(studentEnrollments.professorId, professorId)
+    ));
+}
+
+export async function updateEnrollmentStatus(id: number, status: 'active' | 'completed' | 'dropped', professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(studentEnrollments)
+    .set({ status })
+    .where(and(
+      eq(studentEnrollments.id, id),
+      eq(studentEnrollments.professorId, professorId)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteEnrollment(id: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(studentEnrollments)
+    .where(and(
+      eq(studentEnrollments.id, id),
+      eq(studentEnrollments.professorId, professorId)
+    ));
+  
+  return { success: true };
+}
+
+// ==================== STUDENT TOPIC PROGRESS ====================
+
+export async function getStudentTopicProgress(studentId: number, topicId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const progress = await db.select().from(studentTopicProgress)
+    .where(and(
+      eq(studentTopicProgress.studentId, studentId),
+      eq(studentTopicProgress.topicId, topicId)
+    ));
+  
+  return progress[0] || null;
+}
+
+export async function updateStudentTopicProgress(data: { studentId: number; topicId: number; status?: 'not_started' | 'in_progress' | 'completed'; selfAssessment?: 'understood' | 'have_doubts' | 'need_help'; notes?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await getStudentTopicProgress(data.studentId, data.topicId);
+  
+  if (existing) {
+    const updateData: any = {};
+    if (data.status) updateData.status = data.status;
+    if (data.selfAssessment) updateData.selfAssessment = data.selfAssessment;
+    if (data.notes !== undefined) updateData.notes = data.notes;
+    if (data.status === 'completed') updateData.completedAt = new Date();
+    
+    await db.update(studentTopicProgress)
+      .set(updateData)
+      .where(and(
+        eq(studentTopicProgress.studentId, data.studentId),
+        eq(studentTopicProgress.topicId, data.topicId)
+      ));
+    
+    return { ...existing, ...updateData };
+  } else {
+    const [result] = await db.insert(studentTopicProgress).values({
+      studentId: data.studentId,
+      topicId: data.topicId,
+      status: data.status || 'not_started',
+      selfAssessment: data.selfAssessment,
+      notes: data.notes,
+      completedAt: data.status === 'completed' ? new Date() : undefined,
+    });
+    
+    return { id: result.insertId, ...data };
+  }
+}
+
+export async function getStudentProgressBySubject(studentId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get all modules for this subject
+  const modules = await db.select().from(learningModules)
+    .where(eq(learningModules.subjectId, subjectId));
+  
+  const moduleIds = modules.map(m => m.id);
+  
+  if (moduleIds.length === 0) {
+    return [];
+  }
+  
+  // Get all topics for these modules
+  const topics = await db.select().from(learningTopics)
+    .where(sql`${learningTopics.moduleId} IN (${sql.join(moduleIds.map(id => sql`${id}`), sql`, `)})`);
+  
+  // Get student progress for all topics
+  const topicIds = topics.map(t => t.id);
+  
+  if (topicIds.length === 0) {
+    return [];
+  }
+  
+  const progress = await db.select().from(studentTopicProgress)
+    .where(and(
+      eq(studentTopicProgress.studentId, studentId),
+      sql`${studentTopicProgress.topicId} IN (${sql.join(topicIds.map(id => sql`${id}`), sql`, `)})`
+    ));
+  
+  return progress;
+}
+
+// ==================== TOPIC MATERIALS ====================
+
+export async function createTopicMaterial(data: { topicId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'other'; url: string; fileSize?: number; isRequired?: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get the next order index
+  const [lastMaterial] = await db.select({ orderIndex: topicMaterials.orderIndex })
+    .from(topicMaterials)
+    .where(eq(topicMaterials.topicId, data.topicId))
+    .orderBy(desc(topicMaterials.orderIndex))
+    .limit(1);
+  
+  const nextOrder = lastMaterial ? lastMaterial.orderIndex + 1 : 0;
+  
+  const [result] = await db.insert(topicMaterials).values({
+    ...data,
+    orderIndex: nextOrder,
+    isRequired: data.isRequired ?? false,
+  });
+  
+  return { id: result.insertId, ...data, orderIndex: nextOrder };
+}
+
+export async function getTopicMaterials(topicId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(topicMaterials)
+    .where(eq(topicMaterials.topicId, topicId))
+    .orderBy(topicMaterials.orderIndex);
+}
+
+export async function updateTopicMaterial(id: number, data: { title?: string; description?: string; url?: string; isRequired?: boolean }, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(topicMaterials)
+    .set(data as any)
+    .where(and(
+      eq(topicMaterials.id, id),
+      eq(topicMaterials.professorId, professorId)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteTopicMaterial(id: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(topicMaterials)
+    .where(and(
+      eq(topicMaterials.id, id),
+      eq(topicMaterials.professorId, professorId)
+    ));
+  
+  return { success: true };
+}
+
+// ==================== TOPIC ASSIGNMENTS ====================
+
+export async function createTopicAssignment(data: { topicId: number; professorId: number; title: string; description: string; type: 'exercise' | 'essay' | 'project' | 'quiz' | 'practical'; dueDate?: Date; maxScore?: number; isRequired?: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(topicAssignments).values({
+    ...data,
+    maxScore: data.maxScore ?? 100,
+    isRequired: data.isRequired ?? true,
+  });
+  
+  return { id: result.insertId, ...data };
+}
+
+export async function getTopicAssignments(topicId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(topicAssignments)
+    .where(eq(topicAssignments.topicId, topicId));
+}
+
+export async function updateTopicAssignment(id: number, data: { title?: string; description?: string; dueDate?: Date; maxScore?: number; isRequired?: boolean }, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(topicAssignments)
+    .set(data as any)
+    .where(and(
+      eq(topicAssignments.id, id),
+      eq(topicAssignments.professorId, professorId)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteTopicAssignment(id: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(topicAssignments)
+    .where(and(
+      eq(topicAssignments.id, id),
+      eq(topicAssignments.professorId, professorId)
+    ));
+  
+  return { success: true };
+}
+
+// ==================== ASSIGNMENT SUBMISSIONS ====================
+
+export async function createAssignmentSubmission(data: { assignmentId: number; studentId: number; content?: string; fileUrl?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(assignmentSubmissions).values({
+    ...data,
+    status: 'pending',
+  });
+  
+  return { id: result.insertId, ...data, status: 'pending' };
+}
+
+export async function getAssignmentSubmissions(assignmentId: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verify professor owns this assignment
+  const assignment = await db.select().from(topicAssignments)
+    .where(and(
+      eq(topicAssignments.id, assignmentId),
+      eq(topicAssignments.professorId, professorId)
+    ));
+  
+  if (assignment.length === 0) {
+    throw new Error("Assignment not found or access denied");
+  }
+  
+  return await db.select().from(assignmentSubmissions)
+    .where(eq(assignmentSubmissions.assignmentId, assignmentId));
+}
+
+export async function getStudentSubmission(assignmentId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const submissions = await db.select().from(assignmentSubmissions)
+    .where(and(
+      eq(assignmentSubmissions.assignmentId, assignmentId),
+      eq(assignmentSubmissions.studentId, studentId)
+    ));
+  
+  return submissions[0] || null;
+}
+
+export async function gradeSubmission(id: number, data: { score: number; feedback?: string; gradedBy: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(assignmentSubmissions)
+    .set({
+      score: data.score,
+      feedback: data.feedback,
+      gradedBy: data.gradedBy,
+      gradedAt: new Date(),
+      status: 'graded',
+    })
+    .where(eq(assignmentSubmissions.id, id));
+  
+  return { success: true };
+}
+
+// ==================== TOPIC COMMENTS ====================
+
+export async function createTopicComment(data: { topicId: number; studentId: number; professorId: number; authorId: number; authorType: 'professor' | 'student'; content: string; isPrivate?: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(topicComments).values({
+    ...data,
+    isPrivate: data.isPrivate ?? true,
+  });
+  
+  return { id: result.insertId, ...data };
+}
+
+export async function getTopicComments(topicId: number, studentId: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(topicComments)
+    .where(and(
+      eq(topicComments.topicId, topicId),
+      eq(topicComments.studentId, studentId),
+      eq(topicComments.professorId, professorId)
+    ))
+    .orderBy(topicComments.createdAt);
+}
+
+export async function deleteTopicComment(id: number, authorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(topicComments)
+    .where(and(
+      eq(topicComments.id, id),
+      eq(topicComments.authorId, authorId)
+    ));
+  
+  return { success: true };
 }

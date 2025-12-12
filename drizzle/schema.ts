@@ -263,3 +263,121 @@ export const topicClassLinks = mysqlTable("topic_class_links", {
 
 export type TopicClassLink = typeof topicClassLinks.$inferSelect;
 export type InsertTopicClassLink = typeof topicClassLinks.$inferInsert;
+
+/**
+ * Matrícula de Alunos em Disciplinas
+ */
+export const studentEnrollments = mysqlTable("student_enrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // ID do usuário com role 'user' (aluno)
+  subjectId: int("subjectId").notNull(),
+  classId: int("classId"), // Turma específica (opcional)
+  professorId: int("professorId").notNull(), // Professor responsável
+  enrolledAt: timestamp("enrolledAt").defaultNow().notNull(),
+  status: mysqlEnum("status", ["active", "completed", "dropped"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentEnrollment = typeof studentEnrollments.$inferSelect;
+export type InsertStudentEnrollment = typeof studentEnrollments.$inferInsert;
+
+/**
+ * Progresso Individual do Aluno em Tópicos
+ */
+export const studentTopicProgress = mysqlTable("student_topic_progress", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  topicId: int("topicId").notNull(),
+  status: mysqlEnum("status", ["not_started", "in_progress", "completed"]).default("not_started").notNull(),
+  completedAt: timestamp("completedAt"),
+  selfAssessment: mysqlEnum("selfAssessment", ["understood", "have_doubts", "need_help"]),
+  notes: text("notes"), // Anotações pessoais do aluno
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentTopicProgress = typeof studentTopicProgress.$inferSelect;
+export type InsertStudentTopicProgress = typeof studentTopicProgress.$inferInsert;
+
+/**
+ * Materiais Didáticos por Tópico
+ */
+export const topicMaterials = mysqlTable("topic_materials", {
+  id: int("id").autoincrement().primaryKey(),
+  topicId: int("topicId").notNull(),
+  professorId: int("professorId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  type: mysqlEnum("type", ["pdf", "video", "link", "presentation", "document", "other"]).notNull(),
+  url: text("url").notNull(), // URL do arquivo ou link externo
+  fileSize: int("fileSize"), // Tamanho em bytes (para uploads)
+  orderIndex: int("orderIndex").default(0).notNull(),
+  isRequired: boolean("isRequired").default(false).notNull(), // Material obrigatório
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TopicMaterial = typeof topicMaterials.$inferSelect;
+export type InsertTopicMaterial = typeof topicMaterials.$inferInsert;
+
+/**
+ * Atividades/Exercícios por Tópico
+ */
+export const topicAssignments = mysqlTable("topic_assignments", {
+  id: int("id").autoincrement().primaryKey(),
+  topicId: int("topicId").notNull(),
+  professorId: int("professorId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  type: mysqlEnum("type", ["exercise", "essay", "project", "quiz", "practical"]).notNull(),
+  dueDate: timestamp("dueDate"),
+  maxScore: int("maxScore").default(100).notNull(),
+  isRequired: boolean("isRequired").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TopicAssignment = typeof topicAssignments.$inferSelect;
+export type InsertTopicAssignment = typeof topicAssignments.$inferInsert;
+
+/**
+ * Entregas de Atividades pelos Alunos
+ */
+export const assignmentSubmissions = mysqlTable("assignment_submissions", {
+  id: int("id").autoincrement().primaryKey(),
+  assignmentId: int("assignmentId").notNull(),
+  studentId: int("studentId").notNull(),
+  content: text("content"), // Texto da resposta
+  fileUrl: text("fileUrl"), // URL do arquivo enviado
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+  score: int("score"), // Nota atribuída
+  feedback: text("feedback"), // Feedback do professor
+  status: mysqlEnum("status", ["pending", "graded", "late"]).default("pending").notNull(),
+  gradedAt: timestamp("gradedAt"),
+  gradedBy: int("gradedBy"), // ID do professor que corrigiu
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AssignmentSubmission = typeof assignmentSubmissions.$inferSelect;
+export type InsertAssignmentSubmission = typeof assignmentSubmissions.$inferInsert;
+
+/**
+ * Comentários e Feedback Professor-Aluno
+ */
+export const topicComments = mysqlTable("topic_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  topicId: int("topicId").notNull(),
+  studentId: int("studentId").notNull(),
+  professorId: int("professorId").notNull(),
+  authorId: int("authorId").notNull(), // Quem escreveu (professor ou aluno)
+  authorType: mysqlEnum("authorType", ["professor", "student"]).notNull(),
+  content: text("content").notNull(),
+  isPrivate: boolean("isPrivate").default(true).notNull(), // Comentário privado (apenas aluno e professor)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TopicComment = typeof topicComments.$inferSelect;
+export type InsertTopicComment = typeof topicComments.$inferInsert;

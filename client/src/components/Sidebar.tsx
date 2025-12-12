@@ -92,6 +92,11 @@ const navItems: NavItem[] = [
     href: "/tasks",
   },
   {
+    label: "Portal do Aluno",
+    icon: <User className="h-5 w-5" />,
+    href: "/student/dashboard",
+  },
+  {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",

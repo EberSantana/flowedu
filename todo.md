@@ -1591,3 +1591,58 @@
 - [x] Adicionar botão "Refazer Tour" no menu do usuário (sidebar expandida e compacta)
 - [x] Testar funcionalidade completa no navegador
 - [x] Sistema de onboarding tour completo e funcional! 🎉
+
+## ✅ Sistema de Aprendizagem Guiada para Alunos e Professores - COMPLETO
+
+### Banco de Dados
+- [x] Criar tabela student_enrollments (matrícula aluno-disciplina)
+- [x] Criar tabela topic_materials (materiais didáticos por tópico)
+- [x] Criar tabela student_topic_progress (progresso individual do aluno)
+- [x] Criar tabela topic_assignments (atividades/exercícios por tópico)
+- [x] Criar tabela assignment_submissions (entregas de atividades)
+- [x] Criar tabela topic_comments (feedback professor-aluno)
+- [x] Executar migrations
+
+### Backend (tRPC)
+- [x] Implementar router student com rotas de matrícula
+- [x] Implementar rotas de progresso do aluno
+- [x] Implementar rotas de materiais didáticos
+- [x] Implementar rotas de atividades e entregas
+- [x] Implementar rotas de comentários e feedback (estrutura criada)
+- [x] Implementar rotas de gerenciamento de matrículas (enrollments router)
+- [x] Implementar rotas de materiais (materials router)
+- [x] Implementar rotas de atividades (assignments router)
+
+### Portal do Aluno
+- [x] Criar página de dashboard do aluno (StudentDashboard.tsx)
+- [x] Criar página de visualização de trilha da disciplina (StudentSubjectView.tsx)
+- [x] Implementar marcação de tópicos concluídos
+- [x] Criar visualização de materiais didáticos
+- [x] Implementar autoavaliação do aluno (Entendi/Tenho dúvidas/Preciso de ajuda)
+- [x] Criar sistema de anotações pessoais por tópico
+- [ ] Implementar sistema de entregas de atividades (interface criada, falta testar)
+- [ ] Criar área de feedback e comentários (backend pronto, falta interface)
+
+### Painel do Professor
+- [x] Criar página de gerenciamento de matrículas (ManageEnrollments.tsx)
+- [x] Adicionar botão "Gerenciar Matrículas" nos cards de disciplinas
+- [ ] Criar página de upload de materiais por tópico (backend pronto, falta interface)
+- [ ] Implementar criação de atividades/exercícios (backend pronto, falta interface)
+- [ ] Criar painel de acompanhamento de progresso da turma
+- [ ] Implementar relatórios individuais de alunos
+- [ ] Criar sistema de feedback e comentários
+
+### Funcionalidades Adicionais
+- [ ] Sistema de notificações para alunos (prazos, novos materiais)
+- [ ] Alertas automáticos para alunos atrasados
+- [ ] Exportação de relatórios de progresso em PDF
+- [ ] Integração com Google Drive por tópico
+- [ ] Fórum de dúvidas por tópico (opcional)
+- [ ] Sistema de gamificação (badges, ranking) (opcional)
+
+### Testes
+- [ ] Criar testes para matrícula de alunos
+- [ ] Criar testes para progresso individual
+- [ ] Criar testes para materiais didáticos
+- [ ] Criar testes para atividades e entregas
+- [ ] Criar testes para relatórios de professor
