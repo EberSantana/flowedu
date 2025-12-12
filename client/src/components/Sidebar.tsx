@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckSquare,
-  BarChart3
+  BarChart3,
+  Route
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -73,6 +74,11 @@ const navItems: NavItem[] = [
     label: "Relatórios",
     icon: <BarChart3 className="h-5 w-5" />,
     href: "/reports",
+  },
+  {
+    label: "Trilhas de Aprendizagem",
+    icon: <Route className="h-5 w-5" />,
+    href: "/learning-paths",
   },
   {
     label: "Metodologias",

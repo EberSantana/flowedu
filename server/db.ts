@@ -13,6 +13,9 @@ import {
   activeMethodologies,
   classStatuses,
   tasks,
+  learningModules,
+  learningTopics,
+  topicClassLinks,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -832,4 +835,151 @@ export async function getTaskCategories(userId: number) {
     .where(and(eq(tasks.userId, userId), sql`${tasks.category} IS NOT NULL`));
   
   return result.map((r: any) => r.category).filter(Boolean);
+}
+
+
+// ========== LEARNING PATHS (TRILHAS DE APRENDIZAGEM) ==========
+
+export async function getLearningPathBySubject(subjectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const modules = await db.select().from(learningModules)
+    .where(and(eq(learningModules.subjectId, subjectId), eq(learningModules.userId, userId)))
+    .orderBy(learningModules.orderIndex);
+  
+  const modulesWithTopics = await Promise.all(
+    modules.map(async (module) => {
+      const topics = await db.select().from(learningTopics)
+        .where(and(eq(learningTopics.moduleId, module.id), eq(learningTopics.userId, userId)))
+        .orderBy(learningTopics.orderIndex);
+      
+      return { ...module, topics };
+    })
+  );
+  
+  return modulesWithTopics;
+}
+
+export async function createLearningModule(data: { subjectId: number; title: string; description?: string; userId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get the next order index
+  const [lastModule] = await db.select({ orderIndex: learningModules.orderIndex })
+    .from(learningModules)
+    .where(and(eq(learningModules.subjectId, data.subjectId), eq(learningModules.userId, data.userId)))
+    .orderBy(desc(learningModules.orderIndex))
+    .limit(1);
+  
+  const nextOrder = lastModule ? lastModule.orderIndex + 1 : 0;
+  
+  const [result] = await db.insert(learningModules).values({
+    ...data,
+    orderIndex: nextOrder,
+  });
+  
+  return { id: result.insertId, ...data, orderIndex: nextOrder };
+}
+
+export async function updateLearningModule(id: number, data: { title?: string; description?: string }, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(learningModules)
+    .set(data as any)
+    .where(and(eq(learningModules.id, id), eq(learningModules.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function deleteLearningModule(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete all topics in this module first
+  await db.delete(learningTopics)
+    .where(and(eq(learningTopics.moduleId, id), eq(learningTopics.userId, userId)));
+  
+  // Delete the module
+  await db.delete(learningModules)
+    .where(and(eq(learningModules.id, id), eq(learningModules.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function createLearningTopic(data: { moduleId: number; title: string; description?: string; estimatedHours?: number; userId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get the next order index
+  const [lastTopic] = await db.select({ orderIndex: learningTopics.orderIndex })
+    .from(learningTopics)
+    .where(and(eq(learningTopics.moduleId, data.moduleId), eq(learningTopics.userId, data.userId)))
+    .orderBy(desc(learningTopics.orderIndex))
+    .limit(1);
+  
+  const nextOrder = lastTopic ? lastTopic.orderIndex + 1 : 0;
+  
+  const [result] = await db.insert(learningTopics).values({
+    ...data,
+    orderIndex: nextOrder,
+    status: 'not_started',
+  });
+  
+  return { id: result.insertId, ...data, orderIndex: nextOrder, status: 'not_started' };
+}
+
+export async function updateLearningTopic(id: number, data: { title?: string; description?: string; status?: 'not_started' | 'in_progress' | 'completed'; estimatedHours?: number }, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(learningTopics)
+    .set(data as any)
+    .where(and(eq(learningTopics.id, id), eq(learningTopics.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function deleteLearningTopic(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete topic-class links first
+  await db.delete(topicClassLinks)
+    .where(and(eq(topicClassLinks.topicId, id), eq(topicClassLinks.userId, userId)));
+  
+  // Delete the topic
+  await db.delete(learningTopics)
+    .where(and(eq(learningTopics.id, id), eq(learningTopics.userId, userId)));
+  
+  return { success: true };
+}
+
+export async function getLearningPathProgress(subjectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const modules = await db.select().from(learningModules)
+    .where(and(eq(learningModules.subjectId, subjectId), eq(learningModules.userId, userId)));
+  
+  const moduleIds = modules.map(m => m.id);
+  
+  if (moduleIds.length === 0) {
+    return { totalTopics: 0, completedTopics: 0, inProgressTopics: 0, notStartedTopics: 0, percentage: 0 };
+  }
+  
+  const allTopics = await db.select().from(learningTopics)
+    .where(and(
+      sql`${learningTopics.moduleId} IN (${sql.join(moduleIds.map(id => sql`${id}`), sql`, `)})`,
+      eq(learningTopics.userId, userId)
+    ));
+  
+  const totalTopics = allTopics.length;
+  const completedTopics = allTopics.filter(t => t.status === 'completed').length;
+  const inProgressTopics = allTopics.filter(t => t.status === 'in_progress').length;
+  const notStartedTopics = allTopics.filter(t => t.status === 'not_started').length;
+  const percentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+  
+  return { totalTopics, completedTopics, inProgressTopics, notStartedTopics, percentage };
 }

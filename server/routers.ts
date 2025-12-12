@@ -1166,6 +1166,77 @@ Regras:
       }),
   }),
 
+  learningPath: router({
+    getBySubject: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getLearningPathBySubject(input.subjectId, ctx.user.id);
+      }),
+    
+    createModule: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        title: z.string(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createLearningModule({ ...input, userId: ctx.user.id });
+      }),
+    
+    updateModule: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateLearningModule(id, data, ctx.user.id);
+      }),
+    
+    deleteModule: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteLearningModule(input.id, ctx.user.id);
+      }),
+    
+    createTopic: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+        title: z.string(),
+        description: z.string().optional(),
+        estimatedHours: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createLearningTopic({ ...input, userId: ctx.user.id });
+      }),
+    
+    updateTopic: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        status: z.enum(['not_started', 'in_progress', 'completed']).optional(),
+        estimatedHours: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateLearningTopic(id, data, ctx.user.id);
+      }),
+    
+    deleteTopic: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteLearningTopic(input.id, ctx.user.id);
+      }),
+    
+    getProgress: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getLearningPathProgress(input.subjectId, ctx.user.id);
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

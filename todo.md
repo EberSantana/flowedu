@@ -1439,4 +1439,43 @@
 - [x] Implementar debounce ou disable nos botões durante mutation
 - [x] Otimizar invalidação de queries para evitar race conditions
 - [x] Testar correção no ambiente de produção
+- [x] Salvar checkpoint final
+
+## Sistema de Trilhas de Aprendizagem (11/12/2025)
+
+### Backend - Banco de Dados
+- [x] Adicionar campo `syllabus` (TEXT) na tabela `subject`
+- [x] Criar tabela `learning_module` (id, subjectId, title, description, order, createdAt)
+- [x] Criar tabela `learning_topic` (id, moduleId, title, description, status, order, estimatedHours, createdAt)
+- [x] Criar tabela `topic_class_link` (id, topicId, scheduledClassId) para vincular tópicos a aulas
+- [x] Executar migration com `pnpm db:push`
+
+### Backend - Rotas tRPC
+- [x] Criar router `learningPath.getBySubject` para buscar trilha completa
+- [x] Criar router `learningPath.createModule` para criar módulos
+- [x] Criar router `learningPath.updateModule` para editar módulos
+- [x] Criar router `learningPath.deleteModule` para remover módulos
+- [x] Criar router `learningPath.createTopic` para criar tópicos
+- [x] Criar router `learningPath.updateTopic` para editar tópicos (incluindo status)
+- [x] Criar router `learningPath.deleteTopic` para remover tópicos
+- [x] Criar router `learningPath.getProgress` para calcular progresso da trilha
+
+### Frontend - Interface
+- [x] Criar página `LearningPaths.tsx` com lista de disciplinas
+- [x] Criar componente de visualização hierárquica (Módulos → Tópicos)
+- [x] Implementar barra de progresso por disciplina
+- [x] Criar formulário para adicionar/editar módulos
+- [x] Criar formulário para adicionar/editar tópicos
+- [x] Implementar marcação de status (Não iniciado / Em andamento / Concluído)
+- [ ] Adicionar editor de ementa na página de disciplinas
+- [x] Adicionar link "Trilhas de Aprendizagem" no menu lateral
+
+### Integrações
+- [ ] (Opcional) Adicionar widget de progresso de trilhas no Dashboard
+- [ ] (Opcional) Incluir estatísticas de trilhas nos Relatórios
+- [ ] (Futuro) Permitir vincular aulas agendadas aos tópicos
+
+### Testes e Entrega
+- [x] Testar CRUD completo de módulos e tópicos
+- [x] Testar cálculo de progresso
 - [ ] Salvar checkpoint final

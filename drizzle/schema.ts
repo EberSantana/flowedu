@@ -208,3 +208,53 @@ export const tasks = mysqlTable("tasks", {
 
 export type Task = typeof tasks.$inferSelect;
 export type InsertTask = typeof tasks.$inferInsert;
+
+/**
+ * Módulos da Trilha de Aprendizagem (Unidades de uma disciplina)
+ */
+export const learningModules = mysqlTable("learning_modules", {
+  id: int("id").autoincrement().primaryKey(),
+  subjectId: int("subjectId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  orderIndex: int("orderIndex").default(0).notNull(),
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningModule = typeof learningModules.$inferSelect;
+export type InsertLearningModule = typeof learningModules.$inferInsert;
+
+/**
+ * Tópicos da Trilha de Aprendizagem (Conteúdos dentro de cada módulo)
+ */
+export const learningTopics = mysqlTable("learning_topics", {
+  id: int("id").autoincrement().primaryKey(),
+  moduleId: int("moduleId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  status: mysqlEnum("status", ["not_started", "in_progress", "completed"]).default("not_started").notNull(),
+  estimatedHours: int("estimatedHours").default(0), // Horas estimadas para cobrir o tópico
+  orderIndex: int("orderIndex").default(0).notNull(),
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningTopic = typeof learningTopics.$inferSelect;
+export type InsertLearningTopic = typeof learningTopics.$inferInsert;
+
+/**
+ * Vinculação entre Tópicos e Aulas Agendadas
+ */
+export const topicClassLinks = mysqlTable("topic_class_links", {
+  id: int("id").autoincrement().primaryKey(),
+  topicId: int("topicId").notNull(),
+  scheduledClassId: int("scheduledClassId").notNull(),
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TopicClassLink = typeof topicClassLinks.$inferSelect;
+export type InsertTopicClassLink = typeof topicClassLinks.$inferInsert;
