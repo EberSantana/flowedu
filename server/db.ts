@@ -22,6 +22,7 @@ import {
   topicAssignments,
   assignmentSubmissions,
   topicComments,
+  notifications,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -1359,6 +1360,90 @@ export async function deleteTopicComment(id: number, authorId: number) {
     .where(and(
       eq(topicComments.id, id),
       eq(topicComments.authorId, authorId)
+    ));
+  
+  return { success: true };
+}
+
+
+// ==================== NOTIFICATIONS ====================
+
+export async function createNotification(data: {
+  userId: number;
+  type: 'new_material' | 'new_assignment' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received';
+  title: string;
+  message: string;
+  link?: string;
+  relatedId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result]: any = await db.insert(notifications).values(data);
+  
+  return { id: Number(result.insertId || 0), ...data };
+}
+
+export async function getNotifications(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
+export async function getUnreadNotificationsCount(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({ count: sql<number>`count(*)` })
+    .from(notifications)
+    .where(and(
+      eq(notifications.userId, userId),
+      eq(notifications.isRead, false)
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+export async function markNotificationAsRead(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(notifications)
+    .set({ isRead: true })
+    .where(and(
+      eq(notifications.id, id),
+      eq(notifications.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+export async function markAllNotificationsAsRead(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(notifications)
+    .set({ isRead: true })
+    .where(and(
+      eq(notifications.userId, userId),
+      eq(notifications.isRead, false)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteNotification(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(notifications)
+    .where(and(
+      eq(notifications.id, id),
+      eq(notifications.userId, userId)
     ));
   
   return { success: true };

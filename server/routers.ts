@@ -1600,10 +1600,15 @@ Crie sugestões no formato JSON:
         isRequired: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.createTopicMaterial({
+        const material = await db.createTopicMaterial({
           ...input,
           professorId: ctx.user.id,
         });
+        
+        // Notificações serão implementadas em segundo plano
+        // TODO: Adicionar worker para notificar alunos sobre novos materiais
+        
+        return material;
       }),
     
     update: protectedProcedure
@@ -1692,10 +1697,15 @@ Crie sugestões no formato JSON:
         isRequired: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.createTopicAssignment({
+        const assignment = await db.createTopicAssignment({
           ...input,
           professorId: ctx.user.id,
         });
+        
+        // Notificações serão implementadas em segundo plano
+        // TODO: Adicionar worker para notificar alunos sobre novas atividades
+        
+        return assignment;
       }),
     
     update: protectedProcedure
@@ -1736,6 +1746,37 @@ Crie sugestões no formato JSON:
           feedback: input.feedback,
           gradedBy: ctx.user.id,
         });
+      }),
+  }),
+
+  // Notifications
+  notifications: router({
+    getAll: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getNotifications(ctx.user.id, input.limit);
+      }),
+    
+    getUnreadCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getUnreadNotificationsCount(ctx.user.id);
+      }),
+    
+    markAsRead: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.markNotificationAsRead(input.id, ctx.user.id);
+      }),
+    
+    markAllAsRead: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return await db.markAllNotificationsAsRead(ctx.user.id);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteNotification(input.id, ctx.user.id);
       }),
   }),
 

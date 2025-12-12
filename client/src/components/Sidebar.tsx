@@ -26,6 +26,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
+import NotificationBell from "@/components/NotificationBell";
 import {
   Tooltip,
   TooltipContent,
@@ -168,19 +169,23 @@ export default function Sidebar() {
             isCompact ? 'p-3' : 'p-6'
           }`}>
             {isCompact ? (
-              <div className="flex justify-center">
+              <div className="flex flex-col items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Sun className="h-6 w-6 text-primary" />
                 </div>
+                <NotificationBell />
               </div>
             ) : (
               <>
-                <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Sun className="h-5 w-5 text-primary" />
-                  </div>
-                  Sistema de Gestão
-                </h1>
+                <div className="flex items-center justify-between mb-2">
+                  <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Sun className="h-5 w-5 text-primary" />
+                    </div>
+                    Sistema de Gestão
+                  </h1>
+                  <NotificationBell />
+                </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   Gestão de Tempo para Professores
                 </p>

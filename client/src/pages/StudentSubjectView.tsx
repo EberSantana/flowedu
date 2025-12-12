@@ -109,18 +109,24 @@ export default function StudentSubjectView() {
     }
   };
 
-  const getMaterialIcon = (type: string) => {
+  const getMaterialIcon = (type: string, large: boolean = false) => {
+    const sizeClass = large ? "h-6 w-6" : "h-4 w-4";
+    const colorClass = large ? "text-primary" : "";
+    const className = `${sizeClass} ${colorClass}`;
+    
     switch (type) {
       case 'video':
-        return <Video className="h-4 w-4" />;
+        return <Video className={className} />;
       case 'pdf':
+        return <FileText className={className} />;
       case 'document':
+        return <FileText className={className} />;
       case 'presentation':
-        return <FileText className="h-4 w-4" />;
+        return <FileText className={className} />;
       case 'link':
-        return <LinkIcon className="h-4 w-4" />;
+        return <LinkIcon className={className} />;
       default:
-        return <Download className="h-4 w-4" />;
+        return <Download className={className} />;
     }
   };
 
@@ -383,27 +389,61 @@ export default function StudentSubjectView() {
                       Nenhum material disponível para este tópico.
                     </p>
                   ) : (
-                    <div className="space-y-2">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {materials.map((material) => (
                         <a
                           key={material.id}
                           href={material.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          className="group relative flex flex-col gap-3 p-4 border-2 rounded-xl hover:border-primary hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50"
                         >
-                          {getMaterialIcon(material.type)}
-                          <div className="flex-1">
-                            <p className="font-medium text-sm">{material.title}</p>
-                            {material.description && (
-                              <p className="text-xs text-gray-600">{material.description}</p>
-                            )}
-                          </div>
                           {material.isRequired && (
-                            <Badge variant="secondary" className="text-xs">
-                              Obrigatório
-                            </Badge>
+                            <div className="absolute top-2 right-2">
+                              <Badge className="bg-red-500 text-white text-xs font-semibold">
+                                ⭐ Obrigatório
+                              </Badge>
+                            </div>
                           )}
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0 p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                              {getMaterialIcon(material.type, true)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
+                                {material.title}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs capitalize">
+                                  {material.type === 'pdf' ? 'PDF' :
+                                   material.type === 'video' ? 'Vídeo' :
+                                   material.type === 'link' ? 'Link' :
+                                   material.type === 'document' ? 'Documento' :
+                                   material.type === 'presentation' ? 'Apresentação' :
+                                   'Outro'}
+                                </Badge>
+                                {material.fileSize && (
+                                  <span className="text-xs text-gray-500">
+                                    {(material.fileSize / 1024 / 1024).toFixed(1)} MB
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          {material.description && (
+                            <p className="text-xs text-gray-600 line-clamp-2 pl-1">
+                              {material.description}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between pt-2 border-t">
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <Download className="h-3 w-3" />
+                              Abrir material
+                            </span>
+                            <span className="text-primary text-xs font-medium group-hover:underline">
+                              Acessar →
+                            </span>
+                          </div>
                         </a>
                       ))}
                     </div>

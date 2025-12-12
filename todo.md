@@ -1672,3 +1672,64 @@
 - [x] Adicionar rota no App.tsx
 - [x] Criar breadcrumb de navegação (Trilhas > Módulo > Tópico > Materiais)
 - [x] Integração completa com backend existente
+
+## ✅ Sistema de Notificações em Tempo Real - COMPLETO
+
+### Banco de Dados
+- [x] Criar tabela notifications (notificações para alunos)
+- [x] Adicionar campos: tipo, título, mensagem, link, lida, data
+- [x] Executar migrations
+- [x] Adicionar índices para performance (userId, isRead, createdAt)
+
+### Backend (tRPC)
+- [x] Implementar router notifications
+- [x] Criar rota getNotifications (listar notificações do aluno)
+- [x] Criar rota markAsRead (marcar como lida)
+- [x] Criar rota markAllAsRead (marcar todas como lidas)
+- [x] Criar rota delete (remover notificação)
+- [x] Criar rota getUnreadCount (contador de não lidas)
+- [x] Criar função createNotification (uso interno)
+
+### Triggers Automáticos
+- [x] Estrutura preparada para triggers (TODOs adicionados)
+- [ ] Notificar ao adicionar novo material em tópico (TODO)
+- [ ] Notificar ao criar nova atividade com prazo (TODO)
+- [ ] Notificar ao receber feedback do professor (TODO)
+- [ ] Notificar 24h antes do prazo de atividade (TODO - requer worker)
+
+### Interface Frontend
+- [x] Criar componente NotificationBell no header
+- [x] Mostrar badge com contador de não lidas
+- [x] Criar dropdown com lista de notificações
+- [x] Implementar marcação como lida ao clicar
+- [x] Adicionar botão "Marcar todas como lidas"
+- [x] Adicionar links diretos para recursos relacionados
+- [x] Integrar no Sidebar (visível em todas as páginas)
+- [x] Auto-refresh a cada 30 segundos
+- [x] Ícones visuais por tipo de notificação
+- [x] Botão de deletar notificação individual
+- [x] Formatação de tempo relativo ("5min atrás", "2h atrás")
+
+## ✅ Melhorias no Portal do Aluno - COMPLETO
+
+### Visualização de Materiais
+- [x] Adicionar ícones visuais por tipo de material (com cores e tamanhos dinâmicos)
+- [x] Criar cards visuais para cada material (grid 2 colunas, hover effects)
+- [x] Adicionar badges de "Obrigatório" destacados (estrela vermelha, posição absoluta)
+- [x] Mostrar tamanho do arquivo (MB)
+- [x] Mostrar tipo de material com badge
+- [x] Adicionar gradiente de fundo nos cards
+- [x] Hover effects com borda colorida e sombra
+- [x] Ícones maiores e coloridos (6x6 no modo large)
+- [x] Descrição com line-clamp para não quebrar layout
+- [x] Footer do card com call-to-action "Acessar →"
+- [ ] Implementar thumbnails para PDFs (requer biblioteca externa)
+- [ ] Adicionar preview de vídeos (YouTube embed)
+- [ ] Implementar download em lote (ZIP)
+- [ ] Adicionar filtros por tipo de material
+
+### UX Improvements
+- [x] Design responsivo (grid adapta para mobile)
+- [x] Estados vazios amigáveis já existentes
+- [ ] Adicionar animações de carregamento
+- [ ] Implementar skeleton loading

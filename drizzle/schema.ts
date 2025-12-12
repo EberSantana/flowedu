@@ -381,3 +381,28 @@ export const topicComments = mysqlTable("topic_comments", {
 
 export type TopicComment = typeof topicComments.$inferSelect;
 export type InsertTopicComment = typeof topicComments.$inferInsert;
+
+/**
+ * Notificações para Alunos
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // ID do aluno que receberá a notificação
+  type: mysqlEnum("type", [
+    "new_material",      // Novo material adicionado
+    "new_assignment",    // Nova atividade criada
+    "assignment_due",    // Prazo de atividade próximo
+    "feedback_received", // Feedback do professor recebido
+    "grade_received",    // Nota recebida
+    "comment_received",  // Comentário do professor
+  ]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  link: varchar("link", { length: 500 }), // Link para o recurso relacionado
+  relatedId: int("relatedId"), // ID do recurso relacionado (material, atividade, etc)
+  isRead: boolean("isRead").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
