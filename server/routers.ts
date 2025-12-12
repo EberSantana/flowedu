@@ -1235,6 +1235,236 @@ Regras:
       .query(async ({ ctx, input }) => {
         return await db.getLearningPathProgress(input.subjectId, ctx.user.id);
       }),
+    
+    generateFromAI: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        syllabusText: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        
+        const prompt = `Você é um especialista em design instrucional. Analise a seguinte ementa de disciplina e crie uma trilha de aprendizagem estruturada.
+
+EMENTA:
+${input.syllabusText}
+
+Crie uma estrutura de módulos e tópicos seguindo este formato JSON:
+{
+  "modules": [
+    {
+      "title": "Nome do Módulo",
+      "description": "Descrição breve",
+      "topics": [
+        {
+          "title": "Nome do Tópico",
+          "description": "Descrição detalhada",
+          "estimatedHours": 2
+        }
+      ]
+    }
+  ]
+}
+
+Diretrizes:
+- Crie entre 3-6 módulos
+- Cada módulo deve ter 3-8 tópicos
+- Organize de forma pedagógica (do básico ao avançado)
+- Estime horas realistas para cada tópico
+- Use linguagem clara e objetiva`;
+        
+        const response = await invokeLLM({
+          messages: [
+            { role: 'system', content: 'Você é um especialista em design instrucional e pedagogia.' },
+            { role: 'user', content: prompt }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'learning_path',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  modules: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        title: { type: 'string' },
+                        description: { type: 'string' },
+                        topics: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              title: { type: 'string' },
+                              description: { type: 'string' },
+                              estimatedHours: { type: 'number' }
+                            },
+                            required: ['title', 'description', 'estimatedHours'],
+                            additionalProperties: false
+                          }
+                        }
+                      },
+                      required: ['title', 'description', 'topics'],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ['modules'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const content = typeof response.choices[0].message.content === 'string' 
+          ? response.choices[0].message.content 
+          : JSON.stringify(response.choices[0].message.content);
+        const result = JSON.parse(content || '{}');
+        
+        // Create modules and topics in database
+        for (const [moduleIndex, module] of result.modules.entries()) {
+          const createdModule = await db.createLearningModule({
+            subjectId: input.subjectId,
+            title: module.title,
+            description: module.description,
+            userId: ctx.user.id,
+          });
+          
+          for (const topic of module.topics) {
+            await db.createLearningTopic({
+              moduleId: createdModule.id,
+              title: topic.title,
+              description: topic.description,
+              estimatedHours: topic.estimatedHours,
+              userId: ctx.user.id,
+            });
+          }
+        }
+        
+        return { success: true, modulesCreated: result.modules.length };
+      }),
+    
+    generateInfographic: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { generateImage } = await import('./_core/imageGeneration');
+        const learningPath = await db.getLearningPathBySubject(input.subjectId, ctx.user.id);
+        
+        if (!learningPath || learningPath.length === 0) {
+          throw new Error('Nenhuma trilha encontrada para esta disciplina');
+        }
+        
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        
+        let pathDescription = `Disciplina: ${subject?.name}\n\n`;
+        learningPath.forEach((module, idx) => {
+          pathDescription += `Módulo ${idx + 1}: ${module.title}\n`;
+          if (module.topics) {
+            module.topics.forEach((topic: any, topicIdx: number) => {
+              pathDescription += `  ${idx + 1}.${topicIdx + 1} ${topic.title}\n`;
+            });
+          }
+        });
+        
+        const prompt = `Crie um infográfico visual moderno e profissional para uma trilha de aprendizagem educacional. O infográfico deve:
+
+- Ter design limpo e colorido
+- Mostrar a estrutura hierárquica de módulos e tópicos
+- Usar ícones educacionais
+- Ter fundo branco ou gradiente suave
+- Incluir o título da disciplina no topo
+- Organizar módulos verticalmente com conexões visuais
+
+Conteúdo:
+${pathDescription}`;
+        
+        const result = await generateImage({ prompt });
+        return { imageUrl: result.url };
+      }),
+    
+    suggestLessonPlans: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        const topic = await db.getLearningTopicById(input.topicId, ctx.user.id);
+        
+        if (!topic) {
+          throw new Error('Tópico não encontrado');
+        }
+        
+        const prompt = `Você é um especialista em pedagogia e metodologias ativas. Sugira um plano de aula detalhado para o seguinte tópico:
+
+TÓPICO: ${topic.title}
+DESCRIÇÃO: ${topic.description || 'Não informada'}
+DURAÇÃO ESTIMADA: ${topic.estimatedHours || 2} horas
+
+Crie sugestões no formato JSON:
+{
+  "objectives": ["objetivo 1", "objetivo 2"],
+  "methodology": "Descrição da metodologia sugerida",
+  "activities": [
+    {
+      "title": "Nome da atividade",
+      "description": "Descrição detalhada",
+      "duration": 30
+    }
+  ],
+  "resources": ["recurso 1", "recurso 2"],
+  "assessment": "Forma de avaliação sugerida"
+}`;
+        
+        const response = await invokeLLM({
+          messages: [
+            { role: 'system', content: 'Você é um especialista em pedagogia e metodologias ativas de ensino.' },
+            { role: 'user', content: prompt }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'lesson_plan',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  objectives: {
+                    type: 'array',
+                    items: { type: 'string' }
+                  },
+                  methodology: { type: 'string' },
+                  activities: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        title: { type: 'string' },
+                        description: { type: 'string' },
+                        duration: { type: 'number' }
+                      },
+                      required: ['title', 'description', 'duration'],
+                      additionalProperties: false
+                    }
+                  },
+                  resources: {
+                    type: 'array',
+                    items: { type: 'string' }
+                  },
+                  assessment: { type: 'string' }
+                },
+                required: ['objectives', 'methodology', 'activities', 'resources', 'assessment'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const content = typeof response.choices[0].message.content === 'string' 
+          ? response.choices[0].message.content 
+          : JSON.stringify(response.choices[0].message.content);
+        return JSON.parse(content || '{}');
+      }),
   }),
 
 });

@@ -983,3 +983,13 @@ export async function getLearningPathProgress(subjectId: number, userId: number)
   
   return { totalTopics, completedTopics, inProgressTopics, notStartedTopics, percentage };
 }
+
+export async function getLearningTopicById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const topics = await db.select().from(learningTopics)
+    .where(and(eq(learningTopics.id, id), eq(learningTopics.userId, userId)));
+  
+  return topics[0] || null;
+}

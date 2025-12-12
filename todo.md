@@ -1478,4 +1478,33 @@
 ### Testes e Entrega
 - [x] Testar CRUD completo de módulos e tópicos
 - [x] Testar cálculo de progresso
+- [x] Salvar checkpoint final
+
+
+## Funcionalidades Avançadas com IA para Trilhas de Aprendizagem (12/12/2025)
+
+### Backend - Upload e Processamento de PDF
+- [x] Criar rota tRPC `learningPath.generateFromAI` para gerar trilha com IA
+- [x] Implementar prompt de IA para análise de ementa e geração de módulos/tópicos
+- [x] Usuário poderá colar texto da ementa diretamente (mais simples que PDF)
+
+### Backend - Infográfico e Sugestões
+- [x] Criar rota tRPC `learningPath.generateInfographic` para gerar infográfico visual
+- [x] Criar rota tRPC `learningPath.suggestLessonPlans` para sugestões de aulas
+- [x] Implementar prompts de IA para sugestões pedagógicas
+
+### Frontend - Interface de IA
+- [x] Adicionar botão "Gerar com IA" na página LearningPaths
+- [x] Criar dialog para colar ementa (simplificado, sem PDF)
+- [x] Mostrar loading e progresso durante geração
+- [x] Adicionar botão "Gerar Infográfico" na página de trilha
+- [x] Criar visualização do infográfico gerado com download
+- [x] Adicionar botão "Sugestões" (lâmpada) em cada tópico
+- [x] Criar dialog com sugestões detalhadas de planos de aula
+
+### Testes e Entrega
+- [x] Sistema testado (63/66 testes passando)
+- [x] Geração automática de trilha com IA funcional
+- [x] Geração de infográfico funcional
+- [x] Sugestões de planos de aula funcional
 - [ ] Salvar checkpoint final

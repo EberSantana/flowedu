@@ -16,7 +16,11 @@ import {
   ChevronRight,
   CheckCircle2,
   Circle,
-  Clock
+  Clock,
+  Sparkles,
+  Image as ImageIcon,
+  Lightbulb,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,6 +44,15 @@ export default function LearningPaths() {
   const [topicTitle, setTopicTitle] = useState("");
   const [topicDescription, setTopicDescription] = useState("");
   const [topicEstimatedHours, setTopicEstimatedHours] = useState<number>(0);
+  
+  // AI dialog states
+  const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
+  const [syllabusText, setSyllabusText] = useState("");
+  const [isInfographicDialogOpen, setIsInfographicDialogOpen] = useState(false);
+  const [infographicUrl, setInfographicUrl] = useState<string | null>(null);
+  const [isLessonPlanDialogOpen, setIsLessonPlanDialogOpen] = useState(false);
+  const [selectedTopicForPlan, setSelectedTopicForPlan] = useState<any>(null);
+  const [lessonPlan, setLessonPlan] = useState<any>(null);
   
   const { data: learningPath, isLoading: isLoadingPath } = trpc.learningPath.getBySubject.useQuery(
     { subjectId: selectedSubjectId! },
@@ -119,6 +132,41 @@ export default function LearningPaths() {
     },
     onError: (error) => {
       toast.error("Erro ao remover tópico: " + error.message);
+    },
+  });
+  
+  const generateFromAIMutation = trpc.learningPath.generateFromAI.useMutation({
+    onSuccess: (data) => {
+      utils.learningPath.getBySubject.invalidate();
+      utils.learningPath.getProgress.invalidate();
+      toast.success(`Trilha gerada com sucesso! ${data.modulesCreated} módulos criados.`);
+      setIsAIDialogOpen(false);
+      setSyllabusText("");
+    },
+    onError: (error) => {
+      toast.error("Erro ao gerar trilha: " + error.message);
+    },
+  });
+  
+  const generateInfographicMutation = trpc.learningPath.generateInfographic.useMutation({
+    onSuccess: (data) => {
+      setInfographicUrl(data.imageUrl || null);
+      setIsInfographicDialogOpen(true);
+      toast.success("Infográfico gerado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao gerar infográfico: " + error.message);
+    },
+  });
+  
+  const suggestLessonPlanMutation = trpc.learningPath.suggestLessonPlans.useMutation({
+    onSuccess: (data) => {
+      setLessonPlan(data);
+      setIsLessonPlanDialogOpen(true);
+      toast.success("Sugestões geradas com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao gerar sugestões: " + error.message);
     },
   });
   
@@ -352,10 +400,38 @@ export default function LearningPaths() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">Módulos e Tópicos</h2>
-              <Button onClick={() => openModuleDialog()}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Módulo
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsAIDialogOpen(true)}
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Gerar com IA
+                </Button>
+                {learningPath && learningPath.length > 0 && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      if (!selectedSubjectId) return;
+                      generateInfographicMutation.mutate({ subjectId: selectedSubjectId });
+                    }}
+                    disabled={generateInfographicMutation.isPending}
+                    className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                  >
+                    {generateInfographicMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                    )}
+                    Infográfico
+                  </Button>
+                )}
+                <Button onClick={() => openModuleDialog()}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Módulo
+                </Button>
+              </div>
             </div>
             
             {isLoadingPath ? (
@@ -456,6 +532,23 @@ export default function LearningPaths() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 flex-shrink-0">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedTopicForPlan(topic);
+                                    suggestLessonPlanMutation.mutate({ topicId: topic.id });
+                                  }}
+                                  disabled={suggestLessonPlanMutation.isPending}
+                                  className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                                  title="Sugestões de Aula"
+                                >
+                                  {suggestLessonPlanMutation.isPending && selectedTopicForPlan?.id === topic.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Lightbulb className="h-4 w-4" />
+                                  )}
+                                </Button>
                                 <Button
                                   size="sm"
                                   variant="ghost"
@@ -578,6 +671,170 @@ export default function LearningPaths() {
             </Button>
             <Button onClick={handleSaveTopic}>
               {editingTopic ? "Salvar" : "Criar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* AI Generation Dialog */}
+      <Dialog open={isAIDialogOpen} onOpenChange={setIsAIDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              Gerar Trilha com IA
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Cole a ementa da disciplina abaixo. A IA irá analisar e criar automaticamente módulos e tópicos organizados pedagogicamente.
+            </p>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Ementa da Disciplina *</label>
+              <Textarea
+                value={syllabusText}
+                onChange={(e) => setSyllabusText(e.target.value)}
+                placeholder="Cole aqui o conteúdo da ementa (objetivos, conteúdo programático, bibliografia, etc.)..."
+                rows={12}
+                className="font-mono text-sm"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAIDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => {
+                if (!selectedSubjectId) {
+                  toast.error("Selecione uma disciplina primeiro");
+                  return;
+                }
+                if (!syllabusText.trim()) {
+                  toast.error("Digite a ementa da disciplina");
+                  return;
+                }
+                generateFromAIMutation.mutate({
+                  subjectId: selectedSubjectId,
+                  syllabusText: syllabusText.trim(),
+                });
+              }}
+              disabled={generateFromAIMutation.isPending}
+            >
+              {generateFromAIMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Gerar Trilha
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Infographic Dialog */}
+      <Dialog open={isInfographicDialogOpen} onOpenChange={setIsInfographicDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-blue-500" />
+              Infográfico da Trilha de Aprendizagem
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {infographicUrl ? (
+              <div className="border rounded-lg overflow-hidden">
+                <img 
+                  src={infographicUrl} 
+                  alt="Infográfico da Trilha" 
+                  className="w-full h-auto"
+                />
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">
+                Gerando infográfico...
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            {infographicUrl && (
+              <Button asChild>
+                <a href={infographicUrl} download="trilha-aprendizagem.png" target="_blank" rel="noopener noreferrer">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Baixar Imagem
+                </a>
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => setIsInfographicDialogOpen(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Lesson Plan Dialog */}
+      <Dialog open={isLessonPlanDialogOpen} onOpenChange={setIsLessonPlanDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-yellow-500" />
+              Sugestões de Plano de Aula
+            </DialogTitle>
+          </DialogHeader>
+          {lessonPlan && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-semibold mb-2">Objetivos de Aprendizagem</h3>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {lessonPlan.objectives?.map((obj: string, idx: number) => (
+                    <li key={idx}>{obj}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Metodologia Sugerida</h3>
+                <p className="text-sm text-muted-foreground">{lessonPlan.methodology}</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Atividades</h3>
+                <div className="space-y-3">
+                  {lessonPlan.activities?.map((activity: any, idx: number) => (
+                    <Card key={idx} className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-medium">{activity.title}</h4>
+                        <Badge variant="outline">{activity.duration} min</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{activity.description}</p>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Recursos Necessários</h3>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {lessonPlan.resources?.map((resource: string, idx: number) => (
+                    <li key={idx}>{resource}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Avaliação</h3>
+                <p className="text-sm text-muted-foreground">{lessonPlan.assessment}</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLessonPlanDialogOpen(false)}>
+              Fechar
             </Button>
           </DialogFooter>
         </DialogContent>
