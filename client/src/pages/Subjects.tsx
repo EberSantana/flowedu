@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users, Route } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
@@ -312,14 +312,14 @@ export default function Subjects() {
                   )}
                   
                   <div className="space-y-2 mt-auto pt-3">
-                    <Link href={`/subjects/${subject.id}/enrollments`}>
+                    <Link href="/learning-paths">
                       <Button
                         variant="default"
                         size="sm"
-                        className="w-full"
+                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                       >
-                        <Users className="mr-2 h-3 w-3" />
-                        Gerenciar Matrículas
+                        <Route className="mr-2 h-3 w-3" />
+                        Trilhas de Aprendizagem
                       </Button>
                     </Link>
                     <div className="flex gap-2">

@@ -2033,3 +2033,12 @@
 - [x] Atualizar rota de /classes para /students
 - [x] Manter ícone Users (adequado para matrículas)
 - [x] Manter cor verde do botão (from-green-500 to-green-600)
+
+## ✅ Reorganização do Menu - Remover Duplicação - COMPLETO
+
+- [x] Remover item "Gerenciar Matrículas" do menu lateral (Sidebar.tsx)
+- [x] Localizar botão verde "Gerenciar Matrículas" na seção Disciplinas (Subjects.tsx)
+- [x] Transformar botão em "Trilhas de Aprendizagem"
+- [x] Atualizar ícone para Route (relacionado a trilhas/caminhos)
+- [x] Atualizar rota para /learning-paths
+- [x] Adicionar gradiente roxo/índigo ao botão (from-purple-600 to-indigo-600)
