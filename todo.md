@@ -2025,3 +2025,11 @@
 - [x] Remover padding/margin customizado (lg:ml-64)
 - [x] Ajustar StudentProfile.tsx para usar DashboardLayout
 - [x] Garantir consistência visual com outras páginas do sistema
+
+## ✅ Substituir Botão Gerenciar Turmas por Gerenciar Matrículas - COMPLETO
+
+- [x] Localizar botão "Gerenciar Turmas" no Dashboard (linha 690-698)
+- [x] Substituir texto para "Gerenciar Matrículas"
+- [x] Atualizar rota de /classes para /students
+- [x] Manter ícone Users (adequado para matrículas)
+- [x] Manter cor verde do botão (from-green-500 to-green-600)
