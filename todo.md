@@ -2168,3 +2168,14 @@
 - [x] Ajustar rota raiz (/) no App.tsx para Dashboard quando autenticado
 - [x] Testar fluxo: tela inicial → OAuth → Dashboard do Professor
 - [ ] Criar checkpoint final
+
+
+## 🎨 Ajuste: Menu Lateral Condicional por Tipo de Usuário
+
+- [x] Atualizar Sidebar.tsx para detectar userType do contexto
+- [x] Criar array de itens de menu para professores (completo)
+- [x] Criar array de itens de menu para alunos (simplificado)
+- [x] Implementar renderização condicional baseada em userType
+- [x] Testar menu como professor (todos os itens)
+- [x] Testar menu como aluno (apenas itens relevantes)
+- [ ] Criar checkpoint final

@@ -42,11 +42,12 @@ interface NavItem {
   adminOnly?: boolean;
 }
 
-const navItems: NavItem[] = [
+// Menu para professores (completo)
+const teacherNavItems: NavItem[] = [
   {
     label: "Dashboard",
     icon: <LayoutDashboard className="h-5 w-5" />,
-    href: "/",
+    href: "/dashboard",
   },
   {
     label: "Disciplinas",
@@ -94,9 +95,9 @@ const navItems: NavItem[] = [
     href: "/tasks",
   },
   {
-    label: "Portal do Aluno",
-    icon: <User className="h-5 w-5" />,
-    href: "/student/dashboard",
+    label: "Alunos",
+    icon: <UserPlus className="h-5 w-5" />,
+    href: "/students",
   },
   {
     label: "Usuários",
@@ -106,15 +107,34 @@ const navItems: NavItem[] = [
   },
 ];
 
+// Menu para alunos (simplificado)
+const studentNavItems: NavItem[] = [
+  {
+    label: "Minhas Disciplinas",
+    icon: <BookOpen className="h-5 w-5" />,
+    href: "/student-dashboard",
+  },
+  {
+    label: "Perfil",
+    icon: <User className="h-5 w-5" />,
+    href: "/profile",
+  },
+];
+
 export default function Sidebar() {
   const [location] = useLocation();
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
   
-  // Query para eventos próximos (badge de notificação)
+  // Detectar tipo de usuário baseado na rota atual
+  // Se está em rotas de aluno (/student-dashboard, /student/*), é aluno
+  const isStudent = location.startsWith('/student');
+  
+  // Query para eventos próximos (badge de notificação) - apenas para professores
   const { data: upcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery(undefined, {
-    refetchInterval: 60000, // Atualiza a cada 1 minuto
+    refetchInterval: 60000,
+    enabled: !isStudent, // Desabilita para alunos
   });
   
   const logoutMutation = trpc.auth.logout.useMutation({
@@ -132,6 +152,9 @@ export default function Sidebar() {
     }
   };
 
+  // Selecionar menu baseado no tipo de usuário
+  const navItems = isStudent ? studentNavItems : teacherNavItems;
+  
   const filteredNavItems = navItems.filter(
     (item) => !item.adminOnly || user?.role === "admin"
   );
