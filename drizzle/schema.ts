@@ -463,3 +463,14 @@ export const studentAttendance = mysqlTable("student_attendance", {
 
 export type StudentAttendance = typeof studentAttendance.$inferSelect;
 export type InsertStudentAttendance = typeof studentAttendance.$inferInsert;
+
+/**
+ * Matrícula de Alunos em Disciplinas (Subject Enrollments)
+ */
+export const subjectEnrollments = mysqlTable("subjectEnrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  subjectId: int("subjectId").notNull(),
+  enrolledAt: timestamp("enrolledAt").defaultNow(),
+  userId: int("userId").notNull(),
+});

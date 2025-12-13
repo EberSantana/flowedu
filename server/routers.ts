@@ -76,6 +76,25 @@ export const appRouter = router({
         await db.deleteSubject(input.id, ctx.user.id);
         return { success: true };
       }),
+    
+    // Subject Enrollments
+    enrollStudent: protectedProcedure
+      .input(z.object({ studentId: z.number(), subjectId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.enrollStudentInSubject(input.studentId, input.subjectId, ctx.user.id);
+      }),
+    
+    unenrollStudent: protectedProcedure
+      .input(z.object({ enrollmentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.unenrollStudentFromSubject(input.enrollmentId, ctx.user.id);
+      }),
+    
+    getEnrolledStudents: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+      }),
   }),
 
   classes: router({

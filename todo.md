@@ -2042,3 +2042,79 @@
 - [x] Atualizar ícone para Route (relacionado a trilhas/caminhos)
 - [x] Atualizar rota para /learning-paths
 - [x] Adicionar gradiente roxo/índigo ao botão (from-purple-600 to-indigo-600)
+
+## Sistema de Matrícula de Alunos em Disciplinas
+
+### Backend
+- [ ] Criar tabela subjectEnrollments (relacionamento aluno-disciplina)
+- [ ] Criar funções: enrollStudentInSubject, unenrollStudentFromSubject, getStudentsBySubject
+- [ ] Criar rotas tRPC: subjects.enrollStudent, subjects.unenrollStudent, subjects.getEnrolledStudents
+- [ ] Implementar exportação XLS (biblioteca xlsx)
+- [ ] Implementar exportação DOCX (biblioteca docx)
+- [ ] Implementar exportação PDF (biblioteca jspdf)
+
+### Frontend
+- [ ] Criar página SubjectEnrollments.tsx (gerenciar alunos da disciplina)
+- [ ] Adicionar botão "Gerenciar Alunos" em cada card de disciplina
+- [ ] Lista de alunos matriculados com opção de remover
+- [ ] Modal para adicionar novos alunos
+- [ ] Botões de exportação (XLS, DOCX, PDF)
+
+## Sistema de Login Dual (Portal Aluno vs Professor)
+
+### Backend
+- [ ] Criar rota auth.studentLogin (autenticação por matrícula)
+- [ ] Criar rota auth.getStudentSession
+- [ ] Adicionar campo userType no session (student ou teacher)
+
+### Frontend
+- [ ] Criar página LoginChoice.tsx (escolha entre portais)
+- [ ] Criar página StudentLogin.tsx (login por matrícula)
+- [ ] Atualizar fluxo de autenticação para diferenciar tipos
+- [ ] Redirecionar aluno para /student/dashboard
+- [ ] Redirecionar professor para /dashboard
+
+## Portal do Aluno
+
+### Backend
+- [ ] Criar rota student.getDashboard (disciplinas, frequência, próximas aulas)
+- [ ] Criar rota student.getMySubjects
+- [ ] Criar rota student.getMyAttendance
+
+### Frontend
+- [ ] Criar página StudentDashboard.tsx
+- [ ] Seção de disciplinas matriculadas
+- [ ] Seção de frequência por disciplina
+- [ ] Seção de próximas aulas
+- [ ] Seção de avisos (se houver)
+
+
+## ✅ Sistema de Matrícula de Alunos em Disciplinas - COMPLETO
+
+### Banco de Dados
+- [x] Criar tabela subjectEnrollments (relacionamento aluno-disciplina)
+- [x] Executar migration via SQL direto
+- [x] Adicionar ao schema.ts
+
+### Backend (tRPC)
+- [x] Criar funções enrollStudentInSubject, unenrollStudentFromSubject
+- [x] Criar função getStudentsBySubject (com join de students)
+- [x] Criar função getSubjectsByStudent (com join de subjects)
+- [x] Implementar rota subjects.enrollStudent
+- [x] Implementar rota subjects.unenrollStudent
+- [x] Implementar rota subjects.getEnrolledStudents
+
+### Frontend
+- [x] Criar página SubjectEnrollments.tsx com DashboardLayout
+- [x] Implementar listagem de alunos matriculados (com matrícula e data)
+- [x] Adicionar botão "Adicionar Aluno" com modal e select
+- [x] Implementar remoção de aluno da disciplina (com confirmação)
+- [x] Adicionar rota /subjects/:id/enrollments no App.tsx
+- [x] Adicionar botão "Gerenciar Alunos" (verde) em cada card de disciplina
+
+### Exportação
+- [x] Instalar biblioteca xlsx (v0.18.5) para XLS
+- [x] Implementar exportação XLS (matrícula + nome + data)
+- [x] Implementar exportação DOCX (matrícula + nome + data) com tabela formatada
+- [x] Implementar exportação PDF (matrícula + nome + data) com jsPDF
+- [x] Adicionar 3 botões de exportação na página (XLS, DOCX, PDF)

@@ -26,6 +26,7 @@ import {
   students,
   studentClassEnrollments,
   studentAttendance,
+  subjectEnrollments,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -1648,4 +1649,76 @@ export async function unenrollStudentFromClass(enrollmentId: number, userId: num
     ));
   
   return { success: true };
+}
+
+
+// ===== Subject Enrollments Functions =====
+
+export async function enrollStudentInSubject(studentId: number, subjectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(subjectEnrollments).values({
+    studentId,
+    subjectId,
+    userId,
+  });
+  
+  return { success: true };
+}
+
+export async function unenrollStudentFromSubject(enrollmentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(subjectEnrollments)
+    .where(and(
+      eq(subjectEnrollments.id, enrollmentId),
+      eq(subjectEnrollments.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+export async function getStudentsBySubject(subjectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const enrollments = await db.select({
+    enrollmentId: subjectEnrollments.id,
+    studentId: students.id,
+    registrationNumber: students.registrationNumber,
+    fullName: students.fullName,
+    enrolledAt: subjectEnrollments.enrolledAt,
+  })
+    .from(subjectEnrollments)
+    .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
+    .where(and(
+      eq(subjectEnrollments.subjectId, subjectId),
+      eq(subjectEnrollments.userId, userId)
+    ))
+    .orderBy(students.fullName);
+  
+  return enrollments;
+}
+
+export async function getSubjectsByStudent(studentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const enrollments = await db.select({
+    subjectId: subjects.id,
+    subjectName: subjects.name,
+    subjectCode: subjects.code,
+    enrolledAt: subjectEnrollments.enrolledAt,
+  })
+    .from(subjectEnrollments)
+    .innerJoin(subjects, eq(subjectEnrollments.subjectId, subjects.id))
+    .where(and(
+      eq(subjectEnrollments.studentId, studentId),
+      eq(subjectEnrollments.userId, userId)
+    ))
+    .orderBy(subjects.name);
+  
+  return enrollments;
 }
