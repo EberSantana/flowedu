@@ -1968,3 +1968,28 @@
 - [x] Corrigir prompt de infográfico geral da trilha para português brasileiro correto
 - [x] Prompt de módulos já estava corrigido
 - [x] Garantir que todos usem instruções explícitas de ortografia, acentuação e gramática
+
+## Sistema de Infográficos HTML/SVG Profissionais
+
+### Templates HTML/CSS
+- [x] Criar template HTML para infográfico da trilha completa (path-template.html)
+- [x] Criar template HTML para infográfico de módulo individual (module-template.html)
+- [x] Estilizar com CSS moderno (gradientes, cores vibrantes, hierarquia visual)
+- [x] Adicionar ícones e elementos gráficos educacionais (emojis, badges)
+- [x] Garantir layout responsivo e organizado (grid, flexbox)
+
+### Sistema de Renderização
+- [x] Instalar Puppeteer para renderização HTML→PNG
+- [x] Criar função de renderização de HTML para imagem (renderHTMLToImage)
+- [x] Configurar qualidade de imagem (1200x800px para módulo, 1400x1000px para trilha, deviceScaleFactor: 2)
+- [x] Implementar upload automático para S3 (storagePut)
+- [x] Adicionar tratamento de erros (try/catch com cleanup de browser)
+- [x] Criar sistema de substituição de placeholders (replacePlaceholders)
+- [x] Suportar loops {{#each}} e condicionais {{#if}}
+
+### Integração Backend
+- [x] Atualizar rota generateInfographic para usar HTML (generatePathInfographic)
+- [x] Atualizar rota generateModuleInfographic para usar HTML (generateModuleInfographic)
+- [x] Remover dependência de generateImage (IA) das rotas de infográficos
+- [ ] Testar geração de ambos os tipos de infográficos
+- [ ] Validar URLs de imagens geradas e qualidade visual
