@@ -1404,8 +1404,17 @@ Diretrizes OBRIGATÓRIAS:
 - Incluir o título da disciplina no topo
 - Organizar módulos verticalmente com conexões visuais
 
+**IMPORTANTE: Todo o texto no infográfico DEVE estar em PORTUGUÊS BRASILEIRO correto.**
+- Revise TODA a ortografia e gramática
+- Use acentuação correta (á, é, í, ó, ú, ã, õ, ç)
+- Evite erros comuns de português
+- Garanta concordância verbal e nominal
+- Use vocabulário adequado ao contexto educacional brasileiro
+
 Conteúdo:
-${pathDescription}`;
+${pathDescription}
+
+Crie um infográfico com PORTUGUÊS IMPECÁVEL!`;
         
         const result = await generateImage({ prompt });
         return { imageUrl: result.url };

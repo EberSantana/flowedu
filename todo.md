@@ -1952,3 +1952,19 @@
 - [x] Renomear variáveis isUploadingPDF para isUploadingFile
 - [x] Renomear função handlePDFUpload para handleFileUpload
 - [x] Atualizar ID do input (pdf-upload → file-upload)
+
+## ✅ Ajustes de Interface e Infográficos - COMPLETO
+
+### Remover Botões Redundantes
+- [x] Remover botão "Gerar com IA" do topo de Módulos e Tópicos
+- [x] Remover botão "Infográfico" do topo de Módulos e Tópicos
+- [x] Remover botão "Novo Módulo" do topo de Módulos e Tópicos
+- [x] Simplificar header para apenas título "Módulos e Tópicos"
+- [x] Manter botões contextuais nos cards e estado vazio
+
+### Verificar Prompts de Infográficos
+- [x] Verificar todos os prompts de geração de infográficos no sistema
+- [x] Encontrados 2 prompts: generateInfographic (trilha geral) e generateModuleInfographic (módulos)
+- [x] Corrigir prompt de infográfico geral da trilha para português brasileiro correto
+- [x] Prompt de módulos já estava corrigido
+- [x] Garantir que todos usem instruções explícitas de ortografia, acentuação e gramática

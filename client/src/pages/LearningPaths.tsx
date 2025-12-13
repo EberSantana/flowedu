@@ -562,62 +562,8 @@ export default function LearningPaths() {
 
               {/* Modules and Topics */}
               <Card className="p-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="mb-6">
                   <h2 className="text-xl font-bold">Módulos e Tópicos</h2>
-                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                    {/* Botões de IA */}
-                    <div className="flex gap-2 flex-1 sm:flex-initial">
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAIDialogOpen(true)}
-                        className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 flex-1 sm:flex-initial"
-                      >
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Gerar com IA
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (!selectedSubjectId) return;
-                          if (!learningPath || learningPath.length === 0) {
-                            toast.error(
-                              "Crie módulos primeiro para gerar infográfico"
-                            );
-                            return;
-                          }
-                          generateInfographicMutation.mutate({
-                            subjectId: selectedSubjectId,
-                          });
-                        }}
-                        disabled={
-                          generateInfographicMutation.isPending ||
-                          !learningPath ||
-                          learningPath.length === 0
-                        }
-                        className="border-cyan-200 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-300 flex-1 sm:flex-initial"
-                        title={
-                          !learningPath || learningPath.length === 0
-                            ? "Crie módulos primeiro"
-                            : "Gerar infográfico visual"
-                        }
-                      >
-                        {generateInfographicMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <ImageIcon className="h-4 w-4 mr-2" />
-                        )}
-                        Infográfico
-                      </Button>
-                    </div>
-                    {/* Botão de criar módulo */}
-                    <Button
-                      onClick={() => openModuleDialog()}
-                      className="w-full sm:w-auto"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Novo Módulo
-                    </Button>
-                  </div>
                 </div>
 
                 {isLoadingPath ? (
