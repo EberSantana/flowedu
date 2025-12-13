@@ -1990,3 +1990,30 @@
 - [x] Formatar tabela com 3 colunas: Matrícula, Nome Completo, Data de Cadastro
 - [x] Adicionar rodapé com total de alunos
 - [x] Download automático com nome do arquivo baseado na data
+
+## ✅ Página de Perfil do Aluno - COMPLETO
+
+### Banco de Dados
+- [x] Criar tabela studentClassEnrollments (relacionamento aluno-turma)
+- [x] Criar tabela studentAttendance (registro de frequência)
+- [x] Executar migrations via SQL direto
+
+### Backend (tRPC)
+- [x] Criar função getStudentProfile (dados + turmas + frequência)
+- [x] Criar função getStudentAttendanceHistory
+- [x] Criar função getStudentStatistics (total, presente, ausente, justificado, %)
+- [x] Criar funções enrollStudentInClass e unenrollStudentFromClass
+- [x] Implementar rota students.getProfile
+- [x] Implementar rota students.getAttendanceHistory
+- [x] Implementar rota students.getStatistics
+- [x] Implementar rotas students.enrollInClass e students.unenrollFromClass
+
+### Frontend
+- [x] Criar página StudentProfile.tsx com design moderno
+- [x] Seção de dados do aluno (matrícula, nome, data, taxa de frequência)
+- [x] Seção de turmas matriculadas (lista com código e data de matrícula)
+- [x] Seção de estatísticas (total aulas, presenças, faltas, faltas justificadas)
+- [x] Adicionar gráfico de evolução de frequência (Chart.js com Line chart)
+- [x] Seção de histórico de frequência (tabela com data, turma, status, observações)
+- [x] Adicionar rota /students/:id no App.tsx
+- [x] Adicionar link "Ver Perfil" (botão verde com ícone Eye) na listagem de alunos

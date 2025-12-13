@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { Link } from 'wouter';
 import { trpc } from '../lib/trpc';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Search, UserPlus, Download, FileText } from 'lucide-react';
+import { Pencil, Trash2, Search, UserPlus, Download, FileText, Eye } from 'lucide-react';
 
 type Student = {
   id: number;
@@ -292,11 +293,20 @@ export default function Students() {
                           {new Date(student.createdAt).toLocaleDateString('pt-BR')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <Link href={`/students/${student.id}`}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-green-600 hover:text-green-800 hover:bg-green-50"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(student)}
-                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 ml-2"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>

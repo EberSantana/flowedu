@@ -24,6 +24,8 @@ import {
   topicComments,
   notifications,
   students,
+  studentClassEnrollments,
+  studentAttendance,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -1528,6 +1530,121 @@ export async function deleteStudent(id: number, userId: number) {
     .where(and(
       eq(students.id, id),
       eq(students.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+// ==================== STUDENT PROFILE FUNCTIONS ====================
+
+export async function getStudentProfile(studentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar dados do aluno
+  const student = await db.select()
+    .from(students)
+    .where(and(
+      eq(students.id, studentId),
+      eq(students.userId, userId)
+    ));
+  
+  if (!student[0]) return null;
+  
+  // Buscar turmas matriculadas
+  const enrollments = await db.select({
+    enrollmentId: studentClassEnrollments.id,
+    classId: classes.id,
+    className: classes.name,
+    classCode: classes.code,
+    enrolledAt: studentClassEnrollments.enrolledAt,
+  })
+    .from(studentClassEnrollments)
+    .innerJoin(classes, eq(studentClassEnrollments.classId, classes.id))
+    .where(and(
+      eq(studentClassEnrollments.studentId, studentId),
+      eq(studentClassEnrollments.userId, userId)
+    ))
+    .orderBy(desc(studentClassEnrollments.enrolledAt));
+  
+  return {
+    student: student[0],
+    enrollments,
+  };
+}
+
+export async function getStudentAttendanceHistory(studentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const attendance = await db.select({
+    id: studentAttendance.id,
+    date: studentAttendance.date,
+    status: studentAttendance.status,
+    notes: studentAttendance.notes,
+    classId: classes.id,
+    className: classes.name,
+    classCode: classes.code,
+    scheduleId: studentAttendance.scheduleId,
+  })
+    .from(studentAttendance)
+    .innerJoin(classes, eq(studentAttendance.classId, classes.id))
+    .where(and(
+      eq(studentAttendance.studentId, studentId),
+      eq(studentAttendance.userId, userId)
+    ))
+    .orderBy(desc(studentAttendance.date));
+  
+  return attendance;
+}
+
+export async function getStudentStatistics(studentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const attendance = await db.select()
+    .from(studentAttendance)
+    .where(and(
+      eq(studentAttendance.studentId, studentId),
+      eq(studentAttendance.userId, userId)
+    ));
+  
+  const totalClasses = attendance.length;
+  const present = attendance.filter(a => a.status === 'present').length;
+  const absent = attendance.filter(a => a.status === 'absent').length;
+  const justified = attendance.filter(a => a.status === 'justified').length;
+  const attendanceRate = totalClasses > 0 ? (present / totalClasses) * 100 : 0;
+  
+  return {
+    totalClasses,
+    present,
+    absent,
+    justified,
+    attendanceRate: Math.round(attendanceRate * 10) / 10, // Arredondar para 1 casa decimal
+  };
+}
+
+export async function enrollStudentInClass(studentId: number, classId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(studentClassEnrollments).values({
+    studentId,
+    classId,
+    userId,
+  });
+  
+  return { success: true };
+}
+
+export async function unenrollStudentFromClass(enrollmentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(studentClassEnrollments)
+    .where(and(
+      eq(studentClassEnrollments.id, enrollmentId),
+      eq(studentClassEnrollments.userId, userId)
     ));
   
   return { success: true };

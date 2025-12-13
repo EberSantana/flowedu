@@ -1989,6 +1989,36 @@ Crie sugestões no formato JSON:
           filename: `lista-alunos-${new Date().toISOString().split('T')[0]}.pdf`,
         };
       }),
+    
+    getProfile: protectedProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentProfile(input.studentId, ctx.user.id);
+      }),
+    
+    getAttendanceHistory: protectedProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentAttendanceHistory(input.studentId, ctx.user.id);
+      }),
+    
+    getStatistics: protectedProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentStatistics(input.studentId, ctx.user.id);
+      }),
+    
+    enrollInClass: protectedProcedure
+      .input(z.object({ studentId: z.number(), classId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.enrollStudentInClass(input.studentId, input.classId, ctx.user.id);
+      }),
+    
+    unenrollFromClass: protectedProcedure
+      .input(z.object({ enrollmentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.unenrollStudentFromClass(input.enrollmentId, ctx.user.id);
+      }),
   }),
 
   // Notifications

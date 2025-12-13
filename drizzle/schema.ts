@@ -425,3 +425,41 @@ export const students = mysqlTable("students", {
 
 export type Student = typeof students.$inferSelect;
 export type InsertStudent = typeof students.$inferInsert;
+
+/**
+ * Tabela de matrículas de alunos em turmas
+ */
+export const studentClassEnrollments = mysqlTable("student_class_enrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  classId: int("classId").notNull(), // FK para classes
+  userId: int("userId").notNull(), // Professor responsável
+  enrolledAt: timestamp("enrolledAt").defaultNow().notNull(),
+}, (table) => ({
+  // Índice único: aluno não pode estar matriculado duas vezes na mesma turma
+  uniqueEnrollment: sql`UNIQUE KEY unique_student_class (studentId, classId)`,
+}));
+
+export type StudentClassEnrollment = typeof studentClassEnrollments.$inferSelect;
+export type InsertStudentClassEnrollment = typeof studentClassEnrollments.$inferInsert;
+
+/**
+ * Tabela de registro de frequência dos alunos
+ */
+export const studentAttendance = mysqlTable("student_attendance", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  classId: int("classId").notNull(), // FK para classes
+  scheduleId: int("scheduleId").notNull(), // FK para schedules (aula específica)
+  userId: int("userId").notNull(), // Professor responsável
+  date: varchar("date", { length: 10 }).notNull(), // Formato: YYYY-MM-DD
+  status: mysqlEnum("status", ["present", "absent", "justified"]).notNull(), // Presente, Falta, Falta Justificada
+  notes: text("notes"), // Observações opcionais
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  // Índice único: um aluno não pode ter dois registros de frequência para a mesma aula
+  uniqueAttendance: sql`UNIQUE KEY unique_student_schedule (studentId, scheduleId, date)`,
+}));
+
+export type StudentAttendance = typeof studentAttendance.$inferSelect;
+export type InsertStudentAttendance = typeof studentAttendance.$inferInsert;
