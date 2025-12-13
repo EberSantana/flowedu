@@ -1,6 +1,9 @@
 import express from 'express';
 import multer from 'multer';
 import mammoth from 'mammoth';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const router = express.Router();
 
@@ -46,9 +49,9 @@ router.post('/extract-pdf-text', upload.single('pdf'), async (req, res) => {
 
     // Processar baseado no tipo de arquivo
     if (req.file.mimetype === 'application/pdf') {
-      // Extrair texto do PDF usando import dinâmico
-      const pdfParse = await import('pdf-parse');
-      const data = await (pdfParse as any)(req.file.buffer);
+      // Extrair texto do PDF usando require
+      const pdfParse = require('pdf-parse');
+      const data = await pdfParse(req.file.buffer);
       extractedText = data.text.trim();
       metadata.pages = data.numpages;
       metadata.fileType = 'PDF';

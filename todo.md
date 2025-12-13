@@ -1867,3 +1867,11 @@
 - [x] Contador de caracteres abaixo do textarea
 - [x] Placeholder mais descritivo no textarea
 - [x] Fluxo claro: Upload → Revisar → Gerar Trilha
+
+## ✅ Correção Definitiva - pdf-parse - COMPLETO
+
+- [x] Investigar estrutura de export do pdf-parse
+- [x] Usar createRequire do Node.js para import correto
+- [x] Substituir import dinâmico por require tradicional
+- [x] Reiniciar servidor
+- [x] Solução: `const require = createRequire(import.meta.url)`
