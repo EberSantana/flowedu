@@ -66,7 +66,7 @@ export default function LearningPaths() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
   const [syllabusText, setSyllabusText] = useState("");
   const [workload, setWorkload] = useState<number>(60);
-  const [isUploadingPDF, setIsUploadingPDF] = useState(false);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isInfographicDialogOpen, setIsInfographicDialogOpen] = useState(false);
   const [infographicUrl, setInfographicUrl] = useState<string | null>(null);
@@ -215,20 +215,19 @@ export default function LearningPaths() {
     generateModuleInfographicMutation.mutate({ moduleId });
   };
 
-  // Função para fazer upload de arquivo (PDF, DOCX, TXT) e extrair texto
-  const handlePDFUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Função para fazer upload de arquivo (DOCX, TXT) e extrair texto
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validar tipo de arquivo
     const allowedTypes = [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-      'text/plain', // .txt
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain'
     ];
     
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Por favor, selecione um arquivo PDF, DOCX ou TXT');
+      toast.error('Por favor, selecione um arquivo DOCX ou TXT');
       return;
     }
 
@@ -238,7 +237,7 @@ export default function LearningPaths() {
       return;
     }
 
-    setIsUploadingPDF(true);
+    setIsUploadingFile(true);
     setUploadProgress(0);
 
     try {
@@ -260,7 +259,7 @@ export default function LearningPaths() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao processar PDF');
+        throw new Error(errorData.message || 'Erro ao processar arquivo');
       }
 
       const data = await response.json();
@@ -280,13 +279,13 @@ export default function LearningPaths() {
         
         toast.success(successMessage);
       } else {
-        throw new Error('Não foi possível extrair texto do PDF');
+        throw new Error('Não foi possível extrair texto do arquivo');
       }
     } catch (error: any) {
-      console.error('Erro ao fazer upload do PDF:', error);
-      toast.error(error.message || 'Erro ao processar PDF');
+      console.error('Erro ao fazer upload do arquivo:', error);
+      toast.error(error.message || 'Erro ao processar arquivo');
     } finally {
-      setIsUploadingPDF(false);
+      setIsUploadingFile(false);
       setUploadProgress(0);
       // Limpar input para permitir upload do mesmo arquivo novamente
       event.target.value = '';
@@ -1033,26 +1032,26 @@ export default function LearningPaths() {
                     Ementa da Disciplina *
                   </label>
                   
-                  {/* Botão de Upload de PDF */}
+                  {/* Botão de Upload de Arquivo */}
                   <div className="mb-3 flex items-center gap-2">
                     <input
                       type="file"
-                      accept=".pdf,.docx,.txt"
-                      onChange={handlePDFUpload}
-                      disabled={isUploadingPDF}
+                      accept=".docx,.txt"
+                      onChange={handleFileUpload}
+                      disabled={isUploadingFile}
                       className="hidden"
-                      id="pdf-upload"
+                      id="file-upload"
                     />
                     <label htmlFor="pdf-upload">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        disabled={isUploadingPDF}
-                        onClick={() => document.getElementById('pdf-upload')?.click()}
+                        disabled={isUploadingFile}
+                        onClick={() => document.getElementById('file-upload')?.click()}
                         className="cursor-pointer"
                       >
-                        {isUploadingPDF ? (
+                        {isUploadingFile ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Processando...
@@ -1066,12 +1065,12 @@ export default function LearningPaths() {
                       </Button>
                     </label>
                     <span className="text-xs text-muted-foreground">
-                      (PDF, DOCX ou TXT) ou cole o texto manualmente
+                      (DOCX ou TXT) ou cole o texto manualmente
                     </span>
                   </div>
 
                   {/* Barra de progresso */}
-                  {isUploadingPDF && uploadProgress > 0 && (
+                  {isUploadingFile && uploadProgress > 0 && (
                     <div className="mb-3">
                       <Progress value={uploadProgress} className="h-2" />
                       <p className="text-xs text-muted-foreground mt-1">

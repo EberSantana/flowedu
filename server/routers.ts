@@ -1443,10 +1443,17 @@ ${pathDescription}`;
 - Ter aspecto lúdico e engajador
 - Tamanho: 1200x800 pixels
 
+**IMPORTANTE: Todo o texto no infográfico DEVE estar em PORTUGUÊS BRASILEIRO correto.**
+- Revise TODA a ortografia e gramática
+- Use acentuação correta (á, é, í, ó, ú, ã, õ, ç)
+- Evite erros comuns de português
+- Garanta concordância verbal e nominal
+- Use vocabulário adequado ao contexto educacional brasileiro
+
 Conteúdo do módulo:
 ${moduleDescription}
 
-Crie um infográfico que torne o aprendizado visual e divertido!`;
+Crie um infográfico que torne o aprendizado visual e divertido, com PORTUGUÊS IMPECÁVEL!`;
         
         const result = await generateImage({ prompt });
         

@@ -1932,3 +1932,23 @@
 - [x] Design atrativo para estudantes com ilustrações e ícones
 - [x] Feedback visual durante geração (toast "Gerando...")
 - [x] Botão permite regenerar infográfico a qualquer momento
+
+
+## ✅ Correções de Infográficos e Upload de Ementa - COMPLETO
+
+### Melhorar Português dos Infográficos
+- [x] Ajustar prompt de geração de infográficos para português brasileiro correto
+- [x] Adicionar instrução explícita sobre ortografia e gramática
+- [x] Revisar prompt para evitar erros comuns
+- [x] Adicionar validação de acentuação e concordância
+- [x] Enfatizar importância de português impecável no prompt
+
+### Remover Upload de PDF
+- [x] Remover .pdf do input file accept no frontend
+- [x] Remover validação de PDF no frontend (allowedTypes)
+- [x] Remover lógica de processamento de PDF no backend (extract-pdf.ts)
+- [x] Remover import de pdf-parse e createRequire
+- [x] Atualizar mensagens e instruções (apenas DOCX e TXT)
+- [x] Renomear variáveis isUploadingPDF para isUploadingFile
+- [x] Renomear função handlePDFUpload para handleFileUpload
+- [x] Atualizar ID do input (pdf-upload → file-upload)

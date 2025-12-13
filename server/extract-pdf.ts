@@ -1,9 +1,6 @@
 import express from 'express';
 import multer from 'multer';
 import mammoth from 'mammoth';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
 
 const router = express.Router();
 
@@ -15,7 +12,6 @@ const upload = multer({
   },
   fileFilter: (_req, file, cb) => {
     const allowedMimes = [
-      'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
       'text/plain', // .txt
     ];
@@ -23,12 +19,12 @@ const upload = multer({
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Formato de arquivo não suportado. Use PDF, DOCX ou TXT.'));
+      cb(new Error('Formato de arquivo não suportado. Use DOCX ou TXT.'));
     }
   },
 });
 
-// Endpoint para extrair texto de PDF, DOCX ou TXT
+// Endpoint para extrair texto de DOCX ou TXT
 router.post('/extract-pdf-text', upload.single('pdf'), async (req, res) => {
   try {
     if (!req.file) {
@@ -48,14 +44,7 @@ router.post('/extract-pdf-text', upload.single('pdf'), async (req, res) => {
     };
 
     // Processar baseado no tipo de arquivo
-    if (req.file.mimetype === 'application/pdf') {
-      // Extrair texto do PDF usando require
-      const pdfParse = require('pdf-parse');
-      const data = await pdfParse(req.file.buffer);
-      extractedText = data.text.trim();
-      metadata.pages = data.numpages;
-      metadata.fileType = 'PDF';
-    } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       // Extrair texto do DOCX
       const result = await mammoth.extractRawText({ buffer: req.file.buffer });
       extractedText = result.value.trim();
