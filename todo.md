@@ -1952,3 +1952,41 @@
 - [x] Renomear variáveis isUploadingPDF para isUploadingFile
 - [x] Renomear função handlePDFUpload para handleFileUpload
 - [x] Atualizar ID do input (pdf-upload → file-upload)
+
+## ✅ Sistema de Gerenciamento de Matrículas - COMPLETO
+
+### Banco de Dados
+- [x] Criar tabela students (id, registrationNumber, fullName, userId, createdAt)
+- [x] Adicionar índice único para registrationNumber por userId
+- [x] Executar migration do banco de dados (via SQL direto)
+
+### Backend (tRPC)
+- [x] Criar funções de banco: createStudent, getStudentsByUser, getStudentById, updateStudent, deleteStudent
+- [x] Implementar rota students.create (com validação)
+- [x] Implementar rota students.list
+- [x] Implementar rota students.update
+- [x] Implementar rota students.delete
+- [x] Implementar rota students.exportDOCX (biblioteca docx)
+- [x] Implementar rota students.exportPDF (biblioteca jspdf)
+- [x] Adicionar validação de matrícula única (constraint no banco)
+
+### Frontend
+- [x] Criar página Students.tsx
+- [x] Implementar formulário de cadastro (matrícula + nome completo)
+- [x] Criar tabela de listagem de alunos com data de cadastro
+- [x] Adicionar busca por matrícula ou nome (filtro em tempo real)
+- [x] Implementar edição de alunos (inline no formulário)
+- [x] Implementar exclusão de alunos (com confirmação)
+- [x] Adicionar botões de exportação (DOCX e PDF com loading)
+- [x] Adicionar rota /students no App.tsx
+- [x] Adicionar link "Gerenciar Matrículas" no menu lateral (com ícone UserPlus)
+
+### Exportação
+- [x] Instalar biblioteca docx (v9.5.1) para geração de DOCX
+- [x] Criar template profissional para lista de alunos em DOCX (com tabela azul)
+- [x] Instalar jspdf e jspdf-autotable para geração de PDF
+- [x] Implementar geração de PDF com autoTable
+- [x] Adicionar cabeçalho com título "Lista de Alunos Matriculados" e data
+- [x] Formatar tabela com 3 colunas: Matrícula, Nome Completo, Data de Cadastro
+- [x] Adicionar rodapé com total de alunos
+- [x] Download automático com nome do arquivo baseado na data

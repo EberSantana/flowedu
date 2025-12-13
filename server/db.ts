@@ -23,6 +23,7 @@ import {
   assignmentSubmissions,
   topicComments,
   notifications,
+  students,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -30,7 +31,8 @@ import {
   InsertScheduledClass,
   InsertCalendarEvent,
   InsertActiveMethodology,
-  InsertClassStatus
+  InsertClassStatus,
+  InsertStudent
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1465,6 +1467,67 @@ export async function deleteNotification(id: number, userId: number) {
     .where(and(
       eq(notifications.id, id),
       eq(notifications.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+// ==================== STUDENTS (MATRÍCULAS) ====================
+
+export async function createStudent(data: InsertStudent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(students).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function getStudentsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select()
+    .from(students)
+    .where(eq(students.userId, userId))
+    .orderBy(desc(students.createdAt));
+}
+
+export async function getStudentById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select()
+    .from(students)
+    .where(and(
+      eq(students.id, id),
+      eq(students.userId, userId)
+    ));
+  
+  return result[0] || null;
+}
+
+export async function updateStudent(id: number, data: Partial<InsertStudent>, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(students)
+    .set(data)
+    .where(and(
+      eq(students.id, id),
+      eq(students.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteStudent(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(students)
+    .where(and(
+      eq(students.id, id),
+      eq(students.userId, userId)
     ));
   
   return { success: true };

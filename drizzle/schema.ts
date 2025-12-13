@@ -407,3 +407,21 @@ export const notifications = mysqlTable("notifications", {
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
+ * Tabela de Alunos (Matrículas)
+ */
+export const students = mysqlTable("students", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Professor responsável
+  registrationNumber: varchar("registrationNumber", { length: 50 }).notNull(), // Matrícula do aluno
+  fullName: varchar("fullName", { length: 255 }).notNull(), // Nome completo do aluno
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  // Índice único: mesma matrícula não pode ser cadastrada duas vezes pelo mesmo professor
+  uniqueRegistration: sql`UNIQUE KEY unique_registration_per_user (userId, registrationNumber)`,
+}));
+
+export type Student = typeof students.$inferSelect;
+export type InsertStudent = typeof students.$inferInsert;

@@ -1815,6 +1815,182 @@ Crie sugestões no formato JSON:
       }),
   }),
 
+  // Students (Matrículas)
+  students: router({
+    create: protectedProcedure
+      .input(z.object({
+        registrationNumber: z.string().min(1, "Matrícula é obrigatória"),
+        fullName: z.string().min(3, "Nome completo é obrigatório"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createStudent({
+          ...input,
+          userId: ctx.user.id,
+        });
+      }),
+    
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getStudentsByUser(ctx.user.id);
+      }),
+    
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentById(input.id, ctx.user.id);
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        registrationNumber: z.string().optional(),
+        fullName: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateStudent(id, data, ctx.user.id);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteStudent(input.id, ctx.user.id);
+      }),
+    
+    exportDOCX: protectedProcedure
+      .query(async ({ ctx }) => {
+        const students = await db.getStudentsByUser(ctx.user.id);
+        
+        // Importar biblioteca docx
+        const { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, AlignmentType, BorderStyle } = await import('docx');
+        
+        // Criar documento
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Lista de Alunos Matriculados",
+                    bold: true,
+                    size: 32,
+                  }),
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 400 },
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Data: ${new Date().toLocaleDateString('pt-BR')}`,
+                    size: 20,
+                  }),
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 400 },
+              }),
+              new Table({
+                width: { size: 100, type: WidthType.PERCENTAGE },
+                rows: [
+                  // Cabeçalho
+                  new TableRow({
+                    children: [
+                      new TableCell({
+                        children: [new Paragraph({ text: "Matrícula", bold: true })],
+                        shading: { fill: "4472C4" },
+                      }),
+                      new TableCell({
+                        children: [new Paragraph({ text: "Nome Completo", bold: true })],
+                        shading: { fill: "4472C4" },
+                      }),
+                      new TableCell({
+                        children: [new Paragraph({ text: "Data de Cadastro", bold: true })],
+                        shading: { fill: "4472C4" },
+                      }),
+                    ],
+                  }),
+                  // Linhas de dados
+                  ...students.map(student => 
+                    new TableRow({
+                      children: [
+                        new TableCell({ children: [new Paragraph(student.registrationNumber)] }),
+                        new TableCell({ children: [new Paragraph(student.fullName)] }),
+                        new TableCell({ children: [new Paragraph(new Date(student.createdAt).toLocaleDateString('pt-BR'))] }),
+                      ],
+                    })
+                  ),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `\n\nTotal de alunos: ${students.length}`,
+                    bold: true,
+                  }),
+                ],
+                spacing: { before: 400 },
+              }),
+            ],
+          }],
+        });
+        
+        // Gerar buffer
+        const buffer = await Packer.toBuffer(doc);
+        
+        // Converter para base64
+        return {
+          data: buffer.toString('base64'),
+          filename: `lista-alunos-${new Date().toISOString().split('T')[0]}.docx`,
+        };
+      }),
+    
+    exportPDF: protectedProcedure
+      .query(async ({ ctx }) => {
+        const students = await db.getStudentsByUser(ctx.user.id);
+        
+        // Usar jsPDF para gerar PDF
+        const { jsPDF } = await import('jspdf');
+        await import('jspdf-autotable');
+        
+        const doc = new jsPDF();
+        
+        // Título
+        doc.setFontSize(18);
+        doc.text('Lista de Alunos Matriculados', 105, 20, { align: 'center' });
+        
+        // Data
+        doc.setFontSize(12);
+        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 105, 30, { align: 'center' });
+        
+        // Tabela
+        (doc as any).autoTable({
+          startY: 40,
+          head: [['Matrícula', 'Nome Completo', 'Data de Cadastro']],
+          body: students.map(s => [
+            s.registrationNumber,
+            s.fullName,
+            new Date(s.createdAt).toLocaleDateString('pt-BR'),
+          ]),
+          theme: 'grid',
+          headStyles: { fillColor: [68, 114, 196] },
+        });
+        
+        // Rodapé
+        const finalY = (doc as any).lastAutoTable.finalY || 40;
+        doc.setFontSize(12);
+        doc.text(`Total de alunos: ${students.length}`, 14, finalY + 10);
+        
+        // Gerar buffer
+        const buffer = Buffer.from(doc.output('arraybuffer'));
+        
+        return {
+          data: buffer.toString('base64'),
+          filename: `lista-alunos-${new Date().toISOString().split('T')[0]}.pdf`,
+        };
+      }),
+  }),
+
   // Notifications
   notifications: router({
     getAll: protectedProcedure

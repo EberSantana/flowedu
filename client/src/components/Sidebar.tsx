@@ -18,7 +18,8 @@ import {
   CheckSquare,
   BarChart3,
   Route,
-  HelpCircle
+  HelpCircle,
+  UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -91,6 +92,11 @@ const navItems: NavItem[] = [
     label: "Tarefas",
     icon: <CheckSquare className="h-5 w-5" />,
     href: "/tasks",
+  },
+  {
+    label: "Gerenciar Matrículas",
+    icon: <UserPlus className="h-5 w-5" />,
+    href: "/students",
   },
   {
     label: "Portal do Aluno",
