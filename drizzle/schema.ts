@@ -220,6 +220,7 @@ export const learningModules = mysqlTable("learning_modules", {
   description: text("description"),
   orderIndex: int("orderIndex").default(0).notNull(),
   userId: int("userId").notNull(),
+  infographicUrl: text("infographic_url"), // URL do infográfico gerado para este módulo
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

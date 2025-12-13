@@ -896,7 +896,7 @@ export async function createLearningModule(data: { subjectId: number; title: str
   return { id: result.insertId, ...data, orderIndex: nextOrder };
 }
 
-export async function updateLearningModule(id: number, data: { title?: string; description?: string }, userId: number) {
+export async function updateLearningModule(id: number, data: { title?: string; description?: string; infographicUrl?: string }, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -1006,6 +1006,27 @@ export async function getLearningTopicById(id: number, userId: number) {
     .where(and(eq(learningTopics.id, id), eq(learningTopics.userId, userId)));
   
   return topics[0] || null;
+}
+
+export async function getLearningModuleById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const modules = await db.select().from(learningModules)
+    .where(and(eq(learningModules.id, id), eq(learningModules.userId, userId)));
+  
+  return modules[0] || null;
+}
+
+export async function getLearningTopicsByModule(moduleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const topics = await db.select().from(learningTopics)
+    .where(and(eq(learningTopics.moduleId, moduleId), eq(learningTopics.userId, userId)))
+    .orderBy(learningTopics.orderIndex);
+  
+  return topics;
 }
 
 // ==================== STUDENT ENROLLMENTS ====================

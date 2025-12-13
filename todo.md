@@ -1890,3 +1890,45 @@
 - [x] Adicionar logs detalhados de debug no console
 - [x] Logs mostram: disciplina selecionada, tamanho da ementa, carga horária
 - [x] Logs de erro específicos para cada validação
+
+## Infográficos Individuais por Módulo
+
+### Backend
+- [ ] Criar rota generateModuleInfographic (recebe moduleId)
+- [ ] Gerar prompt específico para cada módulo
+- [ ] Salvar imageUrl no banco (adicionar campo na tabela modules)
+- [ ] Retornar URL do infográfico gerado
+
+### Frontend
+- [ ] Adicionar botão "Gerar Infográfico" em cada card de módulo
+- [ ] Mostrar thumbnail do infográfico no card quando existir
+- [ ] Modal para visualizar infográfico em tamanho grande
+- [ ] Indicador de loading durante geração
+- [ ] Botão para regenerar infográfico
+
+### Database
+- [ ] Adicionar campo infographicUrl na tabela learning_modules
+- [ ] Executar migration
+
+## ✅ Infográficos Individuais por Módulo - COMPLETO
+
+### Backend
+- [x] Adicionar campo infographicUrl na tabela learning_modules
+- [x] Criar rota generateModuleInfographic no backend
+- [x] Implementar geração de infográfico com IA por módulo
+- [x] Salvar URL do infográfico no módulo
+- [x] Adicionar funções getLearningModuleById e getLearningTopicsByModule no db.ts
+- [x] Atualizar updateLearningModule para aceitar infographicUrl
+
+### Frontend
+- [x] Adicionar botão de gerar infográfico em cada card de módulo (ícone roxo)
+- [x] Implementar função handleGenerateModuleInfographic
+- [x] Implementar mutation generateModuleInfographicMutation
+- [x] Mostrar infográfico gerado (abrir em nova aba)
+- [x] Toast notifications para feedback
+
+### UX
+- [x] Prompt de IA lúdico e colorido para infográficos educacionais
+- [x] Design atrativo para estudantes com ilustrações e ícones
+- [x] Feedback visual durante geração (toast "Gerando...")
+- [x] Botão permite regenerar infográfico a qualquer momento

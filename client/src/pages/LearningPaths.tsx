@@ -195,6 +195,26 @@ export default function LearningPaths() {
       },
     });
 
+  const generateModuleInfographicMutation =
+    trpc.learningPath.generateModuleInfographic.useMutation({
+      onSuccess: data => {
+        utils.learningPath.getBySubject.invalidate();
+        toast.success("Infográfico do módulo gerado com sucesso!");
+        // Abrir infográfico em nova aba
+        if (data.imageUrl) {
+          window.open(data.imageUrl, '_blank');
+        }
+      },
+      onError: error => {
+        toast.error("Erro ao gerar infográfico: " + error.message);
+      },
+    });
+
+  const handleGenerateModuleInfographic = (moduleId: number) => {
+    toast.info("Gerando infográfico do módulo...");
+    generateModuleInfographicMutation.mutate({ moduleId });
+  };
+
   // Função para fazer upload de arquivo (PDF, DOCX, TXT) e extrair texto
   const handlePDFUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -697,6 +717,14 @@ export default function LearningPaths() {
                               <Badge variant="outline">
                                 {module.topics?.length || 0} tópico(s)
                               </Badge>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleGenerateModuleInfographic(module.id)}
+                                title="Gerar Infográfico do Módulo"
+                              >
+                                <ImageIcon className="h-4 w-4 text-purple-500" />
+                              </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"

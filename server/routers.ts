@@ -1411,6 +1411,51 @@ ${pathDescription}`;
         return { imageUrl: result.url };
       }),
     
+    generateModuleInfographic: protectedProcedure
+      .input(z.object({ moduleId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { generateImage } = await import('./_core/imageGeneration');
+        const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
+        
+        if (!module) {
+          throw new Error('Módulo não encontrado');
+        }
+        
+        const topics = await db.getLearningTopicsByModule(input.moduleId, ctx.user.id);
+        
+        let moduleDescription = `Módulo: ${module.title}\n`;
+        if (module.description) {
+          moduleDescription += `Descrição: ${module.description}\n\n`;
+        }
+        moduleDescription += `Tópicos:\n`;
+        topics.forEach((topic, idx) => {
+          moduleDescription += `${idx + 1}. ${topic.title}\n`;
+        });
+        
+        const prompt = `Crie um infográfico visual moderno, lúdico e educacional para um módulo de aprendizagem. O infográfico deve:
+
+- Ter design colorido e atrativo para estudantes
+- Usar ilustrações e ícones educacionais divertidos
+- Ter fundo com gradiente suave ou textura sutil
+- Incluir o título do módulo em destaque no topo
+- Mostrar os tópicos de forma visual e organizada
+- Usar elementos gráficos como setas, linhas conectoras, badges
+- Ter aspecto lúdico e engajador
+- Tamanho: 1200x800 pixels
+
+Conteúdo do módulo:
+${moduleDescription}
+
+Crie um infográfico que torne o aprendizado visual e divertido!`;
+        
+        const result = await generateImage({ prompt });
+        
+        // Salvar URL do infográfico no módulo
+        await db.updateLearningModule(input.moduleId, { infographicUrl: result.url }, ctx.user.id);
+        
+        return { imageUrl: result.url };
+      }),
+    
     suggestLessonPlans: protectedProcedure
       .input(z.object({ topicId: z.number() }))
       .mutation(async ({ ctx, input }) => {
