@@ -25,6 +25,8 @@ import TopicMaterialsManager from "./pages/TopicMaterialsManager";
 import Students from "./pages/Students";
 import StudentProfile from "./pages/StudentProfile";
 import SubjectEnrollments from "./pages/SubjectEnrollments";
+import PortalChoice from "./pages/PortalChoice";
+import StudentLogin from "./pages/StudentLogin";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -33,7 +35,9 @@ function Router() {
   return (
     <>
       <Switch>
-        <Route path={"/"} component={Dashboard} />
+        <Route path={"/"} component={PortalChoice} />
+        <Route path={"/student-login"} component={StudentLogin} />
+        <Route path={"dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
         <Route path={"/classes"} component={Classes} />
         <Route path={"/shifts"} component={Shifts} />
@@ -46,7 +50,7 @@ function Router() {
         <Route path={"/tasks"} component={Tasks} />
         <Route path={"/profile"} component={Profile} />
         <Route path={"/admin/users"} component={AdminUsers} />
-        <Route path={"/student/dashboard"} component={StudentDashboard} />
+        <Route path={"/student-dashboard"} component={StudentDashboard} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />

@@ -43,3 +43,20 @@ export const adminProcedure = t.procedure.use(
     });
   }),
 );
+
+const requireStudent = t.middleware(async opts => {
+  const { ctx, next } = opts;
+
+  if (!ctx.studentSession) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Acesso restrito a alunos" });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      studentSession: ctx.studentSession,
+    },
+  });
+});
+
+export const studentProcedure = t.procedure.use(requireStudent);

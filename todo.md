@@ -2118,3 +2118,44 @@
 - [x] Implementar exportação DOCX (matrícula + nome + data) com tabela formatada
 - [x] Implementar exportação PDF (matrícula + nome + data) com jsPDF
 - [x] Adicionar 3 botões de exportação na página (XLS, DOCX, PDF)
+
+
+## 🎯 Sistema de Portais Separados (Aluno vs Professor) - EM ANDAMENTO
+
+### Fase 1: Planejamento
+- [x] Definir estrutura de autenticação dual (OAuth professor + matrícula aluno)
+- [x] Planejar campo userType no contexto (student/teacher)
+- [x] Definir rotas protegidas por tipo de usuário
+- [x] Planejar estrutura do Dashboard do Aluno
+
+### Fase 2: Backend - Autenticação de Alunos
+- [x] Criar rota tRPC auth.loginStudent (matrícula + senha)
+- [x] Implementar validação de matrícula no banco
+- [x] Criar sessão JWT para alunos (incluir userType: 'student')
+- [x] Adicionar middleware de verificação de tipo de usuário
+
+### Fase 3: Frontend - Tela de Login Dual
+- [x] Criar página PortalChoice.tsx (escolha entre Aluno e Professor)
+- [x] Criar página StudentLogin.tsx (login por matrícula)
+- [x] Atualizar App.tsx com novas rotas de login
+- [x] Implementar redirecionamento baseado em userType
+
+### Fase 4: Dashboard do Aluno
+- [x] Criar página StudentDashboard.tsx
+- [x] Mostrar disciplinas matriculadas
+- [ ] Exibir frequência por disciplina (futuro)
+- [ ] Mostrar próximas aulas (futuro)
+- [ ] Adicionar avisos/notificações (futuro)
+
+### Fase 5: Controle de Acesso
+- [ ] Proteger rotas administrativas (apenas professores)
+- [ ] Criar HOC ProtectedRoute com verificação de userType
+- [ ] Atualizar Sidebar para esconder itens admin quando aluno
+- [ ] Adicionar redirecionamento automático se acesso negado
+
+### Fase 6: Testes e Validação
+- [ ] Testar login de aluno com matrícula válida
+- [ ] Testar login de professor com OAuth
+- [ ] Validar controle de acesso (aluno não acessa rotas admin)
+- [ ] Testar dashboard do aluno com dados reais
+- [ ] Criar checkpoint final

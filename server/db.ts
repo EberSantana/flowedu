@@ -1536,6 +1536,17 @@ export async function deleteStudent(id: number, userId: number) {
   return { success: true };
 }
 
+export async function getStudentByRegistration(registrationNumber: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select()
+    .from(students)
+    .where(eq(students.registrationNumber, registrationNumber));
+  
+  return result[0] || null;
+}
+
 // ==================== STUDENT PROFILE FUNCTIONS ====================
 
 export async function getStudentProfile(studentId: number, userId: number) {

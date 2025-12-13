@@ -1,11 +1,13 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME } from "../shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, studentProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import { tasks } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
+import jwt from "jsonwebtoken";
+import { ENV } from "./_core/env";
 
 export const appRouter = router({
   system: systemRouter,
@@ -18,6 +20,52 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    
+    // Login de Aluno (por matrícula)
+    loginStudent: publicProcedure
+      .input(z.object({
+        registrationNumber: z.string().min(1),
+        password: z.string().min(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Buscar aluno pela matrícula
+        const student = await db.getStudentByRegistration(input.registrationNumber);
+        
+        if (!student) {
+          throw new Error("Matrícula não encontrada");
+        }
+        
+        // Validar senha (senha = matrícula)
+        if (input.password !== student.registrationNumber) {
+          throw new Error("Senha incorreta");
+        }
+        
+        // Criar sessão JWT para aluno
+        const token = jwt.sign(
+          {
+            userType: 'student',
+            studentId: student.id,
+            registrationNumber: student.registrationNumber,
+            fullName: student.fullName,
+            professorId: student.userId,
+          },
+          ENV.cookieSecret,
+          { expiresIn: '7d' }
+        );
+        
+        // Configurar cookie de sessão
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        
+        return {
+          success: true,
+          student: {
+            id: student.id,
+            registrationNumber: student.registrationNumber,
+            fullName: student.fullName,
+          },
+        };
+      }),
   }),
 
   subjects: router({
@@ -1580,9 +1628,9 @@ Crie sugestões no formato JSON:
 
   // Student Portal Routes
   student: router({
-    getEnrolledSubjects: protectedProcedure
+    getEnrolledSubjects: studentProcedure
       .query(async ({ ctx }) => {
-        const enrollments = await db.getStudentEnrollments(ctx.user.id);
+        const enrollments = await db.getStudentEnrollments(ctx.studentSession.studentId);
         const subjectsWithDetails = await Promise.all(
           enrollments.map(async (enrollment) => {
             const subject = await db.getSubjectById(enrollment.subjectId, enrollment.professorId);
@@ -1597,7 +1645,7 @@ Crie sugestões no formato JSON:
         return subjectsWithDetails;
       }),
     
-    getSubjectLearningPath: protectedProcedure
+    getSubjectLearningPath: studentProcedure
       .input(z.object({ subjectId: z.number(), professorId: z.number() }))
       .query(async ({ ctx, input }) => {
         const learningPath = await db.getLearningPathBySubject(input.subjectId, input.professorId);
@@ -1607,7 +1655,7 @@ Crie sugestões no formato JSON:
           learningPath.map(async (module) => {
             const topicsWithProgress = await Promise.all(
               (module.topics || []).map(async (topic: any) => {
-                const progress = await db.getStudentTopicProgress(ctx.user.id, topic.id);
+                const progress = await db.getStudentTopicProgress(ctx.studentSession.studentId, topic.id);
                 return {
                   ...topic,
                   studentProgress: progress,
@@ -1624,7 +1672,7 @@ Crie sugestões no formato JSON:
         return pathWithProgress;
       }),
     
-    updateTopicProgress: protectedProcedure
+    updateTopicProgress: studentProcedure
       .input(z.object({
         topicId: z.number(),
         status: z.enum(['not_started', 'in_progress', 'completed']).optional(),
@@ -1633,7 +1681,7 @@ Crie sugestões no formato JSON:
       }))
       .mutation(async ({ ctx, input }) => {
         return await db.updateStudentTopicProgress({
-          studentId: ctx.user.id,
+          studentId: ctx.studentSession.studentId,
           ...input,
         });
       }),
