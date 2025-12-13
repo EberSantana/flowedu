@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { GraduationCap, Users } from "lucide-react";
+import { getLoginUrl } from "@/const";
 
 export default function PortalChoice() {
   return (
@@ -48,7 +49,7 @@ export default function PortalChoice() {
           </Link>
 
           {/* Portal do Professor */}
-          <Link href="/login">
+          <a href={getLoginUrl()}>
             <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-purple-400">
               <div className="flex flex-col items-center text-center space-y-6">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
@@ -75,7 +76,7 @@ export default function PortalChoice() {
                 </div>
               </div>
             </div>
-          </Link>
+          </a>
         </div>
 
         {/* Footer */}

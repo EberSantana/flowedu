@@ -37,7 +37,7 @@ function Router() {
       <Switch>
         <Route path={"/"} component={PortalChoice} />
         <Route path={"/student-login"} component={StudentLogin} />
-        <Route path={"dashboard"} component={Dashboard} />
+        <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
         <Route path={"/classes"} component={Classes} />
         <Route path={"/shifts"} component={Shifts} />

@@ -2159,3 +2159,12 @@
 - [ ] Validar controle de acesso (aluno não acessa rotas admin)
 - [ ] Testar dashboard do aluno com dados reais
 - [ ] Criar checkpoint final
+
+
+## 🔧 Ajuste: Portal do Professor com Login OAuth Tradicional
+
+- [x] Atualizar PortalChoice.tsx para usar getLoginUrl() no botão do professor
+- [x] Remover rota /login desnecessária (usar OAuth direto)
+- [x] Ajustar rota raiz (/) no App.tsx para Dashboard quando autenticado
+- [x] Testar fluxo: tela inicial → OAuth → Dashboard do Professor
+- [ ] Criar checkpoint final
