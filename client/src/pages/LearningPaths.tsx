@@ -971,7 +971,7 @@ export default function LearningPaths() {
 
           {/* AI Generation Dialog */}
           <Dialog open={isAIDialogOpen} onOpenChange={setIsAIDialogOpen}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-purple-500" />
@@ -1070,14 +1070,23 @@ export default function LearningPaths() {
                 </Button>
                 <Button
                   onClick={() => {
+                    console.log('[Gerar Trilha] Botão clicado');
+                    console.log('[Gerar Trilha] selectedSubjectId:', selectedSubjectId);
+                    console.log('[Gerar Trilha] syllabusText length:', syllabusText.length);
+                    console.log('[Gerar Trilha] workload:', workload);
+                    
                     if (!selectedSubjectId) {
+                      console.error('[Gerar Trilha] Erro: Nenhuma disciplina selecionada');
                       toast.error("Selecione uma disciplina primeiro");
                       return;
                     }
                     if (!syllabusText.trim()) {
+                      console.error('[Gerar Trilha] Erro: Ementa vazia');
                       toast.error("Digite a ementa da disciplina");
                       return;
                     }
+                    
+                    console.log('[Gerar Trilha] Iniciando geração...');
                     generateFromAIMutation.mutate({
                       subjectId: selectedSubjectId,
                       syllabusText: syllabusText.trim(),

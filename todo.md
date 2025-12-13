@@ -1875,3 +1875,18 @@
 - [x] Substituir import dinâmico por require tradicional
 - [x] Reiniciar servidor
 - [x] Solução: `const require = createRequire(import.meta.url)`
+
+## ✅ Correção do Dialog de Geração de Trilhas - COMPLETO
+
+### Problemas Identificados
+- [x] Dialog cortando conteúdo (não dava para ver botão "Gerar Trilha")
+- [x] Botão "Gerar Trilha" pode não estar respondendo
+- [x] Faltava scroll no dialog quando conteúdo é grande
+
+### Soluções Implementadas
+- [x] Adicionar max-height (90vh) e overflow-y: auto no DialogContent
+- [x] Dialog agora rola e mostra todo o conteúdo
+- [x] Botão "Gerar Trilha" sempre visível no rodapé
+- [x] Adicionar logs detalhados de debug no console
+- [x] Logs mostram: disciplina selecionada, tamanho da ementa, carga horária
+- [x] Logs de erro específicos para cada validação
