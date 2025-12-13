@@ -1844,3 +1844,10 @@
 - [x] Atualizar texto do botão ("Fazer Upload de Arquivo")
 - [x] Atualizar instruções ("PDF, DOCX ou TXT")
 - [x] Mensagens de sucesso personalizadas por formato
+
+## ✅ Correção de Erro - Import pdf-parse - COMPLETO
+
+- [x] Corrigir import do pdf-parse no backend (usar import dinâmico)
+- [x] Usar `await import('pdf-parse')` sem .default
+- [x] Reiniciar servidor
+- [x] Erro resolvido - servidor rodando sem erros
