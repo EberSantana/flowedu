@@ -1,11 +1,7 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import multer from 'multer';
 import * as pdfParse from 'pdf-parse';
-
-// Estender tipo Request para incluir file do multer
-interface MulterRequest extends Request {
-  file?: any;
-}
+import mammoth from 'mammoth';
 
 const router = express.Router();
 
@@ -13,58 +9,83 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB max
+    fileSize: 10 * 1024 * 1024, // 10MB
   },
-  fileFilter: (req: any, file: any, cb: any) => {
-    if (file.mimetype === 'application/pdf') {
+  fileFilter: (_req, file, cb) => {
+    const allowedMimes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'text/plain', // .txt
+    ];
+    
+    if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Apenas arquivos PDF são permitidos'));
+      cb(new Error('Formato de arquivo não suportado. Use PDF, DOCX ou TXT.'));
     }
   },
 });
 
-// Endpoint para extrair texto de PDF
-router.post('/extract-pdf-text', upload.single('pdf'), async (req: MulterRequest, res: Response) => {
+// Endpoint para extrair texto de PDF, DOCX ou TXT
+router.post('/extract-pdf-text', upload.single('pdf'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ 
-        error: 'Nenhum arquivo enviado',
-        message: 'Por favor, envie um arquivo PDF' 
+      return res.status(400).json({
+        success: false,
+        message: 'Nenhum arquivo foi enviado',
       });
     }
 
-    console.log('[PDF Extract] Processing file:', req.file.originalname, 'Size:', req.file.size);
+    console.log('[File Extract] Processing file:', req.file.originalname, 'Type:', req.file.mimetype, 'Size:', req.file.size);
 
-    // Extrair texto do PDF
-    const data = await (pdfParse as any).default(req.file.buffer);
+    let extractedText = '';
+    let metadata: any = {
+      filename: req.file.originalname,
+      size: req.file.size,
+      mimeType: req.file.mimetype,
+    };
 
-    const extractedText = data.text.trim();
+    // Processar baseado no tipo de arquivo
+    if (req.file.mimetype === 'application/pdf') {
+      // Extrair texto do PDF
+      const data = await (pdfParse as any).default(req.file.buffer);
+      extractedText = data.text.trim();
+      metadata.pages = data.numpages;
+      metadata.fileType = 'PDF';
+    } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      // Extrair texto do DOCX
+      const result = await mammoth.extractRawText({ buffer: req.file.buffer });
+      extractedText = result.value.trim();
+      metadata.fileType = 'DOCX';
+      
+      if (result.messages.length > 0) {
+        console.log('[File Extract] Mammoth warnings:', result.messages);
+      }
+    } else if (req.file.mimetype === 'text/plain') {
+      // Extrair texto do TXT
+      extractedText = req.file.buffer.toString('utf-8').trim();
+      metadata.fileType = 'TXT';
+    }
 
     if (!extractedText) {
       return res.status(400).json({
-        error: 'PDF vazio',
-        message: 'Não foi possível extrair texto do PDF. O arquivo pode estar vazio ou ser uma imagem escaneada.'
+        success: false,
+        message: 'Não foi possível extrair texto do arquivo. O arquivo pode estar vazio ou corrompido.',
       });
     }
 
-    console.log('[PDF Extract] Success! Extracted', extractedText.length, 'characters');
+    console.log('[File Extract] Success! Extracted', extractedText.length, 'characters');
 
     return res.json({
       success: true,
       text: extractedText,
-      metadata: {
-        pages: data.numpages,
-        filename: req.file.originalname,
-        size: req.file.size,
-      },
+      metadata,
     });
   } catch (error: any) {
-    console.error('[PDF Extract] Error:', error);
-    
+    console.error('[File Extract] Error:', error);
     return res.status(500).json({
-      error: 'Erro ao processar PDF',
-      message: error.message || 'Ocorreu um erro ao extrair o texto do PDF. Tente novamente.',
+      success: false,
+      message: error.message || 'Erro ao processar arquivo',
     });
   }
 });

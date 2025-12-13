@@ -1825,3 +1825,22 @@
 - [x] Input limpo após upload para permitir novo upload
 - [x] Opção de colar texto manualmente mantida
 - [x] Mensagem de sucesso com número de páginas extraídas
+
+## ✅ Suporte a Múltiplos Formatos de Upload (.docx, .txt) - COMPLETO
+
+### Backend
+- [x] Instalar biblioteca mammoth para extração de .docx
+- [x] Atualizar endpoint para detectar tipo de arquivo (mimetype)
+- [x] Implementar extração de texto para .docx (mammoth.extractRawText)
+- [x] Implementar extração de texto para .txt (buffer.toString)
+- [x] Atualizar validações (aceitar PDF, DOCX, TXT)
+- [x] Adicionar metadata.fileType para identificar formato
+- [x] Tratamento de erros específico por formato
+
+### Frontend
+- [x] Atualizar accept do input file para múltiplos formatos (.pdf,.docx,.txt)
+- [x] Atualizar validação client-side (array de allowedTypes)
+- [x] Atualizar mensagens de feedback (personalizada por tipo)
+- [x] Atualizar texto do botão ("Fazer Upload de Arquivo")
+- [x] Atualizar instruções ("PDF, DOCX ou TXT")
+- [x] Mensagens de sucesso personalizadas por formato

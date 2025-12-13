@@ -194,14 +194,20 @@ export default function LearningPaths() {
       },
     });
 
-  // Função para fazer upload de PDF e extrair texto
+  // Função para fazer upload de arquivo (PDF, DOCX, TXT) e extrair texto
   const handlePDFUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validar tipo de arquivo
-    if (file.type !== 'application/pdf') {
-      toast.error('Por favor, selecione um arquivo PDF');
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'text/plain', // .txt
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Por favor, selecione um arquivo PDF, DOCX ou TXT');
       return;
     }
 
@@ -240,7 +246,18 @@ export default function LearningPaths() {
       
       if (data.success && data.text) {
         setSyllabusText(data.text);
-        toast.success(`Texto extraído com sucesso! (${data.metadata.pages} páginas)`);
+        
+        // Mensagem personalizada baseada no tipo de arquivo
+        let successMessage = 'Texto extraído com sucesso!';
+        if (data.metadata.fileType === 'PDF' && data.metadata.pages) {
+          successMessage += ` (${data.metadata.pages} páginas)`;
+        } else if (data.metadata.fileType === 'DOCX') {
+          successMessage += ' (Documento Word)';
+        } else if (data.metadata.fileType === 'TXT') {
+          successMessage += ' (Arquivo de texto)';
+        }
+        
+        toast.success(successMessage);
       } else {
         throw new Error('Não foi possível extrair texto do PDF');
       }
@@ -991,7 +1008,7 @@ export default function LearningPaths() {
                   <div className="mb-3 flex items-center gap-2">
                     <input
                       type="file"
-                      accept=".pdf"
+                      accept=".pdf,.docx,.txt"
                       onChange={handlePDFUpload}
                       disabled={isUploadingPDF}
                       className="hidden"
@@ -1014,13 +1031,13 @@ export default function LearningPaths() {
                         ) : (
                           <>
                             <Upload className="w-4 h-4 mr-2" />
-                            Fazer Upload de PDF
+                            Fazer Upload de Arquivo
                           </>
                         )}
                       </Button>
                     </label>
                     <span className="text-xs text-muted-foreground">
-                      ou cole o texto manualmente abaixo
+                      (PDF, DOCX ou TXT) ou cole o texto manualmente
                     </span>
                   </div>
 
@@ -1029,7 +1046,7 @@ export default function LearningPaths() {
                     <div className="mb-3">
                       <Progress value={uploadProgress} className="h-2" />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Extraindo texto do PDF... {uploadProgress}%
+                        Extraindo texto do arquivo... {uploadProgress}%
                       </p>
                     </div>
                   )}
