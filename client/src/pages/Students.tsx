@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Search, UserPlus, Download, FileText, Eye } from 'lucide-react';
+import DashboardLayout from '../components/DashboardLayout';
 
 type Student = {
   id: number;
@@ -147,8 +148,8 @@ export default function Students() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="container mx-auto py-8 px-4 lg:ml-64">
+    <DashboardLayout>
+      <div className="container mx-auto py-8 px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Gerenciar Matrículas</h1>
           <p className="text-gray-600">Cadastre e gerencie os alunos matriculados</p>
@@ -329,6 +330,6 @@ export default function Students() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

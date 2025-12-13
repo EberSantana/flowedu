@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, Calendar, TrendingUp, BookOpen, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import DashboardLayout from "../components/DashboardLayout";
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -50,19 +51,22 @@ export default function StudentProfile() {
 
   if (profileLoading || attendanceLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
+      <DashboardLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando perfil do aluno...</p>
+            <p className="mt-4 text-gray-600">Carregando perfil do aluno...</p>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   if (!profile || !profile.student) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <Card className="max-w-md">
+      <DashboardLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Card className="max-w-md">
           <CardHeader>
             <CardTitle className="text-red-600">Aluno não encontrado</CardTitle>
             <CardDescription>O aluno solicitado não existe ou você não tem permissão para visualizá-lo.</CardDescription>
@@ -72,9 +76,10 @@ export default function StudentProfile() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar para Gerenciar Matrículas
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
     );
   }
 
@@ -120,8 +125,8 @@ export default function StudentProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="container mx-auto py-8 px-4 lg:ml-64">
+    <DashboardLayout>
+      <div className="container mx-auto py-8 px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -369,6 +374,6 @@ export default function StudentProfile() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

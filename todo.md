@@ -2017,3 +2017,11 @@
 - [x] Seção de histórico de frequência (tabela com data, turma, status, observações)
 - [x] Adicionar rota /students/:id no App.tsx
 - [x] Adicionar link "Ver Perfil" (botão verde com ícone Eye) na listagem de alunos
+
+## ✅ Ajuste de Layout - Gerenciar Matrículas - COMPLETO
+
+- [x] Ajustar Students.tsx para usar DashboardLayout
+- [x] Remover background gradient customizado
+- [x] Remover padding/margin customizado (lg:ml-64)
+- [x] Ajustar StudentProfile.tsx para usar DashboardLayout
+- [x] Garantir consistência visual com outras páginas do sistema
