@@ -24,6 +24,7 @@ import ManageEnrollments from "./pages/ManageEnrollments";
 import TopicMaterialsManager from "./pages/TopicMaterialsManager";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
+import OfflineIndicator from "./components/OfflineIndicator";
 
 function Router() {
   return (
@@ -49,6 +50,7 @@ function Router() {
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>
+      <OfflineIndicator />
       <BibleFooter />
       <InstallPWA />
     </>

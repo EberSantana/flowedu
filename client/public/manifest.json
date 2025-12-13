@@ -1,12 +1,12 @@
 {
   "name": "Sistema de Gestão para Professores",
   "short_name": "Gestão Professores",
-  "description": "Sistema completo de gestão de tempo e horários para professores",
+  "description": "Sistema completo de gestão de tempo, disciplinas, trilhas de aprendizagem e acompanhamento de alunos para professores",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3B82F6",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "scope": "/",
   "icons": [
     {
@@ -29,37 +29,29 @@
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "Acessar dashboard principal",
-      "url": "/",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Disciplinas",
+      "short_name": "Disciplinas",
+      "description": "Gerenciar disciplinas",
+      "url": "/subjects",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Grade Semanal",
       "short_name": "Grade",
       "description": "Ver grade de horários",
       "url": "/schedule",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Calendário",
-      "short_name": "Calendário",
-      "description": "Ver eventos e prazos",
-      "url": "/calendar",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Trilhas de Aprendizagem",
+      "short_name": "Trilhas",
+      "description": "Acessar trilhas de aprendizagem",
+      "url": "/learning-paths",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

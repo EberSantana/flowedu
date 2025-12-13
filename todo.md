@@ -1750,3 +1750,41 @@
 - [x] Melhorar tipografia e hierarquia visual (tamanhos reduzidos, badge com bg-primary/5)
 - [x] Garantir responsividade (text-base md:text-lg)
 - [x] Manter consistência com o design geral (border-gray-200, cores neutras)
+
+## ✅ Progressive Web App (PWA) - Modo Offline - COMPLETO
+
+### Manifest e Configuração
+- [x] Melhorar manifest.json com metadados completos do app
+- [x] Ícones já existentes em múltiplos tamanhos (192x192, 512x512)
+- [x] Configurar tema (#3B82F6) e cores do app
+- [x] Adicionar shortcuts para acesso rápido (Dashboard, Disciplinas, Grade, Trilhas)
+- [x] Configurar orientação "any" para suportar todos os dispositivos
+- [x] Adicionar categorias (education, productivity, utilities)
+
+### Service Worker
+- [x] Criar service worker com estratégias avançadas de cache (v1.1.0)
+- [x] Implementar cache de assets estáticos (CSS, JS, imagens) - Cache-First
+- [x] Implementar cache de rotas da aplicação - Stale-While-Revalidate
+- [x] Implementar estratégia Network-First para API com fallback
+- [x] Adicionar página offline HTML personalizada com design bonito
+- [x] Implementar RUNTIME_CACHE separado para conteúdo dinâmico
+- [x] Adicionar limpeza automática de caches antigos
+- [x] Suporte a mensagens do cliente (SKIP_WAITING, CACHE_URLS, CLEAR_CACHE)
+
+### Funcionalidades Offline
+- [x] Criar componente OfflineIndicator para detecção de status
+- [x] Adicionar banner amarelo informando modo offline
+- [x] Toast notifications para transições online/offline
+- [x] Implementar Background Sync API para sincronização automática
+- [x] Sincronizar automaticamente ao voltar online (evento 'online')
+- [x] Estrutura preparada para IndexedDB (placeholder implementado)
+- [x] Mensagens do Service Worker para notificar sincronização completa
+
+### Instalação e UX
+- [x] Componente InstallPWA já existente e funcional
+- [x] Prompt customizado de instalação com design atraente
+- [x] Delay de 10 segundos antes de mostrar prompt (UX não intrusiva)
+- [x] LocalStorage para lembrar se usuário dispensou instalação
+- [x] Detecção se app já está instalado (display-mode: standalone)
+- [x] Service Worker registrado no main.tsx com auto-update a cada 1h
+- [x] Display mode "standalone" para experiência de app nativo
