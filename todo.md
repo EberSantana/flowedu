@@ -2212,3 +2212,25 @@
 - [ ] Testar importação com PDF formatado
 - [ ] Testar importação com DOCX formatado
 - [ ] Criar checkpoint final
+
+
+## 🎓 Melhoria: Importação Direta para Disciplina
+
+### Backend
+- [x] Criar rota tRPC students.importAndEnrollInSubject
+- [x] Verificar se aluno existe por matrícula
+- [x] Criar aluno se não existir
+- [x] Matricular aluno na disciplina (evitar duplicatas)
+- [x] Retornar relatório: criados, matriculados, erros
+
+### Frontend
+- [x] Adicionar prop subjectId ao ImportStudentsModal
+- [x] Atualizar modal para usar nova rota quando subjectId existir
+- [x] Ajustar mensagens de feedback (criados + matriculados)
+- [x] Passar subjectId da página SubjectEnrollments para o modal
+
+### Testes
+- [ ] Testar importação com alunos novos (criar + matricular)
+- [ ] Testar importação com alunos existentes (apenas matricular)
+- [ ] Testar duplicatas na mesma importação
+- [ ] Criar checkpoint final

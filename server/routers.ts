@@ -2168,6 +2168,57 @@ Crie sugestões no formato JSON:
           filename: 'template-importacao-alunos.xlsx',
         };
       }),
+    
+    // Importação e matrícula direta em disciplina
+    importAndEnrollInSubject: protectedProcedure
+      .input(z.object({
+        students: z.array(z.object({
+          registrationNumber: z.string(),
+          fullName: z.string(),
+        })),
+        subjectId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const results = {
+          created: [] as string[],
+          enrolled: [] as string[],
+          errors: [] as string[],
+        };
+        
+        for (const studentData of input.students) {
+          try {
+            // Verificar se aluno já existe
+            let student = await db.getStudentByRegistration(studentData.registrationNumber);
+            
+            // Criar aluno se não existir
+            if (!student) {
+              student = await db.createStudent({
+                registrationNumber: studentData.registrationNumber,
+                fullName: studentData.fullName,
+                userId: ctx.user.id,
+              });
+              results.created.push(`${studentData.fullName} (${studentData.registrationNumber})`);
+            }
+            
+            // Verificar se já está matriculado na disciplina
+            const enrolledStudents = await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+            const alreadyEnrolled = enrolledStudents.some(e => e.studentId === student!.id);
+            
+            if (alreadyEnrolled) {
+              results.errors.push(`${studentData.fullName} já está matriculado nesta disciplina`);
+              continue;
+            }
+            
+            // Matricular na disciplina
+            await db.enrollStudentInSubject(student.id, input.subjectId, ctx.user.id);
+            results.enrolled.push(`${studentData.fullName} (${studentData.registrationNumber})`);
+          } catch (error: any) {
+            results.errors.push(`Erro com ${studentData.fullName}: ${error.message}`);
+          }
+        }
+        
+        return results;
+      }),
   }),
 
   // Notifications

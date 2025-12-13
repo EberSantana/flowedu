@@ -399,6 +399,7 @@ export default function SubjectEnrollments() {
           open={isImportModalOpen}
           onOpenChange={setIsImportModalOpen}
           onSuccess={() => refetch()}
+          subjectId={subjectId}
         />
       </div>
     </DashboardLayout>

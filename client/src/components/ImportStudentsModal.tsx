@@ -11,6 +11,7 @@ interface ImportStudentsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  subjectId?: number; // Opcional: se fornecido, matricula na disciplina
 }
 
 interface ParsedStudent {
@@ -18,7 +19,7 @@ interface ParsedStudent {
   fullName: string;
 }
 
-export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: ImportStudentsModalProps) {
+export default function ImportStudentsModal({ open, onOpenChange, onSuccess, subjectId }: ImportStudentsModalProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedStudent[] | null>(null);
@@ -27,6 +28,7 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
 
   const parseFileMutation = trpc.students.parseImportFile.useMutation();
   const confirmImportMutation = trpc.students.confirmImport.useMutation();
+  const importAndEnrollMutation = trpc.students.importAndEnrollInSubject.useMutation();
   const downloadTemplateMutation = trpc.students.downloadTemplate.useMutation();
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -103,22 +105,54 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
     if (!parsedData || parsedData.length === 0) return;
 
     try {
-      const result = await confirmImportMutation.mutateAsync({
-        students: parsedData,
-      });
+      // Se subjectId for fornecido, usa rota de importação + matrícula
+      if (subjectId) {
+        const result = await importAndEnrollMutation.mutateAsync({
+          students: parsedData,
+          subjectId,
+        });
 
-      if (result.success.length > 0) {
-        toast.success(`${result.success.length} aluno(s) importado(s) com sucesso!`);
-      }
+        const totalSuccess = result.created.length + result.enrolled.length;
+        
+        if (totalSuccess > 0) {
+          const messages = [];
+          if (result.created.length > 0) {
+            messages.push(`${result.created.length} aluno(s) criado(s)`);
+          }
+          if (result.enrolled.length > 0) {
+            messages.push(`${result.enrolled.length} matriculado(s)`);
+          }
+          toast.success(messages.join(', '));
+        }
 
-      if (result.errors.length > 0) {
-        toast.warning(`${result.errors.length} erro(s) durante importação`);
-        setParseErrors(result.errors);
-      }
+        if (result.errors.length > 0) {
+          toast.warning(`${result.errors.length} erro(s) durante importação`);
+          setParseErrors(result.errors);
+        }
 
-      if (result.success.length > 0) {
-        onSuccess();
-        handleClose();
+        if (totalSuccess > 0) {
+          onSuccess();
+          handleClose();
+        }
+      } else {
+        // Rota original: apenas criar alunos
+        const result = await confirmImportMutation.mutateAsync({
+          students: parsedData,
+        });
+
+        if (result.success.length > 0) {
+          toast.success(`${result.success.length} aluno(s) importado(s) com sucesso!`);
+        }
+
+        if (result.errors.length > 0) {
+          toast.warning(`${result.errors.length} erro(s) durante importação`);
+          setParseErrors(result.errors);
+        }
+
+        if (result.success.length > 0) {
+          onSuccess();
+          handleClose();
+        }
       }
     } catch (error: any) {
       toast.error(`Erro ao importar: ${error.message}`);
@@ -170,7 +204,10 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
         <DialogHeader>
           <DialogTitle>Importar Alunos em Massa</DialogTitle>
           <DialogDescription>
-            Faça upload de um arquivo Excel (.xlsx), PDF ou DOCX contendo matrícula e nome completo dos alunos
+            {subjectId 
+              ? "Faça upload de um arquivo Excel (.xlsx), PDF ou DOCX. Os alunos serão criados (se necessário) e matriculados automaticamente nesta disciplina."
+              : "Faça upload de um arquivo Excel (.xlsx), PDF ou DOCX contendo matrícula e nome completo dos alunos"
+            }
           </DialogDescription>
         </DialogHeader>
 
