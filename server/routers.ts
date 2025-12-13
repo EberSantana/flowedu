@@ -1376,7 +1376,7 @@ Diretrizes OBRIGATÓRIAS:
     generateInfographic: protectedProcedure
       .input(z.object({ subjectId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const { generatePathInfographic } = await import('./infographic-renderer');
+        const { generateImage } = await import('./_core/imageGeneration');
         const learningPath = await db.getLearningPathBySubject(input.subjectId, ctx.user.id);
         
         if (!learningPath || learningPath.length === 0) {
@@ -1385,27 +1385,36 @@ Diretrizes OBRIGATÓRIAS:
         
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
         
-        if (!subject) {
-          throw new Error('Disciplina não encontrada');
-        }
+        let pathDescription = `Disciplina: ${subject?.name}\n\n`;
+        learningPath.forEach((module, idx) => {
+          pathDescription += `Módulo ${idx + 1}: ${module.title}\n`;
+          if (module.topics) {
+            module.topics.forEach((topic: any, topicIdx: number) => {
+              pathDescription += `  ${idx + 1}.${topicIdx + 1} ${topic.title}\n`;
+            });
+          }
+        });
         
-        // Preparar dados para o template
-        const pathData = {
-          subjectName: subject.name,
-          modules: learningPath.map(module => ({
-            title: module.title,
-            topics: module.topics || [],
-          })),
-        };
+        const prompt = `Crie um infográfico visual moderno e profissional para uma trilha de aprendizagem educacional. O infográfico deve:
+
+- Ter design limpo e colorido
+- Mostrar a estrutura hierárquica de módulos e tópicos
+- Usar ícones educacionais
+- Ter fundo branco ou gradiente suave
+- Incluir o título da disciplina no topo
+- Organizar módulos verticalmente com conexões visuais
+
+Conteúdo:
+${pathDescription}`;
         
-        const imageUrl = await generatePathInfographic(pathData);
-        return { imageUrl };
+        const result = await generateImage({ prompt });
+        return { imageUrl: result.url };
       }),
     
     generateModuleInfographic: protectedProcedure
       .input(z.object({ moduleId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const { generateModuleInfographic } = await import('./infographic-renderer');
+        const { generateImage } = await import('./_core/imageGeneration');
         const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
         
         if (!module) {
@@ -1414,19 +1423,44 @@ Diretrizes OBRIGATÓRIAS:
         
         const topics = await db.getLearningTopicsByModule(input.moduleId, ctx.user.id);
         
-        // Preparar dados para o template
-        const moduleData = {
-          title: module.title,
-          description: module.description || undefined,
-          topics: topics.map(topic => ({ title: topic.title })),
-        };
+        let moduleDescription = `Módulo: ${module.title}\n`;
+        if (module.description) {
+          moduleDescription += `Descrição: ${module.description}\n\n`;
+        }
+        moduleDescription += `Tópicos:\n`;
+        topics.forEach((topic, idx) => {
+          moduleDescription += `${idx + 1}. ${topic.title}\n`;
+        });
         
-        const imageUrl = await generateModuleInfographic(moduleData);
+        const prompt = `Crie um infográfico visual moderno, lúdico e educacional para um módulo de aprendizagem. O infográfico deve:
+
+- Ter design colorido e atrativo para estudantes
+- Usar ilustrações e ícones educacionais divertidos
+- Ter fundo com gradiente suave ou textura sutil
+- Incluir o título do módulo em destaque no topo
+- Mostrar os tópicos de forma visual e organizada
+- Usar elementos gráficos como setas, linhas conectoras, badges
+- Ter aspecto lúdico e engajador
+- Tamanho: 1200x800 pixels
+
+**IMPORTANTE: Todo o texto no infográfico DEVE estar em PORTUGUÊS BRASILEIRO correto.**
+- Revise TODA a ortografia e gramática
+- Use acentuação correta (á, é, í, ó, ú, ã, õ, ç)
+- Evite erros comuns de português
+- Garanta concordância verbal e nominal
+- Use vocabulário adequado ao contexto educacional brasileiro
+
+Conteúdo do módulo:
+${moduleDescription}
+
+Crie um infográfico que torne o aprendizado visual e divertido, com PORTUGUÊS IMPECÁVEL!`;
+        
+        const result = await generateImage({ prompt });
         
         // Salvar URL do infográfico no módulo
-        await db.updateLearningModule(input.moduleId, { infographicUrl: imageUrl }, ctx.user.id);
+        await db.updateLearningModule(input.moduleId, { infographicUrl: result.url }, ctx.user.id);
         
-        return { imageUrl };
+        return { imageUrl: result.url };
       }),
     
     suggestLessonPlans: protectedProcedure
