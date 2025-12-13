@@ -1403,9 +1403,20 @@ Diretrizes OBRIGATÓRIAS:
 - Ter fundo branco ou gradiente suave
 - Incluir o título da disciplina no topo
 - Organizar módulos verticalmente com conexões visuais
+- Tamanho: 1400x1000 pixels
+
+⚠️ **REGRA OBRIGATÓRIA - PORTUGUÊS BRASILEIRO PERFEITO:**
+Todo o texto no infográfico DEVE estar em PORTUGUÊS BRASILEIRO 100% CORRETO:
+- Revise TODA ortografia, acentuação e gramática ANTES de gerar
+- Use acentuação correta: á, é, í, ó, ú, ã, õ, ç
+- Garanta concordância verbal e nominal perfeita
+- Use vocabulário educacional brasileiro adequado
+- ZERO erros de português são tolerados - revise 3 vezes!
 
 Conteúdo:
-${pathDescription}`;
+${pathDescription}
+
+Lembre-se: PORTUGUÊS IMPECÁVEL é OBRIGATÓRIO!`;
         
         const result = await generateImage({ prompt });
         return { imageUrl: result.url };
@@ -1443,17 +1454,20 @@ ${pathDescription}`;
 - Ter aspecto lúdico e engajador
 - Tamanho: 1200x800 pixels
 
-**IMPORTANTE: Todo o texto no infográfico DEVE estar em PORTUGUÊS BRASILEIRO correto.**
-- Revise TODA a ortografia e gramática
-- Use acentuação correta (á, é, í, ó, ú, ã, õ, ç)
-- Evite erros comuns de português
-- Garanta concordância verbal e nominal
-- Use vocabulário adequado ao contexto educacional brasileiro
+🚨 **REGRA OBRIGATÓRIA INEGOCIÁVEL - PORTUGUÊS BRASILEIRO PERFEITO:**
+Todo o texto no infográfico DEVE estar em PORTUGUÊS BRASILEIRO 100% CORRETO:
+- Revise TODA ortografia, acentuação e gramática ANTES de gerar a imagem
+- Use acentuação correta obrigatoriamente: á, é, í, ó, ú, ã, õ, ç
+- Garanta concordância verbal e nominal perfeita (ex: "tópicos", não "topicos")
+- Use vocabulário educacional brasileiro adequado
+- Evite anglicismos e estrangeirismos desnecessários
+- ZERO erros de português são aceitáveis - revise o texto 3 vezes antes de gerar!
+- Exemplos de erros PROIBIDOS: "topico" (correto: "tópico"), "modulo" (correto: "módulo"), "grafico" (correto: "gráfico")
 
 Conteúdo do módulo:
 ${moduleDescription}
 
-Crie um infográfico que torne o aprendizado visual e divertido, com PORTUGUÊS IMPECÁVEL!`;
+Crie um infográfico que torne o aprendizado visual e divertido, com PORTUGUÊS IMPECÁVEL E SEM NENHUM ERRO!`;
         
         const result = await generateImage({ prompt });
         
