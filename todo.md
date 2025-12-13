@@ -1788,3 +1788,12 @@
 - [x] Detecção se app já está instalado (display-mode: standalone)
 - [x] Service Worker registrado no main.tsx com auto-update a cada 1h
 - [x] Display mode "standalone" para experiência de app nativo
+
+## ✅ Ajuste do Tour de Onboarding - COMPLETO
+
+- [x] Remover modal de boas-vindas (já existe botão "Refazer Tour")
+- [x] Ajustar lógica para tour aparecer apenas no primeiro acesso
+- [x] Tour agora inicia direto no Dashboard (Passo 1)
+- [x] Botão "Pular Tour" no primeiro passo marca como completado
+- [x] Manter funcionalidade do botão "Refazer Tour" no menu lateral
+- [x] Lógica com localStorage (onboarding_tour_completed) já existente

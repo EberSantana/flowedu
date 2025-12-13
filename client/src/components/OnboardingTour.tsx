@@ -32,34 +32,7 @@ export function useOnboardingTour() {
       },
     });
 
-    // Passo 1: Boas-vindas
-    tour.addStep({
-      id: 'welcome',
-      text: `
-        <div class="shepherd-content-custom">
-          <h2 class="text-2xl font-bold mb-3">🎓 Bem-vindo ao Sistema de Gestão!</h2>
-          <p class="text-gray-700 mb-4">
-            Vamos fazer um tour rápido pelas principais funcionalidades para você aproveitar ao máximo o sistema.
-          </p>
-          <p class="text-sm text-gray-600">
-            Este tour leva apenas 1 minuto e você pode pular a qualquer momento.
-          </p>
-        </div>
-      `,
-      buttons: [
-        {
-          text: 'Pular Tour',
-          action: tour.cancel,
-          secondary: true,
-        },
-        {
-          text: 'Começar',
-          action: tour.next,
-        },
-      ],
-    });
-
-    // Passo 2: Dashboard
+    // Passo 1: Dashboard
     tour.addStep({
       id: 'dashboard',
       text: `
@@ -76,8 +49,11 @@ export function useOnboardingTour() {
       },
       buttons: [
         {
-          text: 'Anterior',
-          action: tour.back,
+          text: 'Pular Tour',
+          action: () => {
+            localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+            tour.cancel();
+          },
           secondary: true,
         },
         {
@@ -87,7 +63,7 @@ export function useOnboardingTour() {
       ],
     });
 
-    // Passo 3: Criar Disciplina
+    // Passo 2: Criar Disciplina
     tour.addStep({
       id: 'create-subject',
       text: `
@@ -118,7 +94,7 @@ export function useOnboardingTour() {
       ],
     });
 
-    // Passo 4: Trilhas de Aprendizagem
+    // Passo 3: Trilhas de Aprendizagem
     tour.addStep({
       id: 'learning-paths',
       text: `
@@ -151,7 +127,7 @@ export function useOnboardingTour() {
       ],
     });
 
-    // Passo 5: Grade Semanal
+    // Passo 4: Grade Semanal
     tour.addStep({
       id: 'schedule',
       text: `
@@ -178,7 +154,7 @@ export function useOnboardingTour() {
       ],
     });
 
-    // Passo 6: Relatórios
+    // Passo 5: Relatórios
     tour.addStep({
       id: 'reports',
       text: `
