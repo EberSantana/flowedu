@@ -1851,3 +1851,19 @@
 - [x] Usar `await import('pdf-parse')` sem .default
 - [x] Reiniciar servidor
 - [x] Erro resolvido - servidor rodando sem erros
+
+## ✅ Melhoria da Interface de Upload de Ementa - COMPLETO
+
+### Problemas Identificados
+- [x] Processo de upload não estava claro (botão "concluir" confuso)
+- [x] Usuário não sabia o que fazer após upload do arquivo
+- [x] Falta feedback visual claro do progresso
+
+### Soluções Implementadas
+- [x] Card de instruções passo a passo (azul) no topo
+- [x] Card de sucesso (verde) após upload com mensagem clara
+- [x] Botão "Limpar" (vermelho) para recomeçar o processo
+- [x] Textarea com borda verde após upload (feedback visual)
+- [x] Contador de caracteres abaixo do textarea
+- [x] Placeholder mais descritivo no textarea
+- [x] Fluxo claro: Upload → Revisar → Gerar Trilha

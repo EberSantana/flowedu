@@ -29,6 +29,7 @@ import {
   Loader2,
   FileText,
   Upload,
+  X,
 } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
