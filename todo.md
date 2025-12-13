@@ -1733,3 +1733,20 @@
 - [x] Estados vazios amigáveis já existentes
 - [ ] Adicionar animações de carregamento
 - [ ] Implementar skeleton loading
+
+## ✅ Ajuste de Layout - Consistência Visual - COMPLETO
+
+### Trilhas de Aprendizagem
+- [x] Analisar layout padrão das outras páginas (Sidebar + PageWrapper + container)
+- [x] Ajustar estrutura para usar Sidebar + PageWrapper
+- [x] Ajustar espaçamento e padding (container mx-auto py-8 px-4)
+- [x] Adicionar bg-gray-50 para consistência
+- [x] Garantir responsividade
+- [x] Aplicar prettier para formatação consistente
+
+### BibleFooter (Devocional no Rodapé)
+- [x] Ajustar cores para seguir padrão do sistema (bg-white, text-gray)
+- [x] Ajustar espaçamento e padding (py-8, max-w-4xl)
+- [x] Melhorar tipografia e hierarquia visual (tamanhos reduzidos, badge com bg-primary/5)
+- [x] Garantir responsividade (text-base md:text-lg)
+- [x] Manter consistência com o design geral (border-gray-200, cores neutras)

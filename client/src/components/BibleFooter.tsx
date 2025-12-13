@@ -55,27 +55,32 @@ export default function BibleFooter() {
   }, []);
 
   return (
-    <footer className={`bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 border-t border-slate-200 py-6 mt-12 transition-all duration-300 ${
+    <footer className={`bg-white border-t border-gray-200 py-8 mt-auto transition-all duration-300 ${
       isCompact ? 'lg:ml-16' : 'lg:ml-64'
     }`}>
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          {/* Header */}
+          <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full">
+            <BookOpen className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">
               Devocional Diário
             </span>
           </div>
-          <blockquote className="text-center max-w-3xl">
-            <p className="text-lg md:text-xl italic leading-relaxed text-slate-700">
+          
+          {/* Verse */}
+          <blockquote className="text-center max-w-2xl">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
               "{verse.text}"
             </p>
-            <cite className="block mt-3 text-sm font-semibold text-slate-600">
-              — {verse.reference} (NVI)
+            <cite className="block mt-3 text-sm font-medium text-gray-600">
+              — {verse.reference}
             </cite>
           </blockquote>
-          <div className="pt-4 border-t border-slate-200 w-full text-center">
-            <p className="text-xs text-slate-500">
+          
+          {/* Copyright */}
+          <div className="pt-4 border-t border-gray-100 w-full text-center">
+            <p className="text-xs text-gray-500">
               Sistema de Gestão de Tempo para Professores © {new Date().getFullYear()}
             </p>
           </div>
