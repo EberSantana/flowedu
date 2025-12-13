@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { UserPlus, Trash2, Download, FileSpreadsheet, FileText, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
+import ImportStudentsModal from "@/components/ImportStudentsModal";
 
 export default function SubjectEnrollments() {
   const [, params] = useRoute("/subjects/:id/enrollments");
@@ -20,6 +21,7 @@ export default function SubjectEnrollments() {
   const [isExportingXLS, setIsExportingXLS] = useState(false);
   const [isExportingDOCX, setIsExportingDOCX] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const { data: subject } = trpc.subjects.list.useQuery(undefined, {
     select: (subjects) => subjects.find(s => s.id === subjectId),
@@ -249,6 +251,14 @@ export default function SubjectEnrollments() {
           </div>
           <div className="flex gap-2">
             <Button
+              onClick={() => setIsImportModalOpen(true)}
+              variant="outline"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Importar Alunos
+            </Button>
+            <Button
               onClick={() => setIsAddDialogOpen(true)}
               className="bg-green-600 hover:bg-green-700"
             >
@@ -383,6 +393,13 @@ export default function SubjectEnrollments() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Import Students Modal */}
+        <ImportStudentsModal
+          open={isImportModalOpen}
+          onOpenChange={setIsImportModalOpen}
+          onSuccess={() => refetch()}
+        />
       </div>
     </DashboardLayout>
   );

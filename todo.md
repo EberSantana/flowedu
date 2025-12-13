@@ -2179,3 +2179,36 @@
 - [x] Testar menu como professor (todos os itens)
 - [x] Testar menu como aluno (apenas itens relevantes)
 - [ ] Criar checkpoint final
+
+
+## 📤 Sistema de Importação em Massa de Alunos
+
+### Backend
+- [x] Instalar biblioteca xlsx para processar Excel
+- [x] Instalar biblioteca pdf-parse para extrair texto de PDF
+- [x] Instalar biblioteca mammoth para extrair texto de DOCX
+- [x] Criar rota tRPC students.importFromFile (recebe base64 do arquivo)
+- [x] Implementar parser de Excel (colunas: Matrícula | Nome Completo)
+- [x] Implementar parser de PDF (extração de texto + regex)
+- [x] Implementar parser de DOCX (extração de texto + regex)
+- [x] Adicionar validação (matrícula única, campos obrigatórios)
+- [x] Retornar preview dos dados extraídos
+- [x] Criar rota students.confirmImport para salvar no banco
+
+### Frontend
+- [x] Criar componente ImportStudentsModal.tsx
+- [x] Implementar drag & drop de arquivos (.xlsx, .pdf, .docx)
+- [x] Mostrar preview dos dados extraídos em tabela
+- [x] Adicionar botão "Baixar Template Excel"
+- [x] Implementar barra de progresso durante upload
+- [x] Mostrar relatório de sucesso/erros após importação
+- [x] Adicionar botão "Importar Alunos" na página de matrículas
+- [x] Integrar modal com página SubjectEnrollments.tsx
+
+### Validação e Testes
+- [x] Validar formato de matrícula (apenas números/letras)
+- [x] Verificar duplicatas no arquivo antes de importar
+- [ ] Testar importação com Excel válido
+- [ ] Testar importação com PDF formatado
+- [ ] Testar importação com DOCX formatado
+- [ ] Criar checkpoint final
