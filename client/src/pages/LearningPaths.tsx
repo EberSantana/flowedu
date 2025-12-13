@@ -28,6 +28,7 @@ import {
   Lightbulb,
   Loader2,
   FileText,
+  Upload,
 } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -64,6 +65,8 @@ export default function LearningPaths() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
   const [syllabusText, setSyllabusText] = useState("");
   const [workload, setWorkload] = useState<number>(60);
+  const [isUploadingPDF, setIsUploadingPDF] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isInfographicDialogOpen, setIsInfographicDialogOpen] = useState(false);
   const [infographicUrl, setInfographicUrl] = useState<string | null>(null);
   const [isLessonPlanDialogOpen, setIsLessonPlanDialogOpen] = useState(false);
@@ -190,6 +193,67 @@ export default function LearningPaths() {
         toast.error("Erro ao gerar sugestões: " + error.message);
       },
     });
+
+  // Função para fazer upload de PDF e extrair texto
+  const handlePDFUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    if (file.type !== 'application/pdf') {
+      toast.error('Por favor, selecione um arquivo PDF');
+      return;
+    }
+
+    // Validar tamanho (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('O arquivo deve ter no máximo 10MB');
+      return;
+    }
+
+    setIsUploadingPDF(true);
+    setUploadProgress(0);
+
+    try {
+      const formData = new FormData();
+      formData.append('pdf', file);
+
+      // Simular progresso
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      const response = await fetch('/api/extract-pdf-text', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao processar PDF');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.text) {
+        setSyllabusText(data.text);
+        toast.success(`Texto extraído com sucesso! (${data.metadata.pages} páginas)`);
+      } else {
+        throw new Error('Não foi possível extrair texto do PDF');
+      }
+    } catch (error: any) {
+      console.error('Erro ao fazer upload do PDF:', error);
+      toast.error(error.message || 'Erro ao processar PDF');
+    } finally {
+      setIsUploadingPDF(false);
+      setUploadProgress(0);
+      // Limpar input para permitir upload do mesmo arquivo novamente
+      event.target.value = '';
+    }
+  };
 
   const toggleModule = (moduleId: number) => {
     const newExpanded = new Set(expandedModules);
@@ -922,6 +986,54 @@ export default function LearningPaths() {
                   <label className="text-sm font-medium mb-2 block">
                     Ementa da Disciplina *
                   </label>
+                  
+                  {/* Botão de Upload de PDF */}
+                  <div className="mb-3 flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handlePDFUpload}
+                      disabled={isUploadingPDF}
+                      className="hidden"
+                      id="pdf-upload"
+                    />
+                    <label htmlFor="pdf-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isUploadingPDF}
+                        onClick={() => document.getElementById('pdf-upload')?.click()}
+                        className="cursor-pointer"
+                      >
+                        {isUploadingPDF ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Processando...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            Fazer Upload de PDF
+                          </>
+                        )}
+                      </Button>
+                    </label>
+                    <span className="text-xs text-muted-foreground">
+                      ou cole o texto manualmente abaixo
+                    </span>
+                  </div>
+
+                  {/* Barra de progresso */}
+                  {isUploadingPDF && uploadProgress > 0 && (
+                    <div className="mb-3">
+                      <Progress value={uploadProgress} className="h-2" />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Extraindo texto do PDF... {uploadProgress}%
+                      </p>
+                    </div>
+                  )}
+                  
                   <Textarea
                     value={syllabusText}
                     onChange={e => setSyllabusText(e.target.value)}

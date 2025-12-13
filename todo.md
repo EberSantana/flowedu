@@ -1797,3 +1797,31 @@
 - [x] Botão "Pular Tour" no primeiro passo marca como completado
 - [x] Manter funcionalidade do botão "Refazer Tour" no menu lateral
 - [x] Lógica com localStorage (onboarding_tour_completed) já existente
+
+## ✅ Upload de PDF da Ementa - Trilhas de Aprendizagem - COMPLETO
+
+### Backend
+- [x] Criar endpoint /api/extract-pdf-text para upload e extração
+- [x] Instalar biblioteca pdf-parse para extração de texto
+- [x] Instalar multer para upload de arquivos
+- [x] Implementar validação de arquivo (tipo PDF, tamanho max 10MB)
+- [x] Processar PDF e retornar texto extraído com metadados
+- [x] Adicionar tratamento de erros completo
+- [x] Integrar rota no servidor principal
+
+### Frontend
+- [x] Adicionar botão de upload de PDF na página Trilhas (dialog de IA)
+- [x] Textarea editável permite edição do texto extraído
+- [x] Adicionar indicador de progresso durante upload (barra de progresso)
+- [x] Validação de arquivo no frontend (PDF, max 10MB)
+- [x] Função handlePDFUpload com FormData
+- [x] Estados isUploadingPDF e uploadProgress
+- [x] Toast notifications para sucesso/erro
+- [x] Input file hidden com label customizada
+
+### UX
+- [x] Instruções claras ("ou cole o texto manualmente abaixo")
+- [x] Feedback visual durante processamento (spinner + progresso)
+- [x] Input limpo após upload para permitir novo upload
+- [x] Opção de colar texto manualmente mantida
+- [x] Mensagem de sucesso com número de páginas extraídas
