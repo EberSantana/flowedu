@@ -17,7 +17,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -400,13 +401,25 @@ export default function Dashboard() {
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
           <div className="mb-8 flex items-start justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Bem-vindo, {user?.name || 'Professor'}!
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Visão geral do seu sistema de gestão de tempo
-              </p>
+            <div className="flex items-center gap-4">
+              {/* Avatar do Usuário */}
+              <Avatar className="h-16 w-16 border-2 border-primary/20 shadow-lg">
+                <AvatarImage 
+                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'Professor')}&backgroundColor=6366f1&textColor=ffffff`} 
+                  alt={user?.name || 'Professor'}
+                />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
+                  {user?.name?.charAt(0).toUpperCase() || 'P'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Bem-vindo, {user?.name || 'Professor'}!
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Visão geral do seu sistema de gestão de tempo
+                </p>
+              </div>
             </div>
             <div className="flex gap-2 items-center">
               <LogoutButton />

@@ -2378,3 +2378,4 @@
 - [x] Corrigir problema de redirecionamento OAuth no domínio publicado - limpeza de cache e recompilação
 - [x] Corrigir redirecionamento após login OAuth - redireciona para /dashboard ao invés de /
 - [x] Adicionar botão de Logout no cabeçalho do Dashboard
+- [x] Adicionar foto de perfil do usuário no cabeçalho do Dashboard
