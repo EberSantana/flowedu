@@ -2356,3 +2356,6 @@
 - [x] Corrigir contador de alunos matriculados que está mostrando 0
 
 - [x] Corrigir erros de React hooks (múltiplas cópias do React)
+
+- [x] Corrigir problemas de compatibilidade entre navegadores (Safari, Firefox, Chrome)
+- [x] Resolver problema de cache persistente que requer atualização constante
