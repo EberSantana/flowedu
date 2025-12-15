@@ -3,6 +3,8 @@ import { trpc } from "../lib/trpc";
 import { Button } from "../components/ui/button";
 import { Plus, Edit, Trash2, AlertCircle, Megaphone } from "lucide-react";
 import { toast } from "sonner";
+import DashboardLayout from '../components/DashboardLayout';
+import PageWrapper from '../components/PageWrapper';
 
 export function Announcements() {
   const [isCreating, setIsCreating] = useState(false);
@@ -98,21 +100,17 @@ export function Announcements() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-6 space-y-6">
+    <DashboardLayout>
+      <PageWrapper>
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Megaphone className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Avisos</h1>
-              <p className="text-sm text-gray-600">Poste anúncios importantes para seus alunos</p>
-            </div>
-          </div>
-          
-          {!isCreating && (
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Avisos</h1>
+          <p className="text-gray-600">Poste anúncios importantes para seus alunos</p>
+        </div>
+
+        {/* Botão Novo Aviso */}
+        {!isCreating && (
+          <div className="mb-6 flex justify-end">
             <Button
               onClick={() => setIsCreating(true)}
               className="bg-blue-600 hover:bg-blue-700"
@@ -120,12 +118,13 @@ export function Announcements() {
               <Plus className="w-4 h-4 mr-2" />
               Novo Aviso
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Form */}
         {isCreating && (
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+
+          <div className="bg-green-50 border-green-200 p-6 rounded-lg border shadow-sm mb-6">
             <h2 className="text-lg font-semibold mb-4">
               {editingId ? "Editar Aviso" : "Criar Novo Aviso"}
             </h2>
@@ -213,7 +212,7 @@ export function Announcements() {
         )}
 
         {/* Lista de Avisos */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {isLoading ? (
             <div className="text-center py-8 text-gray-500">Carregando avisos...</div>
           ) : announcements && announcements.length > 0 ? (
@@ -281,8 +280,8 @@ export function Announcements() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </PageWrapper>
+    </DashboardLayout>
   );
 }
 
