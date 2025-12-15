@@ -2348,3 +2348,6 @@
 - [x] Adequar página de Gerenciar Matrículas (Students.tsx) ao layout padrão do sistema com Sidebar e PageWrapper
 
 - [x] Adequar página de Avisos (Announcements.tsx) ao layout padrão do sistema com Sidebar e PageWrapper
+
+- [x] Adequar página StudentAnnouncements.tsx ao layout padrão do sistema
+- [x] Adequar outras páginas relacionadas a alunos ao layout padrão
