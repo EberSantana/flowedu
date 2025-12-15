@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -51,6 +51,37 @@ ChartJS.register(
 );
 
 const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+
+// Componente de botão de logout
+function LogoutButton() {
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      window.location.href = "/";
+    },
+    onError: (error) => {
+      toast.error("Erro ao fazer logout: " + error.message);
+    },
+  });
+
+  const handleLogout = () => {
+    if (confirm("Deseja realmente sair do sistema?")) {
+      logoutMutation.mutate();
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleLogout}
+      variant="outline"
+      size="sm"
+      className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+      disabled={logoutMutation.isPending}
+    >
+      <LogOut className="h-4 w-4" />
+      {logoutMutation.isPending ? 'Saindo...' : 'Sair'}
+    </Button>
+  );
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -377,7 +408,8 @@ export default function Dashboard() {
                 Visão geral do seu sistema de gestão de tempo
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
+              <LogoutButton />
               {isCustomizing && (
                 <Button
                   onClick={resetToDefault}
