@@ -80,7 +80,7 @@ export default function SubjectEnrollments() {
       const data = enrolledStudents.map(s => ({
         'Matrícula': s.registrationNumber,
         'Nome Completo': s.fullName,
-        'Data de Matrícula': new Date(s.enrolledAt).toLocaleDateString('pt-BR'),
+        'Data de Matrícula': s.enrolledAt ? new Date(s.enrolledAt).toLocaleDateString('pt-BR') : 'N/A',
       }));
       
       // Criar workbook

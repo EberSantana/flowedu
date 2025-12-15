@@ -1484,7 +1484,14 @@ export async function createStudent(data: InsertStudent) {
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(students).values(data);
-  return { id: Number(result[0].insertId), ...data };
+  const insertId = Number(result[0].insertId);
+  
+  // Buscar o registro criado para retornar com todos os campos
+  const [created] = await db.select()
+    .from(students)
+    .where(eq(students.id, insertId));
+  
+  return created;
 }
 
 export async function getStudentsByUser(userId: number) {

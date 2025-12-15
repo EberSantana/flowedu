@@ -297,7 +297,7 @@ export default function StudentProfile() {
                       },
                       tooltip: {
                         callbacks: {
-                          label: (context) => `${context.parsed.y.toFixed(1)}%`,
+                          label: (context) => `${(context.parsed.y ?? 0).toFixed(1)}%`,
                         },
                       },
                     },

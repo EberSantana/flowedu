@@ -15,18 +15,11 @@ export default function StudentLogin() {
 
   const loginMutation = trpc.auth.loginStudent.useMutation({
     onSuccess: () => {
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao Portal do Aluno",
-      });
+      toast.success("Login realizado com sucesso! Bem-vindo ao Portal do Aluno");
       setLocation("/student-dashboard");
     },
     onError: (error) => {
-      toast({
-        title: "Erro no login",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(`Erro no login: ${error.message}`);
       setIsLoading(false);
     },
   });
@@ -35,11 +28,7 @@ export default function StudentLogin() {
     e.preventDefault();
     
     if (!registrationNumber || !password) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha matrícula e senha",
-        variant: "destructive",
-      });
+      toast.error("Campos obrigatórios: Por favor, preencha matrícula e senha");
       return;
     }
 

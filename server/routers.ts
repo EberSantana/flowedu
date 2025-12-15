@@ -1980,15 +1980,15 @@ Crie sugestões no formato JSON:
                   new TableRow({
                     children: [
                       new TableCell({
-                        children: [new Paragraph({ text: "Matrícula", bold: true })],
+                        children: [new Paragraph({ children: [new TextRun({ text: "Matrícula", bold: true })] })],
                         shading: { fill: "4472C4" },
                       }),
                       new TableCell({
-                        children: [new Paragraph({ text: "Nome Completo", bold: true })],
+                        children: [new Paragraph({ children: [new TextRun({ text: "Nome Completo", bold: true })] })],
                         shading: { fill: "4472C4" },
                       }),
                       new TableCell({
-                        children: [new Paragraph({ text: "Data de Cadastro", bold: true })],
+                        children: [new Paragraph({ children: [new TextRun({ text: "Data de Cadastro", bold: true })] })],
                         shading: { fill: "4472C4" },
                       }),
                     ],
@@ -1999,7 +1999,7 @@ Crie sugestões no formato JSON:
                       children: [
                         new TableCell({ children: [new Paragraph(student.registrationNumber)] }),
                         new TableCell({ children: [new Paragraph(student.fullName)] }),
-                        new TableCell({ children: [new Paragraph(new Date(student.createdAt).toLocaleDateString('pt-BR'))] }),
+                        new TableCell({ children: [new Paragraph(student.createdAt ? new Date(student.createdAt).toLocaleDateString('pt-BR') : 'N/A')] }),
                       ],
                     })
                   ),

@@ -29,8 +29,7 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess, sub
   const parseFileMutation = trpc.students.parseImportFile.useMutation();
   const confirmImportMutation = trpc.students.confirmImport.useMutation();
   const importAndEnrollMutation = trpc.students.importAndEnrollInSubject.useMutation();
-  const downloadTemplateMutation = trpc.students.downloadTemplate.useMutation();
-
+  
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -159,36 +158,7 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess, sub
     }
   };
 
-  const handleDownloadTemplate = async () => {
-    try {
-      const result = await downloadTemplateMutation.mutateAsync();
-      
-      // Converter base64 para blob e fazer download
-      const blob = base64ToBlob(result.data, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
 
-      toast.success('Template baixado com sucesso!');
-    } catch (error: any) {
-      toast.error(`Erro ao baixar template: ${error.message}`);
-    }
-  };
-
-  const base64ToBlob = (base64: string, mimeType: string) => {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: mimeType });
-  };
 
   const handleClose = () => {
     setFile(null);

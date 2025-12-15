@@ -133,7 +133,7 @@ export default function Subjects() {
       toast.success("Disciplina criada com sucesso!");
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: { message: string }) => {
       toast.error("Erro ao criar disciplina: " + error.message);
     },
   });
@@ -144,7 +144,7 @@ export default function Subjects() {
       toast.success("Disciplina atualizada com sucesso!");
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: { message: string }) => {
       toast.error("Erro ao atualizar disciplina: " + error.message);
     },
   });
@@ -154,13 +154,13 @@ export default function Subjects() {
       utils.subjects.list.invalidate();
       toast.success("Disciplina excluída com sucesso!");
     },
-    onError: (error) => {
+    onError: (error: { message: string }) => {
       toast.error("Erro ao excluir disciplina: " + error.message);
     },
   });
 
   const bulkEnrollMutation = (trpc as any).students.bulkEnrollInMultipleSubjects.useMutation({
-    onSuccess: (result) => {
+    onSuccess: (result: { studentCreated: boolean; enrolled: string[]; errors: string[] }) => {
       const messages = [];
       if (result.studentCreated) {
         messages.push("Aluno criado");
@@ -172,7 +172,7 @@ export default function Subjects() {
         toast.success(messages.join(" e "));
       }
       if (result.errors.length > 0) {
-        result.errors.forEach(error => toast.error(error));
+        result.errors.forEach((error: string) => toast.error(error));
       }
       
       // Limpar formulário e seleção
@@ -181,7 +181,7 @@ export default function Subjects() {
       setIsBulkEnrollOpen(false);
       utils.subjects.list.invalidate();
     },
-    onError: (error) => {
+    onError: (error: { message: string }) => {
       toast.error(`Erro ao matricular: ${error.message}`);
     },
   });
