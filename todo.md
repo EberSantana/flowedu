@@ -2339,4 +2339,3 @@
 - [x] Criar botão de ação em massa para matricular aluno em múltiplas disciplinas
 - [x] Implementar rota tRPC para matrícula em massa em múltiplas disciplinas
 - [x] Corrigir erro crítico: "Invalid hook call" que está quebrando o sistema
-- [x] Ajustar página de Avisos para seguir layout padrão do sistema
