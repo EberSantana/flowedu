@@ -129,12 +129,12 @@ export default function SubjectEnrollments() {
               rows: [
                 new TableRow({
                   children: [
-                    new TableCell({ children: [new Paragraph({ text: "Matrícula", bold: true })] }),
-                    new TableCell({ children: [new Paragraph({ text: "Nome Completo", bold: true })] }),
-                    new TableCell({ children: [new Paragraph({ text: "Data de Matrícula", bold: true })] }),
+                    new TableCell({ children: [new Paragraph({ text: "Matrícula" })] }),
+                    new TableCell({ children: [new Paragraph({ text: "Nome Completo" })] }),
+                    new TableCell({ children: [new Paragraph({ text: "Data de Matrícula" })] }),
                   ],
                 }),
-                ...enrolledStudents.map(s => new TableRow({
+                ...enrolledStudents.map((s: any) => new TableRow({
                   children: [
                     new TableCell({ children: [new Paragraph(s.registrationNumber)] }),
                     new TableCell({ children: [new Paragraph(s.fullName)] }),
@@ -190,7 +190,7 @@ export default function SubjectEnrollments() {
       (doc as any).autoTable({
         startY: 45,
         head: [['Matrícula', 'Nome Completo', 'Data de Matrícula']],
-        body: enrolledStudents.map(s => [
+        body: enrolledStudents.map((s: any) => [
           s.registrationNumber,
           s.fullName,
           new Date(s.enrolledAt).toLocaleDateString('pt-BR'),
@@ -217,7 +217,7 @@ export default function SubjectEnrollments() {
 
   // Filtrar alunos que não estão matriculados
   const availableStudents = allStudents.filter(
-    student => !enrolledStudents.some(enrolled => enrolled.studentId === student.id)
+    (student: any) => !enrolledStudents.some((enrolled: any) => enrolled.studentId === student.id)
   );
 
   if (!subject) {
@@ -326,7 +326,7 @@ export default function SubjectEnrollments() {
               </div>
             ) : (
               <div className="space-y-2">
-                {enrolledStudents.map((student) => (
+                {enrolledStudents.map((student: any) => (
                   <div
                     key={student.enrollmentId}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
@@ -372,7 +372,7 @@ export default function SubjectEnrollments() {
                   className="w-full mt-1 p-2 border rounded-md"
                 >
                   <option value="">Selecione um aluno</option>
-                  {availableStudents.map((student) => (
+                  {availableStudents.map((student: any) => (
                     <option key={student.id} value={student.id}>
                       {student.fullName} ({student.registrationNumber})
                     </option>

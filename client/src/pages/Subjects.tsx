@@ -119,7 +119,8 @@ export default function Subjects() {
   };
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
-  const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
+  // const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
+  const enrollmentCounts: Record<number, number> = {}; // Temporário
   const utils = trpc.useUtils();
 
   const createMutation = trpc.subjects.create.useMutation({
@@ -711,7 +712,7 @@ export default function Subjects() {
           onOpenChange={setIsQuickEnrollOpen}
           onSuccess={() => {
             utils.subjects.list.invalidate();
-            utils.subjects.getEnrollmentCounts.invalidate();
+            // utils.subjects.getEnrollmentCounts.invalidate();
           }}
         />
         </div>

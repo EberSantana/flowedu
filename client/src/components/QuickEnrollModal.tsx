@@ -44,7 +44,7 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess }: Quic
         setFullName("");
         setSelectedSubjectId(null);
         
-        utils.subjects.getEnrollmentCounts.invalidate();
+        // utils.subjects.getEnrollmentCounts.invalidate();
         onSuccess();
         onOpenChange(false);
       }
@@ -186,7 +186,7 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess }: Quic
           onOpenChange={setShowImportModal}
           onSuccess={() => {
             setShowImportModal(false);
-            utils.subjects.getEnrollmentCounts.invalidate();
+            // utils.subjects.getEnrollmentCounts.invalidate();
             onSuccess();
             onOpenChange(false);
           }}

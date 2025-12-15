@@ -2280,3 +2280,17 @@
 - [ ] Testar cadastro manual
 - [ ] Testar importação em massa
 - [ ] Criar checkpoint final
+
+
+## 🐛 Correção de Erros TypeScript
+
+### Erros Identificados
+- [x] SubjectEnrollments.tsx: Parameter 'student' implicitly has an 'any' type (linha 329, 375)
+- [x] SubjectEnrollments.tsx: Parameter 'enrolled' implicitly has an 'any' type (linha 220)
+- [x] Subjects.tsx: Property 'getEnrollmentCounts' does not exist (linha 122, 714)
+
+### Correções
+- [x] Adicionar tipos explícitos para parâmetros em SubjectEnrollments
+- [x] Comentar uso de getEnrollmentCounts temporariamente (contador desabilitado)
+- [x] Reiniciar servidor e verificar
+- [ ] Criar checkpoint após correções
