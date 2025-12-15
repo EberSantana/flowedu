@@ -2344,3 +2344,5 @@
 - [x] Alterar título do sistema de "Sistema de Gestão de Tempo para Professores" para "Sistema de Gestão Educacional Professor & Aluno"
 
 - [x] Ajustar altura dos cards de Portal do Aluno e Professor para ficarem perfeitamente iguais
+
+- [x] Adequar página de Gerenciar Matrículas (Students.tsx) ao layout padrão do sistema com Sidebar e PageWrapper
