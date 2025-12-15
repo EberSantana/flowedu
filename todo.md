@@ -2359,3 +2359,5 @@
 
 - [x] Corrigir problemas de compatibilidade entre navegadores (Safari, Firefox, Chrome)
 - [x] Resolver problema de cache persistente que requer atualização constante
+
+- [x] Corrigir problema de login no sistema (celular e PC) - servidor reiniciado
