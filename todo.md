@@ -2374,3 +2374,4 @@
 - [x] Gerar favicon.ico a partir do novo ícone - gerado com múltiplos tamanhos (16x16, 32x32, 48x48, 64x64)
 
 - [x] Investigar e corrigir erros no sistema - corrigidos 14 erros de TypeScript
+- [x] Corrigir erro de conexão WebSocket do Vite - configurado protocol wss e clientPort 443

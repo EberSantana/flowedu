@@ -44,6 +44,8 @@ export default defineConfig({
     host: true,
     hmr: {
       overlay: true,
+      protocol: 'wss',
+      clientPort: 443,
     },
     allowedHosts: [
       ".manuspre.computer",
