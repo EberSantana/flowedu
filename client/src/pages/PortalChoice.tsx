@@ -9,7 +9,7 @@ export default function PortalChoice() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Sistema de Gestão de Tempo para Professores
+            Sistema de Gestão Educacional Professor & Aluno
           </h1>
           <p className="text-lg text-gray-600">
             Escolha como deseja acessar o sistema
@@ -61,7 +61,8 @@ export default function PortalChoice() {
                     Portal do Professor
                   </h2>
                   <p className="text-gray-600">
-                    Gerencie disciplinas, turmas, horários e acompanhe seus alunos
+                    Gerencie disciplinas, turmas, horários e acompanhe seus
+                    alunos
                   </p>
                 </div>
 
@@ -81,7 +82,7 @@ export default function PortalChoice() {
 
         {/* Footer */}
         <div className="text-center mt-12 text-gray-500 text-sm">
-          <p>© 2025 Sistema de Gestão de Tempo para Professores</p>
+          <p>© 2025 Sistema de Gestão Educacional Professor & Aluno</p>
         </div>
       </div>
     </div>

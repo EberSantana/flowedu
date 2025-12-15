@@ -2339,3 +2339,6 @@
 - [x] Criar botão de ação em massa para matricular aluno em múltiplas disciplinas
 - [x] Implementar rota tRPC para matrícula em massa em múltiplas disciplinas
 - [x] Corrigir erro crítico: "Invalid hook call" que está quebrando o sistema
+
+- [x] Ajustar cards da página de escolha de portal para tamanhos iguais
+- [x] Alterar título do sistema de "Sistema de Gestão de Tempo para Professores" para "Sistema de Gestão Educacional Professor & Aluno"
