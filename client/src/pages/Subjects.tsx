@@ -319,7 +319,7 @@ export default function Subjects() {
                         className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                       >
                         <Users className="mr-2 h-3 w-3" />
-                        Gerenciar Alunos
+                        Matricular Alunos
                       </Button>
                     </Link>
                     <Link href="/learning-paths">

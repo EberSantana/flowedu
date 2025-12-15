@@ -2234,3 +2234,13 @@
 - [ ] Testar importação com alunos existentes (apenas matricular)
 - [ ] Testar duplicatas na mesma importação
 - [ ] Criar checkpoint final
+
+
+## 🎓 Botão Gerenciar Matrículas na Página de Disciplinas
+
+- [x] Adicionar botão "Gerenciar Matrículas" na lista de disciplinas
+- [x] Redirecionar para `/subjects/:id/enrollments`
+- [x] Adicionar ícone apropriado (UserPlus ou Users)
+- [x] Alterar texto para "Matricular Alunos"
+- [x] Testar navegação
+- [ ] Criar checkpoint final
