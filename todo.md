@@ -2375,3 +2375,4 @@
 
 - [x] Investigar e corrigir erros no sistema - corrigidos 14 erros de TypeScript
 - [x] Corrigir erro de conexão WebSocket do Vite - configurado protocol wss e clientPort 443
+- [x] Corrigir problema de redirecionamento OAuth no domínio publicado - limpeza de cache e recompilação

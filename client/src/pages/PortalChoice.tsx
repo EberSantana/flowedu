@@ -1,3 +1,4 @@
+// Version: 2025-12-15-v2 - OAuth redirect fix
 import { Link } from "wouter";
 import { GraduationCap, Users } from "lucide-react";
 import { getLoginUrl } from "@/const";
