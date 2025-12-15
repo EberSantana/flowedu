@@ -2330,3 +2330,5 @@
 - [ ] Testar visualização por aluno
 - [ ] Testar marcação como lido
 - [ ] Criar checkpoint final
+
+- [x] Adicionar botão "Matricular Aluno" individual em cada card de disciplina

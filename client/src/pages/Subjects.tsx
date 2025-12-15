@@ -36,6 +36,7 @@ export default function Subjects() {
   const [showCoursePlan, setShowCoursePlan] = useState(false);
   const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
   const [isQuickEnrollOpen, setIsQuickEnrollOpen] = useState(false);
+  const [selectedSubjectForEnroll, setSelectedSubjectForEnroll] = useState<number | null>(null);
 
   const exportToPDF = () => {
     if (!viewingCoursePlan) return;
@@ -335,16 +336,30 @@ export default function Subjects() {
                   )}
                   
                   <div className="space-y-2 mt-auto pt-3">
-                    <Link href={`/subjects/${subject.id}/enrollments`}>
+                    <div className="flex gap-2">
+                      <Link href={`/subjects/${subject.id}/enrollments`} className="flex-1">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                        >
+                          <Users className="mr-2 h-3 w-3" />
+                          Gerenciar Matrículas
+                        </Button>
+                      </Link>
                       <Button
                         variant="default"
                         size="sm"
-                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                        onClick={() => {
+                          setSelectedSubjectForEnroll(subject.id);
+                          setIsQuickEnrollOpen(true);
+                        }}
+                        className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                        title="Matricular Aluno"
                       >
-                        <Users className="mr-2 h-3 w-3" />
-                        Matricular Alunos
+                        <UserPlus className="h-3 w-3" />
                       </Button>
-                    </Link>
+                    </div>
                     <Link href="/learning-paths">
                       <Button
                         variant="default"
@@ -709,11 +724,17 @@ export default function Subjects() {
         {/* Quick Enroll Modal */}
         <QuickEnrollModal
           open={isQuickEnrollOpen}
-          onOpenChange={setIsQuickEnrollOpen}
+          onOpenChange={(open) => {
+            setIsQuickEnrollOpen(open);
+            if (!open) {
+              setSelectedSubjectForEnroll(null);
+            }
+          }}
           onSuccess={() => {
             utils.subjects.list.invalidate();
             // utils.subjects.getEnrollmentCounts.invalidate();
           }}
+          defaultSubjectId={selectedSubjectForEnroll}
         />
         </div>
       </PageWrapper>

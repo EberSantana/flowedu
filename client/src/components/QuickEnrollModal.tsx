@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,10 +14,18 @@ interface QuickEnrollModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  defaultSubjectId?: number | null;
 }
 
-export default function QuickEnrollModal({ open, onOpenChange, onSuccess }: QuickEnrollModalProps) {
+export default function QuickEnrollModal({ open, onOpenChange, onSuccess, defaultSubjectId }: QuickEnrollModalProps) {
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  
+  // Pré-selecionar disciplina quando defaultSubjectId mudar
+  useEffect(() => {
+    if (defaultSubjectId) {
+      setSelectedSubjectId(defaultSubjectId);
+    }
+  }, [defaultSubjectId]);
   const [registrationNumber, setRegistrationNumber] = useState("");
   const [fullName, setFullName] = useState("");
   const [showImportModal, setShowImportModal] = useState(false);
