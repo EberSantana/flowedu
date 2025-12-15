@@ -355,7 +355,7 @@ export default function Subjects() {
                           setIsQuickEnrollOpen(true);
                         }}
                         className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
-                        title="Matricular Aluno"
+                        title="Matricular aluno rapidamente"
                       >
                         <UserPlus className="h-3 w-3" />
                       </Button>

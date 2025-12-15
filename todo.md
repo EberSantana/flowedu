@@ -2332,3 +2332,5 @@
 - [ ] Criar checkpoint final
 
 - [x] Adicionar botão "Matricular Aluno" individual em cada card de disciplina
+
+- [x] Adicionar tooltip descritivo no botão azul de matrícula individual
