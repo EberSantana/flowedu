@@ -2244,3 +2244,17 @@
 - [x] Alterar texto para "Matricular Alunos"
 - [x] Testar navegação
 - [ ] Criar checkpoint final
+
+
+## 📊 Contador de Alunos nos Cards de Disciplina
+
+### Backend
+- [x] Criar rota tRPC subjects.getEnrollmentCounts
+- [x] Retornar contagem de alunos matriculados por disciplina
+
+### Frontend
+- [x] Adicionar badge visual no card de disciplina
+- [x] Mostrar ícone Users com número
+- [x] Posicionar no header do card (ao lado do título)
+- [x] Badge azul com borda arredondada
+- [ ] Criar checkpoint final

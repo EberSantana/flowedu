@@ -143,6 +143,22 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return await db.getStudentsBySubject(input.subjectId, ctx.user.id);
       }),
+    
+    getEnrollmentCounts: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Buscar todas as disciplinas do usuário
+        const subjects = await db.getSubjectsByUserId(ctx.user.id);
+        
+        // Para cada disciplina, contar alunos matriculados
+        const counts: Record<number, number> = {};
+        
+        for (const subject of subjects) {
+          const students = await db.getStudentsBySubject(subject.id, ctx.user.id);
+          counts[subject.id] = students.length;
+        }
+        
+        return counts;
+      }),
   }),
 
   classes: router({

@@ -117,6 +117,7 @@ export default function Subjects() {
   };
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
+  const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
   const utils = trpc.useUtils();
 
   const createMutation = trpc.subjects.create.useMutation({
@@ -253,7 +254,15 @@ export default function Subjects() {
                       style={{ backgroundColor: subject.color || "#3b82f6" }}
                     />
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{subject.name}</CardTitle>
+                      <div className="flex items-center justify-between gap-2">
+                        <CardTitle className="text-lg truncate">{subject.name}</CardTitle>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 rounded-full border border-blue-200 flex-shrink-0">
+                          <Users className="h-3.5 w-3.5 text-blue-600" />
+                          <span className="text-xs font-semibold text-blue-700">
+                            {enrollmentCounts[subject.id] || 0}
+                          </span>
+                        </div>
+                      </div>
                       <CardDescription className="text-xs">Código: {subject.code}</CardDescription>
                     </div>
                   </div>
