@@ -2361,3 +2361,8 @@
 - [x] Resolver problema de cache persistente que requer atualização constante
 
 - [x] Corrigir problema de login no sistema (celular e PC) - servidor reiniciado
+
+- [x] Padronizar página de Alunos (Students.tsx) ao layout padrão - já estava padronizada
+- [x] Padronizar página de Avisos (Announcements.tsx) ao layout padrão - já estava padronizada
+
+- [x] Padronizar página StudentDashboard.tsx ao layout padrão (DashboardLayout + PageWrapper)
