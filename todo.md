@@ -2338,3 +2338,4 @@
 - [x] Implementar checkboxes para seleção múltipla de disciplinas
 - [x] Criar botão de ação em massa para matricular aluno em múltiplas disciplinas
 - [x] Implementar rota tRPC para matrícula em massa em múltiplas disciplinas
+- [x] Corrigir erro crítico: "Invalid hook call" que está quebrando o sistema
