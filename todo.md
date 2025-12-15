@@ -2370,3 +2370,5 @@
 - [x] Alterar título do sistema para 'Sistema de Gestão Educacional Professor & Aluno' - atualizado em index.html, Sidebar e BibleFooter
 
 - [x] Criar novo ícone representando 'Professor & Aluno' para o sistema - gerados icon-512.png e icon-192.png
+
+- [x] Gerar favicon.ico a partir do novo ícone - gerado com múltiplos tamanhos (16x16, 32x32, 48x48, 64x64)
