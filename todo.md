@@ -2368,3 +2368,5 @@
 - [x] Padronizar página StudentDashboard.tsx ao layout padrão (DashboardLayout + PageWrapper)
 
 - [x] Alterar título do sistema para 'Sistema de Gestão Educacional Professor & Aluno' - atualizado em index.html, Sidebar e BibleFooter
+
+- [x] Criar novo ícone representando 'Professor & Aluno' para o sistema - gerados icon-512.png e icon-192.png
