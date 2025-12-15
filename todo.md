@@ -2342,3 +2342,5 @@
 
 - [x] Ajustar cards da página de escolha de portal para tamanhos iguais
 - [x] Alterar título do sistema de "Sistema de Gestão de Tempo para Professores" para "Sistema de Gestão Educacional Professor & Aluno"
+
+- [x] Ajustar altura dos cards de Portal do Aluno e Professor para ficarem perfeitamente iguais

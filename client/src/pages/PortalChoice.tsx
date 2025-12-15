@@ -20,7 +20,7 @@ export default function PortalChoice() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Portal do Aluno */}
           <Link href="/student-login">
-            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-blue-400">
+            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-blue-400 min-h-[480px] flex items-center">
               <div className="flex flex-col items-center text-center space-y-6">
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
                   <GraduationCap className="w-12 h-12 text-white" />
@@ -50,7 +50,7 @@ export default function PortalChoice() {
 
           {/* Portal do Professor */}
           <a href={getLoginUrl()}>
-            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-purple-400">
+            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-purple-400 min-h-[480px] flex items-center">
               <div className="flex flex-col items-center text-center space-y-6">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
                   <Users className="w-12 h-12 text-white" />
