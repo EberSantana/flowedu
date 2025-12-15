@@ -212,19 +212,6 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess, sub
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Download Template */}
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadTemplate}
-              disabled={downloadTemplateMutation.isPending}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Baixar Template Excel
-            </Button>
-          </div>
-
           {/* Upload Area */}
           {!parsedData && (
             <div

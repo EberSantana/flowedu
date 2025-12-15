@@ -2351,3 +2351,6 @@
 
 - [x] Adequar página StudentAnnouncements.tsx ao layout padrão do sistema
 - [x] Adequar outras páginas relacionadas a alunos ao layout padrão
+
+- [x] Remover botão 'Baixar Template Excel' do modal de importação de alunos
+- [x] Corrigir contador de alunos matriculados que está mostrando 0

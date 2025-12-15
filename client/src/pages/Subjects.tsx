@@ -124,8 +124,7 @@ export default function Subjects() {
   };
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
-  // const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
-  const enrollmentCounts: Record<number, number> = {}; // Temporário
+  const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
   const utils = trpc.useUtils();
 
   const createMutation = trpc.subjects.create.useMutation({
