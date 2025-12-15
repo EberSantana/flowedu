@@ -2354,3 +2354,5 @@
 
 - [x] Remover botão 'Baixar Template Excel' do modal de importação de alunos
 - [x] Corrigir contador de alunos matriculados que está mostrando 0
+
+- [x] Corrigir erros de React hooks (múltiplas cópias do React)
