@@ -2258,3 +2258,25 @@
 - [x] Posicionar no header do card (ao lado do título)
 - [x] Badge azul com borda arredondada
 - [ ] Criar checkpoint final
+
+
+## 🎯 Botão Global "Matricular Alunos" no Cabeçalho
+
+### Modal de Matrícula Rápida
+- [x] Criar componente QuickEnrollModal.tsx
+- [x] Adicionar dropdown de seleção de disciplina
+- [x] Integrar com ImportStudentsModal existente
+- [x] Permitir cadastro manual (matrícula + nome)
+- [x] Permitir importação em massa (Excel/PDF/DOCX)
+
+### Interface
+- [x] Adicionar botão "Matricular Alunos" ao lado de "+ Nova Disciplina"
+- [x] Usar ícone UserPlus
+- [x] Estilo verde (bg-green-50, border-green-200)
+- [x] Abrir modal ao clicar
+
+### Testes
+- [ ] Testar seleção de disciplina
+- [ ] Testar cadastro manual
+- [ ] Testar importação em massa
+- [ ] Criar checkpoint final

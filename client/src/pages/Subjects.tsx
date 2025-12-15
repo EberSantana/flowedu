@@ -9,11 +9,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users, Route } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users, Route, UserPlus } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
+import QuickEnrollModal from "@/components/QuickEnrollModal";
 
 export default function Subjects() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -34,6 +35,7 @@ export default function Subjects() {
   });
   const [showCoursePlan, setShowCoursePlan] = useState(false);
   const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
+  const [isQuickEnrollOpen, setIsQuickEnrollOpen] = useState(false);
 
   const exportToPDF = () => {
     if (!viewingCoursePlan) return;
@@ -235,10 +237,21 @@ export default function Subjects() {
                 Gerenciar Disciplinas
               </h1>
             </div>
-            <Button onClick={() => setIsDialogOpen(true)} size="lg">
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Disciplina
-            </Button>
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => setIsQuickEnrollOpen(true)} 
+                size="lg"
+                variant="outline"
+                className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Matricular Alunos
+              </Button>
+              <Button onClick={() => setIsDialogOpen(true)} size="lg">
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Disciplina
+              </Button>
+            </div>
           </div>
 
         {isLoading ? (
@@ -691,6 +704,16 @@ export default function Subjects() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Quick Enroll Modal */}
+        <QuickEnrollModal
+          open={isQuickEnrollOpen}
+          onOpenChange={setIsQuickEnrollOpen}
+          onSuccess={() => {
+            utils.subjects.list.invalidate();
+            utils.subjects.getEnrollmentCounts.invalidate();
+          }}
+        />
         </div>
       </PageWrapper>
     </>
