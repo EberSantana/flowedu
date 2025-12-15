@@ -2366,3 +2366,5 @@
 - [x] Padronizar página de Avisos (Announcements.tsx) ao layout padrão - já estava padronizada
 
 - [x] Padronizar página StudentDashboard.tsx ao layout padrão (DashboardLayout + PageWrapper)
+
+- [x] Alterar título do sistema para 'Sistema de Gestão Educacional Professor & Aluno' - atualizado em index.html, Sidebar e BibleFooter

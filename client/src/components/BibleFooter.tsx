@@ -81,7 +81,7 @@ export default function BibleFooter() {
           {/* Copyright */}
           <div className="pt-4 border-t border-gray-100 w-full text-center">
             <p className="text-xs text-gray-500">
-              Sistema de Gestão de Tempo para Professores © {new Date().getFullYear()}
+              Sistema de Gestão Educacional Professor & Aluno © {new Date().getFullYear()}
             </p>
           </div>
         </div>
