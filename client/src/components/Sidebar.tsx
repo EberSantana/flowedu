@@ -19,7 +19,8 @@ import {
   BarChart3,
   Route,
   HelpCircle,
-  UserPlus
+  UserPlus,
+  Megaphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -100,6 +101,11 @@ const teacherNavItems: NavItem[] = [
     href: "/students",
   },
   {
+    label: "Avisos",
+    icon: <Megaphone className="h-5 w-5" />,
+    href: "/announcements",
+  },
+  {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",
@@ -113,6 +119,11 @@ const studentNavItems: NavItem[] = [
     label: "Minhas Disciplinas",
     icon: <BookOpen className="h-5 w-5" />,
     href: "/student-dashboard",
+  },
+  {
+    label: "Avisos",
+    icon: <Megaphone className="h-5 w-5" />,
+    href: "/student/announcements",
   },
   {
     label: "Perfil",

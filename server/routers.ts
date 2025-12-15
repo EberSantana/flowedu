@@ -2268,6 +2268,69 @@ Crie sugestões no formato JSON:
       }),
   }),
 
+  // ==================== ANNOUNCEMENTS (AVISOS) ====================
+  announcements: router({
+    // Professor: Criar aviso
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(1),
+        message: z.string().min(1),
+        isImportant: z.boolean(),
+        subjectId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createAnnouncement({
+          ...input,
+          userId: ctx.user.id,
+        });
+      }),
+    
+    // Professor: Listar todos os avisos
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getAnnouncementsByUser(ctx.user.id);
+      }),
+    
+    // Professor: Atualizar aviso
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        message: z.string().optional(),
+        isImportant: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateAnnouncement(id, data, ctx.user.id);
+      }),
+    
+    // Professor: Deletar aviso
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteAnnouncement(input.id, ctx.user.id);
+      }),
+    
+    // Aluno: Listar avisos das disciplinas matriculadas
+    getForStudent: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getAnnouncementsForStudent(ctx.studentSession.studentId);
+      }),
+    
+    // Aluno: Contar avisos não lidos
+    getUnreadCount: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getUnreadAnnouncementsCount(ctx.studentSession.studentId);
+      }),
+    
+    // Aluno: Marcar aviso como lido
+    markAsRead: studentProcedure
+      .input(z.object({ announcementId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.markAnnouncementAsRead(input.announcementId, ctx.studentSession.studentId);
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

@@ -27,6 +27,8 @@ import StudentProfile from "./pages/StudentProfile";
 import SubjectEnrollments from "./pages/SubjectEnrollments";
 import PortalChoice from "./pages/PortalChoice";
 import StudentLogin from "./pages/StudentLogin";
+import Announcements from "./pages/Announcements";
+import StudentAnnouncements from "./pages/StudentAnnouncements";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -48,9 +50,11 @@ function Router() {
         <Route path={"/learning-paths"} component={LearningPaths} />
         <Route path={"/active-methodologies"} component={ActiveMethodologies} />
         <Route path={"/tasks"} component={Tasks} />
+        <Route path={"/announcements"} component={Announcements} />
         <Route path={"/profile"} component={Profile} />
         <Route path={"/admin/users"} component={AdminUsers} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
+        <Route path={"/student/announcements"} component={StudentAnnouncements} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />

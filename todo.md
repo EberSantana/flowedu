@@ -2294,3 +2294,39 @@
 - [x] Comentar uso de getEnrollmentCounts temporariamente (contador desabilitado)
 - [x] Reiniciar servidor e verificar
 - [ ] Criar checkpoint após correções
+
+
+## 📢 Sistema de Avisos (Professor → Aluno)
+
+### Backend - Schema e Rotas
+- [x] Criar tabela `announcements` (id, title, message, isImportant, subjectId, userId, createdAt)
+- [x] Criar tabela `announcement_reads` (announcementId, studentId, readAt)
+- [x] Criar rota tRPC announcements.create (professor)
+- [x] Criar rota tRPC announcements.list (professor - todos os avisos)
+- [x] Criar rota tRPC announcements.update (professor)
+- [x] Criar rota tRPC announcements.delete (professor)
+- [x] Criar rota tRPC announcements.getForStudent (aluno - apenas das disciplinas matriculadas)
+- [x] Criar rota tRPC announcements.markAsRead (aluno)
+- [x] Criar rota tRPC announcements.getUnreadCount (aluno - para badge)
+
+### Frontend - Professor
+- [x] Criar página Announcements.tsx (professores)
+- [x] Formulário de criação (título, mensagem, disciplina, importante)
+- [x] Lista de avisos com edit/delete
+- [x] Avisos importantes com destaque vermelho
+- [x] Adicionar item "Avisos" no menu lateral do professor
+
+### Frontend - Aluno
+- [x] Criar página StudentAnnouncements.tsx
+- [x] Listar avisos das disciplinas matriculadas
+- [x] Destacar avisos importantes (borda vermelha)
+- [x] Botão "Marcar como lido"
+- [x] Badge "Novo" em avisos não lidos
+- [x] Adicionar item "Avisos" no menu lateral do aluno
+- [ ] Badge de contagem de não lidos no menu lateral (futuro)
+
+### Testes
+- [ ] Testar criação de aviso por professor
+- [ ] Testar visualização por aluno
+- [ ] Testar marcação como lido
+- [ ] Criar checkpoint final

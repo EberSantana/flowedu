@@ -474,3 +474,39 @@ export const subjectEnrollments = mysqlTable("subjectEnrollments", {
   enrolledAt: timestamp("enrolledAt").defaultNow(),
   userId: int("userId").notNull(),
 });
+
+
+/**
+ * Avisos/Anúncios (Announcements)
+ * Professores postam avisos para alunos de disciplinas específicas
+ */
+export const announcements = mysqlTable("announcements", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  isImportant: boolean("isImportant").default(false).notNull(),
+  subjectId: int("subjectId").notNull(), // Disciplina relacionada
+  userId: int("userId").notNull(), // Professor que criou
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Announcement = typeof announcements.$inferSelect;
+export type InsertAnnouncement = typeof announcements.$inferInsert;
+
+/**
+ * Leitura de Avisos (Announcement Reads)
+ * Rastreia quais alunos leram quais avisos
+ */
+export const announcementReads = mysqlTable("announcementReads", {
+  id: int("id").autoincrement().primaryKey(),
+  announcementId: int("announcementId").notNull(),
+  studentId: int("studentId").notNull(),
+  readAt: timestamp("readAt").defaultNow().notNull(),
+}, (table) => ({
+  // Índice único: aluno não pode marcar o mesmo aviso como lido duas vezes
+  uniqueRead: sql`UNIQUE KEY unique_announcement_read (announcementId, studentId)`,
+}));
+
+export type AnnouncementRead = typeof announcementReads.$inferSelect;
+export type InsertAnnouncementRead = typeof announcementReads.$inferInsert;

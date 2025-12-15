@@ -27,6 +27,8 @@ import {
   studentClassEnrollments,
   studentAttendance,
   subjectEnrollments,
+  announcements,
+  announcementReads,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -1732,4 +1734,135 @@ export async function getSubjectsByStudent(studentId: number, userId: number) {
     .orderBy(subjects.name);
   
   return enrollments;
+}
+
+
+// ==================== ANNOUNCEMENTS (AVISOS) ====================
+
+export async function createAnnouncement(data: { title: string; message: string; isImportant: boolean; subjectId: number; userId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(announcements).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function getAnnouncementsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({
+    id: announcements.id,
+    title: announcements.title,
+    message: announcements.message,
+    isImportant: announcements.isImportant,
+    subjectId: announcements.subjectId,
+    subjectName: subjects.name,
+    createdAt: announcements.createdAt,
+    updatedAt: announcements.updatedAt,
+  })
+    .from(announcements)
+    .innerJoin(subjects, eq(announcements.subjectId, subjects.id))
+    .where(eq(announcements.userId, userId))
+    .orderBy(desc(announcements.createdAt));
+  
+  return result;
+}
+
+export async function getAnnouncementsForStudent(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar avisos das disciplinas em que o aluno está matriculado
+  const result = await db.select({
+    id: announcements.id,
+    title: announcements.title,
+    message: announcements.message,
+    isImportant: announcements.isImportant,
+    subjectId: announcements.subjectId,
+    subjectName: subjects.name,
+    createdAt: announcements.createdAt,
+    isRead: announcementReads.readAt,
+  })
+    .from(announcements)
+    .innerJoin(subjects, eq(announcements.subjectId, subjects.id))
+    .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, announcements.subjectId))
+    .leftJoin(announcementReads, and(
+      eq(announcementReads.announcementId, announcements.id),
+      eq(announcementReads.studentId, studentId)
+    ))
+    .where(eq(subjectEnrollments.studentId, studentId))
+    .orderBy(desc(announcements.isImportant), desc(announcements.createdAt));
+  
+  return result;
+}
+
+export async function getUnreadAnnouncementsCount(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({
+    count: sql<number>`COUNT(DISTINCT ${announcements.id})`,
+  })
+    .from(announcements)
+    .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, announcements.subjectId))
+    .leftJoin(announcementReads, and(
+      eq(announcementReads.announcementId, announcements.id),
+      eq(announcementReads.studentId, studentId)
+    ))
+    .where(and(
+      eq(subjectEnrollments.studentId, studentId),
+      sql`${announcementReads.id} IS NULL`
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+export async function markAnnouncementAsRead(announcementId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    await db.insert(announcementReads).values({
+      announcementId,
+      studentId,
+    });
+    return { success: true };
+  } catch (error: any) {
+    // Se já foi marcado como lido, ignorar erro de duplicata
+    if (error.code === 'ER_DUP_ENTRY') {
+      return { success: true };
+    }
+    throw error;
+  }
+}
+
+export async function updateAnnouncement(id: number, data: { title?: string; message?: string; isImportant?: boolean }, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(announcements)
+    .set(data)
+    .where(and(
+      eq(announcements.id, id),
+      eq(announcements.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteAnnouncement(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Deletar leituras associadas primeiro
+  await db.delete(announcementReads).where(eq(announcementReads.announcementId, id));
+  
+  // Deletar aviso
+  await db.delete(announcements).where(and(
+    eq(announcements.id, id),
+    eq(announcements.userId, userId)
+  ));
+  
+  return { success: true };
 }
