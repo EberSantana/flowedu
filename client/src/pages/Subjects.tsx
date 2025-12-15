@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,6 +38,9 @@ export default function Subjects() {
   const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
   const [isQuickEnrollOpen, setIsQuickEnrollOpen] = useState(false);
   const [selectedSubjectForEnroll, setSelectedSubjectForEnroll] = useState<number | null>(null);
+  const [selectedSubjects, setSelectedSubjects] = useState<number[]>([]);
+  const [isBulkEnrollOpen, setIsBulkEnrollOpen] = useState(false);
+  const [bulkEnrollData, setBulkEnrollData] = useState({ registrationNumber: "", fullName: "" });
 
   const exportToPDF = () => {
     if (!viewingCoursePlan) return;
@@ -156,6 +160,33 @@ export default function Subjects() {
     },
   });
 
+  const bulkEnrollMutation = (trpc as any).students.bulkEnrollInMultipleSubjects.useMutation({
+    onSuccess: (result) => {
+      const messages = [];
+      if (result.studentCreated) {
+        messages.push("Aluno criado");
+      }
+      if (result.enrolled.length > 0) {
+        messages.push(`Matriculado em ${result.enrolled.length} disciplina(s)`);
+      }
+      if (messages.length > 0) {
+        toast.success(messages.join(" e "));
+      }
+      if (result.errors.length > 0) {
+        result.errors.forEach(error => toast.error(error));
+      }
+      
+      // Limpar formulário e seleção
+      setBulkEnrollData({ registrationNumber: "", fullName: "" });
+      setSelectedSubjects([]);
+      setIsBulkEnrollOpen(false);
+      utils.subjects.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao matricular: ${error.message}`);
+    },
+  });
+
   const resetForm = () => {
     setFormData({ 
       name: "", 
@@ -202,6 +233,24 @@ export default function Subjects() {
     }
   };
 
+  const handleBulkEnroll = () => {
+    if (!bulkEnrollData.registrationNumber.trim() || !bulkEnrollData.fullName.trim()) {
+      toast.error("Preencha matrícula e nome completo");
+      return;
+    }
+
+    if (selectedSubjects.length === 0) {
+      toast.error("Selecione pelo menos uma disciplina");
+      return;
+    }
+
+    bulkEnrollMutation.mutate({
+      registrationNumber: bulkEnrollData.registrationNumber.trim(),
+      fullName: bulkEnrollData.fullName.trim(),
+      subjectIds: selectedSubjects,
+    });
+  };
+
   const handleEdit = (subject: any) => {
     setEditingSubject(subject);
     setFormData({
@@ -240,19 +289,41 @@ export default function Subjects() {
               </h1>
             </div>
             <div className="flex gap-3">
-              <Button 
-                onClick={() => setIsQuickEnrollOpen(true)} 
-                size="lg"
-                variant="outline"
-                className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800"
-              >
-                <UserPlus className="mr-2 h-4 w-4" />
-                Matricular Alunos
-              </Button>
-              <Button onClick={() => setIsDialogOpen(true)} size="lg">
-                <Plus className="mr-2 h-4 w-4" />
-                Nova Disciplina
-              </Button>
+              {selectedSubjects.length > 0 ? (
+                <>
+                  <Button 
+                    onClick={() => setIsBulkEnrollOpen(true)} 
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Matricular em {selectedSubjects.length} Disciplina{selectedSubjects.length > 1 ? 's' : ''}
+                  </Button>
+                  <Button 
+                    onClick={() => setSelectedSubjects([])} 
+                    size="lg"
+                    variant="outline"
+                  >
+                    Cancelar Seleção
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    onClick={() => setIsQuickEnrollOpen(true)} 
+                    size="lg"
+                    variant="outline"
+                    className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Matricular Alunos
+                  </Button>
+                  <Button onClick={() => setIsDialogOpen(true)} size="lg">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nova Disciplina
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -264,6 +335,17 @@ export default function Subjects() {
               <Card key={subject.id} className="bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full">
                 <CardHeader className="pb-3">
                   <div className="flex items-start gap-3">
+                    <Checkbox
+                      checked={selectedSubjects.includes(subject.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedSubjects([...selectedSubjects, subject.id]);
+                        } else {
+                          setSelectedSubjects(selectedSubjects.filter(id => id !== subject.id));
+                        }
+                      }}
+                      className="mt-1.5"
+                    />
                     <div
                       className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
                       style={{ backgroundColor: subject.color || "#3b82f6" }}
@@ -736,6 +818,58 @@ export default function Subjects() {
           }}
           defaultSubjectId={selectedSubjectForEnroll}
         />
+
+        {/* Bulk Enroll Modal */}
+        <Dialog open={isBulkEnrollOpen} onOpenChange={setIsBulkEnrollOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Matricular Aluno em Múltiplas Disciplinas</DialogTitle>
+              <DialogDescription>
+                Matricule o mesmo aluno em {selectedSubjects.length} disciplina{selectedSubjects.length > 1 ? 's' : ''} selecionada{selectedSubjects.length > 1 ? 's' : ''} simultaneamente.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="bulk-registration">Matrícula *</Label>
+                <Input
+                  id="bulk-registration"
+                  placeholder="Ex: 2024001"
+                  value={bulkEnrollData.registrationNumber}
+                  onChange={(e) => setBulkEnrollData({ ...bulkEnrollData, registrationNumber: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bulk-fullname">Nome Completo *</Label>
+                <Input
+                  id="bulk-fullname"
+                  placeholder="Ex: João da Silva"
+                  value={bulkEnrollData.fullName}
+                  onChange={(e) => setBulkEnrollData({ ...bulkEnrollData, fullName: e.target.value })}
+                />
+              </div>
+              <div className="rounded-lg bg-purple-50 border border-purple-200 p-3">
+                <p className="text-sm font-medium text-purple-900 mb-2">Disciplinas selecionadas:</p>
+                <ul className="text-sm text-purple-700 space-y-1">
+                  {subjects?.filter(s => selectedSubjects.includes(s.id)).map(s => (
+                    <li key={s.id}>• {s.name} ({s.code})</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsBulkEnrollOpen(false)}>
+                Cancelar
+              </Button>
+              <Button 
+                onClick={handleBulkEnroll}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Matricular em Todas
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         </div>
       </PageWrapper>
     </>

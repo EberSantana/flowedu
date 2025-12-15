@@ -2235,6 +2235,67 @@ Crie sugestões no formato JSON:
         
         return results;
       }),
+
+    // Matrícula em massa em múltiplas disciplinas
+    bulkEnrollInMultipleSubjects: protectedProcedure
+      .input(z.object({
+        registrationNumber: z.string(),
+        fullName: z.string(),
+        subjectIds: z.array(z.number()),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const results = {
+          studentCreated: false,
+          enrolled: [] as string[],
+          errors: [] as string[],
+        };
+        
+        try {
+          // Verificar se aluno já existe
+          let student = await db.getStudentByRegistration(input.registrationNumber);
+          
+          // Criar aluno se não existir
+          if (!student) {
+            student = await db.createStudent({
+              registrationNumber: input.registrationNumber,
+              fullName: input.fullName,
+              userId: ctx.user.id,
+            });
+            results.studentCreated = true;
+          }
+          
+          // Matricular em cada disciplina
+          for (const subjectId of input.subjectIds) {
+            try {
+              // Buscar nome da disciplina
+              const subject = await db.getSubjectById(subjectId, ctx.user.id);
+              if (!subject) {
+                results.errors.push(`Disciplina ID ${subjectId} não encontrada`);
+                continue;
+              }
+              
+              // Verificar se já está matriculado
+              const enrolledStudents = await db.getStudentsBySubject(subjectId, ctx.user.id);
+              const alreadyEnrolled = enrolledStudents.some(e => e.studentId === student!.id);
+              
+              if (alreadyEnrolled) {
+                results.errors.push(`Já matriculado em ${subject.name}`);
+                continue;
+              }
+              
+              // Matricular
+              await db.enrollStudentInSubject(student.id, subjectId, ctx.user.id);
+              results.enrolled.push(subject.name);
+            } catch (error: any) {
+              results.errors.push(`Erro em disciplina ID ${subjectId}: ${error.message}`);
+            }
+          }
+        } catch (error: any) {
+          results.errors.push(`Erro ao processar aluno: ${error.message}`);
+        }
+        
+        return results;
+      }),
   }),
 
   // Notifications

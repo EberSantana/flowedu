@@ -2334,3 +2334,7 @@
 - [x] Adicionar botão "Matricular Aluno" individual em cada card de disciplina
 
 - [x] Adicionar tooltip descritivo no botão azul de matrícula individual
+
+- [x] Implementar checkboxes para seleção múltipla de disciplinas
+- [x] Criar botão de ação em massa para matricular aluno em múltiplas disciplinas
+- [x] Implementar rota tRPC para matrícula em massa em múltiplas disciplinas
