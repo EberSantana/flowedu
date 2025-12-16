@@ -373,61 +373,6 @@ export default function Subjects() {
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">{subject.description}</p>
                     )}
                     
-                    {/* Lista de Alunos Matriculados */}
-                    {(enrollmentCounts[subject.id] || 0) > 0 && (
-                      <div className="mb-3">
-                        <button
-                          onClick={() => {
-                            if (expandedSubjects.includes(subject.id)) {
-                              setExpandedSubjects(expandedSubjects.filter(id => id !== subject.id));
-                            } else {
-                              setExpandedSubjects([...expandedSubjects, subject.id]);
-                            }
-                          }}
-                          className="w-full p-2 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
-                        >
-                          <div className="flex items-center justify-between text-green-700 text-sm font-medium">
-                            <div className="flex items-center gap-2">
-                              <Users className="h-4 w-4" />
-                              <span>{enrollmentCounts[subject.id]} aluno(s) matriculado(s)</span>
-                            </div>
-                            {expandedSubjects.includes(subject.id) ? (
-                              <ChevronUp className="h-4 w-4" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4" />
-                            )}
-                          </div>
-                        </button>
-                        
-                        {expandedSubjects.includes(subject.id) && enrollmentsWithStudents[subject.id] && (
-                          <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
-                            {enrollmentsWithStudents[subject.id].map((student) => (
-                              <div
-                                key={student.id}
-                                className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-100"
-                              >
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage
-                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(student.fullName)}&backgroundColor=22c55e&textColor=ffffff`}
-                                  />
-                                  <AvatarFallback className="bg-green-500 text-white text-xs">
-                                    {student.fullName.charAt(0).toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                    {student.fullName}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    Mat: {student.registrationNumber}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                   {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (
                     <button
@@ -477,17 +422,70 @@ export default function Subjects() {
                   )}
                   
                   <div className="space-y-2 mt-auto pt-3">
+                    {/* Botão Gerenciar Matrículas com lista expansível */}
                     <div className="flex gap-2">
-                      <Link href={`/subjects/${subject.id}/enrollments`} className="flex-1">
+                      <div className="flex-1">
                         <Button
                           variant="default"
                           size="sm"
+                          onClick={() => {
+                            if (expandedSubjects.includes(subject.id)) {
+                              setExpandedSubjects(expandedSubjects.filter(id => id !== subject.id));
+                            } else {
+                              setExpandedSubjects([...expandedSubjects, subject.id]);
+                            }
+                          }}
                           className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                         >
                           <Users className="mr-2 h-3 w-3" />
-                          Gerenciar Matrículas
+                          {enrollmentCounts[subject.id] || 0} Aluno(s)
+                          {expandedSubjects.includes(subject.id) ? (
+                            <ChevronUp className="ml-2 h-3 w-3" />
+                          ) : (
+                            <ChevronDown className="ml-2 h-3 w-3" />
+                          )}
                         </Button>
-                      </Link>
+                        
+                        {/* Lista de alunos expansível */}
+                        {expandedSubjects.includes(subject.id) && (
+                          <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                            {(enrollmentsWithStudents[subject.id]?.length || 0) === 0 ? (
+                              <p className="text-sm text-gray-500 text-center py-2">Nenhum aluno matriculado</p>
+                            ) : (
+                              <div className="space-y-2 max-h-40 overflow-y-auto">
+                                {enrollmentsWithStudents[subject.id]?.map((student) => (
+                                  <div
+                                    key={student.id}
+                                    className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-100"
+                                  >
+                                    <Avatar className="h-7 w-7">
+                                      <AvatarImage
+                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(student.fullName)}&backgroundColor=22c55e&textColor=ffffff`}
+                                      />
+                                      <AvatarFallback className="bg-green-500 text-white text-xs">
+                                        {student.fullName.charAt(0).toUpperCase()}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-medium text-gray-900 truncate">
+                                        {student.fullName}
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        {student.registrationNumber}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <Link href={`/subjects/${subject.id}/enrollments`} className="block mt-2">
+                              <Button variant="outline" size="sm" className="w-full text-xs">
+                                Ver Detalhes Completos
+                              </Button>
+                            </Link>
+                          </div>
+                        )}
+                      </div>
                       <Button
                         variant="default"
                         size="sm"
