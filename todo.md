@@ -2380,3 +2380,4 @@
 - [x] Adicionar botão de Logout no cabeçalho do Dashboard
 - [x] Adicionar foto de perfil do usuário no cabeçalho do Dashboard
 - [x] Adicionar lista de alunos matriculados na página Gerenciar Matrículas
+- [x] Mostrar prévia dos alunos matriculados no card da disciplina

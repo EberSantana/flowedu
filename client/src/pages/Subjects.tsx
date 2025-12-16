@@ -10,7 +10,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users, Route, UserPlus } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users, Route, UserPlus, Eye, EyeOff } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
@@ -125,6 +127,8 @@ export default function Subjects() {
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
   const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
+  const { data: enrollmentsWithStudents = {} } = trpc.subjects.getEnrollmentsWithStudents.useQuery();
+  const [expandedSubjects, setExpandedSubjects] = useState<number[]>([]);
   const utils = trpc.useUtils();
 
   const createMutation = trpc.subjects.create.useMutation({
@@ -367,6 +371,62 @@ export default function Subjects() {
                   <div className="flex-1">
                     {subject.description && (
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">{subject.description}</p>
+                    )}
+                    
+                    {/* Lista de Alunos Matriculados */}
+                    {(enrollmentCounts[subject.id] || 0) > 0 && (
+                      <div className="mb-3">
+                        <button
+                          onClick={() => {
+                            if (expandedSubjects.includes(subject.id)) {
+                              setExpandedSubjects(expandedSubjects.filter(id => id !== subject.id));
+                            } else {
+                              setExpandedSubjects([...expandedSubjects, subject.id]);
+                            }
+                          }}
+                          className="w-full p-2 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
+                        >
+                          <div className="flex items-center justify-between text-green-700 text-sm font-medium">
+                            <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4" />
+                              <span>{enrollmentCounts[subject.id]} aluno(s) matriculado(s)</span>
+                            </div>
+                            {expandedSubjects.includes(subject.id) ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </div>
+                        </button>
+                        
+                        {expandedSubjects.includes(subject.id) && enrollmentsWithStudents[subject.id] && (
+                          <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                            {enrollmentsWithStudents[subject.id].map((student) => (
+                              <div
+                                key={student.id}
+                                className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-100"
+                              >
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage
+                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(student.fullName)}&backgroundColor=22c55e&textColor=ffffff`}
+                                  />
+                                  <AvatarFallback className="bg-green-500 text-white text-xs">
+                                    {student.fullName.charAt(0).toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {student.fullName}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Mat: {student.registrationNumber}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                   {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (

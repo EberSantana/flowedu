@@ -159,6 +159,24 @@ export const appRouter = router({
         
         return counts;
       }),
+    
+    // Buscar alunos matriculados com detalhes para todas as disciplinas
+    getEnrollmentsWithStudents: protectedProcedure
+      .query(async ({ ctx }) => {
+        const subjects = await db.getSubjectsByUserId(ctx.user.id);
+        const result: Record<number, Array<{ id: number; fullName: string; registrationNumber: string }>> = {};
+        
+        for (const subject of subjects) {
+          const enrollments = await db.getStudentsBySubject(subject.id, ctx.user.id);
+          result[subject.id] = enrollments.map(e => ({
+            id: e.studentId,
+            fullName: e.fullName || 'Aluno',
+            registrationNumber: e.registrationNumber || '',
+          }));
+        }
+        
+        return result;
+      }),
   }),
 
   classes: router({
