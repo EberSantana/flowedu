@@ -2383,3 +2383,5 @@
 - [x] Mostrar prévia dos alunos matriculados no card da disciplina
 - [x] Modificar botão Gerenciar Matrículas para mostrar quantitativo e expandir lista de alunos
 - [x] Melhorar página Gerenciar Matrículas com cards de estatísticas e lista de alunos
+- [x] Adicionar número de matrícula na página Ver Detalhes Completos (ManageEnrollments)
+- [x] Simplificar botão no card de disciplina para apenas "Ver Detalhes" (remover lista expansível)

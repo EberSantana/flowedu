@@ -288,10 +288,10 @@ export default function ManageEnrollments() {
                             {enrollment.student?.name || 'Aluno'}
                           </h4>
                           <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                            {enrollment.student?.email && (
-                              <span className="flex items-center gap-1">
-                                <Mail className="h-3 w-3" />
-                                {enrollment.student.email}
+                            {enrollment.registrationNumber && (
+                              <span className="flex items-center gap-1 font-medium text-gray-700">
+                                <GraduationCap className="h-3 w-3" />
+                                {enrollment.registrationNumber}
                               </span>
                             )}
                             <span className="flex items-center gap-1">

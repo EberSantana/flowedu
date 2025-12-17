@@ -1830,6 +1830,7 @@ Crie sugestões no formato JSON:
           subjectId: input.subjectId,
           enrolledAt: enrollment.enrolledAt,
           status: 'active' as const,
+          registrationNumber: enrollment.registrationNumber || '',
           student: {
             id: enrollment.studentId,
             name: enrollment.fullName || 'Aluno',

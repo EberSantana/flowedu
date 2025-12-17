@@ -10,8 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, ChevronDown, ChevronUp, Download, Users, Route, UserPlus, Eye, EyeOff } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
@@ -127,8 +126,7 @@ export default function Subjects() {
 
   const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
   const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
-  const { data: enrollmentsWithStudents = {} } = trpc.subjects.getEnrollmentsWithStudents.useQuery();
-  const [expandedSubjects, setExpandedSubjects] = useState<number[]>([]);
+  // Query e estado removidos - botão agora redireciona diretamente para página de detalhes
   const utils = trpc.useUtils();
 
   const createMutation = trpc.subjects.create.useMutation({
@@ -425,66 +423,17 @@ export default function Subjects() {
                     {/* Botão Gerenciar Matrículas com lista expansível */}
                     <div className="flex gap-2">
                       <div className="flex-1">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => {
-                            if (expandedSubjects.includes(subject.id)) {
-                              setExpandedSubjects(expandedSubjects.filter(id => id !== subject.id));
-                            } else {
-                              setExpandedSubjects([...expandedSubjects, subject.id]);
-                            }
-                          }}
-                          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                        >
-                          <Users className="mr-2 h-3 w-3" />
-                          {enrollmentCounts[subject.id] || 0} Aluno(s)
-                          {expandedSubjects.includes(subject.id) ? (
-                            <ChevronUp className="ml-2 h-3 w-3" />
-                          ) : (
-                            <ChevronDown className="ml-2 h-3 w-3" />
-                          )}
-                        </Button>
-                        
-                        {/* Lista de alunos expansível */}
-                        {expandedSubjects.includes(subject.id) && (
-                          <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
-                            {(enrollmentsWithStudents[subject.id]?.length || 0) === 0 ? (
-                              <p className="text-sm text-gray-500 text-center py-2">Nenhum aluno matriculado</p>
-                            ) : (
-                              <div className="space-y-2 max-h-40 overflow-y-auto">
-                                {enrollmentsWithStudents[subject.id]?.map((student) => (
-                                  <div
-                                    key={student.id}
-                                    className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-100"
-                                  >
-                                    <Avatar className="h-7 w-7">
-                                      <AvatarImage
-                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(student.fullName)}&backgroundColor=22c55e&textColor=ffffff`}
-                                      />
-                                      <AvatarFallback className="bg-green-500 text-white text-xs">
-                                        {student.fullName.charAt(0).toUpperCase()}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-medium text-gray-900 truncate">
-                                        {student.fullName}
-                                      </p>
-                                      <p className="text-xs text-gray-500">
-                                        {student.registrationNumber}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            <Link href={`/subjects/${subject.id}/enrollments`} className="block mt-2">
-                              <Button variant="outline" size="sm" className="w-full text-xs">
-                                Ver Detalhes Completos
-                              </Button>
-                            </Link>
-                          </div>
-                        )}
+                        {/* Botão Ver Detalhes Completos com contador de alunos */}
+                        <Link href={`/subjects/${subject.id}/enrollments`} className="block">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                          >
+                            <Users className="mr-2 h-3 w-3" />
+                            {enrollmentCounts[subject.id] || 0} Aluno(s) - Ver Detalhes
+                          </Button>
+                        </Link>
                       </div>
                       <Button
                         variant="default"
