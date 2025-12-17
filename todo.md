@@ -2386,3 +2386,4 @@
 - [x] Adicionar número de matrícula na página Ver Detalhes Completos (ManageEnrollments)
 - [x] Simplificar botão no card de disciplina para apenas "Ver Detalhes" (remover lista expansível)
 - [x] Remover botão "Avisos" do menu lateral (não tem serventia)
+- [x] Adicionar seção de Favoritos no menu lateral para acesso rápido às páginas mais usadas

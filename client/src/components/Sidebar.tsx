@@ -20,13 +20,15 @@ import {
   Route,
   HelpCircle,
   UserPlus,
-  Megaphone
+  Megaphone,
+  Star,
+  StarOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import NotificationBell from "@/components/NotificationBell";
 import {
@@ -127,11 +129,48 @@ const studentNavItems: NavItem[] = [
   },
 ];
 
+// Chave para armazenar favoritos no localStorage
+const FAVORITES_KEY = 'sidebar-favorites';
+
 export default function Sidebar() {
   const [location] = useLocation();
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
+  
+  // Estado para favoritos
+  const [favorites, setFavorites] = useState<string[]>([]);
+  
+  // Carregar favoritos do localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(FAVORITES_KEY);
+    if (saved) {
+      try {
+        setFavorites(JSON.parse(saved));
+      } catch {
+        setFavorites([]);
+      }
+    }
+  }, []);
+  
+  // Salvar favoritos no localStorage
+  const saveFavorites = (newFavorites: string[]) => {
+    setFavorites(newFavorites);
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+  };
+  
+  // Toggle favorito
+  const toggleFavorite = (href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (favorites.includes(href)) {
+      saveFavorites(favorites.filter(f => f !== href));
+      toast.success('Removido dos favoritos');
+    } else {
+      saveFavorites([...favorites, href]);
+      toast.success('Adicionado aos favoritos');
+    }
+  };
   
   // Detectar tipo de usuário baseado na rota atual
   // Se está em rotas de aluno (/student-dashboard, /student/*), é aluno
@@ -250,11 +289,94 @@ export default function Sidebar() {
             <nav className={`flex-1 overflow-y-auto transition-all duration-300 ${
               isCompact ? 'p-2' : 'p-4'
             }`}>
+              {/* Seção de Favoritos */}
+              {favorites.length > 0 && !isStudent && (
+                <div className="mb-4">
+                  {!isCompact && (
+                    <div className="flex items-center gap-2 px-2 mb-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Favoritos</span>
+                    </div>
+                  )}
+                  <ul className="space-y-1">
+                    {favorites.map((href) => {
+                      const item = teacherNavItems.find(i => i.href === href);
+                      if (!item) return null;
+                      const isActive = location === item.href;
+                      
+                      return (
+                        <li key={`fav-${item.href}`}>
+                          {isCompact ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Link
+                                  href={item.href}
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                  className={`
+                                    flex items-center justify-center p-3 rounded-xl relative group
+                                    transition-all duration-200
+                                    ${isActive
+                                      ? "bg-gradient-to-r from-yellow-500 to-yellow-400 text-white shadow-lg shadow-yellow-500/20"
+                                      : "text-foreground hover:bg-gradient-to-r hover:from-yellow-500/10 hover:to-yellow-400/5 hover:shadow-md"
+                                    }
+                                  `}
+                                >
+                                  <span className="transition-transform duration-200 group-hover:scale-110">
+                                    {item.icon}
+                                  </span>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent side="right">
+                                <p>⭐ {item.label}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <Link
+                                href={item.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`
+                                  flex-1 flex items-center gap-3 px-4 py-2.5 rounded-xl
+                                  transition-all duration-200
+                                  ${isActive
+                                    ? "bg-gradient-to-r from-yellow-500 to-yellow-400 text-white shadow-lg shadow-yellow-500/20"
+                                    : "text-foreground hover:bg-gradient-to-r hover:from-yellow-500/10 hover:to-yellow-400/5 hover:shadow-md"
+                                  }
+                                `}
+                              >
+                                {item.icon}
+                                <span className="font-medium text-sm">{item.label}</span>
+                              </Link>
+                              <button
+                                onClick={(e) => toggleFavorite(item.href, e)}
+                                className="p-1.5 rounded-lg hover:bg-red-100 text-yellow-500 hover:text-red-500 transition-colors"
+                                title="Remover dos favoritos"
+                              >
+                                <StarOff className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {!isCompact && <div className="border-b border-border/50 mt-3 mb-3" />}
+                </div>
+              )}
+              
+              {/* Menu Principal */}
+              {!isCompact && !isStudent && (
+                <div className="flex items-center gap-2 px-2 mb-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Menu</span>
+                </div>
+              )}
               <ul className="space-y-1">
                 {filteredNavItems.map((item) => {
                   const isActive = location === item.href;
                   const isCalendar = item.href === '/calendar';
                   const notificationCount = isCalendar && upcomingEvents ? upcomingEvents.length : 0;
+                  
+                  const isFavorite = favorites.includes(item.href);
                   
                   const linkContent = (
                     <Link
@@ -303,7 +425,26 @@ export default function Sidebar() {
                           </TooltipContent>
                         </Tooltip>
                       ) : (
-                        linkContent
+                        <div className="flex items-center gap-1 group/item">
+                          <div className="flex-1">
+                            {linkContent}
+                          </div>
+                          {!isStudent && (
+                            <button
+                              onClick={(e) => toggleFavorite(item.href, e)}
+                              className={`
+                                p-1.5 rounded-lg transition-all duration-200
+                                ${isFavorite 
+                                  ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-100' 
+                                  : 'text-gray-300 hover:text-yellow-500 hover:bg-yellow-50 opacity-0 group-hover/item:opacity-100'
+                                }
+                              `}
+                              title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                            >
+                              <Star className={`h-4 w-4 ${isFavorite ? 'fill-yellow-500' : ''}`} />
+                            </button>
+                          )}
+                        </div>
                       )}
                     </li>
                   );
