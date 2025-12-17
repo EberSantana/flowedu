@@ -2382,3 +2382,4 @@
 - [x] Adicionar lista de alunos matriculados na página Gerenciar Matrículas
 - [x] Mostrar prévia dos alunos matriculados no card da disciplina
 - [x] Modificar botão Gerenciar Matrículas para mostrar quantitativo e expandir lista de alunos
+- [x] Melhorar página Gerenciar Matrículas com cards de estatísticas e lista de alunos

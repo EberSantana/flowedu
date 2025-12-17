@@ -1822,17 +1822,21 @@ Crie sugestões no formato JSON:
     getBySubject: protectedProcedure
       .input(z.object({ subjectId: z.number() }))
       .query(async ({ ctx, input }) => {
-        const enrollments = await db.getEnrollmentsBySubject(input.subjectId, ctx.user.id);
-        const enrollmentsWithStudents = await Promise.all(
-          enrollments.map(async (enrollment) => {
-            const student = await db.getUserById(enrollment.studentId);
-            return {
-              ...enrollment,
-              student,
-            };
-          })
-        );
-        return enrollmentsWithStudents;
+        // Usar a mesma tabela que o botão verde (subjectEnrollments)
+        const enrollments = await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+        return enrollments.map(enrollment => ({
+          id: enrollment.enrollmentId,
+          studentId: enrollment.studentId,
+          subjectId: input.subjectId,
+          enrolledAt: enrollment.enrolledAt,
+          status: 'active' as const,
+          student: {
+            id: enrollment.studentId,
+            name: enrollment.fullName || 'Aluno',
+            email: null,
+            registrationNumber: enrollment.registrationNumber,
+          },
+        }));
       }),
     
     updateStatus: protectedProcedure
