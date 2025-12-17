@@ -2390,3 +2390,5 @@
 - [x] Corrigir página de Avisos para usar layout padrão (Sidebar + PageWrapper)
 - [x] Remover item "Alunos" do menu lateral
 - [x] Remover sistema de Favoritos do menu lateral
+- [x] Adicionar botão "Avisos" de volta ao menu lateral
+- [x] Atualizar Ações Rápidas no Dashboard com botões para Tarefas, Avisos e Trilhas de Aprendizagem

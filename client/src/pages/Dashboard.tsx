@@ -742,32 +742,32 @@ export default function Dashboard() {
                   </div>
                 </Link>
 
-                <Link href="/calendar">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <BarChart3 className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Calendário</span>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link href="/active-methodologies">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <Lightbulb className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Metodologias</span>
-                    </div>
-                  </div>
-                </Link>
-
                 <Link href="/tasks">
                   <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
                     <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
                       <CheckSquare className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
                       <span className="text-sm font-semibold text-center">Tarefas</span>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link href="/announcements">
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-red-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <Bell className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Avisos</span>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link href="/learning-paths">
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <TrendingUp className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Trilhas de Aprendizagem</span>
                     </div>
                   </div>
                 </Link>
