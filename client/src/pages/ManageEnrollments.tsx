@@ -106,8 +106,8 @@ export default function ManageEnrollments() {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      enrollment.student?.name?.toLowerCase().includes(query) ||
-      enrollment.student?.email?.toLowerCase().includes(query)
+      (enrollment.student?.name as string | undefined)?.toLowerCase().includes(query) ||
+      (enrollment.registrationNumber as string | undefined)?.toLowerCase().includes(query)
     );
   }) || [];
 
@@ -296,7 +296,7 @@ export default function ManageEnrollments() {
                             )}
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              Matriculado em {new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR')}
+                              Matriculado em {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR') : 'N/A'}
                             </span>
                           </div>
                         </div>

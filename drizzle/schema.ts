@@ -473,6 +473,7 @@ export const subjectEnrollments = mysqlTable("subjectEnrollments", {
   subjectId: int("subjectId").notNull(),
   enrolledAt: timestamp("enrolledAt").defaultNow(),
   userId: int("userId").notNull(),
+  status: mysqlEnum("status", ["active", "completed", "dropped"]).default("active").notNull(),
 });
 
 

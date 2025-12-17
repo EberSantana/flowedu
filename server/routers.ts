@@ -1662,13 +1662,35 @@ Crie sugestões no formato JSON:
 
   // Student Portal Routes
   student: router({
+    // Verificar sessão de aluno
+    me: publicProcedure.query(({ ctx }) => {
+      if (ctx.studentSession) {
+        return {
+          id: ctx.studentSession.studentId,
+          registrationNumber: ctx.studentSession.registrationNumber,
+          fullName: ctx.studentSession.fullName,
+          professorId: ctx.studentSession.professorId,
+        };
+      }
+      return null;
+    }),
+    
+    // Logout de aluno
+    logout: publicProcedure.mutation(({ ctx }) => {
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      return { success: true };
+    }),
+    
     getEnrolledSubjects: studentProcedure
       .query(async ({ ctx }) => {
         const enrollments = await db.getStudentEnrollments(ctx.studentSession.studentId);
         const subjectsWithDetails = await Promise.all(
           enrollments.map(async (enrollment) => {
-            const subject = await db.getSubjectById(enrollment.subjectId, enrollment.professorId);
-            const professor = await db.getUserById(enrollment.professorId);
+            // userId é o professorId na tabela subjectEnrollments
+            const professorId = enrollment.userId;
+            const subject = await db.getSubjectById(enrollment.subjectId, professorId);
+            const professor = await db.getUserById(professorId);
             return {
               ...enrollment,
               subject,
@@ -1829,7 +1851,7 @@ Crie sugestões no formato JSON:
           studentId: enrollment.studentId,
           subjectId: input.subjectId,
           enrolledAt: enrollment.enrolledAt,
-          status: 'active' as const,
+          status: enrollment.status || 'active',
           registrationNumber: enrollment.registrationNumber || '',
           student: {
             id: enrollment.studentId,

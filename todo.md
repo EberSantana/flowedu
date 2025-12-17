@@ -2394,3 +2394,15 @@
 - [x] Atualizar Ações Rápidas no Dashboard com botões para Tarefas, Avisos e Trilhas de Aprendizagem
 - [x] Padronizar página de Avisos com o mesmo layout das demais páginas
 - [x] Substituir botão Gerenciar Matrículas por Relatórios nas Ações Rápidas do Dashboard
+- [ ] Corrigir funcionalidades de status de matrícula (Marcar como Ativa, Concluída, Cancelada, Remover Matrícula)
+- [ ] Corrigir login do aluno por número de matrícula no portal do aluno
+
+## Correções de Bugs - Dezembro 2024
+- [x] Corrigir funcionalidades de status de matrícula (Marcar como Ativa, Concluída, Cancelada, Remover Matrícula)
+- [x] Adicionar campo status na tabela subjectEnrollments
+- [x] Corrigir função updateEnrollmentStatus para usar subjectEnrollments
+- [x] Corrigir login do aluno por número de matrícula no portal do aluno
+- [x] Criar hook useStudentAuth para autenticação de alunos
+- [x] Criar componente StudentLayout para páginas de aluno
+- [x] Corrigir query getEnrolledSubjects para usar userId como professorId
+- [x] Corrigir query getStudentEnrollments para buscar na tabela subjectEnrollments

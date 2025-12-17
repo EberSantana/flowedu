@@ -138,7 +138,7 @@ export default function SubjectEnrollments() {
                   children: [
                     new TableCell({ children: [new Paragraph(s.registrationNumber)] }),
                     new TableCell({ children: [new Paragraph(s.fullName)] }),
-                    new TableCell({ children: [new Paragraph(new Date(s.enrolledAt).toLocaleDateString('pt-BR'))] }),
+                    new TableCell({ children: [new Paragraph(s.enrolledAt ? new Date(s.enrolledAt).toLocaleDateString('pt-BR') : 'N/A')] }),
                   ],
                 })),
               ],
@@ -193,7 +193,7 @@ export default function SubjectEnrollments() {
         body: enrolledStudents.map((s: any) => [
           s.registrationNumber,
           s.fullName,
-          new Date(s.enrolledAt).toLocaleDateString('pt-BR'),
+          s.enrolledAt ? new Date(s.enrolledAt).toLocaleDateString('pt-BR') : 'N/A',
         ]),
         theme: 'grid',
         headStyles: { fillColor: [68, 114, 196] },
@@ -335,7 +335,7 @@ export default function SubjectEnrollments() {
                       <p className="font-medium">{student.fullName}</p>
                       <p className="text-sm text-muted-foreground">
                         Matrícula: {student.registrationNumber} • Matriculado em{" "}
-                        {new Date(student.enrolledAt).toLocaleDateString("pt-BR")}
+                        {student.enrolledAt ? new Date(student.enrolledAt).toLocaleDateString("pt-BR") : 'N/A'}
                       </p>
                     </div>
                     <Button

@@ -1054,8 +1054,9 @@ export async function getStudentEnrollments(studentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  return await db.select().from(studentEnrollments)
-    .where(eq(studentEnrollments.studentId, studentId));
+  // Buscar matrículas na tabela subjectEnrollments
+  return await db.select().from(subjectEnrollments)
+    .where(eq(subjectEnrollments.studentId, studentId));
 }
 
 export async function getEnrollmentsBySubject(subjectId: number, professorId: number) {
@@ -1069,28 +1070,30 @@ export async function getEnrollmentsBySubject(subjectId: number, professorId: nu
     ));
 }
 
-export async function updateEnrollmentStatus(id: number, status: 'active' | 'completed' | 'dropped', professorId: number) {
+export async function updateEnrollmentStatus(id: number, status: 'active' | 'completed' | 'dropped', userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.update(studentEnrollments)
+  // Atualizar na tabela subjectEnrollments
+  await db.update(subjectEnrollments)
     .set({ status })
     .where(and(
-      eq(studentEnrollments.id, id),
-      eq(studentEnrollments.professorId, professorId)
+      eq(subjectEnrollments.id, id),
+      eq(subjectEnrollments.userId, userId)
     ));
   
   return { success: true };
 }
 
-export async function deleteEnrollment(id: number, professorId: number) {
+export async function deleteEnrollment(id: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.delete(studentEnrollments)
+  // Deletar da tabela subjectEnrollments
+  await db.delete(subjectEnrollments)
     .where(and(
-      eq(studentEnrollments.id, id),
-      eq(studentEnrollments.professorId, professorId)
+      eq(subjectEnrollments.id, id),
+      eq(subjectEnrollments.userId, userId)
     ));
   
   return { success: true };
@@ -1710,6 +1713,7 @@ export async function getStudentsBySubject(subjectId: number, userId: number) {
     registrationNumber: students.registrationNumber,
     fullName: students.fullName,
     enrolledAt: subjectEnrollments.enrolledAt,
+    status: subjectEnrollments.status,
   })
     .from(subjectEnrollments)
     .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
