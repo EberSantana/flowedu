@@ -2393,3 +2393,4 @@
 - [x] Adicionar botão "Avisos" de volta ao menu lateral
 - [x] Atualizar Ações Rápidas no Dashboard com botões para Tarefas, Avisos e Trilhas de Aprendizagem
 - [x] Padronizar página de Avisos com o mesmo layout das demais páginas
+- [x] Substituir botão Gerenciar Matrículas por Relatórios nas Ações Rápidas do Dashboard
