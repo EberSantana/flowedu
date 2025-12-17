@@ -2387,3 +2387,6 @@
 - [x] Simplificar botão no card de disciplina para apenas "Ver Detalhes" (remover lista expansível)
 - [x] Remover botão "Avisos" do menu lateral (não tem serventia)
 - [x] Adicionar seção de Favoritos no menu lateral para acesso rápido às páginas mais usadas
+- [x] Corrigir página de Avisos para usar layout padrão (Sidebar + PageWrapper)
+- [x] Remover item "Alunos" do menu lateral
+- [x] Remover sistema de Favoritos do menu lateral
