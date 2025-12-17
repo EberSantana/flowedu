@@ -101,11 +101,6 @@ const teacherNavItems: NavItem[] = [
     href: "/students",
   },
   {
-    label: "Avisos",
-    icon: <Megaphone className="h-5 w-5" />,
-    href: "/announcements",
-  },
-  {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",

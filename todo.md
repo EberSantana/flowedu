@@ -2385,3 +2385,4 @@
 - [x] Melhorar página Gerenciar Matrículas com cards de estatísticas e lista de alunos
 - [x] Adicionar número de matrícula na página Ver Detalhes Completos (ManageEnrollments)
 - [x] Simplificar botão no card de disciplina para apenas "Ver Detalhes" (remover lista expansível)
+- [x] Remover botão "Avisos" do menu lateral (não tem serventia)
