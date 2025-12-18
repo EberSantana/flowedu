@@ -2464,3 +2464,12 @@
 - [x] Implementar tratamento robusto de erros no login do aluno
 - [x] Adicionar validações e feedback visual melhorado
 - [x] Garantir que erros de rede/servidor não causem crash
+
+## Correções Pendentes - Dezembro 2025
+- [ ] Corrigir layout da página de Convites e Aprovações para usar DashboardLayout + PageWrapper
+- [ ] Corrigir erro de e-mail não verificado (domínio profsistemp.info não verificado no Resend)
+
+
+## Correções - 18/12/2025
+- [x] Corrigir layout da página de Convites e Aprovações para usar Sidebar + PageWrapper
+- [x] Corrigir erro de e-mail não verificado (usar domínio padrão onboarding@resend.dev)

@@ -20,8 +20,13 @@ export async function sendEmail({ to, subject, html, from }: SendEmailParams): P
   }
 
   try {
+    // Usar domínio padrão do Resend (onboarding@resend.dev) para evitar erros de domínio não verificado
+    // O domínio personalizado requer verificação no painel do Resend: https://resend.com/domains
+    const defaultFrom = 'Sistema de Gestão Educacional <onboarding@resend.dev>';
+    const emailFrom = from || defaultFrom;
+    
     const result = await resend.emails.send({
-      from: from || process.env.EMAIL_FROM || 'Sistema de Gestão <onboarding@resend.dev>',
+      from: emailFrom,
       to,
       subject,
       html,
