@@ -24,47 +24,63 @@ export const appRouter = router({
     // Login de Aluno (por matrícula)
     loginStudent: publicProcedure
       .input(z.object({
-        registrationNumber: z.string().min(1),
-        password: z.string().min(1),
+        registrationNumber: z.string().min(1, "Número de matrícula é obrigatório"),
+        password: z.string().min(1, "Senha é obrigatória"),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Buscar aluno pela matrícula
-        const student = await db.getStudentByRegistration(input.registrationNumber);
-        
-        if (!student) {
-          throw new Error("Matrícula não encontrada");
+        try {
+          // Sanitizar entrada
+          const registrationNumber = input.registrationNumber.trim();
+          const password = input.password.trim();
+          
+          if (!registrationNumber || !password) {
+            throw new Error("Matrícula e senha são obrigatórios");
+          }
+          
+          // Buscar aluno pela matrícula
+          const student = await db.getStudentByRegistration(registrationNumber);
+          
+          if (!student) {
+            throw new Error("Matrícula não encontrada. Verifique se digitou corretamente.");
+          }
+          
+          // Validar senha (senha = matrícula)
+          if (password !== student.registrationNumber) {
+            throw new Error("Senha incorreta. Lembre-se: sua senha é o mesmo número da matrícula.");
+          }
+          
+          // Criar sessão JWT para aluno
+          const token = jwt.sign(
+            {
+              userType: 'student',
+              studentId: student.id,
+              registrationNumber: student.registrationNumber,
+              fullName: student.fullName,
+              professorId: student.userId,
+            },
+            ENV.cookieSecret,
+            { expiresIn: '7d' }
+          );
+          
+          // Configurar cookie de sessão
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+          
+          return {
+            success: true,
+            student: {
+              id: student.id,
+              registrationNumber: student.registrationNumber,
+              fullName: student.fullName,
+            },
+          };
+        } catch (error) {
+          // Garantir que erros sejam tratados corretamente
+          if (error instanceof Error) {
+            throw error;
+          }
+          throw new Error("Erro ao processar login. Tente novamente.");
         }
-        
-        // Validar senha (senha = matrícula)
-        if (input.password !== student.registrationNumber) {
-          throw new Error("Senha incorreta");
-        }
-        
-        // Criar sessão JWT para aluno
-        const token = jwt.sign(
-          {
-            userType: 'student',
-            studentId: student.id,
-            registrationNumber: student.registrationNumber,
-            fullName: student.fullName,
-            professorId: student.userId,
-          },
-          ENV.cookieSecret,
-          { expiresIn: '7d' }
-        );
-        
-        // Configurar cookie de sessão
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
-        
-        return {
-          success: true,
-          student: {
-            id: student.id,
-            registrationNumber: student.registrationNumber,
-            fullName: student.fullName,
-          },
-        };
       }),
 
     // Validar código de convite (público - para página de registro)

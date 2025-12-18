@@ -14,12 +14,31 @@ export default function StudentLogin() {
   const [isLoading, setIsLoading] = useState(false);
 
   const loginMutation = trpc.auth.loginStudent.useMutation({
-    onSuccess: () => {
-      toast.success("Login realizado com sucesso! Bem-vindo ao Portal do Aluno");
-      setLocation("/student-dashboard");
+    onSuccess: (data) => {
+      if (data?.success) {
+        toast.success(`Login realizado com sucesso! Bem-vindo, ${data.student?.fullName || 'Aluno'}`);
+        setLocation("/student-dashboard");
+      } else {
+        toast.error("Erro inesperado no login. Tente novamente.");
+        setIsLoading(false);
+      }
     },
     onError: (error) => {
-      toast.error(`Erro no login: ${error.message}`);
+      // Tratar diferentes tipos de erro
+      let errorMessage = "Erro ao fazer login. Tente novamente.";
+      
+      if (error.message) {
+        // Verificar se é erro de JSON/HTML (servidor retornou HTML ao invés de JSON)
+        if (error.message.includes("Unexpected token") || error.message.includes("<!DOCTYPE")) {
+          errorMessage = "Erro de conexão com o servidor. Por favor, recarregue a página e tente novamente.";
+        } else if (error.message.includes("fetch") || error.message.includes("network")) {
+          errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
       setIsLoading(false);
     },
   });
@@ -27,13 +46,36 @@ export default function StudentLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!registrationNumber || !password) {
-      toast.error("Campos obrigatórios: Por favor, preencha matrícula e senha");
+    const trimmedRegistration = registrationNumber.trim();
+    const trimmedPassword = password.trim();
+    
+    if (!trimmedRegistration) {
+      toast.error("Por favor, digite seu número de matrícula");
+      return;
+    }
+    
+    if (!trimmedPassword) {
+      toast.error("Por favor, digite sua senha");
+      return;
+    }
+    
+    // Validar formato básico da matrícula (apenas números)
+    if (!/^[0-9]+$/.test(trimmedRegistration)) {
+      toast.error("A matrícula deve conter apenas números");
       return;
     }
 
     setIsLoading(true);
-    loginMutation.mutate({ registrationNumber, password });
+    
+    try {
+      loginMutation.mutate({ 
+        registrationNumber: trimmedRegistration, 
+        password: trimmedPassword 
+      });
+    } catch (error) {
+      toast.error("Erro ao processar login. Tente novamente.");
+      setIsLoading(false);
+    }
   };
 
   return (

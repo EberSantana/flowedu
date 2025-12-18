@@ -2454,3 +2454,13 @@
 - [x] Criar painel admin para aprovar professores pendentes
 - [x] Testar fluxo completo de cadastro com código
 - [x] Testar fluxo completo de cadastro com aprovação manual
+
+
+## Correção OAuth
+- [ ] Corrigir erro 403 do Google OAuth na página de registro
+
+
+## Estabilidade do Login do Aluno
+- [x] Implementar tratamento robusto de erros no login do aluno
+- [x] Adicionar validações e feedback visual melhorado
+- [x] Garantir que erros de rede/servidor não causem crash
