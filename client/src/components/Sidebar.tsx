@@ -19,7 +19,8 @@ import {
   BarChart3,
   Route,
   HelpCircle,
-  Megaphone
+  Megaphone,
+  KeyRound
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -103,6 +104,12 @@ const teacherNavItems: NavItem[] = [
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",
+    adminOnly: true,
+  },
+  {
+    label: "Convites",
+    icon: <KeyRound className="h-5 w-5" />,
+    href: "/admin/invites",
     adminOnly: true,
   },
 ];

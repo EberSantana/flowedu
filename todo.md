@@ -2440,3 +2440,17 @@
 ## Correções Solicitadas
 - [x] Remover botão "Matricular Aluno" da página de Gerenciar Matrículas
 - [x] Corrigir erro de login do aluno que fica parado na tela (testado e funcionando)
+
+
+## Sistema de Cadastro de Professores (Código de Convite + Aprovação Manual)
+- [x] Criar tabela de códigos de convite no banco de dados
+- [x] Adicionar campo de status de aprovação na tabela de usuários
+- [x] Implementar rotas tRPC para gerar códigos de convite
+- [x] Implementar rotas tRPC para listar/revogar códigos
+- [x] Implementar rotas tRPC para aprovar/rejeitar professores pendentes
+- [x] Criar página de registro com código de convite
+- [x] Criar página de registro sem código (aprovação manual)
+- [x] Criar painel admin para gerenciar códigos de convite
+- [x] Criar painel admin para aprovar professores pendentes
+- [x] Testar fluxo completo de cadastro com código
+- [x] Testar fluxo completo de cadastro com aprovação manual

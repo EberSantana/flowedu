@@ -12,6 +12,8 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   active: boolean("active").default(true).notNull(),
+  approvalStatus: mysqlEnum("approvalStatus", ["approved", "pending", "rejected"]).default("approved").notNull(),
+  inviteCode: varchar("inviteCode", { length: 20 }), // Código de convite usado no cadastro
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -19,6 +21,26 @@ export const users = mysqlTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+/**
+ * Tabela de códigos de convite para professores
+ */
+export const inviteCodes = mysqlTable("invite_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  createdBy: int("createdBy").notNull(), // ID do admin que criou
+  usedBy: int("usedBy"), // ID do usuário que usou (null se não usado)
+  maxUses: int("maxUses").default(1).notNull(), // Número máximo de usos
+  currentUses: int("currentUses").default(0).notNull(), // Número atual de usos
+  expiresAt: timestamp("expiresAt"), // Data de expiração (null = sem expiração)
+  isActive: boolean("isActive").default(true).notNull(),
+  description: varchar("description", { length: 255 }), // Descrição opcional do convite
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InviteCode = typeof inviteCodes.$inferSelect;
+export type InsertInviteCode = typeof inviteCodes.$inferInsert;
 
 /**
  * Tabela de logs de auditoria

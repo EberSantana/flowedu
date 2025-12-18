@@ -66,6 +66,13 @@ export const appRouter = router({
           },
         };
       }),
+
+    // Validar código de convite (público - para página de registro)
+    validateInviteCode: publicProcedure
+      .input(z.object({ code: z.string().min(1) }))
+      .query(async ({ input }) => {
+        return db.validateInviteCode(input.code);
+      }),
   }),
 
   subjects: router({
@@ -941,6 +948,140 @@ Regras:
           emailSent: emailResult.success,
           emailError: emailResult.error 
         };
+      }),
+
+    // ==================== CÓDIGOS DE CONVITE ====================
+    
+    // Criar código de convite
+    createInviteCode: protectedProcedure
+      .input(z.object({
+        maxUses: z.number().min(1).default(1),
+        expiresInDays: z.number().min(1).optional(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        
+        const expiresAt = input.expiresInDays 
+          ? new Date(Date.now() + input.expiresInDays * 24 * 60 * 60 * 1000)
+          : undefined;
+        
+        const result = await db.createInviteCode({
+          createdBy: ctx.user.id,
+          maxUses: input.maxUses,
+          expiresAt,
+          description: input.description,
+        });
+        
+        if (!result) {
+          throw new Error('Erro ao criar código de convite');
+        }
+        
+        return result;
+      }),
+
+    // Listar códigos de convite
+    listInviteCodes: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getAllInviteCodes();
+    }),
+
+    // Desativar código de convite
+    deactivateInviteCode: protectedProcedure
+      .input(z.object({ codeId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.deactivateInviteCode(input.codeId);
+      }),
+
+    // Reativar código de convite
+    reactivateInviteCode: protectedProcedure
+      .input(z.object({ codeId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.reactivateInviteCode(input.codeId);
+      }),
+
+    // Deletar código de convite
+    deleteInviteCode: protectedProcedure
+      .input(z.object({ codeId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.deleteInviteCode(input.codeId);
+      }),
+
+    // ==================== APROVAÇÃO DE USUÁRIOS ====================
+    
+    // Listar usuários pendentes de aprovação
+    listPendingUsers: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getPendingUsers();
+    }),
+
+    // Aprovar usuário
+    approveUser: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        
+        const success = await db.approveUser(input.userId);
+        
+        if (success) {
+          // Registrar log de auditoria
+          const user = await db.getUserWithApprovalStatus(input.userId);
+          await db.createAuditLog({
+            adminId: ctx.user.id,
+            adminName: ctx.user.name || 'Administrador',
+            action: 'APPROVE_USER',
+            targetUserId: input.userId,
+            targetUserName: user?.name || '',
+            newData: JSON.stringify({ approvalStatus: 'approved' }),
+            ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for'] as string || 'unknown',
+          });
+        }
+        
+        return success;
+      }),
+
+    // Rejeitar usuário
+    rejectUser: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        
+        const success = await db.rejectUser(input.userId);
+        
+        if (success) {
+          // Registrar log de auditoria
+          const user = await db.getUserWithApprovalStatus(input.userId);
+          await db.createAuditLog({
+            adminId: ctx.user.id,
+            adminName: ctx.user.name || 'Administrador',
+            action: 'REJECT_USER',
+            targetUserId: input.userId,
+            targetUserName: user?.name || '',
+            newData: JSON.stringify({ approvalStatus: 'rejected' }),
+            ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for'] as string || 'unknown',
+          });
+        }
+        
+        return success;
       }),
 
     // Limpar usuários inválidos (sem nome e sem email)

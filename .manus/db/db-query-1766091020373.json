@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE invite_codes (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  code VARCHAR(20) NOT NULL UNIQUE,\n  createdBy INT NOT NULL,\n  usedBy INT,\n  maxUses INT DEFAULT 1 NOT NULL,\n  currentUses INT DEFAULT 0 NOT NULL,\n  expiresAt TIMESTAMP NULL,\n  isActive BOOLEAN DEFAULT TRUE NOT NULL,\n  description VARCHAR(255),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE invite_codes (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  code VARCHAR(20) NOT NULL UNIQUE,\n  createdBy INT NOT NULL,\n  usedBy INT,\n  maxUses INT DEFAULT 1 NOT NULL,\n  currentUses INT DEFAULT 0 NOT NULL,\n  expiresAt TIMESTAMP NULL,\n  isActive BOOLEAN DEFAULT TRUE NOT NULL,\n  description VARCHAR(255),\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 177
+}

@@ -1,6 +1,6 @@
 // Version: 2025-12-15-v3 - Auto redirect authenticated users
 import { Link, useLocation } from "wouter";
-import { GraduationCap, Users, Loader2 } from "lucide-react";
+import { GraduationCap, Users, Loader2, UserPlus } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -115,6 +115,17 @@ export default function PortalChoice() {
               </div>
             </div>
           </a>
+        </div>
+
+        {/* Link de Cadastro */}
+        <div className="text-center mt-8">
+          <p className="text-gray-600 mb-2">Ainda não tem conta?</p>
+          <Link href="/register">
+            <span className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 font-medium cursor-pointer">
+              <UserPlus className="w-4 h-4" />
+              Cadastre-se como Professor
+            </span>
+          </Link>
         </div>
 
         {/* Footer */}

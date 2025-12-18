@@ -14,6 +14,7 @@ import TimeSlots from "./pages/TimeSlots";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import AdminUsers from "./pages/AdminUsers";
+import AdminInvites from "./pages/AdminInvites";
 import ActiveMethodologies from "./pages/ActiveMethodologies";
 import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
@@ -27,6 +28,7 @@ import StudentProfile from "./pages/StudentProfile";
 import SubjectEnrollments from "./pages/SubjectEnrollments";
 import PortalChoice from "./pages/PortalChoice";
 import StudentLogin from "./pages/StudentLogin";
+import Register from "./pages/Register";
 import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
@@ -41,6 +43,7 @@ function Router() {
       <Switch>
         <Route path={"/"} component={PortalChoice} />
         <Route path={"/student-login"} component={StudentLogin} />
+        <Route path={"/register"} component={Register} />
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
         <Route path={"/classes"} component={Classes} />
@@ -55,6 +58,7 @@ function Router() {
         <Route path={"/announcements"} component={Announcements} />
         <Route path={"/profile"} component={Profile} />
         <Route path={"/admin/users"} component={AdminUsers} />
+        <Route path={"/admin/invites"} component={AdminInvites} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
         <Route path={"/student-subjects"} component={StudentSubjects} />
         <Route path={"/student-announcements"} component={StudentAnnouncements} />

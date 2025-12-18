@@ -29,6 +29,7 @@ import {
   subjectEnrollments,
   announcements,
   announcementReads,
+  inviteCodes,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -37,7 +38,8 @@ import {
   InsertCalendarEvent,
   InsertActiveMethodology,
   InsertClassStatus,
-  InsertStudent
+  InsertStudent,
+  InsertInviteCode
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1931,4 +1933,246 @@ export async function markAllStudentNotificationsAsRead(studentId: number) {
     ));
   
   return { success: true };
+}
+
+
+// ==================== CÓDIGOS DE CONVITE ====================
+
+// Gerar código alfanumérico único
+function generateInviteCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Sem I, O, 0, 1 para evitar confusão
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+// Criar código de convite
+export async function createInviteCode(data: {
+  createdBy: number;
+  maxUses?: number;
+  expiresAt?: Date;
+  description?: string;
+}): Promise<{ id: number; code: string } | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const code = generateInviteCode();
+  
+  try {
+    const result = await db.insert(inviteCodes).values({
+      code,
+      createdBy: data.createdBy,
+      maxUses: data.maxUses || 1,
+      expiresAt: data.expiresAt || null,
+      description: data.description || null,
+    });
+
+    return { id: Number(result[0].insertId), code };
+  } catch (error) {
+    console.error("[Database] Error creating invite code:", error);
+    return null;
+  }
+}
+
+// Buscar código de convite por código
+export async function getInviteCodeByCode(code: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(inviteCodes).where(eq(inviteCodes.code, code));
+    return result[0] || null;
+  } catch (error) {
+    console.error("[Database] Error getting invite code:", error);
+    return null;
+  }
+}
+
+// Validar código de convite
+export async function validateInviteCode(code: string): Promise<{ valid: boolean; message: string; inviteId?: number }> {
+  const invite = await getInviteCodeByCode(code);
+  
+  if (!invite) {
+    return { valid: false, message: "Código de convite inválido" };
+  }
+  
+  if (!invite.isActive) {
+    return { valid: false, message: "Este código de convite foi desativado" };
+  }
+  
+  if (invite.currentUses >= invite.maxUses) {
+    return { valid: false, message: "Este código de convite já foi utilizado o número máximo de vezes" };
+  }
+  
+  if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
+    return { valid: false, message: "Este código de convite expirou" };
+  }
+  
+  return { valid: true, message: "Código válido", inviteId: invite.id };
+}
+
+// Usar código de convite (incrementar uso)
+export async function useInviteCode(code: string, userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(inviteCodes)
+      .set({
+        currentUses: sql`${inviteCodes.currentUses} + 1`,
+        usedBy: userId,
+      })
+      .where(eq(inviteCodes.code, code));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error using invite code:", error);
+    return false;
+  }
+}
+
+// Listar todos os códigos de convite (admin)
+export async function getAllInviteCodes() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.select().from(inviteCodes).orderBy(desc(inviteCodes.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Error getting invite codes:", error);
+    return [];
+  }
+}
+
+// Desativar código de convite
+export async function deactivateInviteCode(codeId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(inviteCodes)
+      .set({ isActive: false })
+      .where(eq(inviteCodes.id, codeId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error deactivating invite code:", error);
+    return false;
+  }
+}
+
+// Reativar código de convite
+export async function reactivateInviteCode(codeId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(inviteCodes)
+      .set({ isActive: true })
+      .where(eq(inviteCodes.id, codeId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error reactivating invite code:", error);
+    return false;
+  }
+}
+
+// Deletar código de convite
+export async function deleteInviteCode(codeId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.delete(inviteCodes).where(eq(inviteCodes.id, codeId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error deleting invite code:", error);
+    return false;
+  }
+}
+
+// ==================== APROVAÇÃO DE USUÁRIOS ====================
+
+// Listar usuários pendentes de aprovação
+export async function getPendingUsers() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.select().from(users)
+      .where(eq(users.approvalStatus, 'pending'))
+      .orderBy(desc(users.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Error getting pending users:", error);
+    return [];
+  }
+}
+
+// Aprovar usuário
+export async function approveUser(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(users)
+      .set({ approvalStatus: 'approved' })
+      .where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error approving user:", error);
+    return false;
+  }
+}
+
+// Rejeitar usuário
+export async function rejectUser(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(users)
+      .set({ approvalStatus: 'rejected' })
+      .where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error rejecting user:", error);
+    return false;
+  }
+}
+
+// Atualizar status de aprovação e código de convite do usuário
+export async function updateUserApprovalStatus(userId: number, status: 'approved' | 'pending' | 'rejected', inviteCode?: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const updateData: { approvalStatus: 'approved' | 'pending' | 'rejected'; inviteCode?: string } = { approvalStatus: status };
+    if (inviteCode) {
+      updateData.inviteCode = inviteCode;
+    }
+    
+    await db.update(users)
+      .set(updateData)
+      .where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error updating user approval status:", error);
+    return false;
+  }
+}
+
+// Buscar usuário por ID com status de aprovação
+export async function getUserWithApprovalStatus(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(users).where(eq(users.id, userId));
+    return result[0] || null;
+  } catch (error) {
+    console.error("[Database] Error getting user:", error);
+    return null;
+  }
 }
