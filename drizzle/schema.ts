@@ -392,6 +392,7 @@ export const notifications = mysqlTable("notifications", {
   type: mysqlEnum("type", [
     "new_material",      // Novo material adicionado
     "new_assignment",    // Nova atividade criada
+    "new_announcement",  // Novo aviso postado
     "assignment_due",    // Prazo de atividade próximo
     "feedback_received", // Feedback do professor recebido
     "grade_received",    // Nota recebida

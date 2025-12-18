@@ -1774,6 +1774,29 @@ Crie sugestões no formato JSON:
       .query(async ({ ctx, input }) => {
         return await db.getStudentSubmission(input.assignmentId, ctx.user.id);
       }),
+    
+    // Notificações do aluno
+    getNotifications: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentNotifications(ctx.studentSession.studentId, input.limit || 50);
+      }),
+    
+    getUnreadNotificationsCount: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getStudentUnreadNotificationsCount(ctx.studentSession.studentId);
+      }),
+    
+    markNotificationAsRead: studentProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.markStudentNotificationAsRead(input.id, ctx.studentSession.studentId);
+      }),
+    
+    markAllNotificationsAsRead: studentProcedure
+      .mutation(async ({ ctx }) => {
+        return await db.markAllStudentNotificationsAsRead(ctx.studentSession.studentId);
+      }),
   }),
 
   // Professor Materials Management
@@ -2385,10 +2408,33 @@ Crie sugestões no formato JSON:
         subjectId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.createAnnouncement({
+        // Criar o aviso
+        const announcement = await db.createAnnouncement({
           ...input,
           userId: ctx.user.id,
         });
+        
+        // Buscar alunos matriculados na disciplina e criar notificações
+        const enrolledStudents = await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        
+        // Criar notificação para cada aluno matriculado
+        for (const student of enrolledStudents) {
+          try {
+            await db.createNotification({
+              userId: student.studentId,
+              type: 'new_announcement',
+              title: input.isImportant ? `🚨 Aviso Importante: ${input.title}` : `📢 Novo Aviso: ${input.title}`,
+              message: `${subject?.name || 'Disciplina'}: ${input.message.substring(0, 100)}${input.message.length > 100 ? '...' : ''}`,
+              link: '/student-announcements',
+              relatedId: announcement.id,
+            });
+          } catch (error) {
+            console.error('Erro ao criar notificação para aluno:', student.studentId, error);
+          }
+        }
+        
+        return announcement;
       }),
     
     // Professor: Listar todos os avisos

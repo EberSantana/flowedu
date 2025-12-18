@@ -2410,3 +2410,28 @@
 - [x] Corrigir erro JSON no login do aluno (retornando HTML ao invés de JSON)
 - [x] Corrigir redirecionamento para OAuth quando aluno acessa páginas protegidas
 - [x] Corrigir erros nas páginas Minhas Disciplinas e Avisos do portal do aluno
+
+## Sistema de Notificações para Alunos
+- [ ] Criar tabela de notificações no banco de dados
+- [ ] Implementar rotas tRPC para notificações (listar, marcar como lida, contar não lidas)
+- [ ] Criar componente de sino de notificações no header do aluno
+- [ ] Criar dropdown/modal de notificações
+- [ ] Gerar notificações automaticamente ao criar avisos
+- [ ] Gerar notificações automaticamente ao criar tarefas
+- [ ] Adicionar badge de contagem de notificações não lidas
+- [ ] Integrar notificações no StudentLayout
+
+## Sistema de Notificações para Alunos
+- [x] Criar tabela de notificações no banco de dados (já existente)
+- [x] Adicionar tipo 'new_announcement' ao enum de tipos de notificação
+- [x] Implementar funções de banco: getStudentNotifications, getStudentUnreadNotificationsCount
+- [x] Implementar funções de banco: markStudentNotificationAsRead, markAllStudentNotificationsAsRead
+- [x] Criar rotas tRPC: student.getNotifications, student.getUnreadNotificationsCount
+- [x] Criar rotas tRPC: student.markNotificationAsRead, student.markAllNotificationsAsRead
+- [x] Criar componente StudentNotifications (sino com dropdown)
+- [x] Integrar notificações no StudentLayout (header do portal do aluno)
+- [x] Criar notificações automáticas ao criar novos avisos
+- [x] Criar testes para rotas de notificação de alunos (7 testes passando)
+- [x] Exibir contador de notificações não lidas no sino
+- [x] Implementar "Marcar todas como lidas"
+- [x] Atualização automática a cada 30 segundos

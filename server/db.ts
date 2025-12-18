@@ -1401,7 +1401,7 @@ export async function deleteTopicComment(id: number, authorId: number) {
 
 export async function createNotification(data: {
   userId: number;
-  type: 'new_material' | 'new_assignment' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received';
+  type: 'new_material' | 'new_assignment' | 'new_announcement' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received';
   title: string;
   message: string;
   link?: string;
@@ -1874,6 +1874,61 @@ export async function deleteAnnouncement(id: number, userId: number) {
     eq(announcements.id, id),
     eq(announcements.userId, userId)
   ));
+  
+  return { success: true };
+}
+
+
+// ==================== STUDENT NOTIFICATIONS ====================
+
+export async function getStudentNotifications(studentId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(notifications)
+    .where(eq(notifications.userId, studentId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
+export async function getStudentUnreadNotificationsCount(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({ count: sql<number>`count(*)` })
+    .from(notifications)
+    .where(and(
+      eq(notifications.userId, studentId),
+      eq(notifications.isRead, false)
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+export async function markStudentNotificationAsRead(id: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(notifications)
+    .set({ isRead: true })
+    .where(and(
+      eq(notifications.id, id),
+      eq(notifications.userId, studentId)
+    ));
+  
+  return { success: true };
+}
+
+export async function markAllStudentNotificationsAsRead(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(notifications)
+    .set({ isRead: true })
+    .where(and(
+      eq(notifications.userId, studentId),
+      eq(notifications.isRead, false)
+    ));
   
   return { success: true };
 }

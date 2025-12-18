@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GraduationCap, LogOut, BookOpen, Bell, Home, User } from "lucide-react";
 import { Link } from "wouter";
+import StudentNotifications from "@/components/StudentNotifications";
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const { student, loading, logout, isAuthenticated } = useStudentAuth();
@@ -86,6 +87,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
             {/* User Menu */}
             <div className="flex items-center gap-3">
+              {/* Notificações */}
+              <StudentNotifications />
+              
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium text-gray-900">{student?.fullName}</p>
                 <p className="text-xs text-gray-500">Mat: {student?.registrationNumber}</p>
