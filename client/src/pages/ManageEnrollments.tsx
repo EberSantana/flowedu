@@ -24,7 +24,7 @@ export default function ManageEnrollments() {
   const [, params] = useRoute("/subjects/:subjectId/enrollments");
   const subjectId = params?.subjectId ? parseInt(params.subjectId) : 0;
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -44,7 +44,6 @@ export default function ManageEnrollments() {
     onSuccess: () => {
       utils.enrollments.getBySubject.invalidate();
       toast.success("Aluno matriculado com sucesso!");
-      setIsAddDialogOpen(false);
       setSelectedStudentId(null);
     },
     onError: (error) => {
@@ -165,10 +164,7 @@ export default function ManageEnrollments() {
                   {subject?.name || 'Disciplina'} - {subject?.code}
                 </p>
               </div>
-              <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                Matricular Aluno
-              </Button>
+
             </div>
           </div>
 
@@ -245,18 +241,14 @@ export default function ManageEnrollments() {
             </CardHeader>
             <CardContent>
               {!enrollments || enrollments.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     Nenhum aluno matriculado
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    Comece matriculando alunos nesta disciplina
+                    Matricule alunos através da página de Disciplinas
                   </p>
-                  <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
-                    <UserPlus className="h-4 w-4" />
-                    Matricular Primeiro Aluno
-                  </Button>
                 </div>
               ) : filteredEnrollments.length === 0 ? (
                 <div className="text-center py-8">
@@ -351,80 +343,7 @@ export default function ManageEnrollments() {
             </CardContent>
           </Card>
 
-          {/* Add Enrollment Dialog */}
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <UserPlus className="h-5 w-5" />
-                  Matricular Aluno
-                </DialogTitle>
-              </DialogHeader>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Selecione o Aluno
-                  </label>
-                  <Select
-                    value={selectedStudentId?.toString() || ""}
-                    onValueChange={(value) => setSelectedStudentId(parseInt(value))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Escolha um aluno..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableStudents.length === 0 ? (
-                        <div className="p-2 text-sm text-gray-600">
-                          Todos os alunos já estão matriculados
-                        </div>
-                      ) : (
-                        availableStudents.map((student) => (
-                          <SelectItem key={student.id} value={student.id.toString()}>
-                            <div className="flex items-center gap-2">
-                              <Avatar className="h-6 w-6">
-                                <AvatarImage
-                                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(student.name || 'A')}&backgroundColor=6366f1&textColor=ffffff`}
-                                />
-                                <AvatarFallback className="text-xs">
-                                  {student.name?.charAt(0) || 'A'}
-                                </AvatarFallback>
-                              </Avatar>
-                              <span>{student.name}</span>
-                              <span className="text-gray-500 text-sm">({student.email})</span>
-                            </div>
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <strong>Disciplina:</strong> {subject?.name}
-                  </p>
-                  <p className="text-sm text-blue-600 mt-1">
-                    O aluno terá acesso imediato ao conteúdo da disciplina após a matrícula.
-                  </p>
-                </div>
-              </div>
-
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleAddEnrollment}
-                  disabled={!selectedStudentId || createEnrollmentMutation.isPending}
-                  className="gap-2"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {createEnrollmentMutation.isPending ? "Matriculando..." : "Matricular"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
       </PageWrapper>
     </>

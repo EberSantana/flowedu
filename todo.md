@@ -2435,3 +2435,8 @@
 - [x] Exibir contador de notificações não lidas no sino
 - [x] Implementar "Marcar todas como lidas"
 - [x] Atualização automática a cada 30 segundos
+
+
+## Correções Solicitadas
+- [x] Remover botão "Matricular Aluno" da página de Gerenciar Matrículas
+- [x] Corrigir erro de login do aluno que fica parado na tela (testado e funcionando)
