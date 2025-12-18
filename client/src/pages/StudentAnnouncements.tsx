@@ -2,8 +2,7 @@ import { trpc } from "../lib/trpc";
 import { AlertCircle, Megaphone, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { toast } from "sonner";
-import DashboardLayout from '../components/DashboardLayout';
-import PageWrapper from '../components/PageWrapper';
+import StudentLayout from '../components/StudentLayout';
 
 export function StudentAnnouncements() {
   const { data: announcements, isLoading } = trpc.announcements.getForStudent.useQuery();
@@ -25,8 +24,7 @@ export function StudentAnnouncements() {
   };
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
+    <StudentLayout>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Avisos</h1>
@@ -110,8 +108,7 @@ export function StudentAnnouncements() {
             </div>
           )}
         </div>
-      </PageWrapper>
-    </DashboardLayout>
+    </StudentLayout>
   );
 }
 

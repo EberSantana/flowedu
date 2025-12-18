@@ -2406,3 +2406,7 @@
 - [x] Criar componente StudentLayout para páginas de aluno
 - [x] Corrigir query getEnrolledSubjects para usar userId como professorId
 - [x] Corrigir query getStudentEnrollments para buscar na tabela subjectEnrollments
+
+- [x] Corrigir erro JSON no login do aluno (retornando HTML ao invés de JSON)
+- [x] Corrigir redirecionamento para OAuth quando aluno acessa páginas protegidas
+- [x] Corrigir erros nas páginas Minhas Disciplinas e Avisos do portal do aluno
