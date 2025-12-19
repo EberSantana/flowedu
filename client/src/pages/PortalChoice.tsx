@@ -1,6 +1,6 @@
-// Version: 2025-12-15-v3 - Auto redirect authenticated users
+// Version: 2025-12-18-v4 - Login direto com e-mail/senha para professores
 import { Link, useLocation } from "wouter";
-import { GraduationCap, Users, Loader2, UserPlus } from "lucide-react";
+import { GraduationCap, Users, Loader2, UserPlus, Mail, LogIn } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -57,8 +57,8 @@ export default function PortalChoice() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Portal do Aluno */}
           <Link href="/student-login">
-            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-blue-400 min-h-[480px] flex items-center">
-              <div className="flex flex-col items-center text-center space-y-6">
+            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-blue-400 min-h-[420px] flex items-center">
+              <div className="flex flex-col items-center text-center space-y-6 w-full">
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
                   <GraduationCap className="w-12 h-12 text-white" />
                 </div>
@@ -86,46 +86,45 @@ export default function PortalChoice() {
           </Link>
 
           {/* Portal do Professor */}
-          <a href={getLoginUrl()}>
-            <div className="bg-white rounded-2xl shadow-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 border-2 border-transparent hover:border-purple-400 min-h-[480px] flex items-center">
-              <div className="flex flex-col items-center text-center space-y-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                  <Users className="w-12 h-12 text-white" />
-                </div>
-                
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Portal do Professor
-                  </h2>
-                  <p className="text-gray-600">
-                    Gerencie disciplinas, turmas, horários e acompanhe seus
-                    alunos
-                  </p>
-                </div>
+          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-transparent min-h-[420px] flex items-center">
+            <div className="flex flex-col items-center text-center space-y-6 w-full">
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                <Users className="w-12 h-12 text-white" />
+              </div>
+              
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Portal do Professor
+                </h2>
+                <p className="text-gray-600">
+                  Gerencie disciplinas, turmas, horários e acompanhe seus alunos
+                </p>
+              </div>
 
-                <div className="pt-4">
-                  <div className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                    Entrar como Professor
+              {/* Botões de Login */}
+              <div className="pt-4 space-y-3 w-full max-w-xs">
+                <Link href="/login-professor" className="block">
+                  <div className="inline-flex items-center justify-center w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Entrar com E-mail
                   </div>
-                </div>
+                </Link>
+                
+                <a href={getLoginUrl()} className="block">
+                  <div className="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-colors">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Entrar com Google/GitHub
+                  </div>
+                </a>
+              </div>
 
-                <div className="text-sm text-gray-500 pt-2">
-                  Login com Google ou GitHub
-                </div>
+              <div className="text-sm text-gray-500 pt-2">
+                <Link href="/cadastro-professor" className="text-purple-600 hover:underline">
+                  Não tem conta? Cadastre-se
+                </Link>
               </div>
             </div>
-          </a>
-        </div>
-
-        {/* Link de Cadastro */}
-        <div className="text-center mt-8">
-          <p className="text-gray-600 mb-2">Ainda não tem conta?</p>
-          <Link href="/register">
-            <span className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 font-medium cursor-pointer">
-              <UserPlus className="w-4 h-4" />
-              Cadastre-se como Professor
-            </span>
-          </Link>
+          </div>
         </div>
 
         {/* Footer */}

@@ -29,6 +29,8 @@ import SubjectEnrollments from "./pages/SubjectEnrollments";
 import PortalChoice from "./pages/PortalChoice";
 import StudentLogin from "./pages/StudentLogin";
 import Register from "./pages/Register";
+import TeacherRegister from "./pages/TeacherRegister";
+import TeacherLogin from "./pages/TeacherLogin";
 import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
@@ -44,6 +46,8 @@ function Router() {
         <Route path={"/"} component={PortalChoice} />
         <Route path={"/student-login"} component={StudentLogin} />
         <Route path={"/register"} component={Register} />
+        <Route path={"/cadastro-professor"} component={TeacherRegister} />
+        <Route path={"/login-professor"} component={TeacherLogin} />
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
         <Route path={"/classes"} component={Classes} />

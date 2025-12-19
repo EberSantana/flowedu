@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, studentProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import bcrypt from "bcryptjs";
 import { tasks } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
 import jwt from "jsonwebtoken";
@@ -88,6 +89,130 @@ export const appRouter = router({
       .input(z.object({ code: z.string().min(1) }))
       .query(async ({ input }) => {
         return db.validateInviteCode(input.code);
+      }),
+
+    // Cadastro de Professor com E-mail/Senha
+    registerTeacher: publicProcedure
+      .input(z.object({
+        name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+        email: z.string().email("E-mail inválido"),
+        password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verificar se e-mail já existe
+        const existingUser = await db.getUserByEmail(input.email);
+        if (existingUser) {
+          throw new Error("Este e-mail já está cadastrado. Use outro e-mail ou faça login.");
+        }
+
+        // Hash da senha
+        const passwordHash = await bcrypt.hash(input.password, 10);
+
+        // Criar professor
+        const result = await db.createTeacherWithPassword({
+          name: input.name,
+          email: input.email,
+          passwordHash,
+        });
+
+        if (!result) {
+          throw new Error("Erro ao criar conta. Tente novamente.");
+        }
+
+        // Buscar usuário criado para criar sessão
+        const user = await db.getUserByEmail(input.email);
+        if (!user) {
+          throw new Error("Erro ao criar sessão. Tente fazer login.");
+        }
+
+        // Criar sessão JWT
+        const token = jwt.sign(
+          {
+            userId: user.id,
+            openId: user.openId,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          },
+          ENV.cookieSecret,
+          { expiresIn: '7d' }
+        );
+
+        // Configurar cookie de sessão
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          },
+        };
+      }),
+
+    // Login de Professor com E-mail/Senha
+    loginTeacher: publicProcedure
+      .input(z.object({
+        email: z.string().email("E-mail inválido"),
+        password: z.string().min(1, "Senha é obrigatória"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Buscar usuário pelo e-mail
+        const user = await db.getUserByEmail(input.email);
+        
+        if (!user) {
+          throw new Error("E-mail não encontrado. Verifique ou cadastre-se.");
+        }
+
+        // Verificar se usuário está ativo
+        if (!user.active) {
+          throw new Error("Conta desativada. Entre em contato com o administrador.");
+        }
+
+        // Verificar senha
+        if (!user.passwordHash) {
+          throw new Error("Esta conta usa login com Google/GitHub. Use o botão 'Entrar como Professor'.");
+        }
+
+        const validPassword = await bcrypt.compare(input.password, user.passwordHash);
+        if (!validPassword) {
+          throw new Error("Senha incorreta. Tente novamente.");
+        }
+
+        // Atualizar último login
+        await db.upsertUser({
+          openId: user.openId,
+          lastSignedIn: new Date(),
+        });
+
+        // Criar sessão JWT
+        const token = jwt.sign(
+          {
+            userId: user.id,
+            openId: user.openId,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          },
+          ENV.cookieSecret,
+          { expiresIn: '7d' }
+        );
+
+        // Configurar cookie de sessão
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+        };
       }),
   }),
 

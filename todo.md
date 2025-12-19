@@ -2485,3 +2485,19 @@
 - [x] Corrigir layout da página de Convites e Aprovações para usar Sidebar + PageWrapper
 - [x] Corrigir erro de e-mail não verificado (usar domínio padrão onboarding@resend.dev)
 - [x] Corrigir erro 'Acesso restrito a alunos' na página de materiais (alterado para usar materials.getByTopic ao invés de student.getTopicMaterials)
+
+## Cadastro Direto de Professores com E-mail/Senha
+- [ ] Adicionar campo passwordHash na tabela users
+- [ ] Criar rota tRPC auth.registerTeacher (nome, email, senha)
+- [ ] Criar rota tRPC auth.loginTeacher (email, senha)
+- [ ] Implementar hash de senha com bcrypt
+- [ ] Criar página de cadastro TeacherRegister.tsx
+- [ ] Criar página de login TeacherLogin.tsx
+- [ ] Atualizar PortalChoice.tsx com links para cadastro/login
+- [ ] Remover sistema de código de convite e aprovação
+- [ ] Testar fluxo completo de cadastro e login
+- [x] Criar backend para cadastro e login de professores com e-mail/senha
+- [x] Criar página de cadastro de professor (TeacherRegister.tsx)
+- [x] Criar página de login de professor (TeacherLogin.tsx)
+- [x] Atualizar página inicial (PortalChoice.tsx) com opções de login
+- [x] Adicionar testes para autenticação de professor com e-mail/senha

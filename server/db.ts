@@ -2176,3 +2176,76 @@ export async function getUserWithApprovalStatus(userId: number) {
     return null;
   }
 }
+
+// ==================== AUTENTICAÇÃO DE PROFESSOR COM E-MAIL/SENHA ====================
+
+// Buscar usuário por e-mail
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    console.error("[Database] Error getting user by email:", error);
+    return null;
+  }
+}
+
+// Criar professor com e-mail e senha
+export async function createTeacherWithPassword(data: {
+  name: string;
+  email: string;
+  passwordHash: string;
+}): Promise<{ id: number; openId: string } | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Gerar openId único para o professor
+    const openId = `teacher-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    
+    await db.insert(users).values({
+      openId,
+      name: data.name,
+      email: data.email,
+      passwordHash: data.passwordHash,
+      loginMethod: 'email',
+      role: 'user',
+      active: true,
+      approvalStatus: 'approved', // Aprovado automaticamente
+    });
+
+    // Buscar o usuário criado para retornar o ID
+    const created = await db.select().from(users)
+      .where(eq(users.openId, openId))
+      .limit(1);
+    
+    if (created[0]) {
+      return { id: created[0].id, openId: created[0].openId };
+    }
+    return null;
+  } catch (error) {
+    console.error("[Database] Error creating teacher:", error);
+    return null;
+  }
+}
+
+// Atualizar senha do usuário
+export async function updateUserPassword(userId: number, passwordHash: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(users)
+      .set({ passwordHash })
+      .where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error updating password:", error);
+    return false;
+  }
+}
