@@ -2484,3 +2484,4 @@
 - [x] Verificar materiais da Trilha de Aprendizagem (sistema funciona, materiais precisam ser cadastrados pelo professor)
 - [x] Corrigir layout da página de Convites e Aprovações para usar Sidebar + PageWrapper
 - [x] Corrigir erro de e-mail não verificado (usar domínio padrão onboarding@resend.dev)
+- [x] Corrigir erro 'Acesso restrito a alunos' na página de materiais (alterado para usar materials.getByTopic ao invés de student.getTopicMaterials)

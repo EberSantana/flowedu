@@ -59,7 +59,7 @@ export default function TopicMaterialsManager() {
     { enabled: !!subjectId }
   );
 
-  const { data: materials, isLoading } = trpc.student.getTopicMaterials.useQuery(
+  const { data: materials, isLoading } = trpc.materials.getByTopic.useQuery(
     { topicId },
     { enabled: !!topicId }
   );
@@ -68,7 +68,7 @@ export default function TopicMaterialsManager() {
 
   const createMaterialMutation = trpc.materials.create.useMutation({
     onSuccess: () => {
-      utils.student.getTopicMaterials.invalidate();
+      utils.materials.getByTopic.invalidate();
       toast.success("Material adicionado com sucesso!");
       setIsAddDialogOpen(false);
       resetForm();
@@ -80,7 +80,7 @@ export default function TopicMaterialsManager() {
 
   const updateMaterialMutation = trpc.materials.update.useMutation({
     onSuccess: () => {
-      utils.student.getTopicMaterials.invalidate();
+      utils.materials.getByTopic.invalidate();
       toast.success("Material atualizado!");
     },
     onError: (error) => {
@@ -90,7 +90,7 @@ export default function TopicMaterialsManager() {
 
   const deleteMaterialMutation = trpc.materials.delete.useMutation({
     onSuccess: () => {
-      utils.student.getTopicMaterials.invalidate();
+      utils.materials.getByTopic.invalidate();
       toast.success("Material removido!");
     },
     onError: (error) => {
