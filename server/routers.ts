@@ -1899,15 +1899,15 @@ Crie sugestões no formato JSON:
         });
       }),
     
-    getTopicMaterials: protectedProcedure
+    getTopicMaterials: studentProcedure
       .input(z.object({ topicId: z.number() }))
-      .query(async ({ ctx, input }) => {
+      .query(async ({ input }) => {
         return await db.getTopicMaterials(input.topicId);
       }),
     
-    getTopicAssignments: protectedProcedure
+    getTopicAssignments: studentProcedure
       .input(z.object({ topicId: z.number() }))
-      .query(async ({ ctx, input }) => {
+      .query(async ({ input }) => {
         return await db.getTopicAssignments(input.topicId);
       }),
     

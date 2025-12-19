@@ -2473,3 +2473,14 @@
 ## Correções - 18/12/2025
 - [x] Corrigir layout da página de Convites e Aprovações para usar Sidebar + PageWrapper
 - [x] Corrigir erro de e-mail não verificado (usar domínio padrão onboarding@resend.dev)
+
+## Bugs Reportados - 18/12/2025
+- [ ] Corrigir erro que faz sair do sistema na página de Trilha de Aprendizagem do aluno
+- [ ] Exibir materiais cadastrados pelo professor na Trilha de Aprendizagem do aluno
+
+
+## Correções 18/12/2025 - Sessão 2
+- [x] Corrigir erro que faz sair do sistema na Trilha de Aprendizagem (substituído Sidebar por StudentLayout)
+- [x] Verificar materiais da Trilha de Aprendizagem (sistema funciona, materiais precisam ser cadastrados pelo professor)
+- [x] Corrigir layout da página de Convites e Aprovações para usar Sidebar + PageWrapper
+- [x] Corrigir erro de e-mail não verificado (usar domínio padrão onboarding@resend.dev)

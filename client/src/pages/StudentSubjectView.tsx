@@ -7,8 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import Sidebar from "@/components/Sidebar";
-import PageWrapper from "@/components/PageWrapper";
+import StudentLayout from "@/components/StudentLayout";
 import {
   BookOpen,
   ChevronDown,
@@ -132,45 +131,35 @@ export default function StudentSubjectView() {
 
   if (isLoading) {
     return (
-      <>
-        <Sidebar />
-        <PageWrapper>
-          <div className="container mx-auto py-8">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-4 text-muted-foreground">Carregando trilha de aprendizagem...</p>
-              </div>
-            </div>
+      <StudentLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Carregando trilha de aprendizagem...</p>
           </div>
-        </PageWrapper>
-      </>
+        </div>
+      </StudentLayout>
     );
   }
 
   if (!learningPath || learningPath.length === 0) {
     return (
-      <>
-        <Sidebar />
-        <PageWrapper>
-          <div className="container mx-auto py-8">
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <BookOpen className="h-16 w-16 text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Trilha de aprendizagem não disponível
-                </h3>
-                <p className="text-gray-600 text-center max-w-md mb-4">
-                  O professor ainda não criou a trilha de aprendizagem para esta disciplina.
-                </p>
-                <Link href="/student/dashboard">
-                  <Button>Voltar ao Portal do Aluno</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </PageWrapper>
-      </>
+      <StudentLayout>
+        <Card className="bg-white">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <BookOpen className="h-16 w-16 text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Trilha de aprendizagem não disponível
+            </h3>
+            <p className="text-gray-600 text-center max-w-md mb-4">
+              O professor ainda não criou a trilha de aprendizagem para esta disciplina.
+            </p>
+            <Link href="/student-dashboard">
+              <Button className="bg-blue-600 hover:bg-blue-700">Voltar ao Portal do Aluno</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </StudentLayout>
     );
   }
 
@@ -183,13 +172,11 @@ export default function StudentSubjectView() {
   const progressPercentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
 
   return (
-    <>
-      <Sidebar />
-      <PageWrapper>
-        <div className="container mx-auto py-8">
+    <StudentLayout>
+      <div className="w-full">
           {/* Header */}
           <div className="mb-8">
-            <Link href="/student/dashboard">
+            <Link href="/student-dashboard">
               <Button variant="ghost" size="sm" className="mb-4">
                 ← Voltar ao Portal
               </Button>
@@ -475,7 +462,6 @@ export default function StudentSubjectView() {
             </DialogContent>
           </Dialog>
         </div>
-      </PageWrapper>
-    </>
+    </StudentLayout>
   );
 }

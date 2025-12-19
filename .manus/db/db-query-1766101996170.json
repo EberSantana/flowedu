@@ -1,0 +1,45 @@
+{
+  "query": "SELECT se.id, se.studentId, se.subjectId, se.professorId, s.name as subjectName\nFROM student_enrollments se\nLEFT JOIN subjects s ON se.subjectId = s.id\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.id, se.studentId, se.subjectId, se.professorId, s.name as subjectName\nFROM student_enrollments se\nLEFT JOIN subjects s ON se.subjectId = s.id\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "60004",
+      "studentId": "300002",
+      "subjectId": "2",
+      "professorId": "1",
+      "subjectName": "Segurança da Informação"
+    },
+    {
+      "id": "60002",
+      "studentId": "300002",
+      "subjectId": "6",
+      "professorId": "1",
+      "subjectName": "Interface Homem Computador"
+    },
+    {
+      "id": "120001",
+      "studentId": "1",
+      "subjectId": "7",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "id": "150001",
+      "studentId": "1",
+      "subjectId": "8",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "id": "180001",
+      "studentId": "1",
+      "subjectId": "9",
+      "professorId": "1",
+      "subjectName": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tprofessorId\tsubjectName\n60004\t300002\t2\t1\tSegurança da Informação\n60002\t300002\t6\t1\tInterface Homem Computador\n120001\t1\t7\t1\tNULL\n150001\t1\t8\t1\tNULL\n180001\t1\t9\t1\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}
