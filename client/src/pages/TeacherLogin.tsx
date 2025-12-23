@@ -16,10 +16,19 @@ export default function TeacherLogin() {
     password: "",
   });
 
+  const utils = trpc.useUtils();
+
   const loginMutation = trpc.auth.loginTeacher.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(`Bem-vindo, ${data.user.name}!`);
-      setLocation("/dashboard");
+      
+      // Invalidar cache de autenticação para forçar recarregar sessão
+      await utils.auth.me.invalidate();
+      
+      // Forçar recarregamento completo da página para garantir sessão
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 500);
     },
     onError: (error) => {
       toast.error(error.message);

@@ -18,14 +18,21 @@ export default function TeacherRegister() {
   });
   const [isRegistered, setIsRegistered] = useState(false);
 
+  const utils = trpc.useUtils();
+
   const registerMutation = trpc.auth.registerTeacher.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Conta criada com sucesso!");
       setIsRegistered(true);
-      // Redirecionar para dashboard após 2 segundos
+      
+      // Invalidar cache de autenticação para forçar recarregar sessão
+      await utils.auth.me.invalidate();
+      
+      // Aguardar um pouco mais para garantir que o cookie foi processado
       setTimeout(() => {
-        setLocation("/dashboard");
-      }, 2000);
+        // Forçar recarregamento completo da página para garantir sessão
+        window.location.href = "/dashboard";
+      }, 1500);
     },
     onError: (error) => {
       toast.error(error.message);

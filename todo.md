@@ -2535,3 +2535,7 @@
 - [x] Substituir botão "Infográfico" por "Mapa Mental" na página de Trilhas
 - [x] Adicionar botão "Criar Prova" na página de Trilhas
 - [x] Adicionar botão de exercícios em cada card de módulo
+
+## Bugs
+- [ ] Corrigir logout automático após cadastro de professor (sistema desloga depois de um tempo)
+- [x] Corrigir logout automático após cadastro de professor (invalidar cache e forçar reload completo)
