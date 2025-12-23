@@ -2364,10 +2364,29 @@ Retorne um JSON com a estrutura hierárquica:
           }
         });
         
-        const content = typeof response.choices[0].message.content === 'string' 
-          ? response.choices[0].message.content 
-          : JSON.stringify(response.choices[0].message.content);
-        return JSON.parse(content || '{}');
+        // Tratamento robusto da resposta da IA para mapa mental
+        try {
+          const content = typeof response.choices[0].message.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices[0].message.content);
+          
+          if (!content || content.trim() === '') {
+            throw new Error('Resposta vazia da IA');
+          }
+          
+          // Tentar fazer parse do JSON
+          const parsed = JSON.parse(content);
+          
+          // Validar estrutura mínima do mapa mental
+          if (!parsed.title || !parsed.nodes || !Array.isArray(parsed.nodes)) {
+            throw new Error('Estrutura de mapa mental inválida');
+          }
+          
+          return parsed;
+        } catch (error: any) {
+          console.error('Erro ao processar resposta do mapa mental:', error);
+          throw new Error(`Erro ao gerar mapa mental: ${error.message || 'JSON malformado'}. Tente novamente.`);
+        }
       }),
   }),
 
