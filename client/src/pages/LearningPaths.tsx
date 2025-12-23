@@ -40,7 +40,7 @@ import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import ExamGeneratorModal from "@/components/ExamGeneratorModal";
 import ExerciseGeneratorModal from "@/components/ExerciseGeneratorModal";
-import MindMapModal from "@/components/MindMapModal";
+import FlowDiagramModal from "@/components/FlowDiagramModal";
 import ModuleMindMapModal from "@/components/ModuleMindMapModal";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
@@ -603,17 +603,17 @@ export default function LearningPaths() {
                         onClick={() => {
                           if (!selectedSubjectId) return;
                           if (!learningPath || learningPath.length === 0) {
-                            toast.error("Crie módulos primeiro para gerar mapa mental");
+                            toast.error("Crie módulos primeiro para gerar diagrama");
                             return;
                           }
                           setIsMindMapModalOpen(true);
                         }}
                         disabled={!learningPath || learningPath.length === 0}
                         className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 flex-1 sm:flex-initial"
-                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Visualizar mapa mental"}
+                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Visualizar diagrama de fluxo"}
                       >
                         <Network className="h-4 w-4 mr-2" />
-                        Mapa Mental
+                        Diagrama de Fluxo
                       </Button>
 
                       <Button
@@ -1321,13 +1321,24 @@ export default function LearningPaths() {
             />
           )}
 
-          {/* Mind Map Modal */}
-          {selectedSubjectId && subjects && (
-            <MindMapModal
-              isOpen={isMindMapModalOpen}
-              onClose={() => setIsMindMapModalOpen(false)}
-              subjectId={selectedSubjectId}
+          {/* Flow Diagram Modal */}
+          {selectedSubjectId && subjects && learningPath && (
+            <FlowDiagramModal
+              open={isMindMapModalOpen}
+              onOpenChange={setIsMindMapModalOpen}
               subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
+              modules={learningPath.map(m => ({
+                id: m.id,
+                title: m.title,
+                description: m.description || '',
+              }))}
+              topics={learningPath.flatMap(m => 
+                m.topics?.map(t => ({
+                  id: t.id,
+                  moduleId: m.id,
+                  title: t.title,
+                })) || []
+              )}
             />
           )}
 

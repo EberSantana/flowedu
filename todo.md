@@ -2548,3 +2548,4 @@
 - [x] Adicionar botão de mapa mental nos módulos individuais (onde está o infográfico)
 - [x] Simplificar cadastro de professores (forma mais simples)
 - [x] Corrigir bug de logout automático ao logar
+- [x] Substituir mapa mental por diagrama de fluxo Mermaid.js
