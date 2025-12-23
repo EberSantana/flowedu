@@ -2498,6 +2498,105 @@ Retorne JSON:
           throw new Error(`Erro ao gerar infográfico: ${error.message || 'JSON malformado'}. Tente novamente.`);
         }
       }),
+
+    // Gerar mapa mental de um módulo específico
+    generateModuleMindMap: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        
+        const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
+        if (!module) throw new Error('Módulo não encontrado');
+        
+        // Buscar tópicos do módulo usando getLearningPathBySubject
+        const allModules = await db.getLearningPathBySubject(module.subjectId, ctx.user.id);
+        const moduleWithTopics = allModules?.find((m: any) => m.id === input.moduleId);
+        const topics = moduleWithTopics?.topics?.slice(0, 5) || [];
+        
+        const response = await invokeLLM({
+          max_tokens: 1000,
+          messages: [
+            {
+              role: 'system',
+              content: 'Gere um mapa mental em JSON. Seja MUITO conciso.'
+            },
+            {
+              role: 'user',
+              content: `Mapa mental para "${module.title.substring(0, 40)}":
+Tópicos: ${topics.map((t: any) => t.title.substring(0, 30)).join(', ')}
+
+JSON (descrições MAX 15 chars):
+{"title":"${module.title.substring(0, 40)}","description":"Visão geral","nodes":[{"id":"1","label":"Top","description":"D","color":"#3b82f6","children":[{"id":"1.1","label":"Sub","description":"D"}]}]}`
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'module_mindmap',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  nodes: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        label: { type: 'string' },
+                        description: { type: 'string' },
+                        color: { type: 'string' },
+                        children: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              label: { type: 'string' },
+                              description: { type: 'string' }
+                            },
+                            required: ['id', 'label', 'description'],
+                            additionalProperties: false
+                          }
+                        }
+                      },
+                      required: ['id', 'label', 'description', 'color'],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ['title', 'description', 'nodes'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        try {
+          const content = typeof response.choices[0].message.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices[0].message.content);
+          
+          if (!content || content.trim() === '') {
+            throw new Error('Resposta vazia da IA');
+          }
+          
+          const parsed = JSON.parse(content);
+          
+          if (!parsed.title || !parsed.nodes) {
+            throw new Error('Estrutura inválida');
+          }
+          
+          return parsed;
+        } catch (error: any) {
+          console.error('Erro ao processar mapa mental do módulo:', error);
+          throw new Error(`Erro ao gerar mapa mental: ${error.message || 'JSON malformado'}. Tente novamente.`);
+        }
+      }),
   }),
 
   // Student Portal Routes

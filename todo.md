@@ -2544,3 +2544,5 @@
 - [x] Corrigir definitivamente erro de JSON no mapa mental (limitar tamanho)
 - [x] Criar infográfico visual melhor em português brasileiro
 - [x] Corrigir erro de JSON no mapa mental com limite mais agressivo (3 módulos, 3 tópicos, max_tokens)
+- [x] Remover funcionalidade de infográfico completamente
+- [x] Adicionar botão de mapa mental nos módulos individuais (onde está o infográfico)

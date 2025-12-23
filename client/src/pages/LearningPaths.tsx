@@ -41,7 +41,7 @@ import PageWrapper from "@/components/PageWrapper";
 import ExamGeneratorModal from "@/components/ExamGeneratorModal";
 import ExerciseGeneratorModal from "@/components/ExerciseGeneratorModal";
 import MindMapModal from "@/components/MindMapModal";
-import InfographicModal from "@/components/InfographicModal";
+import ModuleMindMapModal from "@/components/ModuleMindMapModal";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
 
@@ -227,6 +227,15 @@ export default function LearningPaths() {
   const handleGenerateModuleInfographic = (moduleId: number) => {
     toast.info("Gerando infográfico do módulo...");
     generateModuleInfographicMutation.mutate({ moduleId });
+  };
+
+  // Estado para mapa mental do módulo
+  const [selectedModuleForMindMap, setSelectedModuleForMindMap] = useState<{ id: number; title: string } | null>(null);
+  const [isModuleMindMapModalOpen, setIsModuleMindMapModalOpen] = useState(false);
+
+  const handleGenerateModuleMindMap = (moduleId: number, moduleTitle: string) => {
+    setSelectedModuleForMindMap({ id: moduleId, title: moduleTitle });
+    setIsModuleMindMapModalOpen(true);
   };
 
   // Função para fazer upload de arquivo (DOCX, TXT) e extrair texto
@@ -606,23 +615,7 @@ export default function LearningPaths() {
                         <Network className="h-4 w-4 mr-2" />
                         Mapa Mental
                       </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (!selectedSubjectId) return;
-                          if (!learningPath || learningPath.length === 0) {
-                            toast.error("Crie módulos primeiro para gerar infográfico");
-                            return;
-                          }
-                          setIsInfographicModalOpen(true);
-                        }}
-                        disabled={!learningPath || learningPath.length === 0}
-                        className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 flex-1 sm:flex-initial"
-                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Gerar infográfico visual"}
-                      >
-                        <ImageIcon className="h-4 w-4 mr-2" />
-                        Infográfico
-                      </Button>
+
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -762,10 +755,10 @@ export default function LearningPaths() {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => handleGenerateModuleInfographic(module.id)}
-                                title="Gerar Infográfico do Módulo"
+                                onClick={() => handleGenerateModuleMindMap(module.id, module.title)}
+                                title="Gerar Mapa Mental do Módulo"
                               >
-                                <ImageIcon className="h-4 w-4 text-purple-500" />
+                                <Network className="h-4 w-4 text-blue-500" />
                               </Button>
                               <Button
                                 size="sm"
@@ -1338,13 +1331,16 @@ export default function LearningPaths() {
             />
           )}
 
-          {/* Infographic Modal */}
-          {selectedSubjectId && subjects && (
-            <InfographicModal
-              isOpen={isInfographicModalOpen}
-              onClose={() => setIsInfographicModalOpen(false)}
-              subjectId={selectedSubjectId}
-              subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
+          {/* Module Mind Map Modal */}
+          {selectedModuleForMindMap && (
+            <ModuleMindMapModal
+              isOpen={isModuleMindMapModalOpen}
+              onClose={() => {
+                setIsModuleMindMapModalOpen(false);
+                setSelectedModuleForMindMap(null);
+              }}
+              moduleId={selectedModuleForMindMap.id}
+              moduleTitle={selectedModuleForMindMap.title}
             />
           )}
 
