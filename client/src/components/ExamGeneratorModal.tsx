@@ -558,16 +558,20 @@ export default function ExamGeneratorModal({
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex gap-4">
+          <div className="flex-1">
             <ScrollArea className="flex-1 pr-4">
               <div id="exam-content" className="space-y-6 py-4">
                 {/* Cabeçalho da Prova */}
-                <div className="text-center border-b pb-4 mb-6">
-                  <h2 className="text-2xl font-bold">{generatedExam.title}</h2>
-                  <p className="text-base text-muted-foreground mt-3 leading-relaxed">{generatedExam.instructions}</p>
-                  <p className="text-base font-semibold mt-3">
-                    Total de Pontos: {generatedExam.totalPoints}
-                  </p>
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 mb-8 border border-purple-100">
+                  <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">{generatedExam.title}</h2>
+                  <div className="bg-white/80 rounded-lg p-4 text-sm text-gray-600 leading-relaxed">
+                    {generatedExam.instructions}
+                  </div>
+                  <div className="mt-4 flex justify-center">
+                    <span className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                      Total de Pontos: {generatedExam.totalPoints}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Questões */}
@@ -639,26 +643,6 @@ export default function ExamGeneratorModal({
             </div>
           </ScrollArea>
           
-          {/* Mini-índice de Navegação Lateral */}
-          <div className="w-10 flex-shrink-0 no-print">
-            <div className="sticky top-4 flex flex-col gap-1.5">
-              {generatedExam.questions.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    const element = document.getElementById(`question-${idx}`);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-purple-500 hover:text-white text-gray-600 text-xs font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                  title={`Ir para Questão ${idx + 1}`}
-                >
-                  {idx + 1}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
         )}
 
@@ -698,9 +682,6 @@ export default function ExamGeneratorModal({
                   Mostrar gabarito
                 </Label>
               </div>
-              <Button variant="outline" onClick={resetForm}>
-                Nova Prova
-              </Button>
               <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
                 <Download className="h-4 w-4 mr-2" />
                 Word

@@ -2559,3 +2559,8 @@
 - [x] Adicionar mini-índice de navegação lateral no canto direito dos modais de exercícios e provas
 - [x] Remover botão PDF dos modais de exercícios e provas
 - [x] Deixar botões do mini-índice mais fluidos/compactos
+
+- [x] Remover botão "Nova Prova" do modal de provas
+- [x] Remover mini-índice lateral (números 1-10) dos modais de exercícios e provas
+- [x] Manter apenas: Word, Copiar, Imprimir e Fechar
+- [x] Melhorar visual da caixa de avaliação (header/instruções)
