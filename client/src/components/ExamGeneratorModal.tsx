@@ -69,7 +69,6 @@ export default function ExamGeneratorModal({
   const [selectedModules, setSelectedModules] = useState<number[]>([]);
   const [generatedExam, setGeneratedExam] = useState<GeneratedExam | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const generateExamMutation = trpc.learningPath.generateExam.useMutation({
     onSuccess: (data) => {
@@ -432,26 +431,9 @@ export default function ExamGeneratorModal({
     setQuestionCount(10);
     setSelectedModules([]);
     setShowAnswers(false);
-    setCurrentQuestionIndex(0);
   };
 
-  const handlePrevious = () => {
-    setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
-  };
 
-  const handleNext = () => {
-    if (generatedExam) {
-      setCurrentQuestionIndex((prev) => Math.min(generatedExam.questions.length - 1, prev + 1));
-    }
-  };
-
-  const scrollToQuestion = (index: number) => {
-    setCurrentQuestionIndex(index);
-    const element = document.getElementById(`question-${index}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
 
   const handleClose = () => {
     resetForm();
@@ -576,43 +558,7 @@ export default function ExamGeneratorModal({
             </div>
           </div>
         ) : (
-          <>
-            {/* Barra de Navegação */}
-            <div className="flex items-center justify-between border-b pb-3 mb-3 px-4 no-print">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-              >
-                ← Anterior
-              </Button>
-              <div className="flex gap-1 overflow-x-auto max-w-md">
-                {generatedExam.questions.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => scrollToQuestion(idx)}
-                    className={`min-w-[32px] h-8 rounded ${
-                      currentQuestionIndex === idx
-                        ? "bg-green-600 text-white font-semibold"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                    }`}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleNext}
-                disabled={currentQuestionIndex === generatedExam.questions.length - 1}
-              >
-                Próximo →
-              </Button>
-            </div>
-
-            <ScrollArea className="flex-1 pr-4">
+          <ScrollArea className="flex-1 pr-4">
               <div id="exam-content" className="space-y-6 py-4">
                 {/* Cabeçalho da Prova */}
                 <div className="text-center border-b pb-4 mb-6">
@@ -691,7 +637,6 @@ export default function ExamGeneratorModal({
               </div>
             </div>
           </ScrollArea>
-          </>
         )}
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
