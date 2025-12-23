@@ -559,25 +559,25 @@ export default function ExamGeneratorModal({
           <ScrollArea className="flex-1 pr-4">
             <div id="exam-content" className="space-y-6 py-4">
               {/* Cabeçalho da Prova */}
-              <div className="text-center border-b pb-4">
-                <h2 className="text-xl font-bold">{generatedExam.title}</h2>
-                <p className="text-muted-foreground mt-2">{generatedExam.instructions}</p>
-                <p className="text-sm font-medium mt-2">
+              <div className="text-center border-b pb-4 mb-6">
+                <h2 className="text-2xl font-bold">{generatedExam.title}</h2>
+                <p className="text-base text-muted-foreground mt-3 leading-relaxed">{generatedExam.instructions}</p>
+                <p className="text-base font-semibold mt-3">
                   Total de Pontos: {generatedExam.totalPoints}
                 </p>
               </div>
 
               {/* Questões */}
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {generatedExam.questions.map((question) => (
-                  <div key={question.number} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="font-bold">Questão {question.number}</span>
+                  <div key={question.number} className="border rounded-lg p-6 bg-white shadow-sm">
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="text-lg font-bold text-gray-900">Questão {question.number}</span>
                       <div className="flex gap-2">
-                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                        <span className="text-sm bg-gray-100 px-3 py-1 rounded font-medium">
                           {question.points} pts
                         </span>
-                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                        <span className="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded font-medium">
                           {question.type === "objective" ? "Objetiva" : 
                            question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
                         </span>
@@ -585,20 +585,20 @@ export default function ExamGeneratorModal({
                     </div>
                     
                     {question.caseContext && (
-                      <div className="bg-gray-50 p-3 rounded mb-3 text-sm italic">
+                      <div className="bg-gray-50 p-4 rounded-lg mb-4 text-base italic text-gray-700 leading-relaxed">
                         {question.caseContext}
                       </div>
                     )}
                     
-                    <p className="mb-3">{question.question}</p>
+                    <p className="mb-4 text-base text-gray-800 leading-relaxed">{question.question}</p>
                     
                     {question.options && (
-                      <div className="space-y-2 ml-4">
+                      <div className="space-y-3 ml-6">
                         {question.options.map((option, idx) => (
-                          <div key={idx} className={`${
+                          <div key={idx} className={`text-base leading-relaxed ${
                             showAnswers && option.startsWith(question.correctAnswer || "")
-                              ? "text-green-600 font-medium"
-                              : ""
+                              ? "text-green-600 font-semibold"
+                              : "text-gray-700"
                           }`}>
                             {option}
                           </div>
@@ -607,9 +607,9 @@ export default function ExamGeneratorModal({
                     )}
                     
                     {question.caseQuestions && (
-                      <div className="mt-3 space-y-2">
+                      <div className="mt-4 space-y-3">
                         {question.caseQuestions.map((cq, idx) => (
-                          <div key={idx} className="text-sm">
+                          <div key={idx} className="text-base text-gray-700 leading-relaxed">
                             {String.fromCharCode(97 + idx)}) {cq}
                           </div>
                         ))}
@@ -617,15 +617,15 @@ export default function ExamGeneratorModal({
                     )}
                     
                     {showAnswers && (
-                      <div className="mt-4 pt-3 border-t">
+                      <div className="mt-5 pt-4 border-t space-y-3">
                         {question.correctAnswer && (
-                          <p className="text-green-600 text-sm">
-                            <strong>Resposta:</strong> {question.correctAnswer}
+                          <p className="text-green-600 text-base leading-relaxed">
+                            <strong className="font-semibold">Resposta:</strong> {question.correctAnswer}
                           </p>
                         )}
                         {question.expectedAnswer && (
-                          <p className="text-green-600 text-sm">
-                            <strong>Resposta esperada:</strong> {question.expectedAnswer}
+                          <p className="text-green-600 text-base leading-relaxed">
+                            <strong className="font-semibold">Resposta esperada:</strong> {question.expectedAnswer}
                           </p>
                         )}
                       </div>

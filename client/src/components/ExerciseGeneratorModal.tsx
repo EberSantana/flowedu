@@ -476,38 +476,38 @@ export default function ExerciseGeneratorModal({
           <ScrollArea className="flex-1 pr-4">
             <div id="exercises-content" className="space-y-6 py-4">
               {/* Cabeçalho */}
-              <div className="text-center border-b pb-4">
-                <h2 className="text-xl font-bold">Exercícios</h2>
-                <p className="text-muted-foreground mt-1">{generatedExercises.moduleTitle}</p>
+              <div className="text-center border-b pb-4 mb-6">
+                <h2 className="text-2xl font-bold">Exercícios</h2>
+                <p className="text-base text-muted-foreground mt-2">{generatedExercises.moduleTitle}</p>
               </div>
 
               {/* Exercícios */}
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {generatedExercises.exercises.map((exercise) => (
-                  <div key={exercise.number} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="font-bold">Exercício {exercise.number}</span>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                  <div key={exercise.number} className="border rounded-lg p-6 bg-white shadow-sm">
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="text-lg font-bold text-gray-900">Exercício {exercise.number}</span>
+                      <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded font-medium">
                         {exercise.type === "objective" ? "Objetiva" : 
                          exercise.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
                       </span>
                     </div>
                     
                     {exercise.caseContext && (
-                      <div className="bg-gray-50 p-3 rounded mb-3 text-sm italic">
+                      <div className="bg-gray-50 p-4 rounded-lg mb-4 text-base italic text-gray-700 leading-relaxed">
                         {exercise.caseContext}
                       </div>
                     )}
                     
-                    <p className="mb-3">{exercise.question}</p>
+                    <p className="mb-4 text-base text-gray-800 leading-relaxed">{exercise.question}</p>
                     
                     {exercise.options && (
-                      <div className="space-y-2 ml-4">
+                      <div className="space-y-3 ml-6">
                         {exercise.options.map((option, idx) => (
-                          <div key={idx} className={`${
+                          <div key={idx} className={`text-base leading-relaxed ${
                             showAnswers && option.startsWith(exercise.correctAnswer || "")
-                              ? "text-green-600 font-medium"
-                              : ""
+                              ? "text-green-600 font-semibold"
+                              : "text-gray-700"
                           }`}>
                             {option}
                           </div>
@@ -516,9 +516,9 @@ export default function ExerciseGeneratorModal({
                     )}
                     
                     {exercise.caseQuestions && (
-                      <div className="mt-3 space-y-2">
+                      <div className="mt-4 space-y-3">
                         {exercise.caseQuestions.map((cq, idx) => (
-                          <div key={idx} className="text-sm">
+                          <div key={idx} className="text-base text-gray-700 leading-relaxed">
                             {String.fromCharCode(97 + idx)}) {cq}
                           </div>
                         ))}
@@ -526,22 +526,22 @@ export default function ExerciseGeneratorModal({
                     )}
                     
                     {showHints && exercise.hint && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-lg flex items-start gap-2">
-                        <Lightbulb className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-blue-700">{exercise.hint}</p>
+                      <div className="mt-4 p-4 bg-blue-50 rounded-lg flex items-start gap-3">
+                        <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-base text-blue-700 leading-relaxed">{exercise.hint}</p>
                       </div>
                     )}
                     
                     {showAnswers && (
-                      <div className="mt-4 pt-3 border-t space-y-2">
+                      <div className="mt-5 pt-4 border-t space-y-3">
                         {exercise.correctAnswer && (
-                          <p className="text-green-600 text-sm">
-                            <strong>Resposta:</strong> {exercise.correctAnswer}
+                          <p className="text-green-600 text-base leading-relaxed">
+                            <strong className="font-semibold">Resposta:</strong> {exercise.correctAnswer}
                           </p>
                         )}
                         {exercise.explanation && (
-                          <p className="text-gray-600 text-sm">
-                            <strong>Explicação:</strong> {exercise.explanation}
+                          <p className="text-gray-700 text-base leading-relaxed">
+                            <strong className="font-semibold">Explicação:</strong> {exercise.explanation}
                           </p>
                         )}
                       </div>

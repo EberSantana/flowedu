@@ -2549,3 +2549,5 @@
 - [x] Simplificar cadastro de professores (forma mais simples)
 - [x] Corrigir bug de logout automático ao logar
 - [x] Substituir mapa mental por diagrama de fluxo Mermaid.js
+- [ ] Verificar e garantir exportação DOCX em provas e exercícios
+- [x] Melhorar visualização dos modais de exercícios e provas (aumentar fonte, melhorar espaçamento)
