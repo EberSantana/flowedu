@@ -2564,3 +2564,7 @@
 - [x] Remover mini-índice lateral (números 1-10) dos modais de exercícios e provas
 - [x] Manter apenas: Word, Copiar, Imprimir e Fechar
 - [x] Melhorar visual da caixa de avaliação (header/instruções)
+
+- [x] Adicionar barra de rolagem visível na caixa de exercícios/provas
+- [x] Remover caixa de dica (box azul com ícone de lâmpada)
+- [x] Adicionar respostas corretas e justificativas em todas as questões

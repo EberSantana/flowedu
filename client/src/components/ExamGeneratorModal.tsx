@@ -559,7 +559,7 @@ export default function ExamGeneratorModal({
           </div>
         ) : (
           <div className="flex-1">
-            <ScrollArea className="flex-1 pr-4">
+            <ScrollArea className="flex-1 pr-4 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
               <div id="exam-content" className="space-y-6 py-4">
                 {/* Cabeçalho da Prova */}
                 <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 mb-8 border border-purple-100">
@@ -623,20 +623,18 @@ export default function ExamGeneratorModal({
                       </div>
                     )}
                     
-                    {showAnswers && (
-                      <div className="mt-5 pt-4 border-t space-y-3">
-                        {question.correctAnswer && (
-                          <p className="text-green-600 text-base leading-relaxed">
-                            <strong className="font-semibold">Resposta:</strong> {question.correctAnswer}
-                          </p>
-                        )}
-                        {question.expectedAnswer && (
-                          <p className="text-green-600 text-base leading-relaxed">
-                            <strong className="font-semibold">Resposta esperada:</strong> {question.expectedAnswer}
-                          </p>
-                        )}
-                      </div>
-                    )}
+                    <div className="mt-5 pt-4 border-t space-y-3">
+                      {question.correctAnswer && (
+                        <p className="text-green-600 text-base leading-relaxed">
+                          <strong className="font-semibold">Resposta Correta:</strong> {question.correctAnswer}
+                        </p>
+                      )}
+                      {question.expectedAnswer && (
+                        <p className="text-gray-700 text-base leading-relaxed">
+                          <strong className="font-semibold">Justificativa:</strong> {question.expectedAnswer}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

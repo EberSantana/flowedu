@@ -476,7 +476,7 @@ export default function ExerciseGeneratorModal({
           </div>
         ) : (
           <div className="flex-1">
-            <ScrollArea className="flex-1 pr-4">
+            <ScrollArea className="flex-1 pr-4 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
               <div id="exercises-content" className="space-y-6 py-4">
                 {/* Cabeçalho */}
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-8 border border-green-100">
@@ -528,27 +528,18 @@ export default function ExerciseGeneratorModal({
                       </div>
                     )}
                     
-                    {showHints && exercise.hint && (
-                      <div className="mt-4 p-4 bg-blue-50 rounded-lg flex items-start gap-3">
-                        <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-base text-blue-700 leading-relaxed">{exercise.hint}</p>
-                      </div>
-                    )}
-                    
-                    {showAnswers && (
-                      <div className="mt-5 pt-4 border-t space-y-3">
-                        {exercise.correctAnswer && (
-                          <p className="text-green-600 text-base leading-relaxed">
-                            <strong className="font-semibold">Resposta:</strong> {exercise.correctAnswer}
-                          </p>
-                        )}
-                        {exercise.explanation && (
-                          <p className="text-gray-700 text-base leading-relaxed">
-                            <strong className="font-semibold">Explicação:</strong> {exercise.explanation}
-                          </p>
-                        )}
-                      </div>
-                    )}
+                    <div className="mt-5 pt-4 border-t space-y-3">
+                      {exercise.correctAnswer && (
+                        <p className="text-green-600 text-base leading-relaxed">
+                          <strong className="font-semibold">Resposta Correta:</strong> {exercise.correctAnswer}
+                        </p>
+                      )}
+                      {exercise.explanation && (
+                        <p className="text-gray-700 text-base leading-relaxed">
+                          <strong className="font-semibold">Justificativa:</strong> {exercise.explanation}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

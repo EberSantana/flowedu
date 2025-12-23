@@ -2067,6 +2067,10 @@ Crie sugestões no formato JSON:
 Conteúdo dos módulos:
 ${JSON.stringify(modulesContent, null, 2)}
 
+IMPORTANTE:
+- SEMPRE inclua "correctAnswer" com a resposta correta (para objetivas: a letra da alternativa; para subjetivas/casos: deixe como "N/A")
+- SEMPRE inclua "expectedAnswer" com a justificativa detalhada ou resposta esperada (OBRIGATÓRIO para TODAS as questões)
+
 Retorne um JSON com a estrutura:
 {
   "title": "Título da Prova",
@@ -2081,8 +2085,8 @@ Retorne um JSON com a estrutura:
       "module": "Nome do módulo relacionado",
       "question": "Texto da questão",
       "options": ["A) ...", "B) ...", "C) ...", "D) ..."], // apenas para objetivas
-      "correctAnswer": "A", // apenas para objetivas
-      "expectedAnswer": "Resposta esperada ou critérios de avaliação", // para subjetivas
+      "correctAnswer": "A) texto da alternativa correta" (para objetivas) ou "N/A" (para subjetivas),
+      "expectedAnswer": "Justificativa detalhada ou resposta esperada" (OBRIGATÓRIO),
       "caseContext": "Contexto do caso", // apenas para estudos de caso
       "caseQuestions": ["Pergunta 1", "Pergunta 2"] // apenas para estudos de caso
     }
@@ -2118,7 +2122,7 @@ Retorne um JSON com a estrutura:
                         caseContext: { type: 'string' },
                         caseQuestions: { type: 'array', items: { type: 'string' } }
                       },
-                      required: ['number', 'type', 'points', 'difficulty', 'module', 'question'],
+                      required: ['number', 'type', 'points', 'difficulty', 'module', 'question', 'correctAnswer', 'expectedAnswer'],
                       additionalProperties: false
                     }
                   }
@@ -2175,6 +2179,10 @@ Título: ${module.title}
 Descrição: ${module.description || 'Não informada'}
 Tópicos: ${topicsList}
 
+IMPORTANTE:
+- SEMPRE inclua "correctAnswer" com a resposta correta (para objetivas: a letra da alternativa; para subjetivas/casos: a resposta esperada completa)
+- SEMPRE inclua "explanation" com uma justificativa detalhada explicando por que essa é a resposta correta
+
 Retorne um JSON com a estrutura:
 {
   "moduleTitle": "${module.title}",
@@ -2184,9 +2192,8 @@ Retorne um JSON com a estrutura:
       "type": "objective|subjective|case_study",
       "question": "Texto da questão",
       "options": ["A) ...", "B) ...", "C) ...", "D) ..."], // apenas para objetivas
-      "correctAnswer": "A", // apenas para objetivas
-      "hint": "Dica para o aluno",
-      "explanation": "Explicação da resposta",
+      "correctAnswer": "A) texto da alternativa correta" (para objetivas) ou "Resposta esperada completa" (para subjetivas),
+      "explanation": "Justificativa detalhada da resposta" (OBRIGATÓRIO),
       "caseContext": "Contexto do caso", // apenas para estudos de caso
       "caseQuestions": ["Pergunta 1", "Pergunta 2"] // apenas para estudos de caso
     }
@@ -2218,7 +2225,7 @@ Retorne um JSON com a estrutura:
                         caseContext: { type: 'string' },
                         caseQuestions: { type: 'array', items: { type: 'string' } }
                       },
-                      required: ['number', 'type', 'question'],
+                      required: ['number', 'type', 'question', 'correctAnswer', 'explanation'],
                       additionalProperties: false
                     }
                   }
