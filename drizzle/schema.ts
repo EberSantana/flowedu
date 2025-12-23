@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, date, json } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -550,3 +550,116 @@ export const announcementReads = mysqlTable("announcementReads", {
 
 export type AnnouncementRead = typeof announcementReads.$inferSelect;
 export type InsertAnnouncementRead = typeof announcementReads.$inferInsert;
+
+/**
+ * Sistema de Gamificação - Pontos dos Alunos
+ */
+export const studentPoints = mysqlTable("studentPoints", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  totalPoints: int("totalPoints").default(0).notNull(),
+  currentBelt: mysqlEnum("currentBelt", [
+    "white",    // Branca (0-200)
+    "yellow",   // Amarela (200-400)
+    "orange",   // Laranja (400-600)
+    "green",    // Verde (600-900)
+    "blue",     // Azul (900-1200)
+    "purple",   // Roxa (1200-1600)
+    "brown",    // Marrom (1600-2000)
+    "black"     // Preta (2000+)
+  ]).default("white").notNull(),
+  streakDays: int("streakDays").default(0).notNull(), // Dias consecutivos
+  lastActivityDate: date("lastActivityDate"), // Última atividade para streak
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  uniqueStudent: sql`UNIQUE KEY unique_student_points (studentId)`,
+}));
+
+export type StudentPoints = typeof studentPoints.$inferSelect;
+export type InsertStudentPoints = typeof studentPoints.$inferInsert;
+
+/**
+ * Sistema de Gamificação - Histórico de Pontos
+ */
+export const pointsHistory = mysqlTable("pointsHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  points: int("points").notNull(), // Pode ser positivo ou negativo
+  reason: varchar("reason", { length: 255 }).notNull(),
+  activityType: mysqlEnum("activityType", [
+    "exercise_objective",
+    "exercise_subjective",
+    "exercise_case_study",
+    "exam_completed",
+    "streak_bonus",
+    "module_completed",
+    "perfect_score",
+    "manual_adjustment"
+  ]).notNull(),
+  relatedId: int("relatedId"), // ID do exercício/prova relacionado
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PointsHistory = typeof pointsHistory.$inferSelect;
+export type InsertPointsHistory = typeof pointsHistory.$inferInsert;
+
+/**
+ * Sistema de Gamificação - Badges/Conquistas
+ */
+export const badges = mysqlTable("badges", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(), // Ex: "fire_streak_7"
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 50 }).notNull(), // Emoji ou nome do ícone
+  category: mysqlEnum("category", [
+    "streak",
+    "accuracy",
+    "speed",
+    "completion",
+    "special"
+  ]).notNull(),
+  requirement: int("requirement").notNull(), // Valor necessário (ex: 7 dias, 10 exercícios)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Badge = typeof badges.$inferSelect;
+export type InsertBadge = typeof badges.$inferInsert;
+
+/**
+ * Sistema de Gamificação - Badges Conquistados pelos Alunos
+ */
+export const studentBadges = mysqlTable("studentBadges", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  badgeId: int("badgeId").notNull(),
+  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueBadge: sql`UNIQUE KEY unique_student_badge (studentId, badgeId)`,
+}));
+
+export type StudentBadge = typeof studentBadges.$inferSelect;
+export type InsertStudentBadge = typeof studentBadges.$inferInsert;
+
+/**
+ * Sistema de Gamificação - Notificações de Conquistas
+ */
+export const gamificationNotifications = mysqlTable("gamificationNotifications", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  type: mysqlEnum("type", [
+    "belt_upgrade",
+    "badge_earned",
+    "streak_milestone",
+    "points_milestone"
+  ]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("isRead").default(false).notNull(),
+  relatedData: json("relatedData"), // Dados extras (ex: nova faixa, badge conquistado)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type GamificationNotification = typeof gamificationNotifications.$inferSelect;
+export type InsertGamificationNotification = typeof gamificationNotifications.$inferInsert;

@@ -2568,3 +2568,13 @@
 - [x] Adicionar barra de rolagem visível na caixa de exercícios/provas
 - [x] Remover caixa de dica (box azul com ícone de lâmpada)
 - [x] Adicionar respostas corretas e justificativas em todas as questões
+
+## Sistema de Gamificação com Faixas
+- [x] Criar tabelas de pontuação no banco de dados (studentPoints, pointsHistory, badges, studentBadges, gamificationNotifications)
+- [x] Implementar lógica de cálculo de pontos e faixas no backend (12 funções em db.ts)
+- [x] Criar componente de exibição de faixa atual (BeltBadge.tsx)
+- [x] Criar dashboard de gamificação para alunos (StudentGamification.tsx)
+- [x] Implementar sistema de badges e conquistas (10 badges pré-cadastrados)
+- [x] Integrar pontuação com exercícios e provas (exerciseSubmission e examSubmission)
+- [x] Adicionar notificações de subida de faixa (automático ao ganhar pontos)
+- [x] Criar ranking semanal da turma (getClassRanking)

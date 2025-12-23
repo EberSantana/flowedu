@@ -31,6 +31,11 @@ import {
   announcementReads,
   inviteCodes,
   passwordResetTokens,
+  studentPoints,
+  pointsHistory,
+  badges,
+  studentBadges,
+  gamificationNotifications,
   PasswordResetToken,
   InsertPasswordResetToken,
   InsertSubject,
@@ -2326,5 +2331,358 @@ export async function cleanupExpiredTokens(): Promise<boolean> {
   } catch (error) {
     console.error("[Database] Error cleaning up tokens:", error);
     return false;
+  }
+}
+
+// ==================== GAMIFICAÇÃO ====================
+
+// Configuração de faixas e pontos
+export const BELT_CONFIG = {
+  white: { min: 0, max: 200, name: 'Branca', color: '#FFFFFF', icon: '🥋' },
+  yellow: { min: 200, max: 400, name: 'Amarela', color: '#FFD700', icon: '🥋' },
+  orange: { min: 400, max: 600, name: 'Laranja', color: '#FF8C00', icon: '🥋' },
+  green: { min: 600, max: 900, name: 'Verde', color: '#32CD32', icon: '🥋' },
+  blue: { min: 900, max: 1200, name: 'Azul', color: '#1E90FF', icon: '🥋' },
+  purple: { min: 1200, max: 1600, name: 'Roxa', color: '#9370DB', icon: '🥋' },
+  brown: { min: 1600, max: 2000, name: 'Marrom', color: '#8B4513', icon: '🥋' },
+  black: { min: 2000, max: Infinity, name: 'Preta', color: '#000000', icon: '🥋' },
+} as const;
+
+export type BeltType = keyof typeof BELT_CONFIG;
+
+// Calcular faixa baseado nos pontos
+export function calculateBelt(points: number): BeltType {
+  for (const [belt, config] of Object.entries(BELT_CONFIG)) {
+    if (points >= config.min && points < config.max) {
+      return belt as BeltType;
+    }
+  }
+  return 'black';
+}
+
+// Obter ou criar pontuação do aluno
+export async function getOrCreateStudentPoints(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Tentar buscar pontuação existente
+    const existing = await db.select().from(studentPoints)
+      .where(eq(studentPoints.studentId, studentId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Criar nova pontuação
+    await db.insert(studentPoints).values({
+      studentId,
+      totalPoints: 0,
+      currentBelt: 'white',
+      streakDays: 0,
+      lastActivityDate: null,
+    });
+
+    const newPoints = await db.select().from(studentPoints)
+      .where(eq(studentPoints.studentId, studentId))
+      .limit(1);
+
+    return newPoints[0] || null;
+  } catch (error) {
+    console.error("[Database] Error getting/creating student points:", error);
+    return null;
+  }
+}
+
+// Adicionar pontos ao aluno
+export async function addPointsToStudent(
+  studentId: number,
+  points: number,
+  reason: string,
+  activityType: 'exercise_objective' | 'exercise_subjective' | 'exercise_case_study' | 'exam_completed' | 'streak_bonus' | 'module_completed' | 'perfect_score' | 'manual_adjustment',
+  relatedId?: number
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Obter pontuação atual
+    const current = await getOrCreateStudentPoints(studentId);
+    if (!current) return null;
+
+    const newTotal = current.totalPoints + points;
+    const newBelt = calculateBelt(newTotal);
+    const oldBelt = current.currentBelt;
+
+    // Atualizar pontuação
+    await db.update(studentPoints)
+      .set({
+        totalPoints: newTotal,
+        currentBelt: newBelt,
+        updatedAt: new Date(),
+      })
+      .where(eq(studentPoints.studentId, studentId));
+
+    // Registrar no histórico
+    await db.insert(pointsHistory).values({
+      studentId,
+      points,
+      reason,
+      activityType,
+      relatedId,
+    });
+
+    // Se subiu de faixa, criar notificação
+    if (newBelt !== oldBelt) {
+      await db.insert(gamificationNotifications).values({
+        studentId,
+        type: 'belt_upgrade',
+        title: `🎉 Parabéns! Nova Faixa: ${BELT_CONFIG[newBelt].name}`,
+        message: `Você alcançou ${newTotal} pontos e conquistou a faixa ${BELT_CONFIG[newBelt].name}!`,
+        isRead: false,
+        relatedData: JSON.stringify({ oldBelt, newBelt, totalPoints: newTotal }),
+      });
+    }
+
+    return {
+      totalPoints: newTotal,
+      currentBelt: newBelt,
+      beltUpgrade: newBelt !== oldBelt,
+      oldBelt,
+      newBelt,
+    };
+  } catch (error) {
+    console.error("[Database] Error adding points:", error);
+    return null;
+  }
+}
+
+// Atualizar streak do aluno
+export async function updateStudentStreak(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const current = await getOrCreateStudentPoints(studentId);
+    if (!current) return null;
+
+    const today = new Date().toISOString().split('T')[0];
+    const lastActivity = current.lastActivityDate?.toISOString().split('T')[0];
+
+    let newStreak = current.streakDays;
+
+    if (!lastActivity) {
+      // Primeira atividade
+      newStreak = 1;
+    } else {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+      if (lastActivity === yesterdayStr) {
+        // Continuou o streak
+        newStreak = current.streakDays + 1;
+      } else if (lastActivity === today) {
+        // Já fez atividade hoje, mantém streak
+        newStreak = current.streakDays;
+      } else {
+        // Quebrou o streak
+        newStreak = 1;
+      }
+    }
+
+    // Atualizar streak
+    await db.update(studentPoints)
+      .set({
+        streakDays: newStreak,
+        lastActivityDate: new Date(today),
+        updatedAt: new Date(),
+      })
+      .where(eq(studentPoints.studentId, studentId));
+
+    // Verificar marcos de streak (7, 30 dias)
+    if (newStreak === 7 || newStreak === 30) {
+      await db.insert(gamificationNotifications).values({
+        studentId,
+        type: 'streak_milestone',
+        title: `🔥 ${newStreak} Dias de Sequência!`,
+        message: `Incrível! Você completou ${newStreak} dias consecutivos de atividades!`,
+        isRead: false,
+        relatedData: JSON.stringify({ streakDays: newStreak }),
+      });
+    }
+
+    return { streakDays: newStreak };
+  } catch (error) {
+    console.error("[Database] Error updating streak:", error);
+    return null;
+  }
+}
+
+// Obter histórico de pontos do aluno
+export async function getStudentPointsHistory(studentId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const history = await db.select().from(pointsHistory)
+      .where(eq(pointsHistory.studentId, studentId))
+      .orderBy(desc(pointsHistory.createdAt))
+      .limit(limit);
+
+    return history;
+  } catch (error) {
+    console.error("[Database] Error getting points history:", error);
+    return [];
+  }
+}
+
+// Obter badges do aluno
+export async function getStudentBadges(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const earnedBadges = await db
+      .select({
+        badge: badges,
+        earnedAt: studentBadges.earnedAt,
+      })
+      .from(studentBadges)
+      .innerJoin(badges, eq(studentBadges.badgeId, badges.id))
+      .where(eq(studentBadges.studentId, studentId))
+      .orderBy(desc(studentBadges.earnedAt));
+
+    return earnedBadges;
+  } catch (error) {
+    console.error("[Database] Error getting student badges:", error);
+    return [];
+  }
+}
+
+// Conceder badge ao aluno
+export async function awardBadgeToStudent(studentId: number, badgeCode: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Buscar badge
+    const badge = await db.select().from(badges)
+      .where(eq(badges.code, badgeCode))
+      .limit(1);
+
+    if (badge.length === 0) return null;
+
+    // Verificar se já tem o badge
+    const existing = await db.select().from(studentBadges)
+      .where(and(
+        eq(studentBadges.studentId, studentId),
+        eq(studentBadges.badgeId, badge[0].id)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) return null; // Já tem o badge
+
+    // Conceder badge
+    await db.insert(studentBadges).values({
+      studentId,
+      badgeId: badge[0].id,
+    });
+
+    // Criar notificação
+    await db.insert(gamificationNotifications).values({
+      studentId,
+      type: 'badge_earned',
+      title: `${badge[0].icon} Novo Badge: ${badge[0].name}`,
+      message: badge[0].description,
+      isRead: false,
+      relatedData: JSON.stringify({ badgeId: badge[0].id, badgeCode }),
+    });
+
+    return badge[0];
+  } catch (error) {
+    console.error("[Database] Error awarding badge:", error);
+    return null;
+  }
+}
+
+// Obter notificações de gamificação do aluno
+export async function getGamificationNotifications(studentId: number, onlyUnread: boolean = false) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const query = db.select().from(gamificationNotifications)
+      .where(
+        onlyUnread
+          ? and(
+              eq(gamificationNotifications.studentId, studentId),
+              eq(gamificationNotifications.isRead, false)
+            )
+          : eq(gamificationNotifications.studentId, studentId)
+      )
+      .orderBy(desc(gamificationNotifications.createdAt))
+      .limit(50);
+
+    return await query;
+  } catch (error) {
+    console.error("[Database] Error getting gamification notifications:", error);
+    return [];
+  }
+}
+
+// Marcar notificação de gamificação como lida
+export async function markGamificationNotificationAsRead(notificationId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(gamificationNotifications)
+      .set({ isRead: true })
+      .where(eq(gamificationNotifications.id, notificationId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error marking notification as read:", error);
+    return false;
+  }
+}
+
+// Obter ranking da turma (top alunos por pontos)
+export async function getClassRanking(limit: number = 10) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const ranking = await db
+      .select({
+        studentId: studentPoints.studentId,
+        studentName: students.fullName,
+        totalPoints: studentPoints.totalPoints,
+        currentBelt: studentPoints.currentBelt,
+        streakDays: studentPoints.streakDays,
+      })
+      .from(studentPoints)
+      .innerJoin(students, eq(studentPoints.studentId, students.id))
+      .orderBy(desc(studentPoints.totalPoints))
+      .limit(limit);
+
+    return ranking;
+  } catch (error) {
+    console.error("[Database] Error getting class ranking:", error);
+    return [];
+  }
+}
+
+// Obter todos os badges disponíveis
+export async function getAllBadges() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    return await db.select().from(badges).orderBy(badges.category, badges.requirement);
+  } catch (error) {
+    console.error("[Database] Error getting all badges:", error);
+    return [];
   }
 }
