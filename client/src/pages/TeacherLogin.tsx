@@ -103,6 +103,13 @@ export default function TeacherLogin() {
                 </div>
               </div>
 
+              {/* Link Esqueci Senha */}
+              <div className="text-right">
+                <Link href="/esqueci-senha" className="text-sm text-purple-600 hover:underline">
+                  Esqueci minha senha
+                </Link>
+              </div>
+
               {/* Botão de Login */}
               <Button
                 type="submit"

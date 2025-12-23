@@ -2501,3 +2501,18 @@
 - [x] Criar página de login de professor (TeacherLogin.tsx)
 - [x] Atualizar página inicial (PortalChoice.tsx) com opções de login
 - [x] Adicionar testes para autenticação de professor com e-mail/senha
+
+## Recuperação de Senha
+- [ ] Criar tabela passwordResetTokens no banco de dados
+- [ ] Criar funções backend para gerar e validar tokens de recuperação
+- [ ] Implementar envio de e-mail com link de recuperação
+- [ ] Criar página de solicitação de recuperação (/esqueci-senha)
+- [ ] Criar página de redefinição de senha (/redefinir-senha)
+- [ ] Adicionar link "Esqueci minha senha" na página de login
+- [ ] Testar fluxo completo de recuperação de senha
+- [x] Criar tabela passwordResetTokens no banco de dados
+- [x] Criar funções backend para gerar e validar tokens de recuperação
+- [x] Implementar rotas tRPC para recuperação de senha
+- [x] Criar página de solicitação de recuperação (/esqueci-senha)
+- [x] Criar página de redefinição de senha (/redefinir-senha)
+- [x] Adicionar link "Esqueci minha senha" na página de login

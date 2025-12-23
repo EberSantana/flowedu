@@ -214,6 +214,73 @@ export const appRouter = router({
           },
         };
       }),
+
+    // Solicitar recuperação de senha
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email("E-mail inválido"),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await db.getUserByEmail(input.email);
+        
+        if (!user) {
+          // Por segurança, não revelamos se o e-mail existe ou não
+          return { success: true, message: "Se o e-mail existir, você receberá um link de recuperação." };
+        }
+
+        // Gerar token único
+        const token = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+        // Salvar token no banco
+        await db.createPasswordResetToken(user.id, token, expiresAt);
+
+        // TODO: Enviar e-mail com link de recuperação
+        // const resetLink = `${process.env.FRONTEND_URL}/redefinir-senha?token=${token}`;
+        // await sendPasswordResetEmail(user.email, resetLink);
+
+        return { success: true, message: "Se o e-mail existir, você receberá um link de recuperação." };
+      }),
+
+    // Validar token de recuperação
+    validateResetToken: publicProcedure
+      .input(z.object({
+        token: z.string().min(1),
+      }))
+      .query(async ({ input }) => {
+        const tokenData = await db.getPasswordResetToken(input.token);
+        return { valid: !!tokenData };
+      }),
+
+    // Redefinir senha com token
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string().min(1),
+        newPassword: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+      }))
+      .mutation(async ({ input }) => {
+        // Validar token
+        const tokenData = await db.getPasswordResetToken(input.token);
+        
+        if (!tokenData) {
+          throw new Error("Token inválido ou expirado");
+        }
+
+        // Hash da nova senha
+        const passwordHash = await bcrypt.hash(input.newPassword, 10);
+
+        // Atualizar senha
+        const updated = await db.updateUserPassword(tokenData.userId, passwordHash);
+        
+        if (!updated) {
+          throw new Error("Erro ao atualizar senha");
+        }
+
+        // Marcar token como usado
+        await db.markTokenAsUsed(input.token);
+
+        return { success: true, message: "Senha redefinida com sucesso!" };
+      }),
   }),
 
   subjects: router({

@@ -1,4 +1,4 @@
-import { and, or, desc, eq, ne, gte, lte, inArray, sql } from "drizzle-orm";
+import { and, or, desc, eq, ne, gte, lte, gt, lt, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -30,6 +30,9 @@ import {
   announcements,
   announcementReads,
   inviteCodes,
+  passwordResetTokens,
+  PasswordResetToken,
+  InsertPasswordResetToken,
   InsertSubject,
   InsertClass,
   InsertShift,
@@ -2246,6 +2249,82 @@ export async function updateUserPassword(userId: number, passwordHash: string): 
     return true;
   } catch (error) {
     console.error("[Database] Error updating password:", error);
+    return false;
+  }
+}
+
+// ===== RECUPERAÇÃO DE SENHA =====
+
+// Criar token de recuperação de senha
+export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.insert(passwordResetTokens).values({
+      userId,
+      token,
+      expiresAt,
+      used: false,
+    });
+    return true;
+  } catch (error) {
+    console.error("[Database] Error creating password reset token:", error);
+    return false;
+  }
+}
+
+// Buscar token de recuperação válido
+export async function getPasswordResetToken(token: string): Promise<PasswordResetToken | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(passwordResetTokens)
+      .where(and(
+        eq(passwordResetTokens.token, token),
+        eq(passwordResetTokens.used, false),
+        gt(passwordResetTokens.expiresAt, new Date())
+      ))
+      .limit(1);
+    
+    return result[0] || null;
+  } catch (error) {
+    console.error("[Database] Error getting password reset token:", error);
+    return null;
+  }
+}
+
+// Marcar token como usado
+export async function markTokenAsUsed(token: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(passwordResetTokens)
+      .set({ used: true })
+      .where(eq(passwordResetTokens.token, token));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error marking token as used:", error);
+    return false;
+  }
+}
+
+// Deletar tokens expirados ou usados (limpeza)
+export async function cleanupExpiredTokens(): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.delete(passwordResetTokens)
+      .where(or(
+        eq(passwordResetTokens.used, true),
+        lt(passwordResetTokens.expiresAt, new Date())
+      ));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error cleaning up tokens:", error);
     return false;
   }
 }
