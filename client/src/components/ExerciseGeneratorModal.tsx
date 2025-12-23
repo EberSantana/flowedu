@@ -495,7 +495,7 @@ export default function ExerciseGeneratorModal({
         ) : (
           <>
             {/* Barra de Navegação */}
-            <div className="flex items-center justify-between border-b pb-3 mb-3 px-4">
+            <div className="flex items-center justify-between border-b pb-3 mb-3 px-4 no-print">
               <Button
                 variant="outline"
                 size="sm"

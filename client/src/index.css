@@ -249,6 +249,7 @@
   /* Ocultar elementos desnecessários */
   nav, aside, header, footer, 
   button, .sidebar, 
+  .no-print,
   [role="dialog"] > div:first-child, /* Overlay do modal */
   [data-radix-scroll-area-viewport] {
     display: none !important;
