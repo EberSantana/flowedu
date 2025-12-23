@@ -1,34 +1,49 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { LogIn, Mail, Lock, ArrowLeft, Loader2 } from "lucide-react";
+import { LogIn, Mail, Lock, ArrowLeft, Loader2, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { getLoginUrl } from "@/const";
 
 export default function TeacherLogin() {
-  const [, setLocation] = useLocation();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isVerifyingSession, setIsVerifyingSession] = useState(false);
 
   const utils = trpc.useUtils();
+
+  // Query para verificar sessão após login
+  const { data: sessionData } = trpc.auth.me.useQuery(undefined, {
+    enabled: isVerifyingSession,
+    refetchInterval: isVerifyingSession ? 500 : false,
+  });
+
+  // Redirecionar quando sessão for confirmada
+  useEffect(() => {
+    if (isVerifyingSession && sessionData) {
+      window.location.href = "/dashboard";
+    }
+  }, [isVerifyingSession, sessionData]);
 
   const loginMutation = trpc.auth.loginTeacher.useMutation({
     onSuccess: async (data) => {
       toast.success(`Bem-vindo, ${data.user.name}!`);
+      setIsLoggingIn(true);
       
-      // Invalidar cache de autenticação para forçar recarregar sessão
+      // Invalidar cache e começar verificação de sessão
       await utils.auth.me.invalidate();
+      setIsVerifyingSession(true);
       
-      // Forçar recarregamento completo da página para garantir sessão
+      // Fallback: redirecionar após 3 segundos se verificação não funcionar
       setTimeout(() => {
         window.location.href = "/dashboard";
-      }, 500);
+      }, 3000);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -38,21 +53,45 @@ export default function TeacherLogin() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email.trim()) {
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedEmail) {
       toast.error("Digite seu e-mail");
       return;
     }
 
-    if (!formData.password) {
+    if (!password) {
       toast.error("Digite sua senha");
       return;
     }
 
     loginMutation.mutate({
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
+      email: trimmedEmail,
+      password: password,
     });
   };
+
+  if (isLoggingIn) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="pt-8 pb-8">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Login Realizado!</h2>
+            <p className="text-gray-600 mb-4">
+              Redirecionando para o sistema...
+            </p>
+            <div className="flex items-center justify-center gap-2 text-purple-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Aguarde...</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
@@ -88,9 +127,10 @@ export default function TeacherLogin() {
                     type="email"
                     placeholder="seu@email.com"
                     className="pl-10"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={loginMutation.isPending}
+                    autoComplete="email"
                   />
                 </div>
               </div>
@@ -102,13 +142,21 @@ export default function TeacherLogin() {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Sua senha"
-                    className="pl-10"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="pl-10 pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     disabled={loginMutation.isPending}
+                    autoComplete="current-password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 

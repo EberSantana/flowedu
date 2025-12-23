@@ -1,38 +1,49 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { UserPlus, Mail, Lock, User, ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import { UserPlus, Mail, Lock, User, ArrowLeft, Loader2, CheckCircle, Eye, EyeOff } from "lucide-react";
 
 export default function TeacherRegister() {
-  const [, setLocation] = useLocation();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isVerifyingSession, setIsVerifyingSession] = useState(false);
 
   const utils = trpc.useUtils();
+  
+  // Query para verificar sessão após cadastro
+  const { data: sessionData } = trpc.auth.me.useQuery(undefined, {
+    enabled: isVerifyingSession,
+    refetchInterval: isVerifyingSession ? 500 : false,
+  });
+
+  // Redirecionar quando sessão for confirmada
+  useEffect(() => {
+    if (isVerifyingSession && sessionData) {
+      window.location.href = "/dashboard";
+    }
+  }, [isVerifyingSession, sessionData]);
 
   const registerMutation = trpc.auth.registerTeacher.useMutation({
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       toast.success("Conta criada com sucesso!");
       setIsRegistered(true);
       
-      // Invalidar cache de autenticação para forçar recarregar sessão
+      // Invalidar cache e começar verificação de sessão
       await utils.auth.me.invalidate();
+      setIsVerifyingSession(true);
       
-      // Aguardar um pouco mais para garantir que o cookie foi processado
+      // Fallback: redirecionar após 3 segundos se verificação não funcionar
       setTimeout(() => {
-        // Forçar recarregamento completo da página para garantir sessão
         window.location.href = "/dashboard";
-      }, 1500);
+      }, 3000);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -42,31 +53,38 @@ export default function TeacherRegister() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validações
-    if (!formData.name.trim()) {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedName) {
       toast.error("Digite seu nome");
       return;
     }
 
-    if (!formData.email.trim()) {
+    if (trimmedName.length < 2) {
+      toast.error("Nome deve ter pelo menos 2 caracteres");
+      return;
+    }
+
+    if (!trimmedEmail) {
       toast.error("Digite seu e-mail");
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      toast.error("E-mail inválido");
+      return;
+    }
+
+    if (password.length < 6) {
       toast.error("A senha deve ter pelo menos 6 caracteres");
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("As senhas não coincidem");
-      return;
-    }
-
     registerMutation.mutate({
-      name: formData.name.trim(),
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
+      name: trimmedName,
+      email: trimmedEmail,
+      password: password,
     });
   };
 
@@ -80,11 +98,11 @@ export default function TeacherRegister() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Conta Criada!</h2>
             <p className="text-gray-600 mb-4">
-              Sua conta foi criada com sucesso. Você será redirecionado para o dashboard...
+              Sua conta foi criada com sucesso. Redirecionando para o sistema...
             </p>
             <div className="flex items-center justify-center gap-2 text-purple-600">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Redirecionando...</span>
+              <span>Aguarde...</span>
             </div>
           </CardContent>
         </Card>
@@ -108,9 +126,9 @@ export default function TeacherRegister() {
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <UserPlus className="h-8 w-8 text-purple-600" />
             </div>
-            <CardTitle className="text-2xl font-bold">Cadastro de Professor</CardTitle>
+            <CardTitle className="text-2xl font-bold">Cadastro Rápido</CardTitle>
             <CardDescription>
-              Crie sua conta para gerenciar suas disciplinas e turmas
+              Crie sua conta em segundos
             </CardDescription>
           </CardHeader>
 
@@ -118,17 +136,18 @@ export default function TeacherRegister() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Nome */}
               <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
+                <Label htmlFor="name">Nome</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     id="name"
                     type="text"
-                    placeholder="Seu nome completo"
+                    placeholder="Seu nome"
                     className="pl-10"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     disabled={registerMutation.isPending}
+                    autoComplete="name"
                   />
                 </div>
               </div>
@@ -143,9 +162,10 @@ export default function TeacherRegister() {
                     type="email"
                     placeholder="seu@email.com"
                     className="pl-10"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={registerMutation.isPending}
+                    autoComplete="email"
                   />
                 </div>
               </div>
@@ -157,31 +177,30 @@ export default function TeacherRegister() {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Mínimo 6 caracteres"
-                    className="pl-10"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="pl-10 pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     disabled={registerMutation.isPending}
+                    autoComplete="new-password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
-              </div>
-
-              {/* Confirmar Senha */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Digite a senha novamente"
-                    className="pl-10"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    disabled={registerMutation.isPending}
-                  />
-                </div>
+                {password.length > 0 && password.length < 6 && (
+                  <p className="text-xs text-red-500">Faltam {6 - password.length} caracteres</p>
+                )}
+                {password.length >= 6 && (
+                  <p className="text-xs text-green-600 flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" /> Senha válida
+                  </p>
+                )}
               </div>
 
               {/* Botão de Cadastro */}

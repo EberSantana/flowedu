@@ -2546,3 +2546,5 @@
 - [x] Corrigir erro de JSON no mapa mental com limite mais agressivo (3 módulos, 3 tópicos, max_tokens)
 - [x] Remover funcionalidade de infográfico completamente
 - [x] Adicionar botão de mapa mental nos módulos individuais (onde está o infográfico)
+- [x] Simplificar cadastro de professores (forma mais simples)
+- [x] Corrigir bug de logout automático ao logar

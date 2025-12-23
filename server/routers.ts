@@ -9,6 +9,7 @@ import { tasks } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
+import { sdk } from "./_core/sdk";
 
 export const appRouter = router({
   system: systemRouter,
@@ -125,22 +126,18 @@ export const appRouter = router({
           throw new Error("Erro ao criar sessão. Tente fazer login.");
         }
 
-        // Criar sessão JWT
-        const token = jwt.sign(
-          {
-            userId: user.id,
-            openId: user.openId,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-          },
-          ENV.cookieSecret,
-          { expiresIn: '7d' }
-        );
+        // Criar sessão JWT usando o mesmo formato do OAuth
+        const token = await sdk.createSessionToken(user.openId, {
+          name: user.name || '',
+          expiresInMs: 7 * 24 * 60 * 60 * 1000, // 7 dias
+        });
 
         // Configurar cookie de sessão
         const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...cookieOptions,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+        });
 
         return {
           success: true,
@@ -187,22 +184,18 @@ export const appRouter = router({
           lastSignedIn: new Date(),
         });
 
-        // Criar sessão JWT
-        const token = jwt.sign(
-          {
-            userId: user.id,
-            openId: user.openId,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-          },
-          ENV.cookieSecret,
-          { expiresIn: '7d' }
-        );
+        // Criar sessão JWT usando o mesmo formato do OAuth
+        const token = await sdk.createSessionToken(user.openId, {
+          name: user.name || '',
+          expiresInMs: 7 * 24 * 60 * 60 * 1000, // 7 dias
+        });
 
         // Configurar cookie de sessão
         const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...cookieOptions,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+        });
 
         return {
           success: true,
