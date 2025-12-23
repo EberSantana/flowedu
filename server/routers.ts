@@ -2261,10 +2261,13 @@ Retorne um JSON com a estrutura:
           throw new Error('Nenhum módulo encontrado para gerar o mapa mental');
         }
         
-        const modulesContent = modules.map((m: any) => ({
+        // LIMITAR a 5 módulos para evitar JSON muito grande
+        const limitedModules = modules.slice(0, 5);
+        
+        // Simplificar conteúdo: apenas títulos, sem descrições longas
+        const modulesContent = limitedModules.map((m: any) => ({
           title: m.title,
-          description: m.description,
-          topics: m.topics?.map((t: any) => ({ title: t.title, description: t.description })) || []
+          topics: m.topics?.slice(0, 4).map((t: any) => t.title) || [] // Máx 4 tópicos por módulo
         }));
         
         const response = await invokeLLM({
@@ -2275,32 +2278,30 @@ Retorne um JSON com a estrutura:
             },
             {
               role: 'user',
-              content: `Crie um mapa mental para a disciplina "${subject.name}" com base nos módulos:
+              content: `Crie um mapa mental COMPACTO para "${subject.name}" com ${limitedModules.length} módulos:
 
 ${JSON.stringify(modulesContent, null, 2)}
 
-Retorne um JSON com a estrutura hierárquica:
+IMPORTANTE: Seja CONCISO. Use descrições curtas (máx 50 caracteres). NÃO adicione informações extras.
+
+Retorne JSON:
 {
   "title": "${subject.name}",
-  "description": "Descrição geral",
+  "description": "Visão geral da disciplina",
   "nodes": [
     {
       "id": "1",
-      "label": "Nome do módulo",
-      "description": "Breve descrição",
+      "label": "Módulo 1",
+      "description": "Resumo curto",
       "color": "#3b82f6",
       "children": [
         {
           "id": "1.1",
           "label": "Tópico",
-          "description": "Descrição",
-          "keywords": ["palavra1", "palavra2"]
+          "description": "Breve"
         }
       ]
     }
-  ],
-  "connections": [
-    { "from": "1", "to": "2", "label": "Relação" }
   ]
 }`
             }
@@ -2386,6 +2387,135 @@ Retorne um JSON com a estrutura hierárquica:
         } catch (error: any) {
           console.error('Erro ao processar resposta do mapa mental:', error);
           throw new Error(`Erro ao gerar mapa mental: ${error.message || 'JSON malformado'}. Tente novamente.`);
+        }
+      }),
+
+    // Gerar infográfico visual com canvas
+    generateVisualInfographic: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        
+        // Buscar dados da disciplina e módulos
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        if (!subject) throw new Error('Disciplina não encontrada');
+        
+        const modules = await db.getLearningPathBySubject(input.subjectId, ctx.user.id) || [];
+        
+        if (modules.length === 0) {
+          throw new Error('Nenhum módulo encontrado para gerar o infográfico');
+        }
+        
+        // Limitar a 6 módulos
+        const limitedModules = modules.slice(0, 6);
+        
+        const modulesContent = limitedModules.map((m: any) => ({
+          title: m.title,
+          topics: m.topics?.slice(0, 5).map((t: any) => t.title) || []
+        }));
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `Você é um designer de infográficos educacionais. Gere dados para um infográfico visual em português brasileiro.`
+            },
+            {
+              role: 'user',
+              content: `Crie dados para infográfico da disciplina "${subject.name}" com ${limitedModules.length} módulos:
+
+${JSON.stringify(modulesContent, null, 2)}
+
+Para cada módulo:
+- Descrição curta (máx 80 caracteres)
+- Escolha 1 emoji representativo
+- Cor hex (#rrggbb)
+
+Retorne JSON:
+{
+  "title": "${subject.name}",
+  "subtitle": "Visão Geral do Conteúdo Programático",
+  "modules": [
+    {
+      "title": "Título do Módulo",
+      "description": "Descrição breve",
+      "topics": ["Tópico 1", "Tópico 2"],
+      "color": "#3b82f6",
+      "icon": "📚"
+    }
+  ],
+  "stats": {
+    "totalModules": ${limitedModules.length},
+    "totalTopics": ${limitedModules.reduce((acc: number, m: any) => acc + (m.topics?.length || 0), 0)},
+    "estimatedHours": ${limitedModules.length * 8}
+  }
+}`
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'infographic_generation',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  subtitle: { type: 'string' },
+                  modules: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        title: { type: 'string' },
+                        description: { type: 'string' },
+                        topics: { type: 'array', items: { type: 'string' } },
+                        color: { type: 'string' },
+                        icon: { type: 'string' }
+                      },
+                      required: ['title', 'description', 'topics', 'color', 'icon'],
+                      additionalProperties: false
+                    }
+                  },
+                  stats: {
+                    type: 'object',
+                    properties: {
+                      totalModules: { type: 'number' },
+                      totalTopics: { type: 'number' },
+                      estimatedHours: { type: 'number' }
+                    },
+                    required: ['totalModules', 'totalTopics', 'estimatedHours'],
+                    additionalProperties: false
+                  }
+                },
+                required: ['title', 'subtitle', 'modules', 'stats'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        try {
+          const content = typeof response.choices[0].message.content === 'string' 
+            ? response.choices[0].message.content 
+            : JSON.stringify(response.choices[0].message.content);
+          
+          if (!content || content.trim() === '') {
+            throw new Error('Resposta vazia da IA');
+          }
+          
+          const parsed = JSON.parse(content);
+          
+          if (!parsed.title || !parsed.modules || !Array.isArray(parsed.modules)) {
+            throw new Error('Estrutura de infográfico inválida');
+          }
+          
+          return parsed;
+        } catch (error: any) {
+          console.error('Erro ao processar resposta do infográfico:', error);
+          throw new Error(`Erro ao gerar infográfico: ${error.message || 'JSON malformado'}. Tente novamente.`);
         }
       }),
   }),

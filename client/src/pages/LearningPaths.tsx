@@ -41,6 +41,7 @@ import PageWrapper from "@/components/PageWrapper";
 import ExamGeneratorModal from "@/components/ExamGeneratorModal";
 import ExerciseGeneratorModal from "@/components/ExerciseGeneratorModal";
 import MindMapModal from "@/components/MindMapModal";
+import InfographicModal from "@/components/InfographicModal";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
 
@@ -83,6 +84,7 @@ export default function LearningPaths() {
   // New modal states
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
   const [isMindMapModalOpen, setIsMindMapModalOpen] = useState(false);
+  const [isInfographicModalOpen, setIsInfographicModalOpen] = useState(false);
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [selectedModuleForExercise, setSelectedModuleForExercise] = useState<{ id: number; title: string } | null>(null);
 
@@ -603,6 +605,23 @@ export default function LearningPaths() {
                       >
                         <Network className="h-4 w-4 mr-2" />
                         Mapa Mental
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          if (!selectedSubjectId) return;
+                          if (!learningPath || learningPath.length === 0) {
+                            toast.error("Crie módulos primeiro para gerar infográfico");
+                            return;
+                          }
+                          setIsInfographicModalOpen(true);
+                        }}
+                        disabled={!learningPath || learningPath.length === 0}
+                        className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 flex-1 sm:flex-initial"
+                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Gerar infográfico visual"}
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        Infográfico
                       </Button>
                       <Button
                         variant="outline"
@@ -1314,6 +1333,16 @@ export default function LearningPaths() {
             <MindMapModal
               isOpen={isMindMapModalOpen}
               onClose={() => setIsMindMapModalOpen(false)}
+              subjectId={selectedSubjectId}
+              subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
+            />
+          )}
+
+          {/* Infographic Modal */}
+          {selectedSubjectId && subjects && (
+            <InfographicModal
+              isOpen={isInfographicModalOpen}
+              onClose={() => setIsInfographicModalOpen(false)}
               subjectId={selectedSubjectId}
               subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
             />

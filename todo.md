@@ -2541,3 +2541,5 @@
 - [x] Corrigir logout automático após cadastro de professor (invalidar cache e forçar reload completo)
 - [x] Corrigir erro de JSON malformado na geração de mapas mentais
 - [x] Implementar exportação de provas e exercícios em PDF e Word (DOCX)
+- [x] Corrigir definitivamente erro de JSON no mapa mental (limitar tamanho)
+- [x] Criar infográfico visual melhor em português brasileiro
