@@ -40,8 +40,6 @@ import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import ExamGeneratorModal from "@/components/ExamGeneratorModal";
 import ExerciseGeneratorModal from "@/components/ExerciseGeneratorModal";
-import FlowDiagramModal from "@/components/FlowDiagramModal";
-import ModuleMindMapModal from "@/components/ModuleMindMapModal";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
 
@@ -83,8 +81,6 @@ export default function LearningPaths() {
 
   // New modal states
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
-  const [isMindMapModalOpen, setIsMindMapModalOpen] = useState(false);
-  const [isInfographicModalOpen, setIsInfographicModalOpen] = useState(false);
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [selectedModuleForExercise, setSelectedModuleForExercise] = useState<{ id: number; title: string } | null>(null);
 
@@ -229,14 +225,7 @@ export default function LearningPaths() {
     generateModuleInfographicMutation.mutate({ moduleId });
   };
 
-  // Estado para mapa mental do módulo
-  const [selectedModuleForMindMap, setSelectedModuleForMindMap] = useState<{ id: number; title: string } | null>(null);
-  const [isModuleMindMapModalOpen, setIsModuleMindMapModalOpen] = useState(false);
 
-  const handleGenerateModuleMindMap = (moduleId: number, moduleTitle: string) => {
-    setSelectedModuleForMindMap({ id: moduleId, title: moduleTitle });
-    setIsModuleMindMapModalOpen(true);
-  };
 
   // Função para fazer upload de arquivo (DOCX, TXT) e extrair texto
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -603,24 +592,6 @@ export default function LearningPaths() {
                         onClick={() => {
                           if (!selectedSubjectId) return;
                           if (!learningPath || learningPath.length === 0) {
-                            toast.error("Crie módulos primeiro para gerar diagrama");
-                            return;
-                          }
-                          setIsMindMapModalOpen(true);
-                        }}
-                        disabled={!learningPath || learningPath.length === 0}
-                        className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 flex-1 sm:flex-initial"
-                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Visualizar diagrama de fluxo"}
-                      >
-                        <Network className="h-4 w-4 mr-2" />
-                        Diagrama de Fluxo
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (!selectedSubjectId) return;
-                          if (!learningPath || learningPath.length === 0) {
                             toast.error("Crie módulos primeiro para criar prova");
                             return;
                           }
@@ -751,14 +722,6 @@ export default function LearningPaths() {
                                 title="Criar Exercícios do Módulo"
                               >
                                 <Dumbbell className="h-4 w-4 text-green-500" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleGenerateModuleMindMap(module.id, module.title)}
-                                title="Gerar Mapa Mental do Módulo"
-                              >
-                                <Network className="h-4 w-4 text-blue-500" />
                               </Button>
                               <Button
                                 size="sm"
@@ -1321,39 +1284,7 @@ export default function LearningPaths() {
             />
           )}
 
-          {/* Flow Diagram Modal */}
-          {selectedSubjectId && subjects && learningPath && (
-            <FlowDiagramModal
-              open={isMindMapModalOpen}
-              onOpenChange={setIsMindMapModalOpen}
-              subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
-              modules={learningPath.map(m => ({
-                id: m.id,
-                title: m.title,
-                description: m.description || '',
-              }))}
-              topics={learningPath.flatMap(m => 
-                m.topics?.map(t => ({
-                  id: t.id,
-                  moduleId: m.id,
-                  title: t.title,
-                })) || []
-              )}
-            />
-          )}
 
-          {/* Module Mind Map Modal */}
-          {selectedModuleForMindMap && (
-            <ModuleMindMapModal
-              isOpen={isModuleMindMapModalOpen}
-              onClose={() => {
-                setIsModuleMindMapModalOpen(false);
-                setSelectedModuleForMindMap(null);
-              }}
-              moduleId={selectedModuleForMindMap.id}
-              moduleTitle={selectedModuleForMindMap.title}
-            />
-          )}
 
           {/* Exercise Generator Modal */}
           {selectedModuleForExercise && (

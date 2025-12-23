@@ -69,6 +69,7 @@ export default function ExamGeneratorModal({
   const [selectedModules, setSelectedModules] = useState<number[]>([]);
   const [generatedExam, setGeneratedExam] = useState<GeneratedExam | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const generateExamMutation = trpc.learningPath.generateExam.useMutation({
     onSuccess: (data) => {
@@ -431,6 +432,25 @@ export default function ExamGeneratorModal({
     setQuestionCount(10);
     setSelectedModules([]);
     setShowAnswers(false);
+    setCurrentQuestionIndex(0);
+  };
+
+  const handlePrevious = () => {
+    setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    if (generatedExam) {
+      setCurrentQuestionIndex((prev) => Math.min(generatedExam.questions.length - 1, prev + 1));
+    }
+  };
+
+  const scrollToQuestion = (index: number) => {
+    setCurrentQuestionIndex(index);
+    const element = document.getElementById(`question-${index}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleClose = () => {
@@ -556,21 +576,57 @@ export default function ExamGeneratorModal({
             </div>
           </div>
         ) : (
-          <ScrollArea className="flex-1 pr-4">
-            <div id="exam-content" className="space-y-6 py-4">
-              {/* Cabeçalho da Prova */}
-              <div className="text-center border-b pb-4 mb-6">
-                <h2 className="text-2xl font-bold">{generatedExam.title}</h2>
-                <p className="text-base text-muted-foreground mt-3 leading-relaxed">{generatedExam.instructions}</p>
-                <p className="text-base font-semibold mt-3">
-                  Total de Pontos: {generatedExam.totalPoints}
-                </p>
+          <>
+            {/* Barra de Navegação */}
+            <div className="flex items-center justify-between border-b pb-3 mb-3 px-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+              >
+                ← Anterior
+              </Button>
+              <div className="flex gap-1 overflow-x-auto max-w-md">
+                {generatedExam.questions.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => scrollToQuestion(idx)}
+                    className={`min-w-[32px] h-8 rounded ${
+                      currentQuestionIndex === idx
+                        ? "bg-green-600 text-white font-semibold"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={currentQuestionIndex === generatedExam.questions.length - 1}
+              >
+                Próximo →
+              </Button>
+            </div>
 
-              {/* Questões */}
-              <div className="space-y-8">
-                {generatedExam.questions.map((question) => (
-                  <div key={question.number} className="border rounded-lg p-6 bg-white shadow-sm">
+            <ScrollArea className="flex-1 pr-4">
+              <div id="exam-content" className="space-y-6 py-4">
+                {/* Cabeçalho da Prova */}
+                <div className="text-center border-b pb-4 mb-6">
+                  <h2 className="text-2xl font-bold">{generatedExam.title}</h2>
+                  <p className="text-base text-muted-foreground mt-3 leading-relaxed">{generatedExam.instructions}</p>
+                  <p className="text-base font-semibold mt-3">
+                    Total de Pontos: {generatedExam.totalPoints}
+                  </p>
+                </div>
+
+                {/* Questões */}
+                <div className="space-y-8">
+                  {generatedExam.questions.map((question, idx) => (
+                    <div key={question.number} id={`question-${idx}`} className="border rounded-lg p-6 bg-white shadow-sm scroll-mt-4">
                     <div className="flex items-start justify-between mb-4">
                       <span className="text-lg font-bold text-gray-900">Questão {question.number}</span>
                       <div className="flex gap-2">
@@ -635,6 +691,7 @@ export default function ExamGeneratorModal({
               </div>
             </div>
           </ScrollArea>
+          </>
         )}
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">

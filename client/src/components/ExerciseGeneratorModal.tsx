@@ -62,6 +62,7 @@ export default function ExerciseGeneratorModal({
   const [generatedExercises, setGeneratedExercises] = useState<GeneratedExercises | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showHints, setShowHints] = useState(false);
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 
   const generateExercisesMutation = trpc.learningPath.generateModuleExercises.useMutation({
     onSuccess: (data) => {
@@ -403,6 +404,25 @@ export default function ExerciseGeneratorModal({
     setQuestionCount(5);
     setShowAnswers(false);
     setShowHints(false);
+    setCurrentExerciseIndex(0);
+  };
+
+  const handlePrevious = () => {
+    setCurrentExerciseIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    if (generatedExercises) {
+      setCurrentExerciseIndex((prev) => Math.min(generatedExercises.exercises.length - 1, prev + 1));
+    }
+  };
+
+  const scrollToExercise = (index: number) => {
+    setCurrentExerciseIndex(index);
+    const element = document.getElementById(`exercise-${index}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleClose = () => {
@@ -473,18 +493,54 @@ export default function ExerciseGeneratorModal({
             </div>
           </div>
         ) : (
-          <ScrollArea className="flex-1 pr-4">
-            <div id="exercises-content" className="space-y-6 py-4">
-              {/* Cabeçalho */}
-              <div className="text-center border-b pb-4 mb-6">
-                <h2 className="text-2xl font-bold">Exercícios</h2>
-                <p className="text-base text-muted-foreground mt-2">{generatedExercises.moduleTitle}</p>
+          <>
+            {/* Barra de Navegação */}
+            <div className="flex items-center justify-between border-b pb-3 mb-3 px-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={currentExerciseIndex === 0}
+              >
+                ← Anterior
+              </Button>
+              <div className="flex gap-1 overflow-x-auto max-w-md">
+                {generatedExercises.exercises.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => scrollToExercise(idx)}
+                    className={`min-w-[32px] h-8 rounded ${
+                      currentExerciseIndex === idx
+                        ? "bg-green-600 text-white font-semibold"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={currentExerciseIndex === generatedExercises.exercises.length - 1}
+              >
+                Próximo →
+              </Button>
+            </div>
 
-              {/* Exercícios */}
-              <div className="space-y-8">
-                {generatedExercises.exercises.map((exercise) => (
-                  <div key={exercise.number} className="border rounded-lg p-6 bg-white shadow-sm">
+            <ScrollArea className="flex-1 pr-4">
+              <div id="exercises-content" className="space-y-6 py-4">
+                {/* Cabeçalho */}
+                <div className="text-center border-b pb-4 mb-6">
+                  <h2 className="text-2xl font-bold">Exercícios</h2>
+                  <p className="text-base text-muted-foreground mt-2">{generatedExercises.moduleTitle}</p>
+                </div>
+
+                {/* Exercícios */}
+                <div className="space-y-8">
+                  {generatedExercises.exercises.map((exercise, idx) => (
+                    <div key={exercise.number} id={`exercise-${idx}`} className="border rounded-lg p-6 bg-white shadow-sm scroll-mt-4">
                     <div className="flex items-start justify-between mb-4">
                       <span className="text-lg font-bold text-gray-900">Exercício {exercise.number}</span>
                       <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded font-medium">
@@ -551,6 +607,7 @@ export default function ExerciseGeneratorModal({
               </div>
             </div>
           </ScrollArea>
+          </>
         )}
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">

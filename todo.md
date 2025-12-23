@@ -2551,3 +2551,6 @@
 - [x] Substituir mapa mental por diagrama de fluxo Mermaid.js
 - [ ] Verificar e garantir exportação DOCX em provas e exercícios
 - [x] Melhorar visualização dos modais de exercícios e provas (aumentar fonte, melhorar espaçamento)
+- [x] Adicionar barra de navegação nos modais de exercícios e provas para facilitar navegação entre questões
+- [x] Remover botão "Diagrama de Fluxo" da página de Trilhas de Aprendizagem
+- [x] Remover botão "Mapa Mental" dos cards de módulos individuais
