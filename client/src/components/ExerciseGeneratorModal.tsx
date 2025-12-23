@@ -24,6 +24,7 @@ import {
   Copy,
   Printer,
   Lightbulb,
+  Download,
 } from "lucide-react";
 
 interface ExerciseGeneratorModalProps {
@@ -142,6 +143,258 @@ export default function ExerciseGeneratorModal({
     
     navigator.clipboard.writeText(text);
     toast.success("Exercícios copiados para a área de transferência!");
+  };
+
+  const handleExportPDF = async () => {
+    if (!generatedExercises) return;
+    
+    try {
+      const { jsPDF } = await import('jspdf');
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let yPosition = 20;
+      
+      // Título
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Exercícios - ${generatedExercises.moduleTitle}`, pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 15;
+      
+      // Exercícios
+      generatedExercises.exercises.forEach((exercise) => {
+        // Verificar se precisa de nova página
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        // Número do exercício
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Exercício ${exercise.number}`, margin, yPosition);
+        yPosition += 7;
+        
+        // Contexto do caso (se houver)
+        if (exercise.caseContext) {
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'italic');
+          const splitContext = doc.splitTextToSize(exercise.caseContext, pageWidth - 2 * margin);
+          doc.text(splitContext, margin, yPosition);
+          yPosition += splitContext.length * 4 + 3;
+        }
+        
+        // Pergunta
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const splitQuestion = doc.splitTextToSize(exercise.question, pageWidth - 2 * margin);
+        doc.text(splitQuestion, margin, yPosition);
+        yPosition += splitQuestion.length * 5 + 3;
+        
+        // Opções (se houver)
+        if (exercise.options) {
+          exercise.options.forEach((option) => {
+            const splitOption = doc.splitTextToSize(option, pageWidth - 2 * margin - 10);
+            doc.text(splitOption, margin + 5, yPosition);
+            yPosition += splitOption.length * 5;
+          });
+          yPosition += 3;
+        }
+        
+        // Dica (se ativado)
+        if (showHints && exercise.hint) {
+          doc.setFont('helvetica', 'italic');
+          doc.setTextColor(37, 99, 235);
+          const splitHint = doc.splitTextToSize(`Dica: ${exercise.hint}`, pageWidth - 2 * margin - 10);
+          doc.text(splitHint, margin + 5, yPosition);
+          doc.setTextColor(0, 0, 0);
+          yPosition += splitHint.length * 5 + 3;
+        }
+        
+        // Gabarito (se ativado)
+        if (showAnswers) {
+          if (exercise.correctAnswer) {
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(5, 150, 105);
+            doc.text(`Resposta: ${exercise.correctAnswer}`, margin + 5, yPosition);
+            doc.setTextColor(0, 0, 0);
+            yPosition += 5;
+          }
+          if (exercise.explanation) {
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(5, 150, 105);
+            const splitExplanation = doc.splitTextToSize(`Explicação: ${exercise.explanation}`, pageWidth - 2 * margin - 10);
+            doc.text(splitExplanation, margin + 5, yPosition);
+            doc.setTextColor(0, 0, 0);
+            yPosition += splitExplanation.length * 5;
+          }
+        }
+        
+        yPosition += 5;
+      });
+      
+      // Salvar PDF
+      const fileName = `Exercicios_${generatedExercises.moduleTitle.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+      doc.save(fileName);
+      toast.success('PDF exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
+      toast.error('Erro ao exportar PDF');
+    }
+  };
+
+  const handleExportWord = async () => {
+    if (!generatedExercises) return;
+    
+    try {
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
+      
+      const children: any[] = [];
+      
+      // Título
+      children.push(
+        new Paragraph({
+          text: `Exercícios - ${generatedExercises.moduleTitle}`,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 300 },
+        })
+      );
+      
+      // Exercícios
+      generatedExercises.exercises.forEach((exercise) => {
+        // Número do exercício
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Exercício ${exercise.number}`,
+                bold: true,
+                size: 24,
+              }),
+            ],
+            spacing: { before: 200, after: 100 },
+          })
+        );
+        
+        // Contexto do caso
+        if (exercise.caseContext) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: exercise.caseContext,
+                  italics: true,
+                }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+        }
+        
+        // Pergunta
+        children.push(
+          new Paragraph({
+            text: exercise.question,
+            spacing: { after: 100 },
+          })
+        );
+        
+        // Opções
+        if (exercise.options) {
+          exercise.options.forEach((option) => {
+            children.push(
+              new Paragraph({
+                text: option,
+                indent: { left: 720 },
+                spacing: { after: 50 },
+              })
+            );
+          });
+        }
+        
+        // Dica
+        if (showHints && exercise.hint) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `💡 Dica: ${exercise.hint}`,
+                  italics: true,
+                  color: '2563eb',
+                }),
+              ],
+              indent: { left: 720 },
+              spacing: { after: 100 },
+            })
+          );
+        }
+        
+        // Gabarito
+        if (showAnswers) {
+          if (exercise.correctAnswer) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `✓ Resposta: ${exercise.correctAnswer}`,
+                    bold: true,
+                    color: '059669',
+                  }),
+                ],
+                indent: { left: 720 },
+                spacing: { after: 50 },
+              })
+            );
+          }
+          if (exercise.explanation) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `📝 Explicação: ${exercise.explanation}`,
+                    color: '059669',
+                  }),
+                ],
+                indent: { left: 720 },
+                spacing: { after: 100 },
+              })
+            );
+          }
+        }
+        
+        // Espaço entre exercícios
+        children.push(
+          new Paragraph({
+            text: '',
+            spacing: { after: 200 },
+          })
+        );
+      });
+      
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: children,
+          },
+        ],
+      });
+      
+      const blob = await Packer.toBlob(doc);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Exercicios_${generatedExercises.moduleTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Word exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar Word:', error);
+      toast.error('Erro ao exportar Word');
+    }
   };
 
   const resetForm = () => {
@@ -346,6 +599,14 @@ export default function ExerciseGeneratorModal({
               </div>
               <Button variant="outline" onClick={resetForm}>
                 Novos Exercícios
+              </Button>
+              <Button variant="outline" onClick={handleExportPDF} className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
+                <Download className="h-4 w-4 mr-2" />
+                PDF
+              </Button>
+              <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                <Download className="h-4 w-4 mr-2" />
+                Word
               </Button>
               <Button variant="outline" onClick={handleCopy}>
                 <Copy className="h-4 w-4 mr-2" />

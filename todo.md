@@ -2540,3 +2540,4 @@
 - [ ] Corrigir logout automático após cadastro de professor (sistema desloga depois de um tempo)
 - [x] Corrigir logout automático após cadastro de professor (invalidar cache e forçar reload completo)
 - [x] Corrigir erro de JSON malformado na geração de mapas mentais
+- [x] Implementar exportação de provas e exercícios em PDF e Word (DOCX)

@@ -164,6 +164,266 @@ export default function ExamGeneratorModal({
     toast.success("Prova copiada para a área de transferência!");
   };
 
+  const handleExportPDF = async () => {
+    if (!generatedExam) return;
+    
+    try {
+      const { jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let yPosition = 20;
+      
+      // Título
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text(generatedExam.title, pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
+      
+      // Instruções
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const splitInstructions = doc.splitTextToSize(generatedExam.instructions, pageWidth - 2 * margin);
+      doc.text(splitInstructions, margin, yPosition);
+      yPosition += splitInstructions.length * 5 + 5;
+      
+      // Total de pontos
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Total de Pontos: ${generatedExam.totalPoints}`, margin, yPosition);
+      yPosition += 10;
+      
+      // Questões
+      generatedExam.questions.forEach((question, idx) => {
+        // Verificar se precisa de nova página
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        // Número e tipo da questão
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Questão ${question.number} (${question.points} pts)`, margin, yPosition);
+        yPosition += 7;
+        
+        // Contexto do caso (se houver)
+        if (question.caseContext) {
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'italic');
+          const splitContext = doc.splitTextToSize(question.caseContext, pageWidth - 2 * margin);
+          doc.text(splitContext, margin, yPosition);
+          yPosition += splitContext.length * 4 + 3;
+        }
+        
+        // Pergunta
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const splitQuestion = doc.splitTextToSize(question.question, pageWidth - 2 * margin);
+        doc.text(splitQuestion, margin, yPosition);
+        yPosition += splitQuestion.length * 5 + 3;
+        
+        // Opções (se houver)
+        if (question.options) {
+          question.options.forEach((option) => {
+            const splitOption = doc.splitTextToSize(option, pageWidth - 2 * margin - 10);
+            doc.text(splitOption, margin + 5, yPosition);
+            yPosition += splitOption.length * 5;
+          });
+          yPosition += 3;
+        }
+        
+        // Gabarito (se ativado)
+        if (showAnswers) {
+          if (question.correctAnswer) {
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(5, 150, 105);
+            doc.text(`Resposta: ${question.correctAnswer}`, margin + 5, yPosition);
+            doc.setTextColor(0, 0, 0);
+            yPosition += 5;
+          }
+          if (question.expectedAnswer) {
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(5, 150, 105);
+            const splitAnswer = doc.splitTextToSize(`Resposta esperada: ${question.expectedAnswer}`, pageWidth - 2 * margin - 10);
+            doc.text(splitAnswer, margin + 5, yPosition);
+            doc.setTextColor(0, 0, 0);
+            yPosition += splitAnswer.length * 5;
+          }
+        }
+        
+        yPosition += 5;
+      });
+      
+      // Salvar PDF
+      const fileName = `${generatedExam.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+      doc.save(fileName);
+      toast.success('PDF exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
+      toast.error('Erro ao exportar PDF');
+    }
+  };
+
+  const handleExportWord = async () => {
+    if (!generatedExam) return;
+    
+    try {
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
+      
+      const children: any[] = [];
+      
+      // Título
+      children.push(
+        new Paragraph({
+          text: generatedExam.title,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+        })
+      );
+      
+      // Instruções
+      children.push(
+        new Paragraph({
+          text: generatedExam.instructions,
+          spacing: { after: 200 },
+        })
+      );
+      
+      // Total de pontos
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Total de Pontos: ${generatedExam.totalPoints}`,
+              bold: true,
+            }),
+          ],
+          spacing: { after: 300 },
+        })
+      );
+      
+      // Questões
+      generatedExam.questions.forEach((question) => {
+        // Número da questão
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Questão ${question.number} (${question.points} pts - ${question.type === 'objective' ? 'Objetiva' : question.type === 'subjective' ? 'Subjetiva' : 'Estudo de Caso'})`,
+                bold: true,
+                size: 24,
+              }),
+            ],
+            spacing: { before: 200, after: 100 },
+          })
+        );
+        
+        // Contexto do caso
+        if (question.caseContext) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: question.caseContext,
+                  italics: true,
+                }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+        }
+        
+        // Pergunta
+        children.push(
+          new Paragraph({
+            text: question.question,
+            spacing: { after: 100 },
+          })
+        );
+        
+        // Opções
+        if (question.options) {
+          question.options.forEach((option) => {
+            children.push(
+              new Paragraph({
+                text: option,
+                indent: { left: 720 },
+                spacing: { after: 50 },
+              })
+            );
+          });
+        }
+        
+        // Gabarito
+        if (showAnswers) {
+          if (question.correctAnswer) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Resposta: ${question.correctAnswer}`,
+                    bold: true,
+                    color: '059669',
+                  }),
+                ],
+                indent: { left: 720 },
+                spacing: { after: 100 },
+              })
+            );
+          }
+          if (question.expectedAnswer) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Resposta esperada: ${question.expectedAnswer}`,
+                    bold: true,
+                    color: '059669',
+                  }),
+                ],
+                indent: { left: 720 },
+                spacing: { after: 100 },
+              })
+            );
+          }
+        }
+        
+        // Espaço entre questões
+        children.push(
+          new Paragraph({
+            text: '',
+            spacing: { after: 200 },
+          })
+        );
+      });
+      
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: children,
+          },
+        ],
+      });
+      
+      const blob = await Packer.toBlob(doc);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${generatedExam.title.replace(/[^a-z0-9]/gi, '_')}.docx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Word exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar Word:', error);
+      toast.error('Erro ao exportar Word');
+    }
+  };
+
   const resetForm = () => {
     setGeneratedExam(null);
     setExamType("mixed");
@@ -415,6 +675,14 @@ export default function ExamGeneratorModal({
               </div>
               <Button variant="outline" onClick={resetForm}>
                 Nova Prova
+              </Button>
+              <Button variant="outline" onClick={handleExportPDF} className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
+                <Download className="h-4 w-4 mr-2" />
+                PDF
+              </Button>
+              <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                <Download className="h-4 w-4 mr-2" />
+                Word
               </Button>
               <Button variant="outline" onClick={handleCopy}>
                 <Copy className="h-4 w-4 mr-2" />
