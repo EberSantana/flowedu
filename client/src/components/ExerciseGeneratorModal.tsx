@@ -475,7 +475,8 @@ export default function ExerciseGeneratorModal({
             </div>
           </div>
         ) : (
-          <ScrollArea className="flex-1 pr-4">
+          <div className="flex-1 flex gap-4">
+            <ScrollArea className="flex-1 pr-4">
               <div id="exercises-content" className="space-y-6 py-4">
                 {/* Cabeçalho */}
                 <div className="text-center border-b pb-4 mb-6">
@@ -553,6 +554,28 @@ export default function ExerciseGeneratorModal({
               </div>
             </div>
           </ScrollArea>
+          
+          {/* Mini-índice de Navegação Lateral */}
+          <div className="w-12 flex-shrink-0 no-print">
+            <div className="sticky top-4 flex flex-col gap-2">
+              {generatedExercises.exercises.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    const element = document.getElementById(`exercise-${idx}`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="w-10 h-10 rounded-full bg-gray-200 hover:bg-green-600 hover:text-white text-gray-700 text-sm font-medium transition-colors flex items-center justify-center"
+                  title={`Ir para Exercício ${idx + 1}`}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         )}
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">

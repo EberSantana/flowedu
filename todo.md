@@ -2556,3 +2556,4 @@
 - [x] Remover botão "Mapa Mental" dos cards de módulos individuais
 - [x] Ocultar barra de navegação ao exportar exercícios/provas para Word/PDF
 - [x] Remover barra de navegação (botões anterior/próximo e números) dos modais de exercícios e provas
+- [x] Adicionar mini-índice de navegação lateral no canto direito dos modais de exercícios e provas
