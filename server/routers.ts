@@ -2261,16 +2261,17 @@ Retorne um JSON com a estrutura:
           throw new Error('Nenhum módulo encontrado para gerar o mapa mental');
         }
         
-        // LIMITAR a 5 módulos para evitar JSON muito grande
-        const limitedModules = modules.slice(0, 5);
+        // LIMITAR DRASTICAMENTE: apenas 3 módulos
+        const limitedModules = modules.slice(0, 3);
         
-        // Simplificar conteúdo: apenas títulos, sem descrições longas
+        // Simplificar conteúdo: títulos curtos
         const modulesContent = limitedModules.map((m: any) => ({
-          title: m.title,
-          topics: m.topics?.slice(0, 4).map((t: any) => t.title) || [] // Máx 4 tópicos por módulo
+          title: m.title.substring(0, 50),
+          topics: m.topics?.slice(0, 3).map((t: any) => t.title.substring(0, 40)) || []
         }));
         
         const response = await invokeLLM({
+          max_tokens: 1500,
           messages: [
             {
               role: 'system',
@@ -2278,32 +2279,11 @@ Retorne um JSON com a estrutura:
             },
             {
               role: 'user',
-              content: `Crie um mapa mental COMPACTO para "${subject.name}" com ${limitedModules.length} módulos:
+              content: `Mapa mental MINIMALISTA "${subject.name}":
+${JSON.stringify(modulesContent)}
 
-${JSON.stringify(modulesContent, null, 2)}
-
-IMPORTANTE: Seja CONCISO. Use descrições curtas (máx 50 caracteres). NÃO adicione informações extras.
-
-Retorne JSON:
-{
-  "title": "${subject.name}",
-  "description": "Visão geral da disciplina",
-  "nodes": [
-    {
-      "id": "1",
-      "label": "Módulo 1",
-      "description": "Resumo curto",
-      "color": "#3b82f6",
-      "children": [
-        {
-          "id": "1.1",
-          "label": "Tópico",
-          "description": "Breve"
-        }
-      ]
-    }
-  ]
-}`
+JSON (descrições MAX 20 chars):
+{"title":"${subject.name}","description":"Visão geral","nodes":[{"id":"1","label":"Mod","description":"Desc","color":"#3b82f6","children":[{"id":"1.1","label":"Top","description":"D"}]}]}`
             }
           ],
           response_format: {
