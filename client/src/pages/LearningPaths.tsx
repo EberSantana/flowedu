@@ -30,11 +30,17 @@ import {
   FileText,
   Upload,
   X,
+  Network,
+  Dumbbell,
+  ClipboardList,
 } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
+import ExamGeneratorModal from "@/components/ExamGeneratorModal";
+import ExerciseGeneratorModal from "@/components/ExerciseGeneratorModal";
+import MindMapModal from "@/components/MindMapModal";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
 
@@ -73,6 +79,12 @@ export default function LearningPaths() {
   const [isLessonPlanDialogOpen, setIsLessonPlanDialogOpen] = useState(false);
   const [selectedTopicForPlan, setSelectedTopicForPlan] = useState<any>(null);
   const [lessonPlan, setLessonPlan] = useState<any>(null);
+
+  // New modal states
+  const [isExamModalOpen, setIsExamModalOpen] = useState(false);
+  const [isMindMapModalOpen, setIsMindMapModalOpen] = useState(false);
+  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
+  const [selectedModuleForExercise, setSelectedModuleForExercise] = useState<{ id: number; title: string } | null>(null);
 
   const { data: learningPath, isLoading: isLoadingPath } =
     trpc.learningPath.getBySubject.useQuery(
@@ -566,7 +578,7 @@ export default function LearningPaths() {
                   <h2 className="text-xl font-bold">Módulos e Tópicos</h2>
                   <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     {/* Botões de IA */}
-                    <div className="flex gap-2 flex-1 sm:flex-initial">
+                    <div className="flex gap-2 flex-1 sm:flex-initial flex-wrap">
                       <Button
                         variant="outline"
                         onClick={() => setIsAIDialogOpen(true)}
@@ -580,33 +592,34 @@ export default function LearningPaths() {
                         onClick={() => {
                           if (!selectedSubjectId) return;
                           if (!learningPath || learningPath.length === 0) {
-                            toast.error(
-                              "Crie módulos primeiro para gerar infográfico"
-                            );
+                            toast.error("Crie módulos primeiro para gerar mapa mental");
                             return;
                           }
-                          generateInfographicMutation.mutate({
-                            subjectId: selectedSubjectId,
-                          });
+                          setIsMindMapModalOpen(true);
                         }}
-                        disabled={
-                          generateInfographicMutation.isPending ||
-                          !learningPath ||
-                          learningPath.length === 0
-                        }
-                        className="border-cyan-200 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-300 flex-1 sm:flex-initial"
-                        title={
-                          !learningPath || learningPath.length === 0
-                            ? "Crie módulos primeiro"
-                            : "Gerar infográfico visual"
-                        }
+                        disabled={!learningPath || learningPath.length === 0}
+                        className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 flex-1 sm:flex-initial"
+                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Visualizar mapa mental"}
                       >
-                        {generateInfographicMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <ImageIcon className="h-4 w-4 mr-2" />
-                        )}
-                        Infográfico
+                        <Network className="h-4 w-4 mr-2" />
+                        Mapa Mental
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          if (!selectedSubjectId) return;
+                          if (!learningPath || learningPath.length === 0) {
+                            toast.error("Crie módulos primeiro para criar prova");
+                            return;
+                          }
+                          setIsExamModalOpen(true);
+                        }}
+                        disabled={!learningPath || learningPath.length === 0}
+                        className="border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300 flex-1 sm:flex-initial"
+                        title={!learningPath || learningPath.length === 0 ? "Crie módulos primeiro" : "Criar prova com IA"}
+                      >
+                        <ClipboardList className="h-4 w-4 mr-2" />
+                        Criar Prova
                       </Button>
                     </div>
                     {/* Botão de criar módulo */}
@@ -716,6 +729,17 @@ export default function LearningPaths() {
                               <Badge variant="outline">
                                 {module.topics?.length || 0} tópico(s)
                               </Badge>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSelectedModuleForExercise({ id: module.id, title: module.title });
+                                  setIsExerciseModalOpen(true);
+                                }}
+                                title="Criar Exercícios do Módulo"
+                              >
+                                <Dumbbell className="h-4 w-4 text-green-500" />
+                              </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -1273,6 +1297,40 @@ export default function LearningPaths() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* Exam Generator Modal */}
+          {selectedSubjectId && subjects && (
+            <ExamGeneratorModal
+              isOpen={isExamModalOpen}
+              onClose={() => setIsExamModalOpen(false)}
+              subjectId={selectedSubjectId}
+              subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
+              modules={learningPath?.map(m => ({ id: m.id, title: m.title })) || []}
+            />
+          )}
+
+          {/* Mind Map Modal */}
+          {selectedSubjectId && subjects && (
+            <MindMapModal
+              isOpen={isMindMapModalOpen}
+              onClose={() => setIsMindMapModalOpen(false)}
+              subjectId={selectedSubjectId}
+              subjectName={subjects.find(s => s.id === selectedSubjectId)?.name || ""}
+            />
+          )}
+
+          {/* Exercise Generator Modal */}
+          {selectedModuleForExercise && (
+            <ExerciseGeneratorModal
+              isOpen={isExerciseModalOpen}
+              onClose={() => {
+                setIsExerciseModalOpen(false);
+                setSelectedModuleForExercise(null);
+              }}
+              moduleId={selectedModuleForExercise.id}
+              moduleTitle={selectedModuleForExercise.title}
+            />
+          )}
         </div>
       </PageWrapper>
     </>

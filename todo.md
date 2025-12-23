@@ -2516,3 +2516,22 @@
 - [x] Criar página de solicitação de recuperação (/esqueci-senha)
 - [x] Criar página de redefinição de senha (/redefinir-senha)
 - [x] Adicionar link "Esqueci minha senha" na página de login
+
+## Geração de Provas e Exercícios com IA
+- [ ] Criar rota tRPC para gerar provas com IA (objetivas, subjetivas, estudos de caso)
+- [ ] Criar rota tRPC para gerar exercícios por módulo com IA
+- [ ] Criar modal de criação de provas com seleção de tipo
+- [ ] Criar modal de criação de exercícios por módulo
+- [ ] Substituir botão "Infográfico" por "Mapa Mental"
+- [ ] Implementar visualização de mapa mental dos módulos
+- [ ] Adicionar botão de exercícios em cada card de módulo
+- [ ] Testar geração de conteúdo com IA
+- [x] Criar rota tRPC para gerar provas com IA (objetivas, subjetivas, estudos de caso)
+- [x] Criar rota tRPC para gerar exercícios por módulo com IA
+- [x] Criar rota tRPC para gerar mapa mental dos módulos
+- [x] Criar modal de criação de provas com seleção de tipo (ExamGeneratorModal)
+- [x] Criar modal de criação de exercícios por módulo (ExerciseGeneratorModal)
+- [x] Criar modal de visualização de mapa mental (MindMapModal)
+- [x] Substituir botão "Infográfico" por "Mapa Mental" na página de Trilhas
+- [x] Adicionar botão "Criar Prova" na página de Trilhas
+- [x] Adicionar botão de exercícios em cada card de módulo

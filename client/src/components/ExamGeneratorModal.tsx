@@ -1,0 +1,436 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+import {
+  Loader2,
+  FileText,
+  CheckSquare,
+  MessageSquare,
+  Briefcase,
+  Shuffle,
+  Download,
+  Printer,
+  Copy,
+} from "lucide-react";
+
+interface ExamGeneratorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  subjectId: number;
+  subjectName: string;
+  modules: Array<{ id: number; title: string }>;
+}
+
+type ExamType = "objective" | "subjective" | "case_study" | "mixed";
+type Difficulty = "easy" | "medium" | "hard" | "mixed";
+
+interface GeneratedExam {
+  title: string;
+  instructions: string;
+  totalPoints: number;
+  questions: Array<{
+    number: number;
+    type: string;
+    points: number;
+    difficulty: string;
+    module: string;
+    question: string;
+    options?: string[];
+    correctAnswer?: string;
+    expectedAnswer?: string;
+    caseContext?: string;
+    caseQuestions?: string[];
+  }>;
+}
+
+export default function ExamGeneratorModal({
+  isOpen,
+  onClose,
+  subjectId,
+  subjectName,
+  modules,
+}: ExamGeneratorModalProps) {
+  const [examType, setExamType] = useState<ExamType>("mixed");
+  const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
+  const [questionCount, setQuestionCount] = useState(10);
+  const [selectedModules, setSelectedModules] = useState<number[]>([]);
+  const [generatedExam, setGeneratedExam] = useState<GeneratedExam | null>(null);
+  const [showAnswers, setShowAnswers] = useState(false);
+
+  const generateExamMutation = trpc.learningPath.generateExam.useMutation({
+    onSuccess: (data) => {
+      setGeneratedExam(data as GeneratedExam);
+      toast.success("Prova gerada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao gerar prova: " + error.message);
+    },
+  });
+
+  const handleGenerate = () => {
+    if (modules.length === 0) {
+      toast.error("Crie módulos primeiro para gerar a prova");
+      return;
+    }
+
+    generateExamMutation.mutate({
+      subjectId,
+      examType,
+      moduleIds: selectedModules.length > 0 ? selectedModules : undefined,
+      questionCount,
+      difficulty,
+    });
+  };
+
+  const handleModuleToggle = (moduleId: number) => {
+    setSelectedModules((prev) =>
+      prev.includes(moduleId)
+        ? prev.filter((id) => id !== moduleId)
+        : [...prev, moduleId]
+    );
+  };
+
+  const handleSelectAllModules = () => {
+    if (selectedModules.length === modules.length) {
+      setSelectedModules([]);
+    } else {
+      setSelectedModules(modules.map((m) => m.id));
+    }
+  };
+
+  const handlePrint = () => {
+    const printContent = document.getElementById("exam-content");
+    if (printContent) {
+      const printWindow = window.open("", "_blank");
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>${generatedExam?.title || "Prova"}</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { text-align: center; }
+                .question { margin-bottom: 20px; page-break-inside: avoid; }
+                .options { margin-left: 20px; }
+                .answer { color: #059669; font-weight: bold; }
+                @media print { .no-print { display: none; } }
+              </style>
+            </head>
+            <body>
+              ${printContent.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      }
+    }
+  };
+
+  const handleCopy = () => {
+    if (!generatedExam) return;
+    
+    let text = `${generatedExam.title}\n\n`;
+    text += `${generatedExam.instructions}\n\n`;
+    
+    generatedExam.questions.forEach((q) => {
+      text += `${q.number}. ${q.question}\n`;
+      if (q.options) {
+        q.options.forEach((opt) => {
+          text += `   ${opt}\n`;
+        });
+      }
+      if (showAnswers) {
+        if (q.correctAnswer) text += `   Resposta: ${q.correctAnswer}\n`;
+        if (q.expectedAnswer) text += `   Resposta esperada: ${q.expectedAnswer}\n`;
+      }
+      text += "\n";
+    });
+    
+    navigator.clipboard.writeText(text);
+    toast.success("Prova copiada para a área de transferência!");
+  };
+
+  const resetForm = () => {
+    setGeneratedExam(null);
+    setExamType("mixed");
+    setDifficulty("mixed");
+    setQuestionCount(10);
+    setSelectedModules([]);
+    setShowAnswers(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  const examTypeOptions = [
+    { value: "objective", label: "Objetivas", icon: CheckSquare, description: "Múltipla escolha" },
+    { value: "subjective", label: "Subjetivas", icon: MessageSquare, description: "Dissertativas" },
+    { value: "case_study", label: "Estudos de Caso", icon: Briefcase, description: "Casos práticos" },
+    { value: "mixed", label: "Mista", icon: Shuffle, description: "Todos os tipos" },
+  ];
+
+  const difficultyOptions = [
+    { value: "easy", label: "Fácil" },
+    { value: "medium", label: "Média" },
+    { value: "hard", label: "Difícil" },
+    { value: "mixed", label: "Variada" },
+  ];
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-purple-600" />
+            Criar Prova com IA - {subjectName}
+          </DialogTitle>
+        </DialogHeader>
+
+        {!generatedExam ? (
+          <div className="space-y-6 py-4">
+            {/* Tipo de Prova */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Tipo de Questões</Label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {examTypeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setExamType(option.value as ExamType)}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      examType === option.value
+                        ? "border-purple-500 bg-purple-50"
+                        : "border-gray-200 hover:border-purple-300"
+                    }`}
+                  >
+                    <option.icon className={`h-6 w-6 mx-auto mb-2 ${
+                      examType === option.value ? "text-purple-600" : "text-gray-500"
+                    }`} />
+                    <div className="font-medium text-sm">{option.label}</div>
+                    <div className="text-xs text-muted-foreground">{option.description}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Dificuldade */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Dificuldade</Label>
+              <RadioGroup
+                value={difficulty}
+                onValueChange={(v) => setDifficulty(v as Difficulty)}
+                className="flex flex-wrap gap-4"
+              >
+                {difficultyOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={option.value} id={`diff-${option.value}`} />
+                    <Label htmlFor={`diff-${option.value}`}>{option.label}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {/* Número de Questões */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">
+                Número de Questões: {questionCount}
+              </Label>
+              <Slider
+                value={[questionCount]}
+                onValueChange={([v]) => setQuestionCount(v)}
+                min={5}
+                max={30}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>5</span>
+                <span>30</span>
+              </div>
+            </div>
+
+            {/* Seleção de Módulos */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold">Módulos (opcional)</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSelectAllModules}
+                >
+                  {selectedModules.length === modules.length ? "Desmarcar todos" : "Selecionar todos"}
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Selecione módulos específicos ou deixe em branco para usar todos
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                {modules.map((module) => (
+                  <div key={module.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`module-${module.id}`}
+                      checked={selectedModules.includes(module.id)}
+                      onCheckedChange={() => handleModuleToggle(module.id)}
+                    />
+                    <Label htmlFor={`module-${module.id}`} className="text-sm truncate">
+                      {module.title}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ScrollArea className="flex-1 pr-4">
+            <div id="exam-content" className="space-y-6 py-4">
+              {/* Cabeçalho da Prova */}
+              <div className="text-center border-b pb-4">
+                <h2 className="text-xl font-bold">{generatedExam.title}</h2>
+                <p className="text-muted-foreground mt-2">{generatedExam.instructions}</p>
+                <p className="text-sm font-medium mt-2">
+                  Total de Pontos: {generatedExam.totalPoints}
+                </p>
+              </div>
+
+              {/* Questões */}
+              <div className="space-y-6">
+                {generatedExam.questions.map((question) => (
+                  <div key={question.number} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <span className="font-bold">Questão {question.number}</span>
+                      <div className="flex gap-2">
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {question.points} pts
+                        </span>
+                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                          {question.type === "objective" ? "Objetiva" : 
+                           question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {question.caseContext && (
+                      <div className="bg-gray-50 p-3 rounded mb-3 text-sm italic">
+                        {question.caseContext}
+                      </div>
+                    )}
+                    
+                    <p className="mb-3">{question.question}</p>
+                    
+                    {question.options && (
+                      <div className="space-y-2 ml-4">
+                        {question.options.map((option, idx) => (
+                          <div key={idx} className={`${
+                            showAnswers && option.startsWith(question.correctAnswer || "")
+                              ? "text-green-600 font-medium"
+                              : ""
+                          }`}>
+                            {option}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {question.caseQuestions && (
+                      <div className="mt-3 space-y-2">
+                        {question.caseQuestions.map((cq, idx) => (
+                          <div key={idx} className="text-sm">
+                            {String.fromCharCode(97 + idx)}) {cq}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {showAnswers && (
+                      <div className="mt-4 pt-3 border-t">
+                        {question.correctAnswer && (
+                          <p className="text-green-600 text-sm">
+                            <strong>Resposta:</strong> {question.correctAnswer}
+                          </p>
+                        )}
+                        {question.expectedAnswer && (
+                          <p className="text-green-600 text-sm">
+                            <strong>Resposta esperada:</strong> {question.expectedAnswer}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+        )}
+
+        <DialogFooter className="flex-shrink-0 border-t pt-4">
+          {!generatedExam ? (
+            <>
+              <Button variant="outline" onClick={handleClose}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleGenerate}
+                disabled={generateExamMutation.isPending || modules.length === 0}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                {generateExamMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Gerar Prova
+                  </>
+                )}
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mr-auto">
+                <Checkbox
+                  id="show-answers"
+                  checked={showAnswers}
+                  onCheckedChange={(checked) => setShowAnswers(checked as boolean)}
+                />
+                <Label htmlFor="show-answers" className="text-sm">
+                  Mostrar gabarito
+                </Label>
+              </div>
+              <Button variant="outline" onClick={resetForm}>
+                Nova Prova
+              </Button>
+              <Button variant="outline" onClick={handleCopy}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copiar
+              </Button>
+              <Button variant="outline" onClick={handlePrint}>
+                <Printer className="h-4 w-4 mr-2" />
+                Imprimir
+              </Button>
+              <Button onClick={handleClose}>
+                Fechar
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

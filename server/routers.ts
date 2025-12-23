@@ -2007,6 +2007,368 @@ Crie sugestões no formato JSON:
           : JSON.stringify(response.choices[0].message.content);
         return JSON.parse(content || '{}');
       }),
+
+    // Gerar prova com IA
+    generateExam: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        examType: z.enum(['objective', 'subjective', 'case_study', 'mixed']),
+        moduleIds: z.array(z.number()).optional(), // Se vazio, usa todos os módulos
+        questionCount: z.number().min(1).max(50).default(10),
+        difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        
+        // Buscar dados da disciplina e módulos
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        if (!subject) throw new Error('Disciplina não encontrada');
+        
+        const modules = await db.getLearningPathBySubject(input.subjectId, ctx.user.id) || [];
+        
+        // Filtrar módulos se especificados
+        let filteredModules = modules;
+        if (input.moduleIds && input.moduleIds.length > 0) {
+          filteredModules = modules.filter((m: any) => input.moduleIds!.includes(m.id));
+        }
+        
+        if (filteredModules.length === 0) {
+          throw new Error('Nenhum módulo encontrado para gerar a prova');
+        }
+        
+        // Preparar conteúdo dos módulos
+        const modulesContent = filteredModules.map((m: any) => ({
+          title: m.title,
+          description: m.description,
+          topics: m.topics?.map((t: any) => t.title).join(', ') || ''
+        }));
+        
+        const examTypeLabels = {
+          objective: 'questões objetivas (múltipla escolha com 4 alternativas, indicando a correta)',
+          subjective: 'questões dissertativas/subjetivas',
+          case_study: 'estudos de caso práticos com perguntas',
+          mixed: 'misto (objetivas, subjetivas e estudos de caso)'
+        };
+        
+        const difficultyLabels = {
+          easy: 'fácil',
+          medium: 'média',
+          hard: 'difícil',
+          mixed: 'variada (fácil, média e difícil)'
+        };
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `Você é um professor especialista em criar provas e avaliações. Gere uma prova completa em português brasileiro com base no conteúdo fornecido. Retorne APENAS um JSON válido.`
+            },
+            {
+              role: 'user',
+              content: `Crie uma prova para a disciplina "${subject.name}" com as seguintes especificações:
+
+- Tipo: ${examTypeLabels[input.examType]}
+- Número de questões: ${input.questionCount}
+- Dificuldade: ${difficultyLabels[input.difficulty]}
+
+Conteúdo dos módulos:
+${JSON.stringify(modulesContent, null, 2)}
+
+Retorne um JSON com a estrutura:
+{
+  "title": "Título da Prova",
+  "instructions": "Instruções gerais",
+  "totalPoints": 100,
+  "questions": [
+    {
+      "number": 1,
+      "type": "objective|subjective|case_study",
+      "points": 10,
+      "difficulty": "easy|medium|hard",
+      "module": "Nome do módulo relacionado",
+      "question": "Texto da questão",
+      "options": ["A) ...", "B) ...", "C) ...", "D) ..."], // apenas para objetivas
+      "correctAnswer": "A", // apenas para objetivas
+      "expectedAnswer": "Resposta esperada ou critérios de avaliação", // para subjetivas
+      "caseContext": "Contexto do caso", // apenas para estudos de caso
+      "caseQuestions": ["Pergunta 1", "Pergunta 2"] // apenas para estudos de caso
+    }
+  ]
+}`
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'exam_generation',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  instructions: { type: 'string' },
+                  totalPoints: { type: 'number' },
+                  questions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        number: { type: 'number' },
+                        type: { type: 'string' },
+                        points: { type: 'number' },
+                        difficulty: { type: 'string' },
+                        module: { type: 'string' },
+                        question: { type: 'string' },
+                        options: { type: 'array', items: { type: 'string' } },
+                        correctAnswer: { type: 'string' },
+                        expectedAnswer: { type: 'string' },
+                        caseContext: { type: 'string' },
+                        caseQuestions: { type: 'array', items: { type: 'string' } }
+                      },
+                      required: ['number', 'type', 'points', 'difficulty', 'module', 'question'],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ['title', 'instructions', 'totalPoints', 'questions'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const content = typeof response.choices[0].message.content === 'string' 
+          ? response.choices[0].message.content 
+          : JSON.stringify(response.choices[0].message.content);
+        return JSON.parse(content || '{}');
+      }),
+
+    // Gerar exercícios para um módulo específico
+    generateModuleExercises: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+        exerciseType: z.enum(['objective', 'subjective', 'case_study', 'mixed']),
+        questionCount: z.number().min(1).max(20).default(5),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        
+        // Buscar dados do módulo
+        const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
+        if (!module) throw new Error('Módulo não encontrado');
+        
+        // Buscar tópicos do módulo
+        const topics = await db.getLearningTopicsByModule(input.moduleId, ctx.user.id);
+        const topicsList = topics?.map((t: any) => t.title).join(', ') || 'Não informados';
+        
+        const exerciseTypeLabels = {
+          objective: 'questões objetivas (múltipla escolha com 4 alternativas)',
+          subjective: 'questões dissertativas',
+          case_study: 'estudos de caso práticos',
+          mixed: 'misto (objetivas, subjetivas e estudos de caso)'
+        };
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `Você é um professor especialista em criar exercícios didáticos. Gere exercícios em português brasileiro. Retorne APENAS um JSON válido.`
+            },
+            {
+              role: 'user',
+              content: `Crie ${input.questionCount} exercícios do tipo ${exerciseTypeLabels[input.exerciseType]} para o módulo:
+
+Título: ${module.title}
+Descrição: ${module.description || 'Não informada'}
+Tópicos: ${topicsList}
+
+Retorne um JSON com a estrutura:
+{
+  "moduleTitle": "${module.title}",
+  "exercises": [
+    {
+      "number": 1,
+      "type": "objective|subjective|case_study",
+      "question": "Texto da questão",
+      "options": ["A) ...", "B) ...", "C) ...", "D) ..."], // apenas para objetivas
+      "correctAnswer": "A", // apenas para objetivas
+      "hint": "Dica para o aluno",
+      "explanation": "Explicação da resposta",
+      "caseContext": "Contexto do caso", // apenas para estudos de caso
+      "caseQuestions": ["Pergunta 1", "Pergunta 2"] // apenas para estudos de caso
+    }
+  ]
+}`
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'exercises_generation',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  moduleTitle: { type: 'string' },
+                  exercises: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        number: { type: 'number' },
+                        type: { type: 'string' },
+                        question: { type: 'string' },
+                        options: { type: 'array', items: { type: 'string' } },
+                        correctAnswer: { type: 'string' },
+                        hint: { type: 'string' },
+                        explanation: { type: 'string' },
+                        caseContext: { type: 'string' },
+                        caseQuestions: { type: 'array', items: { type: 'string' } }
+                      },
+                      required: ['number', 'type', 'question'],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ['moduleTitle', 'exercises'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const content = typeof response.choices[0].message.content === 'string' 
+          ? response.choices[0].message.content 
+          : JSON.stringify(response.choices[0].message.content);
+        return JSON.parse(content || '{}');
+      }),
+
+    // Gerar mapa mental dos módulos
+    generateMindMap: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { invokeLLM } = await import('./_core/llm');
+        
+        // Buscar dados da disciplina e módulos
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        if (!subject) throw new Error('Disciplina não encontrada');
+        
+        const modules = await db.getLearningPathBySubject(input.subjectId, ctx.user.id) || [];
+        
+        if (modules.length === 0) {
+          throw new Error('Nenhum módulo encontrado para gerar o mapa mental');
+        }
+        
+        const modulesContent = modules.map((m: any) => ({
+          title: m.title,
+          description: m.description,
+          topics: m.topics?.map((t: any) => ({ title: t.title, description: t.description })) || []
+        }));
+        
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `Você é um especialista em criar mapas mentais educacionais. Gere uma estrutura de mapa mental em português brasileiro. Retorne APENAS um JSON válido.`
+            },
+            {
+              role: 'user',
+              content: `Crie um mapa mental para a disciplina "${subject.name}" com base nos módulos:
+
+${JSON.stringify(modulesContent, null, 2)}
+
+Retorne um JSON com a estrutura hierárquica:
+{
+  "title": "${subject.name}",
+  "description": "Descrição geral",
+  "nodes": [
+    {
+      "id": "1",
+      "label": "Nome do módulo",
+      "description": "Breve descrição",
+      "color": "#3b82f6",
+      "children": [
+        {
+          "id": "1.1",
+          "label": "Tópico",
+          "description": "Descrição",
+          "keywords": ["palavra1", "palavra2"]
+        }
+      ]
+    }
+  ],
+  "connections": [
+    { "from": "1", "to": "2", "label": "Relação" }
+  ]
+}`
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'mindmap_generation',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  nodes: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        label: { type: 'string' },
+                        description: { type: 'string' },
+                        color: { type: 'string' },
+                        children: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              label: { type: 'string' },
+                              description: { type: 'string' },
+                              keywords: { type: 'array', items: { type: 'string' } }
+                            },
+                            required: ['id', 'label'],
+                            additionalProperties: false
+                          }
+                        }
+                      },
+                      required: ['id', 'label'],
+                      additionalProperties: false
+                    }
+                  },
+                  connections: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        from: { type: 'string' },
+                        to: { type: 'string' },
+                        label: { type: 'string' }
+                      },
+                      required: ['from', 'to'],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ['title', 'description', 'nodes'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const content = typeof response.choices[0].message.content === 'string' 
+          ? response.choices[0].message.content 
+          : JSON.stringify(response.choices[0].message.content);
+        return JSON.parse(content || '{}');
+      }),
   }),
 
   // Student Portal Routes
