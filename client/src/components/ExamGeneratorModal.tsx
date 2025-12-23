@@ -640,8 +640,8 @@ export default function ExamGeneratorModal({
           </ScrollArea>
           
           {/* Mini-índice de Navegação Lateral */}
-          <div className="w-12 flex-shrink-0 no-print">
-            <div className="sticky top-4 flex flex-col gap-2">
+          <div className="w-10 flex-shrink-0 no-print">
+            <div className="sticky top-4 flex flex-col gap-1.5">
               {generatedExam.questions.map((_, idx) => (
                 <button
                   key={idx}
@@ -651,7 +651,7 @@ export default function ExamGeneratorModal({
                       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                   }}
-                  className="w-10 h-10 rounded-full bg-gray-200 hover:bg-purple-600 hover:text-white text-gray-700 text-sm font-medium transition-colors flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-purple-500 hover:text-white text-gray-600 text-xs font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
                   title={`Ir para Questão ${idx + 1}`}
                 >
                   {idx + 1}
@@ -700,10 +700,6 @@ export default function ExamGeneratorModal({
               </div>
               <Button variant="outline" onClick={resetForm}>
                 Nova Prova
-              </Button>
-              <Button variant="outline" onClick={handleExportPDF} className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100">
-                <Download className="h-4 w-4 mr-2" />
-                PDF
               </Button>
               <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
                 <Download className="h-4 w-4 mr-2" />
