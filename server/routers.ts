@@ -3652,6 +3652,77 @@ JSON (descrições MAX 15 chars):
       .query(async ({ ctx }) => {
         return await db.getPointsEvolutionData();
       }),
+    
+    // Gerar relatório PDF
+    generateReport: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { generateGamificationReport } = await import('./gamification-report');
+        
+        // Coletar todos os dados
+        const allBadges = await db.getAllBadges();
+        const totalEarned = await db.getTotalStudentsWithBadges();
+        const ranking = await db.getClassRanking(20);
+        const badgeStats = await db.getBadgeStatistics();
+        const evolutionData = await db.getPointsEvolutionData();
+        
+        const totalStudents = ranking.length;
+        const activeStudents = ranking.filter(s => s.streakDays > 0).length;
+        const averagePoints = totalStudents > 0
+          ? Math.round(ranking.reduce((sum, s) => sum + s.totalPoints, 0) / totalStudents)
+          : 0;
+        
+        // Calcular distribuição de faixas
+        const BELT_CONFIG = [
+          { name: 'white', label: 'Branca' },
+          { name: 'yellow', label: 'Amarela' },
+          { name: 'orange', label: 'Laranja' },
+          { name: 'green', label: 'Verde' },
+          { name: 'blue', label: 'Azul' },
+          { name: 'purple', label: 'Roxa' },
+          { name: 'brown', label: 'Marrom' },
+          { name: 'black', label: 'Preta' },
+        ];
+        
+        const beltDistribution = BELT_CONFIG.map(belt => {
+          const count = ranking.filter(s => s.currentBelt === belt.name).length;
+          const percentage = totalStudents > 0 ? (count / totalStudents) * 100 : 0;
+          return { ...belt, count, percentage };
+        });
+        
+        // Preparar dados de badges
+        const badges = badgeStats.map(badge => ({
+          name: badge.name,
+          description: badge.description,
+          earnedCount: badge.earnedCount,
+          percentage: totalStudents > 0 ? (badge.earnedCount / totalStudents) * 100 : 0,
+        }));
+        
+        // Gerar PDF
+        const pdfStream = generateGamificationReport({
+          totalStudents,
+          activeStudents,
+          averagePoints,
+          totalBadgesEarned: totalEarned,
+          totalBadgesAvailable: allBadges.length,
+          beltDistribution,
+          ranking,
+          badges,
+          evolutionData,
+        });
+        
+        // Converter stream para buffer
+        const chunks: Buffer[] = [];
+        for await (const chunk of pdfStream) {
+          chunks.push(Buffer.from(chunk));
+        }
+        const pdfBuffer = Buffer.concat(chunks);
+        
+        // Retornar como base64
+        return {
+          pdf: pdfBuffer.toString('base64'),
+          filename: `relatorio-gamificacao-${new Date().toISOString().split('T')[0]}.pdf`,
+        };
+      }),
   }),
 
 });

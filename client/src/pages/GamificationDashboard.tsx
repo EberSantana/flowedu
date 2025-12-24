@@ -2,11 +2,12 @@ import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Trophy, Award, TrendingUp, Users, Flame, Target } from "lucide-react";
+import { Trophy, Award, TrendingUp, Users, Flame, Target, FileDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -45,11 +46,47 @@ const BELT_CONFIG = [
 
 export default function GamificationDashboard() {
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery() || { data: null, isLoading: false };
   const { data: ranking, isLoading: rankingLoading } = trpc.gamification.getClassRanking.useQuery({ limit: 20 });
   const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery() || { data: [], isLoading: false };
   const { data: evolutionData, isLoading: evolutionLoading } = (trpc.gamification as any).getPointsEvolution?.useQuery() || { data: [], isLoading: false };
+  
+  const generateReportMutation = (trpc.gamification as any).generateReport?.useMutation() || { mutate: () => {}, isPending: false };
+  
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const result = await generateReportMutation.mutateAsync();
+      
+      // Converter base64 para blob e fazer download
+      const byteCharacters = atob(result.pdf);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      
+      // Criar link de download
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Relatório PDF gerado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast.error('Erro ao gerar relatório PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (overviewLoading) {
     return (
@@ -81,9 +118,19 @@ export default function GamificationDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard de Gamificação 🎮</h1>
-          <p className="text-gray-600 mt-1">Acompanhe o progresso e engajamento dos seus alunos</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard de Gamificação 🎮</h1>
+            <p className="text-gray-600 mt-1">Acompanhe o progresso e engajamento dos seus alunos</p>
+          </div>
+          <button
+            onClick={handleExportPDF}
+            disabled={isExporting}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FileDown className="h-5 w-5" />
+            {isExporting ? 'Gerando PDF...' : 'Exportar PDF'}
+          </button>
         </div>
 
         {/* Stats Cards */}

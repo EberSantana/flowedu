@@ -2584,3 +2584,16 @@
 - [x] Adicionar rota tRPC gamification.getPointsEvolution
 - [x] Integrar gráfico Chart.js no GamificationDashboard.tsx
 - [x] Testar visualização com dados reais
+
+## Exportação de Relatório PDF - Dashboard de Gamificação
+- [x] Criar rota tRPC gamification.generateReport para gerar PDF
+- [x] Implementar geração de PDF com PDFKit no backend
+- [x] Incluir cabeçalho com logo e data do relatório
+- [x] Adicionar seção de estatísticas gerais (cards)
+- [x] Incluir tabela de distribuição de faixas
+- [x] Adicionar tabela de ranking (top 20)
+- [x] Incluir lista de badges mais conquistados
+- [x] Incluir seção de evolução temporal (4 semanas)
+- [x] Adicionar botão "Exportar PDF" no dashboard do professor
+- [x] Implementar download automático do PDF no frontend
+- [x] Adicionar toast de sucesso/erro na exportação
