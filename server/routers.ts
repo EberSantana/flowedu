@@ -10,6 +10,8 @@ import { and, eq, sql } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
 import { sdk } from "./_core/sdk";
+import { TRPCError } from "@trpc/server";
+import { invokeLLM } from "./_core/llm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -3725,6 +3727,288 @@ JSON (descrições MAX 15 chars):
       }),
   }),
 
+  // ==================== PENSAMENTO COMPUTACIONAL ====================
+  computationalThinking: router({
+    // Buscar perfil de PC do aluno (4 dimensões)
+    getProfile: studentProcedure
+      .query(async ({ ctx }) => {
+        const profile = await db.getStudentCTProfile(ctx.studentSession.studentId);
+        return profile;
+      }),
+
+    // Buscar média da turma (para professor)
+    getClassAverage: protectedProcedure
+      .query(async ({ ctx }) => {
+        const average = await db.getClassCTAverage(ctx.user.id);
+        return average;
+      }),
+
+    // Buscar exercícios disponíveis
+    getExercises: studentProcedure
+      .input(z.object({
+        dimension: z.enum(['decomposition', 'pattern_recognition', 'abstraction', 'algorithms']).optional(),
+        difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const exercises = await db.getCTExercises(input);
+        return exercises;
+      }),
+
+    // Submeter resposta de exercício
+    submitExercise: studentProcedure
+      .input(z.object({
+        exerciseId: z.number(),
+        answer: z.string(),
+        timeSpent: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Buscar exercício
+        const exercises = await db.getCTExercises();
+        const exercise = exercises.find(e => e.id === input.exerciseId);
+        
+        if (!exercise) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado' });
+        }
+
+        // Analisar resposta com IA
+        const analysis = await analyzeCTAnswer({
+          dimension: exercise.dimension,
+          question: exercise.description,
+          answer: input.answer,
+          expectedAnswer: exercise.expectedAnswer || '',
+        });
+
+        // Submeter exercício
+        await db.submitCTExercise({
+          studentId: ctx.studentSession.studentId,
+          exerciseId: input.exerciseId,
+          answer: input.answer,
+          score: analysis.score,
+          feedback: analysis.feedback,
+          timeSpent: input.timeSpent,
+        });
+
+        // Verificar e conceder badges automaticamente
+        await db.checkAndAwardCTBadges(ctx.studentSession.studentId);
+
+        return {
+          score: analysis.score,
+          feedback: analysis.feedback,
+          pointsEarned: exercise.points,
+        };
+      }),
+
+    // Buscar histórico de submissões
+    getSubmissions: studentProcedure
+      .input(z.object({
+        limit: z.number().optional().default(20),
+      }))
+      .query(async ({ input, ctx }) => {
+        const submissions = await db.getStudentCTSubmissions(ctx.studentSession.studentId, input.limit);
+        return submissions;
+      }),
+
+    // Buscar badges de PC do aluno
+    getBadges: studentProcedure
+      .query(async ({ ctx }) => {
+        const badges = await db.getStudentCTBadges(ctx.studentSession.studentId);
+        return badges;
+      }),
+
+    // Buscar todos os badges disponíveis
+    getAllBadges: publicProcedure
+      .query(async () => {
+        const badges = await db.getAllCTBadges();
+        return badges;
+      }),
+
+    // [PROFESSOR] Criar exercício de PC
+    createExercise: protectedProcedure
+      .input(z.object({
+        title: z.string(),
+        description: z.string(),
+        dimension: z.enum(['decomposition', 'pattern_recognition', 'abstraction', 'algorithms']),
+        difficulty: z.enum(['easy', 'medium', 'hard']),
+        content: z.string(),
+        expectedAnswer: z.string().optional(),
+        points: z.number().default(10),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.createCTExercise({
+          ...input,
+          createdBy: ctx.user.id,
+        });
+        return { success: true, exerciseId: result };
+      }),
+
+    // [PROFESSOR] Buscar estatísticas da turma
+    getClassStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Buscar todos os alunos do professor
+        const teacherStudents = await db.getStudentsByUser(ctx.user.id);
+        
+        // Buscar perfil de cada aluno
+        const profiles = await Promise.all(
+          teacherStudents.map(async (student: any) => {
+            const profile = await db.getStudentCTProfile(student.id);
+            return {
+              studentId: student.id,
+              studentName: student.name,
+              profile,
+            };
+          })
+        );
+
+        // Calcular média da turma
+        const average = await db.getClassCTAverage(ctx.user.id);
+
+        return {
+          students: profiles,
+          classAverage: average,
+          totalStudents: teacherStudents.length,
+        };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;
+
+// ==================== FUNÇÕES AUXILIARES ====================
+
+/**
+ * Analisar resposta de exercício de PC usando IA
+ */
+async function analyzeCTAnswer(params: {
+  dimension: string;
+  question: string;
+  answer: string;
+  expectedAnswer: string;
+}) {
+  const { dimension, question, answer, expectedAnswer } = params;
+
+  // Mapear dimensões para português
+  const dimensionNames: Record<string, string> = {
+    decomposition: 'Decomposição',
+    pattern_recognition: 'Reconhecimento de Padrões',
+    abstraction: 'Abstração',
+    algorithms: 'Algoritmos',
+  };
+
+  const dimensionName = dimensionNames[dimension] || dimension;
+
+  // Prompt específico para cada dimensão
+  const prompts: Record<string, string> = {
+    decomposition: `Você está avaliando a habilidade de DECOMPOSIÇÃO (dividir problemas complexos em partes menores).
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. O aluno conseguiu identificar as partes principais do problema?
+2. A divisão proposta é lógica e facilita a resolução?
+3. As partes são independentes e bem definidas?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    pattern_recognition: `Você está avaliando a habilidade de RECONHECIMENTO DE PADRÕES.
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. O aluno identificou padrões ou repetições?
+2. Os padrões identificados são relevantes?
+3. A explicação é clara?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    abstraction: `Você está avaliando a habilidade de ABSTRAÇÃO (focar no essencial, ignorar detalhes irrelevantes).
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. O aluno focou nos aspectos essenciais?
+2. Detalhes irrelevantes foram ignorados?
+3. A abstração facilita o entendimento?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    algorithms: `Você está avaliando a habilidade de criar ALGORITMOS (sequência lógica de passos).
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. Os passos estão em ordem lógica?
+2. A sequência é completa e resolve o problema?
+3. Os passos são claros e executáveis?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+  };
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: 'system', content: 'Você é um avaliador de Pensamento Computacional. Seja justo e construtivo.' },
+        { role: 'user', content: prompts[dimension] || prompts.decomposition },
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'ct_evaluation',
+          strict: true,
+          schema: {
+            type: 'object',
+            properties: {
+              score: { type: 'integer', description: 'Pontuação de 0 a 100' },
+              feedback: { type: 'string', description: 'Feedback construtivo' },
+            },
+            required: ['score', 'feedback'],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content || typeof content !== 'string') {
+      throw new Error('Resposta vazia da IA');
+    }
+
+    const result = JSON.parse(content);
+    return {
+      score: Math.min(100, Math.max(0, result.score)),
+      feedback: result.feedback,
+    };
+  } catch (error) {
+    console.error('[CT Analysis] Error analyzing answer:', error);
+    // Fallback: pontuação baseada em comprimento da resposta
+    const score = Math.min(100, Math.max(20, answer.length * 2));
+    return {
+      score,
+      feedback: 'Resposta recebida. Continue praticando!',
+    };
+  }
+}

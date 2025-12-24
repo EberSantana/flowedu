@@ -2597,3 +2597,58 @@
 - [x] Adicionar botão "Exportar PDF" no dashboard do professor
 - [x] Implementar download automático do PDF no frontend
 - [x] Adicionar toast de sucesso/erro na exportação
+
+
+## Sistema de Avaliação de Pensamento Computacional
+
+### Banco de Dados
+- [x] Criar tabela computational_thinking_scores (studentId, dimension, score, lastUpdated)
+- [x] Criar tabela ct_exercises (id, title, description, dimension, difficulty, content)
+- [x] Criar tabela ct_submissions (studentId, exerciseId, answer, score, feedback, submittedAt)
+- [x] Criar tabela ct_badges (id, name, description, dimension, requirement)
+- [x] Atualizar schema Drizzle com novas tabelas
+
+### Backend
+- [x] Criar funções no db.ts para CRUD de exercícios de PC
+- [x] Criar função calculateCTScore para análise automática
+- [x] Criar função updateStudentCTDimension para atualizar pontuação
+- [x] Criar função getStudentCTProfile para buscar perfil completo
+- [x] Criar função getClassCTAverage para média da turma
+- [x] Adicionar rotas tRPC: ct.getExercises, ct.submitExercise, ct.getProfile, ct.getClassStats
+
+### Exercícios de Pensamento Computacional
+- [x] Criar 5 exercícios de Decomposição (dividir problemas)
+- [x] Criar 5 exercícios de Reconhecimento de Padrões
+- [x] Criar 5 exercícios de Abstração (focar no essencial)
+- [x] Criar 5 exercícios de Algoritmos (sequência lógica)
+- [x] Implementar análise automática com IA para cada tipo
+
+### Dashboard de Pensamento Computacional
+- [x] Criar página ComputationalThinkingDashboard.tsx
+- [x] Implementar radar chart com Chart.js mostrando 4 dimensões
+- [x] Adicionar cards de estatísticas por dimensão
+- [ ] Criar gráfico de evolução temporal (últimas 8 semanas)
+- [ ] Adicionar comparação com média da turma
+- [ ] Mostrar exercícios recomendados baseado em pontos fracos
+
+### Badges Especiais
+- [x] Badge "Mestre da Lógica" (80+ em Algoritmos)
+- [x] Badge "Caçador de Padrões" (80+ em Reconhecimento de Padrões)
+- [x] Badge "Simplificador" (80+ em Abstração)
+- [x] Badge "Quebra-Cabeças" (80+ em Decomposição)
+- [x] Badge "Pensador Completo" (70+ em todas as dimensões)
+- [x] Integrar badges com sistema de gamificação existente
+
+### Interface do Aluno
+- [x] Adicionar rota /student-computational-thinking no menu
+- [x] Criar página de exercícios de PC para alunos
+- [x] Implementar sistema de submissão com feedback imediato
+- [x] Mostrar radar chart do perfil do aluno
+- [ ] Adicionar recomendações personalizadas
+
+### Interface do Professor
+- [ ] Adicionar botão no Dashboard para PC
+- [ ] Criar página de visão geral da turma
+- [ ] Mostrar radar chart médio da turma
+- [ ] Listar alunos com pontuação baixa em cada dimensão
+- [ ] Permitir atribuir exercícios específicos

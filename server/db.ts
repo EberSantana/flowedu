@@ -47,7 +47,12 @@ import {
   pointsHistory,
   badges,
   studentBadges,
-  gamificationNotifications
+  gamificationNotifications,
+  computationalThinkingScores,
+  ctExercises,
+  ctSubmissions,
+  ctBadges,
+  studentCTBadges
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -2799,5 +2804,432 @@ export async function getPointsEvolutionData() {
   } catch (error) {
     console.error("[Database] Error getting points evolution data:", error);
     return [];
+  }
+}
+
+
+// ==================== PENSAMENTO COMPUTACIONAL ====================
+
+/**
+ * Criar ou atualizar pontuação de uma dimensão do PC
+ */
+export async function updateCTScore(studentId: number, dimension: string, scoreToAdd: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    const existing = await db
+      .select()
+      .from(computationalThinkingScores)
+      .where(
+        and(
+          eq(computationalThinkingScores.studentId, studentId),
+          eq(computationalThinkingScores.dimension, dimension as any)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Atualizar pontuação existente (média ponderada)
+      const currentScore = existing[0].score;
+      const exercisesCompleted = existing[0].exercisesCompleted + 1;
+      const newScore = Math.round((currentScore * existing[0].exercisesCompleted + scoreToAdd) / exercisesCompleted);
+      
+      await db
+        .update(computationalThinkingScores)
+        .set({
+          score: Math.min(100, newScore), // Máximo 100
+          exercisesCompleted,
+          lastUpdated: new Date(),
+        })
+        .where(eq(computationalThinkingScores.id, existing[0].id));
+      
+      return { score: Math.min(100, newScore), exercisesCompleted };
+    } else {
+      // Criar novo registro
+      await db.insert(computationalThinkingScores).values({
+        studentId,
+        dimension: dimension as any,
+        score: Math.min(100, scoreToAdd),
+        exercisesCompleted: 1,
+      });
+      
+      return { score: Math.min(100, scoreToAdd), exercisesCompleted: 1 };
+    }
+  } catch (error) {
+    console.error("[Database] Error updating CT score:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar perfil completo de PC do aluno (4 dimensões)
+ */
+export async function getStudentCTProfile(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  try {
+    const scores = await db
+      .select()
+      .from(computationalThinkingScores)
+      .where(eq(computationalThinkingScores.studentId, studentId));
+
+    // Garantir que todas as 4 dimensões existam (mesmo com score 0)
+    const dimensions = ['decomposition', 'pattern_recognition', 'abstraction', 'algorithms'];
+    const profile: any = {};
+    
+    dimensions.forEach(dim => {
+      const found = scores.find(s => s.dimension === dim);
+      profile[dim] = found ? {
+        score: found.score,
+        exercisesCompleted: found.exercisesCompleted,
+        lastUpdated: found.lastUpdated,
+      } : {
+        score: 0,
+        exercisesCompleted: 0,
+        lastUpdated: null,
+      };
+    });
+
+    return profile;
+  } catch (error) {
+    console.error("[Database] Error getting student CT profile:", error);
+    return null;
+  }
+}
+
+/**
+ * Buscar média da turma em cada dimensão
+ */
+export async function getClassCTAverage(userId: number) {
+  const db = await getDb();
+  if (!db) return { decomposition: 0, pattern_recognition: 0, abstraction: 0, algorithms: 0 };
+  
+  try {
+    // Buscar todos os alunos do professor
+    const teacherStudents = await db
+      .select({ id: students.id })
+      .from(students)
+      .where(eq(students.userId, userId));
+
+    if (teacherStudents.length === 0) {
+      return {
+        decomposition: 0,
+        pattern_recognition: 0,
+        abstraction: 0,
+        algorithms: 0,
+      };
+    }
+
+    const studentIds = teacherStudents.map(s => s.id);
+
+    // Buscar todas as pontuações
+    const allScores = await db
+      .select()
+      .from(computationalThinkingScores)
+      .where(inArray(computationalThinkingScores.studentId, studentIds));
+
+    // Calcular média por dimensão
+    const dimensions = ['decomposition', 'pattern_recognition', 'abstraction', 'algorithms'];
+    const averages: any = {};
+
+    dimensions.forEach(dim => {
+      const dimScores = allScores.filter(s => s.dimension === dim);
+      const sum = dimScores.reduce((acc, s) => acc + s.score, 0);
+      averages[dim] = dimScores.length > 0 ? Math.round(sum / dimScores.length) : 0;
+    });
+
+    return averages;
+  } catch (error) {
+    console.error("[Database] Error getting class CT average:", error);
+    return {
+      decomposition: 0,
+      pattern_recognition: 0,
+      abstraction: 0,
+      algorithms: 0,
+    };
+  }
+}
+
+/**
+ * Criar exercício de PC
+ */
+export async function createCTExercise(data: {
+  title: string;
+  description: string;
+  dimension: string;
+  difficulty: string;
+  content: string;
+  expectedAnswer?: string;
+  points: number;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    const result = await db.insert(ctExercises).values({
+      ...data,
+      dimension: data.dimension as any,
+      difficulty: data.difficulty as any,
+    });
+    return result;
+  } catch (error) {
+    console.error("[Database] Error creating CT exercise:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar exercícios de PC (com filtros opcionais)
+ */
+export async function getCTExercises(filters?: {
+  dimension?: string;
+  difficulty?: string;
+  createdBy?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    let query = db.select().from(ctExercises).where(eq(ctExercises.isActive, true));
+
+    // Aplicar filtros se fornecidos
+    // (Simplificado - em produção usar query builder dinâmico)
+    
+    const exercises = await query;
+    return exercises;
+  } catch (error) {
+    console.error("[Database] Error getting CT exercises:", error);
+    return [];
+  }
+}
+
+/**
+ * Submeter resposta de exercício de PC
+ */
+export async function submitCTExercise(data: {
+  studentId: number;
+  exerciseId: number;
+  answer: string;
+  score: number;
+  feedback?: string;
+  timeSpent?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    // Inserir submissão
+    await db.insert(ctSubmissions).values(data);
+
+    // Buscar exercício para pegar a dimensão
+    const exercise = await db
+      .select()
+      .from(ctExercises)
+      .where(eq(ctExercises.id, data.exerciseId))
+      .limit(1);
+
+    if (exercise.length > 0) {
+      // Atualizar pontuação da dimensão
+      await updateCTScore(data.studentId, exercise[0].dimension, data.score);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Error submitting CT exercise:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar histórico de submissões do aluno
+ */
+export async function getStudentCTSubmissions(studentId: number, limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    const submissions = await db
+      .select({
+        id: ctSubmissions.id,
+        exerciseId: ctSubmissions.exerciseId,
+        exerciseTitle: ctExercises.title,
+        dimension: ctExercises.dimension,
+        answer: ctSubmissions.answer,
+        score: ctSubmissions.score,
+        feedback: ctSubmissions.feedback,
+        timeSpent: ctSubmissions.timeSpent,
+        submittedAt: ctSubmissions.submittedAt,
+      })
+      .from(ctSubmissions)
+      .leftJoin(ctExercises, eq(ctSubmissions.exerciseId, ctExercises.id))
+      .where(eq(ctSubmissions.studentId, studentId))
+      .orderBy(desc(ctSubmissions.submittedAt))
+      .limit(limit);
+
+    return submissions;
+  } catch (error) {
+    console.error("[Database] Error getting student CT submissions:", error);
+    return [];
+  }
+}
+
+/**
+ * Conceder badge de PC ao aluno
+ */
+export async function awardCTBadge(studentId: number, badgeId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    // Verificar se já possui o badge
+    const existing = await db
+      .select()
+      .from(studentCTBadges)
+      .where(
+        and(
+          eq(studentCTBadges.studentId, studentId),
+          eq(studentCTBadges.badgeId, badgeId)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      return { alreadyHas: true };
+    }
+
+    // Conceder badge
+    await db.insert(studentCTBadges).values({
+      studentId,
+      badgeId,
+    });
+
+    // Buscar informações do badge
+    const badge = await db
+      .select()
+      .from(ctBadges)
+      .where(eq(ctBadges.id, badgeId))
+      .limit(1);
+
+    // Se o badge dá pontos de gamificação, adicionar
+    if (badge.length > 0 && badge[0].points > 0) {
+      await addPointsToStudent(studentId, badge[0].points, 'ct_badge', `Badge de PC: ${badge[0].name}`);
+    }
+
+    return { success: true, badge: badge[0] };
+  } catch (error) {
+    console.error("[Database] Error awarding CT badge:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar badges de PC do aluno
+ */
+export async function getStudentCTBadges(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    const badges = await db
+      .select({
+        id: studentCTBadges.id,
+        badgeId: ctBadges.id,
+        name: ctBadges.name,
+        description: ctBadges.description,
+        dimension: ctBadges.dimension,
+        icon: ctBadges.icon,
+        color: ctBadges.color,
+        earnedAt: studentCTBadges.earnedAt,
+      })
+      .from(studentCTBadges)
+      .leftJoin(ctBadges, eq(studentCTBadges.badgeId, ctBadges.id))
+      .where(eq(studentCTBadges.studentId, studentId))
+      .orderBy(desc(studentCTBadges.earnedAt));
+
+    return badges;
+  } catch (error) {
+    console.error("[Database] Error getting student CT badges:", error);
+    return [];
+  }
+}
+
+/**
+ * Buscar todos os badges de PC disponíveis
+ */
+export async function getAllCTBadges() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  try {
+    const badges = await db.select().from(ctBadges).orderBy(ctBadges.dimension);
+    return badges;
+  } catch (error) {
+    console.error("[Database] Error getting all CT badges:", error);
+    return [];
+  }
+}
+
+/**
+ * Verificar e conceder badges automaticamente baseado nas pontuações
+ */
+export async function checkAndAwardCTBadges(studentId: number) {
+  try {
+    const profile = await getStudentCTProfile(studentId);
+    const allBadges = await getAllCTBadges();
+    const studentBadges = await getStudentCTBadges(studentId);
+    const studentBadgeIds = studentBadges.map(b => b.badgeId);
+
+    const badgesToAward = [];
+
+    for (const badge of allBadges) {
+      // Pular se já possui
+      if (studentBadgeIds.includes(badge.id)) continue;
+
+      const requirement = JSON.parse(badge.requirement);
+
+      // Badge "Mestre da Lógica" - 80+ em Algoritmos
+      if (badge.name === 'Mestre da Lógica' && profile.algorithms.score >= 80) {
+        badgesToAward.push(badge.id);
+      }
+
+      // Badge "Caçador de Padrões" - 80+ em Reconhecimento de Padrões
+      if (badge.name === 'Caçador de Padrões' && profile.pattern_recognition.score >= 80) {
+        badgesToAward.push(badge.id);
+      }
+
+      // Badge "Simplificador" - 80+ em Abstração
+      if (badge.name === 'Simplificador' && profile.abstraction.score >= 80) {
+        badgesToAward.push(badge.id);
+      }
+
+      // Badge "Quebra-Cabeças" - 80+ em Decomposição
+      if (badge.name === 'Quebra-Cabeças' && profile.decomposition.score >= 80) {
+        badgesToAward.push(badge.id);
+      }
+
+      // Badge "Pensador Completo" - 70+ em todas as dimensões
+      if (
+        badge.name === 'Pensador Completo' &&
+        profile.decomposition.score >= 70 &&
+        profile.pattern_recognition.score >= 70 &&
+        profile.abstraction.score >= 70 &&
+        profile.algorithms.score >= 70
+      ) {
+        badgesToAward.push(badge.id);
+      }
+    }
+
+    // Conceder badges
+    for (const badgeId of badgesToAward) {
+      await awardCTBadge(studentId, badgeId);
+    }
+
+    return { badgesAwarded: badgesToAward.length };
+  } catch (error) {
+    console.error("[Database] Error checking and awarding CT badges:", error);
+    return { badgesAwarded: 0 };
   }
 }

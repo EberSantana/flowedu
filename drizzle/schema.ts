@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -639,3 +639,104 @@ export const gamificationNotifications = mysqlTable("gamification_notifications"
 
 export type GamificationNotification = typeof gamificationNotifications.$inferSelect;
 export type InsertGamificationNotification = typeof gamificationNotifications.$inferInsert;
+
+
+/**
+ * ==================== PENSAMENTO COMPUTACIONAL ====================
+ * Sistema de avaliação de Pensamento Computacional
+ * 4 dimensões: Decomposição, Reconhecimento de Padrões, Abstração, Algoritmos
+ */
+
+/**
+ * Pontuações de Pensamento Computacional por Dimensão
+ * Armazena a pontuação atual do aluno em cada uma das 4 dimensões
+ */
+export const computationalThinkingScores = mysqlTable("computational_thinking_scores", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  dimension: mysqlEnum("dimension", ["decomposition", "pattern_recognition", "abstraction", "algorithms"]).notNull(),
+  score: int("score").default(0).notNull(), // Pontuação de 0-100
+  exercisesCompleted: int("exercisesCompleted").default(0).notNull(), // Quantidade de exercícios completados
+  lastUpdated: timestamp("lastUpdated").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueStudentDimension: unique().on(table.studentId, table.dimension), // Um registro por aluno por dimensão
+}));
+
+export type ComputationalThinkingScore = typeof computationalThinkingScores.$inferSelect;
+export type InsertComputationalThinkingScore = typeof computationalThinkingScores.$inferInsert;
+
+/**
+ * Exercícios de Pensamento Computacional
+ * Banco de exercícios específicos para cada dimensão
+ */
+export const ctExercises = mysqlTable("ct_exercises", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  dimension: mysqlEnum("dimension", ["decomposition", "pattern_recognition", "abstraction", "algorithms"]).notNull(),
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
+  content: text("content").notNull(), // JSON com estrutura do exercício
+  expectedAnswer: text("expectedAnswer"), // Resposta esperada ou critérios de avaliação
+  points: int("points").default(10).notNull(), // Pontos ao completar
+  createdBy: int("createdBy").notNull(), // FK para users (professor que criou)
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CTExercise = typeof ctExercises.$inferSelect;
+export type InsertCTExercise = typeof ctExercises.$inferInsert;
+
+/**
+ * Submissões de Exercícios de Pensamento Computacional
+ * Histórico de respostas dos alunos
+ */
+export const ctSubmissions = mysqlTable("ct_submissions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  exerciseId: int("exerciseId").notNull(), // FK para ct_exercises
+  answer: text("answer").notNull(), // Resposta do aluno
+  score: int("score").notNull(), // Pontuação obtida (0-100)
+  feedback: text("feedback"), // Feedback automático da IA
+  timeSpent: int("timeSpent"), // Tempo gasto em segundos
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+});
+
+export type CTSubmission = typeof ctSubmissions.$inferSelect;
+export type InsertCTSubmission = typeof ctSubmissions.$inferInsert;
+
+/**
+ * Badges de Pensamento Computacional
+ * Conquistas especiais relacionadas às dimensões do PC
+ */
+export const ctBadges = mysqlTable("ct_badges", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description").notNull(),
+  dimension: mysqlEnum("dimension", ["decomposition", "pattern_recognition", "abstraction", "algorithms", "all"]).notNull(),
+  requirement: text("requirement").notNull(), // JSON com critérios para conquistar
+  icon: varchar("icon", { length: 50 }).notNull(), // Nome do ícone
+  color: varchar("color", { length: 50 }).notNull(), // Cor do badge
+  points: int("points").default(0).notNull(), // Pontos de gamificação ao conquistar
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CTBadge = typeof ctBadges.$inferSelect;
+export type InsertCTBadge = typeof ctBadges.$inferInsert;
+
+/**
+ * Badges de PC Conquistados pelos Alunos
+ * Relacionamento entre alunos e badges de PC
+ */
+export const studentCTBadges = mysqlTable("student_ct_badges", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  badgeId: int("badgeId").notNull(), // FK para ct_badges
+  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueStudentBadge: unique().on(table.studentId, table.badgeId), // Um badge por aluno apenas uma vez
+}));
+
+export type StudentCTBadge = typeof studentCTBadges.$inferSelect;
+export type InsertStudentCTBadge = typeof studentCTBadges.$inferInsert;
