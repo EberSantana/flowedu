@@ -2578,3 +2578,9 @@
 - [x] Adicionar botão de Gamificação no Dashboard principal
 - [x] Criar função getStudentExerciseCount para contar exercícios completados
 - [x] Adicionar lógica de badges em todas as rotas de submissão (objetivo, subjetivo, caso)
+
+## Gráfico de Evolução Temporal - Dashboard do Professor
+- [x] Criar função getPointsEvolutionData no db.ts para obter dados das últimas 4 semanas
+- [x] Adicionar rota tRPC gamification.getPointsEvolution
+- [x] Integrar gráfico Chart.js no GamificationDashboard.tsx
+- [x] Testar visualização com dados reais

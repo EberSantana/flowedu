@@ -7,6 +7,30 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+// Registrar componentes do Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const BELT_CONFIG = [
   { name: 'white', label: 'Branca', minPoints: 0, color: 'bg-gray-400', gradient: 'from-gray-300 to-gray-500' },
@@ -25,6 +49,7 @@ export default function GamificationDashboard() {
   const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery() || { data: null, isLoading: false };
   const { data: ranking, isLoading: rankingLoading } = trpc.gamification.getClassRanking.useQuery({ limit: 20 });
   const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery() || { data: [], isLoading: false };
+  const { data: evolutionData, isLoading: evolutionLoading } = (trpc.gamification as any).getPointsEvolution?.useQuery() || { data: [], isLoading: false };
 
   if (overviewLoading) {
     return (
@@ -151,6 +176,103 @@ export default function GamificationDashboard() {
                 );
               })}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Gráfico de Evolução Temporal */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              Evolução de Pontos da Turma
+            </CardTitle>
+            <CardDescription>Últimas 4 semanas - Total de pontos ganhos pela turma</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {evolutionLoading ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-500">Carregando dados...</p>
+                </div>
+              </div>
+            ) : evolutionData && evolutionData.length > 0 ? (
+              <div className="h-[300px]">
+                <Line
+                  data={{
+                    labels: evolutionData.map((d: any) => d.week),
+                    datasets: [
+                      {
+                        label: 'Pontos Totais',
+                        data: evolutionData.map((d: any) => d.totalPoints),
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: 'rgb(59, 130, 246)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                          size: 14,
+                          weight: 'bold',
+                        },
+                        bodyFont: {
+                          size: 13,
+                        },
+                        callbacks: {
+                          label: function(context) {
+                            return `Pontos: ${context.parsed.y}`;
+                          }
+                        }
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        ticks: {
+                          font: {
+                            size: 12,
+                          },
+                        },
+                        grid: {
+                          color: 'rgba(0, 0, 0, 0.05)',
+                        },
+                      },
+                      x: {
+                        ticks: {
+                          font: {
+                            size: 12,
+                            weight: 'bold',
+                          },
+                        },
+                        grid: {
+                          display: false,
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center">
+                <p className="text-gray-500">Nenhum dado disponível ainda</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

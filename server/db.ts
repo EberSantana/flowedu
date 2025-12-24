@@ -2750,3 +2750,54 @@ export async function getStudentExerciseCount(studentId: number) {
     return 0;
   }
 }
+
+// Obter evolução temporal de pontos (últimas 4 semanas)
+export async function getPointsEvolutionData() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // Calcular data de 4 semanas atrás
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+
+    // Buscar histórico de pontos das últimas 4 semanas
+    const history = await db.select({
+      createdAt: pointsHistory.createdAt,
+      points: pointsHistory.points,
+    })
+    .from(pointsHistory)
+    .where(sql`${pointsHistory.createdAt} >= ${fourWeeksAgo}`)
+    .orderBy(pointsHistory.createdAt);
+
+    // Agrupar por semana
+    const weeklyData: { [key: string]: number } = {};
+    
+    history.forEach((entry) => {
+      if (!entry.createdAt) return;
+      
+      const date = new Date(entry.createdAt);
+      // Calcular número da semana (0-3, sendo 0 a mais antiga)
+      const daysDiff = Math.floor((date.getTime() - fourWeeksAgo.getTime()) / (1000 * 60 * 60 * 24));
+      const weekNumber = Math.floor(daysDiff / 7);
+      
+      const weekKey = `Semana ${weekNumber + 1}`;
+      weeklyData[weekKey] = (weeklyData[weekKey] || 0) + entry.points;
+    });
+
+    // Garantir que todas as 4 semanas existam
+    const result = [];
+    for (let i = 0; i < 4; i++) {
+      const weekKey = `Semana ${i + 1}`;
+      result.push({
+        week: weekKey,
+        totalPoints: weeklyData[weekKey] || 0,
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error("[Database] Error getting points evolution data:", error);
+    return [];
+  }
+}

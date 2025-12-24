@@ -3646,6 +3646,12 @@ JSON (descrições MAX 15 chars):
       .query(async ({ ctx }) => {
         return await db.getBadgeStatistics();
       }),
+    
+    // Evolução temporal de pontos (4 semanas)
+    getPointsEvolution: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getPointsEvolutionData();
+      }),
   }),
 
 });
