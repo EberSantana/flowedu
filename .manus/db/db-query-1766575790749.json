@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO badges (code, name, description, icon, category, requirement) VALUES \n('first_exercise', 'Primeira Questão', 'Complete seu primeiro exercício', '🎯', 'completion', 1),\n('exercise_10', 'Mestre', 'Complete 10 exercícios', '📚', 'completion', 10),\n('first_exam', 'Primeira Prova', 'Complete sua primeira prova', '📝', 'completion', 1),\n('perfect_score', 'Nota Perfeita', 'Tire 10 em uma prova', '💯', 'accuracy', 100),\n('streak_7', 'Semana de Fogo', 'Mantenha 7 dias consecutivos', '🔥', 'streak', 7),\n('streak_30', 'Mês Incandescente', 'Mantenha 30 dias consecutivos', '🌟', 'streak', 30),\n('speedster_15', 'Velocista', 'Complete prova em 15min', '⚡', 'speed', 15),\n('speedster_30', 'Rápido', 'Complete prova em 30min', '🏃', 'speed', 30)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO badges (code, name, description, icon, category, requirement) VALUES \n('first_exercise', 'Primeira Questão', 'Complete seu primeiro exercício', '🎯', 'completion', 1),\n('exercise_10', 'Mestre', 'Complete 10 exercícios', '📚', 'completion', 10),\n('first_exam', 'Primeira Prova', 'Complete sua primeira prova', '📝', 'completion', 1),\n('perfect_score', 'Nota Perfeita', 'Tire 10 em uma prova', '💯', 'accuracy', 100),\n('streak_7', 'Semana de Fogo', 'Mantenha 7 dias consecutivos', '🔥', 'streak', 7),\n('streak_30', 'Mês Incandescente', 'Mantenha 30 dias consecutivos', '🌟', 'streak', 30),\n('speedster_15', 'Velocista', 'Complete prova em 15min', '⚡', 'speed', 15),\n('speedster_30', 'Rápido', 'Complete prova em 30min', '🏃', 'speed', 30)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 64
+}

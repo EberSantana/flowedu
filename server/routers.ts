@@ -3422,62 +3422,7 @@ JSON (descrições MAX 15 chars):
       }),
   }),
 
-  // ==================== GAMIFICAÇÃO ====================
-  gamification: router({
-    // Obter pontuação do aluno
-    getMyPoints: studentProcedure
-      .query(async ({ ctx }) => {
-        return await db.getOrCreateStudentPoints(ctx.studentSession.studentId);
-      }),
-    
-    // Obter histórico de pontos
-    getPointsHistory: studentProcedure
-      .input(z.object({ limit: z.number().optional() }))
-      .query(async ({ ctx, input }) => {
-        return await db.getStudentPointsHistory(ctx.studentSession.studentId, input.limit);
-      }),
-    
-    // Obter badges conquistados
-    getMyBadges: studentProcedure
-      .query(async ({ ctx }) => {
-        return await db.getStudentBadges(ctx.studentSession.studentId);
-      }),
-    
-    // Obter todos os badges disponíveis
-    getAllBadges: studentProcedure
-      .query(async () => {
-        return await db.getAllBadges();
-      }),
-    
-    // Obter notificações de gamificação
-    getNotifications: studentProcedure
-      .input(z.object({ onlyUnread: z.boolean().optional() }))
-      .query(async ({ ctx, input }) => {
-        return await db.getGamificationNotifications(ctx.studentSession.studentId, input.onlyUnread);
-      }),
-    
-    // Marcar notificação como lida
-    markNotificationAsRead: studentProcedure
-      .input(z.object({ notificationId: z.number() }))
-      .mutation(async ({ input }) => {
-        return await db.markGamificationNotificationAsRead(input.notificationId);
-      }),
-    
-    // Obter ranking da turma
-    getClassRanking: studentProcedure
-      .input(z.object({ limit: z.number().optional() }))
-      .query(async ({ input }) => {
-        return await db.getClassRanking(input.limit);
-      }),
-    
-    // Obter configuração de faixas
-    getBeltConfig: studentProcedure
-      .query(() => {
-        return db.BELT_CONFIG;
-      }),
-  }),
-
-  // ==================== SUBMISSÃO DE EXERCÍCIOS/PROVAS COM GAMIFICAÇÃO ====================
+  // ==================== EXERCISE SUBMISSION (SUBMISSÃO DE EXERCÍCIOS) ====================
   exerciseSubmission: router({
     // Submeter exercício objetivo (múltipla escolha)
     submitObjective: studentProcedure
@@ -3485,13 +3430,12 @@ JSON (descrições MAX 15 chars):
         exerciseId: z.number(),
         selectedAnswer: z.string(),
         correctAnswer: z.string(),
-        moduleId: z.number().optional(),
+        moduleId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
         const isCorrect = input.selectedAnswer === input.correctAnswer;
         const points = isCorrect ? 10 : 0;
-
-        // Adicionar pontos se correto
+        
         if (isCorrect) {
           await db.addPointsToStudent(
             ctx.studentSession.studentId,
@@ -3500,25 +3444,21 @@ JSON (descrições MAX 15 chars):
             'exercise_objective',
             input.exerciseId
           );
-
-          // Atualizar streak
-          await db.updateStudentStreak(ctx.studentSession.studentId);
         }
-
+        
         return { isCorrect, points };
       }),
-
+    
     // Submeter exercício subjetivo
     submitSubjective: studentProcedure
       .input(z.object({
         exerciseId: z.number(),
         answer: z.string(),
-        moduleId: z.number().optional(),
+        moduleId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Exercícios subjetivos sempre ganham pontos por completar
         const points = 15;
-
+        
         await db.addPointsToStudent(
           ctx.studentSession.studentId,
           points,
@@ -3526,38 +3466,33 @@ JSON (descrições MAX 15 chars):
           'exercise_subjective',
           input.exerciseId
         );
-
-        // Atualizar streak
-        await db.updateStudentStreak(ctx.studentSession.studentId);
-
+        
         return { points };
       }),
-
+    
     // Submeter estudo de caso
     submitCaseStudy: studentProcedure
       .input(z.object({
         exerciseId: z.number(),
         answer: z.string(),
-        moduleId: z.number().optional(),
+        moduleId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
         const points = 20;
-
+        
         await db.addPointsToStudent(
           ctx.studentSession.studentId,
           points,
-          'Estudo de caso resolvido',
+          'Estudo de caso completado',
           'exercise_case_study',
           input.exerciseId
         );
-
-        // Atualizar streak
-        await db.updateStudentStreak(ctx.studentSession.studentId);
-
+        
         return { points };
       }),
   }),
 
+  // ==================== EXAM SUBMISSION (SUBMISSÃO DE PROVAS) ====================
   examSubmission: router({
     // Submeter prova completa
     submit: studentProcedure
@@ -3577,53 +3512,102 @@ JSON (descrições MAX 15 chars):
       .mutation(async ({ ctx, input }) => {
         // Calcular nota
         let correctCount = 0;
-        for (const answer of input.answers) {
+        input.answers.forEach((answer) => {
           const correct = input.correctAnswers.find(
-            (c) => c.questionNumber === answer.questionNumber
+            (ca) => ca.questionNumber === answer.questionNumber
           );
-          if (correct && correct.correctAnswer === answer.answer) {
+          if (correct && answer.answer === correct.correctAnswer) {
             correctCount++;
           }
-        }
-
+        });
+        
         const score = (correctCount / input.totalQuestions) * 10;
-
+        
         // Calcular pontos baseado na nota
         let points = 0;
-        if (score >= 6.0 && score < 7.1) points = 30;
-        else if (score >= 7.1 && score < 8.6) points = 50;
-        else if (score >= 8.6) points = 80;
-
-        // Bônus por velocidade (menos de 30 min)
-        if (input.timeSpent < 30 && points > 0) {
+        if (score >= 6.0 && score < 7.1) {
+          points = 30;
+        } else if (score >= 7.1 && score < 8.6) {
+          points = 50;
+        } else if (score >= 8.6) {
+          points = 80;
+        }
+        
+        // Bonus por velocidade
+        if (input.timeSpent < 15) {
+          points += 10;
+          await db.awardBadgeToStudent(ctx.studentSession.studentId, 'speedster_15');
+        } else if (input.timeSpent < 30) {
+          points += 5;
           await db.awardBadgeToStudent(ctx.studentSession.studentId, 'speedster_30');
         }
-
-        // Bônus por velocidade (menos de 15 min)
-        if (input.timeSpent < 15 && points > 0) {
-          await db.awardBadgeToStudent(ctx.studentSession.studentId, 'speedster_15');
-        }
-
-        // Adicionar pontos
+        
         if (points > 0) {
           await db.addPointsToStudent(
             ctx.studentSession.studentId,
             points,
             `Prova concluída - Nota: ${score.toFixed(1)}`,
-            'exam_completed',
+            'exam',
             input.examId
           );
-
-          // Atualizar streak
-          await db.updateStudentStreak(ctx.studentSession.studentId);
         }
+        
+        return { score, points, correctCount };
+      }),
+  }),
 
+  // ==================== GAMIFICATION QUERIES (CONSULTAS DE GAMIFICAÇÃO) ====================
+  gamification: router({
+    // Obter estatísticas do aluno
+    getStudentStats: studentProcedure
+      .query(async ({ ctx }) => {
+        const points = await db.getOrCreateStudentPoints(ctx.studentSession.studentId);
+        const ranking = await db.getClassRanking(100);
+        const studentRank = ranking.findIndex(r => r.studentId === ctx.studentSession.studentId) + 1;
+        
         return {
-          score,
-          correctCount,
-          totalQuestions: input.totalQuestions,
-          points,
+          totalPoints: points?.totalPoints || 0,
+          currentBelt: points?.currentBelt || 'white',
+          streakDays: points?.streakDays || 0,
+          rank: studentRank || null,
         };
+      }),
+    
+    // Obter histórico de pontos
+    getPointsHistory: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentPointsHistory(ctx.studentSession.studentId, input.limit || 20);
+      }),
+    
+    // Obter badges do aluno
+    getStudentBadges: studentProcedure
+      .query(async ({ ctx }) => {
+        const earned = await db.getStudentBadges(ctx.studentSession.studentId);
+        const all = await db.getAllBadges();
+        
+        return { earned, all, total: all.length };
+      }),
+    
+    // Obter ranking da turma
+    getClassRanking: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getClassRanking(input.limit || 10);
+      }),
+    
+    // Obter notificações de gamificação
+    getNotifications: studentProcedure
+      .input(z.object({ onlyUnread: z.boolean().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getGamificationNotifications(ctx.studentSession.studentId, input.onlyUnread || false);
+      }),
+    
+    // Marcar notificação como lida
+    markNotificationAsRead: studentProcedure
+      .input(z.object({ notificationId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.markGamificationNotificationAsRead(input.notificationId);
       }),
   }),
 

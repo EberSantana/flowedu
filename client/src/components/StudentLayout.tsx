@@ -2,7 +2,7 @@ import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { GraduationCap, LogOut, BookOpen, Bell, Home, User } from "lucide-react";
+import { GraduationCap, LogOut, BookOpen, Bell, Home, User, Trophy } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
 
@@ -45,6 +45,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const menuItems = [
     { icon: Home, label: "Início", path: "/student-dashboard" },
     { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects" },
+    { icon: Trophy, label: "Minha Jornada", path: "/student-gamification" },
     { icon: Bell, label: "Avisos", path: "/student-announcements" },
     { icon: User, label: "Meu Perfil", path: "/student-profile" },
   ];

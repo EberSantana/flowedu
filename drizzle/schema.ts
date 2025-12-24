@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, date, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -551,53 +551,37 @@ export const announcementReads = mysqlTable("announcementReads", {
 export type AnnouncementRead = typeof announcementReads.$inferSelect;
 export type InsertAnnouncementRead = typeof announcementReads.$inferInsert;
 
+// ==================== GAMIFICATION TABLES ====================
+
 /**
- * Sistema de Gamificação - Pontos dos Alunos
+ * Pontuação dos Alunos (Student Points)
+ * Armazena pontos totais, faixa atual e streak
  */
-export const studentPoints = mysqlTable("studentPoints", {
+export const studentPoints = mysqlTable("student_points", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(),
+  studentId: int("studentId").notNull().unique(), // FK para students
   totalPoints: int("totalPoints").default(0).notNull(),
-  currentBelt: mysqlEnum("currentBelt", [
-    "white",    // Branca (0-200)
-    "yellow",   // Amarela (200-400)
-    "orange",   // Laranja (400-600)
-    "green",    // Verde (600-900)
-    "blue",     // Azul (900-1200)
-    "purple",   // Roxa (1200-1600)
-    "brown",    // Marrom (1600-2000)
-    "black"     // Preta (2000+)
-  ]).default("white").notNull(),
-  streakDays: int("streakDays").default(0).notNull(), // Dias consecutivos
-  lastActivityDate: date("lastActivityDate"), // Última atividade para streak
+  currentBelt: varchar("currentBelt", { length: 50 }).default("white").notNull(), // white, yellow, orange, green, blue, purple, brown, black
+  streakDays: int("streakDays").default(0).notNull(),
+  lastActivityDate: timestamp("lastActivityDate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  uniqueStudent: sql`UNIQUE KEY unique_student_points (studentId)`,
-}));
+});
 
 export type StudentPoints = typeof studentPoints.$inferSelect;
 export type InsertStudentPoints = typeof studentPoints.$inferInsert;
 
 /**
- * Sistema de Gamificação - Histórico de Pontos
+ * Histórico de Pontos (Points History)
+ * Registra todas as atividades que geraram pontos
  */
-export const pointsHistory = mysqlTable("pointsHistory", {
+export const pointsHistory = mysqlTable("points_history", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(),
-  points: int("points").notNull(), // Pode ser positivo ou negativo
+  studentId: int("studentId").notNull(), // FK para students
+  points: int("points").notNull(),
   reason: varchar("reason", { length: 255 }).notNull(),
-  activityType: mysqlEnum("activityType", [
-    "exercise_objective",
-    "exercise_subjective",
-    "exercise_case_study",
-    "exam_completed",
-    "streak_bonus",
-    "module_completed",
-    "perfect_score",
-    "manual_adjustment"
-  ]).notNull(),
-  relatedId: int("relatedId"), // ID do exercício/prova relacionado
+  activityType: varchar("activityType", { length: 100 }).notNull(), // exercise_objective, exercise_subjective, exam, etc
+  relatedId: int("relatedId"), // ID da atividade relacionada (exercício, prova, etc)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -605,22 +589,17 @@ export type PointsHistory = typeof pointsHistory.$inferSelect;
 export type InsertPointsHistory = typeof pointsHistory.$inferInsert;
 
 /**
- * Sistema de Gamificação - Badges/Conquistas
+ * Badges Disponíveis (Badges)
+ * Catálogo de todas as conquistas disponíveis
  */
 export const badges = mysqlTable("badges", {
   id: int("id").autoincrement().primaryKey(),
-  code: varchar("code", { length: 50 }).notNull().unique(), // Ex: "fire_streak_7"
+  code: varchar("code", { length: 50 }).notNull().unique(),
   name: varchar("name", { length: 100 }).notNull(),
   description: text("description").notNull(),
-  icon: varchar("icon", { length: 50 }).notNull(), // Emoji ou nome do ícone
-  category: mysqlEnum("category", [
-    "streak",
-    "accuracy",
-    "speed",
-    "completion",
-    "special"
-  ]).notNull(),
-  requirement: int("requirement").notNull(), // Valor necessário (ex: 7 dias, 10 exercícios)
+  icon: varchar("icon", { length: 50 }).notNull(),
+  category: mysqlEnum("category", ["streak", "accuracy", "speed", "completion", "special"]).notNull(),
+  requirement: int("requirement").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -628,14 +607,16 @@ export type Badge = typeof badges.$inferSelect;
 export type InsertBadge = typeof badges.$inferInsert;
 
 /**
- * Sistema de Gamificação - Badges Conquistados pelos Alunos
+ * Badges Conquistados pelos Alunos (Student Badges)
+ * Relaciona alunos com badges que conquistaram
  */
-export const studentBadges = mysqlTable("studentBadges", {
+export const studentBadges = mysqlTable("student_badges", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(),
-  badgeId: int("badgeId").notNull(),
+  studentId: int("studentId").notNull(), // FK para students
+  badgeId: int("badgeId").notNull(), // FK para badges
   earnedAt: timestamp("earnedAt").defaultNow().notNull(),
 }, (table) => ({
+  // Índice único: aluno não pode ganhar o mesmo badge duas vezes
   uniqueBadge: sql`UNIQUE KEY unique_student_badge (studentId, badgeId)`,
 }));
 
@@ -643,21 +624,16 @@ export type StudentBadge = typeof studentBadges.$inferSelect;
 export type InsertStudentBadge = typeof studentBadges.$inferInsert;
 
 /**
- * Sistema de Gamificação - Notificações de Conquistas
+ * Notificações de Gamificação (Gamification Notifications)
+ * Notificações sobre conquistas, subida de faixa, etc
  */
-export const gamificationNotifications = mysqlTable("gamificationNotifications", {
+export const gamificationNotifications = mysqlTable("gamification_notifications", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(),
-  type: mysqlEnum("type", [
-    "belt_upgrade",
-    "badge_earned",
-    "streak_milestone",
-    "points_milestone"
-  ]).notNull(),
+  studentId: int("studentId").notNull(), // FK para students
+  type: varchar("type", { length: 50 }).notNull(), // badge_earned, belt_upgrade, streak_milestone
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
   isRead: boolean("isRead").default(false).notNull(),
-  relatedData: json("relatedData"), // Dados extras (ex: nova faixa, badge conquistado)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

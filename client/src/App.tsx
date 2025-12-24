@@ -37,6 +37,7 @@ import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
 import StudentProfilePage from "./pages/StudentProfilePage";
+import StudentGamification from "./pages/StudentGamification";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -71,6 +72,7 @@ function Router() {
         <Route path={"/student-subjects"} component={StudentSubjects} />
         <Route path={"/student-announcements"} component={StudentAnnouncements} />
         <Route path={"/student-profile"} component={StudentProfilePage} />
+        <Route path={"/student-gamification"} component={StudentGamification} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />

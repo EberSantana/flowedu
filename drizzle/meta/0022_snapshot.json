@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "cbee791f-c542-4273-acba-0639abf27305",
-  "prevId": "6b19a0d3-a388-44b5-8429-d75af1a9fe96",
+  "id": "835a8b42-c3ec-4204-95e3-c7945ed098ce",
+  "prevId": "cbee791f-c542-4273-acba-0639abf27305",
   "tables": {
     "active_methodologies": {
       "name": "active_methodologies",
@@ -438,14 +438,14 @@
         },
         "code": {
           "name": "code",
-          "type": "varchar(100)",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -454,21 +454,28 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "icon": {
           "name": "icon",
           "type": "varchar(50)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "category": {
           "name": "category",
-          "type": "varchar(50)",
+          "type": "enum('streak','accuracy','speed','completion','special')",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "requirement": {
+          "name": "requirement",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
           "autoincrement": false
         },
         "createdAt": {

@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS pointsHistory (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  points INT NOT NULL,\n  reason VARCHAR(255) NOT NULL,\n  activityType ENUM('exercise_objective', 'exercise_subjective', 'exercise_case_study', 'exam_completed', 'streak_bonus', 'module_completed', 'perfect_score', 'manual_adjustment') NOT NULL,\n  relatedId INT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS pointsHistory (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  points INT NOT NULL,\n  reason VARCHAR(255) NOT NULL,\n  activityType ENUM('exercise_objective', 'exercise_subjective', 'exercise_case_study', 'exam_completed', 'streak_bonus', 'module_completed', 'perfect_score', 'manual_adjustment') NOT NULL,\n  relatedId INT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 194
-}
