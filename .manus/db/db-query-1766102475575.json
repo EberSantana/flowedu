@@ -1,0 +1,80 @@
+{
+  "query": "SELECT s.id as studentId, s.registrationNumber, se.subjectId, se.userId as professorId, sub.name as subjectName\nFROM students s\nINNER JOIN subjectEnrollments se ON se.studentId = s.id\nINNER JOIN subjects sub ON sub.id = se.subjectId\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id as studentId, s.registrationNumber, se.subjectId, se.userId as professorId, sub.name as subjectName\nFROM students s\nINNER JOIN subjectEnrollments se ON se.studentId = s.id\nINNER JOIN subjects sub ON sub.id = se.subjectId\nLIMIT 10;",
+  "rows": [
+    {
+      "studentId": "60074",
+      "registrationNumber": "2023318463",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60073",
+      "registrationNumber": "2023308636",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60072",
+      "registrationNumber": "2023307960",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60071",
+      "registrationNumber": "2023306426",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60070",
+      "registrationNumber": "2023318472",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60069",
+      "registrationNumber": "2023305957",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60068",
+      "registrationNumber": "2023306622",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60067",
+      "registrationNumber": "2023305760",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60066",
+      "registrationNumber": "2023305840",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "studentId": "60065",
+      "registrationNumber": "2023308369",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "Informática Básica"
+    }
+  ],
+  "messages": [],
+  "stdout": "studentId\tregistrationNumber\tsubjectId\tprofessorId\tsubjectName\n60074\t2023318463\t120001\t1\tInformática Básica\n60073\t2023308636\t120001\t1\tInformática Básica\n60072\t2023307960\t120001\t1\tInformática Básica\n60071\t2023306426\t120001\t1\tInformática Básica\n60070\t2023318472\t120001\t1\tInformática Básica\n60069\t2023305957\t120001\t1\tInformática Básica\n60068\t2023306622\t120001\t1\tInformática Básica\n60067\t2023305760\t120001\t1\tInformática Básica\n60066\t2023305840\t120001\t1\tInformática Básica\n60065\t2023308369\t120001\t1\tInformática Básica\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

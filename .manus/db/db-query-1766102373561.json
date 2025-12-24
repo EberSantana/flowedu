@@ -1,0 +1,40 @@
+{
+  "query": "SELECT lm.subjectId, lm.userId, s.name as subjectName, COUNT(*) as moduleCount\nFROM learning_modules lm\nLEFT JOIN subjects s ON lm.subjectId = s.id\nGROUP BY lm.subjectId, lm.userId, s.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT lm.subjectId, lm.userId, s.name as subjectName, COUNT(*) as moduleCount\nFROM learning_modules lm\nLEFT JOIN subjects s ON lm.subjectId = s.id\nGROUP BY lm.subjectId, lm.userId, s.name;",
+  "rows": [
+    {
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica",
+      "moduleCount": "5"
+    },
+    {
+      "subjectId": "9",
+      "userId": "1",
+      "subjectName": "NULL",
+      "moduleCount": "1"
+    },
+    {
+      "subjectId": "7",
+      "userId": "1",
+      "subjectName": "NULL",
+      "moduleCount": "4"
+    },
+    {
+      "subjectId": "8",
+      "userId": "1",
+      "subjectName": "NULL",
+      "moduleCount": "4"
+    },
+    {
+      "subjectId": "5",
+      "userId": "1",
+      "subjectName": "Segurança da Informação",
+      "moduleCount": "5"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tuserId\tsubjectName\tmoduleCount\n120001\t1\tInformática Básica\t5\n9\t1\tNULL\t1\n7\t1\tNULL\t4\n8\t1\tNULL\t4\n5\t1\tSegurança da Informação\t5\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

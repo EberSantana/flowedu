@@ -1,0 +1,100 @@
+{
+  "query": "SELECT lm.id, lm.title, lm.subjectId, lm.userId\nFROM learning_modules lm \nORDER BY lm.subjectId\nLIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT lm.id, lm.title, lm.subjectId, lm.userId\nFROM learning_modules lm \nORDER BY lm.subjectId\nLIMIT 15;",
+  "rows": [
+    {
+      "id": "60018",
+      "title": "Módulo 3: Governança, Padrões e Estratégias de Segurança",
+      "subjectId": "5",
+      "userId": "1"
+    },
+    {
+      "id": "60020",
+      "title": "Módulo 5: Auditoria em Sistemas de Informação",
+      "subjectId": "5",
+      "userId": "1"
+    },
+    {
+      "id": "60016",
+      "title": "Módulo 1: Fundamentos e Princípios da Segurança da Informação",
+      "subjectId": "5",
+      "userId": "1"
+    },
+    {
+      "id": "60017",
+      "title": "Módulo 2: Segurança em Aplicações e Ambientes",
+      "subjectId": "5",
+      "userId": "1"
+    },
+    {
+      "id": "60019",
+      "title": "Módulo 4: Segurança no Ciclo de Desenvolvimento de Software (SDLC)",
+      "subjectId": "5",
+      "userId": "1"
+    },
+    {
+      "id": "60008",
+      "title": "Módulo 3: Produtividade com Editor de Texto (Word/Writer)",
+      "subjectId": "7",
+      "userId": "1"
+    },
+    {
+      "id": "60007",
+      "title": "Módulo 2: Navegação, Comunicação e Nuvem",
+      "subjectId": "7",
+      "userId": "1"
+    },
+    {
+      "id": "60009",
+      "title": "Módulo 4: Análise e Cálculo com Editor de Planilhas (Excel/Calc)",
+      "subjectId": "7",
+      "userId": "1"
+    },
+    {
+      "id": "60010",
+      "title": "Módulo 5: Criação de Apresentações Profissionais (PowerPoint/Impress)",
+      "subjectId": "7",
+      "userId": "1"
+    },
+    {
+      "id": "60013",
+      "title": "Módulo 3: Produtividade com Editor de Texto (Word Processing)",
+      "subjectId": "8",
+      "userId": "1"
+    },
+    {
+      "id": "60012",
+      "title": "Módulo 2: Internet, Comunicação Digital e Nuvem",
+      "subjectId": "8",
+      "userId": "1"
+    },
+    {
+      "id": "60014",
+      "title": "Módulo 4: Análise e Cálculo com Editor de Planilhas (Spreadsheets)",
+      "subjectId": "8",
+      "userId": "1"
+    },
+    {
+      "id": "60015",
+      "title": "Módulo 5: Criação de Apresentações Profissionais (Slides)",
+      "subjectId": "8",
+      "userId": "1"
+    },
+    {
+      "id": "90001",
+      "title": "Módulo Teste",
+      "subjectId": "9",
+      "userId": "1"
+    },
+    {
+      "id": "120001",
+      "title": "Módulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais",
+      "subjectId": "120001",
+      "userId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tsubjectId\tuserId\n60018\tMódulo 3: Governança, Padrões e Estratégias de Segurança\t5\t1\n60020\tMódulo 5: Auditoria em Sistemas de Informação\t5\t1\n60016\tMódulo 1: Fundamentos e Princípios da Segurança da Informação\t5\t1\n60017\tMódulo 2: Segurança em Aplicações e Ambientes\t5\t1\n60019\tMódulo 4: Segurança no Ciclo de Desenvolvimento de Software (SDLC)\t5\t1\n60008\tMódulo 3: Produtividade com Editor de Texto (Word/Writer)\t7\t1\n60007\tMódulo 2: Navegação, Comunicação e Nuvem\t7\t1\n60009\tMódulo 4: Análise e Cálculo com Editor de Planilhas (Excel/Calc)\t7\t1\n60010\tMódulo 5: Criação de Apresentações Profissionais (PowerPoint/Impress)\t7\t1\n60013\tMódulo 3: Produtividade com Editor de Texto (Word Processing)\t8\t1\n60012\tMódulo 2: Internet, Comunicação Digital e Nuvem\t8\t1\n60014\tMódulo 4: Análise e Cálculo com Editor de Planilhas (Spreadsheets)\t8\t1\n60015\tMódulo 5: Criação de Apresentações Profissionais (Slides)\t8\t1\n90001\tMódulo Teste\t9\t1\n120001\tMódulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais\t120001\t1\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

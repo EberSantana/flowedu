@@ -1,0 +1,16 @@
+{
+  "query": "SHOW TABLES LIKE '%learning%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE '%learning%';",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%learning%)": "learning_modules"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%learning%)": "learning_topics"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%learning%)\nlearning_modules\nlearning_topics\n",
+  "stderr": "",
+  "execution_time_ms": 71
+}

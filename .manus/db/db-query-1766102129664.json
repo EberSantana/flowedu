@@ -1,0 +1,90 @@
+{
+  "query": "SELECT s.id, s.registrationNumber, s.fullName, se.subjectId, se.userId, sub.name as subjectName\nFROM students s\nINNER JOIN subjectEnrollments se ON se.studentId = s.id\nLEFT JOIN subjects sub ON sub.id = se.subjectId\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id, s.registrationNumber, s.fullName, se.subjectId, se.userId, sub.name as subjectName\nFROM students s\nINNER JOIN subjectEnrollments se ON se.studentId = s.id\nLEFT JOIN subjects sub ON sub.id = se.subjectId\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "60060",
+      "registrationNumber": "2023305803",
+      "fullName": "JEREMIAS SOUZA DE ALMEIDA",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60059",
+      "registrationNumber": "2023312343",
+      "fullName": "JANDERSON FREITAS DOS SANTOS",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60058",
+      "registrationNumber": "2023327130",
+      "fullName": "HIOJANDECY GAMA DE OLIVEIRA",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60057",
+      "registrationNumber": "2023308082",
+      "fullName": "FELIPE SILVA DOS SANTOS",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60056",
+      "registrationNumber": "2023311702",
+      "fullName": "FABIANO MACIEL LIMA",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60055",
+      "registrationNumber": "2023308331",
+      "fullName": "ELIANDRO COBOS FABA",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60054",
+      "registrationNumber": "2023317958",
+      "fullName": "DOUGLAS DANIEL APARICIO",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60053",
+      "registrationNumber": "2023312281",
+      "fullName": "DOUGLAS DA SILVA SOUZA",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60052",
+      "registrationNumber": "2023308313",
+      "fullName": "DARLESSON COELHO PAULO",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "60051",
+      "registrationNumber": "2023327800",
+      "fullName": "ANGELA SABRINA COSTA DA SILVA",
+      "subjectId": "120001",
+      "userId": "1",
+      "subjectName": "Informática Básica"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregistrationNumber\tfullName\tsubjectId\tuserId\tsubjectName\n60060\t2023305803\tJEREMIAS SOUZA DE ALMEIDA\t120001\t1\tInformática Básica\n60059\t2023312343\tJANDERSON FREITAS DOS SANTOS\t120001\t1\tInformática Básica\n60058\t2023327130\tHIOJANDECY GAMA DE OLIVEIRA\t120001\t1\tInformática Básica\n60057\t2023308082\tFELIPE SILVA DOS SANTOS\t120001\t1\tInformática Básica\n60056\t2023311702\tFABIANO MACIEL LIMA\t120001\t1\tInformática Básica\n60055\t2023308331\tELIANDRO COBOS FABA\t120001\t1\tInformática Básica\n60054\t2023317958\tDOUGLAS DANIEL APARICIO\t120001\t1\tInformática Básica\n60053\t2023312281\tDOUGLAS DA SILVA SOUZA\t120001\t1\tInformática Básica\n60052\t2023308313\tDARLESSON COELHO PAULO\t120001\t1\tInformática Básica\n60051\t2023327800\tANGELA SABRINA COSTA DA SILVA\t120001\t1\tInformática Básica\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}
