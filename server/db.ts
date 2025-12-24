@@ -2677,3 +2677,76 @@ export async function getClassRanking(limit: number = 10) {
     return [];
   }
 }
+
+// ==================== TEACHER DASHBOARD FUNCTIONS ====================
+
+// Obter total de alunos com badges
+export async function getTotalStudentsWithBadges() {
+  const db = await getDb();
+  if (!db) return 0;
+
+  try {
+    const result = await db.select({ studentId: studentBadges.studentId })
+      .from(studentBadges)
+      .groupBy(studentBadges.studentId);
+
+    return result.length;
+  } catch (error) {
+    console.error("[Database] Error getting total students with badges:", error);
+    return 0;
+  }
+}
+
+// Obter estatísticas de badges (quantos alunos conquistaram cada badge)
+export async function getBadgeStatistics() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const allBadges = await db.select().from(badges);
+    const badgeStats = [];
+
+    for (const badge of allBadges) {
+      const earnedCount = await db.select({ studentId: studentBadges.studentId })
+        .from(studentBadges)
+        .where(eq(studentBadges.badgeId, badge.id));
+
+      badgeStats.push({
+        ...badge,
+        earnedCount: earnedCount.length,
+      });
+    }
+
+    // Ordenar por mais conquistados
+    return badgeStats.sort((a, b) => b.earnedCount - a.earnedCount);
+  } catch (error) {
+    console.error("[Database] Error getting badge statistics:", error);
+    return [];
+  }
+}
+
+// Contar quantos exercícios o aluno completou
+export async function getStudentExerciseCount(studentId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  try {
+    const history = await db.select()
+      .from(pointsHistory)
+      .where(
+        and(
+          eq(pointsHistory.studentId, studentId),
+          or(
+            eq(pointsHistory.activityType, 'exercise_objective'),
+            eq(pointsHistory.activityType, 'exercise_subjective'),
+            eq(pointsHistory.activityType, 'exercise_case_study')
+          )
+        )
+      );
+
+    return history.length;
+  } catch (error) {
+    console.error("[Database] Error counting student exercises:", error);
+    return 0;
+  }
+}

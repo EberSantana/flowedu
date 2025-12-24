@@ -2568,3 +2568,13 @@
 - [x] Adicionar barra de rolagem visível na caixa de exercícios/provas
 - [x] Remover caixa de dica (box azul com ícone de lâmpada)
 - [x] Adicionar respostas corretas e justificativas em todas as questões
+
+## Sistema de Gamificação - Próximos Passos
+- [ ] Integrar StudentExerciseModal nas páginas onde professor gera exercícios (LearningPaths, TopicMaterialsManager)
+- [x] Criar dashboard do professor para visualizar progresso dos alunos
+- [x] Implementar badges automáticos (first_exercise, exercise_10) com lógica de contagem
+- [x] Adicionar visualização de distribuição de faixas no dashboard do professor
+- [x] Implementar sistema de badges mais conquistados
+- [x] Adicionar botão de Gamificação no Dashboard principal
+- [x] Criar função getStudentExerciseCount para contar exercícios completados
+- [x] Adicionar lógica de badges em todas as rotas de submissão (objetivo, subjetivo, caso)

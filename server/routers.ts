@@ -3462,10 +3462,19 @@ JSON (descrições MAX 15 chars):
         await db.addPointsToStudent(
           ctx.studentSession.studentId,
           points,
-          'Exercício subjetivo completado',
-          'exercise_subjective',
+          'Exercício objetivo completado',
+          'exercise_objective',
           input.exerciseId
         );
+        
+        // Verificar badges automáticos
+        const exerciseCount = await db.getStudentExerciseCount(ctx.studentSession.studentId);
+        
+        if (exerciseCount === 1) {
+          await db.awardBadgeToStudent(ctx.studentSession.studentId, 'first_exercise');
+        } else if (exerciseCount === 10) {
+          await db.awardBadgeToStudent(ctx.studentSession.studentId, 'exercise_10');
+        }
         
         return { points };
       }),
@@ -3487,6 +3496,15 @@ JSON (descrições MAX 15 chars):
           'exercise_case_study',
           input.exerciseId
         );
+        
+        // Verificar badges automáticos
+        const exerciseCount = await db.getStudentExerciseCount(ctx.studentSession.studentId);
+        
+        if (exerciseCount === 1) {
+          await db.awardBadgeToStudent(ctx.studentSession.studentId, 'first_exercise');
+        } else if (exerciseCount === 10) {
+          await db.awardBadgeToStudent(ctx.studentSession.studentId, 'exercise_10');
+        }
         
         return { points };
       }),
@@ -3608,6 +3626,25 @@ JSON (descrições MAX 15 chars):
       .input(z.object({ notificationId: z.number() }))
       .mutation(async ({ ctx, input }) => {
         return await db.markGamificationNotificationAsRead(input.notificationId);
+      }),
+    
+    // ==================== TEACHER DASHBOARD (DASHBOARD DO PROFESSOR) ====================
+    // Visão geral para o professor
+    getTeacherOverview: protectedProcedure
+      .query(async ({ ctx }) => {
+        const allBadges = await db.getAllBadges();
+        const totalEarned = await db.getTotalStudentsWithBadges();
+        
+        return {
+          totalBadgesAvailable: allBadges.length,
+          totalBadgesEarned: totalEarned,
+        };
+      }),
+    
+    // Estatísticas de badges
+    getBadgeStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getBadgeStatistics();
       }),
   }),
 
