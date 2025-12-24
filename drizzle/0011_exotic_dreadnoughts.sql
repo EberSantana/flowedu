@@ -1,1 +1,0 @@
-ALTER TABLE `learning_modules` ADD `infographic_url` text;

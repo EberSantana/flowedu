@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS audit_logs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,\n  admin_id INT NOT NULL,\n  admin_name VARCHAR(255) NOT NULL,\n  action VARCHAR(100) NOT NULL,\n  target_user_id INT,\n  target_user_name VARCHAR(255),\n  old_data TEXT,\n  new_data TEXT,\n  ip_address VARCHAR(45),\n  INDEX idx_admin_id (admin_id),\n  INDEX idx_target_user_id (target_user_id),\n  INDEX idx_timestamp (timestamp),\n  INDEX idx_action (action)\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS audit_logs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,\n  admin_id INT NOT NULL,\n  admin_name VARCHAR(255) NOT NULL,\n  action VARCHAR(100) NOT NULL,\n  target_user_id INT,\n  target_user_name VARCHAR(255),\n  old_data TEXT,\n  new_data TEXT,\n  ip_address VARCHAR(45),\n  INDEX idx_admin_id (admin_id),\n  INDEX idx_target_user_id (target_user_id),\n  INDEX idx_timestamp (timestamp),\n  INDEX idx_action (action)\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 222
-}
