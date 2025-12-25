@@ -3616,6 +3616,13 @@ JSON (descrições MAX 15 chars):
         return await db.getClassRanking(input.limit || 10);
       }),
     
+    // Obter ranking da turma (versão para professores)
+    getClassRankingTeacher: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getClassRanking(input.limit || 10);
+      }),
+    
     // Obter notificações de gamificação
     getNotifications: studentProcedure
       .input(z.object({ onlyUnread: z.boolean().optional() }))

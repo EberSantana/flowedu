@@ -169,6 +169,20 @@
       "when": 1766616831480,
       "tag": "0023_wild_vertigo",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1766617558108,
+      "tag": "0024_lazy_the_executioner",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1766617585746,
+      "tag": "0025_thin_talon",
+      "breakpoints": true
     }
   ]
 }

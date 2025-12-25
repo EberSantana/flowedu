@@ -49,7 +49,7 @@ export default function GamificationDashboard() {
   const [isExporting, setIsExporting] = useState(false);
 
   const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery() || { data: null, isLoading: false };
-  const { data: ranking, isLoading: rankingLoading } = trpc.gamification.getClassRanking.useQuery({ limit: 20 });
+  const { data: ranking, isLoading: rankingLoading } = trpc.gamification.getClassRankingTeacher.useQuery({ limit: 20 });
   const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery() || { data: [], isLoading: false };
   const { data: evolutionData, isLoading: evolutionLoading } = (trpc.gamification as any).getPointsEvolution?.useQuery() || { data: [], isLoading: false };
   

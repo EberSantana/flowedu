@@ -2652,3 +2652,8 @@
 - [ ] Mostrar radar chart médio da turma
 - [ ] Listar alunos com pontuação baixa em cada dimensão
 - [ ] Permitir atribuir exercícios específicos
+
+## Correção de Erro de Gamificação para Professores
+- [x] Adicionar rotas de gamificação para professores (getTeacherOverview, getClassRanking para professores)
+- [x] Atualizar GamificationDashboard.tsx para usar rotas corretas baseadas no tipo de usuário
+- [x] Testar acesso à página de gamificação como professor
