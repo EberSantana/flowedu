@@ -3950,6 +3950,155 @@ JSON (descrições MAX 15 chars):
       }),
   }),
 
+  // ==================== EXERCÍCIOS PARA ALUNOS ====================
+  studentExercises: router({
+    // Listar exercícios disponíveis
+    listAvailable: studentProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.user.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const exercises = await db.listAvailableExercises(studentId, input.subjectId);
+        return exercises;
+      }),
+
+    // Obter detalhes de um exercício
+    getDetails: studentProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.user.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const exercise = await db.getExerciseDetails(input.exerciseId, studentId);
+        if (!exercise) throw new TRPCError({ code: "NOT_FOUND", message: "Exercise not found" });
+        
+        return exercise;
+      }),
+
+    // Iniciar tentativa
+    startAttempt: studentProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.user.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const result = await db.startExerciseAttempt(input.exerciseId, studentId);
+        return result;
+      }),
+
+    // Submeter tentativa completa
+    submitAttempt: studentProcedure
+      .input(z.object({
+        attemptId: z.number(),
+        exerciseId: z.number(),
+        answers: z.array(z.object({
+          questionNumber: z.number(),
+          answer: z.string(),
+        })),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.user.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        // Buscar dados do exercício
+        const exercise = await db.getExerciseDetails(input.exerciseId, studentId);
+        if (!exercise) throw new TRPCError({ code: "NOT_FOUND", message: "Exercise not found" });
+        
+        // Submeter e corrigir
+        const result = await db.submitExerciseAttempt(
+          input.attemptId,
+          input.answers,
+          exercise.exerciseData
+        );
+        
+        // Adicionar pontos de gamificação
+        if (result.pointsEarned > 0) {
+          await db.addExercisePoints(
+            studentId,
+            exercise.subjectId,
+            result.pointsEarned,
+            `Exercício: ${exercise.title} (${result.correctAnswers}/${result.totalQuestions} acertos)`
+          );
+        }
+        
+        return result;
+      }),
+
+    // Ver resultados de uma tentativa
+    getResults: studentProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const results = await db.getExerciseResults(input.attemptId);
+        if (!results) throw new TRPCError({ code: "NOT_FOUND", message: "Results not found" });
+        
+        return results;
+      }),
+
+    // Histórico de tentativas
+    getHistory: studentProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.user.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const history = await db.getStudentExerciseHistory(studentId, input.subjectId);
+        return history;
+      }),
+  }),
+
+  // Rotas do professor para gerenciar exercícios
+  teacherExercises: router({
+    // Publicar exercício gerado para os alunos
+    publish: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+        subjectId: z.number(),
+        title: z.string(),
+        description: z.string().optional(),
+        exerciseData: z.any(), // JSON com as questões
+        totalQuestions: z.number(),
+        totalPoints: z.number(),
+        passingScore: z.number().default(60),
+        maxAttempts: z.number().default(3),
+        timeLimit: z.number().optional(),
+        showAnswersAfter: z.boolean().default(true),
+        availableFrom: z.date(),
+        availableTo: z.date().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.createStudentExercise({
+          ...input,
+          teacherId: ctx.user.id,
+          status: "published",
+        });
+        
+        return { success: true, exerciseId: result[0].insertId };
+      }),
+
+    // Listar exercícios criados pelo professor
+    list: protectedProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error("Database not available");
+        
+        const { studentExercises } = await import("../drizzle/schema");
+        
+        let query = db_instance
+          .select()
+          .from(studentExercises)
+          .where(eq(studentExercises.teacherId, ctx.user.id));
+        
+        if (input.subjectId) {
+          query = query.where(eq(studentExercises.subjectId, input.subjectId));
+        }
+        
+        const exercises = await query;
+        return exercises;
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

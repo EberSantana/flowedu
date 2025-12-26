@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -807,3 +807,73 @@ export const studentSubjectBadges = mysqlTable("student_subject_badges", {
 
 export type StudentSubjectBadge = typeof studentSubjectBadges.$inferSelect;
 export type InsertStudentSubjectBadge = typeof studentSubjectBadges.$inferInsert;
+
+/**
+ * Exercícios publicados pelos professores para os alunos
+ */
+export const studentExercises = mysqlTable("student_exercises", {
+  id: int("id").autoincrement().primaryKey(),
+  moduleId: int("moduleId").notNull(), // Módulo da trilha de aprendizagem
+  subjectId: int("subjectId").notNull(), // Disciplina
+  teacherId: int("teacherId").notNull(), // Professor que criou
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  exerciseData: json("exerciseData").notNull(), // JSON com as questões geradas
+  totalQuestions: int("totalQuestions").notNull(),
+  totalPoints: int("totalPoints").notNull(),
+  passingScore: int("passingScore").default(60).notNull(), // Nota mínima para passar (%)
+  maxAttempts: int("maxAttempts").default(3).notNull(), // Número máximo de tentativas (0 = ilimitado)
+  timeLimit: int("timeLimit"), // Tempo limite em minutos (null = sem limite)
+  showAnswersAfter: boolean("showAnswersAfter").default(true).notNull(), // Mostrar gabarito após conclusão
+  availableFrom: timestamp("availableFrom").notNull(),
+  availableTo: timestamp("availableTo"),
+  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentExercise = typeof studentExercises.$inferSelect;
+export type InsertStudentExercise = typeof studentExercises.$inferInsert;
+
+/**
+ * Tentativas de resolução de exercícios pelos alunos
+ */
+export const studentExerciseAttempts = mysqlTable("student_exercise_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  exerciseId: int("exerciseId").notNull(),
+  studentId: int("studentId").notNull(),
+  attemptNumber: int("attemptNumber").notNull(), // 1, 2, 3...
+  answers: json("answers").notNull(), // Array de respostas do aluno
+  score: int("score").notNull(), // Pontuação obtida (0-100)
+  correctAnswers: int("correctAnswers").notNull(),
+  totalQuestions: int("totalQuestions").notNull(),
+  pointsEarned: int("pointsEarned").notNull(), // Pontos de gamificação ganhos
+  timeSpent: int("timeSpent"), // Tempo gasto em segundos
+  status: mysqlEnum("status", ["in_progress", "completed", "abandoned"]).default("in_progress").notNull(),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentExerciseAttempt = typeof studentExerciseAttempts.$inferSelect;
+export type InsertStudentExerciseAttempt = typeof studentExerciseAttempts.$inferInsert;
+
+/**
+ * Respostas individuais por questão (para análise detalhada)
+ */
+export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
+  id: int("id").autoincrement().primaryKey(),
+  attemptId: int("attemptId").notNull(),
+  questionNumber: int("questionNumber").notNull(),
+  questionType: varchar("questionType", { length: 50 }).notNull(), // objective, subjective, case_study
+  studentAnswer: text("studentAnswer").notNull(),
+  correctAnswer: text("correctAnswer"),
+  isCorrect: boolean("isCorrect"),
+  pointsAwarded: int("pointsAwarded").default(0).notNull(),
+  teacherFeedback: text("teacherFeedback"), // Feedback manual do professor (para subjetivas)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StudentExerciseAnswer = typeof studentExerciseAnswers.$inferSelect;
+export type InsertStudentExerciseAnswer = typeof studentExerciseAnswers.$inferInsert;

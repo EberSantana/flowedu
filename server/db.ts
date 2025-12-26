@@ -1,4 +1,4 @@
-import { and, or, desc, eq, ne, gte, lte, gt, lt, inArray, sql } from "drizzle-orm";
+import { and, or, desc, asc, eq, ne, gte, lte, gt, lt, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -56,7 +56,13 @@ import {
   studentSubjectPoints,
   subjectPointsHistory,
   subjectBadges,
-  studentSubjectBadges
+  studentSubjectBadges,
+  studentExercises,
+  studentExerciseAttempts,
+  studentExerciseAnswers,
+  InsertStudentExercise,
+  InsertStudentExerciseAttempt,
+  InsertStudentExerciseAnswer
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -3655,4 +3661,363 @@ export async function createDefaultSubjectBadges(subjectId: number) {
   } catch (error) {
     console.error("[Database] Error creating default subject badges:", error);
   }
+}
+
+
+// ============================================
+// STUDENT EXERCISES - Exercícios para Alunos
+// ============================================
+
+/**
+ * Criar um novo exercício para alunos
+ */
+export async function createStudentExercise(data: InsertStudentExercise) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(studentExercises).values(data);
+  return result;
+}
+
+/**
+ * Listar exercícios disponíveis para um aluno
+ */
+export async function listAvailableExercises(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const now = new Date();
+  
+  const conditions = [
+    eq(studentExercises.status, "published"),
+    lte(studentExercises.availableFrom, now)
+  ];
+  
+  if (subjectId) {
+    conditions.push(eq(studentExercises.subjectId, subjectId));
+  }
+  
+  const exercises = await db
+    .select()
+    .from(studentExercises)
+    .where(and(...conditions));
+  
+  // Para cada exercício, buscar tentativas do aluno
+  const exercisesWithAttempts = await Promise.all(
+    exercises.map(async (exercise) => {
+      const attempts = await db
+        .select()
+        .from(studentExerciseAttempts)
+        .where(
+          and(
+            eq(studentExerciseAttempts.exerciseId, exercise.id),
+            eq(studentExerciseAttempts.studentId, studentId)
+          )
+        )
+        .orderBy(desc(studentExerciseAttempts.attemptNumber));
+      
+      return {
+        ...exercise,
+        attempts: attempts.length,
+        lastAttempt: attempts[0] || null,
+        canAttempt: exercise.maxAttempts === 0 || attempts.length < exercise.maxAttempts,
+      };
+    })
+  );
+  
+  return exercisesWithAttempts;
+}
+
+/**
+ * Obter detalhes de um exercício específico
+ */
+export async function getExerciseDetails(exerciseId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const exercise = await db
+    .select()
+    .from(studentExercises)
+    .where(eq(studentExercises.id, exerciseId))
+    .limit(1);
+  
+  if (!exercise[0]) return null;
+  
+  const attempts = await db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(
+      and(
+        eq(studentExerciseAttempts.exerciseId, exerciseId),
+        eq(studentExerciseAttempts.studentId, studentId)
+      )
+    )
+    .orderBy(desc(studentExerciseAttempts.attemptNumber));
+  
+  return {
+    ...exercise[0],
+    attempts,
+    canAttempt: exercise[0].maxAttempts === 0 || attempts.length < exercise[0].maxAttempts,
+  };
+}
+
+/**
+ * Iniciar uma nova tentativa de exercício
+ */
+export async function startExerciseAttempt(exerciseId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar número de tentativas anteriores
+  const previousAttempts = await db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(
+      and(
+        eq(studentExerciseAttempts.exerciseId, exerciseId),
+        eq(studentExerciseAttempts.studentId, studentId)
+      )
+    );
+  
+  const attemptNumber = previousAttempts.length + 1;
+  
+  const result = await db.insert(studentExerciseAttempts).values({
+    exerciseId,
+    studentId,
+    attemptNumber,
+    answers: [],
+    score: 0,
+    correctAnswers: 0,
+    totalQuestions: 0,
+    pointsEarned: 0,
+    status: "in_progress",
+    startedAt: new Date(),
+  });
+  
+  return { attemptId: result[0].insertId, attemptNumber };
+}
+
+/**
+ * Submeter tentativa de exercício completa
+ */
+export async function submitExerciseAttempt(
+  attemptId: number,
+  answers: any[],
+  exerciseData: any
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar tentativa
+  const attempt = await db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(eq(studentExerciseAttempts.id, attemptId))
+    .limit(1);
+  
+  if (!attempt[0]) throw new Error("Attempt not found");
+  
+  // Calcular tempo gasto
+  const timeSpent = Math.floor((Date.now() - attempt[0].startedAt.getTime()) / 1000);
+  
+  // Corrigir questões objetivas
+  let correctAnswers = 0;
+  const questions = exerciseData.exercises || [];
+  
+  const detailedAnswers = answers.map((answer, idx) => {
+    const question = questions[idx];
+    let isCorrect = false;
+    
+    if (question.type === "objective" && question.correctAnswer) {
+      // Normalizar respostas para comparação
+      const studentAns = answer.answer?.trim().toUpperCase();
+      const correctAns = question.correctAnswer.trim().toUpperCase();
+      isCorrect = studentAns === correctAns;
+      if (isCorrect) correctAnswers++;
+    }
+    
+    return {
+      attemptId,
+      questionNumber: idx + 1,
+      questionType: question.type,
+      studentAnswer: answer.answer || "",
+      correctAnswer: question.correctAnswer || null,
+      isCorrect: question.type === "objective" ? isCorrect : null,
+      pointsAwarded: isCorrect ? 10 : 0, // 10 pontos por questão correta
+    };
+  });
+  
+  // Calcular pontuação
+  const totalQuestions = questions.length;
+  const score = Math.round((correctAnswers / totalQuestions) * 100);
+  const pointsEarned = correctAnswers * 10; // 10 pontos por acerto
+  
+  // Atualizar tentativa
+  await db
+    .update(studentExerciseAttempts)
+    .set({
+      answers: JSON.stringify(answers),
+      score,
+      correctAnswers,
+      totalQuestions,
+      pointsEarned,
+      timeSpent,
+      status: "completed",
+      completedAt: new Date(),
+    })
+    .where(eq(studentExerciseAttempts.id, attemptId));
+  
+  // Salvar respostas individuais
+  for (const answer of detailedAnswers) {
+    await db.insert(studentExerciseAnswers).values(answer);
+  }
+  
+  return {
+    score,
+    correctAnswers,
+    totalQuestions,
+    pointsEarned,
+    timeSpent,
+  };
+}
+
+/**
+ * Obter resultados de uma tentativa
+ */
+export async function getExerciseResults(attemptId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const attempt = await db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(eq(studentExerciseAttempts.id, attemptId))
+    .limit(1);
+  
+  if (!attempt[0]) return null;
+  
+  const answers = await db
+    .select()
+    .from(studentExerciseAnswers)
+    .where(eq(studentExerciseAnswers.attemptId, attemptId))
+    .orderBy(asc(studentExerciseAnswers.questionNumber));
+  
+  return {
+    ...attempt[0],
+    detailedAnswers: answers,
+  };
+}
+
+/**
+ * Obter histórico de tentativas de um aluno
+ */
+export async function getStudentExerciseHistory(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const conditions = [eq(studentExerciseAttempts.studentId, studentId)];
+  
+  if (subjectId) {
+    conditions.push(eq(studentExercises.subjectId, subjectId));
+  }
+  
+  const history = await db
+    .select({
+      attempt: studentExerciseAttempts,
+      exercise: studentExercises,
+    })
+    .from(studentExerciseAttempts)
+    .innerJoin(
+      studentExercises,
+      eq(studentExerciseAttempts.exerciseId, studentExercises.id)
+    )
+    .where(and(...conditions))
+    .orderBy(desc(studentExerciseAttempts.completedAt));
+  
+  return history;
+}
+
+/**
+ * Adicionar pontos de gamificação após completar exercício
+ */
+export async function addExercisePoints(studentId: number, subjectId: number, points: number, description: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Adicionar aos pontos gerais
+  await db.insert(pointsHistory).values({
+    studentId,
+    points,
+    reason: description,
+    activityType: "exercise",
+  });
+  
+  // Atualizar total de pontos do aluno
+  const currentPoints = await db
+    .select()
+    .from(studentPoints)
+    .where(eq(studentPoints.studentId, studentId))
+    .limit(1);
+  
+  if (currentPoints[0]) {
+    await db
+      .update(studentPoints)
+      .set({
+        totalPoints: currentPoints[0].totalPoints + points,
+      })
+      .where(eq(studentPoints.studentId, studentId));
+  } else {
+    await db.insert(studentPoints).values({
+      studentId,
+      totalPoints: points,
+      currentBelt: "white",
+      streakDays: 0,
+    });
+  }
+  
+  // Adicionar aos pontos da disciplina específica
+  await db.insert(subjectPointsHistory).values({
+    studentId,
+    subjectId,
+    points,
+    activityType: "exercise",
+    description,
+    earnedAt: new Date(),
+  });
+  
+  // Atualizar total de pontos da disciplina
+  const currentSubjectPoints = await db
+    .select()
+    .from(studentSubjectPoints)
+    .where(
+      and(
+        eq(studentSubjectPoints.studentId, studentId),
+        eq(studentSubjectPoints.subjectId, subjectId)
+      )
+    )
+    .limit(1);
+  
+  if (currentSubjectPoints[0]) {
+    await db
+      .update(studentSubjectPoints)
+      .set({
+        totalPoints: currentSubjectPoints[0].totalPoints + points,
+      })
+      .where(
+        and(
+          eq(studentSubjectPoints.studentId, studentId),
+          eq(studentSubjectPoints.subjectId, subjectId)
+        )
+      );
+  } else {
+    await db.insert(studentSubjectPoints).values({
+      studentId,
+      subjectId,
+      totalPoints: points,
+      currentBelt: "white",
+      streakDays: 0,
+    });
+  }
+  
+  return { success: true, pointsAdded: points };
 }

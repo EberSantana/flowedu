@@ -2867,3 +2867,90 @@
 - [x] Remover botão "Imprimir" do modal de exercícios
 - [x] Reorganizar layout dos botões (justify-between)
 - [x] Manter consistência visual entre os dois modais
+
+## 🎮 Sistema de Exercícios para Alunos com Gamificação - EM DESENVOLVIMENTO
+
+### Banco de Dados
+- [ ] Criar tabela `student_exercises` (exercícios disponíveis para alunos)
+- [ ] Criar tabela `student_exercise_attempts` (tentativas de resolução)
+- [ ] Criar tabela `student_exercise_answers` (respostas individuais por questão)
+- [ ] Adicionar campos: moduleId, exerciseData (JSON), status, availableFrom, availableTo
+- [ ] Executar migrations
+
+### Backend (tRPC)
+- [ ] Rota `student.listAvailableExercises` - listar exercícios disponíveis
+- [ ] Rota `student.getExerciseDetails` - detalhes de um exercício específico
+- [ ] Rota `student.submitExerciseAttempt` - enviar tentativa completa
+- [ ] Rota `student.getExerciseResults` - ver resultados e feedback
+- [ ] Rota `student.getExerciseHistory` - histórico de tentativas
+- [ ] Implementar correção automática de questões objetivas
+- [ ] Calcular pontuação baseada em acertos
+
+### Frontend - Páginas
+- [ ] Criar página `StudentExercises.tsx` - listagem de exercícios
+- [ ] Criar página `StudentExerciseAttempt.tsx` - resolver exercício
+- [ ] Criar página `StudentExerciseResults.tsx` - ver resultados
+- [ ] Adicionar rotas no App.tsx
+- [ ] Adicionar link no Dashboard/Sidebar
+
+### Frontend - Componentes
+- [ ] Componente de card de exercício (status: disponível, em andamento, concluído)
+- [ ] Componente de questão objetiva (radio buttons)
+- [ ] Componente de questão subjetiva (textarea)
+- [ ] Componente de progresso (X de Y questões respondidas)
+- [ ] Componente de resultado (nota, acertos, feedback)
+- [ ] Timer opcional para exercícios cronometrados
+
+### Gamificação
+- [ ] Integrar com sistema de pontos existente
+- [ ] Definir regras de pontuação (ex: 10 pontos por acerto)
+- [ ] Adicionar bônus por conclusão rápida (opcional)
+- [ ] Adicionar bônus por streak de acertos
+- [ ] Atualizar ranking após conclusão de exercício
+- [ ] Notificação de pontos ganhos
+
+### Funcionalidades Extras
+- [ ] Permitir múltiplas tentativas (configurável pelo professor)
+- [ ] Mostrar gabarito após conclusão (configurável)
+- [ ] Estatísticas de desempenho por módulo
+- [ ] Filtros: por disciplina, por status, por data
+- [ ] Sistema de dicas (consome pontos)
+
+### Testes
+- [ ] Testar listagem de exercícios
+- [ ] Testar submissão de respostas
+- [ ] Testar correção automática
+- [ ] Testar integração com gamificação
+- [ ] Testar cálculo de pontuação
+
+## ✅ Progresso Atual - Sistema de Exercícios
+
+### Concluído:
+- [x] Criar tabela `student_exercises` (exercícios disponíveis para alunos)
+- [x] Criar tabela `student_exercise_attempts` (tentativas de resolução)
+- [x] Criar tabela `student_exercise_answers` (respostas individuais por questão)
+- [x] Adicionar campos: moduleId, exerciseData (JSON), status, availableFrom, availableTo
+- [x] Executar migrations
+- [x] Rota `student.listAvailableExercises` - listar exercícios disponíveis
+- [x] Rota `student.getExerciseDetails` - detalhes de um exercício específico
+- [x] Rota `student.submitExerciseAttempt` - enviar tentativa completa
+- [x] Rota `student.getExerciseResults` - ver resultados e feedback
+- [x] Rota `student.getExerciseHistory` - histórico de tentativas
+- [x] Implementar correção automática de questões objetivas
+- [x] Calcular pontuação baseada em acertos
+- [x] Integrar com sistema de pontos existente
+- [x] Definir regras de pontuação (10 pontos por acerto)
+- [x] Atualizar ranking após conclusão de exercício
+
+### Próximos Passos:
+- [ ] Criar página `StudentExercises.tsx` - listagem de exercícios
+- [ ] Criar página `StudentExerciseAttempt.tsx` - resolver exercício
+- [ ] Criar página `StudentExerciseResults.tsx` - ver resultados
+- [ ] Adicionar rotas no App.tsx
+- [ ] Adicionar link no Dashboard/Sidebar
+- [ ] Componente de card de exercício (status: disponível, em andamento, concluído)
+- [ ] Componente de questão objetiva (radio buttons)
+- [ ] Componente de progresso (X de Y questões respondidas)
+- [ ] Componente de resultado (nota, acertos, feedback)
+- [ ] Criar interface no professor para publicar exercícios
+- [ ] Testar fluxo completo

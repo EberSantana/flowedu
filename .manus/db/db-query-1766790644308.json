@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS student_exercises (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  moduleId INT NOT NULL,\n  subjectId INT NOT NULL,\n  teacherId INT NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  description TEXT,\n  exerciseData JSON NOT NULL,\n  totalQuestions INT NOT NULL,\n  totalPoints INT NOT NULL,\n  passingScore INT NOT NULL DEFAULT 60,\n  maxAttempts INT NOT NULL DEFAULT 3,\n  timeLimit INT,\n  showAnswersAfter BOOLEAN NOT NULL DEFAULT TRUE,\n  availableFrom TIMESTAMP NOT NULL,\n  availableTo TIMESTAMP,\n  status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft',\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS student_exercises (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  moduleId INT NOT NULL,\n  subjectId INT NOT NULL,\n  teacherId INT NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  description TEXT,\n  exerciseData JSON NOT NULL,\n  totalQuestions INT NOT NULL,\n  totalPoints INT NOT NULL,\n  passingScore INT NOT NULL DEFAULT 60,\n  maxAttempts INT NOT NULL DEFAULT 3,\n  timeLimit INT,\n  showAnswersAfter BOOLEAN NOT NULL DEFAULT TRUE,\n  availableFrom TIMESTAMP NOT NULL,\n  availableTo TIMESTAMP,\n  status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft',\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1112
+}
