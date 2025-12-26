@@ -2834,3 +2834,21 @@
 - [x] Resposta correta em text-xl font-bold
 - [x] Justificativa em text-lg
 - [x] Padding aumentado em todos os elementos (p-8)
+
+## 🔧 Barra Lateral de Navegação e Correção de Botões - PENDENTE
+- [ ] Adicionar barra lateral fixa no lado direito do modal
+- [ ] Botões numerados (1, 2, 3...) para navegar entre questões
+- [ ] Scroll automático ao clicar no número da questão
+- [ ] Destaque visual da questão atual
+- [ ] Corrigir layout dos botões (Word, Copiar, Imprimir, Fechar) que estão sobrepostos
+- [ ] Organizar botões em linha horizontal com espaçamento adequado
+
+## ✅ Barra Lateral e Botões - CONCLUÍDO
+- [x] Barra lateral fixa no lado direito do modal (w-16, bg-gray-50)
+- [x] Botões numerados (1, 2, 3...) para navegar entre questões
+- [x] Scroll automático ao clicar no número da questão (scrollIntoView smooth)
+- [x] Hover effects nos botões (bg-purple-100)
+- [x] Layout dos botões corrigido (flex justify-between)
+- [x] Botões organizados em linha horizontal com espaçamento adequado
+- [x] Checkbox "Mostrar gabarito" à esquerda
+- [x] Botões de ação (Word, Copiar, Imprimir, Fechar) à direita
