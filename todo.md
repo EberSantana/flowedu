@@ -2705,3 +2705,98 @@
 - [x] Adicionar ícones circulares coloridos para cada faixa
 - [x] Padronizar cores, espaçamentos e tipografia
 - [x] Testar responsividade
+
+## Padronização da Página de Gamificação do Aluno
+- [ ] Analisar StudentGamification.tsx e identificar problemas de layout
+- [ ] Redesenhar com cards de estatísticas no topo (4 cards)
+- [ ] Implementar seção de distribuição de faixas com barras horizontais
+- [ ] Adicionar ícones circulares coloridos para cada faixa
+- [ ] Padronizar cores, espaçamentos e tipografia
+- [ ] Testar responsividade
+
+## 🎨 Plano de Padronização Visual Completo
+
+### Documento de Referência
+- [x] Criar DESIGN_STANDARDS.md com todos os padrões estabelecidos
+
+### Prioridade Alta - Dashboards e Páginas Principais
+- [ ] Dashboard.tsx (Professor) - Padronizar cards de estatísticas
+- [ ] StudentDashboard.tsx (Aluno) - Padronizar cards de estatísticas
+- [ ] Reports.tsx (Relatórios) - Padronizar layout e cards
+
+### Prioridade Média - Páginas de Gestão
+- [ ] Students.tsx - Padronizar cards e layout
+- [ ] Classes.tsx - Padronizar cards e layout
+- [ ] Subjects.tsx - Já melhorado, revisar se segue 100% o padrão
+- [ ] Tasks.tsx - Padronizar cards e layout
+- [ ] LearningPaths.tsx - Padronizar cards e layout
+- [ ] ActiveMethodologies.tsx - Padronizar cards e layout
+- [ ] ManageEnrollments.tsx - Padronizar cards e layout
+- [ ] SubjectEnrollments.tsx - Padronizar cards e layout
+
+### Prioridade Média - Páginas do Aluno
+- [ ] StudentSubjects.tsx - Padronizar cards e layout
+- [ ] StudentSubjectView.tsx - Padronizar cards e layout
+- [ ] StudentComputationalThinking.tsx - Padronizar cards e layout
+- [ ] StudentAnnouncements.tsx - Padronizar cards e layout
+
+### Prioridade Baixa - Páginas Secundárias
+- [ ] Profile.tsx (Perfil do Professor) - Padronizar layout
+- [ ] StudentProfile.tsx (Perfil do Aluno) - Padronizar layout
+- [ ] StudentProfilePage.tsx - Padronizar layout
+- [ ] Calendar.tsx (Calendário) - Padronizar cards
+- [ ] Schedule.tsx (Grade de Horários) - Padronizar cards
+- [ ] Shifts.tsx (Turnos) - Padronizar cards
+- [ ] TimeSlots.tsx (Horários) - Padronizar cards
+- [ ] Announcements.tsx - Padronizar cards
+- [ ] TopicMaterialsManager.tsx - Padronizar layout
+
+### Páginas Administrativas
+- [ ] AdminUsers.tsx - Revisar se segue padrão
+- [ ] AdminInvites.tsx - Padronizar se necessário
+
+### Páginas Já Padronizadas ✅
+- [x] GamificationDashboard.tsx (Professor) - Referência principal
+- [x] StudentGamification.tsx (Aluno) - Padronizada em 26/12/2025
+
+### Checklist de Validação (Aplicar em cada página)
+- [ ] Cards com border-l-4 colorido
+- [ ] Ícones circulares com fundo colorido (p-2 bg-{color}-100 rounded-full)
+- [ ] Ícones tamanho h-5 w-5
+- [ ] Grid responsivo (grid-cols-1 md:grid-cols-2 lg:grid-cols-4)
+- [ ] Espaçamento gap-6 entre cards
+- [ ] Espaçamento space-y-8 entre seções
+- [ ] Valores em text-3xl font-bold text-gray-900
+- [ ] Descrições em text-xs text-gray-500
+- [ ] Sombras shadow-md hover:shadow-lg transition-all
+- [ ] Barras de progresso com ícones circulares (quando aplicável)
+- [ ] Responsividade testada em mobile/tablet/desktop
+
+### Ordem Sugerida de Execução
+1. Dashboard.tsx (mais importante - página inicial do professor)
+2. StudentDashboard.tsx (página inicial do aluno)
+3. Reports.tsx (relatórios são muito usados)
+4. Students.tsx, Classes.tsx, Subjects.tsx (gestão principal)
+5. Páginas do aluno (StudentSubjects, StudentSubjectView, etc)
+6. Páginas secundárias (Profile, Calendar, Schedule, etc)
+
+## 🔥 URGENTE - Redesign do Modal de Questões (10ª tentativa)
+- [ ] Analisar código atual do modal em LearningPaths.tsx
+- [ ] Redesenhar com layout limpo e espaçado
+- [ ] Separar questão em card destacado
+- [ ] Formatar alternativas com espaçamento adequado
+- [ ] Criar seção colapsável para justificativa
+- [ ] Destacar resposta correta em verde
+- [ ] Melhorar tipografia e legibilidade
+- [ ] Testar visualização completa
+
+## ✅ Redesign do Modal de Questões - CONCLUÍDO
+- [x] Analisar código atual do modal em ExamGeneratorModal.tsx
+- [x] Redesenhar com layout limpo e espaçado (space-y-10)
+- [x] Separar questão em card destacado (border, shadow-sm)
+- [x] Formatar alternativas com letras grandes em círculos (w-10 h-10)
+- [x] Criar card verde para gabarito e justificativa
+- [x] Destacar resposta correta em verde vibrante (bg-green-50, border-green-400)
+- [x] Melhorar tipografia (text-2xl para título, text-lg para conteúdo)
+- [x] Adicionar ícones (Briefcase, CheckSquare, MessageSquare)
+- [x] Contexto do caso em card azul com borda lateral

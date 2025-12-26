@@ -3586,6 +3586,7 @@ JSON (descrições MAX 15 chars):
         const studentRank = ranking.findIndex(r => r.studentId === ctx.studentSession.studentId) + 1;
         
         return {
+          studentId: ctx.studentSession.studentId,
           totalPoints: points?.totalPoints || 0,
           currentBelt: points?.currentBelt || 'white',
           streakDays: points?.streakDays || 0,

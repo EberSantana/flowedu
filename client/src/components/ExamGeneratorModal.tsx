@@ -575,69 +575,122 @@ export default function ExamGeneratorModal({
                 </div>
 
                 {/* Questões */}
-                <div className="space-y-8">
+                <div className="space-y-10">
                   {generatedExam.questions.map((question, idx) => (
-                    <div key={question.number} id={`question-${idx}`} className="border rounded-lg p-6 bg-white shadow-sm scroll-mt-4">
-                    <div className="flex items-start justify-between mb-4">
-                      <span className="text-lg font-bold text-gray-900">Questão {question.number}</span>
-                      <div className="flex gap-2">
-                        <span className="text-sm bg-gray-100 px-3 py-1 rounded font-medium">
-                          {question.points} pts
-                        </span>
-                        <span className="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded font-medium">
-                          {question.type === "objective" ? "Objetiva" : 
-                           question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
-                        </span>
+                    <div key={question.number} id={`question-${idx}`} className="scroll-mt-4">
+                      {/* Header da Questão */}
+                      <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-200">
+                        <h3 className="text-2xl font-bold text-gray-900">Questão {question.number}</h3>
+                        <div className="flex gap-3">
+                          <span className="text-base bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold">
+                            {question.points} pts
+                          </span>
+                          <span className="text-base bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-semibold">
+                            {question.type === "objective" ? "Objetiva" : 
+                             question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    
-                    {question.caseContext && (
-                      <div className="bg-gray-50 p-4 rounded-lg mb-4 text-base italic text-gray-700 leading-relaxed">
-                        {question.caseContext}
-                      </div>
-                    )}
-                    
-                    <p className="mb-4 text-base text-gray-800 leading-relaxed">{question.question}</p>
-                    
-                    {question.options && (
-                      <div className="space-y-3 ml-6">
-                        {question.options.map((option, idx) => (
-                          <div key={idx} className={`text-base leading-relaxed ${
-                            showAnswers && option.startsWith(question.correctAnswer || "")
-                              ? "text-green-600 font-semibold"
-                              : "text-gray-700"
-                          }`}>
-                            {option}
+
+                      {/* Contexto do Caso (se houver) */}
+                      {question.caseContext && (
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg mb-6">
+                          <div className="flex items-start gap-3">
+                            <Briefcase className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                            <div>
+                              <h4 className="text-sm font-semibold text-blue-900 mb-2 uppercase tracking-wide">Estudo de Caso</h4>
+                              <p className="text-lg text-gray-800 leading-relaxed italic">{question.caseContext}</p>
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {question.caseQuestions && (
-                      <div className="mt-4 space-y-3">
-                        {question.caseQuestions.map((cq, idx) => (
-                          <div key={idx} className="text-base text-gray-700 leading-relaxed">
-                            {String.fromCharCode(97 + idx)}) {cq}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <div className="mt-5 pt-4 border-t space-y-3">
-                      {question.correctAnswer && (
-                        <p className="text-green-600 text-base leading-relaxed">
-                          <strong className="font-semibold">Resposta Correta:</strong> {question.correctAnswer}
-                        </p>
+                        </div>
                       )}
-                      {question.expectedAnswer && (
-                        <p className="text-gray-700 text-base leading-relaxed">
-                          <strong className="font-semibold">Justificativa:</strong> {question.expectedAnswer}
-                        </p>
+
+                      {/* Enunciado da Questão */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
+                        <p className="text-lg text-gray-900 leading-relaxed font-medium">{question.question}</p>
+                      </div>
+
+                      {/* Alternativas (Questões Objetivas) */}
+                      {question.options && (
+                        <div className="space-y-4 mb-6">
+                          {question.options.map((option, idx) => {
+                            const letter = String.fromCharCode(65 + idx); // A, B, C, D
+                            const isCorrect = showAnswers && option.startsWith(question.correctAnswer || "");
+                            
+                            return (
+                              <div 
+                                key={idx} 
+                                className={`flex items-start gap-4 p-5 rounded-lg border-2 transition-all ${
+                                  isCorrect 
+                                    ? "bg-green-50 border-green-400 shadow-md" 
+                                    : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                                }`}
+                              >
+                                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+                                  isCorrect 
+                                    ? "bg-green-500 text-white" 
+                                    : "bg-gray-300 text-gray-700"
+                                }`}>
+                                  {letter}
+                                </div>
+                                <p className={`text-lg leading-relaxed flex-1 ${
+                                  isCorrect 
+                                    ? "text-green-900 font-semibold" 
+                                    : "text-gray-800"
+                                }`}>
+                                  {option.replace(/^[A-E]\)\s*/, '')}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Sub-questões (Estudo de Caso) */}
+                      {question.caseQuestions && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                          <h4 className="text-base font-semibold text-gray-700 mb-4">Responda:</h4>
+                          <div className="space-y-4">
+                            {question.caseQuestions.map((cq, idx) => (
+                              <div key={idx} className="flex items-start gap-3">
+                                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold">
+                                  {String.fromCharCode(97 + idx)}
+                                </span>
+                                <p className="text-lg text-gray-800 leading-relaxed flex-1">{cq}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Gabarito e Justificativa */}
+                      {showAnswers && (question.correctAnswer || question.expectedAnswer) && (
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-6 space-y-4">
+                          {question.correctAnswer && (
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <CheckSquare className="h-5 w-5 text-green-600" />
+                                <h4 className="text-base font-bold text-green-900 uppercase tracking-wide">Resposta Correta</h4>
+                              </div>
+                              <p className="text-lg text-green-800 font-semibold pl-7">{question.correctAnswer}</p>
+                            </div>
+                          )}
+                          {question.expectedAnswer && (
+                            <div className="pt-3 border-t border-green-200">
+                              <div className="flex items-start gap-2 mb-2">
+                                <MessageSquare className="h-5 w-5 text-green-600 flex-shrink-0 mt-1" />
+                                <div className="flex-1">
+                                  <h4 className="text-base font-bold text-green-900 uppercase tracking-wide mb-2">Justificativa</h4>
+                                  <p className="text-base text-gray-800 leading-relaxed">{question.expectedAnswer}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
             </div>
           </ScrollArea>
           
