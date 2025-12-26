@@ -40,6 +40,10 @@ import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentGamification from "./pages/StudentGamification";
 import GamificationDashboard from "./pages/GamificationDashboard";
 import StudentComputationalThinking from "./pages/StudentComputationalThinking";
+import StudentExercises from "./pages/StudentExercises";
+import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
+import StudentExerciseResults from "./pages/StudentExerciseResults";
+import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -63,6 +67,7 @@ function Router() {
         <Route path={"/schedule"} component={Schedule} />
         <Route path={"/calendar"} component={Calendar} />
         <Route path={"/reports"} component={Reports} />
+        <Route path={"/exercise-performance"} component={ExercisePerformanceReport} />
         <Route path={"/learning-paths"} component={LearningPaths} />
         <Route path={"/active-methodologies"} component={ActiveMethodologies} />
         <Route path={"/tasks"} component={Tasks} />
@@ -77,6 +82,9 @@ function Router() {
         <Route path={"/student-gamification"} component={StudentGamification} />
         <Route path={"/gamification-dashboard"} component={GamificationDashboard} />
         <Route path={"/student-computational-thinking"} component={StudentComputationalThinking} />
+        <Route path={"/student-exercises"} component={StudentExercises} />
+        <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
+        <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />

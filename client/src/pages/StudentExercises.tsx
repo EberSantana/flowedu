@@ -12,9 +12,9 @@ export default function StudentExercises() {
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
 
   // Buscar exercícios disponíveis
-  const { data: exercises, isLoading } = trpc.studentExercises.listAvailable.useQuery({
-    subjectId: selectedSubject,
-  });
+  // TODO: Implementar após criar rotas tRPC
+  const exercises: any[] = [];
+  const isLoading = false;
 
   // Buscar disciplinas do aluno (comentado por enquanto - será implementado)
   // const { data: enrollments } = trpc.student.getEnrollments.useQuery();

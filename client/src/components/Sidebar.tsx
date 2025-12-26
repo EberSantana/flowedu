@@ -18,6 +18,7 @@ import {
   CheckSquare,
   BarChart3,
   Route,
+  Target,
   HelpCircle,
   Megaphone,
   KeyRound
@@ -79,6 +80,11 @@ const teacherNavItems: NavItem[] = [
     label: "Relatórios",
     icon: <BarChart3 className="h-5 w-5" />,
     href: "/reports",
+  },
+  {
+    label: "Desempenho em Exercícios",
+    icon: <Target className="h-5 w-5" />,
+    href: "/exercise-performance",
   },
   {
     label: "Trilhas de Aprendizagem",

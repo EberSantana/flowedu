@@ -12,6 +12,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
@@ -25,6 +28,9 @@ import {
   Printer,
   Lightbulb,
   Download,
+  Send,
+  Calendar,
+  Users,
 } from "lucide-react";
 
 interface ExerciseGeneratorModalProps {
@@ -57,11 +63,22 @@ export default function ExerciseGeneratorModal({
   moduleId,
   moduleTitle,
 }: ExerciseGeneratorModalProps) {
+  // Component state
   const [exerciseType, setExerciseType] = useState<ExerciseType>("mixed");
   const [questionCount, setQuestionCount] = useState(5);
   const [generatedExercises, setGeneratedExercises] = useState<GeneratedExercises | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showHints, setShowHints] = useState(false);
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [publishConfig, setPublishConfig] = useState({
+    title: "",
+    description: "",
+    availableFrom: "",
+    availableUntil: "",
+    maxAttempts: 3,
+    timeLimit: 0, // 0 = sem limite
+    showAnswersAfter: "submission" as "submission" | "deadline" | "never",
+  });
 
   const generateExercisesMutation = trpc.learningPath.generateModuleExercises.useMutation({
     onSuccess: (data) => {
@@ -70,6 +87,27 @@ export default function ExerciseGeneratorModal({
     },
     onError: (error) => {
       toast.error("Erro ao gerar exercícios: " + error.message);
+    },
+  });
+
+  // @ts-ignore - Rota existe no backend
+  const publishExercisesMutation = trpc.teacherExercises.publish.useMutation({
+    onSuccess: () => {
+      toast.success("Exercícios publicados com sucesso!");
+      setShowPublishDialog(false);
+      // Resetar configurações
+      setPublishConfig({
+        title: "",
+        description: "",
+        availableFrom: "",
+        availableUntil: "",
+        maxAttempts: 3,
+        timeLimit: 0,
+        showAnswersAfter: "submission",
+      });
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao publicar: " + error.message);
     },
   });
 
@@ -420,6 +458,7 @@ export default function ExerciseGeneratorModal({
   ];
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
@@ -616,6 +655,13 @@ export default function ExerciseGeneratorModal({
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <Button 
+                  onClick={() => setShowPublishDialog(true)} 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Publicar para Alunos
+                </Button>
                 <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
                   <Download className="h-4 w-4 mr-2" />
                   Word
@@ -633,5 +679,201 @@ export default function ExerciseGeneratorModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Dialog de Publicação */}
+    <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            <Send className="h-6 w-6 text-green-600" />
+            Publicar Exercícios para Alunos
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Título */}
+          <div className="space-y-2">
+            <Label htmlFor="publish-title" className="text-sm font-semibold">
+              Título do Exercício *
+            </Label>
+            <Input
+              id="publish-title"
+              placeholder="Ex: Avaliação do Módulo 1"
+              value={publishConfig.title}
+              onChange={(e) => setPublishConfig({ ...publishConfig, title: e.target.value })}
+              className="w-full"
+            />
+          </div>
+
+          {/* Descrição */}
+          <div className="space-y-2">
+            <Label htmlFor="publish-description" className="text-sm font-semibold">
+              Descrição (opcional)
+            </Label>
+            <Textarea
+              id="publish-description"
+              placeholder="Instruções ou observações para os alunos..."
+              value={publishConfig.description}
+              onChange={(e) => setPublishConfig({ ...publishConfig, description: e.target.value })}
+              className="w-full min-h-[80px]"
+            />
+          </div>
+
+          {/* Datas de disponibilidade */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="available-from" className="text-sm font-semibold flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Disponível a partir de
+              </Label>
+              <Input
+                id="available-from"
+                type="datetime-local"
+                value={publishConfig.availableFrom}
+                onChange={(e) => setPublishConfig({ ...publishConfig, availableFrom: e.target.value })}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="available-until" className="text-sm font-semibold flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Disponível até
+              </Label>
+              <Input
+                id="available-until"
+                type="datetime-local"
+                value={publishConfig.availableUntil}
+                onChange={(e) => setPublishConfig({ ...publishConfig, availableUntil: e.target.value })}
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          {/* Tentativas máximas */}
+          <div className="space-y-2">
+            <Label htmlFor="max-attempts" className="text-sm font-semibold">
+              Tentativas Máximas
+            </Label>
+            <Select
+              value={publishConfig.maxAttempts.toString()}
+              onValueChange={(value) => setPublishConfig({ ...publishConfig, maxAttempts: parseInt(value) })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 tentativa</SelectItem>
+                <SelectItem value="2">2 tentativas</SelectItem>
+                <SelectItem value="3">3 tentativas</SelectItem>
+                <SelectItem value="5">5 tentativas</SelectItem>
+                <SelectItem value="999">Ilimitadas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tempo limite */}
+          <div className="space-y-2">
+            <Label htmlFor="time-limit" className="text-sm font-semibold">
+              Tempo Limite (minutos)
+            </Label>
+            <Input
+              id="time-limit"
+              type="number"
+              min="0"
+              placeholder="0 = sem limite"
+              value={publishConfig.timeLimit}
+              onChange={(e) => setPublishConfig({ ...publishConfig, timeLimit: parseInt(e.target.value) || 0 })}
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500">Deixe 0 para não ter limite de tempo</p>
+          </div>
+
+          {/* Quando mostrar respostas */}
+          <div className="space-y-2">
+            <Label htmlFor="show-answers-after" className="text-sm font-semibold">
+              Mostrar Respostas
+            </Label>
+            <Select
+              value={publishConfig.showAnswersAfter}
+              onValueChange={(value: any) => setPublishConfig({ ...publishConfig, showAnswersAfter: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="submission">Após envio (imediatamente)</SelectItem>
+                <SelectItem value="deadline">Após prazo final</SelectItem>
+                <SelectItem value="never">Nunca mostrar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Resumo */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+            <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Resumo da Publicação
+            </h4>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• {questionCount} questões ({exerciseType === "mixed" ? "mistas" : exerciseType})</li>
+              <li>• {publishConfig.maxAttempts === 999 ? "Tentativas ilimitadas" : `${publishConfig.maxAttempts} tentativa(s)`}</li>
+              <li>• {publishConfig.timeLimit > 0 ? `${publishConfig.timeLimit} minutos` : "Sem limite de tempo"}</li>
+              <li>• Respostas: {publishConfig.showAnswersAfter === "submission" ? "Imediatas" : publishConfig.showAnswersAfter === "deadline" ? "Após prazo" : "Não mostrar"}</li>
+            </ul>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowPublishDialog(false)}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={() => {
+              if (!publishConfig.title.trim()) {
+                toast.error("Título é obrigatório!");
+                return;
+              }
+              if (!generatedExercises) {
+                toast.error("Nenhum exercício gerado!");
+                return;
+              }
+
+              // Preparar dados para publicação
+              publishExercisesMutation.mutate({
+                moduleId,
+                title: publishConfig.title,
+                description: publishConfig.description || null,
+                questions: generatedExercises.exercises.map((ex) => ({
+                  question: ex.question,
+                  type: ex.type,
+                  options: ex.options || [],
+                  correctAnswer: ex.correctAnswer || "",
+                  explanation: ex.explanation || null,
+                })),
+                availableFrom: publishConfig.availableFrom ? new Date(publishConfig.availableFrom).toISOString() : null,
+                availableUntil: publishConfig.availableUntil ? new Date(publishConfig.availableUntil).toISOString() : null,
+                maxAttempts: publishConfig.maxAttempts === 999 ? null : publishConfig.maxAttempts,
+                timeLimit: publishConfig.timeLimit > 0 ? publishConfig.timeLimit : null,
+              });
+            }}
+            disabled={publishExercisesMutation.isPending}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            {publishExercisesMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Publicando...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                Publicar Agora
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </>
   );
 }

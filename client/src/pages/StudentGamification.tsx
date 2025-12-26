@@ -317,7 +317,7 @@ export default function StudentGamification() {
                 ) : ranking && ranking.length > 0 ? (
                   <div className="space-y-2">
                     {ranking.map((student: any, index: number) => {
-                      const isCurrentStudent = student.studentId === stats?.studentId;
+                      const isCurrentStudent = false; // TODO: Implementar detecção de aluno atual
                       const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : null;
                       
                       return (

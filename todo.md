@@ -2954,3 +2954,28 @@
 - [ ] Componente de resultado (nota, acertos, feedback)
 - [ ] Criar interface no professor para publicar exercícios
 - [ ] Testar fluxo completo
+
+## Sistema de Exercícios para Alunos - Frontend Completo
+
+### Interface do Aluno
+- [x] Criar página StudentExerciseAttempt.tsx para resolução de exercícios
+- [x] Criar página StudentExerciseResults.tsx para visualização de resultados com gabarito
+- [x] Adicionar rotas no App.tsx (/student-exercises/:id/attempt e /student-exercises/:id/results)
+- [x] Integrar timer de contagem regressiva (se houver tempo limite)
+- [x] Implementar navegação entre questões
+- [x] Adicionar feedback visual instantâneo após submissão
+
+### Interface do Professor
+- [x] Adicionar botão "Publicar para Alunos" no ExerciseGeneratorModal.tsx
+- [x] Criar dialog de configuração de publicação (data, tentativas, tempo limite)
+- [x] Integrar com rota tRPC teacherExercises.publish
+- [ ] Adicionar página de gerenciamento de exercícios publicados
+- [ ] Permitir edição de configurações de exercícios já publicados
+
+### Relatório de Desempenho
+- [x] Criar página ExercisePerformanceReport.tsx
+- [x] Implementar rotas tRPC para estatísticas de exercícios
+- [x] Adicionar gráficos de desempenho (Chart.js)
+- [x] Criar tabela de alunos com dificuldades por exercício/módulo
+- [x] Adicionar exportação de relatório em PDF
+- [x] Link no menu lateral do professor
