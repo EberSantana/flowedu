@@ -49,7 +49,7 @@ export default function GamificationDashboard() {
   const [isExporting, setIsExporting] = useState(false);
 
   const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery() || { data: null, isLoading: false };
-  const { data: ranking, isLoading: rankingLoading } = trpc.gamification.getClassRankingTeacher.useQuery({ limit: 20 });
+  const { data: ranking, isLoading: rankingLoading } = (trpc.gamification as any).getClassRankingTeacher?.useQuery({ limit: 20 }) || { data: null, isLoading: false };
   const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery() || { data: [], isLoading: false };
   const { data: evolutionData, isLoading: evolutionLoading } = (trpc.gamification as any).getPointsEvolution?.useQuery() || { data: [], isLoading: false };
   
@@ -104,15 +104,15 @@ export default function GamificationDashboard() {
   // Calcular distribuição de faixas
   const beltDistribution = BELT_CONFIG.map(belt => ({
     ...belt,
-    count: ranking?.filter(s => s.currentBelt === belt.name).length || 0
+    count: ranking?.filter((s: any) => s.currentBelt === belt.name).length || 0
   }));
 
   const totalStudents = ranking?.length || 0;
   const averagePoints = totalStudents > 0
-    ? Math.round((ranking?.reduce((sum, s) => sum + s.totalPoints, 0) || 0) / totalStudents)
+    ? Math.round((ranking?.reduce((sum: number, s: any) => sum + s.totalPoints, 0) || 0) / totalStudents)
     : 0;
 
-  const activeStudents = ranking?.filter(s => s.streakDays > 0).length || 0;
+  const activeStudents = ranking?.filter((s: any) => s.streakDays > 0).length || 0;
 
   return (
     <DashboardLayout>
@@ -345,7 +345,7 @@ export default function GamificationDashboard() {
                     <div className="text-center py-8 text-gray-500">Carregando ranking...</div>
                   ) : ranking && ranking.length > 0 ? (
                     <div className="space-y-2">
-                      {ranking.map((student, index) => {
+                      {ranking.map((student: any, index: number) => {
                         const belt = BELT_CONFIG.find(b => b.name === student.currentBelt) || BELT_CONFIG[0];
                         return (
                           <div
