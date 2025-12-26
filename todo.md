@@ -2657,3 +2657,22 @@
 - [x] Adicionar rotas de gamificação para professores (getTeacherOverview, getClassRanking para professores)
 - [x] Atualizar GamificationDashboard.tsx para usar rotas corretas baseadas no tipo de usuário
 - [x] Testar acesso à página de gamificação como professor
+
+## Interface do Aluno - Gamificação e PC
+- [ ] Criar página StudentGamification.tsx
+- [ ] Implementar painel de pontos totais e faixa atual
+- [ ] Adicionar barra de progresso para próxima faixa
+- [ ] Criar galeria de badges conquistados
+- [ ] Implementar radar chart de Pensamento Computacional
+- [ ] Adicionar histórico de pontos recentes
+- [ ] Mostrar ranking da turma
+- [ ] Integrar rota no App.tsx
+- [ ] Adicionar link no menu lateral
+- [ ] Testar interface completa
+
+## ✅ Tarefas Concluídas - Interface do Aluno
+- [x] Página StudentGamification.tsx já existia e está completa
+- [x] Adicionado radar chart de Pensamento Computacional
+- [x] Corrigido schema do banco (coluna currentBelt)
+- [x] Sistema funcionando sem erros TypeScript
+- [x] Rota integrada no App.tsx

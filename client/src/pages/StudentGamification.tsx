@@ -7,6 +7,25 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Radar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 const BELT_CONFIG = [
   { name: 'white', label: 'Branca', minPoints: 0, maxPoints: 200, color: 'bg-gray-400', gradient: 'from-gray-300 to-gray-500' },
@@ -26,6 +45,7 @@ export default function StudentGamification() {
   const { data: history, isLoading: historyLoading } = trpc.gamification.getPointsHistory.useQuery({ limit: 20 });
   const { data: badges, isLoading: badgesLoading } = trpc.gamification.getStudentBadges.useQuery();
   const { data: ranking, isLoading: rankingLoading } = trpc.gamification.getClassRanking.useQuery({ limit: 10 });
+  const { data: ctProfile, isLoading: ctLoading } = (trpc.computationalThinking as any).getProfile?.useQuery() || { data: null, isLoading: false };
 
   if (statsLoading) {
     return (
@@ -216,6 +236,95 @@ export default function StudentGamification() {
                     </div>
                   )}
                 </ScrollArea>
+              </CardContent>
+            </Card>
+            
+            {/* Card de Pensamento Computacional */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  🧠 Pensamento Computacional
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {ctLoading ? (
+                  <div className="text-center py-8 text-gray-500">Carregando perfil...</div>
+                ) : ctProfile ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Radar Chart */}
+                    <div className="flex items-center justify-center">
+                      <div className="w-full max-w-[300px]">
+                        <Radar
+                          data={{
+                            labels: ["Decomposição", "Padrões", "Abstração", "Algoritmos"],
+                            datasets: [
+                              {
+                                label: "Seu Perfil",
+                                data: [
+                                  ctProfile.decomposition || 0,
+                                  ctProfile.patternRecognition || 0,
+                                  ctProfile.abstraction || 0,
+                                  ctProfile.algorithms || 0,
+                                ],
+                                backgroundColor: "rgba(59, 130, 246, 0.2)",
+                                borderColor: "rgb(59, 130, 246)",
+                                borderWidth: 2,
+                                pointBackgroundColor: "rgb(59, 130, 246)",
+                                pointBorderColor: "#fff",
+                                pointHoverBackgroundColor: "#fff",
+                                pointHoverBorderColor: "rgb(59, 130, 246)",
+                              },
+                            ],
+                          }}
+                          options={{
+                            scales: {
+                              r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                  stepSize: 20,
+                                },
+                              },
+                            },
+                            plugins: {
+                              legend: {
+                                display: false,
+                              },
+                            },
+                          }}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Scores */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                        <div className="text-3xl font-bold text-blue-600">{ctProfile.decomposition || 0}</div>
+                        <div className="text-sm text-gray-600 mt-1">Decomposição</div>
+                        <div className="text-xs text-gray-500 mt-1">Dividir problemas</div>
+                      </div>
+                      <div className="text-center p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                        <div className="text-3xl font-bold text-green-600">{ctProfile.patternRecognition || 0}</div>
+                        <div className="text-sm text-gray-600 mt-1">Padrões</div>
+                        <div className="text-xs text-gray-500 mt-1">Identificar padrões</div>
+                      </div>
+                      <div className="text-center p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+                        <div className="text-3xl font-bold text-purple-600">{ctProfile.abstraction || 0}</div>
+                        <div className="text-sm text-gray-600 mt-1">Abstração</div>
+                        <div className="text-xs text-gray-500 mt-1">Focar no essencial</div>
+                      </div>
+                      <div className="text-center p-4 bg-orange-50 rounded-lg border-2 border-orange-200">
+                        <div className="text-3xl font-bold text-orange-600">{ctProfile.algorithms || 0}</div>
+                        <div className="text-sm text-gray-600 mt-1">Algoritmos</div>
+                        <div className="text-xs text-gray-500 mt-1">Sequência lógica</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Complete exercícios de Pensamento Computacional para ver seu perfil!
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
