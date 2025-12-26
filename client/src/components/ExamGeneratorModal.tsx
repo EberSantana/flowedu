@@ -456,7 +456,7 @@ export default function ExamGeneratorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-purple-600" />
@@ -559,8 +559,8 @@ export default function ExamGeneratorModal({
           </div>
         ) : (
           <div className="flex-1">
-            <ScrollArea className="flex-1 pr-4 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
-              <div id="exam-content" className="space-y-6 py-4">
+            <ScrollArea className="flex-1 pr-6 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
+              <div id="exam-content" className="space-y-12 py-6 px-2">
                 {/* Cabeçalho da Prova */}
                 <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 mb-8 border border-purple-100">
                   <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">{generatedExam.title}</h2>
@@ -579,16 +579,18 @@ export default function ExamGeneratorModal({
                   {generatedExam.questions.map((question, idx) => (
                     <div key={question.number} id={`question-${idx}`} className="scroll-mt-4">
                       {/* Header da Questão */}
-                      <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-200">
-                        <h3 className="text-2xl font-bold text-gray-900">Questão {question.number}</h3>
-                        <div className="flex gap-3">
-                          <span className="text-base bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold">
-                            {question.points} pts
-                          </span>
-                          <span className="text-base bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-semibold">
-                            {question.type === "objective" ? "Objetiva" : 
-                             question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
-                          </span>
+                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 mb-8 border-l-4 border-purple-500 shadow-sm">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-3xl font-bold text-gray-900">Questão {question.number}</h3>
+                          <div className="flex gap-3">
+                            <span className="text-lg bg-blue-500 text-white px-5 py-2 rounded-lg font-bold shadow-sm">
+                              {question.points} pts
+                            </span>
+                            <span className="text-lg bg-purple-500 text-white px-5 py-2 rounded-lg font-bold shadow-sm">
+                              {question.type === "objective" ? "Objetiva" : 
+                               question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -606,8 +608,8 @@ export default function ExamGeneratorModal({
                       )}
 
                       {/* Enunciado da Questão */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
-                        <p className="text-lg text-gray-900 leading-relaxed font-medium">{question.question}</p>
+                      <div className="bg-white border-2 border-gray-300 rounded-xl p-8 mb-8 shadow-md">
+                        <p className="text-xl text-gray-900 leading-loose font-medium">{question.question}</p>
                       </div>
 
                       {/* Alternativas (Questões Objetivas) */}
@@ -633,10 +635,10 @@ export default function ExamGeneratorModal({
                                 }`}>
                                   {letter}
                                 </div>
-                                <p className={`text-lg leading-relaxed flex-1 ${
+                                <p className={`text-xl leading-loose flex-1 ${
                                   isCorrect 
-                                    ? "text-green-900 font-semibold" 
-                                    : "text-gray-800"
+                                    ? "text-green-900 font-bold" 
+                                    : "text-gray-900"
                                 }`}>
                                   {option.replace(/^[A-E]\)\s*/, '')}
                                 </p>
@@ -656,7 +658,7 @@ export default function ExamGeneratorModal({
                                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold">
                                   {String.fromCharCode(97 + idx)}
                                 </span>
-                                <p className="text-lg text-gray-800 leading-relaxed flex-1">{cq}</p>
+                                <p className="text-xl text-gray-900 leading-loose flex-1">{cq}</p>
                               </div>
                             ))}
                           </div>
@@ -672,7 +674,7 @@ export default function ExamGeneratorModal({
                                 <CheckSquare className="h-5 w-5 text-green-600" />
                                 <h4 className="text-base font-bold text-green-900 uppercase tracking-wide">Resposta Correta</h4>
                               </div>
-                              <p className="text-lg text-green-800 font-semibold pl-7">{question.correctAnswer}</p>
+                              <p className="text-xl text-green-800 font-bold pl-7">{question.correctAnswer}</p>
                             </div>
                           )}
                           {question.expectedAnswer && (
@@ -681,7 +683,7 @@ export default function ExamGeneratorModal({
                                 <MessageSquare className="h-5 w-5 text-green-600 flex-shrink-0 mt-1" />
                                 <div className="flex-1">
                                   <h4 className="text-base font-bold text-green-900 uppercase tracking-wide mb-2">Justificativa</h4>
-                                  <p className="text-base text-gray-800 leading-relaxed">{question.expectedAnswer}</p>
+                                  <p className="text-lg text-gray-800 leading-relaxed">{question.expectedAnswer}</p>
                                 </div>
                               </div>
                             </div>

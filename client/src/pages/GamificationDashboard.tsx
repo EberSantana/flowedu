@@ -143,14 +143,14 @@ export default function GamificationDashboard() {
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full ${belt.color} flex items-center justify-center`}>
                       <span className="text-white font-bold text-sm">
-                        {belt.name === 'white' && '⚪'}
-                        {belt.name === 'yellow' && '🟡'}
-                        {belt.name === 'orange' && '🟠'}
-                        {belt.name === 'green' && '🟢'}
-                        {belt.name === 'blue' && '🔵'}
-                        {belt.name === 'purple' && '🟣'}
-                        {belt.name === 'brown' && '🟤'}
-                        {belt.name === 'black' && '⚫'}
+                        {belt.name === 'white' ? '⚪' :
+                         belt.name === 'yellow' ? '🟡' :
+                         belt.name === 'orange' ? '🟠' :
+                         belt.name === 'green' ? '🟢' :
+                         belt.name === 'blue' ? '🔵' :
+                         belt.name === 'purple' ? '🟣' :
+                         belt.name === 'brown' ? '🟤' :
+                         belt.name === 'black' ? '⚫' : '🔵'}
                       </span>
                     </div>
                     <div>

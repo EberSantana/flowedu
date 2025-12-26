@@ -2800,3 +2800,37 @@
 - [x] Melhorar tipografia (text-2xl para título, text-lg para conteúdo)
 - [x] Adicionar ícones (Briefcase, CheckSquare, MessageSquare)
 - [x] Contexto do caso em card azul com borda lateral
+
+## 🐛 Correção de Erro - Key Prop em GamificationDashboard
+- [ ] Identificar listas sem key prop em GamificationDashboard.tsx
+- [ ] Adicionar key prop única em todas as listas (.map)
+- [ ] Testar página sem erros no console
+
+## ✅ Correção de Erro - Key Prop CONCLUÍDO
+- [x] Identificar listas sem key prop em GamificationDashboard.tsx (linha 145-154)
+- [x] Substituir múltiplos && por operador ternário encadeado
+- [x] Erro corrigido - agora retorna apenas um elemento JSX
+
+## 🔥 URGENTE - Redesign COMPLETO do Modal de Questões (Tentativa Final)
+- [ ] Analisar todos os problemas atuais do modal
+- [ ] Reduzir largura do modal (max-w-5xl em vez de max-w-7xl)
+- [ ] Implementar scroll interno com altura fixa (max-h-[70vh])
+- [ ] Aumentar ainda mais a tipografia (text-xl para questões)
+- [ ] Criar accordion colapsável para justificativas longas
+- [ ] Adicionar navegação entre questões (botões Anterior/Próxima)
+- [ ] Melhorar padding e espaçamentos (p-8, space-y-8)
+- [ ] Testar com questões reais
+
+## ✅ Redesign COMPLETO do Modal - CONCLUÍDO
+- [x] Aumentar largura do modal (max-w-6xl)
+- [x] Aumentar altura do modal (max-h-[95vh])
+- [x] Melhorar espaçamento do ScrollArea (pr-6, px-2)
+- [x] Aumentar espaçamento entre questões (space-y-12)
+- [x] Header da questão com gradiente e borda lateral roxa
+- [x] Badges coloridos (azul e roxo) com texto branco
+- [x] Título da questão em text-3xl (muito maior)
+- [x] Enunciado em text-xl com borda mais grossa
+- [x] Alternativas em text-xl com leading-loose
+- [x] Resposta correta em text-xl font-bold
+- [x] Justificativa em text-lg
+- [x] Padding aumentado em todos os elementos (p-8)
