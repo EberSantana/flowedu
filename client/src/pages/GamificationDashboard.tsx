@@ -1,92 +1,36 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Trophy, Award, TrendingUp, Users, Flame, Target, FileDown } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "sonner";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
-// Registrar componentes do Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import { Users, TrendingUp, Trophy, Award } from "lucide-react";
 
 const BELT_CONFIG = [
-  { name: 'white', label: 'Branca', minPoints: 0, color: 'bg-gray-400', gradient: 'from-gray-300 to-gray-500' },
-  { name: 'yellow', label: 'Amarela', minPoints: 200, color: 'bg-yellow-400', gradient: 'from-yellow-300 to-yellow-500' },
-  { name: 'orange', label: 'Laranja', minPoints: 400, color: 'bg-orange-400', gradient: 'from-orange-300 to-orange-500' },
-  { name: 'green', label: 'Verde', minPoints: 600, color: 'bg-green-500', gradient: 'from-green-400 to-green-600' },
-  { name: 'blue', label: 'Azul', minPoints: 900, color: 'bg-blue-500', gradient: 'from-blue-400 to-blue-600' },
-  { name: 'purple', label: 'Roxa', minPoints: 1200, color: 'bg-purple-500', gradient: 'from-purple-400 to-purple-600' },
-  { name: 'brown', label: 'Marrom', minPoints: 1600, color: 'bg-amber-700', gradient: 'from-amber-600 to-amber-800' },
-  { name: 'black', label: 'Preta', minPoints: 2000, color: 'bg-gray-900', gradient: 'from-gray-800 to-black' },
+  { name: 'white', label: 'Faixa Branca', minPoints: 0, color: 'bg-gray-400', iconBg: 'bg-gray-100' },
+  { name: 'yellow', label: 'Faixa Amarela', minPoints: 200, color: 'bg-yellow-400', iconBg: 'bg-yellow-100' },
+  { name: 'orange', label: 'Faixa Laranja', minPoints: 400, color: 'bg-orange-400', iconBg: 'bg-orange-100' },
+  { name: 'green', label: 'Faixa Verde', minPoints: 600, color: 'bg-green-500', iconBg: 'bg-green-100' },
+  { name: 'blue', label: 'Faixa Azul', minPoints: 900, color: 'bg-blue-500', iconBg: 'bg-blue-100' },
+  { name: 'purple', label: 'Faixa Roxa', minPoints: 1200, color: 'bg-purple-500', iconBg: 'bg-purple-100' },
+  { name: 'brown', label: 'Faixa Marrom', minPoints: 1600, color: 'bg-amber-700', iconBg: 'bg-amber-100' },
+  { name: 'black', label: 'Faixa Preta', minPoints: 2000, color: 'bg-gray-900', iconBg: 'bg-gray-800' },
 ];
 
 export default function GamificationDashboard() {
-  const [selectedTab, setSelectedTab] = useState("overview");
-  const [isExporting, setIsExporting] = useState(false);
-
   const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery() || { data: null, isLoading: false };
   const { data: ranking, isLoading: rankingLoading } = (trpc.gamification as any).getClassRankingTeacher?.useQuery({ limit: 20 }) || { data: null, isLoading: false };
   const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery() || { data: [], isLoading: false };
-  const { data: evolutionData, isLoading: evolutionLoading } = (trpc.gamification as any).getPointsEvolution?.useQuery() || { data: [], isLoading: false };
-  
-  const generateReportMutation = (trpc.gamification as any).generateReport?.useMutation() || { mutate: () => {}, isPending: false };
-  
-  const handleExportPDF = async () => {
-    setIsExporting(true);
-    try {
-      const result = await generateReportMutation.mutateAsync();
-      
-      // Converter base64 para blob e fazer download
-      const byteCharacters = atob(result.pdf);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-      
-      // Criar link de download
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = result.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success('Relatório PDF gerado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      toast.error('Erro ao gerar relatório PDF');
-    } finally {
-      setIsExporting(false);
-    }
-  };
+
+  // Calcular distribuição de faixas
+  const beltDistribution = BELT_CONFIG.map(belt => {
+    const count = ranking?.filter((student: any) => student.currentBelt === belt.name).length || 0;
+    const percentage = ranking && ranking.length > 0 ? (count / ranking.length) * 100 : 0;
+    return { ...belt, count, percentage };
+  });
+
+  const totalStudents = overview?.totalStudents || 0;
+  const activeStudents = overview?.activeStudents || 0;
+  const averagePoints = overview?.averagePoints || 0;
+  const totalBadgesEarned = badges?.reduce((sum: number, badge: any) => sum + (badge.earnedCount || 0), 0) || 0;
 
   if (overviewLoading) {
     return (
@@ -101,89 +45,80 @@ export default function GamificationDashboard() {
     );
   }
 
-  // Calcular distribuição de faixas
-  const beltDistribution = BELT_CONFIG.map(belt => ({
-    ...belt,
-    count: ranking?.filter((s: any) => s.currentBelt === belt.name).length || 0
-  }));
-
-  const totalStudents = ranking?.length || 0;
-  const averagePoints = totalStudents > 0
-    ? Math.round((ranking?.reduce((sum: number, s: any) => sum + s.totalPoints, 0) || 0) / totalStudents)
-    : 0;
-
-  const activeStudents = ranking?.filter((s: any) => s.streakDays > 0).length || 0;
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard de Gamificação 🎮</h1>
-            <p className="text-gray-600 mt-1">Acompanhe o progresso e engajamento dos seus alunos</p>
-          </div>
-          <button
-            onClick={handleExportPDF}
-            disabled={isExporting}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FileDown className="h-5 w-5" />
-            {isExporting ? 'Gerando PDF...' : 'Exportar PDF'}
-          </button>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            Dashboard de Gamificação 🎮
+          </h1>
+          <p className="text-gray-600 mt-2">Acompanhe o progresso e engajamento dos seus alunos</p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-blue-700 flex items-center gap-2">
-                <Users className="h-4 w-4" />
+        {/* Cards de Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total de Alunos */}
+          <Card className="border-l-4 border-l-blue-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">
                 Total de Alunos
               </CardTitle>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-900">{totalStudents}</div>
-              <p className="text-xs text-blue-600 mt-1">cadastrados no sistema</p>
+              <div className="text-3xl font-bold text-gray-900">{totalStudents}</div>
+              <p className="text-xs text-gray-500 mt-1">cadastrados no sistema</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-green-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-green-700 flex items-center gap-2">
-                <Flame className="h-4 w-4" />
+          {/* Alunos Ativos */}
+          <Card className="border-l-4 border-l-green-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">
                 Alunos Ativos
               </CardTitle>
+              <div className="p-2 bg-green-100 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-green-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-900">{activeStudents}</div>
-              <p className="text-xs text-green-600 mt-1">com streak ativo</p>
+              <div className="text-3xl font-bold text-gray-900">{activeStudents}</div>
+              <p className="text-xs text-gray-500 mt-1">com streak ativo</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-purple-700 flex items-center gap-2">
-                <Trophy className="h-4 w-4" />
+          {/* Pontos Médios */}
+          <Card className="border-l-4 border-l-purple-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">
                 Pontos Médios
               </CardTitle>
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Trophy className="h-5 w-5 text-purple-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-900">{averagePoints}</div>
-              <p className="text-xs text-purple-600 mt-1">por aluno</p>
+              <div className="text-3xl font-bold text-gray-900">{Math.round(averagePoints)}</div>
+              <p className="text-xs text-gray-500 mt-1">por aluno</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-orange-700 flex items-center gap-2">
-                <Award className="h-4 w-4" />
+          {/* Badges Conquistados */}
+          <Card className="border-l-4 border-l-orange-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700">
                 Badges Conquistados
               </CardTitle>
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Award className="h-5 w-5 text-orange-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-900">{overview?.totalBadgesEarned || 0}</div>
-              <p className="text-xs text-orange-600 mt-1">de {overview?.totalBadgesAvailable || 0} disponíveis</p>
+              <div className="text-3xl font-bold text-gray-900">{totalBadgesEarned}</div>
+              <p className="text-xs text-gray-500 mt-1">de {badges?.length || 0} disponíveis</p>
             </CardContent>
           </Card>
         </div>
@@ -191,255 +126,128 @@ export default function GamificationDashboard() {
         {/* Distribuição de Faixas */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-blue-600" />
-              Distribuição de Faixas
-            </CardTitle>
-            <CardDescription>Veja como seus alunos estão distribuídos nas diferentes faixas</CardDescription>
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Trophy className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Distribuição de Faixas</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">Veja como seus alunos estão distribuídos nas diferentes faixas</p>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {beltDistribution.map((belt) => {
-                const percentage = totalStudents > 0 ? (belt.count / totalStudents) * 100 : 0;
-                return (
-                  <div key={belt.name} className="space-y-2">
-                    <div className="flex items-center justify-between">
+          <CardContent className="space-y-4">
+            {beltDistribution.map((belt) => (
+              <div key={belt.name} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full ${belt.color} flex items-center justify-center`}>
+                      <span className="text-white font-bold text-sm">
+                        {belt.name === 'white' && '⚪'}
+                        {belt.name === 'yellow' && '🟡'}
+                        {belt.name === 'orange' && '🟠'}
+                        {belt.name === 'green' && '🟢'}
+                        {belt.name === 'blue' && '🔵'}
+                        {belt.name === 'purple' && '🟣'}
+                        {belt.name === 'brown' && '🟤'}
+                        {belt.name === 'black' && '⚫'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{belt.label}</p>
+                      <p className="text-sm text-gray-500">{belt.minPoints}+ pontos</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl font-bold text-gray-900">{belt.count}</span>
+                    <span className="text-sm text-gray-500 w-12 text-right">{belt.percentage.toFixed(1)}%</span>
+                  </div>
+                </div>
+                
+                {/* Barra de progresso */}
+                <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div 
+                    className={`${belt.color} h-2 rounded-full transition-all duration-500`}
+                    style={{ width: `${belt.percentage}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Ranking de Alunos */}
+        {ranking && ranking.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Top 10 Alunos</CardTitle>
+              <p className="text-sm text-gray-600 mt-1">Alunos com melhor desempenho no sistema de gamificação</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {ranking.slice(0, 10).map((student: any, index: number) => {
+                  const belt = BELT_CONFIG.find(b => b.name === student.currentBelt) || BELT_CONFIG[0];
+                  return (
+                    <div key={student.studentId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${belt.gradient} flex items-center justify-center shadow-md`}>
-                          <span className="text-white text-sm font-bold">🥋</span>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                          index === 0 ? 'bg-yellow-400 text-yellow-900' :
+                          index === 1 ? 'bg-gray-300 text-gray-700' :
+                          index === 2 ? 'bg-amber-600 text-amber-100' :
+                          'bg-gray-200 text-gray-600'
+                        }`}>
+                          {index + 1}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">Faixa {belt.label}</p>
-                          <p className="text-xs text-gray-500">{belt.minPoints}+ pontos</p>
+                          <p className="font-medium text-gray-900">{student.fullName}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className={`w-3 h-3 rounded-full ${belt.color}`}></div>
+                            <span className="text-xs text-gray-600">{belt.label}</span>
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">{belt.count}</p>
-                        <p className="text-xs text-gray-500">{percentage.toFixed(1)}%</p>
+                        <p className="text-lg font-bold text-gray-900">{student.totalPoints}</p>
+                        <p className="text-xs text-gray-500">pontos</p>
                       </div>
                     </div>
-                    <Progress value={percentage} className="h-2" />
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Gráfico de Evolução Temporal */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-              Evolução de Pontos da Turma
-            </CardTitle>
-            <CardDescription>Últimas 4 semanas - Total de pontos ganhos pela turma</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {evolutionLoading ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                  <p className="text-sm text-gray-500">Carregando dados...</p>
-                </div>
+                  );
+                })}
               </div>
-            ) : evolutionData && evolutionData.length > 0 ? (
-              <div className="h-[300px]">
-                <Line
-                  data={{
-                    labels: evolutionData.map((d: any) => d.week),
-                    datasets: [
-                      {
-                        label: 'Pontos Totais',
-                        data: evolutionData.map((d: any) => d.totalPoints),
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointBackgroundColor: 'rgb(59, 130, 246)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                      },
-                    ],
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                          size: 14,
-                          weight: 'bold',
-                        },
-                        bodyFont: {
-                          size: 13,
-                        },
-                        callbacks: {
-                          label: function(context) {
-                            return `Pontos: ${context.parsed.y}`;
-                          }
-                        }
-                      },
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                        ticks: {
-                          font: {
-                            size: 12,
-                          },
-                        },
-                        grid: {
-                          color: 'rgba(0, 0, 0, 0.05)',
-                        },
-                      },
-                      x: {
-                        ticks: {
-                          font: {
-                            size: 12,
-                            weight: 'bold',
-                          },
-                        },
-                        grid: {
-                          display: false,
-                        },
-                      },
-                    },
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="h-[300px] flex items-center justify-center">
-                <p className="text-gray-500">Nenhum dado disponível ainda</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="overview">Ranking Completo</TabsTrigger>
-            <TabsTrigger value="badges">Badges Mais Conquistados</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
-                  Ranking Geral da Turma
-                </CardTitle>
-                <CardDescription>Top 20 alunos com maior pontuação</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[500px] pr-4">
-                  {rankingLoading ? (
-                    <div className="text-center py-8 text-gray-500">Carregando ranking...</div>
-                  ) : ranking && ranking.length > 0 ? (
-                    <div className="space-y-2">
-                      {ranking.map((student: any, index: number) => {
-                        const belt = BELT_CONFIG.find(b => b.name === student.currentBelt) || BELT_CONFIG[0];
-                        return (
-                          <div
-                            key={student.studentId}
-                            className={`flex items-center gap-4 p-3 rounded-lg ${
-                              index === 0
-                                ? 'bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-400'
-                                : index === 1
-                                ? 'bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-gray-400'
-                                : index === 2
-                                ? 'bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-400'
-                                : 'bg-gray-50 hover:bg-gray-100'
-                            }`}
-                          >
-                            <div className="text-2xl font-bold text-gray-700 w-8">
-                              {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}º`}
-                            </div>
-                            <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${belt.gradient} flex items-center justify-center shadow-md`}>
-                              <span className="text-white text-sm">🥋</span>
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-semibold text-gray-900">{student.studentName}</p>
-                              <p className="text-xs text-gray-600">
-                                Faixa {belt.label} • {student.streakDays} dias de sequência
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xl font-bold text-blue-600">{student.totalPoints}</p>
-                              <p className="text-xs text-gray-500">pontos</p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      Nenhum aluno com pontuação ainda.
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="badges" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5 text-yellow-600" />
-                  Badges Mais Conquistados
-                </CardTitle>
-                <CardDescription>Veja quais conquistas seus alunos mais alcançam</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {badgesLoading ? (
-                  <div className="text-center py-8 text-gray-500">Carregando badges...</div>
-                ) : badges && badges.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {badges.map((badge: any) => {
-                      const earnedPercentage = totalStudents > 0 
-                        ? (badge.earnedCount / totalStudents) * 100 
-                        : 0;
-                      return (
-                        <div
-                          key={badge.id}
-                          className="p-4 rounded-lg border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="text-4xl">{badge.icon || '🏆'}</div>
-                            <div className="flex-1">
-                              <h4 className="font-bold text-gray-900">{badge.name}</h4>
-                              <p className="text-sm text-gray-600 mt-1">{badge.description}</p>
-                              <div className="mt-3">
-                                <div className="flex justify-between text-sm text-gray-700 mb-1">
-                                  <span>{badge.earnedCount} alunos</span>
-                                  <span>{earnedPercentage.toFixed(0)}%</span>
-                                </div>
-                                <Progress value={earnedPercentage} className="h-2" />
-                              </div>
-                            </div>
-                          </div>
+        {/* Badges */}
+        {badges && badges.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Badges Disponíveis</CardTitle>
+              <p className="text-sm text-gray-600 mt-1">Conquistas que os alunos podem desbloquear</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {badges.map((badge: any) => (
+                  <div key={badge.badgeKey} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3">
+                      <div className="text-3xl">{badge.iconUrl || '🏆'}</div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">{badge.name}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{badge.description}</p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="text-xs text-gray-500">{badge.requiredPoints} pontos</span>
+                          <span className="text-sm font-medium text-blue-600">
+                            {badge.earnedCount || 0} conquistados
+                          </span>
                         </div>
-                      );
-                    })}
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    Nenhum badge conquistado ainda.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardLayout>
   );

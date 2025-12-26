@@ -2689,3 +2689,19 @@
 - [ ] Melhorar visualização de faixas de evolução
 - [ ] Adicionar animações suaves de transição
 - [ ] Testar fluxo completo de gamificação por disciplina
+
+## Padronização de Layout - Gamificação
+- [ ] Adequar GamificationDashboard.tsx ao layout padrão do sistema
+- [ ] Implementar cards de estatísticas no topo (4 cards)
+- [ ] Criar seção de distribuição de faixas com barras horizontais
+- [ ] Adicionar ícones circulares coloridos para cada faixa
+- [ ] Padronizar cores, espaçamentos e tipografia
+- [ ] Testar responsividade
+
+## Tarefas Concluídas - Layout Padronizado
+- [x] Adequar GamificationDashboard.tsx ao layout padrão do sistema
+- [x] Implementar cards de estatísticas no topo (4 cards)
+- [x] Criar seção de distribuição de faixas com barras horizontais
+- [x] Adicionar ícones circulares coloridos para cada faixa
+- [x] Padronizar cores, espaçamentos e tipografia
+- [x] Testar responsividade
