@@ -475,7 +475,29 @@ export default function ExerciseGeneratorModal({
             </div>
           </div>
         ) : (
-          <div className="flex-1">
+          <div className="flex-1 flex gap-4">
+            {/* Barra Lateral de Navegação */}
+            <div className="flex-shrink-0 w-16 bg-gray-50 rounded-lg p-2 space-y-2 overflow-y-auto max-h-[calc(90vh-200px)]">
+              {generatedExercises.exercises.map((exercise, idx) => {
+                return (
+                  <button
+                    key={exercise.number}
+                    onClick={() => {
+                      const element = document.getElementById(`exercise-${idx}`);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                    className="w-full h-12 rounded-lg font-bold text-sm transition-all bg-white text-gray-700 hover:bg-green-100 hover:text-green-700 border border-gray-200"
+                    title={`Ir para Exercício ${exercise.number}`}
+                  >
+                    {exercise.number}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Conteúdo Principal */}
             <ScrollArea className="flex-1 pr-4 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
               <div id="exercises-content" className="space-y-6 py-4">
                 {/* Cabeçalho */}
@@ -574,15 +596,15 @@ export default function ExerciseGeneratorModal({
               </Button>
             </>
           ) : (
-            <>
-              <div className="flex items-center gap-4 mr-auto">
+            <div className="flex items-center justify-between w-full gap-4">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="show-hints"
                     checked={showHints}
                     onCheckedChange={(checked) => setShowHints(checked as boolean)}
                   />
-                  <Label htmlFor="show-hints" className="text-sm">Dicas</Label>
+                  <Label htmlFor="show-hints" className="text-sm font-medium">Dicas</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox
@@ -590,25 +612,23 @@ export default function ExerciseGeneratorModal({
                     checked={showAnswers}
                     onCheckedChange={(checked) => setShowAnswers(checked as boolean)}
                   />
-                  <Label htmlFor="show-answers-ex" className="text-sm">Respostas</Label>
+                  <Label htmlFor="show-answers-ex" className="text-sm font-medium">Respostas</Label>
                 </div>
               </div>
-              <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
-                <Download className="h-4 w-4 mr-2" />
-                Word
-              </Button>
-              <Button variant="outline" onClick={handleCopy}>
-                <Copy className="h-4 w-4 mr-2" />
-                Copiar
-              </Button>
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="h-4 w-4 mr-2" />
-                Imprimir
-              </Button>
-              <Button onClick={handleClose}>
-                Fechar
-              </Button>
-            </>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                  <Download className="h-4 w-4 mr-2" />
+                  Word
+                </Button>
+                <Button variant="outline" onClick={handleCopy}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copiar
+                </Button>
+                <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
+                  Fechar
+                </Button>
+              </div>
+            </div>
           )}
         </DialogFooter>
       </DialogContent>

@@ -2852,3 +2852,18 @@
 - [x] Botões organizados em linha horizontal com espaçamento adequado
 - [x] Checkbox "Mostrar gabarito" à esquerda
 - [x] Botões de ação (Word, Copiar, Imprimir, Fechar) à direita
+
+## 🔧 Ajustes nos Modais de Prova e Exercícios - PENDENTE
+- [ ] Reduzir tamanhos de fonte no modal de prova (ExamGeneratorModal)
+- [ ] Adicionar barra lateral de navegação no modal de exercícios (ExerciseGeneratorModal)
+- [ ] Remover botão "Imprimir" do modal de prova
+- [ ] Remover botão "Imprimir" do modal de exercícios
+- [ ] Manter consistência visual entre os dois modais
+
+## ✅ Ajustes nos Modais - CONCLUÍDO
+- [x] Reduzir tamanhos de fonte no modal de prova (text-xl → text-base)
+- [x] Adicionar barra lateral de navegação no modal de exercícios
+- [x] Remover botão "Imprimir" do modal de prova
+- [x] Remover botão "Imprimir" do modal de exercícios
+- [x] Reorganizar layout dos botões (justify-between)
+- [x] Manter consistência visual entre os dois modais

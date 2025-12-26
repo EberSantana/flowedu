@@ -591,7 +591,7 @@ export default function ExamGeneratorModal({
               <div id="exam-content" className="space-y-12 py-6 px-2">
                 {/* Cabeçalho da Prova */}
                 <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 mb-8 border border-purple-100">
-                  <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">{generatedExam.title}</h2>
+                  <h2 className="text-xl font-bold text-center text-gray-800 mb-4">{generatedExam.title}</h2>
                   <div className="bg-white/80 rounded-lg p-4 text-sm text-gray-600 leading-relaxed">
                     {generatedExam.instructions}
                   </div>
@@ -609,12 +609,12 @@ export default function ExamGeneratorModal({
                       {/* Header da Questão */}
                       <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 mb-8 border-l-4 border-purple-500 shadow-sm">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-3xl font-bold text-gray-900">Questão {question.number}</h3>
+                          <h3 className="text-xl font-bold text-gray-900">Questão {question.number}</h3>
                           <div className="flex gap-3">
-                            <span className="text-lg bg-blue-500 text-white px-5 py-2 rounded-lg font-bold shadow-sm">
+                            <span className="text-sm bg-blue-500 text-white px-3 py-1 rounded-lg font-semibold shadow-sm">
                               {question.points} pts
                             </span>
-                            <span className="text-lg bg-purple-500 text-white px-5 py-2 rounded-lg font-bold shadow-sm">
+                            <span className="text-sm bg-purple-500 text-white px-3 py-1 rounded-lg font-semibold shadow-sm">
                               {question.type === "objective" ? "Objetiva" : 
                                question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
                             </span>
@@ -629,7 +629,7 @@ export default function ExamGeneratorModal({
                             <Briefcase className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
                             <div>
                               <h4 className="text-sm font-semibold text-blue-900 mb-2 uppercase tracking-wide">Estudo de Caso</h4>
-                              <p className="text-lg text-gray-800 leading-relaxed italic">{question.caseContext}</p>
+                              <p className="text-base text-gray-800 leading-relaxed italic">{question.caseContext}</p>
                             </div>
                           </div>
                         </div>
@@ -637,7 +637,7 @@ export default function ExamGeneratorModal({
 
                       {/* Enunciado da Questão */}
                       <div className="bg-white border-2 border-gray-300 rounded-xl p-8 mb-8 shadow-md">
-                        <p className="text-xl text-gray-900 leading-loose font-medium">{question.question}</p>
+                        <p className="text-base text-gray-900 leading-relaxed font-medium">{question.question}</p>
                       </div>
 
                       {/* Alternativas (Questões Objetivas) */}
@@ -656,14 +656,14 @@ export default function ExamGeneratorModal({
                                     : "bg-gray-50 border-gray-200 hover:border-gray-300"
                                 }`}
                               >
-                                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                                   isCorrect 
                                     ? "bg-green-500 text-white" 
                                     : "bg-gray-300 text-gray-700"
                                 }`}>
                                   {letter}
                                 </div>
-                                <p className={`text-xl leading-loose flex-1 ${
+                                <p className={`text-base leading-relaxed flex-1 ${
                                   isCorrect 
                                     ? "text-green-900 font-bold" 
                                     : "text-gray-900"
@@ -686,7 +686,7 @@ export default function ExamGeneratorModal({
                                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold">
                                   {String.fromCharCode(97 + idx)}
                                 </span>
-                                <p className="text-xl text-gray-900 leading-loose flex-1">{cq}</p>
+                                <p className="text-base text-gray-900 leading-relaxed flex-1">{cq}</p>
                               </div>
                             ))}
                           </div>
@@ -770,10 +770,6 @@ export default function ExamGeneratorModal({
                 <Button variant="outline" onClick={handleCopy}>
                   <Copy className="h-4 w-4 mr-2" />
                   Copiar
-                </Button>
-                <Button variant="outline" onClick={handlePrint}>
-                  <Printer className="h-4 w-4 mr-2" />
-                  Imprimir
                 </Button>
                 <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
                   Fechar
