@@ -183,6 +183,13 @@
       "when": 1766617585746,
       "tag": "0025_thin_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1766773737854,
+      "tag": "0026_tearful_mandrill",
+      "breakpoints": true
     }
   ]
 }

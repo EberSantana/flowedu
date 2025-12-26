@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -740,3 +740,70 @@ export const studentCTBadges = mysqlTable("student_ct_badges", {
 
 export type StudentCTBadge = typeof studentCTBadges.$inferSelect;
 export type InsertStudentCTBadge = typeof studentCTBadges.$inferInsert;
+
+/**
+ * Pontos de Gamificação por Disciplina
+ * Cada aluno tem pontos separados para cada disciplina
+ */
+export const studentSubjectPoints = mysqlTable("student_subject_points", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  subjectId: int("subjectId").notNull(),
+  totalPoints: int("totalPoints").default(0).notNull(),
+  currentBelt: varchar("currentBelt", { length: 50 }).default("white").notNull(),
+  streakDays: int("streakDays").default(0).notNull(),
+  lastActivityDate: datetime("lastActivityDate"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentSubjectPoints = typeof studentSubjectPoints.$inferSelect;
+export type InsertStudentSubjectPoints = typeof studentSubjectPoints.$inferInsert;
+
+/**
+ * Histórico de Pontos por Disciplina
+ */
+export const subjectPointsHistory = mysqlTable("subject_points_history", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  subjectId: int("subjectId").notNull(),
+  points: int("points").notNull(),
+  activityType: varchar("activityType", { length: 50 }).notNull(),
+  activityId: int("activityId"),
+  description: text("description"),
+  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
+});
+
+export type SubjectPointsHistory = typeof subjectPointsHistory.$inferSelect;
+export type InsertSubjectPointsHistory = typeof subjectPointsHistory.$inferInsert;
+
+/**
+ * Badges por Disciplina
+ */
+export const subjectBadges = mysqlTable("subject_badges", {
+  id: int("id").autoincrement().primaryKey(),
+  subjectId: int("subjectId").notNull(),
+  badgeKey: varchar("badgeKey", { length: 50 }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  iconUrl: varchar("iconUrl", { length: 255 }),
+  requiredPoints: int("requiredPoints").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SubjectBadge = typeof subjectBadges.$inferSelect;
+export type InsertSubjectBadge = typeof subjectBadges.$inferInsert;
+
+/**
+ * Badges Conquistados por Aluno em cada Disciplina
+ */
+export const studentSubjectBadges = mysqlTable("student_subject_badges", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  subjectId: int("subjectId").notNull(),
+  badgeId: int("badgeId").notNull(),
+  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
+});
+
+export type StudentSubjectBadge = typeof studentSubjectBadges.$inferSelect;
+export type InsertStudentSubjectBadge = typeof studentSubjectBadges.$inferInsert;

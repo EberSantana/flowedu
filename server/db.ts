@@ -52,7 +52,11 @@ import {
   ctExercises,
   ctSubmissions,
   ctBadges,
-  studentCTBadges
+  studentCTBadges,
+  studentSubjectPoints,
+  subjectPointsHistory,
+  subjectBadges,
+  studentSubjectBadges
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1358,6 +1362,53 @@ export async function gradeSubmission(id: number, data: { score: number; feedbac
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Buscar informações da submissão
+  const submission = await db.select()
+    .from(assignmentSubmissions)
+    .where(eq(assignmentSubmissions.id, id))
+    .limit(1);
+  
+  if (submission.length === 0) {
+    throw new Error("Submissão não encontrada");
+  }
+  
+  const submissionData = submission[0];
+  
+  // Buscar atividade para obter tipo e nota máxima
+  const assignment = await db.select()
+    .from(topicAssignments)
+    .where(eq(topicAssignments.id, submissionData.assignmentId))
+    .limit(1);
+  
+  if (assignment.length === 0) {
+    throw new Error("Atividade não encontrada");
+  }
+  
+  const assignmentData = assignment[0];
+  
+  // Buscar tópico para obter módulo
+  const topic = await db.select()
+    .from(learningTopics)
+    .where(eq(learningTopics.id, assignmentData.topicId))
+    .limit(1);
+  
+  if (topic.length === 0) {
+    throw new Error("Tópico não encontrado");
+  }
+  
+  // Buscar módulo para obter disciplina
+  const module = await db.select()
+    .from(learningModules)
+    .where(eq(learningModules.id, topic[0].moduleId))
+    .limit(1);
+  
+  if (module.length === 0) {
+    throw new Error("Módulo não encontrado");
+  }
+  
+  const subjectId = module[0].subjectId;
+  
+  // Atualizar submissão
   await db.update(assignmentSubmissions)
     .set({
       score: data.score,
@@ -1368,7 +1419,44 @@ export async function gradeSubmission(id: number, data: { score: number; feedbac
     })
     .where(eq(assignmentSubmissions.id, id));
   
-  return { success: true };
+  // Calcular pontos baseado no tipo de atividade e desempenho
+  const maxScore = assignmentData.maxScore || 100;
+  const percentage = (data.score / maxScore) * 100;
+  
+  // Pontos base por tipo de atividade
+  const basePoints: Record<string, number> = {
+    exercise: 10,
+    quiz: 15,
+    practical: 25,
+    project: 50,
+    essay: 30,
+  };
+  
+  let points = basePoints[assignmentData.type] || 10;
+  
+  // Bônus por desempenho
+  if (percentage >= 90) {
+    points += Math.floor(points * 0.5); // +50% de bônus
+  } else if (percentage >= 70) {
+    points += Math.floor(points * 0.25); // +25% de bônus
+  }
+  
+  // Adicionar pontos ao aluno na disciplina
+  try {
+    await addSubjectPoints(
+      submissionData.studentId,
+      subjectId,
+      points,
+      assignmentData.type,
+      assignmentData.id,
+      `Atividade: ${assignmentData.title} (${percentage.toFixed(0)}%)`
+    );
+  } catch (error) {
+    console.error("[Database] Erro ao adicionar pontos de gamificação:", error);
+    // Não falhar a avaliação se houver erro na gamificação
+  }
+  
+  return { success: true, pointsEarned: points };
 }
 
 // ==================== TOPIC COMMENTS ====================
@@ -3231,5 +3319,340 @@ export async function checkAndAwardCTBadges(studentId: number) {
   } catch (error) {
     console.error("[Database] Error checking and awarding CT badges:", error);
     return { badgesAwarded: 0 };
+  }
+}
+
+
+// ==================== GAMIFICAÇÃO POR DISCIPLINA ====================
+
+/**
+ * Obter ou criar pontos do aluno em uma disciplina específica
+ */
+export async function getOrCreateStudentSubjectPoints(studentId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const existing = await db
+      .select()
+      .from(studentSubjectPoints)
+      .where(
+        and(
+          eq(studentSubjectPoints.studentId, studentId),
+          eq(studentSubjectPoints.subjectId, subjectId)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Criar novo registro
+    await db.insert(studentSubjectPoints).values({
+      studentId,
+      subjectId,
+      totalPoints: 0,
+      currentBelt: "white",
+      streakDays: 0,
+    });
+
+    const newRecord = await db
+      .select()
+      .from(studentSubjectPoints)
+      .where(
+        and(
+          eq(studentSubjectPoints.studentId, studentId),
+          eq(studentSubjectPoints.subjectId, subjectId)
+        )
+      )
+      .limit(1);
+
+    return newRecord[0];
+  } catch (error) {
+    console.error("[Database] Error getting/creating student subject points:", error);
+    throw error;
+  }
+}
+
+/**
+ * Adicionar pontos ao aluno em uma disciplina específica
+ */
+export async function addSubjectPoints(
+  studentId: number,
+  subjectId: number,
+  points: number,
+  activityType: string,
+  activityId: number | null,
+  description: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Obter ou criar registro de pontos
+    const studentPoints = await getOrCreateStudentSubjectPoints(studentId, subjectId);
+
+    // Calcular novos pontos
+    const newTotalPoints = studentPoints.totalPoints + points;
+
+    // Determinar nova faixa
+    const BELT_THRESHOLDS = [
+      { name: "white", min: 0 },
+      { name: "yellow", min: 100 },
+      { name: "orange", min: 250 },
+      { name: "green", min: 500 },
+      { name: "blue", min: 1000 },
+      { name: "purple", min: 2000 },
+      { name: "brown", min: 3500 },
+      { name: "black", min: 5000 },
+    ];
+
+    let newBelt = "white";
+    for (const belt of BELT_THRESHOLDS) {
+      if (newTotalPoints >= belt.min) {
+        newBelt = belt.name;
+      }
+    }
+
+    // Atualizar pontos
+    await db
+      .update(studentSubjectPoints)
+      .set({
+        totalPoints: newTotalPoints,
+        currentBelt: newBelt,
+        lastActivityDate: new Date(),
+      })
+      .where(
+        and(
+          eq(studentSubjectPoints.studentId, studentId),
+          eq(studentSubjectPoints.subjectId, subjectId)
+        )
+      );
+
+    // Adicionar ao histórico
+    await db.insert(subjectPointsHistory).values({
+      studentId,
+      subjectId,
+      points,
+      activityType,
+      activityId,
+      description,
+    });
+
+    // Verificar se ganhou novos badges
+    await checkAndAwardSubjectBadges(studentId, subjectId, newTotalPoints);
+
+    return { newTotalPoints, newBelt, oldBelt: studentPoints.currentBelt };
+  } catch (error) {
+    console.error("[Database] Error adding subject points:", error);
+    throw error;
+  }
+}
+
+/**
+ * Verificar e conceder badges baseados em pontos
+ */
+async function checkAndAwardSubjectBadges(studentId: number, subjectId: number, totalPoints: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Buscar badges disponíveis para a disciplina
+    const availableBadges = await db
+      .select()
+      .from(subjectBadges)
+      .where(
+        and(
+          eq(subjectBadges.subjectId, subjectId),
+          lte(subjectBadges.requiredPoints, totalPoints)
+        )
+      );
+
+    // Buscar badges já conquistados
+    const earnedBadges = await db
+      .select()
+      .from(studentSubjectBadges)
+      .where(
+        and(
+          eq(studentSubjectBadges.studentId, studentId),
+          eq(studentSubjectBadges.subjectId, subjectId)
+        )
+      );
+
+    const earnedBadgeIds = new Set(earnedBadges.map((b) => b.badgeId));
+
+    // Conceder novos badges
+    for (const badge of availableBadges) {
+      if (!earnedBadgeIds.has(badge.id)) {
+        await db.insert(studentSubjectBadges).values({
+          studentId,
+          subjectId,
+          badgeId: badge.id,
+        });
+      }
+    }
+  } catch (error) {
+    console.error("[Database] Error checking/awarding badges:", error);
+  }
+}
+
+/**
+ * Obter estatísticas de gamificação do aluno em uma disciplina
+ */
+export async function getStudentSubjectStats(studentId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const points = await getOrCreateStudentSubjectPoints(studentId, subjectId);
+
+    // Buscar badges conquistados
+    const earnedBadgesData = await db
+      .select({
+        badge: subjectBadges,
+        earnedAt: studentSubjectBadges.earnedAt,
+      })
+      .from(studentSubjectBadges)
+      .innerJoin(subjectBadges, eq(studentSubjectBadges.badgeId, subjectBadges.id))
+      .where(
+        and(
+          eq(studentSubjectBadges.studentId, studentId),
+          eq(studentSubjectBadges.subjectId, subjectId)
+        )
+      );
+
+    // Buscar ranking na disciplina
+    const allStudents = await db
+      .select()
+      .from(studentSubjectPoints)
+      .where(eq(studentSubjectPoints.subjectId, subjectId))
+      .orderBy(desc(studentSubjectPoints.totalPoints));
+
+    const rankPosition = allStudents.findIndex((s) => s.studentId === studentId) + 1;
+
+    return {
+      totalPoints: points.totalPoints,
+      currentBelt: points.currentBelt,
+      streakDays: points.streakDays,
+      badgesEarned: earnedBadgesData.length,
+      rankPosition,
+      totalStudents: allStudents.length,
+    };
+  } catch (error) {
+    console.error("[Database] Error getting student subject stats:", error);
+    throw error;
+  }
+}
+
+/**
+ * Obter ranking de uma disciplina
+ */
+export async function getSubjectRanking(subjectId: number, limit: number = 10) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const ranking = await db
+      .select({
+        studentId: studentSubjectPoints.studentId,
+        fullName: students.fullName,
+        totalPoints: studentSubjectPoints.totalPoints,
+        currentBelt: studentSubjectPoints.currentBelt,
+        streakDays: studentSubjectPoints.streakDays,
+      })
+      .from(studentSubjectPoints)
+      .innerJoin(students, eq(studentSubjectPoints.studentId, students.id))
+      .where(eq(studentSubjectPoints.subjectId, subjectId))
+      .orderBy(desc(studentSubjectPoints.totalPoints))
+      .limit(limit);
+
+    return ranking;
+  } catch (error) {
+    console.error("[Database] Error getting subject ranking:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter histórico de pontos de um aluno em uma disciplina
+ */
+export async function getSubjectPointsHistory(studentId: number, subjectId: number, limit: number = 20) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const history = await db
+      .select()
+      .from(subjectPointsHistory)
+      .where(
+        and(
+          eq(subjectPointsHistory.studentId, studentId),
+          eq(subjectPointsHistory.subjectId, subjectId)
+        )
+      )
+      .orderBy(desc(subjectPointsHistory.earnedAt))
+      .limit(limit);
+
+    return history;
+  } catch (error) {
+    console.error("[Database] Error getting subject points history:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter todas as disciplinas com pontos do aluno
+ */
+export async function getStudentSubjectsWithPoints(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const subjectsWithPoints = await db
+      .select({
+        subjectId: studentSubjectPoints.subjectId,
+        subjectName: subjects.name,
+        totalPoints: studentSubjectPoints.totalPoints,
+        currentBelt: studentSubjectPoints.currentBelt,
+        streakDays: studentSubjectPoints.streakDays,
+      })
+      .from(studentSubjectPoints)
+      .innerJoin(subjects, eq(studentSubjectPoints.subjectId, subjects.id))
+      .where(eq(studentSubjectPoints.studentId, studentId))
+      .orderBy(desc(studentSubjectPoints.totalPoints));
+
+    return subjectsWithPoints;
+  } catch (error) {
+    console.error("[Database] Error getting student subjects with points:", error);
+    return [];
+  }
+}
+
+/**
+ * Criar badges padrão para uma disciplina
+ */
+export async function createDefaultSubjectBadges(subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const defaultBadges = [
+    { badgeKey: "first_steps", name: "Primeiros Passos", description: "Complete sua primeira atividade", requiredPoints: 10 },
+    { badgeKey: "dedicated", name: "Dedicado", description: "Alcance 100 pontos", requiredPoints: 100 },
+    { badgeKey: "committed", name: "Comprometido", description: "Alcance 250 pontos", requiredPoints: 250 },
+    { badgeKey: "expert", name: "Expert", description: "Alcance 500 pontos", requiredPoints: 500 },
+    { badgeKey: "master", name: "Mestre", description: "Alcance 1000 pontos", requiredPoints: 1000 },
+    { badgeKey: "legend", name: "Lenda", description: "Alcance 2000 pontos", requiredPoints: 2000 },
+  ];
+
+  try {
+    for (const badge of defaultBadges) {
+      await db.insert(subjectBadges).values({
+        subjectId,
+        ...badge,
+      }).onDuplicateKeyUpdate({ set: { name: badge.name } });
+    }
+  } catch (error) {
+    console.error("[Database] Error creating default subject badges:", error);
   }
 }

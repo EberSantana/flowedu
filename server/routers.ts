@@ -3877,6 +3877,78 @@ JSON (descrições MAX 15 chars):
       }),
   }),
 
+  // ==================== GAMIFICAÇÃO POR DISCIPLINA ====================
+  subjectGamification: router({
+    // Obter estatísticas do aluno em uma disciplina
+    getStats: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.studentId) {
+          throw new Error("Apenas alunos podem acessar suas estatísticas");
+        }
+        return await db.getStudentSubjectStats(ctx.user.studentId, input.subjectId);
+      }),
+
+    // Obter todas as disciplinas com pontos do aluno
+    getMySubjects: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user?.studentId) {
+          throw new Error("Apenas alunos podem acessar suas disciplinas");
+        }
+        return await db.getStudentSubjectsWithPoints(ctx.user.studentId);
+      }),
+
+    // Obter ranking de uma disciplina
+    getRanking: protectedProcedure
+      .input(z.object({ 
+        subjectId: z.number(),
+        limit: z.number().default(10)
+      }))
+      .query(async ({ input }) => {
+        return await db.getSubjectRanking(input.subjectId, input.limit);
+      }),
+
+    // Obter histórico de pontos em uma disciplina
+    getHistory: protectedProcedure
+      .input(z.object({ 
+        subjectId: z.number(),
+        limit: z.number().default(20)
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.studentId) {
+          throw new Error("Apenas alunos podem acessar seu histórico");
+        }
+        return await db.getSubjectPointsHistory(ctx.user.studentId, input.subjectId, input.limit);
+      }),
+
+    // Adicionar pontos manualmente (professor)
+    addPoints: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        subjectId: z.number(),
+        points: z.number(),
+        description: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.addSubjectPoints(
+          input.studentId,
+          input.subjectId,
+          input.points,
+          "manual",
+          null,
+          input.description
+        );
+      }),
+
+    // Criar badges padrão para uma disciplina
+    createDefaultBadges: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.createDefaultSubjectBadges(input.subjectId);
+        return { success: true };
+      }),
+  }),
+
 });
 
 export type AppRouter = typeof appRouter;

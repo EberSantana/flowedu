@@ -2676,3 +2676,16 @@
 - [x] Corrigido schema do banco (coluna currentBelt)
 - [x] Sistema funcionando sem erros TypeScript
 - [x] Rota integrada no App.tsx
+
+## Gamificação por Disciplina e Melhorias de UX
+- [x] Criar tabela student_subject_points (pontos por disciplina)
+- [x] Criar tabela subject_rankings (ranking por disciplina)
+- [x] Modificar sistema de pontos para ser por disciplina
+- [x] Vincular atividades das trilhas aos alunos matriculados
+- [ ] Criar sistema de notificação de novas atividades
+- [ ] Padronizar cores da página de gamificação
+- [ ] Ajustar componentes para seguir design system
+- [ ] Reorganizar menu lateral do aluno
+- [ ] Melhorar visualização de faixas de evolução
+- [ ] Adicionar animações suaves de transição
+- [ ] Testar fluxo completo de gamificação por disciplina
