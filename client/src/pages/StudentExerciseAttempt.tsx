@@ -22,7 +22,7 @@ export default function StudentExerciseAttempt() {
 
   // Buscar detalhes do exercício
   // @ts-ignore - Rota existe no backend, erro de inferência de tipo
-  const { data: exercise, isLoading } = trpc.studentExercises.getDetails.useQuery(
+  const { data: exercise, isLoading, error } = trpc.studentExercises.getDetails.useQuery(
     { exerciseId: parseInt(id!) },
     { enabled: !!id }
   );
@@ -91,8 +91,9 @@ export default function StudentExerciseAttempt() {
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
+    if (!exercise?.questions) return;
 
-    const unanswered = exercise?.questions.filter(
+    const unanswered = exercise.questions.filter(
       (_: any, index: number) => !answers[index]
     );
 
@@ -105,14 +106,15 @@ export default function StudentExerciseAttempt() {
 
     setIsSubmitting(true);
 
-    const answersArray = exercise?.questions.map((_: any, index: number) => ({
-      questionIndex: index,
+    const answersArray = exercise.questions.map((_: any, index: number) => ({
+      questionNumber: index + 1,
       answer: answers[index] || "",
     }));
 
     submitAttemptMutation.mutate({
-      attemptId: exercise!.currentAttemptId!,
-      answers: answersArray || [],
+      attemptId: exercise.currentAttemptId!,
+      exerciseId: parseInt(id!),
+      answers: answersArray,
     });
   };
 
@@ -129,7 +131,7 @@ export default function StudentExerciseAttempt() {
     );
   }
 
-  if (!exercise) {
+  if (error || (!isLoading && !exercise)) {
     return (
       <StudentLayout>
         <div className="container mx-auto py-8 px-4">
@@ -137,8 +139,42 @@ export default function StudentExerciseAttempt() {
             <CardContent className="pt-6">
               <div className="text-center py-8">
                 <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Exercício não encontrado</h2>
-                <p className="text-gray-600 mb-4">O exercício que você está tentando acessar não existe ou não está mais disponível.</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {error?.message?.includes("UNAUTHORIZED") || error?.message?.includes("Student ID") 
+                    ? "Acesso Negado" 
+                    : "Exercício não encontrado"}
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  {error?.message?.includes("UNAUTHORIZED") || error?.message?.includes("Student ID")
+                    ? "Você precisa estar logado como aluno para acessar exercícios. Por favor, faça logout e entre pelo Portal do Aluno."
+                    : "O exercício que você está tentando acessar não existe ou não está mais disponível."}
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <Button onClick={() => setLocation("/")} variant="outline">
+                    Voltar ao Início
+                  </Button>
+                  <Button onClick={() => setLocation("/student-exercises")}>
+                    Exercícios
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  if (!exercise || !exercise.questions) {
+    return (
+      <StudentLayout>
+        <div className="container mx-auto py-8 px-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center py-8">
+                <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Dados incompletos</h2>
+                <p className="text-gray-600 mb-4">O exercício não possui questões cadastradas.</p>
                 <Button onClick={() => setLocation("/student-exercises")}>
                   Voltar para Exercícios
                 </Button>

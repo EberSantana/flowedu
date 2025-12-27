@@ -68,7 +68,7 @@ export default function StudentExercises() {
   };
 
   const handleStartExercise = (exerciseId: number) => {
-    setLocation(`/student/exercises/${exerciseId}`);
+    setLocation(`/student-exercises/${exerciseId}/attempt`);
   };
 
   if (isLoading) {

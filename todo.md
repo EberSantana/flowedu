@@ -3017,3 +3017,21 @@
 - [x] Corrigido: todas as rotas studentExercises agora usam ctx.studentSession.studentId
 - [x] Adicionado link "Exercícios" no menu do Portal do Aluno
 - [x] Testado e validado: exercícios aparecem corretamente para alunos matriculados
+
+## 🐛 Bug Urgente - Erro ao iniciar exercício
+- [ ] Investigar erro na página de resolução de exercícios (StudentExerciseAttempt.tsx)
+- [ ] Verificar console do navegador para mensagens de erro
+- [ ] Analisar logs do servidor
+- [ ] Verificar se rota tRPC startAttempt está funcionando
+- [ ] Verificar se dados do exercício estão sendo carregados corretamente
+- [ ] Identificar causa raiz do erro
+- [ ] Implementar correção
+- [ ] Testar fluxo completo: listar → iniciar → resolver → submeter
+
+## ✅ Correções Realizadas
+- [x] Adicionar import de useState e useEffect no StudentExerciseAttempt.tsx
+- [x] Corrigir URL de navegação de /student/exercises para /student-exercises/:id/attempt
+- [x] Corrigir uso de ctx.user.studentId para ctx.studentSession.studentId em subjectGamification
+- [x] Adicionar validações para evitar erro quando exercise.questions é undefined
+- [x] Adicionar mensagem de erro apropriada quando professor tenta acessar exercícios de aluno
+- [x] Corrigir estrutura de answers enviados (questionNumber em vez de questionIndex)

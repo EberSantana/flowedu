@@ -3881,22 +3881,16 @@ JSON (descrições MAX 15 chars):
   // ==================== GAMIFICAÇÃO POR DISCIPLINA ====================
   subjectGamification: router({
     // Obter estatísticas do aluno em uma disciplina
-    getStats: protectedProcedure
+    getStats: studentProcedure
       .input(z.object({ subjectId: z.number() }))
       .query(async ({ ctx, input }) => {
-        if (!ctx.user?.studentId) {
-          throw new Error("Apenas alunos podem acessar suas estatísticas");
-        }
-        return await db.getStudentSubjectStats(ctx.user.studentId, input.subjectId);
+        return await db.getStudentSubjectStats(ctx.studentSession.studentId, input.subjectId);
       }),
 
     // Obter todas as disciplinas com pontos do aluno
-    getMySubjects: protectedProcedure
+    getMySubjects: studentProcedure
       .query(async ({ ctx }) => {
-        if (!ctx.user?.studentId) {
-          throw new Error("Apenas alunos podem acessar suas disciplinas");
-        }
-        return await db.getStudentSubjectsWithPoints(ctx.user.studentId);
+        return await db.getStudentSubjectsWithPoints(ctx.studentSession.studentId);
       }),
 
     // Obter ranking de uma disciplina
@@ -3910,16 +3904,13 @@ JSON (descrições MAX 15 chars):
       }),
 
     // Obter histórico de pontos em uma disciplina
-    getHistory: protectedProcedure
+    getHistory: studentProcedure
       .input(z.object({ 
         subjectId: z.number(),
         limit: z.number().default(20)
       }))
       .query(async ({ ctx, input }) => {
-        if (!ctx.user?.studentId) {
-          throw new Error("Apenas alunos podem acessar seu histórico");
-        }
-        return await db.getSubjectPointsHistory(ctx.user.studentId, input.subjectId, input.limit);
+        return await db.getSubjectPointsHistory(ctx.studentSession.studentId, input.subjectId, input.limit);
       }),
 
     // Adicionar pontos manualmente (professor)
