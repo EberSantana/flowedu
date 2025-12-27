@@ -1,0 +1,21 @@
+{
+  "query": "-- Buscar exercícios publicados que deveriam aparecer para o aluno\nSELECT \n  se.id,\n  se.title,\n  se.subjectId,\n  sub.name as subject_name,\n  se.status,\n  se.availableFrom,\n  se.availableTo,\n  NOW() as current_time,\n  CASE \n    WHEN se.availableFrom <= NOW() THEN 'Disponível'\n    ELSE 'Futuro'\n  END as availability\nFROM student_exercises se\nJOIN subjects sub ON se.subjectId = sub.id\nWHERE se.status = 'published'\n  AND se.subjectId IN (\n    SELECT subjectId \n    FROM subjectEnrollments \n    WHERE studentId = 1\n  )\nORDER BY se.availableFrom DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute -- Buscar exercícios publicados que deveriam aparecer para o aluno\nSELECT \n  se.id,\n  se.title,\n  se.subjectId,\n  sub.name as subject_name,\n  se.status,\n  se.availableFrom,\n  se.availableTo,\n  NOW() as current_time,\n  CASE \n    WHEN se.availableFrom <= NOW() THEN 'Disponível'\n    ELSE 'Futuro'\n  END as availability\nFROM student_exercises se\nJOIN subjects sub ON se.subjectId = sub.id\nWHERE se.status = 'published'\n  AND se.subjectId IN (\n    SELECT subjectId \n    FROM subjectEnrollments \n    WHERE studentId = 1\n  )\nORDER BY se.availableFrom DESC;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 2: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 9 column 24 near \"current_time,",
+    "  CASE ",
+    "    WHEN se.availableFrom <= NOW() THEN 'Disponível'",
+    "    ELSE 'Futuro'",
+    "  END as availability",
+    "FROM student_exercises se",
+    "JOIN subjects sub ON se.subjectId = sub.id",
+    "WHERE se.status = 'published'",
+    "  AND se.subjectId IN (",
+    "    SELECT subjectId ",
+    "    FROM subjectEnrollments ",
+    "    WHERE studentId = 1",
+    "  )",
+    "ORDER BY se.availableFrom DESC\""
+  ]
+}

@@ -6,19 +6,20 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, Clock, Trophy, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import StudentLayout from "@/components/StudentLayout";
 
 export default function StudentExercises() {
   const [, setLocation] = useLocation();
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
 
   // Buscar exercícios disponíveis
-  // TODO: Implementar após criar rotas tRPC
-  const exercises: any[] = [];
-  const isLoading = false;
+  const { data: exercises = [], isLoading } = trpc.studentExercises.listAvailable.useQuery(
+    { subjectId: selectedSubject },
+    { refetchOnWindowFocus: false }
+  );
 
-  // Buscar disciplinas do aluno (comentado por enquanto - será implementado)
-  // const { data: enrollments } = trpc.student.getEnrollments.useQuery();
-  const enrollments: any[] = [];
+  // Buscar disciplinas do aluno
+  const { data: enrollments = [] } = trpc.student.getEnrolledSubjects.useQuery();
 
   const getStatusBadge = (exercise: any) => {
     if (!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts) {
@@ -86,7 +87,8 @@ export default function StudentExercises() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <StudentLayout>
+      <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Exercícios Disponíveis</h1>
         <p className="text-muted-foreground">
@@ -194,6 +196,7 @@ export default function StudentExercises() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </StudentLayout>
   );
 }

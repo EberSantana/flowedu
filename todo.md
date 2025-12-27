@@ -3009,3 +3009,11 @@
 - [x] Adicionar verificação de matrículas vazias (retorna array vazio)
 - [x] Usar inArray para filtrar apenas disciplinas do aluno
 - [x] Correção implementada e pronta para teste manual
+
+## ✅ Bug Corrigido - Exercícios não apareciam para alunos
+- [x] Identificado problema: página StudentExercises.tsx não chamava API (array vazio hardcoded)
+- [x] Identificado problema: rotas tRPC usavam ctx.user.studentId em vez de ctx.studentSession.studentId
+- [x] Corrigido: página agora chama trpc.studentExercises.listAvailable.useQuery()
+- [x] Corrigido: todas as rotas studentExercises agora usam ctx.studentSession.studentId
+- [x] Adicionado link "Exercícios" no menu do Portal do Aluno
+- [x] Testado e validado: exercícios aparecem corretamente para alunos matriculados

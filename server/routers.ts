@@ -3956,7 +3956,7 @@ JSON (descrições MAX 15 chars):
     listAvailable: studentProcedure
       .input(z.object({ subjectId: z.number().optional() }))
       .query(async ({ ctx, input }) => {
-        const studentId = ctx.user.studentId;
+        const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
         
         const exercises = await db.listAvailableExercises(studentId, input.subjectId);
@@ -3967,7 +3967,7 @@ JSON (descrições MAX 15 chars):
     getDetails: studentProcedure
       .input(z.object({ exerciseId: z.number() }))
       .query(async ({ ctx, input }) => {
-        const studentId = ctx.user.studentId;
+        const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
         
         const exercise = await db.getExerciseDetails(input.exerciseId, studentId);
@@ -3980,7 +3980,7 @@ JSON (descrições MAX 15 chars):
     startAttempt: studentProcedure
       .input(z.object({ exerciseId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const studentId = ctx.user.studentId;
+        const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
         
         const result = await db.startExerciseAttempt(input.exerciseId, studentId);
@@ -3998,7 +3998,7 @@ JSON (descrições MAX 15 chars):
         })),
       }))
       .mutation(async ({ ctx, input }) => {
-        const studentId = ctx.user.studentId;
+        const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
         
         // Buscar dados do exercício
@@ -4039,7 +4039,7 @@ JSON (descrições MAX 15 chars):
     getHistory: studentProcedure
       .input(z.object({ subjectId: z.number().optional() }))
       .query(async ({ ctx, input }) => {
-        const studentId = ctx.user.studentId;
+        const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
         
         const history = await db.getStudentExerciseHistory(studentId, input.subjectId);
