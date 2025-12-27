@@ -46,7 +46,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     { icon: Home, label: "Início", path: "/student-dashboard" },
     { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises" },
-    { icon: Trophy, label: "Minha Jornada", path: "/student-gamification" },
+    { icon: Trophy, label: "Rankings", path: "/student-leaderboard" },
     { icon: Brain, label: "Pensamento Computacional", path: "/student-computational-thinking" },
     { icon: Bell, label: "Avisos", path: "/student-announcements" },
     { icon: User, label: "Meu Perfil", path: "/student-profile" },

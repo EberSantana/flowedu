@@ -3052,3 +3052,47 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - ✅ server/routers.ts - 100% corrigido
 - ✅ server/db.ts - Funções getExerciseResults e getExerciseDetails aprimoradas
 - ✅ Compilação TypeScript: 0 erros
+
+
+## 🏆 Sistema de Rankings (Leaderboard) - Gamificação
+
+### Backend
+- [x] Criar função getRankingBySubject no db.ts (top alunos por disciplina)
+- [x] Criar função getRankingByModule no db.ts (top alunos por módulo)
+- [x] Criar função getStudentRankPosition no db.ts (posição do aluno)
+- [x] Criar função getSubjectTopPerformers no db.ts (top 3 por disciplina)
+- [x] Implementar cálculo de pontuação baseado em exercícios e provas (já existe no sistema de gamificação)
+
+### API tRPC
+- [x] Criar namespace rankings no routers.ts (integrado ao gamification router)
+- [x] Criar rota getSubjectRanking (protectedProcedure para professor)
+- [x] Criar rota getModuleRanking (protectedProcedure para professor)
+- [x] Criar rota getMyPosition (studentProcedure para aluno)
+- [x] Criar rota getTopPerformers (ambos professor e aluno)
+- [x] Criar rota getSubjectRankingByPeriod (filtro por período)
+- [x] Criar rota getSubjectRankingStats (estatísticas gerais)
+
+### Interface do Professor
+- [x] Criar página Leaderboard.tsx
+- [x] Implementar filtros (por disciplina e período)
+- [x] Criar cards de top 3 com medalhas (🥇🥈🥉)
+- [x] Criar tabela completa de rankings (top 20)
+- [x] Adicionar estatísticas gerais (total alunos, média, máx, mín)
+- [x] Adicionar botão de exportação para PDF (placeholder)
+- [x] Adicionar link no menu lateral
+
+### Interface do Aluno
+- [x] Criar componente StudentRankingWidget.tsx
+- [x] Criar página StudentLeaderboard.tsx
+- [x] Mostrar posição atual do aluno
+- [x] Mostrar top 10 da turma
+- [x] Adicionar indicador visual de progresso
+- [x] Adicionar link no menu do aluno
+- [x] Destacar posição do aluno na tabela
+
+### Gamificação
+- [x] Criar badges especiais para top 3 (ouro, prata, bronze)
+- [ ] Implementar notificações quando aluno sobe no ranking (futuro)
+- [x] Adicionar função de histórico de posições (getStudentRankHistory)
+- [ ] Criar sistema de pontos extras para top performers (futuro)
+

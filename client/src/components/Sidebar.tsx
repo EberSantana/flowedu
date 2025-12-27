@@ -21,7 +21,8 @@ import {
   Target,
   HelpCircle,
   Megaphone,
-  KeyRound
+  KeyRound,
+  Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -85,6 +86,11 @@ const teacherNavItems: NavItem[] = [
     label: "Desempenho em Exercícios",
     icon: <Target className="h-5 w-5" />,
     href: "/exercise-performance",
+  },
+  {
+    label: "Rankings",
+    icon: <Trophy className="h-5 w-5" />,
+    href: "/leaderboard",
   },
   {
     label: "Trilhas de Aprendizagem",

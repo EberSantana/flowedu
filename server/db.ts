@@ -4086,3 +4086,302 @@ export async function addExercisePoints(studentId: number, subjectId: number, po
   
   return { success: true, pointsAdded: points };
 }
+
+
+/**
+ * ===========================
+ * SISTEMA DE RANKINGS (LEADERBOARD)
+ * ===========================
+ */
+
+/**
+ * Obter posição de um aluno no ranking de uma disciplina
+ */
+export async function getStudentRankPosition(studentId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Buscar todos os alunos da disciplina ordenados por pontos
+    const allStudents = await db
+      .select({
+        studentId: studentSubjectPoints.studentId,
+        totalPoints: studentSubjectPoints.totalPoints,
+      })
+      .from(studentSubjectPoints)
+      .where(eq(studentSubjectPoints.subjectId, subjectId))
+      .orderBy(desc(studentSubjectPoints.totalPoints));
+
+    // Encontrar posição do aluno
+    const position = allStudents.findIndex(s => s.studentId === studentId) + 1;
+    
+    // Buscar dados completos do aluno
+    const studentData = await db
+      .select({
+        studentId: studentSubjectPoints.studentId,
+        fullName: students.fullName,
+        totalPoints: studentSubjectPoints.totalPoints,
+        currentBelt: studentSubjectPoints.currentBelt,
+        streakDays: studentSubjectPoints.streakDays,
+      })
+      .from(studentSubjectPoints)
+      .innerJoin(students, eq(studentSubjectPoints.studentId, students.id))
+      .where(
+        and(
+          eq(studentSubjectPoints.studentId, studentId),
+          eq(studentSubjectPoints.subjectId, subjectId)
+        )
+      )
+      .limit(1);
+
+    if (studentData.length === 0) {
+      return {
+        position: 0,
+        totalStudents: allStudents.length,
+        studentData: null,
+      };
+    }
+
+    return {
+      position,
+      totalStudents: allStudents.length,
+      studentData: studentData[0],
+    };
+  } catch (error) {
+    console.error("[Database] Error getting student rank position:", error);
+    return {
+      position: 0,
+      totalStudents: 0,
+      studentData: null,
+    };
+  }
+}
+
+/**
+ * Obter top 3 performers de uma disciplina (para badges especiais)
+ */
+export async function getSubjectTopPerformers(subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const topPerformers = await db
+      .select({
+        studentId: studentSubjectPoints.studentId,
+        fullName: students.fullName,
+        registrationNumber: students.registrationNumber,
+        totalPoints: studentSubjectPoints.totalPoints,
+        currentBelt: studentSubjectPoints.currentBelt,
+        streakDays: studentSubjectPoints.streakDays,
+      })
+      .from(studentSubjectPoints)
+      .innerJoin(students, eq(studentSubjectPoints.studentId, students.id))
+      .where(eq(studentSubjectPoints.subjectId, subjectId))
+      .orderBy(desc(studentSubjectPoints.totalPoints))
+      .limit(3);
+
+    return topPerformers.map((performer, index) => ({
+      ...performer,
+      position: index + 1,
+      medal: index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉",
+    }));
+  } catch (error) {
+    console.error("[Database] Error getting top performers:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter ranking de uma disciplina com filtro de período
+ */
+export async function getSubjectRankingByPeriod(
+  subjectId: number,
+  startDate: Date,
+  endDate: Date,
+  limit: number = 20
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Buscar pontos ganhos no período especificado
+    const pointsInPeriod = await db
+      .select({
+        studentId: subjectPointsHistory.studentId,
+        totalPoints: sql<number>`SUM(${subjectPointsHistory.points})`.as('totalPoints'),
+      })
+      .from(subjectPointsHistory)
+      .where(
+        and(
+          eq(subjectPointsHistory.subjectId, subjectId),
+          sql`${subjectPointsHistory.earnedAt} >= ${startDate}`,
+          sql`${subjectPointsHistory.earnedAt} <= ${endDate}`
+        )
+      )
+      .groupBy(subjectPointsHistory.studentId)
+      .orderBy(desc(sql`SUM(${subjectPointsHistory.points})`))
+      .limit(limit);
+
+    // Buscar dados completos dos alunos
+    const studentIds = pointsInPeriod.map(p => p.studentId);
+    if (studentIds.length === 0) return [];
+
+    const studentsData = await db
+      .select({
+        studentId: students.id,
+        fullName: students.fullName,
+        registrationNumber: students.registrationNumber,
+      })
+      .from(students)
+      .where(inArray(students.id, studentIds));
+
+    // Combinar dados
+    return pointsInPeriod.map((points, index) => {
+      const student = studentsData.find(s => s.studentId === points.studentId);
+      return {
+        position: index + 1,
+        studentId: points.studentId,
+        fullName: student?.fullName || "Desconhecido",
+        registrationNumber: student?.registrationNumber || "",
+        totalPoints: points.totalPoints,
+      };
+    });
+  } catch (error) {
+    console.error("[Database] Error getting ranking by period:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter ranking por módulo de aprendizagem
+ */
+export async function getModuleRanking(moduleId: number, limit: number = 20) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Buscar tópicos do módulo
+    const topics = await db
+      .select({ id: learningTopics.id })
+      .from(learningTopics)
+      .where(eq(learningTopics.moduleId, moduleId));
+
+    const topicIds = topics.map(t => t.id);
+    if (topicIds.length === 0) return [];
+
+    // Buscar progresso dos alunos nos tópicos do módulo
+    const progress = await db
+      .select({
+        studentId: studentTopicProgress.studentId,
+        completedTopics: sql<number>`COUNT(CASE WHEN ${studentTopicProgress.status} = 'completed' THEN 1 END)`.as('completedTopics'),
+        totalTopics: sql<number>`COUNT(*)`.as('totalTopics'),
+      })
+      .from(studentTopicProgress)
+      .where(inArray(studentTopicProgress.topicId, topicIds))
+      .groupBy(studentTopicProgress.studentId)
+      .orderBy(
+        desc(sql`COUNT(CASE WHEN ${studentTopicProgress.status} = 'completed' THEN 1 END)`)
+      )
+      .limit(limit);
+
+    // Buscar dados dos alunos
+    const studentIds = progress.map(p => p.studentId);
+    if (studentIds.length === 0) return [];
+
+    const studentsData = await db
+      .select({
+        studentId: students.id,
+        fullName: students.fullName,
+        registrationNumber: students.registrationNumber,
+      })
+      .from(students)
+      .where(inArray(students.id, studentIds));
+
+    // Combinar dados
+    return progress.map((prog, index) => {
+      const student = studentsData.find(s => s.studentId === prog.studentId);
+      return {
+        position: index + 1,
+        studentId: prog.studentId,
+        fullName: student?.fullName || "Desconhecido",
+        registrationNumber: student?.registrationNumber || "",
+        completedTopics: prog.completedTopics,
+        totalTopics: prog.totalTopics,
+        completionRate: Math.round((prog.completedTopics / prog.totalTopics) * 100),
+      };
+    });
+  } catch (error) {
+    console.error("[Database] Error getting module ranking:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter estatísticas gerais de ranking de uma disciplina
+ */
+export async function getSubjectRankingStats(subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const stats = await db
+      .select({
+        totalStudents: sql<number>`COUNT(*)`.as('totalStudents'),
+        avgPoints: sql<number>`AVG(${studentSubjectPoints.totalPoints})`.as('avgPoints'),
+        maxPoints: sql<number>`MAX(${studentSubjectPoints.totalPoints})`.as('maxPoints'),
+        minPoints: sql<number>`MIN(${studentSubjectPoints.totalPoints})`.as('minPoints'),
+      })
+      .from(studentSubjectPoints)
+      .where(eq(studentSubjectPoints.subjectId, subjectId));
+
+    return stats[0] || {
+      totalStudents: 0,
+      avgPoints: 0,
+      maxPoints: 0,
+      minPoints: 0,
+    };
+  } catch (error) {
+    console.error("[Database] Error getting ranking stats:", error);
+    return {
+      totalStudents: 0,
+      avgPoints: 0,
+      maxPoints: 0,
+      minPoints: 0,
+    };
+  }
+}
+
+/**
+ * Obter histórico de posições de um aluno ao longo do tempo
+ */
+export async function getStudentRankHistory(studentId: number, subjectId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Buscar pontos acumulados por dia
+    const dailyPoints = await db
+      .select({
+        date: sql<string>`DATE(${subjectPointsHistory.earnedAt})`.as('date'),
+        cumulativePoints: sql<number>`SUM(${subjectPointsHistory.points})`.as('cumulativePoints'),
+      })
+      .from(subjectPointsHistory)
+      .where(
+        and(
+          eq(subjectPointsHistory.studentId, studentId),
+          eq(subjectPointsHistory.subjectId, subjectId),
+          sql`${subjectPointsHistory.earnedAt} >= ${startDate}`
+        )
+      )
+      .groupBy(sql`DATE(${subjectPointsHistory.earnedAt})`)
+      .orderBy(sql`DATE(${subjectPointsHistory.earnedAt})`);
+
+    return dailyPoints;
+  } catch (error) {
+    console.error("[Database] Error getting rank history:", error);
+    return [];
+  }
+}

@@ -3733,6 +3733,79 @@ JSON (descrições MAX 15 chars):
           filename: `relatorio-gamificacao-${new Date().toISOString().split('T')[0]}.pdf`,
         };
       }),
+    
+    // ==================== RANKINGS (LEADERBOARD) ====================
+    // Obter ranking de uma disciplina (professor)
+    getSubjectRanking: protectedProcedure
+      .input(z.object({ 
+        subjectId: z.number(),
+        limit: z.number().optional()
+      }))
+      .query(async ({ input }) => {
+        return await db.getSubjectRanking(input.subjectId, input.limit || 20);
+      }),
+    
+    // Obter ranking de uma disciplina com filtro de período (professor)
+    getSubjectRankingByPeriod: protectedProcedure
+      .input(z.object({ 
+        subjectId: z.number(),
+        startDate: z.date(),
+        endDate: z.date(),
+        limit: z.number().optional()
+      }))
+      .query(async ({ input }) => {
+        return await db.getSubjectRankingByPeriod(
+          input.subjectId, 
+          input.startDate, 
+          input.endDate, 
+          input.limit || 20
+        );
+      }),
+    
+    // Obter ranking de um módulo (professor)
+    getModuleRanking: protectedProcedure
+      .input(z.object({ 
+        moduleId: z.number(),
+        limit: z.number().optional()
+      }))
+      .query(async ({ input }) => {
+        return await db.getModuleRanking(input.moduleId, input.limit || 20);
+      }),
+    
+    // Obter top 3 performers de uma disciplina (professor)
+    getSubjectTopPerformers: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getSubjectTopPerformers(input.subjectId);
+      }),
+    
+    // Obter estatísticas de ranking de uma disciplina (professor)
+    getSubjectRankingStats: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getSubjectRankingStats(input.subjectId);
+      }),
+    
+    // Obter posição do aluno no ranking (aluno)
+    getMyPosition: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentRankPosition(ctx.studentSession.studentId, input.subjectId);
+      }),
+    
+    // Obter histórico de posições do aluno (aluno)
+    getMyRankHistory: studentProcedure
+      .input(z.object({ 
+        subjectId: z.number(),
+        days: z.number().optional()
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentRankHistory(
+          ctx.studentSession.studentId, 
+          input.subjectId, 
+          input.days || 30
+        );
+      }),
   }),
 
   // ==================== PENSAMENTO COMPUTACIONAL ====================

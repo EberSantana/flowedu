@@ -44,6 +44,8 @@ import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
 import StudentExerciseResults from "./pages/StudentExerciseResults";
 import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
+import { Leaderboard } from "./pages/Leaderboard";
+import { StudentLeaderboard } from "./pages/StudentLeaderboard";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -81,6 +83,8 @@ function Router() {
         <Route path={"/student-profile"} component={StudentProfilePage} />
         <Route path={"/student-gamification"} component={StudentGamification} />
         <Route path={"/gamification-dashboard"} component={GamificationDashboard} />
+        <Route path={"/leaderboard"} component={Leaderboard} />
+        <Route path={"/student-leaderboard"} component={StudentLeaderboard} />
         <Route path={"/student-computational-thinking"} component={StudentComputationalThinking} />
         <Route path={"/student-exercises"} component={StudentExercises} />
         <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
