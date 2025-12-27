@@ -3758,6 +3758,18 @@ export async function getExerciseDetails(exerciseId: number, studentId: number) 
   
   if (!exercise[0]) return null;
   
+  const subject = await db
+    .select()
+    .from(subjects)
+    .where(eq(subjects.id, exercise[0].subjectId))
+    .limit(1);
+  
+  const module = await db
+    .select()
+    .from(learningModules)
+    .where(eq(learningModules.id, exercise[0].moduleId))
+    .limit(1);
+  
   const attempts = await db
     .select()
     .from(studentExerciseAttempts)
@@ -3769,9 +3781,18 @@ export async function getExerciseDetails(exerciseId: number, studentId: number) 
     )
     .orderBy(desc(studentExerciseAttempts.attemptNumber));
   
+  const exerciseData = exercise[0].exerciseData ? JSON.parse(exercise[0].exerciseData as string) : { questions: [] };
+  
+  const currentAttempt = attempts.find(a => a.status === "in_progress");
+  
   return {
     ...exercise[0],
+    subjectName: subject[0]?.name || "Disciplina",
+    moduleName: module[0]?.title || "Módulo",
+    questions: exerciseData.questions || [],
     attempts,
+    currentAttemptId: currentAttempt?.id || null,
+    startedAt: currentAttempt?.startedAt || null,
     canAttempt: exercise[0].maxAttempts === 0 || attempts.length < exercise[0].maxAttempts,
   };
 }
@@ -3911,15 +3932,44 @@ export async function getExerciseResults(attemptId: number) {
   
   if (!attempt[0]) return null;
   
+  // Buscar o exercício para obter título e questões
+  const exercise = await db
+    .select()
+    .from(studentExercises)
+    .where(eq(studentExercises.id, attempt[0].exerciseId))
+    .limit(1);
+  
   const answers = await db
     .select()
     .from(studentExerciseAnswers)
     .where(eq(studentExerciseAnswers.attemptId, attemptId))
     .orderBy(asc(studentExerciseAnswers.questionNumber));
   
+  // Parse exerciseData para obter as questões originais
+  const exerciseData = exercise[0]?.exerciseData ? JSON.parse(exercise[0].exerciseData as string) : { questions: [] };
+  
+  // Combinar respostas com questões originais
+  const questionsWithAnswers = answers.map((answer) => {
+    const originalQuestion = exerciseData.questions?.find((q: any) => q.number === answer.questionNumber) || {};
+    return {
+      question: originalQuestion.question || answer.questionType,
+      studentAnswer: answer.studentAnswer,
+      correctAnswer: answer.correctAnswer,
+      isCorrect: answer.isCorrect,
+      explanation: originalQuestion.explanation || null,
+      questionType: answer.questionType,
+      pointsAwarded: answer.pointsAwarded,
+    };
+  });
+  
   return {
     ...attempt[0],
+    exerciseTitle: exercise[0]?.title || "Exercício",
+    questions: questionsWithAnswers,
     detailedAnswers: answers,
+    correctCount: attempt[0].correctAnswers,
+    totalQuestions: attempt[0].totalQuestions,
+    canRetry: exercise[0] ? (attempt[0].attemptNumber < (exercise[0].maxAttempts || 999)) : false,
   };
 }
 

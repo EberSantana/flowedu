@@ -4076,16 +4076,17 @@ JSON (descrições MAX 15 chars):
         
         const { studentExercises } = await import("../drizzle/schema");
         
-        let query = db_instance
-          .select()
-          .from(studentExercises)
-          .where(eq(studentExercises.teacherId, ctx.user.id));
+        const conditions = [eq(studentExercises.teacherId, ctx.user.id)];
         
         if (input.subjectId) {
-          query = query.where(eq(studentExercises.subjectId, input.subjectId));
+          conditions.push(eq(studentExercises.subjectId, input.subjectId));
         }
         
-        const exercises = await query;
+        const exercises = await db_instance
+          .select()
+          .from(studentExercises)
+          .where(and(...conditions));
+        
         return exercises;
       }),
   }),

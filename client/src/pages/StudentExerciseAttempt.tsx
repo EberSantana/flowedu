@@ -214,7 +214,7 @@ export default function StudentExerciseAttempt() {
                   </Badge>
                   {exercise.maxAttempts && (
                     <Badge variant="outline">
-                      Tentativa {exercise.attempts + 1} de {exercise.maxAttempts}
+                      Tentativa {exercise.attempts.length + 1} de {exercise.maxAttempts}
                     </Badge>
                   )}
                 </div>
