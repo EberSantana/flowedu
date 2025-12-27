@@ -2979,3 +2979,9 @@
 - [x] Criar tabela de alunos com dificuldades por exercício/módulo
 - [x] Adicionar exportação de relatório em PDF
 - [x] Link no menu lateral do professor
+
+## Correção de Erro - Trilhas de Aprendizagem
+- [x] Investigar erro de validação na página /learning-paths
+- [x] Identificar mutation com parâmetros inválidos (subjectId, totalQuestions, totalPoints, availableFrom)
+- [x] Corrigir tipos de dados e campos obrigatórios
+- [x] Testar correção e validar funcionamento

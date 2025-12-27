@@ -38,6 +38,7 @@ interface ExerciseGeneratorModalProps {
   onClose: () => void;
   moduleId: number;
   moduleTitle: string;
+  subjectId: number;
 }
 
 type ExerciseType = "objective" | "subjective" | "case_study" | "mixed";
@@ -62,6 +63,7 @@ export default function ExerciseGeneratorModal({
   onClose,
   moduleId,
   moduleTitle,
+  subjectId,
 }: ExerciseGeneratorModalProps) {
   // Component state
   const [exerciseType, setExerciseType] = useState<ExerciseType>("mixed");
@@ -839,21 +841,30 @@ export default function ExerciseGeneratorModal({
               }
 
               // Preparar dados para publicação
-              publishExercisesMutation.mutate({
-                moduleId,
-                title: publishConfig.title,
-                description: publishConfig.description || null,
-                questions: generatedExercises.exercises.map((ex) => ({
+              const exerciseData = {
+                exercises: generatedExercises.exercises.map((ex) => ({
                   question: ex.question,
                   type: ex.type,
                   options: ex.options || [],
                   correctAnswer: ex.correctAnswer || "",
                   explanation: ex.explanation || null,
-                })),
-                availableFrom: publishConfig.availableFrom ? new Date(publishConfig.availableFrom).toISOString() : null,
-                availableUntil: publishConfig.availableUntil ? new Date(publishConfig.availableUntil).toISOString() : null,
-                maxAttempts: publishConfig.maxAttempts === 999 ? null : publishConfig.maxAttempts,
-                timeLimit: publishConfig.timeLimit > 0 ? publishConfig.timeLimit : null,
+                }))
+              };
+
+              publishExercisesMutation.mutate({
+                moduleId,
+                subjectId,
+                title: publishConfig.title,
+                description: publishConfig.description || undefined,
+                exerciseData: JSON.stringify(exerciseData),
+                totalQuestions: generatedExercises.exercises.length,
+                totalPoints: generatedExercises.exercises.length * 10, // 10 pontos por questão
+                passingScore: 60,
+                maxAttempts: publishConfig.maxAttempts === 999 ? 999 : publishConfig.maxAttempts,
+                timeLimit: publishConfig.timeLimit > 0 ? publishConfig.timeLimit : undefined,
+                showAnswersAfter: publishConfig.showAnswersAfter === "submission",
+                availableFrom: publishConfig.availableFrom ? new Date(publishConfig.availableFrom) : new Date(),
+                availableTo: publishConfig.availableUntil ? new Date(publishConfig.availableUntil) : undefined,
               });
             }}
             disabled={publishExercisesMutation.isPending}

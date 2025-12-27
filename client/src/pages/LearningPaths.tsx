@@ -1296,6 +1296,7 @@ export default function LearningPaths() {
               }}
               moduleId={selectedModuleForExercise.id}
               moduleTitle={selectedModuleForExercise.title}
+              subjectId={selectedSubjectId!}
             />
           )}
         </div>
