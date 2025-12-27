@@ -3688,9 +3688,24 @@ export async function listAvailableExercises(studentId: number, subjectId?: numb
   
   const now = new Date();
   
+  // Primeiro, buscar disciplinas em que o aluno está matriculado
+  const enrolledSubjects = await db
+    .select({ subjectId: subjectEnrollments.subjectId })
+    .from(subjectEnrollments)
+    .where(eq(subjectEnrollments.studentId, studentId));
+  
+  const enrolledSubjectIds = enrolledSubjects.map(e => e.subjectId);
+  
+  // Se o aluno não está matriculado em nenhuma disciplina, retornar vazio
+  if (enrolledSubjectIds.length === 0) {
+    return [];
+  }
+  
   const conditions = [
     eq(studentExercises.status, "published"),
-    lte(studentExercises.availableFrom, now)
+    lte(studentExercises.availableFrom, now),
+    // Apenas exercícios das disciplinas em que o aluno está matriculado
+    inArray(studentExercises.subjectId, enrolledSubjectIds)
   ];
   
   if (subjectId) {

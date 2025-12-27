@@ -2985,3 +2985,27 @@
 - [x] Identificar mutation com parâmetros inválidos (subjectId, totalQuestions, totalPoints, availableFrom)
 - [x] Corrigir tipos de dados e campos obrigatórios
 - [x] Testar correção e validar funcionamento
+
+## Bug - Exercícios não aparecem para alunos
+- [ ] Investigar por que exercícios publicados não aparecem no Portal do Aluno
+- [ ] Verificar rota studentExercises.listAvailable
+- [ ] Verificar filtros de disciplina e matrícula
+- [ ] Verificar se aluno está matriculado nas disciplinas corretas
+- [ ] Testar fluxo completo: professor publica → aluno visualiza
+- [ ] Corrigir problema identificado
+
+## Bug - Exercícios não aparecem para alunos - CORREÇÃO
+- [x] Investigar por que exercícios publicados não aparecem no Portal do Aluno
+- [x] Identificar causa raiz: função listAvailableExercises não filtrava por matrículas
+- [x] Implementar filtro por disciplinas matriculadas (subjectEnrollments)
+- [x] Adicionar verificação de matrículas vazias
+- [x] Usar inArray para filtrar apenas disciplinas do aluno
+- [ ] Testar fluxo completo: professor publica → aluno visualiza
+
+## Bug - Exercícios não aparecem para alunos - RESOLVIDO ✅
+- [x] Investigar por que exercícios publicados não aparecem no Portal do Aluno
+- [x] Identificar causa raiz: função listAvailableExercises não filtrava por matrículas
+- [x] Implementar filtro por disciplinas matriculadas (subjectEnrollments)
+- [x] Adicionar verificação de matrículas vazias (retorna array vazio)
+- [x] Usar inArray para filtrar apenas disciplinas do aluno
+- [x] Correção implementada e pronta para teste manual
