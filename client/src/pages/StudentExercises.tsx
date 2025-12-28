@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,21 @@ export default function StudentExercises() {
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
 
   // Buscar exercícios disponíveis
-  const { data: exercises = [], isLoading } = trpc.studentExercises.listAvailable.useQuery(
+  const { data: exercises = [], isLoading, error } = trpc.studentExercises.listAvailable.useQuery(
     { subjectId: selectedSubject },
     { refetchOnWindowFocus: false }
   );
+  
+  // Debug: mostrar estado atual
+  useEffect(() => {
+    console.log('[StudentExercises] Estado atual:');
+    console.log('  - isLoading:', isLoading);
+    console.log('  - exercises:', exercises?.length || 0);
+    console.log('  - error:', error?.message || 'nenhum');
+    if (exercises && exercises.length > 0) {
+      console.log('[StudentExercises] Primeiros exercícios:', exercises.slice(0, 3));
+    }
+  }, [isLoading, exercises, error]);
 
   // Buscar disciplinas do aluno
   const { data: enrollments = [] } = trpc.student.getEnrolledSubjects.useQuery();

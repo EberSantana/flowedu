@@ -3096,3 +3096,5 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Adicionar função de histórico de posições (getStudentRankHistory)
 - [ ] Criar sistema de pontos extras para top performers (futuro)
 
+
+- [ ] Investigar e corrigir problema: atividades não aparecem no Portal do Aluno quando professor publica
