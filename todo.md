@@ -3110,3 +3110,10 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Melhorar badges de status (Disponível, Em Andamento, Aprovado, etc)
 - [x] Adicionar footer no Portal do Aluno
 - [x] Corrigir import do useStudentAuth
+
+## Padronização de Layout (28/12/2025)
+- [x] Padronizar ExercisePerformanceReport.tsx para usar DashboardLayout + PageWrapper + Sidebar
+- [x] Padronizar GamificationDashboard.tsx para usar DashboardLayout + PageWrapper + Sidebar
+- [x] Remover layouts customizados e usar padrão do sistema (como Calendário)
+- [x] Garantir background cinza claro (bg-gray-50) consistente
+- [x] Testar navegação e responsividade

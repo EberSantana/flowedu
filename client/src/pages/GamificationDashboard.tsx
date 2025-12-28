@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
+import PageWrapper from "@/components/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Users, TrendingUp, Trophy, Award } from "lucide-react";
@@ -35,19 +36,22 @@ export default function GamificationDashboard() {
   if (overviewLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Carregando estatísticas...</p>
+        <PageWrapper>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Carregando estatísticas...</p>
+            </div>
           </div>
-        </div>
+        </PageWrapper>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageWrapper>
+        <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
@@ -248,7 +252,8 @@ export default function GamificationDashboard() {
             </CardContent>
           </Card>
         )}
-      </div>
+        </div>
+      </PageWrapper>
     </DashboardLayout>
   );
 }
