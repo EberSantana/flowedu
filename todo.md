@@ -3098,3 +3098,15 @@ Todas as correções TypeScript foram implementadas com sucesso:
 
 
 - [ ] Investigar e corrigir problema: atividades não aparecem no Portal do Aluno quando professor publica
+
+
+## Melhorias de Layout do Portal do Aluno (28/12/2025)
+- [x] Investigar por que exercícios não aparecem no Portal do Aluno
+- [x] Redesenhar página StudentExercises.tsx com layout mais limpo e legível
+- [x] Melhorar StudentLayout com navegação mais clara e profissional
+- [x] Adicionar mensagens explicativas quando não há exercícios disponíveis
+- [x] Melhorar hierarquia visual com cards maiores e mais espaçamento
+- [x] Adicionar grid de informações (questões, pontos, tempo, nota mínima)
+- [x] Melhorar badges de status (Disponível, Em Andamento, Aprovado, etc)
+- [x] Adicionar footer no Portal do Aluno
+- [x] Corrigir import do useStudentAuth
