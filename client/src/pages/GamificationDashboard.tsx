@@ -233,8 +233,8 @@ export default function GamificationDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {badges.map((badge: any) => (
-                  <div key={badge.badgeKey} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                {badges.map((badge: any, badgeIndex: number) => (
+                  <div key={badge.badgeKey || `badge-${badgeIndex}`} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
                     <div className="flex items-start gap-3">
                       <div className="text-3xl">{badge.iconUrl || '🏆'}</div>
                       <div className="flex-1">

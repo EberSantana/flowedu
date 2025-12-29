@@ -3129,3 +3129,6 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Corrigir estrutura do GamificationDashboard.tsx para seguir padrão exato
 - [x] Testar visualização e responsividade
 
+
+## Menu do Aluno - Trilhas de Aprendizagem
+- [x] Adicionar link 'Trilhas de Aprendizagem' no menu do Portal do Aluno para visualizar atividades dos módulos

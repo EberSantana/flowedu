@@ -36,6 +36,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
+import StudentLearningPaths from "./pages/StudentLearningPaths";
 import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentGamification from "./pages/StudentGamification";
 import GamificationDashboard from "./pages/GamificationDashboard";
@@ -79,6 +80,7 @@ function Router() {
         <Route path={"/admin/invites"} component={AdminInvites} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
         <Route path={"/student-subjects"} component={StudentSubjects} />
+        <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
         <Route path={"/student-announcements"} component={StudentAnnouncements} />
         <Route path={"/student-profile"} component={StudentProfilePage} />
         <Route path={"/student-gamification"} component={StudentGamification} />
