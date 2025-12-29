@@ -54,6 +54,11 @@
 - [ ] Documentar rotas da API
 - [ ] Criar guia de uso do sistema
 
+## Correção de Layout - Relatório de Desempenho
+- [x] Corrigir layout da página de Relatório de Desempenho para usar Sidebar + PageWrapper
+- [x] Remover DashboardLayout e substituir por Sidebar
+- [x] Padronizar estrutura com outras páginas do sistema
+
 ## Novos Recursos - Filtros na Grade
 - [x] Adicionar seletor de filtro por disciplina
 - [x] Adicionar seletor de filtro por turma

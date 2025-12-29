@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,23 +71,27 @@ export default function ExercisePerformanceReport() {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <PageWrapper>
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Carregando relatório...</p>
+      <>
+        <Sidebar />
+        <PageWrapper className="min-h-screen bg-gray-50">
+          <div className="container mx-auto py-6 px-4">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Carregando relatório...</p>
+              </div>
             </div>
           </div>
         </PageWrapper>
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <div className="space-y-6">
+    <>
+      <Sidebar />
+      <PageWrapper className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-6 px-4 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -505,6 +509,6 @@ export default function ExercisePerformanceReport() {
           }
         `}</style>
       </PageWrapper>
-    </DashboardLayout>
+    </>
   );
 }
