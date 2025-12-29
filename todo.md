@@ -3138,3 +3138,12 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Atualizar backend para suportar vinculação de exercícios aos módulos
 - [x] Modificar interface do professor para selecionar módulo ao publicar exercício
 - [x] Atualizar página do aluno para exibir exercícios dentro dos módulos
+
+## Melhorias de Layout do Portal do Aluno
+- [x] Remover componente ModuleExercises da página StudentSubjectView
+- [x] Remover rota tRPC studentExercises.listByModule
+- [x] Remover função listExercisesByModule do db.ts
+- [x] Otimizar layout da página StudentSubjectView (trilhas)
+- [x] Melhorar visualização de módulos e tópicos
+- [x] Ajustar espaçamentos e hierarquia visual
+- [x] Tornar interface mais fluida e fácil de usar

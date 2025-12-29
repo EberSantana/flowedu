@@ -27,90 +27,6 @@ import {
 import { toast } from "sonner";
 import { Link } from "wouter";
 
-// Componente para exibir exercícios de um módulo
-function ModuleExercises({ moduleId }: { moduleId: number }) {
-  const { data: exercises, isLoading } = trpc.studentExercises.listByModule.useQuery(
-    { moduleId },
-    { enabled: !!moduleId }
-  );
-
-  if (isLoading) {
-    return (
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <p className="text-sm text-gray-600">Carregando exercícios...</p>
-      </div>
-    );
-  }
-
-  if (!exercises || exercises.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200">
-      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-        <FileText className="h-5 w-5 text-blue-600" />
-        Exercícios deste Módulo ({exercises.length})
-      </h4>
-      <div className="space-y-2">
-        {exercises.map((exercise: any) => {
-          const hasAttempts = exercise.attempts > 0;
-          const lastScore = exercise.lastAttempt?.score || 0;
-          const passed = lastScore >= exercise.passingScore;
-          
-          return (
-            <Link key={exercise.id} href={`/student/exercise/${exercise.id}`}>
-              <div className="p-3 bg-white rounded-lg border hover:border-blue-400 hover:shadow-md transition-all cursor-pointer">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h5 className="font-medium text-gray-900">{exercise.title}</h5>
-                    {exercise.description && (
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{exercise.description}</p>
-                    )}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                      <span>{exercise.totalQuestions} questões</span>
-                      <span>•</span>
-                      <span>{exercise.totalPoints} pontos</span>
-                      {exercise.timeLimit && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {exercise.timeLimit} min
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="ml-4 text-right">
-                    {hasAttempts ? (
-                      <div>
-                        <Badge variant={passed ? "default" : "secondary"} className="mb-1">
-                          {passed ? "✓ Aprovado" : "× Reprovado"}
-                        </Badge>
-                        <p className="text-xs text-gray-600">
-                          Última nota: {lastScore}%
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {exercise.attempts}/{exercise.maxAttempts === 0 ? '∞' : exercise.maxAttempts} tentativas
-                        </p>
-                      </div>
-                    ) : (
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-                        Novo
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export default function StudentSubjectView() {
   const [, params] = useRoute("/student/subject/:subjectId/:professorId");
   const subjectId = params?.subjectId ? parseInt(params.subjectId) : 0;
@@ -257,38 +173,45 @@ export default function StudentSubjectView() {
 
   return (
     <StudentLayout>
-      <div className="w-full">
+      <div className="container mx-auto py-6 px-4 max-w-5xl">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <Link href="/student-dashboard">
-              <Button variant="ghost" size="sm" className="mb-4">
+              <Button variant="ghost" size="sm" className="mb-3 hover:bg-gray-100">
                 ← Voltar ao Portal
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
               Trilha de Aprendizagem
             </h1>
-            <p className="text-gray-600">
+            <p className="text-lg text-gray-600">
               Acompanhe seu progresso e acesse os materiais de estudo
             </p>
           </div>
 
           {/* Progress Summary */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Seu Progresso</CardTitle>
-              <CardDescription>
-                {completedTopics} de {totalTopics} tópicos concluídos
-              </CardDescription>
+          <Card className="mb-6 border-l-4 border-l-blue-500 shadow-md">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl">Seu Progresso</CardTitle>
+                  <CardDescription className="text-base mt-1">
+                    {completedTopics} de {totalTopics} tópicos concluídos
+                  </CardDescription>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-blue-600">{progressPercentage}%</div>
+                  <div className="text-xs text-gray-500">completo</div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <Progress value={progressPercentage} className="h-3" />
-              <p className="text-sm text-gray-600 mt-2">{progressPercentage}% completo</p>
             </CardContent>
           </Card>
 
           {/* Learning Path Modules */}
-          <div className="space-y-4">
+          <div className="space-y-5">
             {learningPath.map((module, moduleIndex) => {
               const isExpanded = expandedModules.has(module.id);
               const moduleTopics = module.topics || [];
@@ -296,51 +219,56 @@ export default function StudentSubjectView() {
               const moduleProgress = moduleTopics.length > 0 ? Math.round((moduleCompleted / moduleTopics.length) * 100) : 0;
 
               return (
-                <Card key={module.id}>
+                <Card key={module.id} className="shadow-md hover:shadow-lg transition-shadow">
                   <CardHeader
-                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="cursor-pointer hover:bg-gray-50 transition-all pb-4"
                     onClick={() => toggleModule(module.id)}
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          {isExpanded ? (
-                            <ChevronDown className="h-5 w-5 text-gray-500" />
-                          ) : (
-                            <ChevronRight className="h-5 w-5 text-gray-500" />
-                          )}
-                          <div>
-                            <CardTitle className="text-lg">
+                          <div className="flex-shrink-0">
+                            {isExpanded ? (
+                              <ChevronDown className="h-6 w-6 text-blue-600" />
+                            ) : (
+                              <ChevronRight className="h-6 w-6 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <CardTitle className="text-xl font-semibold text-gray-900">
                               Módulo {moduleIndex + 1}: {module.title}
                             </CardTitle>
                             {module.description && (
-                              <CardDescription className="mt-1">
+                              <CardDescription className="mt-2 text-base text-gray-600">
                                 {module.description}
                               </CardDescription>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="text-right ml-4">
-                        <Badge variant={moduleProgress === 100 ? "default" : "secondary"}>
+                      <div className="flex-shrink-0 text-right">
+                        <Badge 
+                          variant={moduleProgress === 100 ? "default" : "secondary"}
+                          className="text-sm px-3 py-1"
+                        >
                           {moduleProgress}%
                         </Badge>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {moduleCompleted}/{moduleTopics.length} tópicos
+                        </div>
                       </div>
                     </div>
                     {isExpanded && (
                       <div className="mt-4">
-                        <Progress value={moduleProgress} className="h-2" />
+                        <Progress value={moduleProgress} className="h-2.5" />
                       </div>
                     )}
                   </CardHeader>
 
                   {isExpanded && (
-                    <CardContent>
-                      {/* Exercícios do Módulo */}
-                      <ModuleExercises moduleId={module.id} />
-                      
+                    <CardContent className="pt-4">
                       {/* Tópicos do Módulo */}
-                      <div className="space-y-3 mt-6">
+                      <div className="space-y-4">
                         {moduleTopics.map((topic: any, topicIndex: number) => {
                           const topicStatus = topic.studentProgress?.status || 'not_started';
                           const selfAssessment = topic.studentProgress?.selfAssessment;
@@ -348,87 +276,91 @@ export default function StudentSubjectView() {
                           return (
                             <div
                               key={topic.id}
-                              className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                              className="border-2 rounded-xl p-5 hover:bg-blue-50/30 hover:border-blue-300 transition-all bg-white"
                             >
-                              <div className="flex items-start gap-3">
-                                <div className="mt-1">
+                              <div className="flex items-start gap-4">
+                                <div className="mt-0.5 flex-shrink-0">
                                   {getStatusIcon(topicStatus)}
                                 </div>
-                                <div className="flex-1">
-                                  <h4 className="font-medium text-gray-900">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-gray-900 text-base">
                                     {moduleIndex + 1}.{topicIndex + 1} {topic.title}
                                   </h4>
                                   {topic.description && (
-                                    <p className="text-sm text-gray-600 mt-1">
+                                    <p className="text-sm text-gray-600 mt-2 leading-relaxed">
                                       {topic.description}
                                     </p>
                                   )}
                                   {topic.estimatedHours > 0 && (
-                                    <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                                      <Clock className="h-3 w-3" />
+                                    <p className="text-sm text-gray-500 mt-2 flex items-center gap-1.5">
+                                      <Clock className="h-4 w-4" />
                                       {topic.estimatedHours}h estimadas
                                     </p>
                                   )}
 
                                   {/* Self Assessment */}
                                   {topicStatus !== 'not_started' && (
-                                    <div className="mt-3 flex items-center gap-2">
-                                      <span className="text-xs text-gray-600">Como você está?</span>
-                                      <Button
-                                        size="sm"
-                                        variant={selfAssessment === 'understood' ? 'default' : 'outline'}
-                                        className="h-7 px-2 text-xs"
-                                        onClick={() => handleSelfAssessment(topic.id, 'understood')}
-                                      >
-                                        <ThumbsUp className="h-3 w-3 mr-1" />
-                                        Entendi
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant={selfAssessment === 'have_doubts' ? 'default' : 'outline'}
-                                        className="h-7 px-2 text-xs"
-                                        onClick={() => handleSelfAssessment(topic.id, 'have_doubts')}
-                                      >
-                                        <HelpCircle className="h-3 w-3 mr-1" />
-                                        Tenho dúvidas
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant={selfAssessment === 'need_help' ? 'default' : 'outline'}
-                                        className="h-7 px-2 text-xs"
-                                        onClick={() => handleSelfAssessment(topic.id, 'need_help')}
-                                      >
-                                        <AlertCircle className="h-3 w-3 mr-1" />
-                                        Preciso de ajuda
-                                      </Button>
+                                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                                      <span className="text-sm font-medium text-gray-700 block mb-2">Como você está?</span>
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <Button
+                                          size="sm"
+                                          variant={selfAssessment === 'understood' ? 'default' : 'outline'}
+                                          className="h-8 px-3 text-sm"
+                                          onClick={() => handleSelfAssessment(topic.id, 'understood')}
+                                        >
+                                          <ThumbsUp className="h-4 w-4 mr-1.5" />
+                                          Entendi
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant={selfAssessment === 'have_doubts' ? 'default' : 'outline'}
+                                          className="h-8 px-3 text-sm"
+                                          onClick={() => handleSelfAssessment(topic.id, 'have_doubts')}
+                                        >
+                                          <HelpCircle className="h-4 w-4 mr-1.5" />
+                                          Tenho dúvidas
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant={selfAssessment === 'need_help' ? 'default' : 'outline'}
+                                          className="h-8 px-3 text-sm"
+                                          onClick={() => handleSelfAssessment(topic.id, 'need_help')}
+                                        >
+                                          <AlertCircle className="h-4 w-4 mr-1.5" />
+                                          Preciso de ajuda
+                                        </Button>
+                                      </div>
                                     </div>
                                   )}
 
                                   {/* Actions */}
-                                  <div className="mt-3 flex items-center gap-2">
+                                  <div className="mt-4 flex flex-wrap items-center gap-2">
                                     <Button
-                                      size="sm"
+                                      size="default"
                                       variant={topicStatus === 'completed' ? 'secondary' : 'default'}
+                                      className="h-10"
                                       onClick={() => handleMarkComplete(topic.id, topicStatus)}
                                     >
                                       {topicStatus === 'completed' ? (
                                         <>
-                                          <CheckCircle2 className="h-4 w-4 mr-1" />
+                                          <CheckCircle2 className="h-5 w-5 mr-2" />
                                           Concluído
                                         </>
                                       ) : (
                                         <>
-                                          <Circle className="h-4 w-4 mr-1" />
+                                          <Circle className="h-5 w-5 mr-2" />
                                           Marcar como concluído
                                         </>
                                       )}
                                     </Button>
                                     <Button
-                                      size="sm"
+                                      size="default"
                                       variant="outline"
+                                      className="h-10"
                                       onClick={() => openMaterialsDialog(topic)}
                                     >
-                                      <FileText className="h-4 w-4 mr-1" />
+                                      <FileText className="h-5 w-5 mr-2" />
                                       Materiais e Anotações
                                     </Button>
                                   </div>
