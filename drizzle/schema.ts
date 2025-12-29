@@ -872,6 +872,8 @@ export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
   isCorrect: boolean("isCorrect"),
   pointsAwarded: int("pointsAwarded").default(0).notNull(),
   teacherFeedback: text("teacherFeedback"), // Feedback manual do professor (para subjetivas)
+  aiFeedback: text("aiFeedback"), // Feedback automático gerado por IA para questões erradas
+  studyTips: text("studyTips"), // Dicas de estudo personalizadas geradas por IA
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

@@ -14,6 +14,9 @@ import {
   ArrowLeft,
   RotateCcw,
   BookOpen,
+  Lightbulb,
+  GraduationCap,
+  Sparkles,
 } from "lucide-react";
 
 export default function StudentExerciseResults() {
@@ -243,12 +246,39 @@ export default function StudentExerciseResults() {
                   {/* Explicação (se disponível) */}
                   {question.explanation && (
                     <div className="p-4 rounded-lg bg-purple-50 border-2 border-purple-200">
-                      <div className="text-sm font-semibold text-purple-700 mb-2">
-                        💡 Explicação:
+                      <div className="text-sm font-semibold text-purple-700 mb-2 flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4" />
+                        Explicação:
                       </div>
                       <div className="text-gray-700 leading-relaxed">
                         {question.explanation}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Feedback com IA (apenas para questões erradas) */}
+                  {!isCorrect && question.aiFeedback && (
+                    <div className="p-4 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 shadow-md">
+                      <div className="text-sm font-semibold text-amber-800 mb-3 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-amber-600" />
+                        Feedback Personalizado:
+                      </div>
+                      <div className="text-gray-800 leading-relaxed mb-3 bg-white/60 p-3 rounded-md">
+                        {question.aiFeedback}
+                      </div>
+                      
+                      {/* Dicas de estudo */}
+                      {question.studyTips && (
+                        <div className="mt-3 pt-3 border-t-2 border-amber-200">
+                          <div className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                            <GraduationCap className="w-4 h-4 text-blue-600" />
+                            Dicas de Estudo:
+                          </div>
+                          <div className="text-gray-700 leading-relaxed bg-blue-50/50 p-3 rounded-md">
+                            {question.studyTips}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>

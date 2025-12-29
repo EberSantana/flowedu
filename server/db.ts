@@ -65,6 +65,7 @@ import {
   InsertStudentExerciseAnswer
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { invokeLLM } from './_core/llm';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -3897,6 +3898,52 @@ export async function startExerciseAttempt(exerciseId: number, studentId: number
 }
 
 /**
+ * Gerar feedback personalizado com IA para questões erradas
+ */
+async function generateQuestionFeedback(
+  question: string,
+  studentAnswer: string,
+  correctAnswer: string,
+  existingExplanation: string
+): Promise<{ feedback: string; studyTips: string }> {
+  const prompt = `Você é um professor experiente. Um aluno errou a seguinte questão:
+
+**Questão:** ${question}
+
+**Resposta do aluno:** ${studentAnswer}
+**Resposta correta:** ${correctAnswer}
+${existingExplanation ? `**Explicação existente:** ${existingExplanation}` : ''}
+
+Por favor, forneça:
+1. Um feedback educativo explicando por que a resposta do aluno está incorreta e qual é o raciocínio correto (máximo 3 frases).
+2. Dicas de estudo específicas para ajudar o aluno a entender melhor esse tópico (máximo 2 dicas práticas).
+
+Formato da resposta:
+FEEDBACK: [seu feedback aqui]
+DICAS: [suas dicas aqui]`;
+
+  const response = await invokeLLM({
+    messages: [
+      { role: "system", content: "Você é um professor experiente e empatíco que ajuda alunos a aprenderem com seus erros." },
+      { role: "user", content: prompt }
+    ],
+    maxTokens: 500
+  });
+
+  const content = response.choices[0]?.message?.content || "";
+  const text = typeof content === 'string' ? content : '';
+  
+  // Extrair feedback e dicas do texto
+  const feedbackMatch = text.match(/FEEDBACK:\s*([\s\S]*?)(?=DICAS:|$)/i);
+  const tipsMatch = text.match(/DICAS:\s*([\s\S]*?)$/i);
+  
+  const feedback = feedbackMatch ? feedbackMatch[1].trim() : text.split('DICAS:')[0].trim();
+  const studyTips = tipsMatch ? tipsMatch[1].trim() : "Revise o conteúdo relacionado e pratique exercícios similares.";
+  
+  return { feedback, studyTips };
+}
+
+/**
  * Submeter tentativa de exercício completa
  */
 export async function submitExerciseAttempt(
@@ -3966,9 +4013,33 @@ export async function submitExerciseAttempt(
     })
     .where(eq(studentExerciseAttempts.id, attemptId));
   
-  // Salvar respostas individuais
+  // Salvar respostas individuais e gerar feedback com IA para questões erradas
   for (const answer of detailedAnswers) {
-    await db.insert(studentExerciseAnswers).values(answer);
+    let aiFeedback = null;
+    let studyTips = null;
+    
+    // Gerar feedback apenas para questões objetivas erradas
+    if (answer.questionType === "objective" && answer.isCorrect === false) {
+      try {
+        const question = questions[answer.questionNumber - 1];
+        const feedbackResponse = await generateQuestionFeedback(
+          question.question,
+          answer.studentAnswer,
+          answer.correctAnswer,
+          question.explanation || ""
+        );
+        aiFeedback = feedbackResponse.feedback;
+        studyTips = feedbackResponse.studyTips;
+      } catch (error) {
+        console.error("Erro ao gerar feedback com IA:", error);
+      }
+    }
+    
+    await db.insert(studentExerciseAnswers).values({
+      ...answer,
+      aiFeedback,
+      studyTips,
+    });
   }
   
   return {
@@ -4022,6 +4093,8 @@ export async function getExerciseResults(attemptId: number) {
       explanation: originalQuestion.explanation || null,
       questionType: answer.questionType,
       pointsAwarded: answer.pointsAwarded,
+      aiFeedback: answer.aiFeedback || null,
+      studyTips: answer.studyTips || null,
     };
   });
   
