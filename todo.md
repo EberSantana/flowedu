@@ -3132,3 +3132,9 @@ Todas as correções TypeScript foram implementadas com sucesso:
 
 ## Menu do Aluno - Trilhas de Aprendizagem
 - [x] Adicionar link 'Trilhas de Aprendizagem' no menu do Portal do Aluno para visualizar atividades dos módulos
+
+## Vincular Exercícios aos Módulos da Trilha
+- [x] Adicionar campo moduleId na tabela student_exercises
+- [x] Atualizar backend para suportar vinculação de exercícios aos módulos
+- [x] Modificar interface do professor para selecionar módulo ao publicar exercício
+- [x] Atualizar página do aluno para exibir exercícios dentro dos módulos

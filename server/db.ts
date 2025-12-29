@@ -3680,6 +3680,68 @@ export async function createStudentExercise(data: InsertStudentExercise) {
 }
 
 /**
+ * Listar exercícios por módulo para um aluno
+ */
+export async function listExercisesByModule(studentId: number, moduleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const now = new Date();
+  
+  // Primeiro, buscar disciplinas em que o aluno está matriculado
+  const enrolledSubjects = await db
+    .select({ subjectId: subjectEnrollments.subjectId })
+    .from(subjectEnrollments)
+    .where(eq(subjectEnrollments.studentId, studentId));
+  
+  const enrolledSubjectIds = enrolledSubjects.map(e => e.subjectId);
+  
+  // Se o aluno não está matriculado em nenhuma disciplina, retornar vazio
+  if (enrolledSubjectIds.length === 0) {
+    return [];
+  }
+  
+  const conditions = [
+    eq(studentExercises.status, "published"),
+    eq(studentExercises.moduleId, moduleId),
+    lte(studentExercises.availableFrom, now),
+    // Apenas exercícios das disciplinas em que o aluno está matriculado
+    inArray(studentExercises.subjectId, enrolledSubjectIds)
+  ];
+  
+  const exercises = await db
+    .select()
+    .from(studentExercises)
+    .where(and(...conditions))
+    .orderBy(studentExercises.availableFrom);
+  
+  // Para cada exercício, buscar tentativas do aluno
+  const exercisesWithAttempts = await Promise.all(
+    exercises.map(async (exercise) => {
+      const attempts = await db
+        .select()
+        .from(studentExerciseAttempts)
+        .where(
+          and(
+            eq(studentExerciseAttempts.exerciseId, exercise.id),
+            eq(studentExerciseAttempts.studentId, studentId)
+          )
+        )
+        .orderBy(desc(studentExerciseAttempts.attemptNumber));
+      
+      return {
+        ...exercise,
+        attempts: attempts.length,
+        lastAttempt: attempts[0] || null,
+        canAttempt: exercise.maxAttempts === 0 || attempts.length < exercise.maxAttempts,
+      };
+    })
+  );
+  
+  return exercisesWithAttempts;
+}
+
+/**
  * Listar exercícios disponíveis para um aluno
  */
 export async function listAvailableExercises(studentId: number, subjectId?: number) {

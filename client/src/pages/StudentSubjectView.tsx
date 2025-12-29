@@ -27,6 +27,90 @@ import {
 import { toast } from "sonner";
 import { Link } from "wouter";
 
+// Componente para exibir exercícios de um módulo
+function ModuleExercises({ moduleId }: { moduleId: number }) {
+  const { data: exercises, isLoading } = trpc.studentExercises.listByModule.useQuery(
+    { moduleId },
+    { enabled: !!moduleId }
+  );
+
+  if (isLoading) {
+    return (
+      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+        <p className="text-sm text-gray-600">Carregando exercícios...</p>
+      </div>
+    );
+  }
+
+  if (!exercises || exercises.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200">
+      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <FileText className="h-5 w-5 text-blue-600" />
+        Exercícios deste Módulo ({exercises.length})
+      </h4>
+      <div className="space-y-2">
+        {exercises.map((exercise: any) => {
+          const hasAttempts = exercise.attempts > 0;
+          const lastScore = exercise.lastAttempt?.score || 0;
+          const passed = lastScore >= exercise.passingScore;
+          
+          return (
+            <Link key={exercise.id} href={`/student/exercise/${exercise.id}`}>
+              <div className="p-3 bg-white rounded-lg border hover:border-blue-400 hover:shadow-md transition-all cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h5 className="font-medium text-gray-900">{exercise.title}</h5>
+                    {exercise.description && (
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{exercise.description}</p>
+                    )}
+                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                      <span>{exercise.totalQuestions} questões</span>
+                      <span>•</span>
+                      <span>{exercise.totalPoints} pontos</span>
+                      {exercise.timeLimit && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {exercise.timeLimit} min
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="ml-4 text-right">
+                    {hasAttempts ? (
+                      <div>
+                        <Badge variant={passed ? "default" : "secondary"} className="mb-1">
+                          {passed ? "✓ Aprovado" : "× Reprovado"}
+                        </Badge>
+                        <p className="text-xs text-gray-600">
+                          Última nota: {lastScore}%
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {exercise.attempts}/{exercise.maxAttempts === 0 ? '∞' : exercise.maxAttempts} tentativas
+                        </p>
+                      </div>
+                    ) : (
+                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                        Novo
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function StudentSubjectView() {
   const [, params] = useRoute("/student/subject/:subjectId/:professorId");
   const subjectId = params?.subjectId ? parseInt(params.subjectId) : 0;
@@ -252,7 +336,11 @@ export default function StudentSubjectView() {
 
                   {isExpanded && (
                     <CardContent>
-                      <div className="space-y-3">
+                      {/* Exercícios do Módulo */}
+                      <ModuleExercises moduleId={module.id} />
+                      
+                      {/* Tópicos do Módulo */}
+                      <div className="space-y-3 mt-6">
                         {moduleTopics.map((topic: any, topicIndex: number) => {
                           const topicStatus = topic.studentProgress?.status || 'not_started';
                           const selfAssessment = topic.studentProgress?.selfAssessment;

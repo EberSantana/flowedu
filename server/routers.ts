@@ -4027,6 +4027,17 @@ JSON (descrições MAX 15 chars):
         return exercises;
       }),
 
+    // Listar exercícios por módulo
+    listByModule: studentProcedure
+      .input(z.object({ moduleId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const exercises = await db.listExercisesByModule(studentId, input.moduleId);
+        return exercises;
+      }),
+
     // Obter detalhes de um exercício
     getDetails: studentProcedure
       .input(z.object({ exerciseId: z.number() }))
