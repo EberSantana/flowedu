@@ -3252,3 +3252,27 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Testar responsividade dos modais
 - [x] Validar melhorias em diferentes resoluções
 
+
+## Redesign Completo do Modal de Visualização de Exercícios
+
+- [ ] Analisar problemas atuais de UX/UI no modal
+- [ ] Redesenhar header com melhor hierarquia visual
+- [ ] Reorganizar sistema de abas (Dicas, Respostas)
+- [ ] Destacar botão "Publicar para Alunos" como ação principal
+- [ ] Melhorar navegação lateral (números das questões)
+- [ ] Aumentar espaçamento entre elementos
+- [ ] Melhorar tipografia e contraste
+- [ ] Adicionar transições suaves
+- [ ] Testar responsividade
+- [ ] Validar experiência completa de navegação
+
+## Atualização de Status - Redesign do Modal
+
+- [x] Analisar problemas atuais de UX/UI no modal
+- [x] Redesenhar header com melhor hierarquia visual
+- [x] Reorganizar sistema de abas (Dicas, Respostas)
+- [x] Destacar botão "Publicar para Alunos" como ação principal
+- [x] Melhorar navegação lateral (números das questões)
+- [x] Aumentar espaçamento entre elementos
+- [x] Melhorar tipografia e contraste
+- [x] Adicionar transições suaves

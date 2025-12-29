@@ -516,9 +516,12 @@ export default function ExerciseGeneratorModal({
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex gap-4">
-            {/* Barra Lateral de Navegação */}
-            <div className="flex-shrink-0 w-16 bg-gray-50 rounded-lg p-2 space-y-2 overflow-y-auto max-h-[calc(90vh-200px)]">
+          <div className="flex gap-6 h-[calc(90vh-200px)]">
+            {/* Navegação Lateral Melhorada */}
+            <div className="flex-shrink-0 w-20 bg-gradient-to-b from-green-50 to-emerald-50 rounded-xl p-3 space-y-3 overflow-y-auto max-h-[calc(90vh-200px)] border border-green-100 shadow-sm">
+              <div className="text-xs font-semibold text-green-700 text-center mb-2 pb-2 border-b border-green-200">
+                Questões
+              </div>
               {generatedExercises.exercises.map((exercise, idx) => {
                 return (
                   <button
@@ -529,7 +532,7 @@ export default function ExerciseGeneratorModal({
                         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }
                     }}
-                    className="w-full h-12 rounded-lg font-bold text-sm transition-all bg-white text-gray-700 hover:bg-green-100 hover:text-green-700 border border-gray-200"
+                    className="w-full h-14 rounded-xl font-bold text-base transition-all duration-200 bg-white text-gray-700 hover:bg-green-500 hover:text-white hover:scale-105 hover:shadow-md border-2 border-green-200 hover:border-green-500 flex items-center justify-center"
                     title={`Ir para Exercício ${exercise.number}`}
                   >
                     {exercise.number}
@@ -537,7 +540,7 @@ export default function ExerciseGeneratorModal({
                 );
               })}
             </div>
-
+            
             {/* Conteúdo Principal */}
             <ScrollArea className="flex-1 pr-4 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
               <div id="exercises-content" className="space-y-6 py-4">
@@ -550,30 +553,38 @@ export default function ExerciseGeneratorModal({
                 {/* Exercícios */}
                 <div className="space-y-8">
                   {generatedExercises.exercises.map((exercise, idx) => (
-                    <div key={exercise.number} id={`exercise-${idx}`} className="border rounded-lg p-6 bg-white shadow-sm scroll-mt-4">
-                    <div className="flex items-start justify-between mb-4">
-                      <span className="text-lg font-bold text-gray-900">Exercício {exercise.number}</span>
-                      <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded font-medium">
+                    <div key={exercise.number} id={`exercise-${idx}`} className="border-2 border-green-100 rounded-2xl p-8 bg-white shadow-md hover:shadow-lg transition-all duration-200 scroll-mt-4">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-lg">
+                          {exercise.number}
+                        </div>
+                        <span className="text-xl font-bold text-gray-900">Exercício {exercise.number}</span>
+                      </div>
+                      <span className="text-sm bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
                         {exercise.type === "objective" ? "Objetiva" : 
                          exercise.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
                       </span>
                     </div>
                     
                     {exercise.caseContext && (
-                      <div className="bg-gray-50 p-4 rounded-lg mb-4 text-base italic text-gray-700 leading-relaxed">
-                        {exercise.caseContext}
+                      <div className="bg-amber-50 border-l-4 border-amber-400 p-5 rounded-lg mb-6 text-base italic text-gray-700 leading-relaxed">
+                        <div className="flex items-start gap-2">
+                          <span className="text-amber-600 font-semibold text-sm uppercase tracking-wide">Contexto:</span>
+                        </div>
+                        <p className="mt-2">{exercise.caseContext}</p>
                       </div>
                     )}
                     
-                    <p className="mb-4 text-base text-gray-800 leading-relaxed">{exercise.question}</p>
+                    <p className="mb-6 text-lg text-gray-800 leading-relaxed font-medium">{exercise.question}</p>
                     
                     {exercise.options && (
-                      <div className="space-y-3 ml-6">
+                      <div className="space-y-3 ml-2">
                         {exercise.options.map((option, idx) => (
-                          <div key={idx} className={`text-base leading-relaxed ${
+                          <div key={idx} className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                             showAnswers && option.startsWith(exercise.correctAnswer || "")
-                              ? "text-green-600 font-semibold"
-                              : "text-gray-700"
+                              ? "bg-green-50 border-green-400 text-green-700 font-semibold shadow-sm"
+                              : "bg-gray-50 border-gray-200 text-gray-700 hover:border-green-200 hover:bg-green-50/30"
                           }`}>
                             {option}
                           </div>
@@ -591,18 +602,28 @@ export default function ExerciseGeneratorModal({
                       </div>
                     )}
                     
-                    <div className="mt-5 pt-4 border-t space-y-3">
-                      {exercise.correctAnswer && (
-                        <p className="text-green-600 text-base leading-relaxed">
-                          <strong className="font-semibold">Resposta Correta:</strong> {exercise.correctAnswer}
-                        </p>
-                      )}
-                      {exercise.explanation && (
-                        <p className="text-gray-700 text-base leading-relaxed">
-                          <strong className="font-semibold">Justificativa:</strong> {exercise.explanation}
-                        </p>
-                      )}
-                    </div>
+                    {showAnswers && (exercise.correctAnswer || exercise.explanation) && (
+                      <div className="mt-6 pt-6 border-t-2 border-green-100 space-y-4">
+                        {exercise.correctAnswer && (
+                          <div className="bg-green-50 border-l-4 border-green-500 p-5 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <CheckSquare className="h-5 w-5 text-green-600" />
+                              <strong className="font-bold text-green-700 text-base">Resposta Correta:</strong>
+                            </div>
+                            <p className="text-green-700 text-base leading-relaxed ml-7">{exercise.correctAnswer}</p>
+                          </div>
+                        )}
+                        {exercise.explanation && (
+                          <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Lightbulb className="h-5 w-5 text-blue-600" />
+                              <strong className="font-bold text-blue-700 text-base">Justificativa:</strong>
+                            </div>
+                            <p className="text-blue-700 text-base leading-relaxed ml-7">{exercise.explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -612,16 +633,16 @@ export default function ExerciseGeneratorModal({
         </div>
         )}
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4">
+        <DialogFooter className="flex-shrink-0 border-t pt-6 bg-gradient-to-r from-gray-50 to-green-50">
           {!generatedExercises ? (
-            <>
-              <Button variant="outline" onClick={handleClose}>
+            <div className="flex justify-end gap-3 w-full">
+              <Button variant="outline" onClick={handleClose} className="px-6">
                 Cancelar
               </Button>
               <Button
                 onClick={handleGenerate}
                 disabled={generateExercisesMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 px-8 shadow-md hover:shadow-lg transition-all"
               >
                 {generateExercisesMutation.isPending ? (
                   <>
@@ -635,48 +656,60 @@ export default function ExerciseGeneratorModal({
                   </>
                 )}
               </Button>
-            </>
+            </div>
           ) : (
-            <div className="flex items-center justify-between w-full gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-4 w-full">
+              {/* Linha 1: Abas de Visualização */}
+              <div className="flex items-center gap-6 pb-4 border-b">
+                <span className="text-sm font-semibold text-gray-700">Visualizar:</span>
+                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-all">
                   <Checkbox
                     id="show-hints"
                     checked={showHints}
                     onCheckedChange={(checked) => setShowHints(checked as boolean)}
                   />
-                  <Label htmlFor="show-hints" className="text-sm font-medium">Dicas</Label>
+                  <Label htmlFor="show-hints" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    Dicas
+                  </Label>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-all">
                   <Checkbox
                     id="show-answers-ex"
                     checked={showAnswers}
                     onCheckedChange={(checked) => setShowAnswers(checked as boolean)}
                   />
-                  <Label htmlFor="show-answers-ex" className="text-sm font-medium">Respostas</Label>
+                  <Label htmlFor="show-answers-ex" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                    <CheckSquare className="h-4 w-4 text-green-600" />
+                    Respostas
+                  </Label>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              
+              {/* Linha 2: Ações Principais */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <Button 
                   onClick={() => setShowPublishDialog(true)} 
-                  className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                  size="lg"
                 >
-                  <Send className="h-4 w-4 mr-2" />
+                  <Send className="h-5 w-5 mr-2" />
                   Publicar para Alunos
                 </Button>
-                <div className="flex gap-2 flex-1">
-                  <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 flex-1">
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 px-5 transition-all">
                     <Download className="h-4 w-4 mr-2" />
-                    Word
+                    Exportar Word
                   </Button>
-                  <Button variant="outline" onClick={handleCopy} className="flex-1">
+                  <Button variant="outline" onClick={handleCopy} className="px-5 hover:bg-gray-100 transition-all">
                     <Copy className="h-4 w-4 mr-2" />
-                    Copiar
+                    Copiar Texto
+                  </Button>
+                  <Button onClick={handleClose} variant="outline" className="px-5 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all">
+                    Fechar
                   </Button>
                 </div>
-                <Button onClick={handleClose} variant="outline" className="sm:ml-auto">
-                  Fechar
-                </Button>
               </div>
             </div>
           )}
