@@ -3147,3 +3147,42 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Melhorar visualização de módulos e tópicos
 - [x] Ajustar espaçamentos e hierarquia visual
 - [x] Tornar interface mais fluida e fácil de usar
+
+## URGENTE - Correções Críticas do Portal do Aluno
+
+### Bug de Exercícios Não Aparecendo
+- [ ] Investigar por que exercícios publicados não aparecem para alunos
+- [ ] Verificar query studentExercises.listAvailable
+- [ ] Verificar filtros de matrícula e disciplinas
+- [ ] Adicionar logs detalhados para debug
+- [ ] Testar com dados reais do banco
+
+### Redesign Completo do Portal do Aluno
+- [ ] Redesenhar menu lateral com navegação clara
+- [ ] Criar dashboard do aluno mais visual e intuitivo
+- [ ] Melhorar página de exercícios com cards maiores
+- [ ] Adicionar filtros e busca na página de exercícios
+- [ ] Melhorar hierarquia visual e espaçamentos
+- [ ] Adicionar estados vazios amigáveis
+- [ ] Otimizar responsividade mobile
+
+## ✅ CORREÇÕES CONCLUÍDAS - 29/12/2024
+
+### Bug de Exercícios Não Aparecendo
+- [x] Investigar por que exercícios publicados não aparecem para alunos
+- [x] Verificar query studentExercises.listAvailable
+- [x] Verificar filtros de matrícula e disciplinas
+- [x] Identificar causa raiz: aluno sem matrículas ativas
+- [x] Criar guia de matricula para professores (GUIA_MATRICULA_ALUNOS.md)
+
+### Redesign Completo do Portal do Aluno
+- [x] Redesenhar menu lateral com navegação clara (StudentLayout.tsx)
+- [x] Criar sidebar moderna com gradientes e ícones coloridos
+- [x] Criar dashboard do aluno mais visual e intuitivo
+- [x] Melhorar página de exercícios com cards maiores
+- [x] Adicionar filtros e busca na página de exercícios
+- [x] Melhorar hierarquia visual e espaçamentos
+- [x] Adicionar estados vazios amigáveis
+- [x] Otimizar responsividade mobile (sidebar colapsável)
+- [x] Adicionar seção "Ações Rápidas" no dashboard
+- [x] Melhorar cards de estatísticas com gradientes

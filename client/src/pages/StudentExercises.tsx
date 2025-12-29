@@ -3,7 +3,21 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock, Trophy, CheckCircle2, XCircle, AlertCircle, Calendar, Target } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { 
+  BookOpen, 
+  Clock, 
+  Trophy, 
+  CheckCircle2, 
+  XCircle, 
+  AlertCircle, 
+  Calendar, 
+  Target,
+  Search,
+  Filter,
+  Award,
+  FileText
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import StudentLayout from "@/components/StudentLayout";
@@ -11,6 +25,7 @@ import StudentLayout from "@/components/StudentLayout";
 export default function StudentExercises() {
   const [, setLocation] = useLocation();
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Buscar exercícios disponíveis
   const { data: exercises = [], isLoading } = trpc.studentExercises.listAvailable.useQuery(
@@ -24,8 +39,8 @@ export default function StudentExercises() {
   const getStatusBadge = (exercise: any) => {
     if (!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts) {
       return (
-        <Badge variant="destructive" className="gap-1.5 px-3 py-1">
-          <XCircle className="w-3.5 h-3.5" />
+        <Badge variant="destructive" className="gap-1.5 px-3 py-1.5 text-sm font-semibold">
+          <XCircle className="w-4 h-4" />
           Esgotado
         </Badge>
       );
@@ -35,15 +50,15 @@ export default function StudentExercises() {
       const score = exercise.lastAttempt.score;
       if (score >= exercise.passingScore) {
         return (
-          <Badge className="gap-1.5 px-3 py-1 bg-green-600 hover:bg-green-700">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+          <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-green-600 hover:bg-green-700">
+            <CheckCircle2 className="w-4 h-4" />
             Aprovado ({score}%)
           </Badge>
         );
       } else {
         return (
-          <Badge variant="secondary" className="gap-1.5 px-3 py-1">
-            <AlertCircle className="w-3.5 h-3.5" />
+          <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-semibold">
+            <AlertCircle className="w-4 h-4" />
             Reprovado ({score}%)
           </Badge>
         );
@@ -52,16 +67,16 @@ export default function StudentExercises() {
 
     if (exercise.lastAttempt?.status === "in_progress") {
       return (
-        <Badge variant="outline" className="gap-1.5 px-3 py-1 border-blue-300 text-blue-700">
-          <Clock className="w-3.5 h-3.5" />
+        <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm font-semibold border-blue-300 text-blue-700">
+          <Clock className="w-4 h-4" />
           Em Andamento
         </Badge>
       );
     }
 
     return (
-      <Badge className="gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-700">
-        <BookOpen className="w-3.5 h-3.5" />
+      <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700">
+        <BookOpen className="w-4 h-4" />
         Disponível
       </Badge>
     );
@@ -71,16 +86,26 @@ export default function StudentExercises() {
     setLocation(`/student-exercises/${exerciseId}/attempt`);
   };
 
+  // Filtrar exercícios por busca
+  const filteredExercises = exercises.filter((exercise: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      exercise.title?.toLowerCase().includes(query) ||
+      exercise.description?.toLowerCase().includes(query)
+    );
+  });
+
   if (isLoading) {
     return (
       <StudentLayout>
-        <div className="container mx-auto py-8 px-4">
-          <div className="space-y-6">
-            <Skeleton className="h-16 w-96" />
-            <Skeleton className="h-12 w-full max-w-2xl" />
+        <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+          <div className="space-y-8">
+            <Skeleton className="h-20 w-full max-w-2xl" />
+            <Skeleton className="h-14 w-full max-w-md" />
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-80" />
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Skeleton key={i} className="h-96" />
               ))}
             </div>
           </div>
@@ -91,81 +116,124 @@ export default function StudentExercises() {
 
   return (
     <StudentLayout>
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Cabeçalho */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-3 text-gray-900">Exercícios Disponíveis</h1>
-          <p className="text-lg text-gray-600">
-            Complete os exercícios para ganhar pontos e subir no ranking da turma!
-          </p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <FileText className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">Exercícios Disponíveis</h1>
+              <p className="text-lg text-gray-600 mt-1">
+                Complete os exercícios para ganhar pontos e subir no ranking!
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Filtro por Disciplina */}
-        {enrollments && enrollments.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-              Filtrar por Disciplina
-            </h2>
-            <div className="flex gap-3 flex-wrap">
-              <Button
-                variant={selectedSubject === undefined ? "default" : "outline"}
-                onClick={() => setSelectedSubject(undefined)}
-                className="h-10"
-              >
-                Todas as Disciplinas
-              </Button>
-              {enrollments.map((enrollment: any) => (
+        {/* Barra de Busca e Filtros */}
+        <div className="mb-8 space-y-4">
+          {/* Busca */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Buscar exercícios..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Filtro por Disciplina */}
+          {enrollments && enrollments.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="w-5 h-5 text-gray-600" />
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Filtrar por Disciplina
+                </h2>
+              </div>
+              <div className="flex gap-3 flex-wrap">
                 <Button
-                  key={enrollment.subject.id}
-                  variant={selectedSubject === enrollment.subject.id ? "default" : "outline"}
-                  onClick={() => setSelectedSubject(enrollment.subject.id)}
-                  className="h-10"
+                  variant={selectedSubject === undefined ? "default" : "outline"}
+                  onClick={() => setSelectedSubject(undefined)}
+                  className="h-11 px-5 font-medium"
                 >
-                  {enrollment.subject.name}
+                  Todas as Disciplinas
                 </Button>
-              ))}
+                {enrollments.map((enrollment: any) => (
+                  <Button
+                    key={enrollment.subject.id}
+                    variant={selectedSubject === enrollment.subject.id ? "default" : "outline"}
+                    onClick={() => setSelectedSubject(enrollment.subject.id)}
+                    className="h-11 px-5 font-medium"
+                  >
+                    {enrollment.subject.name}
+                  </Button>
+                ))}
+              </div>
             </div>
+          )}
+        </div>
+
+        {/* Contador de Resultados */}
+        {searchQuery && (
+          <div className="mb-6">
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold text-gray-900">{filteredExercises.length}</span> exercício(s) encontrado(s)
+            </p>
           </div>
         )}
 
         {/* Lista de Exercícios */}
-        {exercises && exercises.length === 0 ? (
-          <Card className="border-2 border-dashed">
-            <CardContent className="py-16 text-center">
-              <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                <BookOpen className="w-12 h-12 text-gray-400" />
+        {filteredExercises && filteredExercises.length === 0 ? (
+          <Card className="border-2 border-dashed border-gray-300">
+            <CardContent className="py-20 text-center">
+              <div className="mx-auto w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-8 shadow-inner">
+                <BookOpen className="w-14 h-14 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-semibold mb-3 text-gray-900">
+              <h3 className="text-3xl font-bold mb-4 text-gray-900">
                 Nenhum exercício disponível
               </h3>
-              <p className="text-gray-600 text-lg max-w-md mx-auto mb-6">
-                Aguarde seu professor publicar novos exercícios para esta disciplina.
+              <p className="text-gray-600 text-lg max-w-md mx-auto mb-8">
+                {searchQuery 
+                  ? "Nenhum exercício corresponde à sua busca. Tente outros termos."
+                  : "Aguarde seu professor publicar novos exercícios para esta disciplina."}
               </p>
               {enrollments && enrollments.length === 0 && (
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md mx-auto">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Atenção:</strong> Você não está matriculado em nenhuma disciplina.
-                    Entre em contato com seu professor.
-                  </p>
+                <div className="mt-8 p-6 bg-yellow-50 border-2 border-yellow-200 rounded-xl max-w-lg mx-auto">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <AlertCircle className="w-6 h-6 text-yellow-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-yellow-900 mb-2 text-lg">Atenção</p>
+                      <p className="text-sm text-yellow-800">
+                        Você não está matriculado em nenhuma disciplina. Entre em contato com seu professor para se matricular.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {exercises.map((exercise: any) => (
+            {filteredExercises.map((exercise: any) => (
               <Card 
                 key={exercise.id} 
-                className="hover:shadow-xl transition-all duration-200 border-l-4 border-l-blue-500 flex flex-col"
+                className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-blue-300 flex flex-col group"
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <CardTitle className="text-xl font-bold text-gray-900 leading-tight">
+                    <CardTitle className="text-xl font-bold text-gray-900 leading-tight flex-1">
                       {exercise.title}
                     </CardTitle>
                     {getStatusBadge(exercise)}
                   </div>
-                  <CardDescription className="text-base text-gray-600 line-clamp-2">
+                  <CardDescription className="text-base text-gray-600 line-clamp-3 min-h-[4.5rem]">
                     {exercise.description || "Sem descrição"}
                   </CardDescription>
                 </CardHeader>
@@ -174,76 +242,85 @@ export default function StudentExercises() {
                   <div className="space-y-4 flex-1">
                     {/* Grid de Informações */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 text-sm bg-gray-50 p-3 rounded-lg">
-                        <BookOpen className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <div className="flex items-center gap-3 text-sm bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <BookOpen className="w-5 h-5 text-blue-600" />
+                        </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{exercise.totalQuestions}</p>
+                          <p className="font-bold text-gray-900 text-lg">{exercise.totalQuestions}</p>
                           <p className="text-xs text-gray-600">questões</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 text-sm bg-gray-50 p-3 rounded-lg">
-                        <Trophy className="w-4 h-4 text-yellow-600 flex-shrink-0" />
+                      <div className="flex items-center gap-3 text-sm bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                        <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Trophy className="w-5 h-5 text-yellow-600" />
+                        </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{exercise.totalPoints}</p>
+                          <p className="font-bold text-gray-900 text-lg">{exercise.totalPoints}</p>
                           <p className="text-xs text-gray-600">pontos</p>
                         </div>
                       </div>
 
                       {exercise.timeLimit && (
-                        <div className="flex items-center gap-2 text-sm bg-gray-50 p-3 rounded-lg">
-                          <Clock className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                        <div className="flex items-center gap-3 text-sm bg-orange-50 p-4 rounded-xl border border-orange-100 col-span-2">
+                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Clock className="w-5 h-5 text-orange-600" />
+                          </div>
                           <div>
-                            <p className="font-semibold text-gray-900">{exercise.timeLimit}</p>
-                            <p className="text-xs text-gray-600">minutos</p>
+                            <p className="font-bold text-gray-900 text-lg">{exercise.timeLimit} minutos</p>
+                            <p className="text-xs text-gray-600">tempo limite</p>
                           </div>
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2 text-sm bg-gray-50 p-3 rounded-lg">
-                        <Target className="w-4 h-4 text-green-600 flex-shrink-0" />
+                      <div className="flex items-center gap-3 text-sm bg-green-50 p-4 rounded-xl border border-green-100 col-span-2">
+                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Target className="w-5 h-5 text-green-600" />
+                        </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{exercise.passingScore}%</p>
-                          <p className="text-xs text-gray-600">para passar</p>
+                          <p className="font-bold text-gray-900 text-lg">{exercise.passingScore}%</p>
+                          <p className="text-xs text-gray-600">nota mínima para aprovação</p>
                         </div>
                       </div>
                     </div>
 
                     {/* Tentativas */}
-                    <div className="pt-3 border-t">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Tentativas:</span>
-                        <span className="font-semibold text-gray-900">
-                          {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
-                        </span>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-purple-600" />
+                        <span className="text-sm font-medium text-gray-700">Tentativas:</span>
                       </div>
+                      <span className="text-sm font-bold text-gray-900">
+                        {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
+                      </span>
                     </div>
 
-                    {/* Melhor Resultado */}
-                    {exercise.lastAttempt?.status === "completed" && (
-                      <div className="pt-3 border-t bg-blue-50 -mx-6 px-6 py-3 rounded-lg">
-                        <p className="text-sm font-semibold text-blue-900 mb-1">
-                          Melhor resultado: {exercise.lastAttempt.score}%
-                        </p>
-                        <p className="text-xs text-blue-700">
-                          {exercise.lastAttempt.correctAnswers} de {exercise.lastAttempt.totalQuestions} acertos
-                        </p>
+                    {/* Data de Disponibilidade */}
+                    {exercise.availableFrom && (
+                      <div className="flex items-center gap-2 text-xs text-gray-500 p-3 bg-gray-50 rounded-lg">
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                          Disponível desde {new Date(exercise.availableFrom).toLocaleDateString('pt-BR')}
+                        </span>
                       </div>
                     )}
                   </div>
 
                   {/* Botão de Ação */}
-                  <Button
-                    className="w-full mt-6 h-11 text-base font-semibold"
-                    onClick={() => handleStartExercise(exercise.id)}
-                    disabled={!exercise.canAttempt}
-                  >
-                    {exercise.lastAttempt?.status === "in_progress"
-                      ? "Continuar Exercício"
-                      : exercise.lastAttempt?.status === "completed"
-                      ? "Tentar Novamente"
-                      : "Iniciar Exercício"}
-                  </Button>
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <Button
+                      onClick={() => handleStartExercise(exercise.id)}
+                      disabled={!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts}
+                      className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg group-hover:shadow-xl transition-all"
+                    >
+                      {exercise.lastAttempt?.status === "in_progress" 
+                        ? "Continuar Exercício" 
+                        : exercise.lastAttempt?.status === "completed"
+                        ? "Tentar Novamente"
+                        : "Iniciar Exercício"}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}

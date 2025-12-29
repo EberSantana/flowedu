@@ -1,10 +1,25 @@
-import { trpc } from "../lib/trpc";
+import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock, GraduationCap, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { 
+  BookOpen, 
+  Clock, 
+  GraduationCap, 
+  AlertCircle, 
+  Trophy,
+  FileText,
+  TrendingUp,
+  CheckCircle,
+  ArrowRight,
+  Sparkles
+} from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
+import { Link } from "wouter";
+import { useStudentAuth } from "@/hooks/useStudentAuth";
 
 export default function StudentDashboard() {
+  const { student } = useStudentAuth();
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
@@ -12,177 +27,275 @@ export default function StudentDashboard() {
 
   return (
     <StudentLayout>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Bem-vindo ao Portal</h1>
-        <p className="text-gray-600">Acompanhe suas disciplinas e progresso acadêmico</p>
-      </div>
-
-      {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando suas disciplinas...</p>
-        </div>
-      ) : (
-        <>
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="border-l-4 border-l-blue-500 bg-white">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">
-                  Disciplinas Ativas
-                </CardTitle>
-                <BookOpen className="h-5 w-5 text-blue-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
-                  {activeSubjects.length}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  em andamento
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-green-500 bg-white">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">
-                  Concluídas
-                </CardTitle>
-                <GraduationCap className="h-5 w-5 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
-                  {completedSubjects.length}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  disciplinas finalizadas
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-purple-500 bg-white">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">
-                  Total de Disciplinas
-                </CardTitle>
-                <Clock className="h-5 w-5 text-purple-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
-                  {enrolledSubjects?.length || 0}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  no histórico
-                </p>
-              </CardContent>
-            </Card>
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+        {/* Header com Boas-vindas */}
+        <div className="mb-10">
+          <div className="flex items-start gap-4 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Olá, {student?.fullName?.split(' ')[0] || 'Aluno'}! 👋
+              </h1>
+              <p className="text-lg text-gray-600">
+                Bem-vindo ao seu painel de estudos. Acompanhe seu progresso e continue aprendendo!
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* Disciplinas Ativas */}
-          <Card className="bg-white">
-            <CardHeader>
-              <CardTitle className="text-xl">Minhas Disciplinas</CardTitle>
-              <CardDescription>
-                Acompanhe suas disciplinas matriculadas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        {isLoading ? (
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto"></div>
+            <p className="mt-6 text-gray-600 font-medium text-lg">Carregando suas disciplinas...</p>
+          </div>
+        ) : (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-white hover:shadow-xl transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    Disciplinas Ativas
+                  </CardTitle>
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <BookOpen className="h-6 w-6 text-blue-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-5xl font-bold text-blue-600 mb-2">
+                    {activeSubjects.length}
+                  </div>
+                  <p className="text-sm text-gray-600 font-medium">
+                    em andamento
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-white hover:shadow-xl transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    Concluídas
+                  </CardTitle>
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-5xl font-bold text-green-600 mb-2">
+                    {completedSubjects.length}
+                  </div>
+                  <p className="text-sm text-gray-600 font-medium">
+                    disciplinas finalizadas
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-white hover:shadow-xl transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    Total de Disciplinas
+                  </CardTitle>
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <GraduationCap className="h-6 w-6 text-purple-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-5xl font-bold text-purple-600 mb-2">
+                    {enrolledSubjects?.length || 0}
+                  </div>
+                  <p className="text-sm text-gray-600 font-medium">
+                    no histórico
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Ações Rápidas */}
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <TrendingUp className="w-7 h-7 text-blue-600" />
+                Ações Rápidas
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Link href="/student-exercises">
+                  <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-orange-300 bg-gradient-to-br from-orange-50 to-white group">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <FileText className="w-8 h-8 text-orange-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-lg mb-2">Exercícios</h3>
+                      <p className="text-sm text-gray-600">Resolver atividades</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link href="/student-leaderboard">
+                  <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-yellow-300 bg-gradient-to-br from-yellow-50 to-white group">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <Trophy className="w-8 h-8 text-yellow-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-lg mb-2">Rankings</h3>
+                      <p className="text-sm text-gray-600">Ver classificação</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link href="/student-learning-paths">
+                  <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-300 bg-gradient-to-br from-purple-50 to-white group">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <TrendingUp className="w-8 h-8 text-purple-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-lg mb-2">Trilhas</h3>
+                      <p className="text-sm text-gray-600">Acompanhar progresso</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link href="/student-subjects">
+                  <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300 bg-gradient-to-br from-blue-50 to-white group">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <BookOpen className="w-8 h-8 text-blue-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-lg mb-2">Disciplinas</h3>
+                      <p className="text-sm text-gray-600">Ver todas</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            </div>
+
+            {/* Minhas Disciplinas */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <BookOpen className="w-7 h-7 text-blue-600" />
+                  Minhas Disciplinas Ativas
+                </h2>
+                {activeSubjects.length > 0 && (
+                  <Link href="/student-subjects">
+                    <Button variant="outline" className="gap-2 font-semibold">
+                      Ver Todas
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
+
               {activeSubjects.length === 0 ? (
-                <div className="text-center py-12">
-                  <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">Você não está matriculado em nenhuma disciplina</p>
-                  <p className="text-sm text-gray-500">Entre em contato com seu professor para se matricular</p>
-                </div>
+                <Card className="border-2 border-dashed border-gray-300">
+                  <CardContent className="py-20 text-center">
+                    <div className="w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                      <AlertCircle className="w-14 h-14 text-gray-400" />
+                    </div>
+                    <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                      Nenhuma disciplina ativa
+                    </h3>
+                    <p className="text-gray-600 text-lg mb-3">
+                      Você não está matriculado em nenhuma disciplina
+                    </p>
+                    <p className="text-sm text-gray-500 max-w-md mx-auto">
+                      Entre em contato com seu professor para se matricular e começar seus estudos
+                    </p>
+                  </CardContent>
+                </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {activeSubjects.map((enrollment: any) => (
-                    <Card key={enrollment.id} className="hover:shadow-lg transition-shadow border">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {activeSubjects.slice(0, 6).map((enrollment: any) => (
+                    <Card 
+                      key={enrollment.id} 
+                      className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-blue-300 group"
+                    >
+                      <CardHeader className="pb-4">
+                        <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
-                            <CardTitle className="text-lg mb-1">
+                            <CardTitle className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                               {enrollment.subject?.name || 'Disciplina'}
                             </CardTitle>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 font-mono font-semibold">
                               {enrollment.subject?.code || ''}
                             </p>
                           </div>
-                          <Badge variant="secondary" className="bg-green-100 text-green-700">
+                          <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200 font-semibold">
                             Ativa
                           </Badge>
                         </div>
                       </CardHeader>
+                      
                       <CardContent>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center text-gray-600">
-                            <BookOpen className="w-4 h-4 mr-2" />
-                            <span>Professor: {enrollment.professor?.name || 'N/A'}</span>
+                        <div className="space-y-4">
+                          <div className="flex items-center text-gray-700 bg-gray-50 p-3 rounded-lg">
+                            <GraduationCap className="w-5 h-5 mr-3 text-blue-600 flex-shrink-0" />
+                            <span className="text-sm font-medium truncate">
+                              Prof: {enrollment.professor?.name || 'N/A'}
+                            </span>
                           </div>
+                          
                           {enrollment.subject?.description && (
-                            <p className="text-gray-600 line-clamp-2">
+                            <p className="text-gray-600 text-sm line-clamp-3 min-h-[3.75rem]">
                               {enrollment.subject.description}
                             </p>
                           )}
-                        </div>
-                        
-                        <div className="mt-4 pt-4 border-t">
-                          <p className="text-xs text-gray-500">
-                            Matriculado em: {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR') : 'N/A'}
-                          </p>
+
+                          <div className="pt-4 border-t border-gray-200">
+                            <p className="text-xs text-gray-500 flex items-center gap-2">
+                              <Clock className="w-3.5 h-3.5" />
+                              Matriculado em: {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR') : 'N/A'}
+                            </p>
+                          </div>
+
+                          <Link href={`/student/subject/${enrollment.subjectId}/${enrollment.userId}`}>
+                            <Button className="w-full mt-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-semibold group-hover:shadow-lg transition-all">
+                              Ver Detalhes
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </Link>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Disciplinas Concluídas */}
-          {completedSubjects.length > 0 && (
-            <Card className="mt-6 bg-white">
-              <CardHeader>
-                <CardTitle className="text-xl">Disciplinas Concluídas</CardTitle>
-                <CardDescription>
-                  Histórico de disciplinas finalizadas
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {completedSubjects.map((enrollment: any) => (
-                    <Card key={enrollment.id} className="opacity-75 border">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle className="text-lg mb-1">
+            {/* Disciplinas Concluídas */}
+            {completedSubjects.length > 0 && (
+              <div className="mt-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <CheckCircle className="w-7 h-7 text-green-600" />
+                  Disciplinas Concluídas
+                </h2>
+                <Card className="bg-gradient-to-br from-green-50 to-white border-2 border-green-100">
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {completedSubjects.map((enrollment: any) => (
+                        <div
+                          key={enrollment.id}
+                          className="p-4 bg-white rounded-xl border border-green-200 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900 text-base line-clamp-1">
                               {enrollment.subject?.name || 'Disciplina'}
-                            </CardTitle>
-                            <p className="text-sm text-gray-500">
-                              {enrollment.subject?.code || ''}
-                            </p>
+                            </h4>
+                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                           </div>
-                          <Badge variant="secondary" className="bg-gray-100 text-gray-700">
-                            Concluída
-                          </Badge>
+                          <p className="text-sm text-gray-500 font-mono">
+                            {enrollment.subject?.code || ''}
+                          </p>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center text-gray-600">
-                            <BookOpen className="w-4 h-4 mr-2" />
-                            <span>Professor: {enrollment.professor?.name || 'N/A'}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </>
-      )}
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </StudentLayout>
   );
 }
