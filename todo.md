@@ -3186,3 +3186,26 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Otimizar responsividade mobile (sidebar colapsável)
 - [x] Adicionar seção "Ações Rápidas" no dashboard
 - [x] Melhorar cards de estatísticas com gradientes
+
+## 🎨 REDESIGN DE PÁGINAS DO PORTAL DO ALUNO - Em Andamento
+
+### Trilhas de Aprendizagem
+- [ ] Aplicar sidebar moderna com gradientes azul/roxo
+- [ ] Redesenhar cards de estatísticas com bordas laterais coloridas
+- [ ] Melhorar hierarquia visual e espaçamentos
+- [ ] Adicionar estados vazios amigáveis
+- [ ] Otimizar responsividade mobile
+
+### Rankings (Leaderboard)
+- [ ] Aplicar sidebar moderna com gradientes azul/roxo
+- [ ] Redesenhar cards de estatísticas com bordas laterais coloridas
+- [ ] Melhorar visualização do ranking (top 3 com destaque)
+- [ ] Melhorar hierarquia visual e espaçamentos
+- [ ] Otimizar responsividade mobile
+
+### Pensamento Computacional
+- [ ] Aplicar sidebar moderna com gradientes azul/roxo
+- [ ] Redesenhar cards de estatísticas das 4 dimensões
+- [ ] Melhorar visualização do radar chart
+- [ ] Melhorar hierarquia visual e espaçamentos
+- [ ] Otimizar responsividade mobile

@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import StudentLayout from "@/components/StudentLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trophy, Medal, TrendingUp, Award } from "lucide-react";
+import { Trophy, Medal, TrendingUp, Award, Users, Target, Flame } from "lucide-react";
 
 export function StudentLeaderboard() {
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
@@ -66,22 +66,29 @@ export function StudentLeaderboard() {
 
   return (
     <StudentLayout>
-        <div className="container py-8">
+        <div className="container py-8 max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <Trophy className="w-8 h-8 text-primary" />
-              <h1 className="text-3xl font-bold">Rankings</h1>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg">
+                <Trophy className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900">Rankings</h1>
+                <p className="text-lg text-gray-600 mt-1">
+                  Veja sua posição e os melhores alunos da turma
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground">
-              Veja sua posição e os melhores alunos da turma
-            </p>
           </div>
 
           {/* Filtro de disciplina */}
-          <Card className="mb-6">
+          <Card className="mb-6 border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle>Selecione a Disciplina</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-600" />
+                Selecione a Disciplina
+              </CardTitle>
               <CardDescription>Escolha uma disciplina para ver o ranking</CardDescription>
             </CardHeader>
             <CardContent>
@@ -103,72 +110,109 @@ export function StudentLeaderboard() {
             </CardContent>
           </Card>
 
-          {/* Minha posição */}
+          {/* Cards de Estatísticas - Minha Posição */}
           {selectedSubjectId && myPosition && myPosition.studentData && (
-            <Card className="mb-6 border-l-4 border-l-primary">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="w-6 h-6 text-primary" />
-                  Minha Posição
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Posição</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-4xl">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Award className="w-6 h-6 text-purple-600" />
+                Minha Posição
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-semibold text-gray-700">
+                        Posição
+                      </CardTitle>
+                      <Trophy className="w-5 h-5 text-purple-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl">
                         {myPosition.position === 1 ? "🥇" :
                          myPosition.position === 2 ? "🥈" :
                          myPosition.position === 3 ? "🥉" :
                          myPosition.position <= 10 ? "🏆" : "📊"}
                       </span>
-                      <span className="text-3xl font-bold">{myPosition.position}º</span>
+                      <span className="text-3xl font-bold text-gray-900">{myPosition.position}º</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-sm text-gray-600 mt-2">
                       de {myPosition.totalStudents} alunos
                     </p>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Pontos</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-primary" />
-                      <span className="text-3xl font-bold">{myPosition.studentData.totalPoints}</span>
+                <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-semibold text-gray-700">
+                        Pontos
+                      </CardTitle>
+                      <TrendingUp className="w-5 h-5 text-blue-600" />
                     </div>
-                  </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-3xl font-bold text-gray-900">{myPosition.studentData.totalPoints}</p>
+                    <p className="text-sm text-gray-600 mt-2">pontos totais</p>
+                  </CardContent>
+                </Card>
 
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Faixa</p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getBeltColor(myPosition.studentData.currentBelt)}`}>
+                <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-semibold text-gray-700">
+                        Faixa
+                      </CardTitle>
+                      <Award className="w-5 h-5 text-green-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <span className={`inline-block px-3 py-2 rounded-full text-sm font-semibold ${getBeltColor(myPosition.studentData.currentBelt)}`}>
                       {getBeltLabel(myPosition.studentData.currentBelt)}
                     </span>
-                  </div>
+                    <p className="text-sm text-gray-600 mt-2">faixa atual</p>
+                  </CardContent>
+                </Card>
 
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Sequência</p>
-                    <div className="flex items-center justify-center gap-2">
-                      {myPosition.studentData.streakDays > 0 ? (
-                        <>
-                          <span className="text-2xl">🔥</span>
-                          <span className="text-2xl font-bold">{myPosition.studentData.streakDays}</span>
-                          <span className="text-sm text-muted-foreground">dias</span>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
+                <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-semibold text-gray-700">
+                        Sequência
+                      </CardTitle>
+                      <Flame className="w-5 h-5 text-orange-600" />
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardHeader>
+                  <CardContent>
+                    {myPosition.studentData.streakDays > 0 ? (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <span className="text-3xl">🔥</span>
+                          <span className="text-3xl font-bold text-gray-900">{myPosition.studentData.streakDays}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2">dias consecutivos</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-3xl font-bold text-gray-400">0</p>
+                        <p className="text-sm text-gray-600 mt-2">sem sequência ativa</p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           )}
 
-          {/* Top 3 */}
+          {/* Top 3 - Pódio */}
           {selectedSubjectId && topPerformers.length > 0 && (
-            <Card className="mb-6">
+            <Card className="mb-6 border-l-4 border-l-yellow-500 hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle>🏆 Top 3 da Turma</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-yellow-600" />
+                  Top 3 da Turma
+                </CardTitle>
                 <CardDescription>Os melhores alunos desta disciplina</CardDescription>
               </CardHeader>
               <CardContent>
@@ -176,21 +220,21 @@ export function StudentLeaderboard() {
                   {topPerformers.map((performer) => (
                     <Card 
                       key={performer.studentId} 
-                      className={`border-2 ${
-                        performer.position === 1 ? "border-yellow-400 bg-yellow-50" :
-                        performer.position === 2 ? "border-gray-400 bg-gray-50" :
-                        "border-amber-600 bg-amber-50"
+                      className={`border-2 transition-all hover:scale-105 ${
+                        performer.position === 1 ? "border-yellow-400 bg-gradient-to-br from-yellow-50 to-yellow-100 shadow-lg" :
+                        performer.position === 2 ? "border-gray-400 bg-gradient-to-br from-gray-50 to-gray-100" :
+                        "border-amber-600 bg-gradient-to-br from-amber-50 to-amber-100"
                       }`}
                     >
                       <CardContent className="pt-6 text-center">
-                        <div className="text-5xl mb-2">{performer.medal}</div>
-                        <h3 className="text-lg font-bold mb-1">{performer.fullName}</h3>
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                          <Trophy className="w-4 h-4 text-primary" />
-                          <span className="text-xl font-bold">{performer.totalPoints}</span>
-                          <span className="text-xs text-muted-foreground">pontos</span>
+                        <div className="text-5xl mb-3">{performer.medal}</div>
+                        <h3 className="text-lg font-bold mb-2 text-gray-900">{performer.fullName}</h3>
+                        <div className="flex items-center justify-center gap-2 mb-3 bg-white/50 rounded-lg py-2">
+                          <Trophy className="w-4 h-4 text-yellow-600" />
+                          <span className="text-2xl font-bold text-gray-900">{performer.totalPoints}</span>
+                          <span className="text-xs text-gray-600">pontos</span>
                         </div>
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getBeltColor(performer.currentBelt)}`}>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getBeltColor(performer.currentBelt)}`}>
                           {getBeltLabel(performer.currentBelt)}
                         </span>
                       </CardContent>
@@ -202,30 +246,33 @@ export function StudentLeaderboard() {
           )}
 
           {/* Ranking completo (Top 10) */}
-          <Card>
+          <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle>Ranking da Turma (Top 10)</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-6 h-6 text-blue-600" />
+                Ranking da Turma (Top 10)
+              </CardTitle>
               <CardDescription>Classificação dos melhores alunos</CardDescription>
             </CardHeader>
             <CardContent>
               {!selectedSubjectId && (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Selecione uma disciplina para visualizar o ranking</p>
+                <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                  <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-600 text-lg font-medium">Selecione uma disciplina para visualizar o ranking</p>
                 </div>
               )}
 
               {selectedSubjectId && isLoading && (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-4 text-muted-foreground">Carregando ranking...</p>
+                <div className="text-center py-16">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Carregando ranking...</p>
                 </div>
               )}
 
               {selectedSubjectId && !isLoading && ranking.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Medal className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Nenhum aluno encontrado neste ranking</p>
+                <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                  <Medal className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-600 text-lg font-medium">Nenhum aluno encontrado neste ranking</p>
                 </div>
               )}
 
@@ -233,11 +280,11 @@ export function StudentLeaderboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-3 px-4 font-semibold">Posição</th>
-                        <th className="text-left py-3 px-4 font-semibold">Aluno</th>
-                        <th className="text-left py-3 px-4 font-semibold">Pontos</th>
-                        <th className="text-left py-3 px-4 font-semibold">Faixa</th>
+                      <tr className="border-b-2 border-gray-200 bg-gray-50">
+                        <th className="text-left py-4 px-4 font-bold text-gray-700">Posição</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-700">Aluno</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-700">Pontos</th>
+                        <th className="text-left py-4 px-4 font-bold text-gray-700">Faixa</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -247,32 +294,32 @@ export function StudentLeaderboard() {
                         return (
                           <tr 
                             key={student.studentId} 
-                            className={`border-b transition-colors ${
-                              isMe ? "bg-primary/10 font-semibold" : "hover:bg-muted/50"
+                            className={`border-b border-gray-200 transition-all ${
+                              isMe ? "bg-blue-50 font-semibold shadow-sm" : "hover:bg-gray-50"
                             }`}
                           >
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-4">
                               <div className="flex items-center gap-2">
                                 {medal && <span className="text-2xl">{medal}</span>}
-                                <span className="font-bold text-lg">{index + 1}º</span>
+                                <span className="font-bold text-lg text-gray-900">{index + 1}º</span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">
-                              {student.fullName}
+                            <td className="py-4 px-4">
+                              <span className="text-gray-900">{student.fullName}</span>
                               {isMe && (
-                                <span className="ml-2 text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
+                                <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-semibold">
                                   Você
                                 </span>
                               )}
                             </td>
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-4">
                               <div className="flex items-center gap-2">
-                                <Trophy className="w-4 h-4 text-primary" />
-                                <span className="font-bold">{student.totalPoints}</span>
+                                <Trophy className="w-4 h-4 text-yellow-600" />
+                                <span className="font-bold text-gray-900">{student.totalPoints}</span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getBeltColor(student.currentBelt)}`}>
+                            <td className="py-4 px-4">
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getBeltColor(student.currentBelt)}`}>
                                 {getBeltLabel(student.currentBelt)}
                               </span>
                             </td>
