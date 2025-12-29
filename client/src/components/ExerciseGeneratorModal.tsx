@@ -856,7 +856,7 @@ export default function ExerciseGeneratorModal({
                 subjectId,
                 title: publishConfig.title,
                 description: publishConfig.description || undefined,
-                exerciseData: JSON.stringify(exerciseData),
+                exerciseData: exerciseData, // Enviar como objeto, não string
                 totalQuestions: generatedExercises.exercises.length,
                 totalPoints: generatedExercises.exercises.length * 10, // 10 pontos por questão
                 passingScore: 60,
