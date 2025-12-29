@@ -4017,11 +4017,16 @@ export async function submitExerciseAttempt(
   for (const answer of detailedAnswers) {
     let aiFeedback = null;
     let studyTips = null;
+    let aiScore = null;
+    let aiConfidence = null;
+    let aiAnalysis = null;
+    let needsReview = false;
     
-    // Gerar feedback apenas para questões objetivas erradas
+    const question = questions[answer.questionNumber - 1];
+    
+    // Gerar feedback para questões objetivas erradas
     if (answer.questionType === "objective" && answer.isCorrect === false) {
       try {
-        const question = questions[answer.questionNumber - 1];
         const feedbackResponse = await generateQuestionFeedback(
           question.question,
           answer.studentAnswer,
@@ -4035,10 +4040,44 @@ export async function submitExerciseAttempt(
       }
     }
     
+    // Validar respostas abertas (subjective) com IA
+    if (answer.questionType === "subjective" && answer.correctAnswer) {
+      try {
+        const { analyzeOpenAnswer } = await import("./open-answer-validation");
+        const analysis = await analyzeOpenAnswer({
+          question: question.question,
+          studentAnswer: answer.studentAnswer,
+          correctAnswer: answer.correctAnswer,
+          context: question.explanation || undefined,
+        });
+        
+        aiScore = analysis.score;
+        aiConfidence = analysis.confidence;
+        aiAnalysis = JSON.stringify({
+          feedback: analysis.feedback,
+          strengths: analysis.strengths,
+          weaknesses: analysis.weaknesses,
+          reasoning: analysis.reasoning,
+        });
+        needsReview = analysis.needsReview;
+        aiFeedback = analysis.feedback;
+        
+        // Atualizar pontuação baseada na análise da IA
+        answer.pointsAwarded = Math.round((analysis.score / 100) * 10); // 10 pontos máximos
+      } catch (error) {
+        console.error("Erro ao validar resposta aberta com IA:", error);
+        needsReview = true; // Forçar revisão manual em caso de erro
+      }
+    }
+    
     await db.insert(studentExerciseAnswers).values({
       ...answer,
       aiFeedback,
       studyTips,
+      aiScore,
+      aiConfidence,
+      aiAnalysis,
+      needsReview,
     });
   }
   

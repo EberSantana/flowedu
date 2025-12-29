@@ -204,6 +204,13 @@
       "when": 1767039733006,
       "tag": "0028_curly_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1767047110905,
+      "tag": "0029_icy_vulcan",
+      "breakpoints": true
     }
   ]
 }

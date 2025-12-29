@@ -4,6 +4,18 @@
 
 - [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
 
+## 🤖 Sistema de Validação Inteligente de Respostas Abertas
+
+- [x] Criar função analyzeOpenAnswer() no backend usando IA
+- [x] Adicionar campos aiScore, aiConfidence, aiAnalysis, needsReview na tabela student_exercise_answers
+- [x] Integrar validação inteligente em submitExerciseAttempt()
+- [x] Criar rota tRPC teacherExercises.getPendingReviews para listar respostas que precisam revisão
+- [x] Criar rota tRPC teacherExercises.reviewAnswer para professor ajustar nota
+- [x] Criar página TeacherReviewAnswers.tsx com interface de revisão
+- [x] Adicionar link "Revisão de Respostas" no menu Sidebar
+- [x] Criar testes automatizados para validação inteligente (8 testes passando)
+- [ ] Adicionar notificações para professor quando houver respostas pendentes
+
 ## Banco de Dados
 - [x] Criar tabela de disciplinas (subjects)
 - [x] Criar tabela de turmas (classes)

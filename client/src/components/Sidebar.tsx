@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckSquare,
+  CheckCircle2,
   BarChart3,
   Route,
   Target,
@@ -86,6 +87,11 @@ const teacherNavItems: NavItem[] = [
     label: "Desempenho em Exercícios",
     icon: <Target className="h-5 w-5" />,
     href: "/exercise-performance",
+  },
+  {
+    label: "Revisão de Respostas",
+    icon: <CheckCircle2 className="h-5 w-5" />,
+    href: "/teacher-review-answers",
   },
   {
     label: "Rankings",

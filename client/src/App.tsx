@@ -45,6 +45,7 @@ import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
 import StudentExerciseResults from "./pages/StudentExerciseResults";
 import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
+import TeacherReviewAnswers from "./pages/TeacherReviewAnswers";
 import { Leaderboard } from "./pages/Leaderboard";
 import { StudentLeaderboard } from "./pages/StudentLeaderboard";
 import BibleFooter from "./components/BibleFooter";
@@ -70,7 +71,8 @@ function Router() {
         <Route path={"/schedule"} component={Schedule} />
         <Route path={"/calendar"} component={Calendar} />
         <Route path={"/reports"} component={Reports} />
-        <Route path={"/exercise-performance"} component={ExercisePerformanceReport} />
+        <Route path="/exercise-performance" component={ExercisePerformanceReport} />
+        <Route path="/teacher-review-answers" component={TeacherReviewAnswers} />
         <Route path={"/learning-paths"} component={LearningPaths} />
         <Route path={"/active-methodologies"} component={ActiveMethodologies} />
         <Route path={"/tasks"} component={Tasks} />

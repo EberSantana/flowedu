@@ -874,6 +874,14 @@ export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
   teacherFeedback: text("teacherFeedback"), // Feedback manual do professor (para subjetivas)
   aiFeedback: text("aiFeedback"), // Feedback automático gerado por IA para questões erradas
   studyTips: text("studyTips"), // Dicas de estudo personalizadas geradas por IA
+  // Campos de validação inteligente de respostas abertas
+  aiScore: int("aiScore"), // Nota automática da IA (0-100) para questões abertas
+  aiConfidence: int("aiConfidence"), // Confiança da IA na avaliação (0-100)
+  aiAnalysis: text("aiAnalysis"), // Análise completa da IA em JSON (strengths, weaknesses, reasoning)
+  needsReview: boolean("needsReview").default(false), // true se confiança < 70% ou professor solicitou revisão
+  reviewedBy: int("reviewedBy"), // ID do professor que revisou manualmente
+  reviewedAt: timestamp("reviewedAt"), // Data da revisão manual
+  finalScore: int("finalScore"), // Nota final após revisão manual (se houver)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
