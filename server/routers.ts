@@ -4173,6 +4173,79 @@ JSON (descrições MAX 15 chars):
         
         return exercises;
       }),
+
+    // Alias para compatibilidade
+    listBySubject: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error("Database not available");
+        
+        const { studentExercises } = await import("../drizzle/schema");
+        
+        const exercises = await db_instance
+          .select()
+          .from(studentExercises)
+          .where(
+            and(
+              eq(studentExercises.teacherId, ctx.user.id),
+              eq(studentExercises.subjectId, input.subjectId)
+            )
+          );
+        
+        return exercises;
+      }),
+
+    // Deletar exercício criado pelo professor
+    delete: protectedProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error("Database not available");
+        
+        const { studentExercises, studentExerciseAttempts, studentExerciseAnswers } = await import("../drizzle/schema");
+        
+        // Verificar se o exercício pertence ao professor
+        const exercise = await db_instance
+          .select()
+          .from(studentExercises)
+          .where(
+            and(
+              eq(studentExercises.id, input.exerciseId),
+              eq(studentExercises.teacherId, ctx.user.id)
+            )
+          )
+          .limit(1);
+        
+        if (!exercise[0]) {
+          throw new Error("Exercício não encontrado ou você não tem permissão para deletá-lo");
+        }
+        
+        // Buscar todas as tentativas relacionadas ao exercício
+        const attempts = await db_instance
+          .select()
+          .from(studentExerciseAttempts)
+          .where(eq(studentExerciseAttempts.exerciseId, input.exerciseId));
+        
+        // Deletar respostas de cada tentativa
+        for (const attempt of attempts) {
+          await db_instance
+            .delete(studentExerciseAnswers)
+            .where(eq(studentExerciseAnswers.attemptId, attempt.id));
+        }
+        
+        // Deletar tentativas
+        await db_instance
+          .delete(studentExerciseAttempts)
+          .where(eq(studentExerciseAttempts.exerciseId, input.exerciseId));
+        
+        // Deletar exercício
+        await db_instance
+          .delete(studentExercises)
+          .where(eq(studentExercises.id, input.exerciseId));
+        
+        return { success: true };
+      }),
   }),
 
 });

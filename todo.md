@@ -3209,3 +3209,12 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Melhorar visualização do radar chart
 - [ ] Melhorar hierarquia visual e espaçamentos
 - [ ] Otimizar responsividade mobile
+
+## 🐛 CORREÇÕES URGENTES - SISTEMA DE EXERCÍCIOS
+
+- [x] Investigar e corrigir bug de exercícios mostrando "0 questões"
+- [x] Verificar armazenamento de exerciseData no banco de dados
+- [x] Corrigir recuperação de questions do exerciseData (remover JSON.parse desnecessário)
+- [x] Implementar rota tRPC para deletar exercícios (teacherExercises.delete)
+- [x] Adicionar botão de deletar na interface do professor (ExercisePerformanceReport)
+- [x] Testar fluxo completo de publicação e visualização de exercícios (5 testes passando)

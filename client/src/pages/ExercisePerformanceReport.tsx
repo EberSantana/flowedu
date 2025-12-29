@@ -37,7 +37,9 @@ import {
   FileText,
   Download,
   Calendar,
+  Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ExercisePerformanceReport() {
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
@@ -48,10 +50,22 @@ export default function ExercisePerformanceReport() {
 
   // Buscar exercícios da disciplina selecionada
   // @ts-ignore - Rota existe no backend
-  const { data: exercises } = trpc.teacherExercises.listBySubject.useQuery(
+  const { data: exercises, refetch: refetchExercises } = trpc.teacherExercises.listBySubject.useQuery(
     { subjectId: selectedSubject! },
     { enabled: !!selectedSubject }
   );
+
+  // Mutation para deletar exercício
+  // @ts-ignore - Rota existe no backend
+  const deleteExerciseMutation = trpc.teacherExercises.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Exercício deletado com sucesso!");
+      refetchExercises();
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao deletar exercício: " + error.message);
+    },
+  });
 
   // Buscar estatísticas gerais
   // @ts-ignore - Rota existe no backend
@@ -163,6 +177,52 @@ export default function ExercisePerformanceReport() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Gerenciar Exercícios Publicados */}
+          {selectedSubject && exercises && exercises.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  Exercícios Publicados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {exercises.map((exercise: any) => (
+                    <div key={exercise.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{exercise.title}</h4>
+                        {exercise.description && (
+                          <p className="text-sm text-gray-600 mt-1">{exercise.description}</p>
+                        )}
+                        <div className="flex gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs">
+                            {exercise.totalQuestions} questões
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {exercise.status === "published" ? "Publicado" : "Rascunho"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          if (window.confirm(`Tem certeza que deseja deletar o exercício "${exercise.title}"? Esta ação não pode ser desfeita.`)) {
+                            deleteExerciseMutation.mutate({ exerciseId: exercise.id });
+                          }
+                        }}
+                        disabled={deleteExerciseMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {!selectedSubject ? (
             <Card>
