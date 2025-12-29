@@ -3844,7 +3844,7 @@ export async function getExerciseDetails(exerciseId: number, studentId: number) 
     .orderBy(desc(studentExerciseAttempts.attemptNumber));
   
   // exerciseData já é um objeto JSON (tipo json no Drizzle), não precisa fazer parse
-  const exerciseData = exercise[0].exerciseData as any || { questions: [] };
+  const exerciseData = exercise[0].exerciseData as any || { exercises: [] };
   
   const currentAttempt = attempts.find(a => a.status === "in_progress");
   
@@ -3852,7 +3852,7 @@ export async function getExerciseDetails(exerciseId: number, studentId: number) 
     ...exercise[0],
     subjectName: subject[0]?.name || "Disciplina",
     moduleName: module[0]?.title || "Módulo",
-    questions: exerciseData.questions || [],
+    questions: exerciseData.exercises || [],
     attempts,
     currentAttemptId: currentAttempt?.id || null,
     startedAt: currentAttempt?.startedAt || null,
@@ -4009,11 +4009,11 @@ export async function getExerciseResults(attemptId: number) {
     .orderBy(asc(studentExerciseAnswers.questionNumber));
   
   // exerciseData já é um objeto JSON (tipo json no Drizzle), não precisa fazer parse
-  const exerciseData = exercise[0]?.exerciseData as any || { questions: [] };
+  const exerciseData = exercise[0]?.exerciseData as any || { exercises: [] };
   
   // Combinar respostas com questões originais
   const questionsWithAnswers = answers.map((answer) => {
-    const originalQuestion = exerciseData.questions?.find((q: any) => q.number === answer.questionNumber) || {};
+    const originalQuestion = exerciseData.exercises?.find((q: any) => q.number === answer.questionNumber) || {};
     return {
       question: originalQuestion.question || answer.questionType,
       studentAnswer: answer.studentAnswer,
