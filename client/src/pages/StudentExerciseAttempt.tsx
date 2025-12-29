@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Clock, Send, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -19,6 +20,7 @@ export default function StudentExerciseAttempt() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attemptId, setAttemptId] = useState<number | null>(null);
 
   // Buscar detalhes do exercício
   // @ts-ignore - Rota existe no backend, erro de inferência de tipo
@@ -49,11 +51,13 @@ export default function StudentExerciseAttempt() {
 
   // Iniciar tentativa automaticamente
   useEffect(() => {
-    if (exercise && !exercise.currentAttemptId) {
+    if (exercise && !exercise.currentAttemptId && !attemptId) {
       startAttemptMutation.mutate(
         { exerciseId: parseInt(id!) },
         {
           onSuccess: (data: any) => {
+            // Armazenar attemptId retornado pela mutation
+            setAttemptId(data.attemptId);
             if (exercise.timeLimit) {
               setTimeRemaining(exercise.timeLimit * 60); // converter minutos para segundos
             }
@@ -61,12 +65,14 @@ export default function StudentExerciseAttempt() {
         }
       );
     } else if (exercise?.currentAttemptId && exercise.timeLimit) {
+      // Se já existe tentativa, usar o ID existente
+      setAttemptId(exercise.currentAttemptId);
       // Calcular tempo restante se já existe tentativa
       const elapsed = Math.floor((Date.now() - new Date(exercise.startedAt!).getTime()) / 1000);
       const remaining = (exercise.timeLimit * 60) - elapsed;
       setTimeRemaining(remaining > 0 ? remaining : 0);
     }
-  }, [exercise]);
+  }, [exercise, attemptId]);
 
   // Timer countdown
   useEffect(() => {
@@ -111,8 +117,15 @@ export default function StudentExerciseAttempt() {
       answer: answers[index] || "",
     }));
 
+    // Verificar se attemptId está disponível
+    if (!attemptId) {
+      showToast.error("Erro", { description: "Tentativa não foi iniciada corretamente. Recarregue a página." });
+      setIsSubmitting(false);
+      return;
+    }
+
     submitAttemptMutation.mutate({
-      attemptId: exercise.currentAttemptId!,
+      attemptId: attemptId,
       exerciseId: parseInt(id!),
       answers: answersArray,
     });
@@ -270,40 +283,60 @@ export default function StudentExerciseAttempt() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                <RadioGroup
-                  value={answers[index] || ""}
-                  onValueChange={(value) => handleAnswerChange(index, value)}
-                >
-                  <div className="space-y-3">
-                    {question.options.map((option: string, optIndex: number) => {
-                      const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
-                      return (
-                        <div
-                          key={optIndex}
-                          className={`flex items-start gap-3 p-4 rounded-lg border-2 transition-all cursor-pointer hover:bg-gray-50 ${
-                            answers[index] === option
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-200"
-                          }`}
-                          onClick={() => handleAnswerChange(index, option)}
-                        >
-                          <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} />
-                          <Label
-                            htmlFor={`q${index}-opt${optIndex}`}
-                            className="flex-1 cursor-pointer"
+                {/* Questões de múltipla escolha */}
+                {question.options && question.options.length > 0 ? (
+                  <RadioGroup
+                    value={answers[index] || ""}
+                    onValueChange={(value) => handleAnswerChange(index, value)}
+                  >
+                    <div className="space-y-3">
+                      {question.options.map((option: string, optIndex: number) => {
+                        const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
+                        return (
+                          <div
+                            key={optIndex}
+                            className={`flex items-start gap-3 p-4 rounded-lg border-2 transition-all cursor-pointer hover:bg-gray-50 ${
+                              answers[index] === option
+                                ? "border-blue-500 bg-blue-50"
+                                : "border-gray-200"
+                            }`}
+                            onClick={() => handleAnswerChange(index, option)}
                           >
-                            <div className="flex items-start gap-2">
-                              <span className="font-bold text-blue-600 min-w-[24px]">
-                                {optionLetter})
-                              </span>
-                              <span className="text-gray-900 leading-relaxed">{option}</span>
-                            </div>
-                          </Label>
-                        </div>
-                      );
-                    })}
+                            <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} />
+                            <Label
+                              htmlFor={`q${index}-opt${optIndex}`}
+                              className="flex-1 cursor-pointer"
+                            >
+                              <div className="flex items-start gap-2">
+                                <span className="font-bold text-blue-600 min-w-[24px]">
+                                  {optionLetter})
+                                </span>
+                                <span className="text-gray-900 leading-relaxed">{option}</span>
+                              </div>
+                            </Label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </RadioGroup>
+                ) : (
+                  /* Questões abertas/dissertativas */
+                  <div className="space-y-3">
+                    <Label htmlFor={`q${index}-textarea`} className="text-sm font-medium text-gray-700">
+                      Digite sua resposta:
+                    </Label>
+                    <Textarea
+                      id={`q${index}-textarea`}
+                      placeholder="Escreva sua resposta aqui..."
+                      value={answers[index] || ""}
+                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      className="min-h-[150px] resize-y border-2 focus:border-blue-500 text-base leading-relaxed"
+                    />
+                    <p className="text-xs text-gray-500">
+                      {answers[index]?.length || 0} caracteres
+                    </p>
                   </div>
-                </RadioGroup>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -339,32 +372,7 @@ export default function StudentExerciseAttempt() {
           </CardContent>
         </Card>
 
-        {/* Mini-índice lateral de navegação */}
-        <div className="fixed right-4 top-1/2 -translate-y-1/2 hidden lg:block no-print">
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-2">
-            <div className="space-y-1">
-              {exercise.questions.map((_: any, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    document.getElementById(`question-${index}`)?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center",
-                    });
-                  }}
-                  className={`w-8 h-8 rounded-full text-xs font-bold transition-all ${
-                    answers[index]
-                      ? "bg-green-500 text-white hover:bg-green-600"
-                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                  }`}
-                  title={`Questão ${index + 1}${answers[index] ? " (respondida)" : ""}`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+
       </div>
     </StudentLayout>
   );

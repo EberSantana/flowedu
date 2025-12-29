@@ -3276,3 +3276,16 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Aumentar espaçamento entre elementos
 - [x] Melhorar tipografia e contraste
 - [x] Adicionar transições suaves
+
+## Correção Urgente - Sistema de Exercícios
+
+- [x] Investigar erro de attemptId null na página StudentExerciseAttempt
+- [x] Corrigir lógica de criação/inicialização do attemptId
+- [x] Validar que attemptId é criado corretamente ao iniciar exercício
+- [ ] Testar fluxo completo de resolução de exercício
+
+## Melhorias de Interface - Exercícios para Alunos (29/12/2024)
+- [x] Adicionar campo textarea para questões abertas/dissertativas
+- [x] Remover menu de navegação lateral (botões 1-10) que está atrapalhando o layout
+- [ ] Implementar validação de respostas abertas comparando com gabarito
+- [ ] Testar fluxo completo de resolução de exercícios com questões abertas
