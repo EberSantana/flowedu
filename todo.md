@@ -3241,3 +3241,14 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Adicionar indicadores visuais (ícones, cores) para feedback
 - [x] Testar fluxo completo de feedback
 - [x] Documentar sistema de feedback
+
+## Melhorias de UX - Modais de Exercícios
+
+- [x] Analisar problemas de layout nos modais de exercícios
+- [x] Corrigir sobreposição de botões no modal de criação
+- [x] Melhorar espaçamento dos cards de tipo de exercício
+- [x] Corrigir rodapé do modal de visualização (botões sobrepostos)
+- [x] Reorganizar botões: Publicar, Word, Copiar, Fechar
+- [x] Testar responsividade dos modais
+- [x] Validar melhorias em diferentes resoluções
+

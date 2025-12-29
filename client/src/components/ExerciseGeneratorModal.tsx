@@ -475,22 +475,22 @@ export default function ExerciseGeneratorModal({
             {/* Tipo de Exercício */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">Tipo de Exercícios</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 {exerciseTypeOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => setExerciseType(option.value as ExerciseType)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-5 rounded-lg border-2 transition-all flex flex-col items-center justify-center min-h-[100px] ${
                       exerciseType === option.value
-                        ? "border-green-500 bg-green-50"
-                        : "border-gray-200 hover:border-green-300"
+                        ? "border-green-500 bg-green-50 shadow-md"
+                        : "border-gray-200 hover:border-green-300 hover:shadow-sm"
                     }`}
                   >
-                    <option.icon className={`h-6 w-6 mx-auto mb-2 ${
+                    <option.icon className={`h-8 w-8 mb-3 ${
                       exerciseType === option.value ? "text-green-600" : "text-gray-500"
                     }`} />
-                    <div className="font-medium text-sm">{option.label}</div>
-                    <div className="text-xs text-muted-foreground">{option.description}</div>
+                    <div className="font-semibold text-sm text-center">{option.label}</div>
+                    <div className="text-xs text-muted-foreground text-center mt-1">{option.description}</div>
                   </button>
                 ))}
               </div>
@@ -656,23 +656,25 @@ export default function ExerciseGeneratorModal({
                   <Label htmlFor="show-answers-ex" className="text-sm font-medium">Respostas</Label>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <Button 
                   onClick={() => setShowPublishDialog(true)} 
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
                 >
                   <Send className="h-4 w-4 mr-2" />
                   Publicar para Alunos
                 </Button>
-                <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
-                  <Download className="h-4 w-4 mr-2" />
-                  Word
-                </Button>
-                <Button variant="outline" onClick={handleCopy}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copiar
-                </Button>
-                <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
+                <div className="flex gap-2 flex-1">
+                  <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 flex-1">
+                    <Download className="h-4 w-4 mr-2" />
+                    Word
+                  </Button>
+                  <Button variant="outline" onClick={handleCopy} className="flex-1">
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copiar
+                  </Button>
+                </div>
+                <Button onClick={handleClose} variant="outline" className="sm:ml-auto">
                   Fechar
                 </Button>
               </div>
