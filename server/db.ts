@@ -4043,6 +4043,7 @@ export async function submitExerciseAttempt(
   }
   
   return {
+    attemptId,
     score,
     correctAnswers,
     totalQuestions,

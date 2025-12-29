@@ -1,5 +1,9 @@
 # Sistema de Gestão de Tempo para Professores - TODO
 
+## 🐛 Bugs Críticos
+
+- [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
+
 ## Banco de Dados
 - [x] Criar tabela de disciplinas (subjects)
 - [x] Criar tabela de turmas (classes)
