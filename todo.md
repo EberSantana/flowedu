@@ -3463,3 +3463,35 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Aumentar tamanhos de fonte para melhor legibilidade
 - [x] Adicionar espaçamento adequado entre elementos
 - [ ] Testar correções no navegador
+
+## Sistema de Pensamento Computacional por Disciplina
+
+### Backend
+- [x] Adicionar campo hasComputationalThinking (boolean) na tabela subjects
+- [x] Atualizar schema Drizzle com novo campo
+- [x] Criar função toggleSubjectCT no db.ts
+- [x] Criar rota tRPC subjects.toggleCT para habilitar/desabilitar PC
+- [x] Criar função getCTStatsBySubject para estatísticas da turma
+- [x] Criar função getStudentCTEvolution para evolução individual
+- [x] Criar rota tRPC computationalThinking.getSubjectStats
+- [x] Criar rota tRPC computationalThinking.getStudentEvolution
+
+### Interface do Professor
+- [x] Adicionar toggle switch nos cards de disciplinas
+- [x] Criar página SubjectCTStats.tsx com estatísticas da turma
+- [x] Implementar radar chart comparativo (Chart.js)
+- [x] Implementar gráfico de evolução temporal (Line chart)
+- [x] Adicionar tabela de desempenho individual dos alunos
+- [x] Adicionar link no menu lateral "Pensamento Computacional"
+
+### Interface do Aluno
+- [x] Mostrar tab "Pensamento Computacional" apenas se habilitado
+- [x] Criar componente StudentCTBySubject.tsx
+- [x] Implementar radar chart das 4 dimensões
+- [x] Implementar gráfico de evolução pessoal
+- [x] Mostrar histórico de exercícios de PC realizados
+
+### Testes
+- [ ] Criar testes para toggle de PC por disciplina
+- [ ] Criar testes para estatísticas de PC
+- [ ] Validar visualização condicional na interface

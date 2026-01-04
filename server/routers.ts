@@ -346,6 +346,13 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    toggleCT: protectedProcedure
+      .input(z.object({ id: z.number(), enabled: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const updated = await db.toggleSubjectCT(input.id, ctx.user.id, input.enabled);
+        return { success: true, subject: updated };
+      }),
+    
     // Subject Enrollments
     enrollStudent: protectedProcedure
       .input(z.object({ studentId: z.number(), subjectId: z.number() }))
@@ -3972,6 +3979,20 @@ JSON (descrições MAX 15 chars):
           classAverage: average,
           totalStudents: teacherStudents.length,
         };
+      }),
+    
+    // [PROFESSOR] Obter estatísticas completas de PC por disciplina
+    getSubjectStats: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getCTStatsBySubject(ctx.user.id, input.subjectId);
+      }),
+    
+    // [ALUNO] Obter evolução temporal do PC em uma disciplina
+    getStudentEvolution: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentCTEvolution(ctx.studentSession.studentId, input.subjectId);
       }),
   }),
 

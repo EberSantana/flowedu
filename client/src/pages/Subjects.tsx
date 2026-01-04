@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Brain } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
@@ -157,8 +157,17 @@ export default function Subjects() {
       utils.subjects.list.invalidate();
       toast.success("Disciplina excluída com sucesso!");
     },
-    onError: (error: { message: string }) => {
-      toast.error("Erro ao excluir disciplina: " + error.message);
+    onError: (error) => {
+      toast.error(error.message || "Erro ao excluir disciplina");
+    },
+  });
+  
+  const toggleCT = trpc.subjects.toggleCT.useMutation({
+    onSuccess: () => {
+      utils.subjects.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao atualizar Pensamento Computacional");
     },
   });
 
@@ -391,6 +400,47 @@ export default function Subjects() {
                     </button>
                   )}
                   
+                  {/* Toggle Pensamento Computacional */}
+                  <div className="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Brain className="h-4 w-4 text-indigo-600" />
+                        <span className="text-sm font-medium text-indigo-900">Pensamento Computacional</span>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await toggleCT.mutateAsync({
+                              id: subject.id,
+                              enabled: !subject.computationalThinkingEnabled,
+                            });
+                            toast.success(
+                              subject.computationalThinkingEnabled
+                                ? "Pensamento Computacional desabilitado"
+                                : "Pensamento Computacional habilitado"
+                            );
+                          } catch (error) {
+                            toast.error("Erro ao atualizar configuração");
+                          }
+                        }}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          subject.computationalThinkingEnabled ? "bg-indigo-600" : "bg-gray-300"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            subject.computationalThinkingEnabled ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    {subject.computationalThinkingEnabled && (
+                      <p className="text-xs text-indigo-600 mt-2">
+                        Alunos poderão visualizar e desenvolver habilidades de PC nesta disciplina
+                      </p>
+                    )}
+                  </div>
+                  
                   {/* Botões de Integração Google */}
                   {(subject.googleDriveUrl || subject.googleClassroomUrl) && (
                     <div className="mb-4 flex gap-2">
@@ -462,6 +512,18 @@ export default function Subjects() {
                         Trilhas de Aprendizagem
                       </Button>
                     </Link>
+                    {subject.computationalThinkingEnabled && (
+                      <Link href={`/subjects/${subject.id}/ct-stats`}>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                        >
+                          <Brain className="mr-2 h-3 w-3" />
+                          Estatísticas de PC
+                        </Button>
+                      </Link>
+                    )}
                     <div className="flex gap-2">
                       <Button
                         variant="outline"

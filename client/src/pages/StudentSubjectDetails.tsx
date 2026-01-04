@@ -23,6 +23,7 @@ import {
   Circle,
   Star,
 } from "lucide-react";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
 
 export default function StudentSubjectDetails() {
   const [, params] = useRoute("/student/subject-details/:subjectId/:professorId");
@@ -493,28 +494,196 @@ function ExercisesTab({
 
 // Componente da Tab Pensamento Computacional
 function ComputationalThinkingTab({ subjectId }: { subjectId: number }) {
+  const { data: profile, isLoading } = trpc.computationalThinking.getProfile.useQuery(
+    { subjectId },
+    { enabled: !!subjectId }
+  );
+  
+  const { data: evolution } = trpc.computationalThinking.getStudentEvolution.useQuery(
+    { subjectId },
+    { enabled: !!subjectId }
+  );
+  
+  if (isLoading) {
+    return (
+      <Card className="shadow-md">
+        <CardContent className="py-12 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando seu perfil de PC...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  if (!profile) {
+    return (
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-6 w-6 text-purple-600" />
+            Pensamento Computacional
+          </CardTitle>
+          <CardDescription>
+            Desenvolva suas habilidades de raciocínio lógico e resolução de problemas
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <Brain className="h-16 w-16 text-purple-400 mx-auto mb-4" />
+            <p className="text-gray-500 mb-4">
+              Você ainda não possui pontuação em Pensamento Computacional nesta disciplina.
+            </p>
+            <p className="text-sm text-gray-400">
+              Complete exercícios de PC para começar a desenvolver suas habilidades!
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  const radarData = [
+    { dimension: 'Decomposição', pontos: profile.decomposition },
+    { dimension: 'Padrões', pontos: profile.pattern_recognition },
+    { dimension: 'Abstração', pontos: profile.abstraction },
+    { dimension: 'Algoritmos', pontos: profile.algorithms },
+  ];
+  
+  const average = Math.round(
+    (profile.decomposition + profile.pattern_recognition + profile.abstraction + profile.algorithms) / 4
+  );
+  
   return (
-    <Card className="shadow-md">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="h-6 w-6 text-purple-600" />
-          Pensamento Computacional
-        </CardTitle>
-        <CardDescription>
-          Desenvolva suas habilidades de raciocínio lógico e resolução de problemas
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="text-center py-8">
-          <Brain className="h-16 w-16 text-purple-400 mx-auto mb-4" />
-          <p className="text-gray-500 mb-4">
-            O perfil de Pensamento Computacional para esta disciplina estará disponível em breve.
-          </p>
-          <p className="text-sm text-gray-400">
-            Aqui você poderá visualizar suas habilidades em Decomposição, Reconhecimento de Padrões, Abstração e Algoritmos.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      {/* Cards de Métricas */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium">Decomposição</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{profile.decomposition}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium">Padrões</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{profile.pattern_recognition}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium">Abstração</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{profile.abstraction}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium">Algoritmos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{profile.algorithms}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium">Média Geral</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{average}</div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Radar Chart */}
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-indigo-600" />
+            Seu Perfil de Pensamento Computacional
+          </CardTitle>
+          <CardDescription>
+            Visualização das suas competências nas 4 dimensões
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart data={radarData}>
+                <PolarGrid stroke="#e5e7eb" />
+                <PolarAngleAxis 
+                  dataKey="dimension" 
+                  tick={{ fill: '#374151', fontSize: 14, fontWeight: 500 }}
+                />
+                <PolarRadiusAxis 
+                  angle={90} 
+                  domain={[0, 100]} 
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                />
+                <Radar
+                  name="Suas Pontuações"
+                  dataKey="pontos"
+                  stroke="#6366f1"
+                  fill="#6366f1"
+                  fillOpacity={0.6}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  iconType="circle"
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Histórico de Submissões */}
+      {evolution && evolution.totalSubmissions > 0 && (
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              Seu Progresso
+            </CardTitle>
+            <CardDescription>
+              Total de exercícios de PC realizados: {evolution.totalSubmissions}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Object.entries(evolution.evolution).map(([dimension, data]: [string, any]) => {
+                const dimensionNames: Record<string, string> = {
+                  decomposition: 'Decomposição',
+                  pattern_recognition: 'Reconhecimento de Padrões',
+                  abstraction: 'Abstração',
+                  algorithms: 'Algoritmos',
+                };
+                
+                if (data.length === 0) return null;
+                
+                return (
+                  <div key={dimension} className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      {dimensionNames[dimension]}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      {data.length} exercício(s) realizado(s)
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

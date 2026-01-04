@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { SidebarProvider } from "./contexts/SidebarContext";
 import Dashboard from "./pages/Dashboard";
 import Subjects from "./pages/Subjects";
+import SubjectCTStats from "./pages/SubjectCTStats";
 import Classes from "./pages/Classes";
 import Schedule from "./pages/Schedule";
 import Shifts from "./pages/Shifts";
@@ -67,6 +68,7 @@ function Router() {
         <Route path={"/redefinir-senha"} component={ResetPassword} />
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
+        <Route path={"/subjects/:id/ct-stats"} component={SubjectCTStats} />
         <Route path={"/classes"} component={Classes} />
         <Route path={"/shifts"} component={Shifts} />
         <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />

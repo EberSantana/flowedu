@@ -206,6 +206,21 @@ export async function deleteSubject(id: number, userId: number) {
   );
 }
 
+export async function toggleSubjectCT(id: number, userId: number, enabled: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(subjects).set({ computationalThinkingEnabled: enabled }).where(
+    and(eq(subjects.id, id), eq(subjects.userId, userId))
+  );
+  
+  const [updated] = await db.select().from(subjects).where(
+    and(eq(subjects.id, id), eq(subjects.userId, userId))
+  ).limit(1);
+  
+  return updated;
+}
+
 // ========== CLASSES ==========
 
 export async function createClass(data: InsertClass) {
@@ -3287,6 +3302,122 @@ export async function getAllCTBadges() {
   } catch (error) {
     console.error("[Database] Error getting all CT badges:", error);
     return [];
+  }
+}
+
+/**
+ * Obter estatísticas completas de PC por disciplina para o professor
+ */
+export async function getCTStatsBySubject(userId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    // Buscar alunos matriculados na disciplina
+    const enrolledStudents = await db
+      .select({
+        studentId: students.id,
+        fullName: students.fullName,
+        registrationNumber: students.registrationNumber,
+      })
+      .from(subjectEnrollments)
+      .innerJoin(students, eq(students.id, subjectEnrollments.studentId))
+      .where(
+        and(
+          eq(subjectEnrollments.subjectId, subjectId),
+          eq(subjectEnrollments.userId, userId)
+        )
+      );
+    
+    // Buscar pontuações de PC de cada aluno
+    const studentsWithScores = await Promise.all(
+      enrolledStudents.map(async (student) => {
+        const profile = await getStudentCTProfile(student.studentId, subjectId);
+        const decomposition = profile?.decomposition?.score || 0;
+        const pattern_recognition = profile?.pattern_recognition?.score || 0;
+        const abstraction = profile?.abstraction?.score || 0;
+        const algorithms = profile?.algorithms?.score || 0;
+        
+        return {
+          ...student,
+          decomposition,
+          pattern_recognition,
+          abstraction,
+          algorithms,
+          average: Math.round((decomposition + pattern_recognition + abstraction + algorithms) / 4),
+        };
+      })
+    );
+    
+    // Calcular média da turma
+    const classAverage = await getClassCTAverage(userId, subjectId);
+    
+    return {
+      students: studentsWithScores,
+      classAverage,
+    };
+  } catch (error) {
+    console.error("[Database] Error getting CT stats by subject:", error);
+    throw error;
+  }
+}
+
+/**
+ * Obter evolução temporal do PC de um aluno em uma disciplina
+ */
+export async function getStudentCTEvolution(studentId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  try {
+    // Buscar submissões de exercícios de PC ordenadas por data
+    const submissions = await db
+      .select({
+        id: ctSubmissions.id,
+        exerciseId: ctSubmissions.exerciseId,
+        dimension: ctExercises.dimension,
+        score: ctSubmissions.score,
+        submittedAt: ctSubmissions.submittedAt,
+      })
+      .from(ctSubmissions)
+      .innerJoin(ctExercises, eq(ctExercises.id, ctSubmissions.exerciseId))
+      .where(
+        and(
+          eq(ctSubmissions.studentId, studentId),
+          eq(ctSubmissions.subjectId, subjectId)
+        )
+      )
+      .orderBy(ctSubmissions.submittedAt);
+    
+    // Agrupar por dimensão e calcular evolução
+    const evolutionByDimension: Record<string, Array<{ date: string; score: number }>> = {
+      decomposition: [],
+      pattern_recognition: [],
+      abstraction: [],
+      algorithms: [],
+    };
+    
+    submissions.forEach((sub) => {
+      const date = new Date(sub.submittedAt).toISOString().split('T')[0];
+      if (evolutionByDimension[sub.dimension]) {
+        evolutionByDimension[sub.dimension].push({
+          date,
+          score: sub.score,
+        });
+      }
+    });
+    
+    // Perfil atual
+    const currentProfile = await getStudentCTProfile(studentId, subjectId);
+    
+    return {
+      evolution: evolutionByDimension,
+      currentProfile,
+      totalSubmissions: submissions.length,
+    };
+  } catch (error) {
+    console.error("[Database] Error getting student CT evolution:", error);
+    throw error;
   }
 }
 
