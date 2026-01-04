@@ -2,8 +2,9 @@ import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Users, TrendingUp, Trophy, Award } from "lucide-react";
+import { Users, TrendingUp, Trophy, Award, BookOpen } from "lucide-react";
 
 const BELT_CONFIG = [
   { name: 'white', label: 'Faixa Branca', minPoints: 0, color: 'bg-gray-400', iconBg: 'bg-gray-100' },
@@ -17,9 +18,14 @@ const BELT_CONFIG = [
 ];
 
 export default function GamificationDashboard() {
-  const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery() || { data: null, isLoading: false };
-  const { data: ranking, isLoading: rankingLoading } = (trpc.gamification as any).getClassRankingTeacher?.useQuery({ limit: 20 }) || { data: null, isLoading: false };
-  const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery() || { data: [], isLoading: false };
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | undefined>(undefined);
+
+  // Buscar disciplinas do professor
+  const { data: subjects } = trpc.subjects.list.useQuery();
+
+  const { data: overview, isLoading: overviewLoading } = (trpc.gamification as any).getTeacherOverview?.useQuery({ subjectId: selectedSubjectId }) || { data: null, isLoading: false };
+  const { data: ranking, isLoading: rankingLoading } = (trpc.gamification as any).getClassRankingTeacher?.useQuery({ limit: 20, subjectId: selectedSubjectId }) || { data: null, isLoading: false };
+  const { data: badges, isLoading: badgesLoading } = (trpc.gamification as any).getBadgeStats?.useQuery({ subjectId: selectedSubjectId }) || { data: [], isLoading: false };
 
   // Calcular distribuição de faixas
   const beltDistribution = BELT_CONFIG.map(belt => {
@@ -55,11 +61,46 @@ export default function GamificationDashboard() {
       <PageWrapper className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-6 px-4 space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            Dashboard de Gamificação 🎮
-          </h1>
-          <p className="text-gray-600 mt-2">Acompanhe o progresso e engajamento dos seus alunos</p>
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              Dashboard de Gamificação 🎮
+            </h1>
+            <p className="text-gray-600 mt-2">Acompanhe o progresso e engajamento dos seus alunos</p>
+          </div>
+
+          {/* Seletor de Disciplina */}
+          <Card className="border-l-4 border-l-indigo-500">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-indigo-600" />
+                Filtrar por Disciplina
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={selectedSubjectId?.toString() || "all"}
+                onValueChange={(value) => setSelectedSubjectId(value === "all" ? undefined : parseInt(value))}
+              >
+                <SelectTrigger className="w-full md:w-[300px]">
+                  <SelectValue placeholder="Selecione uma disciplina" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Disciplinas</SelectItem>
+                  {subjects?.map((subject) => (
+                    <SelectItem key={subject.id} value={subject.id.toString()}>
+                      {subject.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedSubjectId && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Exibindo estatísticas da disciplina: <span className="font-semibold">{subjects?.find(s => s.id === selectedSubjectId)?.name}</span>
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Cards de Estatísticas */}

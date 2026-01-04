@@ -3643,9 +3643,12 @@ JSON (descrições MAX 15 chars):
     
     // Obter ranking da turma (versão para professores)
     getClassRankingTeacher: protectedProcedure
-      .input(z.object({ limit: z.number().optional() }))
+      .input(z.object({ 
+        limit: z.number().optional(),
+        subjectId: z.number().optional(),
+      }))
       .query(async ({ ctx, input }) => {
-        return await db.getClassRanking(input.limit || 10);
+        return await db.getClassRanking(input.limit || 10, input.subjectId);
       }),
     
     // Obter notificações de gamificação
@@ -3665,9 +3668,10 @@ JSON (descrições MAX 15 chars):
     // ==================== TEACHER DASHBOARD (DASHBOARD DO PROFESSOR) ====================
     // Visão geral para o professor
     getTeacherOverview: protectedProcedure
-      .query(async ({ ctx }) => {
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
         const allBadges = await db.getAllBadges();
-        const totalEarned = await db.getTotalStudentsWithBadges();
+        const totalEarned = await db.getTotalStudentsWithBadges(input.subjectId);
         
         return {
           totalBadgesAvailable: allBadges.length,
@@ -3677,25 +3681,28 @@ JSON (descrições MAX 15 chars):
     
     // Estatísticas de badges
     getBadgeStats: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await db.getBadgeStatistics();
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getBadgeStatistics(input.subjectId);
       }),
     
     // Evolução temporal de pontos (4 semanas)
     getPointsEvolution: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await db.getPointsEvolutionData();
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getPointsEvolutionData(input.subjectId);
       }),
     
     // Gerar relatório PDF
     generateReport: protectedProcedure
-      .mutation(async ({ ctx }) => {
+      .input(z.object({ subjectId: z.number().optional() }))
+      .mutation(async ({ ctx, input }) => {
         const { generateGamificationReport } = await import('./gamification-report');
         
         // Coletar todos os dados
         const allBadges = await db.getAllBadges();
-        const totalEarned = await db.getTotalStudentsWithBadges();
-        const ranking = await db.getClassRanking(20);
+        const totalEarned = await db.getTotalStudentsWithBadges(input.subjectId);
+        const ranking = await db.getClassRanking(20, input.subjectId);
         const badgeStats = await db.getBadgeStatistics();
         const evolutionData = await db.getPointsEvolutionData();
         

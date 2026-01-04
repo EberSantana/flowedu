@@ -2786,12 +2786,31 @@ export async function markGamificationNotificationAsRead(notificationId: number)
   }
 }
 
-// Obter ranking da turma
-export async function getClassRanking(limit: number = 10) {
+// Obter ranking da turma (com filtro opcional por disciplina)
+export async function getClassRanking(limit: number = 10, subjectId?: number) {
   const db = await getDb();
   if (!db) return [];
 
   try {
+    // Se subjectId fornecido, usar pontos por disciplina
+    if (subjectId) {
+      const ranking = await db.select({
+        studentId: studentSubjectPoints.studentId,
+        studentName: students.fullName,
+        totalPoints: studentSubjectPoints.totalPoints,
+        currentBelt: studentSubjectPoints.currentBelt,
+        streakDays: studentSubjectPoints.streakDays,
+      })
+      .from(studentSubjectPoints)
+      .innerJoin(students, eq(studentSubjectPoints.studentId, students.id))
+      .where(eq(studentSubjectPoints.subjectId, subjectId))
+      .orderBy(desc(studentSubjectPoints.totalPoints))
+      .limit(limit);
+
+      return ranking;
+    }
+
+    // Caso contrário, usar pontos globais
     const ranking = await db.select({
       studentId: studentPoints.studentId,
       studentName: students.fullName,
@@ -2813,12 +2832,26 @@ export async function getClassRanking(limit: number = 10) {
 
 // ==================== TEACHER DASHBOARD FUNCTIONS ====================
 
-// Obter total de alunos com badges
-export async function getTotalStudentsWithBadges() {
+// Obter total de alunos com badges (com filtro opcional por disciplina)
+export async function getTotalStudentsWithBadges(subjectId?: number) {
   const db = await getDb();
   if (!db) return 0;
 
   try {
+    // Se subjectId fornecido, contar apenas badges relacionados à disciplina
+    if (subjectId) {
+      // Contar alunos únicos que ganharam badges em exercícios desta disciplina
+      const result = await db.select({ studentId: studentBadges.studentId })
+        .from(studentBadges)
+        .innerJoin(studentExerciseAttempts, eq(studentBadges.studentId, studentExerciseAttempts.studentId))
+        .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+        .where(eq(studentExercises.subjectId, subjectId))
+        .groupBy(studentBadges.studentId);
+
+      return result.length;
+    }
+
+    // Caso contrário, contar todos os alunos com badges
     const result = await db.select({ studentId: studentBadges.studentId })
       .from(studentBadges)
       .groupBy(studentBadges.studentId);
@@ -2830,8 +2863,8 @@ export async function getTotalStudentsWithBadges() {
   }
 }
 
-// Obter estatísticas de badges (quantos alunos conquistaram cada badge)
-export async function getBadgeStatistics() {
+// Obter estatísticas de badges (quantos alunos conquistaram cada badge, com filtro opcional por disciplina)
+export async function getBadgeStatistics(subjectId?: number) {
   const db = await getDb();
   if (!db) return [];
 
@@ -2840,9 +2873,24 @@ export async function getBadgeStatistics() {
     const badgeStats = [];
 
     for (const badge of allBadges) {
-      const earnedCount = await db.select({ studentId: studentBadges.studentId })
-        .from(studentBadges)
-        .where(eq(studentBadges.badgeId, badge.id));
+      let earnedCount;
+
+      // Se subjectId fornecido, contar apenas badges de exercícios desta disciplina
+      if (subjectId) {
+        earnedCount = await db.select({ studentId: studentBadges.studentId })
+          .from(studentBadges)
+          .innerJoin(studentExerciseAttempts, eq(studentBadges.studentId, studentExerciseAttempts.studentId))
+          .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+          .where(and(
+            eq(studentBadges.badgeId, badge.id),
+            eq(studentExercises.subjectId, subjectId)
+          ));
+      } else {
+        // Caso contrário, contar todos
+        earnedCount = await db.select({ studentId: studentBadges.studentId })
+          .from(studentBadges)
+          .where(eq(studentBadges.badgeId, badge.id));
+      }
 
       badgeStats.push({
         ...badge,
@@ -2884,8 +2932,8 @@ export async function getStudentExerciseCount(studentId: number) {
   }
 }
 
-// Obter evolução temporal de pontos (últimas 4 semanas)
-export async function getPointsEvolutionData() {
+// Obter evolução temporal de pontos (últimas 4 semanas, com filtro opcional por disciplina)
+export async function getPointsEvolutionData(subjectId?: number) {
   const db = await getDb();
   if (!db) return [];
 
@@ -2894,7 +2942,41 @@ export async function getPointsEvolutionData() {
     const fourWeeksAgo = new Date();
     fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
 
-    // Buscar histórico de pontos das últimas 4 semanas
+    // Se subjectId fornecido, buscar histórico de pontos por disciplina
+    if (subjectId) {
+      const history = await db.select({
+        createdAt: subjectPointsHistory.earnedAt,
+        points: subjectPointsHistory.points,
+      })
+      .from(subjectPointsHistory)
+      .where(and(
+        sql`${subjectPointsHistory.earnedAt} >= ${fourWeeksAgo}`,
+        eq(subjectPointsHistory.subjectId, subjectId)
+      ))
+      .orderBy(subjectPointsHistory.earnedAt);
+
+      // Agrupar por semana
+      const weeklyData: { [key: string]: number } = {};
+      
+      history.forEach(record => {
+        const date = new Date(record.createdAt);
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay()); // Início da semana (domingo)
+        const weekKey = weekStart.toISOString().split('T')[0];
+        
+        if (!weeklyData[weekKey]) {
+          weeklyData[weekKey] = 0;
+        }
+        weeklyData[weekKey] += record.points;
+      });
+
+      // Converter para array ordenado
+      return Object.entries(weeklyData)
+        .map(([week, totalPoints]) => ({ week, totalPoints }))
+        .sort((a, b) => a.week.localeCompare(b.week));
+    }
+
+    // Caso contrário, buscar histórico global
     const history = await db.select({
       createdAt: pointsHistory.createdAt,
       points: pointsHistory.points,

@@ -3569,3 +3569,14 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Adicionar comparação de avatares entre amigos
 - [ ] Criar desafios especiais para acessórios raros
 - [ ] Implementar avatar 3D (WebGL) para faixa preta
+
+## Dashboard de Gamificação por Disciplina
+- [x] Adicionar filtro/seleção de disciplina no Dashboard de Gamificação
+- [x] Atualizar rotas tRPC para aceitar subjectId como parâmetro opcional
+- [x] Modificar funções do db.ts para filtrar por disciplina quando subjectId fornecido
+- [x] Atualizar interface GamificationDashboard.tsx com dropdown de disciplinas
+- [x] Exibir estatísticas específicas da disciplina selecionada
+- [x] Mostrar ranking dos alunos na disciplina
+- [x] Exibir distribuição de faixas por disciplina
+- [x] Listar badges conquistados na disciplina
+- [x] Adicionar opção "Todas as Disciplinas" para visão geral
