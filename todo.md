@@ -3390,3 +3390,65 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Validar novo design do Portal do Aluno
 - [ ] Verificar responsividade mobile
 - [ ] Testar integração de PC dentro das disciplinas
+
+
+## 📱 Portal do Aluno - Visualização Individual de Disciplina com Tabs
+
+### Planejamento
+- [x] Verificar rotas tRPC necessárias (getSubjectDetails, getSubjectStats, etc.)
+- [x] Definir estrutura de dados para cada tab
+- [x] Planejar integração com PC por disciplina
+
+### Backend
+- [x] Criar rota subjects.getById (info completa da disciplina)
+- [ ] Criar rota student.getSubjectStats (progresso, pontos, faixa)
+- [x] Criar rota studentExercises.listBySubject (exercícios filtrados)
+- [ ] Criar rota student.getSubjectCTProfile (PC por disciplina)
+
+### Frontend - Componente Principal
+- [x] Criar página StudentSubjectDetails.tsx com sistema de tabs
+- [x] Implementar Tabs component do shadcn/ui
+- [x] Criar header com info da disciplina (nome, código, professor)
+- [x] Adicionar breadcrumb de navegação
+
+### Tab 1: Visão Geral
+- [x] Card de progresso geral da disciplina
+- [x] Stats de gamificação (pontos, faixa, posição no ranking)
+- [x] Próximas atividades/prazos
+- [x] Informações do professor
+- [x] Links rápidos (Drive, Classroom)
+
+### Tab 2: Módulos
+- [x] Reutilizar componente de trilha de aprendizagem existente (link direto)
+- [x] Mostrar módulos e tópicos expansíveis
+- [x] Indicadores de progresso por módulo
+- [x] Materiais didáticos por tópico
+- [x] Autoavaliação de compreensão
+
+### Tab 3: Exercícios
+- [x] Lista de exercícios disponíveis da disciplina
+- [ ] Filtros por status (Novo, Em Andamento, Concluído)
+- [x] Cards com informações (questões, pontos, prazo)
+- [x] Link direto para resolver exercício
+- [ ] Histórico de tentativas
+
+### Tab 4: Pensamento Computacional
+- [x] Verificar se PC está habilitado na disciplina (computationalThinkingEnabled)
+- [x] Mostrar apenas se habilitado pelo professor
+- [ ] Radar chart com 4 dimensões (Decomposição, Padrões, Abstração, Algoritmos)
+- [ ] Cards de pontuação por dimensão
+- [ ] Lista de exercícios de PC disponíveis
+- [ ] Histórico de submissões de PC
+
+### Integração
+- [x] Configurar rota /student/subject-details/:subjectId/:professorId no App.tsx
+- [x] Atualizar StudentDashboard.tsx (cards de disciplinas clicáveis)
+- [x] Adicionar link "Voltar ao Dashboard" no header
+- [ ] Testar navegação completa
+
+### Testes
+- [ ] Testar todas as tabs com dados reais
+- [ ] Validar exibição condicional da tab PC
+- [ ] Testar responsividade mobile
+- [ ] Criar checkpoint final
+

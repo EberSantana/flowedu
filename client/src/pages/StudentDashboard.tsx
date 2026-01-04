@@ -248,7 +248,7 @@ export default function StudentDashboard() {
                             </p>
                           </div>
 
-                          <Link href={`/student/subject/${enrollment.subjectId}/${enrollment.userId}`}>
+                          <Link href={`/student/subject-details/${enrollment.subjectId}/${enrollment.userId}`}>
                             <Button className="w-full mt-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-semibold group-hover:shadow-lg transition-all">
                               Ver Detalhes
                               <ArrowRight className="w-4 h-4 ml-2" />

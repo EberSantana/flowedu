@@ -160,7 +160,14 @@ export async function createSubject(data: InsertSubject) {
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(subjects).values(data);
-  return result;
+  const insertId = Number(result[0].insertId);
+  
+  // Buscar o registro criado para retornar com todos os campos
+  const [created] = await db.select()
+    .from(subjects)
+    .where(eq(subjects.id, insertId));
+  
+  return created;
 }
 
 export async function getSubjectsByUserId(userId: number) {

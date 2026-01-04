@@ -283,6 +283,17 @@ export const appRouter = router({
       return await db.getSubjectsByUserId(ctx.user.id);
     }),
     
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const subjects = await db.getSubjectsByUserId(ctx.user.id);
+        const subject = subjects.find(s => s.id === input.id);
+        if (!subject) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Disciplina não encontrada' });
+        }
+        return subject;
+      }),
+    
     create: protectedProcedure
       .input(z.object({
         name: z.string().min(1),
@@ -4032,6 +4043,17 @@ JSON (descrições MAX 15 chars):
     // Listar exercícios disponíveis
     listAvailable: studentProcedure
       .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const exercises = await db.listAvailableExercises(studentId, input.subjectId);
+        return exercises;
+      }),
+    
+    // Alias para listAvailable (compatibilidade)
+    listBySubject: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
       .query(async ({ ctx, input }) => {
         const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
