@@ -119,6 +119,11 @@ const teacherNavItems: NavItem[] = [
     href: "/announcements",
   },
   {
+    label: "Gamificação",
+    icon: <Trophy className="h-5 w-5" />,
+    href: "/gamification-dashboard",
+  },
+  {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",

@@ -772,16 +772,6 @@ export default function Dashboard() {
                   </div>
                 </Link>
 
-                <Link href="/gamification-dashboard">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <span className="text-3xl mb-1 group-hover:scale-110 transition-transform">🎮</span>
-                      <span className="text-sm font-semibold text-center">Gamificação</span>
-                    </div>
-                  </div>
-                </Link>
-
                 </div>
               </CardContent>
             </Card>
