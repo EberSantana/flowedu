@@ -57,6 +57,7 @@ import Avatar3DDemo from "./pages/Avatar3DDemo";
 import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
 import StudentShop from "./pages/StudentShop";
+import { SubjectGamificationDashboard } from "./pages/SubjectGamificationDashboard";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -115,7 +116,8 @@ function Router() {
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
         <Route path={"/students"} component={Students} />
         <Route path={"/students/:id"} component={StudentProfile} />
-        <Route path={"/subjects/:id/enrollments"} component={SubjectEnrollments} />
+         <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
+        <Route path={"/subjects/:subjectId/gamification"} component={SubjectGamificationDashboard} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

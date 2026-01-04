@@ -3710,3 +3710,12 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Detectar mudança de faixa automaticamente
 - [x] Integrar animação no BeltUpgradeNotification
 - [x] Testar animações em todas as transições de faixa
+
+
+## Gamificação por Disciplina (Nova Solicitação)
+- [x] Implementar rotas tRPC para ranking por disciplina (getSubjectGamificationDashboard, getSubjectGamificationStudent)
+- [x] Criar página SubjectGamificationDashboard.tsx
+- [x] Adicionar botão "Gamificação 🏆" em cada card de disciplina (Subjects.tsx)
+- [x] Integrar com sistema de pontos global existente
+- [x] Registrar rota no App.tsx
+- [x] Criar testes automatizados para gamificação por disciplina (12 testes)

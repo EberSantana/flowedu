@@ -3837,6 +3837,93 @@ JSON (descrições MAX 15 chars):
           input.days || 30
         );
       }),
+    
+    // ==================== GAMIFICAÇÃO POR DISCIPLINA ====================
+    // Obter ranking e estatísticas de gamificação de uma disciplina (professor)
+    getSubjectGamificationDashboard: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ input }) => {
+        const ranking = await db.getSubjectRanking(input.subjectId, 100);
+        const stats = await db.getSubjectRankingStats(input.subjectId);
+        
+        // Calcular distribuição de faixas
+        const BELT_CONFIG = [
+          { name: 'white', label: 'Branca', emoji: '⚪' },
+          { name: 'yellow', label: 'Amarela', emoji: '🟡' },
+          { name: 'orange', label: 'Laranja', emoji: '🟠' },
+          { name: 'green', label: 'Verde', emoji: '🟢' },
+          { name: 'blue', label: 'Azul', emoji: '🔵' },
+          { name: 'purple', label: 'Roxa', emoji: '🟣' },
+          { name: 'brown', label: 'Marrom', emoji: '🟤' },
+          { name: 'black', label: 'Preta', emoji: '⚫' },
+        ];
+        
+        const beltDistribution = BELT_CONFIG.map(belt => {
+          const count = ranking.filter(s => s.currentBelt === belt.name).length;
+          const percentage = stats.totalStudents > 0 ? (count / stats.totalStudents) * 100 : 0;
+          return { ...belt, count, percentage };
+        });
+        
+        // Obter badges da disciplina
+        const badges = await db.getAllBadges();
+        
+        return {
+          ranking: ranking.map((r, index) => ({
+            ...r,
+            position: index + 1,
+          })),
+          stats,
+          beltDistribution,
+          badges: badges || [],
+          totalStudents: stats.totalStudents,
+          activeStudents: ranking.filter(s => s.streakDays > 0).length,
+        };
+      }),
+    
+    // Obter dados de gamificação de uma disciplina para aluno
+    getSubjectGamificationStudent: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const ranking = await db.getSubjectRanking(input.subjectId, 100);
+        const stats = await db.getSubjectRankingStats(input.subjectId);
+        const studentPosition = ranking.findIndex(r => r.studentId === ctx.studentSession.studentId) + 1;
+        const studentData = ranking.find(r => r.studentId === ctx.studentSession.studentId);
+        
+        // Calcular distribuição de faixas
+        const BELT_CONFIG = [
+          { name: 'white', label: 'Branca', emoji: '⚪' },
+          { name: 'yellow', label: 'Amarela', emoji: '🟡' },
+          { name: 'orange', label: 'Laranja', emoji: '🟠' },
+          { name: 'green', label: 'Verde', emoji: '🟢' },
+          { name: 'blue', label: 'Azul', emoji: '🔵' },
+          { name: 'purple', label: 'Roxa', emoji: '🟣' },
+          { name: 'brown', label: 'Marrom', emoji: '🟤' },
+          { name: 'black', label: 'Preta', emoji: '⚫' },
+        ];
+        
+        const beltDistribution = BELT_CONFIG.map(belt => {
+          const count = ranking.filter(s => s.currentBelt === belt.name).length;
+          const percentage = stats.totalStudents > 0 ? (count / stats.totalStudents) * 100 : 0;
+          return { ...belt, count, percentage };
+        });
+        
+        // Obter badges da disciplina
+        const badges = await db.getAllBadges();
+        
+        return {
+          ranking: ranking.map((r, index) => ({
+            ...r,
+            position: index + 1,
+          })),
+          stats,
+          beltDistribution,
+          badges: badges || [],
+          studentPosition: studentPosition || null,
+          studentData: studentData || null,
+          totalStudents: stats.totalStudents,
+          activeStudents: ranking.filter(s => s.streakDays > 0).length,
+        };
+      }),
   }),
 
   // ==================== PENSAMENTO COMPUTACIONAL ====================
