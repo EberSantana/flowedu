@@ -246,6 +246,13 @@
       "when": 1767560135510,
       "tag": "0034_square_emma_frost",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1767562460223,
+      "tag": "0035_friendly_magdalene",
+      "breakpoints": true
     }
   ]
 }

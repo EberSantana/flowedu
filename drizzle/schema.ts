@@ -459,7 +459,12 @@ export const students = mysqlTable("students", {
   // Campos de customização do avatar de karatê
   avatarSkinTone: varchar("avatarSkinTone", { length: 20 }).default("light"), // Tom de pele (light, medium, tan, dark, darker, darkest)
   avatarKimonoColor: varchar("avatarKimonoColor", { length: 20 }).default("white"), // Cor do kimono (white, blue, red, black)
-  avatarHairStyle: varchar("avatarHairStyle", { length: 20 }).default("short"), // Estilo de cabelo (short, medium, long, bald, ponytail)
+  avatarHairStyle: varchar("avatarHairStyle", { length: 20 }).default("short"), // Estilo de cabelo (short, medium, long, bald, ponytail, mohawk)
+  avatarHairColor: varchar("avatarHairColor", { length: 20 }).default("black"), // Cor do cabelo (black, brown, blonde, red, colorful)
+  avatarKimonoStyle: varchar("avatarKimonoStyle", { length: 20 }).default("traditional"), // Estilo do kimono (traditional, modern, competition)
+  avatarHeadAccessory: varchar("avatarHeadAccessory", { length: 20 }).default("none"), // Acessório de cabeça (none, bandana, headband, cap, glasses)
+  avatarExpression: varchar("avatarExpression", { length: 20 }).default("neutral"), // Expressão facial (neutral, happy, determined, focused, victorious)
+  avatarPose: varchar("avatarPose", { length: 20 }).default("standing"), // Pose (standing, fighting, punch, kick)
   avatarAccessories: text("avatarAccessories"), // JSON com acessórios desbloqueados
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

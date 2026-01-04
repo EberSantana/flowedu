@@ -4563,6 +4563,11 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         avatarSkinTone: z.string().optional(),
         avatarKimonoColor: z.string().optional(),
         avatarHairStyle: z.string().optional(),
+        avatarHairColor: z.string().optional(),
+        avatarKimonoStyle: z.string().optional(),
+        avatarHeadAccessory: z.string().optional(),
+        avatarExpression: z.string().optional(),
+        avatarPose: z.string().optional(),
         avatarAccessories: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {

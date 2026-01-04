@@ -5120,6 +5120,11 @@ export async function getStudentAvatarByStudentId(studentId: number) {
       avatarSkinTone: students.avatarSkinTone,
       avatarKimonoColor: students.avatarKimonoColor,
       avatarHairStyle: students.avatarHairStyle,
+      avatarHairColor: students.avatarHairColor,
+      avatarKimonoStyle: students.avatarKimonoStyle,
+      avatarHeadAccessory: students.avatarHeadAccessory,
+      avatarExpression: students.avatarExpression,
+      avatarPose: students.avatarPose,
       avatarAccessories: students.avatarAccessories,
     })
     .from(students)
@@ -5139,6 +5144,11 @@ export async function updateStudentAvatar(
     avatarSkinTone?: string;
     avatarKimonoColor?: string;
     avatarHairStyle?: string;
+    avatarHairColor?: string;
+    avatarKimonoStyle?: string;
+    avatarHeadAccessory?: string;
+    avatarExpression?: string;
+    avatarPose?: string;
     avatarAccessories?: string;
   }
 ) {

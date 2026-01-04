@@ -389,3 +389,284 @@
 .animate-star-fall {
   animation: star-fall 2s ease-in forwards;
 }
+
+
+/* ===== ANIMAÇÕES DO AVATAR 3D PROFISSIONAL ===== */
+
+/* Animação de flutuação suave */
+@keyframes avatar-float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+.animate-avatar-float {
+  animation: avatar-float 3s ease-in-out infinite;
+}
+
+/* Animação de bounce energético */
+@keyframes avatar-bounce {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  25% { 
+    transform: translateY(-20px) scale(1.08); 
+  }
+  50% { 
+    transform: translateY(0) scale(1); 
+  }
+  75% { 
+    transform: translateY(-12px) scale(1.04); 
+  }
+}
+
+.animate-avatar-bounce {
+  animation: avatar-bounce 1s ease-in-out;
+}
+
+/* Animação de partículas flutuantes */
+@keyframes float-particle {
+  0% { 
+    transform: translateY(0) scale(1); 
+    opacity: 0; 
+  }
+  20% { 
+    opacity: 1; 
+  }
+  80% { 
+    opacity: 0.8; 
+  }
+  100% { 
+    transform: translateY(-80px) scale(0.3); 
+    opacity: 0; 
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle 2s ease-out infinite;
+}
+
+/* Animação de estrelas brilhantes flutuantes */
+@keyframes sparkle-float {
+  0% { 
+    transform: scale(0) rotate(0deg); 
+    opacity: 0; 
+  }
+  25% { 
+    transform: scale(1.3) rotate(90deg); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1) rotate(180deg); 
+    opacity: 0.8; 
+  }
+  75% { 
+    transform: scale(1.2) rotate(270deg); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: scale(0) rotate(360deg); 
+    opacity: 0; 
+  }
+}
+
+.animate-sparkle-float {
+  animation: sparkle-float 1.8s ease-in-out infinite;
+}
+
+/* Animação de glow pulsante */
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 0.4; 
+    transform: scale(1.2); 
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.4); 
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Animação de glow pulsante lento */
+@keyframes pulse-glow-slow {
+  0%, 100% { 
+    opacity: 0.2; 
+    transform: scale(1.4); 
+  }
+  50% { 
+    opacity: 0.5; 
+    transform: scale(1.7); 
+  }
+}
+
+.animate-pulse-glow-slow {
+  animation: pulse-glow-slow 3.5s ease-in-out infinite;
+}
+
+/* Animação de entrada dramática */
+@keyframes avatar-entrance {
+  0% {
+    transform: scale(0.5) translateY(50px);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) translateY(-10px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-avatar-entrance {
+  animation: avatar-entrance 0.8s ease-out forwards;
+}
+
+/* Animação de aura rotativa */
+@keyframes aura-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-aura-rotate {
+  animation: aura-rotate 8s linear infinite;
+}
+
+/* Animação de respiração */
+@keyframes avatar-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.animate-avatar-breathe {
+  animation: avatar-breathe 4s ease-in-out infinite;
+}
+
+/* Animação de hover interativo */
+@keyframes avatar-hover-effect {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.animate-avatar-hover {
+  animation: avatar-hover-effect 0.3s ease-out;
+}
+
+/* Animação de conquista épica */
+@keyframes epic-achievement {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.3) rotate(-5deg);
+    filter: brightness(1.5);
+  }
+  50% {
+    transform: scale(1.4) rotate(5deg);
+    filter: brightness(2);
+  }
+  75% {
+    transform: scale(1.2) rotate(-3deg);
+    filter: brightness(1.3);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+}
+
+.animate-epic-achievement {
+  animation: epic-achievement 1.5s ease-out;
+}
+
+/* Animação de energia */
+@keyframes energy-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3),
+                0 0 40px rgba(59, 130, 246, 0.2),
+                0 0 60px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5),
+                0 0 60px rgba(59, 130, 246, 0.3),
+                0 0 90px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.animate-energy-pulse {
+  animation: energy-pulse 2s ease-in-out infinite;
+}
+
+/* Animação de faixa preta especial */
+@keyframes black-belt-glow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.4),
+                0 0 60px rgba(251, 191, 36, 0.2),
+                0 0 90px rgba(251, 191, 36, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(251, 191, 36, 0.6),
+                0 0 100px rgba(251, 191, 36, 0.4),
+                0 0 150px rgba(251, 191, 36, 0.2);
+  }
+}
+
+.animate-black-belt-glow {
+  animation: black-belt-glow 2.5s ease-in-out infinite;
+}
+
+/* Animação de ondas de energia */
+@keyframes energy-wave {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-energy-wave {
+  animation: energy-wave 1.5s ease-out infinite;
+}
+
+/* Animação de texto flutuante */
+@keyframes float-text {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float-text {
+  animation: float-text 2s ease-in-out infinite;
+}

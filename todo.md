@@ -3656,3 +3656,27 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Criar seed com itens iniciais da loja (21 itens)
 - [x] Implementar sistema de itens raros/exclusivos por faixa
 - [x] Criar testes automatizados para loja (11 testes passando)
+
+## Customização Avançada do Avatar (Nova Solicitação)
+
+### Correções
+- [x] Corrigir mudança de cor de pele que não está funcionando
+
+### Aparência Física
+- [x] Implementar 6 tons de pele (Claro, Médio, Bronzeado, Moreno, Escuro, Muito Escuro)
+- [x] Implementar 6 estilos de cabelo (Curto, Médio, Longo, Careca, Rabo de Cavalo, Moicano)
+- [x] Implementar 5 cores de cabelo (Preto, Castanho, Loiro, Ruivo, Colorido)
+
+### Equipamentos
+- [x] Implementar 4 cores de kimono (Branco, Azul, Vermelho, Preto)
+- [x] Implementar 3 estilos de kimono (Tradicional, Moderno, Competição)
+- [x] Implementar 5 acessórios de cabeça (Nenhum, Bandana, Faixa na testa, Boné, Óculos)
+
+### Expressões/Poses
+- [x] Implementar 5 expressões faciais (Neutro, Feliz, Determinado, Concentrado, Vitorioso)
+- [x] Implementar 4 poses (Saudação, Posição de Luta, Soco, Chute)
+
+### Backend
+- [x] Adicionar novos campos no banco de dados (hairColor, kimonoStyle, headAccessory, expression, pose)
+- [x] Atualizar rotas tRPC para salvar novas configurações
+- [x] Atualizar página de customização com todas as opções
