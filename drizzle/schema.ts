@@ -456,6 +456,11 @@ export const students = mysqlTable("students", {
   userId: int("userId").notNull(), // Professor responsável
   registrationNumber: varchar("registrationNumber", { length: 50 }).notNull(), // Matrícula do aluno
   fullName: varchar("fullName", { length: 255 }).notNull(), // Nome completo do aluno
+  // Campos de customização do avatar de karatê
+  avatarSkinTone: varchar("avatarSkinTone", { length: 20 }).default("light"), // Tom de pele (light, medium, tan, dark, darker, darkest)
+  avatarKimonoColor: varchar("avatarKimonoColor", { length: 20 }).default("white"), // Cor do kimono (white, blue, red, black)
+  avatarHairStyle: varchar("avatarHairStyle", { length: 20 }).default("short"), // Estilo de cabelo (short, medium, long, bald, ponytail)
+  avatarAccessories: text("avatarAccessories"), // JSON com acessórios desbloqueados
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

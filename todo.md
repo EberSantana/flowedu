@@ -173,6 +173,22 @@
 - [x] Exportar planos de curso em CSV
 - [ ] Adicionar interface de exportação no sistema
 
+## Sistema de Avatares de Karatê - MVP
+- [x] Criar componente KarateAvatar.tsx com SVG customizado
+- [x] Implementar 8 variações de faixa (Branca → Preta)
+- [x] Adicionar campos no banco de dados (avatarSkinTone, avatarKimonoColor, avatarHairStyle, avatarAccessories)
+- [x] Aplicar mudanças no schema do banco de dados
+- [x] Integrar avatar no Dashboard do aluno
+- [x] Criar sistema de cálculo de faixa baseado em pontos
+- [x] Implementar barra de progresso dinâmica
+- [x] Criar página de teste com todas as variações
+- [x] Adicionar 4 tamanhos de avatar (sm, md, lg, xl)
+- [x] Documentar sistema de pontuação
+- [ ] Conectar avatar com sistema de pontos existente (gamificação)
+- [ ] Criar notificações de conquista de nova faixa
+- [ ] Implementar histórico de evolução do aluno
+- [ ] Adicionar animações de transição entre faixas
+
 ## Sistema Administrativo e Multiusuário
 - [x] Criar página de gerenciamento de usuários (admin)
 - [x] Implementar listagem de todos os usuários cadastrados

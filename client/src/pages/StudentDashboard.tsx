@@ -17,10 +17,41 @@ import {
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
+import { KarateAvatar, type BeltColor } from "@/components/KarateAvatar";
+
+// Função helper para determinar a faixa baseada nos pontos
+function getBeltFromPoints(points: number): BeltColor {
+  if (points >= 2000) return 'black';      // Faixa Preta: 2000+
+  if (points >= 1600) return 'brown';      // Faixa Marrom: 1600-1999
+  if (points >= 1200) return 'purple';     // Faixa Roxa: 1200-1599
+  if (points >= 900) return 'blue';        // Faixa Azul: 900-1199
+  if (points >= 600) return 'green';       // Faixa Verde: 600-899
+  if (points >= 400) return 'orange';      // Faixa Laranja: 400-599
+  if (points >= 200) return 'yellow';      // Faixa Amarela: 200-399
+  return 'white';                          // Faixa Branca: 0-199
+}
+
+// Função helper para calcular pontos para próxima faixa
+function getNextBeltThreshold(points: number): number {
+  if (points >= 2000) return 2000; // Já é faixa preta (máximo)
+  if (points >= 1600) return 2000;
+  if (points >= 1200) return 1600;
+  if (points >= 900) return 1200;
+  if (points >= 600) return 900;
+  if (points >= 400) return 600;
+  if (points >= 200) return 400;
+  return 200; // Próxima faixa é amarela
+}
 
 export default function StudentDashboard() {
   const { student } = useStudentAuth();
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
+  
+  // Buscar pontos do aluno (por enquanto hardcoded como 0, depois integrar com gamificação)
+  const studentPoints = 0; // TODO: Integrar com sistema de gamificação
+  const currentBelt = getBeltFromPoints(studentPoints);
+  const nextThreshold = getNextBeltThreshold(studentPoints);
+  const progressPercentage = (studentPoints / nextThreshold) * 100;
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
@@ -28,19 +59,53 @@ export default function StudentDashboard() {
   return (
     <StudentLayout>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Header com Boas-vindas */}
+        {/* Header com Boas-vindas e Avatar de Karatê */}
         <div className="mb-10">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
-              <Sparkles className="w-8 h-8 text-white" />
+          <div className="flex items-start gap-6 mb-6">
+            {/* Avatar de Karatê com Faixa */}
+            <div className="flex-shrink-0">
+              <KarateAvatar 
+                belt={currentBelt} 
+                size="lg" 
+                showLabel 
+              />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Olá, {student?.fullName?.split(' ')[0] || 'Aluno'}! 👋
-              </h1>
-              <p className="text-lg text-gray-600">
-                Bem-vindo ao seu painel de estudos. Acompanhe seu progresso e continue aprendendo!
-              </p>
+            
+            <div className="flex-1">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                    Olá, {student?.fullName?.split(' ')[0] || 'Aluno'}! 👋
+                  </h1>
+                  <p className="text-lg text-gray-600">
+                    Bem-vindo ao seu painel de estudos. Acompanhe seu progresso e continue aprendendo!
+                  </p>
+                </div>
+              </div>
+              
+              {/* Barra de Progresso de Pontos */}
+              <div className="bg-white rounded-xl p-4 shadow-md border-2 border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-gray-700">
+                    Progresso para próxima faixa
+                  </span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {studentPoints} / {nextThreshold} pontos
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercentage}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Continue completando exercícios e atividades para evoluir sua faixa!
+                </p>
+              </div>
             </div>
           </div>
         </div>
