@@ -473,7 +473,7 @@ export default function Subjects() {
                     </div>
                   )}
                   
-                  <div className="space-y-2 mt-auto pt-3">
+                  <div className="flex flex-col gap-2 mt-auto pt-3">
                     {/* Botão Gerenciar Matrículas com lista expansível */}
                     <div className="flex gap-2">
                       <div className="flex-1">

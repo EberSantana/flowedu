@@ -3,6 +3,7 @@
 ## 🐛 Bugs Críticos
 
 - [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
+- [x] Corrigir sobreposição de botões "Trilhas de Aprendizagem" e "Estatísticas de PC" nos cards de disciplinas
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 
