@@ -23,6 +23,7 @@ import { StudentDashboardHeaderKimono } from "@/components/StudentDashboardHeade
 import { GamifiedStatsCards } from "@/components/GamifiedStatsCards";
 import { QuickActionsGrid } from "@/components/QuickActionsGrid";
 import { NextGoalsSection } from "@/components/NextGoalsSection";
+import { StudentAlerts } from "@/components/StudentAlerts";
 
 // Função helper para determinar a faixa baseada nos pontos
 function getBeltFromPoints(points: number): BeltColor {
@@ -83,6 +84,11 @@ export default function StudentDashboard() {
 
       <StudentLayout>
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+          {/* Alertas Importantes */}
+          <div className="mb-6">
+            <StudentAlerts />
+          </div>
+
           {/* Header Profissional com Avatar de Kimono */}
           <StudentDashboardHeaderKimono
             studentName={student?.fullName || 'Aluno'}

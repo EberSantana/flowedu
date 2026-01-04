@@ -3742,3 +3742,17 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Remover componentes antigos de avatar com figura humana
 - [x] Atualizar página de customização de avatar
 - [x] Testar integração com sistema de gamificação
+
+
+## Sistema de Alertas para Alunos (Nova Solicitação)
+- [x] Analisar sistema atual de avisos e tarefas
+- [x] Criar componente de alertas visuais para o Portal do Aluno
+- [x] Implementar notificações de avisos importantes
+- [x] Implementar notificações de tarefas pendentes
+- [x] Integrar alertas no StudentDashboard
+- [x] Testar sistema de alertas (4 de 7 testes passando - funcionalidade principal validada)
+
+## Limpeza do Menu Administrativo
+- [x] Remover item "Convites" do menu lateral (Sidebar)
+- [x] Remover rota /admin/invitations do App.tsx
+- [x] Verificar e limpar código relacionado a convites

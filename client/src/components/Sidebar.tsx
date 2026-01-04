@@ -129,12 +129,6 @@ const teacherNavItems: NavItem[] = [
     href: "/admin/users",
     adminOnly: true,
   },
-  {
-    label: "Convites",
-    icon: <KeyRound className="h-5 w-5" />,
-    href: "/admin/invites",
-    adminOnly: true,
-  },
 ];
 
 // Menu para alunos (simplificado)
