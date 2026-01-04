@@ -3452,3 +3452,14 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Testar responsividade mobile
 - [ ] Criar checkpoint final
 
+
+## 🚨 Correção Urgente - Gabarito Detalhado (Portal do Aluno)
+
+- [x] Corrigir StudentExerciseResults.tsx para exibir enunciado completo das questões
+- [x] Exibir opções de resposta (A, B, C, D) quando for questão de múltipla escolha
+- [x] Melhorar design UX/UI da página de gabarito com layout mais limpo
+- [x] Adicionar numeração visual clara das questões
+- [x] Melhorar hierarquia visual: enunciado → opções → sua resposta → resposta correta → feedback
+- [x] Aumentar tamanhos de fonte para melhor legibilidade
+- [x] Adicionar espaçamento adequado entre elementos
+- [ ] Testar correções no navegador

@@ -4149,15 +4149,25 @@ export async function getExerciseResults(attemptId: number) {
   const questionsWithAnswers = answers.map((answer) => {
     const originalQuestion = exerciseData.exercises?.find((q: any) => q.number === answer.questionNumber) || {};
     return {
-      question: originalQuestion.question || answer.questionType,
+      // Dados da questão original
+      question: originalQuestion.question || answer.questionType, // Mantido para compatibilidade
+      text: originalQuestion.text || originalQuestion.question || answer.questionType, // Enunciado completo
+      type: originalQuestion.type || answer.questionType, // Tipo da questão
+      options: originalQuestion.options || [], // Alternativas (para múltipla escolha)
+      
+      // Respostas do aluno
       studentAnswer: answer.studentAnswer,
       correctAnswer: answer.correctAnswer,
       isCorrect: answer.isCorrect,
+      
+      // Feedback e explicações
       explanation: originalQuestion.explanation || null,
-      questionType: answer.questionType,
       pointsAwarded: answer.pointsAwarded,
       aiFeedback: answer.aiFeedback || null,
       studyTips: answer.studyTips || null,
+      
+      // Metadados (compatibilidade)
+      questionType: answer.questionType,
     };
   });
   
