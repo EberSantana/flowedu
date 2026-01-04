@@ -232,6 +232,13 @@
       "when": 1767551766646,
       "tag": "0032_purple_champions",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1767557248751,
+      "tag": "0033_overconfident_power_pack",
+      "breakpoints": true
     }
   ]
 }

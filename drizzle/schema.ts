@@ -646,6 +646,20 @@ export const gamificationNotifications = mysqlTable("gamification_notifications"
 export type GamificationNotification = typeof gamificationNotifications.$inferSelect;
 export type InsertGamificationNotification = typeof gamificationNotifications.$inferInsert;
 
+/**
+ * Histórico de Evolução de Faixas (Belt History)
+ * Registra todas as conquistas de novas faixas pelos alunos
+ */
+export const beltHistory = mysqlTable("belt_history", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  belt: varchar("belt", { length: 50 }).notNull(), // white, yellow, orange, green, blue, purple, brown, black
+  pointsAtAchievement: int("pointsAtAchievement").notNull(), // Pontos totais quando conquistou a faixa
+  achievedAt: timestamp("achievedAt").defaultNow().notNull(),
+});
+
+export type BeltHistory = typeof beltHistory.$inferSelect;
+export type InsertBeltHistory = typeof beltHistory.$inferInsert;
 
 /**
  * ==================== PENSAMENTO COMPUTACIONAL ====================

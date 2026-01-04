@@ -63,7 +63,8 @@ import {
   reviewSessions,
   InsertStudentExercise,
   InsertStudentExerciseAttempt,
-  InsertStudentExerciseAnswer
+  InsertStudentExerciseAnswer,
+  beltHistory
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -2554,9 +2555,18 @@ export async function addPointsToStudent(
       relatedId,
     });
 
-    // Se subiu de faixa, criar notificação
+    // Se subiu de faixa, criar notificação e registrar no histórico
     if (newBelt !== oldBelt) {
       const beltInfo = BELT_CONFIG.find(b => b.name === newBelt);
+      
+      // Registrar no histórico de faixas
+      await db.insert(beltHistory).values({
+        studentId,
+        belt: newBelt,
+        pointsAtAchievement: newTotalPoints,
+      });
+      
+      // Criar notificação
       await db.insert(gamificationNotifications).values({
         studentId,
         type: 'belt_upgrade',
@@ -4235,6 +4245,9 @@ export async function submitExerciseAttempt(
     });
   }
   
+  // Verificar e conceder badges especiais
+  await checkAllSpecialBadges(attempt[0].studentId, timeSpent, new Date());
+  
   return {
     attemptId,
     score,
@@ -5057,5 +5070,294 @@ export async function updateStudentAvatar(
   } catch (error) {
     console.error("Error updating student avatar:", error);
     return null;
+  }
+}
+
+// ==================== HISTÓRICO DE FAIXAS ====================
+
+/**
+ * Buscar histórico de evolução de faixas do aluno
+ */
+export async function getStudentBeltHistory(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const history = await db.select()
+      .from(beltHistory)
+      .where(eq(beltHistory.studentId, studentId))
+      .orderBy(beltHistory.achievedAt);
+
+    return history;
+  } catch (error) {
+    console.error("[Database] Error fetching belt history:", error);
+    return [];
+  }
+}
+
+/**
+ * Registrar faixa inicial (branca) para novo aluno
+ */
+export async function registerInitialBelt(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Verificar se já existe registro
+    const existing = await db.select()
+      .from(beltHistory)
+      .where(eq(beltHistory.studentId, studentId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Registrar faixa branca inicial
+    await db.insert(beltHistory).values({
+      studentId,
+      belt: 'white',
+      pointsAtAchievement: 0,
+    });
+
+    return { studentId, belt: 'white', pointsAtAchievement: 0 };
+  } catch (error) {
+    console.error("[Database] Error registering initial belt:", error);
+    return null;
+  }
+}
+
+// ==================== BADGES ESPECIAIS ====================
+
+/**
+ * Verificar e conceder badge "Velocista" (exercício em menos de 2 minutos)
+ */
+export async function checkSpeedsterBadge(studentId: number, timeSpent: number) {
+  if (timeSpent < 120) { // Menos de 2 minutos (120 segundos)
+    await awardBadgeToStudent(studentId, 'speedster');
+  }
+}
+
+/**
+ * Verificar e conceder badge "Perfeccionista" (10 acertos consecutivos)
+ */
+export async function checkPerfectionistBadge(studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Buscar últimas 10 tentativas
+    const recentAttempts = await db.select()
+      .from(studentExerciseAttempts)
+      .where(eq(studentExerciseAttempts.studentId, studentId))
+      .orderBy(sql`${studentExerciseAttempts.completedAt} DESC`)
+      .limit(10);
+
+    // Verificar se todas têm 100% de acerto
+    if (recentAttempts.length >= 10) {
+      const allPerfect = recentAttempts.every(attempt => attempt.score === 100);
+      if (allPerfect) {
+        await awardBadgeToStudent(studentId, 'perfectionist');
+      }
+    }
+  } catch (error) {
+    console.error("[Database] Error checking perfectionist badge:", error);
+  }
+}
+
+/**
+ * Verificar e conceder badge "Maratonista" (5 exercícios no mesmo dia)
+ */
+export async function checkMarathonBadge(studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todayAttempts = await db.select()
+      .from(studentExerciseAttempts)
+      .where(
+        and(
+          eq(studentExerciseAttempts.studentId, studentId),
+          sql`${studentExerciseAttempts.completedAt} >= ${today}`,
+          sql`${studentExerciseAttempts.completedAt} < ${tomorrow}`
+        )
+      );
+
+    if (todayAttempts.length >= 5) {
+      await awardBadgeToStudent(studentId, 'marathon_runner');
+    }
+  } catch (error) {
+    console.error("[Database] Error checking marathon badge:", error);
+  }
+}
+
+/**
+ * Verificar e conceder badge "Coruja Noturna" (exercício após 22h)
+ */
+export async function checkNightOwlBadge(studentId: number, completedAt: Date) {
+  const hour = completedAt.getHours();
+  if (hour >= 22 || hour < 6) { // Entre 22h e 6h
+    await awardBadgeToStudent(studentId, 'night_owl');
+  }
+}
+
+/**
+ * Verificar e conceder badge "Madrugador" (exercício antes das 7h)
+ */
+export async function checkEarlyBirdBadge(studentId: number, completedAt: Date) {
+  const hour = completedAt.getHours();
+  if (hour >= 5 && hour < 7) { // Entre 5h e 7h
+    await awardBadgeToStudent(studentId, 'early_bird');
+  }
+}
+
+/**
+ * Verificar e conceder badge "Mestre do Combo" (5 exercícios seguidos sem pausar)
+ */
+export async function checkComboMasterBadge(studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Buscar últimas 5 tentativas
+    const recentAttempts = await db.select()
+      .from(studentExerciseAttempts)
+      .where(eq(studentExerciseAttempts.studentId, studentId))
+      .orderBy(sql`${studentExerciseAttempts.completedAt} DESC`)
+      .limit(5);
+
+    if (recentAttempts.length >= 5) {
+      // Verificar se todas foram feitas com intervalo menor que 5 minutos
+      let isCombo = true;
+      for (let i = 0; i < recentAttempts.length - 1; i++) {
+        const current = recentAttempts[i]?.completedAt;
+        const next = recentAttempts[i + 1]?.completedAt;
+        if (!current || !next) continue;
+        const diffMinutes = (current.getTime() - next.getTime()) / (1000 * 60);
+        if (diffMinutes > 5) {
+          isCombo = false;
+          break;
+        }
+      }
+
+      if (isCombo) {
+        await awardBadgeToStudent(studentId, 'combo_master');
+      }
+    }
+  } catch (error) {
+    console.error("[Database] Error checking combo master badge:", error);
+  }
+}
+
+/**
+ * Verificar e conceder badge "Persistente" (20 exercícios em uma semana)
+ */
+export async function checkPersistentBadge(studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const weekAttempts = await db.select()
+      .from(studentExerciseAttempts)
+      .where(
+        and(
+          eq(studentExerciseAttempts.studentId, studentId),
+          sql`${studentExerciseAttempts.completedAt} >= ${weekAgo}`
+        )
+      );
+
+    if (weekAttempts.length >= 20) {
+      await awardBadgeToStudent(studentId, 'persistent');
+    }
+  } catch (error) {
+    console.error("[Database] Error checking persistent badge:", error);
+  }
+}
+
+/**
+ * Verificar e conceder badge "Semana Perfeita" (100% de acertos na semana)
+ */
+export async function checkFlawlessWeekBadge(studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const weekAttempts = await db.select()
+      .from(studentExerciseAttempts)
+      .where(
+        and(
+          eq(studentExerciseAttempts.studentId, studentId),
+          sql`${studentExerciseAttempts.completedAt} >= ${weekAgo}`
+        )
+      );
+
+    if (weekAttempts.length > 0) {
+      const allPerfect = weekAttempts.every(attempt => attempt.score === 100);
+      if (allPerfect) {
+        await awardBadgeToStudent(studentId, 'flawless_week');
+      }
+    }
+  } catch (error) {
+    console.error("[Database] Error checking flawless week badge:", error);
+  }
+}
+
+/**
+ * Verificar e conceder badge "Rei do Retorno" (voltar após 7 dias de inatividade)
+ */
+export async function checkComebackBadge(studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const points = await getOrCreateStudentPoints(studentId);
+    if (!points || !points.lastActivityDate) return;
+
+    const lastActivity = new Date(points.lastActivityDate);
+    const today = new Date();
+    const diffDays = Math.floor((today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays >= 7) {
+      await awardBadgeToStudent(studentId, 'comeback_king');
+    }
+  } catch (error) {
+    console.error("[Database] Error checking comeback badge:", error);
+  }
+}
+
+/**
+ * Verificar todos os badges especiais após completar exercício
+ */
+export async function checkAllSpecialBadges(
+  studentId: number,
+  timeSpent: number,
+  completedAt: Date
+) {
+  try {
+    // Badges baseados em tempo
+    await checkSpeedsterBadge(studentId, timeSpent);
+    await checkNightOwlBadge(studentId, completedAt);
+    await checkEarlyBirdBadge(studentId, completedAt);
+
+    // Badges baseados em histórico
+    await checkPerfectionistBadge(studentId);
+    await checkMarathonBadge(studentId);
+    await checkComboMasterBadge(studentId);
+    await checkPersistentBadge(studentId);
+    await checkFlawlessWeekBadge(studentId);
+    await checkComebackBadge(studentId);
+  } catch (error) {
+    console.error("[Database] Error checking special badges:", error);
   }
 }

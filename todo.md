@@ -201,7 +201,9 @@
   - [x] Componente de notificação com animação
   - [x] Toast especial para evolução de faixa
   - [x] Animação especial para faixa preta
-- [ ] Implementar histórico de evolução do aluno
+- [x] Adicionar botão "Personalizar Avatar" no Dashboard do aluno
+- [x] Criar histórico de evolução de faixas com linha do tempo
+- [x] Implementar badges especiais para conquistas extraordinárias (Velocista, Perfeccionista, etc)
 - [ ] Adicionar animações de transição entre faixas
 
 ## Sistema Administrativo e Multiusuário

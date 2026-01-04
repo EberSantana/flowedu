@@ -3628,6 +3628,12 @@ JSON (descrições MAX 15 chars):
         return { earned, all, total: all.length };
       }),
     
+    // Obter histórico de evolução de faixas
+    getBeltHistory: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getStudentBeltHistory(ctx.studentSession.studentId);
+      }),
+    
     // Obter ranking da turma
     getClassRanking: studentProcedure
       .input(z.object({ limit: z.number().optional() }))

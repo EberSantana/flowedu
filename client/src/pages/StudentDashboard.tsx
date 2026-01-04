@@ -12,7 +12,8 @@ import {
   TrendingUp,
   CheckCircle,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Palette
 } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
@@ -200,7 +201,7 @@ export default function StudentDashboard() {
                 <TrendingUp className="w-7 h-7 text-blue-600" />
                 Ações Rápidas
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <Link href="/student-exercises">
                   <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-orange-300 bg-gradient-to-br from-orange-50 to-white group">
                     <CardContent className="p-6 text-center">
@@ -245,6 +246,18 @@ export default function StudentDashboard() {
                       </div>
                       <h3 className="font-bold text-gray-900 text-lg mb-2">Disciplinas</h3>
                       <p className="text-sm text-gray-600">Ver todas</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+
+                <Link href="/student/customize-avatar">
+                  <Card className="cursor-pointer hover:shadow-xl transition-all duration-300 border-2 hover:border-pink-300 bg-gradient-to-br from-pink-50 to-white group">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <Palette className="w-8 h-8 text-pink-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-lg mb-2">Personalizar</h3>
+                      <p className="text-sm text-gray-600">Customizar avatar</p>
                     </CardContent>
                   </Card>
                 </Link>
