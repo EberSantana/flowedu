@@ -4576,6 +4576,159 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return updated;
       }),
   }),
+
+  // ==================== LOJA DE ITENS ====================
+  shop: router({
+    // Listar itens da loja
+    getItems: studentProcedure
+      .input(z.object({
+        category: z.string().optional(),
+        requiredBelt: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const items = await db.getShopItems(input);
+        return items;
+      }),
+
+    // Buscar item específico
+    getItem: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .query(async ({ input }) => {
+        const item = await db.getShopItemById(input.itemId);
+        if (!item) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Item não encontrado',
+          });
+        }
+        return item;
+      }),
+
+    // Comprar item
+    purchase: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.purchaseShopItem(ctx.studentSession.studentId, input.itemId);
+        if (!result.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: result.message,
+          });
+        }
+        return result;
+      }),
+
+    // Listar meus itens comprados
+    getMyItems: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentPurchasedItems(ctx.studentSession.studentId);
+      }),
+
+    // Listar itens equipados
+    getEquippedItems: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentEquippedItems(ctx.studentSession.studentId);
+      }),
+
+    // Equipar item
+    equip: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.equipItem(ctx.studentSession.studentId, input.itemId);
+        if (!result.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: result.message,
+          });
+        }
+        return result;
+      }),
+
+    // Desequipar item
+    unequip: studentProcedure
+      .input(z.object({ slot: z.enum(['hat', 'glasses', 'accessory', 'background']) }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.unequipItem(ctx.studentSession.studentId, input.slot);
+        if (!result.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: result.message,
+          });
+        }
+        return result;
+      }),
+
+    // Verificar se possui item
+    ownsItem: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.studentOwnsItem(ctx.studentSession.studentId, input.itemId);
+      }),
+
+    // Seed inicial de itens (admin)
+    seedItems: protectedProcedure
+      .mutation(async () => {
+        await db.seedShopItems();
+        return { success: true, message: 'Itens da loja criados com sucesso!' };
+      }),
+
+    // Admin: Criar item
+    createItem: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        description: z.string().optional(),
+        category: z.enum(['hat', 'glasses', 'accessory', 'background', 'special']),
+        price: z.number().min(1),
+        imageUrl: z.string().optional(),
+        svgData: z.string().optional(),
+        requiredBelt: z.string().optional(),
+        isRare: z.boolean().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.createShopItem(input as any);
+        return { success: true };
+      }),
+
+    // Admin: Atualizar item
+    updateItem: protectedProcedure
+      .input(z.object({
+        itemId: z.number(),
+        data: z.object({
+          name: z.string().optional(),
+          description: z.string().optional(),
+          category: z.enum(['hat', 'glasses', 'accessory', 'background', 'special']).optional(),
+          price: z.number().optional(),
+          imageUrl: z.string().optional(),
+          svgData: z.string().optional(),
+          requiredBelt: z.string().optional(),
+          isActive: z.boolean().optional(),
+          isRare: z.boolean().optional(),
+          sortOrder: z.number().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateShopItem(input.itemId, input.data as any);
+        return { success: true };
+      }),
+
+    // Admin: Deletar item
+    deleteItem: protectedProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteShopItem(input.itemId);
+        return { success: true };
+      }),
+
+    // Admin: Listar todos os itens (incluindo inativos)
+    getAllItems: protectedProcedure
+      .query(async () => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) return [];
+        const { shopItems } = await import('../drizzle/schema');
+        return dbInstance.select().from(shopItems).orderBy(shopItems.sortOrder);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

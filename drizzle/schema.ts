@@ -929,3 +929,57 @@ export const reviewSessions = mysqlTable("review_sessions", {
 
 export type ReviewSession = typeof reviewSessions.$inferSelect;
 export type InsertReviewSession = typeof reviewSessions.$inferInsert;
+
+
+/**
+ * Itens da loja para avatares
+ */
+export const shopItems = mysqlTable("shop_items", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["hat", "glasses", "accessory", "background", "special"]).notNull(),
+  price: int("price").notNull(), // Preço em pontos
+  imageUrl: text("imageUrl"), // URL da imagem do item
+  svgData: text("svgData"), // Dados SVG para renderização no avatar
+  requiredBelt: varchar("requiredBelt", { length: 20 }).default("white"), // Faixa mínima necessária
+  isActive: boolean("isActive").default(true).notNull(),
+  isRare: boolean("isRare").default(false).notNull(), // Item raro/exclusivo
+  sortOrder: int("sortOrder").default(0).notNull(), // Ordem de exibição
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ShopItem = typeof shopItems.$inferSelect;
+export type InsertShopItem = typeof shopItems.$inferInsert;
+
+/**
+ * Itens comprados pelos alunos
+ */
+export const studentPurchasedItems = mysqlTable("student_purchased_items", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  itemId: int("itemId").notNull(),
+  purchasedAt: timestamp("purchasedAt").defaultNow().notNull(),
+}, (table) => ({
+  uniquePurchase: unique().on(table.studentId, table.itemId),
+}));
+
+export type StudentPurchasedItem = typeof studentPurchasedItems.$inferSelect;
+export type InsertStudentPurchasedItem = typeof studentPurchasedItems.$inferInsert;
+
+/**
+ * Itens equipados pelos alunos (atualmente em uso no avatar)
+ */
+export const studentEquippedItems = mysqlTable("student_equipped_items", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  itemId: int("itemId").notNull(),
+  slot: mysqlEnum("slot", ["hat", "glasses", "accessory", "background"]).notNull(),
+  equippedAt: timestamp("equippedAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueSlot: unique().on(table.studentId, table.slot),
+}));
+
+export type StudentEquippedItem = typeof studentEquippedItems.$inferSelect;
+export type InsertStudentEquippedItem = typeof studentEquippedItems.$inferInsert;

@@ -54,6 +54,7 @@ import StudentReview from "./pages/StudentReview";
 import AvatarTest from "./pages/AvatarTest";
 import { CustomizeAvatar } from "./pages/CustomizeAvatar";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
+import StudentShop from "./pages/StudentShop";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -102,6 +103,7 @@ function Router() {
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
         <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
+        <Route path={"/student/shop"} component={StudentShop} />
         <Route path={"/avatar-test"} component={AvatarTest} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />

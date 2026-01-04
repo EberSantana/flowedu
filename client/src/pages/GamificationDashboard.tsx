@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

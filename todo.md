@@ -3637,3 +3637,22 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Criar animações de transição entre seleções
 - [x] Atualizar StudentDashboard com novos componentes
 - [x] Corrigir erro de useState duplicado no GamificationDashboard
+
+
+## Loja de Itens para Avatares
+- [x] Criar tabela shop_items no banco de dados (id, name, description, type, price, imageUrl, requiredBelt, isActive)
+- [x] Criar tabela student_purchased_items (studentId, itemId, purchasedAt)
+- [x] Criar tabela student_equipped_items (studentId, itemId, slot, equippedAt)
+- [x] Implementar funções no db.ts (getShopItems, purchaseItem, getStudentItems, equipItem, unequipItem)
+- [x] Criar rotas tRPC para loja (shop.getItems, shop.purchase, shop.getMyItems, shop.equip, shop.unequip)
+- [x] Criar página StudentShop.tsx com interface da loja
+- [x] Adicionar categorias de itens (chapéus, óculos, acessórios, fundos)
+- [x] Implementar sistema de filtros por categoria e preço
+- [x] Criar cards de itens com preview visual
+- [x] Implementar modal de confirmação de compra
+- [x] Mostrar saldo de pontos do aluno
+- [x] Atualizar componente KarateAvatarPro para renderizar itens equipados
+- [x] Adicionar link "Loja" no menu do Portal do Aluno
+- [x] Criar seed com itens iniciais da loja (21 itens)
+- [x] Implementar sistema de itens raros/exclusivos por faixa
+- [x] Criar testes automatizados para loja (11 testes passando)

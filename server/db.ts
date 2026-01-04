@@ -64,7 +64,12 @@ import {
   InsertStudentExercise,
   InsertStudentExerciseAttempt,
   InsertStudentExerciseAnswer,
-  beltHistory
+  beltHistory,
+  shopItems,
+  studentPurchasedItems,
+  studentEquippedItems,
+  ShopItem,
+  InsertShopItem
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -5441,5 +5446,367 @@ export async function checkAllSpecialBadges(
     await checkComebackBadge(studentId);
   } catch (error) {
     console.error("[Database] Error checking special badges:", error);
+  }
+}
+
+
+// ============================================
+// LOJA DE ITENS PARA AVATARES
+// ============================================
+
+/**
+ * Listar todos os itens ativos da loja
+ */
+export async function getShopItems(filters?: { category?: string; requiredBelt?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    let query = db.select().from(shopItems).where(eq(shopItems.isActive, true));
+    
+    const items = await query.orderBy(shopItems.sortOrder, shopItems.price);
+    
+    // Aplicar filtros em memória se necessário
+    let filteredItems = items;
+    if (filters?.category) {
+      filteredItems = filteredItems.filter(item => item.category === filters.category);
+    }
+    if (filters?.requiredBelt) {
+      filteredItems = filteredItems.filter(item => item.requiredBelt === filters.requiredBelt);
+    }
+    
+    return filteredItems;
+  } catch (error) {
+    console.error("[Database] Error getting shop items:", error);
+    return [];
+  }
+}
+
+/**
+ * Buscar item específico da loja
+ */
+export async function getShopItemById(itemId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [item] = await db.select().from(shopItems).where(eq(shopItems.id, itemId));
+    return item || null;
+  } catch (error) {
+    console.error("[Database] Error getting shop item:", error);
+    return null;
+  }
+}
+
+/**
+ * Verificar se aluno já possui um item
+ */
+export async function studentOwnsItem(studentId: number, itemId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const [purchase] = await db
+      .select()
+      .from(studentPurchasedItems)
+      .where(and(
+        eq(studentPurchasedItems.studentId, studentId),
+        eq(studentPurchasedItems.itemId, itemId)
+      ));
+    return !!purchase;
+  } catch (error) {
+    console.error("[Database] Error checking item ownership:", error);
+    return false;
+  }
+}
+
+/**
+ * Comprar item da loja
+ */
+export async function purchaseShopItem(studentId: number, itemId: number): Promise<{ success: boolean; message: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, message: "Banco de dados não disponível" };
+
+  try {
+    // Verificar se o item existe e está ativo
+    const item = await getShopItemById(itemId);
+    if (!item) {
+      return { success: false, message: "Item não encontrado" };
+    }
+    if (!item.isActive) {
+      return { success: false, message: "Item não está disponível" };
+    }
+
+    // Verificar se já possui o item
+    const alreadyOwns = await studentOwnsItem(studentId, itemId);
+    if (alreadyOwns) {
+      return { success: false, message: "Você já possui este item" };
+    }
+
+    // Verificar pontos do aluno
+    const points = await getOrCreateStudentPoints(studentId);
+    if (!points || points.totalPoints < item.price) {
+      return { success: false, message: `Pontos insuficientes. Você tem ${points?.totalPoints || 0} pontos, mas precisa de ${item.price}` };
+    }
+
+    // Verificar faixa necessária
+    const BELT_ORDER = ['white', 'yellow', 'orange', 'green', 'blue', 'purple', 'brown', 'black'];
+    const studentBeltIndex = BELT_ORDER.indexOf(points.currentBelt || 'white');
+    const requiredBeltIndex = BELT_ORDER.indexOf(item.requiredBelt || 'white');
+    
+    if (studentBeltIndex < requiredBeltIndex) {
+      return { success: false, message: `Você precisa da faixa ${item.requiredBelt} para comprar este item` };
+    }
+
+    // Deduzir pontos
+    await db.update(studentPoints)
+      .set({ totalPoints: sql`${studentPoints.totalPoints} - ${item.price}` })
+      .where(eq(studentPoints.studentId, studentId));
+
+    // Registrar compra
+    await db.insert(studentPurchasedItems).values({
+      studentId,
+      itemId,
+    });
+
+    // Registrar no histórico de pontos
+    await db.insert(pointsHistory).values({
+      studentId,
+      points: -item.price,
+      activityType: 'shop_purchase',
+      reason: `Compra: ${item.name}`,
+      relatedId: itemId,
+    });
+
+    return { success: true, message: `Item "${item.name}" comprado com sucesso!` };
+  } catch (error) {
+    console.error("[Database] Error purchasing item:", error);
+    return { success: false, message: "Erro ao processar compra" };
+  }
+}
+
+/**
+ * Listar itens comprados pelo aluno
+ */
+export async function getStudentPurchasedItems(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const purchases = await db
+      .select({
+        purchaseId: studentPurchasedItems.id,
+        purchasedAt: studentPurchasedItems.purchasedAt,
+        item: shopItems,
+      })
+      .from(studentPurchasedItems)
+      .innerJoin(shopItems, eq(studentPurchasedItems.itemId, shopItems.id))
+      .where(eq(studentPurchasedItems.studentId, studentId))
+      .orderBy(desc(studentPurchasedItems.purchasedAt));
+
+    return purchases;
+  } catch (error) {
+    console.error("[Database] Error getting student purchases:", error);
+    return [];
+  }
+}
+
+/**
+ * Equipar item no avatar
+ */
+export async function equipItem(studentId: number, itemId: number): Promise<{ success: boolean; message: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, message: "Banco de dados não disponível" };
+
+  try {
+    // Verificar se possui o item
+    const owns = await studentOwnsItem(studentId, itemId);
+    if (!owns) {
+      return { success: false, message: "Você não possui este item" };
+    }
+
+    // Buscar detalhes do item
+    const item = await getShopItemById(itemId);
+    if (!item) {
+      return { success: false, message: "Item não encontrado" };
+    }
+
+    // Determinar o slot baseado na categoria
+    const slotMap: Record<string, string> = {
+      'hat': 'hat',
+      'glasses': 'glasses',
+      'accessory': 'accessory',
+      'background': 'background',
+      'special': 'accessory', // Itens especiais vão no slot de acessório
+    };
+    const slot = slotMap[item.category] || 'accessory';
+
+    // Remover item anterior do mesmo slot (se houver)
+    await db.delete(studentEquippedItems)
+      .where(and(
+        eq(studentEquippedItems.studentId, studentId),
+        eq(studentEquippedItems.slot, slot as any)
+      ));
+
+    // Equipar novo item
+    await db.insert(studentEquippedItems).values({
+      studentId,
+      itemId,
+      slot: slot as any,
+    });
+
+    return { success: true, message: `Item "${item.name}" equipado!` };
+  } catch (error) {
+    console.error("[Database] Error equipping item:", error);
+    return { success: false, message: "Erro ao equipar item" };
+  }
+}
+
+/**
+ * Desequipar item do avatar
+ */
+export async function unequipItem(studentId: number, slot: string): Promise<{ success: boolean; message: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, message: "Banco de dados não disponível" };
+
+  try {
+    await db.delete(studentEquippedItems)
+      .where(and(
+        eq(studentEquippedItems.studentId, studentId),
+        eq(studentEquippedItems.slot, slot as any)
+      ));
+
+    return { success: true, message: "Item removido" };
+  } catch (error) {
+    console.error("[Database] Error unequipping item:", error);
+    return { success: false, message: "Erro ao remover item" };
+  }
+}
+
+/**
+ * Listar itens equipados pelo aluno
+ */
+export async function getStudentEquippedItems(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const equipped = await db
+      .select({
+        slot: studentEquippedItems.slot,
+        equippedAt: studentEquippedItems.equippedAt,
+        item: shopItems,
+      })
+      .from(studentEquippedItems)
+      .innerJoin(shopItems, eq(studentEquippedItems.itemId, shopItems.id))
+      .where(eq(studentEquippedItems.studentId, studentId));
+
+    return equipped;
+  } catch (error) {
+    console.error("[Database] Error getting equipped items:", error);
+    return [];
+  }
+}
+
+/**
+ * Criar item na loja (admin)
+ */
+export async function createShopItem(data: InsertShopItem) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const result = await db.insert(shopItems).values(data);
+    return result;
+  } catch (error) {
+    console.error("[Database] Error creating shop item:", error);
+    throw error;
+  }
+}
+
+/**
+ * Atualizar item da loja (admin)
+ */
+export async function updateShopItem(itemId: number, data: Partial<InsertShopItem>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db.update(shopItems).set(data).where(eq(shopItems.id, itemId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error updating shop item:", error);
+    throw error;
+  }
+}
+
+/**
+ * Deletar item da loja (admin) - soft delete
+ */
+export async function deleteShopItem(itemId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db.update(shopItems).set({ isActive: false }).where(eq(shopItems.id, itemId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Error deleting shop item:", error);
+    throw error;
+  }
+}
+
+/**
+ * Seed inicial de itens da loja
+ */
+export async function seedShopItems() {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Verificar se já existem itens
+    const existingItems = await db.select().from(shopItems).limit(1);
+    if (existingItems.length > 0) {
+      console.log("[Database] Shop items already seeded");
+      return;
+    }
+
+    const initialItems: InsertShopItem[] = [
+      // Chapéus
+      { name: "Bandana Vermelha", description: "Uma bandana estilosa para treinos intensos", category: "hat", price: 50, requiredBelt: "white", sortOrder: 1 },
+      { name: "Faixa na Cabeça", description: "Faixa tradicional de karateca", category: "hat", price: 75, requiredBelt: "yellow", sortOrder: 2 },
+      { name: "Boné Esportivo", description: "Boné moderno para o dia a dia", category: "hat", price: 100, requiredBelt: "orange", sortOrder: 3 },
+      { name: "Chapéu Samurai", description: "Chapéu inspirado nos guerreiros samurais", category: "hat", price: 200, requiredBelt: "green", isRare: true, sortOrder: 4 },
+      { name: "Coroa de Campeão", description: "Para os verdadeiros mestres", category: "hat", price: 500, requiredBelt: "black", isRare: true, sortOrder: 5 },
+      
+      // Óculos
+      { name: "Óculos de Sol", description: "Óculos escuros estilosos", category: "glasses", price: 60, requiredBelt: "white", sortOrder: 10 },
+      { name: "Óculos Esportivos", description: "Proteção para treinos ao ar livre", category: "glasses", price: 90, requiredBelt: "yellow", sortOrder: 11 },
+      { name: "Óculos Ninja", description: "Visão aguçada como um ninja", category: "glasses", price: 150, requiredBelt: "blue", isRare: true, sortOrder: 12 },
+      
+      // Acessórios
+      { name: "Medalha de Bronze", description: "Primeira conquista", category: "accessory", price: 30, requiredBelt: "white", sortOrder: 20 },
+      { name: "Medalha de Prata", description: "Reconhecimento intermediário", category: "accessory", price: 80, requiredBelt: "green", sortOrder: 21 },
+      { name: "Medalha de Ouro", description: "Excelência comprovada", category: "accessory", price: 150, requiredBelt: "purple", sortOrder: 22 },
+      { name: "Troféu de Mestre", description: "O maior reconhecimento", category: "accessory", price: 300, requiredBelt: "brown", isRare: true, sortOrder: 23 },
+      { name: "Dragão Dourado", description: "Símbolo de poder supremo", category: "accessory", price: 1000, requiredBelt: "black", isRare: true, sortOrder: 24 },
+      
+      // Fundos
+      { name: "Dojo Tradicional", description: "Fundo de dojo japonês", category: "background", price: 100, requiredBelt: "yellow", sortOrder: 30 },
+      { name: "Montanha Sagrada", description: "Cenário de montanha ao amanhecer", category: "background", price: 150, requiredBelt: "green", sortOrder: 31 },
+      { name: "Templo Zen", description: "Ambiente de paz e concentração", category: "background", price: 200, requiredBelt: "blue", sortOrder: 32 },
+      { name: "Arena de Combate", description: "Palco para grandes batalhas", category: "background", price: 300, requiredBelt: "purple", isRare: true, sortOrder: 33 },
+      { name: "Céu Estrelado", description: "Treine sob as estrelas", category: "background", price: 400, requiredBelt: "brown", isRare: true, sortOrder: 34 },
+      
+      // Especiais
+      { name: "Aura de Fogo", description: "Efeito especial de chamas", category: "special", price: 500, requiredBelt: "purple", isRare: true, sortOrder: 40 },
+      { name: "Aura de Gelo", description: "Efeito especial de gelo", category: "special", price: 500, requiredBelt: "purple", isRare: true, sortOrder: 41 },
+      { name: "Aura Dourada", description: "Brilho de um verdadeiro mestre", category: "special", price: 800, requiredBelt: "black", isRare: true, sortOrder: 42 },
+    ];
+
+    await db.insert(shopItems).values(initialItems);
+    console.log("[Database] Shop items seeded successfully");
+  } catch (error) {
+    console.error("[Database] Error seeding shop items:", error);
   }
 }

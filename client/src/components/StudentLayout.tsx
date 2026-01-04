@@ -17,7 +17,8 @@ import {
   Menu,
   X,
   Lightbulb,
-  Award
+  Award,
+  ShoppingBag
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -66,6 +67,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "text-orange-600" },
     { icon: Lightbulb, label: "Revisão Inteligente", path: "/student-review", color: "text-indigo-600" },
     { icon: Award, label: "Histórico de Faixas", path: "/student/belt-history", color: "text-amber-600" },
+    { icon: ShoppingBag, label: "Loja do Dojo", path: "/student/shop", color: "text-pink-600" },
     { icon: Trophy, label: "Rankings", path: "/student-leaderboard", color: "text-yellow-600" },
     { icon: Bell, label: "Avisos", path: "/student-announcements", color: "text-red-600" },
   ];

@@ -9,6 +9,13 @@ export type KimonoColor = 'white' | 'blue' | 'red' | 'black';
 export type AvatarMood = 'idle' | 'happy' | 'excited' | 'proud' | 'focused';
 export type AvatarAnimation = 'none' | 'idle' | 'celebrate' | 'levelUp' | 'bow' | 'punch';
 
+// Tipos para itens equipados
+export type EquippedItem = {
+  slot: 'hat' | 'glasses' | 'accessory' | 'background';
+  name: string;
+  category: string;
+};
+
 interface KarateAvatarProProps {
   belt: BeltColor;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
@@ -24,6 +31,7 @@ interface KarateAvatarProProps {
   showParticles?: boolean;
   onClick?: () => void;
   onAnimationEnd?: () => void;
+  equippedItems?: EquippedItem[];
 }
 
 // Mapeamento de cores das faixas com gradientes
@@ -148,6 +156,7 @@ export const KarateAvatarPro: React.FC<KarateAvatarProProps> = ({
   showParticles = false,
   onClick,
   onAnimationEnd,
+  equippedItems = [],
 }) => {
   const [currentMood, setCurrentMood] = useState<AvatarMood>(mood);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -540,6 +549,127 @@ export const KarateAvatarPro: React.FC<KarateAvatarProProps> = ({
             <g filter="url(#glow)">
               <circle cx="60" cy="68" r="6" fill="gold" stroke="#B8860B" strokeWidth="1" />
               <text x="60" y="71" textAnchor="middle" fontSize="8" fill="#1F2937" fontWeight="bold">★</text>
+            </g>
+          )}
+
+          {/* Itens Equipados */}
+          {/* Chapéu */}
+          {equippedItems.find(i => i.slot === 'hat') && (
+            <g className="equipped-hat">
+              {/* Bandana */}
+              {equippedItems.find(i => i.slot === 'hat')?.name.includes('Bandana') && (
+                <>
+                  <path d="M 40 15 Q 60 10, 80 15 L 78 20 Q 60 16, 42 20 Z" fill="#DC2626" />
+                  <path d="M 78 18 L 90 25 Q 92 28, 88 30" fill="#DC2626" stroke="#B91C1C" strokeWidth="1" />
+                </>
+              )}
+              {/* Faixa na Cabeça */}
+              {equippedItems.find(i => i.slot === 'hat')?.name.includes('Faixa na') && (
+                <>
+                  <rect x="38" y="14" width="44" height="6" rx="1" fill="#FBBF24" stroke="#F59E0B" strokeWidth="1" />
+                  <circle cx="60" cy="17" r="3" fill="#F59E0B" />
+                </>
+              )}
+              {/* Boné */}
+              {equippedItems.find(i => i.slot === 'hat')?.name.includes('Boné') && (
+                <>
+                  <ellipse cx="60" cy="12" rx="22" ry="8" fill="#3B82F6" />
+                  <path d="M 38 12 L 30 18 Q 28 20, 32 20 L 40 16" fill="#3B82F6" stroke="#2563EB" strokeWidth="1" />
+                </>
+              )}
+              {/* Chapéu Samurai */}
+              {equippedItems.find(i => i.slot === 'hat')?.name.includes('Samurai') && (
+                <>
+                  <path d="M 30 18 Q 60 0, 90 18 L 85 22 Q 60 8, 35 22 Z" fill="#1F2937" stroke="#374151" strokeWidth="1" />
+                  <circle cx="60" cy="14" r="4" fill="#EF4444" />
+                </>
+              )}
+              {/* Coroa */}
+              {equippedItems.find(i => i.slot === 'hat')?.name.includes('Coroa') && (
+                <>
+                  <path d="M 42 18 L 45 5 L 52 12 L 60 2 L 68 12 L 75 5 L 78 18 Z" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1.5" />
+                  <circle cx="60" cy="8" r="3" fill="#EF4444" />
+                  <circle cx="48" cy="10" r="2" fill="#3B82F6" />
+                  <circle cx="72" cy="10" r="2" fill="#10B981" />
+                </>
+              )}
+            </g>
+          )}
+
+          {/* Óculos */}
+          {equippedItems.find(i => i.slot === 'glasses') && (
+            <g className="equipped-glasses">
+              {/* Óculos de Sol */}
+              {equippedItems.find(i => i.slot === 'glasses')?.name.includes('Sol') && (
+                <>
+                  <ellipse cx="50" cy="30" rx="8" ry="6" fill="#1F2937" stroke="#000" strokeWidth="1" />
+                  <ellipse cx="70" cy="30" rx="8" ry="6" fill="#1F2937" stroke="#000" strokeWidth="1" />
+                  <line x1="58" y1="30" x2="62" y2="30" stroke="#000" strokeWidth="2" />
+                  <line x1="42" y1="28" x2="38" y2="26" stroke="#000" strokeWidth="1.5" />
+                  <line x1="78" y1="28" x2="82" y2="26" stroke="#000" strokeWidth="1.5" />
+                </>
+              )}
+              {/* Óculos Esportivos */}
+              {equippedItems.find(i => i.slot === 'glasses')?.name.includes('Esportivos') && (
+                <>
+                  <rect x="42" y="26" width="16" height="10" rx="3" fill="#F97316" fillOpacity="0.6" stroke="#EA580C" strokeWidth="1.5" />
+                  <rect x="62" y="26" width="16" height="10" rx="3" fill="#F97316" fillOpacity="0.6" stroke="#EA580C" strokeWidth="1.5" />
+                  <line x1="58" y1="31" x2="62" y2="31" stroke="#EA580C" strokeWidth="2" />
+                </>
+              )}
+              {/* Óculos Ninja */}
+              {equippedItems.find(i => i.slot === 'glasses')?.name.includes('Ninja') && (
+                <>
+                  <rect x="38" y="26" width="44" height="10" rx="2" fill="#1F2937" fillOpacity="0.9" stroke="#374151" strokeWidth="1" />
+                  <line x1="50" y1="31" x2="70" y2="31" stroke="#EF4444" strokeWidth="2" />
+                </>
+              )}
+            </g>
+          )}
+
+          {/* Acessório (medalhas/troféus) */}
+          {equippedItems.find(i => i.slot === 'accessory') && (
+            <g className="equipped-accessory">
+              {/* Medalha de Bronze */}
+              {equippedItems.find(i => i.slot === 'accessory')?.name.includes('Bronze') && (
+                <>
+                  <path d="M 60 52 L 60 62" stroke="#F59E0B" strokeWidth="2" />
+                  <circle cx="60" cy="68" r="6" fill="#CD7F32" stroke="#8B4513" strokeWidth="1" />
+                  <text x="60" y="71" textAnchor="middle" fontSize="6" fill="#FFF" fontWeight="bold">3</text>
+                </>
+              )}
+              {/* Medalha de Prata */}
+              {equippedItems.find(i => i.slot === 'accessory')?.name.includes('Prata') && (
+                <>
+                  <path d="M 60 52 L 60 62" stroke="#9CA3AF" strokeWidth="2" />
+                  <circle cx="60" cy="68" r="6" fill="#C0C0C0" stroke="#6B7280" strokeWidth="1" />
+                  <text x="60" y="71" textAnchor="middle" fontSize="6" fill="#374151" fontWeight="bold">2</text>
+                </>
+              )}
+              {/* Medalha de Ouro */}
+              {equippedItems.find(i => i.slot === 'accessory')?.name.includes('Ouro') && (
+                <>
+                  <path d="M 60 52 L 60 62" stroke="#FCD34D" strokeWidth="2" />
+                  <circle cx="60" cy="68" r="7" fill="#FFD700" stroke="#B8860B" strokeWidth="1.5" filter="url(#glow)" />
+                  <text x="60" y="71" textAnchor="middle" fontSize="7" fill="#1F2937" fontWeight="bold">1</text>
+                </>
+              )}
+              {/* Troféu de Mestre */}
+              {equippedItems.find(i => i.slot === 'accessory')?.name.includes('Troféu') && (
+                <g transform="translate(52, 55)">
+                  <path d="M 8 0 L 2 4 L 2 8 L 14 8 L 14 4 Z" fill="#FFD700" stroke="#B8860B" strokeWidth="1" />
+                  <rect x="6" y="8" width="4" height="6" fill="#B8860B" />
+                  <rect x="4" y="14" width="8" height="3" fill="#FFD700" stroke="#B8860B" strokeWidth="0.5" />
+                </g>
+              )}
+              {/* Dragão Dourado */}
+              {equippedItems.find(i => i.slot === 'accessory')?.name.includes('Dragão') && (
+                <g transform="translate(48, 55)" filter="url(#glow)">
+                  <path d="M 12 0 Q 20 5, 18 12 Q 15 15, 12 12 Q 9 15, 6 12 Q 4 5, 12 0" fill="#FFD700" stroke="#B8860B" strokeWidth="1" />
+                  <circle cx="9" cy="6" r="1.5" fill="#EF4444" />
+                  <circle cx="15" cy="6" r="1.5" fill="#EF4444" />
+                </g>
+              )}
             </g>
           )}
         </svg>
