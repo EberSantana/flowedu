@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { cn } from '@/lib/utils';
 import { KarateAvatarPro, type BeltColor, type AvatarMood } from './KarateAvatarPro';
+import { Avatar3DDisplay } from './Avatar3DDisplay';
 import { Button } from '@/components/ui/button';
 import { 
   Sparkles, 
@@ -196,32 +197,17 @@ export const StudentDashboardHeader: React.FC<StudentDashboardHeaderProps> = ({
 
       <div className="relative p-6 lg:p-10">
         <div className="flex flex-col lg:flex-row gap-10 items-center lg:items-start">
-          {/* Seção do Avatar 3D */}
+          {/* Seção do Avatar 3D Realista */}
           <div className="flex flex-col items-center">
-            {/* Container do Avatar com efeitos aprimorados */}
-            <div className="relative group">
-              {/* Círculos decorativos de fundo */}
-              <div className={cn(
-                'absolute inset-0 rounded-full transition-all duration-700',
-                'group-hover:scale-110',
-                isMaxBelt && 'animate-black-belt-glow'
-              )} />
-              
-              {/* Avatar 3D Profissional */}
-              <KarateAvatarPro
-                belt={currentBelt}
-                size="2xl"
-                skinTone={skinTone}
-                hairStyle={hairStyle}
-                kimonoColor={kimonoColor}
-                mood={avatarMood}
-                animation="idle"
-                interactive
-                showGlow={true}
-                showParticles={isMaxBelt}
-                onClick={handleAvatarClick}
-              />
-            </div>
+            {/* Avatar 3D Realista em Alta Qualidade */}
+            <Avatar3DDisplay
+              belt={currentBelt}
+              gender="female"
+              size="2xl"
+              interactive
+              showGlow={true}
+              onClick={handleAvatarClick}
+            />
 
             {/* Badge da faixa aprimorado */}
             <div className={cn(

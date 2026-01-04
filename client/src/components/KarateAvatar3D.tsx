@@ -47,8 +47,8 @@ const SIZES = {
 
 // Mapeamento de imagens por gênero e faixa
 const getAvatarImage = (gender: Gender, belt: BeltColor): string => {
-  // Para faixas que não têm imagem feminina específica, usa masculina
-  const femaleAvailableBelts: BeltColor[] = ['white', 'blue', 'black'];
+  // Agora temos avatares femininos para todas as faixas
+  const femaleAvailableBelts: BeltColor[] = ['white', 'yellow', 'orange', 'green', 'blue', 'purple', 'brown', 'black'];
   
   if (gender === 'female' && femaleAvailableBelts.includes(belt)) {
     return `/avatars/3d/female_${belt}_belt.png`;
@@ -56,7 +56,7 @@ const getAvatarImage = (gender: Gender, belt: BeltColor): string => {
   
   // Default: usar imagem masculina
   return `/avatars/3d/male_${belt}_belt.png`;
-};
+}
 
 export const KarateAvatar3D: React.FC<KarateAvatar3DProps> = ({
   belt,

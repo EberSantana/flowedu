@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { KarateAvatar, BeltColor } from '@/components/KarateAvatar';
 import { Sparkles, Trophy, Star } from 'lucide-react';
+import { CelebrationAnimation } from './CelebrationAnimation';
 
 interface BeltUpgradeNotificationProps {
   oldBelt: BeltColor;
@@ -39,13 +40,13 @@ export function BeltUpgradeNotification({
   onClose,
 }: BeltUpgradeNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const isBlackBelt = newBelt === 'black';
 
   useEffect(() => {
     // Animação de entrada
     setTimeout(() => setIsVisible(true), 100);
-    setTimeout(() => setShowConfetti(true), 500);
+    setTimeout(() => setShowCelebration(true), 500);
 
     // Auto-fechar após 8 segundos
     const timer = setTimeout(() => {
@@ -87,32 +88,19 @@ export function BeltUpgradeNotification({
           `}
         >
           <CardContent className="p-8 relative overflow-hidden">
-            {/* Confetti animado */}
-            {showConfetti && (
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute animate-confetti"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: '-10px',
-                      animationDelay: `${Math.random() * 0.5}s`,
-                      animationDuration: `${2 + Math.random() * 2}s`,
-                    }}
-                  >
-                    {i % 3 === 0 ? '⭐' : i % 3 === 1 ? '✨' : '🎉'}
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Animação de celebração */}
+            <CelebrationAnimation
+              isActive={showCelebration}
+              type={isBlackBelt ? 'blackbelt' : 'levelup'}
+              onComplete={() => setShowCelebration(false)}
+            />
 
-            {/* Ícone de troféu */}
+            {/* Ícone de troféu com animação aprimorada */}
             <div className="flex justify-center mb-4">
               {isBlackBelt ? (
-                <div className="relative">
-                  <Trophy className="h-16 w-16 text-yellow-400 animate-bounce" />
-                  <Sparkles className="h-8 w-8 text-yellow-300 absolute -top-2 -right-2 animate-pulse" />
+                <div className="relative animate-bounce">
+                  <Trophy className="h-16 w-16 text-yellow-400" />
+                  <Sparkles className="h-8 w-8 text-yellow-300 absolute -top-2 -right-2 animate-spin" />
                 </div>
               ) : (
                 <Star className="h-16 w-16 text-orange-500 animate-pulse" />
