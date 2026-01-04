@@ -3719,3 +3719,26 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Integrar com sistema de pontos global existente
 - [x] Registrar rota no App.tsx
 - [x] Criar testes automatizados para gamificação por disciplina (12 testes)
+
+
+## Redesign Sistema de Avatares - Kimono (Gi) Sem Figura Humana
+
+### Avatar Baseado em Kimono
+- [x] Criar novo componente KimonoAvatar.tsx baseado apenas no uniforme (sem figura humana)
+- [x] Gerar imagens de kimonos com 8 faixas diferentes (branca, amarela, laranja, verde, azul, roxa, marrom, preta)
+- [x] Implementar sistema de cores de faixa integrado ao kimono
+- [x] Criar variações de tamanho (sm, md, lg, xl)
+
+### Loja de Customização de Kimonos
+- [x] Redesenhar loja focada em customização de kimonos
+- [x] Implementar opções de cores de kimono (branco, azul, preto)
+- [x] Adicionar opções de estilos (Tradicional, Moderno, Competição)
+- [x] Implementar emblemas/patches para o kimono
+- [x] Adicionar opções de bordados personalizados
+- [x] Sistema de desbloqueio por nível/pontos
+
+### Integração
+- [x] Atualizar StudentDashboardHeader para usar novo avatar de kimono
+- [x] Remover componentes antigos de avatar com figura humana
+- [x] Atualizar página de customização de avatar
+- [x] Testar integração com sistema de gamificação

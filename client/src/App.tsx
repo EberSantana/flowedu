@@ -57,6 +57,7 @@ import Avatar3DDemo from "./pages/Avatar3DDemo";
 import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
 import StudentShop from "./pages/StudentShop";
+import KimonoShop from "./pages/KimonoShop";
 import { SubjectGamificationDashboard } from "./pages/SubjectGamificationDashboard";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
@@ -107,6 +108,7 @@ function Router() {
         <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
         <Route path={"/student/shop"} component={StudentShop} />
+        <Route path={"/student/kimono-shop"} component={KimonoShop} />
         <Route path={"/avatar-test"} component={AvatarTest} />
         <Route path={"/avatar-3d-demo"} component={Avatar3DDemo} />
         <Route path={"/student/customize-avatar-3d"} component={CustomizeAvatar3D} />

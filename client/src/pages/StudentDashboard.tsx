@@ -19,6 +19,7 @@ import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
 
 // Novos componentes profissionais
 import { StudentDashboardHeader } from "@/components/StudentDashboardHeader";
+import { StudentDashboardHeaderKimono } from "@/components/StudentDashboardHeaderKimono";
 import { GamifiedStatsCards } from "@/components/GamifiedStatsCards";
 import { QuickActionsGrid } from "@/components/QuickActionsGrid";
 import { NextGoalsSection } from "@/components/NextGoalsSection";
@@ -82,15 +83,12 @@ export default function StudentDashboard() {
 
       <StudentLayout>
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-          {/* Header Profissional com Avatar */}
-          <StudentDashboardHeader
+          {/* Header Profissional com Avatar de Kimono */}
+          <StudentDashboardHeaderKimono
             studentName={student?.fullName || 'Aluno'}
             currentBelt={currentBelt}
             totalPoints={studentPoints}
             nextBeltThreshold={nextThreshold}
-            skinTone={avatarSkinTone}
-            hairStyle={avatarHairStyle}
-            kimonoColor={avatarKimonoColor}
             streak={0}
           />
 
