@@ -5,6 +5,7 @@
 - [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
 - [x] Corrigir sobreposição de botões "Trilhas de Aprendizagem" e "Estatísticas de PC" nos cards de disciplinas
 - [x] Padronizar página SubjectCTStats.tsx seguindo padrão UX (cards brancos com border-l-4, ícones circulares coloridos)
+- [x] Centralizar layout da página SubjectCTStats.tsx (aplicar container mx-auto com max-width)
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 
