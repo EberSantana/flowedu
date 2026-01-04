@@ -40,7 +40,7 @@ import StudentLearningPaths from "./pages/StudentLearningPaths";
 import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentGamification from "./pages/StudentGamification";
 import GamificationDashboard from "./pages/GamificationDashboard";
-import StudentComputationalThinking from "./pages/StudentComputationalThinking";
+
 import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
 import StudentExerciseResults from "./pages/StudentExerciseResults";
@@ -48,6 +48,7 @@ import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
 import TeacherReviewAnswers from "./pages/TeacherReviewAnswers";
 import { Leaderboard } from "./pages/Leaderboard";
 import { StudentLeaderboard } from "./pages/StudentLeaderboard";
+import StudentReview from "./pages/StudentReview";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -89,10 +90,11 @@ function Router() {
         <Route path={"/gamification-dashboard"} component={GamificationDashboard} />
         <Route path={"/leaderboard"} component={Leaderboard} />
         <Route path={"/student-leaderboard"} component={StudentLeaderboard} />
-        <Route path={"/student-computational-thinking"} component={StudentComputationalThinking} />
+
         <Route path={"/student-exercises"} component={StudentExercises} />
         <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
+        <Route path={"/student-review"} component={StudentReview} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />

@@ -3305,3 +3305,88 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Remover menu de navegação lateral (botões 1-10) que está atrapalhando o layout
 - [ ] Implementar validação de respostas abertas comparando com gabarito
 - [ ] Testar fluxo completo de resolução de exercícios com questões abertas
+
+
+## 📚 Sistema de Revisão Inteligente com Dicas Personalizadas
+
+### Backend e Banco de Dados
+- [ ] Criar tabela review_sessions para armazenar sessões de revisão
+- [ ] Criar função getWrongAnswers() para buscar questões erradas do aluno
+- [ ] Criar função generateStudyTips() usando IA para gerar dicas personalizadas
+- [ ] Criar função analyzeErrorPatterns() para identificar padrões de erro
+- [ ] Criar função markQuestionAsReviewed() para marcar questão como revisada
+- [ ] Criar função retakeQuestion() para permitir refazer questão
+
+### Rotas tRPC
+- [ ] studentReview.getWrongAnswers - listar questões erradas com filtros
+- [ ] studentReview.getStudyTips - obter dicas de estudo personalizadas
+- [ ] studentReview.getErrorPatterns - análise de padrões de erro
+- [ ] studentReview.markAsReviewed - marcar questão como revisada
+- [ ] studentReview.retakeQuestion - refazer questão específica
+- [ ] studentReview.getReviewStats - estatísticas de revisão
+
+### Interface do Aluno
+- [ ] Criar página StudentReview.tsx com listagem de questões erradas
+- [ ] Implementar filtros por disciplina, módulo, tipo de questão
+- [ ] Criar componente QuestionReviewCard com dicas de IA
+- [ ] Implementar modal de "Refazer Questão"
+- [ ] Criar seção de análise de padrões de erro
+- [ ] Adicionar indicador de progresso de revisão
+- [ ] Adicionar link "Revisão" no menu do Portal do Aluno
+
+### Funcionalidades de IA
+- [ ] Gerar dicas de estudo específicas para o erro cometido
+- [ ] Sugerir materiais complementares (vídeos, artigos, exercícios)
+- [ ] Identificar conceitos que precisam ser reforçados
+- [ ] Criar plano de estudos personalizado baseado nos erros
+
+### Testes
+- [ ] Criar testes automatizados para funções de revisão
+- [ ] Testar geração de dicas com IA
+- [ ] Validar análise de padrões de erro
+- [ ] Testar fluxo completo de revisão
+
+
+## 🎯 Pensamento Computacional por Disciplina + Redesign Portal do Aluno (30/12/2024)
+
+### Backend - Pensamento Computacional por Disciplina
+- [x] Adicionar campo `computationalThinkingEnabled` (boolean, default false) na tabela subjects
+- [x] Adicionar campo `subjectId` na tabela ct_exercises
+- [x] Adicionar campo `subjectId` na tabela ct_submissions
+- [x] Adicionar campo `subjectId` na tabela computational_thinking_scores
+- [x] Atualizar funções do db.ts para filtrar exercícios de PC por disciplina
+- [x] Atualizar rotas tRPC studentCT.* para trabalhar com disciplinas específicas
+- [x] Migrar dados existentes de PC (se houver) para vincular a disciplinas
+
+### Interface do Professor
+- [x] Adicionar toggle "Habilitar Pensamento Computacional" na aba de edição de disciplinas
+- [ ] Criar página de gerenciamento de exercícios de PC por disciplina (professor cria exercícios customizados)
+- [ ] Dashboard de acompanhamento de PC dos alunos por disciplina (gráficos e estatísticas)
+- [ ] Adicionar indicador visual nas disciplinas que têm PC habilitado
+
+### Redesign Clean do Portal do Aluno
+- [x] Simplificar menu lateral (remover Pensamento Computacional)
+- [x] Menu atual: Início, Minhas Disciplinas, Trilhas, Exercícios, Revisão, Rankings, Avisos
+- [ ] Redesign do Dashboard com foco em disciplinas e progresso (cards menores e mais objetivos)
+- [ ] Simplificar página de disciplinas (remover informações excessivas, focar no essencial)
+- [ ] Redesign da página de exercícios (mais direta e objetiva, menos gradientes)
+- [ ] Integrar PC dentro da visualização de disciplinas (não como página separada)
+- [ ] Integrar gamificação dentro da visualização de disciplinas (pontos e faixa por disciplina)
+- [ ] Reduzir gradientes e cores excessivas (paleta mais neutra: cinza, azul suave, verde suave)
+- [ ] Cards menores e mais informativos (menos padding, mais conteúdo)
+- [ ] Tipografia mais limpa e legível (sans-serif, tamanhos menores)
+- [ ] Remover animações excessivas (manter apenas hover suave)
+- [ ] Simplificar badges e ícones (menos cores, mais minimalista)
+
+### Integração de PC nas Disciplinas
+- [ ] Adicionar seção "Pensamento Computacional" na página de visualização da disciplina (apenas se habilitado)
+- [ ] Mostrar radar chart das 4 dimensões (Decomposição, Padrões, Abstração, Algoritmos)
+- [ ] Listar exercícios de PC disponíveis para aquela disciplina
+- [ ] Mostrar progresso e pontuação do aluno em PC naquela disciplina
+
+### Testes
+- [ ] Testar habilitação/desabilitação de PC por disciplina
+- [ ] Testar visualização do aluno (apenas disciplinas com PC habilitado)
+- [ ] Validar novo design do Portal do Aluno
+- [ ] Verificar responsividade mobile
+- [ ] Testar integração de PC dentro das disciplinas

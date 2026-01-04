@@ -115,6 +115,7 @@ export const subjects = mysqlTable("subjects", {
   googleDriveUrl: text("googleDriveUrl"), // URL da pasta do Google Drive
   googleClassroomUrl: text("googleClassroomUrl"), // URL da turma do Google Classroom
   workload: int("workload").default(60), // Carga horária total em horas
+  computationalThinkingEnabled: boolean("computationalThinkingEnabled").default(false).notNull(), // Habilitar avaliação de Pensamento Computacional
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -654,13 +655,14 @@ export type InsertGamificationNotification = typeof gamificationNotifications.$i
 export const computationalThinkingScores = mysqlTable("computational_thinking_scores", {
   id: int("id").autoincrement().primaryKey(),
   studentId: int("studentId").notNull(), // FK para students
+  subjectId: int("subjectId").notNull(), // FK para subjects
   dimension: mysqlEnum("dimension", ["decomposition", "pattern_recognition", "abstraction", "algorithms"]).notNull(),
   score: int("score").default(0).notNull(), // Pontuação de 0-100
   exercisesCompleted: int("exercisesCompleted").default(0).notNull(), // Quantidade de exercícios completados
   lastUpdated: timestamp("lastUpdated").defaultNow().onUpdateNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, (table) => ({
-  uniqueStudentDimension: unique().on(table.studentId, table.dimension), // Um registro por aluno por dimensão
+  uniqueStudentSubjectDimension: unique().on(table.studentId, table.subjectId, table.dimension), // Um registro por aluno por disciplina por dimensão
 }));
 
 export type ComputationalThinkingScore = typeof computationalThinkingScores.$inferSelect;
@@ -672,6 +674,7 @@ export type InsertComputationalThinkingScore = typeof computationalThinkingScore
  */
 export const ctExercises = mysqlTable("ct_exercises", {
   id: int("id").autoincrement().primaryKey(),
+  subjectId: int("subjectId").notNull(), // FK para subjects
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description").notNull(),
   dimension: mysqlEnum("dimension", ["decomposition", "pattern_recognition", "abstraction", "algorithms"]).notNull(),
@@ -695,6 +698,7 @@ export type InsertCTExercise = typeof ctExercises.$inferInsert;
 export const ctSubmissions = mysqlTable("ct_submissions", {
   id: int("id").autoincrement().primaryKey(),
   studentId: int("studentId").notNull(), // FK para students
+  subjectId: int("subjectId").notNull(), // FK para subjects
   exerciseId: int("exerciseId").notNull(), // FK para ct_exercises
   answer: text("answer").notNull(), // Resposta do aluno
   score: int("score").notNull(), // Pontuação obtida (0-100)
@@ -887,3 +891,22 @@ export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
 
 export type StudentExerciseAnswer = typeof studentExerciseAnswers.$inferSelect;
 export type InsertStudentExerciseAnswer = typeof studentExerciseAnswers.$inferInsert;
+
+/**
+ * Sessões de revisão de questões erradas
+ */
+export const reviewSessions = mysqlTable("review_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  subjectId: int("subjectId"),
+  moduleId: int("moduleId"),
+  totalQuestionsReviewed: int("totalQuestionsReviewed").default(0).notNull(),
+  questionsRetaken: int("questionsRetaken").default(0).notNull(),
+  improvementRate: int("improvementRate").default(0).notNull(), // Porcentagem de melhoria após revisão
+  sessionDuration: int("sessionDuration").default(0).notNull(), // Duração em minutos
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReviewSession = typeof reviewSessions.$inferSelect;
+export type InsertReviewSession = typeof reviewSessions.$inferInsert;

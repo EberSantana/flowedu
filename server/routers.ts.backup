@@ -3810,33 +3810,26 @@ JSON (descrições MAX 15 chars):
 
   // ==================== PENSAMENTO COMPUTACIONAL ====================
   computationalThinking: router({
-    // Buscar perfil de PC do aluno (4 dimensões) por disciplina
+    // Buscar perfil de PC do aluno (4 dimensões)
     getProfile: studentProcedure
-      .input(z.object({
-        subjectId: z.number(),
-      }))
-      .query(async ({ ctx, input }) => {
-        const profile = await db.getStudentCTProfile(ctx.studentSession.studentId, input.subjectId);
+      .query(async ({ ctx }) => {
+        const profile = await db.getStudentCTProfile(ctx.studentSession.studentId);
         return profile;
       }),
 
-    // Buscar média da turma (para professor) por disciplina
+    // Buscar média da turma (para professor)
     getClassAverage: protectedProcedure
-      .input(z.object({
-        subjectId: z.number(),
-      }))
-      .query(async ({ ctx, input }) => {
-        const average = await db.getClassCTAverage(ctx.user.id, input.subjectId);
+      .query(async ({ ctx }) => {
+        const average = await db.getClassCTAverage(ctx.user.id);
         return average;
       }),
 
-    // Buscar exercícios disponíveis por disciplina
+    // Buscar exercícios disponíveis
     getExercises: studentProcedure
       .input(z.object({
-        subjectId: z.number(),
         dimension: z.enum(['decomposition', 'pattern_recognition', 'abstraction', 'algorithms']).optional(),
         difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
-      }))
+      }).optional())
       .query(async ({ input }) => {
         const exercises = await db.getCTExercises(input);
         return exercises;
@@ -3845,14 +3838,13 @@ JSON (descrições MAX 15 chars):
     // Submeter resposta de exercício
     submitExercise: studentProcedure
       .input(z.object({
-        subjectId: z.number(),
         exerciseId: z.number(),
         answer: z.string(),
         timeSpent: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         // Buscar exercício
-        const exercises = await db.getCTExercises({ subjectId: input.subjectId });
+        const exercises = await db.getCTExercises();
         const exercise = exercises.find(e => e.id === input.exerciseId);
         
         if (!exercise) {
@@ -3870,7 +3862,6 @@ JSON (descrições MAX 15 chars):
         // Submeter exercício
         await db.submitCTExercise({
           studentId: ctx.studentSession.studentId,
-          subjectId: input.subjectId,
           exerciseId: input.exerciseId,
           answer: input.answer,
           score: analysis.score,
@@ -3879,7 +3870,7 @@ JSON (descrições MAX 15 chars):
         });
 
         // Verificar e conceder badges automaticamente
-        await db.checkAndAwardCTBadges(ctx.studentSession.studentId, input.subjectId);
+        await db.checkAndAwardCTBadges(ctx.studentSession.studentId);
 
         return {
           score: analysis.score,
@@ -3912,10 +3903,9 @@ JSON (descrições MAX 15 chars):
         return badges;
       }),
 
-    // [PROFESSOR] Criar exercício de PC para uma disciplina
+    // [PROFESSOR] Criar exercício de PC
     createExercise: protectedProcedure
       .input(z.object({
-        subjectId: z.number(),
         title: z.string(),
         description: z.string(),
         dimension: z.enum(['decomposition', 'pattern_recognition', 'abstraction', 'algorithms']),
@@ -3932,19 +3922,16 @@ JSON (descrições MAX 15 chars):
         return { success: true, exerciseId: result };
       }),
 
-    // [PROFESSOR] Buscar estatísticas da turma por disciplina
+    // [PROFESSOR] Buscar estatísticas da turma
     getClassStats: protectedProcedure
-      .input(z.object({
-        subjectId: z.number(),
-      }))
-      .query(async ({ ctx, input }) => {
+      .query(async ({ ctx }) => {
         // Buscar todos os alunos do professor
         const teacherStudents = await db.getStudentsByUser(ctx.user.id);
         
-        // Buscar perfil de cada aluno para a disciplina específica
+        // Buscar perfil de cada aluno
         const profiles = await Promise.all(
           teacherStudents.map(async (student: any) => {
-            const profile = await db.getStudentCTProfile(student.id, input.subjectId);
+            const profile = await db.getStudentCTProfile(student.id);
             return {
               studentId: student.id,
               studentName: student.name,
@@ -3953,8 +3940,8 @@ JSON (descrições MAX 15 chars):
           })
         );
 
-        // Calcular média da turma para a disciplina
-        const average = await db.getClassCTAverage(ctx.user.id, input.subjectId);
+        // Calcular média da turma
+        const average = await db.getClassCTAverage(ctx.user.id);
 
         return {
           students: profiles,
@@ -4306,6 +4293,122 @@ JSON (descrições MAX 15 chars):
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
   studentReview: router({
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. O aluno conseguiu identificar as partes principais do problema?
+2. A divisão proposta é lógica e facilita a resolução?
+3. As partes são independentes e bem definidas?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    pattern_recognition: `Você está avaliando a habilidade de RECONHECIMENTO DE PADRÕES.
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. O aluno identificou padrões ou repetições?
+2. Os padrões identificados são relevantes?
+3. A explicação é clara?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    abstraction: `Você está avaliando a habilidade de ABSTRAÇÃO (focar no essencial, ignorar detalhes irrelevantes).
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. O aluno focou nos aspectos essenciais?
+2. Detalhes irrelevantes foram ignorados?
+3. A abstração facilita o entendimento?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    algorithms: `Você está avaliando a habilidade de criar ALGORITMOS (sequência lógica de passos).
+
+Questão: ${question}
+
+Resposta esperada: ${expectedAnswer}
+
+Resposta do aluno: ${answer}
+
+Avalie a resposta considerando:
+1. Os passos estão em ordem lógica?
+2. A sequência é completa e resolve o problema?
+3. Os passos são claros e executáveis?
+
+Retorne um JSON com:
+- score: número de 0 a 100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+  };
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: 'system', content: 'Você é um avaliador de Pensamento Computacional. Seja justo e construtivo.' },
+        { role: 'user', content: prompts[dimension] || prompts.decomposition },
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'ct_evaluation',
+          strict: true,
+          schema: {
+            type: 'object',
+            properties: {
+              score: { type: 'integer', description: 'Pontuação de 0 a 100' },
+              feedback: { type: 'string', description: 'Feedback construtivo' },
+            },
+            required: ['score', 'feedback'],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content || typeof content !== 'string') {
+      throw new Error('Resposta vazia da IA');
+    }
+
+    const result = JSON.parse(content);
+    return {
+      score: Math.min(100, Math.max(0, result.score)),
+      feedback: result.feedback,
+    };
+  } catch (error) {
+    console.error('[CT Analysis] Error analyzing answer:', error);
+    // Fallback: pontuação baseada em comprimento da resposta
+    const score = Math.min(100, Math.max(20, answer.length * 2));
+    return {
+      score,
+      feedback: 'Resposta recebida. Continue praticando!',
+    };
+  }
+}
+
+
+  // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
+  studentReview: router({
     // Listar questões erradas com filtros
     getWrongAnswers: studentProcedure
       .input(
@@ -4488,141 +4591,3 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
 });
 
 export type AppRouter = typeof appRouter;
-// ==================== FUNÇÕES AUXILIARES ====================
-
-/**
- * Analisar resposta de exercício de PC usando IA
- */
-async function analyzeCTAnswer(params: {
-  dimension: string;
-  question: string;
-  answer: string;
-  expectedAnswer: string;
-}) {
-  const { dimension, question, answer, expectedAnswer } = params;
-
-  // Mapear dimensões para português
-  const dimensionNames: Record<string, string> = {
-    decomposition: 'Decomposição',
-    pattern_recognition: 'Reconhecimento de Padrões',
-    abstraction: 'Abstração',
-    algorithms: 'Algoritmos',
-  };
-
-  const dimensionName = dimensionNames[dimension] || dimension;
-
-  // Prompt específico para cada dimensão
-  const prompts: Record<string, string> = {
-    decomposition: `Você está avaliando a habilidade de DECOMPOSIÇÃO (dividir problemas complexos em partes menores).
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno conseguiu identificar as partes principais do problema?
-2. A divisão proposta é lógica e facilita a resolução?
-3. As partes são independentes e bem definidas?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-
-    pattern_recognition: `Você está avaliando a habilidade de RECONHECIMENTO DE PADRÕES.
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno identificou padrões ou repetições?
-2. Os padrões identificados são relevantes?
-3. A explicação é clara?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-
-    abstraction: `Você está avaliando a habilidade de ABSTRAÇÃO (focar no essencial, ignorar detalhes irrelevantes).
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno focou nos aspectos essenciais?
-2. Detalhes irrelevantes foram ignorados?
-3. A abstração facilita o entendimento?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-
-    algorithms: `Você está avaliando a habilidade de criar ALGORITMOS (sequência lógica de passos).
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. Os passos estão em ordem lógica?
-2. A sequência é completa e resolve o problema?
-3. Os passos são claros e executáveis?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-  };
-
-  try {
-    const response = await invokeLLM({
-      messages: [
-        { role: 'system', content: 'Você é um avaliador de Pensamento Computacional. Seja justo e construtivo.' },
-        { role: 'user', content: prompts[dimension] || prompts.decomposition },
-      ],
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'ct_evaluation',
-          strict: true,
-          schema: {
-            type: 'object',
-            properties: {
-              score: { type: 'integer', description: 'Pontuação de 0 a 100' },
-              feedback: { type: 'string', description: 'Feedback construtivo' },
-            },
-            required: ['score', 'feedback'],
-            additionalProperties: false,
-          },
-        },
-      },
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content || typeof content !== 'string') {
-      throw new Error('Resposta vazia da IA');
-    }
-
-    const result = JSON.parse(content);
-    return {
-      score: Math.min(100, Math.max(0, result.score)),
-      feedback: result.feedback,
-    };
-  } catch (error) {
-    console.error('[CT Analysis] Error analyzing answer:', error);
-    // Fallback: pontuação baseada em comprimento da resposta
-    const score = Math.min(100, Math.max(20, answer.length * 2));
-    return {
-      score,
-      feedback: 'Resposta recebida. Continue praticando!',
-    };
-  }
-}

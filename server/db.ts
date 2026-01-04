@@ -60,6 +60,7 @@ import {
   studentExercises,
   studentExerciseAttempts,
   studentExerciseAnswers,
+  reviewSessions,
   InsertStudentExercise,
   InsertStudentExerciseAttempt,
   InsertStudentExerciseAnswer
@@ -2908,7 +2909,7 @@ export async function getPointsEvolutionData() {
 /**
  * Criar ou atualizar pontuação de uma dimensão do PC
  */
-export async function updateCTScore(studentId: number, dimension: string, scoreToAdd: number) {
+export async function updateCTScore(studentId: number, subjectId: number, dimension: string, scoreToAdd: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -2919,6 +2920,7 @@ export async function updateCTScore(studentId: number, dimension: string, scoreT
       .where(
         and(
           eq(computationalThinkingScores.studentId, studentId),
+          eq(computationalThinkingScores.subjectId, subjectId),
           eq(computationalThinkingScores.dimension, dimension as any)
         )
       )
@@ -2944,6 +2946,7 @@ export async function updateCTScore(studentId: number, dimension: string, scoreT
       // Criar novo registro
       await db.insert(computationalThinkingScores).values({
         studentId,
+        subjectId,
         dimension: dimension as any,
         score: Math.min(100, scoreToAdd),
         exercisesCompleted: 1,
@@ -2958,9 +2961,9 @@ export async function updateCTScore(studentId: number, dimension: string, scoreT
 }
 
 /**
- * Buscar perfil completo de PC do aluno (4 dimensões)
+ * Buscar perfil completo de PC do aluno (4 dimensões) por disciplina
  */
-export async function getStudentCTProfile(studentId: number) {
+export async function getStudentCTProfile(studentId: number, subjectId: number) {
   const db = await getDb();
   if (!db) return null;
   
@@ -2968,7 +2971,12 @@ export async function getStudentCTProfile(studentId: number) {
     const scores = await db
       .select()
       .from(computationalThinkingScores)
-      .where(eq(computationalThinkingScores.studentId, studentId));
+      .where(
+        and(
+          eq(computationalThinkingScores.studentId, studentId),
+          eq(computationalThinkingScores.subjectId, subjectId)
+        )
+      );
 
     // Garantir que todas as 4 dimensões existam (mesmo com score 0)
     const dimensions = ['decomposition', 'pattern_recognition', 'abstraction', 'algorithms'];
@@ -2995,9 +3003,9 @@ export async function getStudentCTProfile(studentId: number) {
 }
 
 /**
- * Buscar média da turma em cada dimensão
+ * Buscar média da turma em cada dimensão por disciplina
  */
-export async function getClassCTAverage(userId: number) {
+export async function getClassCTAverage(userId: number, subjectId: number) {
   const db = await getDb();
   if (!db) return { decomposition: 0, pattern_recognition: 0, abstraction: 0, algorithms: 0 };
   
@@ -3019,11 +3027,16 @@ export async function getClassCTAverage(userId: number) {
 
     const studentIds = teacherStudents.map(s => s.id);
 
-    // Buscar todas as pontuações
+    // Buscar todas as pontuações da disciplina específica
     const allScores = await db
       .select()
       .from(computationalThinkingScores)
-      .where(inArray(computationalThinkingScores.studentId, studentIds));
+      .where(
+        and(
+          inArray(computationalThinkingScores.studentId, studentIds),
+          eq(computationalThinkingScores.subjectId, subjectId)
+        )
+      );
 
     // Calcular média por dimensão
     const dimensions = ['decomposition', 'pattern_recognition', 'abstraction', 'algorithms'];
@@ -3051,6 +3064,7 @@ export async function getClassCTAverage(userId: number) {
  * Criar exercício de PC
  */
 export async function createCTExercise(data: {
+  subjectId: number;
   title: string;
   description: string;
   dimension: string;
@@ -3080,6 +3094,7 @@ export async function createCTExercise(data: {
  * Buscar exercícios de PC (com filtros opcionais)
  */
 export async function getCTExercises(filters?: {
+  subjectId?: number;
   dimension?: string;
   difficulty?: string;
   createdBy?: number;
@@ -3106,6 +3121,7 @@ export async function getCTExercises(filters?: {
  */
 export async function submitCTExercise(data: {
   studentId: number;
+  subjectId: number;
   exerciseId: number;
   answer: string;
   score: number;
@@ -3128,7 +3144,7 @@ export async function submitCTExercise(data: {
 
     if (exercise.length > 0) {
       // Atualizar pontuação da dimensão
-      await updateCTScore(data.studentId, exercise[0].dimension, data.score);
+      await updateCTScore(data.studentId, data.subjectId, exercise[0].dimension, data.score);
     }
 
     return { success: true };
@@ -3270,9 +3286,9 @@ export async function getAllCTBadges() {
 /**
  * Verificar e conceder badges automaticamente baseado nas pontuações
  */
-export async function checkAndAwardCTBadges(studentId: number) {
+export async function checkAndAwardCTBadges(studentId: number, subjectId: number) {
   try {
-    const profile = await getStudentCTProfile(studentId);
+    const profile = await getStudentCTProfile(studentId, subjectId);
     const allBadges = await getAllCTBadges();
     const studentBadges = await getStudentCTBadges(studentId);
     const studentBadgeIds = studentBadges.map(b => b.badgeId);
@@ -4559,5 +4575,285 @@ export async function getStudentRankHistory(studentId: number, subjectId: number
   } catch (error) {
     console.error("[Database] Error getting rank history:", error);
     return [];
+  }
+}
+
+// ==================== REVIEW SYSTEM ====================
+
+/**
+ * Buscar questões erradas de um aluno com filtros
+ */
+export async function getWrongAnswers(
+  studentId: number,
+  filters?: {
+    subjectId?: number;
+    moduleId?: number;
+    questionType?: string;
+    limit?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Aplicar filtros opcionais
+    const conditions = [
+      eq(studentExerciseAttempts.studentId, studentId),
+      eq(studentExerciseAnswers.isCorrect, false),
+    ];
+
+    if (filters?.subjectId) {
+      conditions.push(eq(studentExercises.subjectId, filters.subjectId));
+    }
+
+    if (filters?.moduleId) {
+      conditions.push(eq(studentExercises.moduleId, filters.moduleId));
+    }
+
+    if (filters?.questionType) {
+      conditions.push(eq(studentExerciseAnswers.questionType, filters.questionType));
+    }
+
+    const results = await db
+      .select({
+        id: studentExerciseAnswers.id,
+        attemptId: studentExerciseAnswers.attemptId,
+        questionNumber: studentExerciseAnswers.questionNumber,
+        questionType: studentExerciseAnswers.questionType,
+        studentAnswer: studentExerciseAnswers.studentAnswer,
+        correctAnswer: studentExerciseAnswers.correctAnswer,
+        isCorrect: studentExerciseAnswers.isCorrect,
+        pointsAwarded: studentExerciseAnswers.pointsAwarded,
+        aiFeedback: studentExerciseAnswers.aiFeedback,
+        studyTips: studentExerciseAnswers.studyTips,
+        aiScore: studentExerciseAnswers.aiScore,
+        aiConfidence: studentExerciseAnswers.aiConfidence,
+        aiAnalysis: studentExerciseAnswers.aiAnalysis,
+        createdAt: studentExerciseAnswers.createdAt,
+        exerciseId: studentExerciseAttempts.exerciseId,
+        subjectId: studentExercises.subjectId,
+        moduleId: studentExercises.moduleId,
+        exerciseTitle: studentExercises.title,
+      })
+      .from(studentExerciseAnswers)
+      .innerJoin(
+        studentExerciseAttempts,
+        eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+      )
+      .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+      .where(and(...conditions))
+      .orderBy(desc(studentExerciseAnswers.createdAt))
+      .limit(filters?.limit || 50);
+
+    return results;
+  } catch (error) {
+    console.error("[Database] Error getting wrong answers:", error);
+    return [];
+  }
+}
+
+/**
+ * Analisar padrões de erro de um aluno
+ */
+export async function analyzeErrorPatterns(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const conditions = [
+      eq(studentExerciseAttempts.studentId, studentId),
+      eq(studentExerciseAnswers.isCorrect, false),
+    ];
+
+    if (subjectId) {
+      conditions.push(eq(studentExercises.subjectId, subjectId));
+    }
+
+    // Erros por tipo de questão
+    const errorsByType = await db
+      .select({
+        questionType: studentExerciseAnswers.questionType,
+        count: sql<number>`COUNT(*)`.as("count"),
+      })
+      .from(studentExerciseAnswers)
+      .innerJoin(
+        studentExerciseAttempts,
+        eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+      )
+      .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+      .where(and(...conditions))
+      .groupBy(studentExerciseAnswers.questionType);
+
+    // Erros por módulo
+    const errorsByModule = await db
+      .select({
+        moduleId: studentExercises.moduleId,
+        moduleName: learningModules.title,
+        count: sql<number>`COUNT(*)`.as("count"),
+      })
+      .from(studentExerciseAnswers)
+      .innerJoin(
+        studentExerciseAttempts,
+        eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+      )
+      .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+      .leftJoin(learningModules, eq(studentExercises.moduleId, learningModules.id))
+      .where(
+        and(...conditions)
+      )
+      .groupBy(studentExercises.moduleId, learningModules.title)
+      .orderBy(desc(sql`COUNT(*)`))
+      .limit(5);
+
+    // Taxa de erro geral
+    const totalAnswers = await db
+      .select({
+        count: sql<number>`COUNT(*)`.as("count"),
+      })
+      .from(studentExerciseAnswers)
+      .innerJoin(
+        studentExerciseAttempts,
+        eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+      )
+      .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+      .where(
+        subjectId
+          ? and(
+              eq(studentExerciseAttempts.studentId, studentId),
+              eq(studentExercises.subjectId, subjectId)
+            )
+          : eq(studentExerciseAttempts.studentId, studentId)
+      );
+
+    const wrongAnswers = await db
+      .select({
+        count: sql<number>`COUNT(*)`.as("count"),
+      })
+      .from(studentExerciseAnswers)
+      .innerJoin(
+        studentExerciseAttempts,
+        eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+      )
+      .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+      .where(and(...conditions));
+
+    const errorRate =
+      totalAnswers[0]?.count > 0
+        ? Math.round((wrongAnswers[0]?.count / totalAnswers[0]?.count) * 100)
+        : 0;
+
+    return {
+      errorsByType,
+      errorsByModule,
+      errorRate,
+      totalErrors: wrongAnswers[0]?.count || 0,
+      totalAnswers: totalAnswers[0]?.count || 0,
+    };
+  } catch (error) {
+    console.error("[Database] Error analyzing error patterns:", error);
+    return {
+      errorsByType: [],
+      errorsByModule: [],
+      errorRate: 0,
+      totalErrors: 0,
+      totalAnswers: 0,
+    };
+  }
+}
+
+/**
+ * Marcar questão como revisada
+ */
+export async function markQuestionAsReviewed(answerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Adicionar campo 'reviewed' na tabela se ainda não existir
+    // Por enquanto, vamos usar o campo studyTips para indicar que foi revisada
+    await db
+      .update(studentExerciseAnswers)
+      .set({
+        studyTips: sql`CONCAT(COALESCE(${studentExerciseAnswers.studyTips}, ''), '\n[REVISADA]')`,
+      })
+      .where(eq(studentExerciseAnswers.id, answerId));
+
+    return true;
+  } catch (error) {
+    console.error("[Database] Error marking question as reviewed:", error);
+    return false;
+  }
+}
+
+/**
+ * Criar sessão de revisão
+ */
+export async function createReviewSession(data: {
+  studentId: number;
+  subjectId?: number;
+  moduleId?: number;
+  totalQuestionsReviewed: number;
+  sessionDuration: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const result = await db.insert(reviewSessions).values(data);
+    return result[0].insertId;
+  } catch (error) {
+    console.error("[Database] Error creating review session:", error);
+    throw error;
+  }
+}
+
+/**
+ * Obter estatísticas de revisão de um aluno
+ */
+export async function getReviewStats(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const conditions = subjectId
+      ? and(
+          eq(reviewSessions.studentId, studentId),
+          eq(reviewSessions.subjectId, subjectId)
+        )
+      : eq(reviewSessions.studentId, studentId);
+
+    const stats = await db
+      .select({
+        totalSessions: sql<number>`COUNT(*)`.as("totalSessions"),
+        totalQuestionsReviewed: sql<number>`SUM(${reviewSessions.totalQuestionsReviewed})`.as(
+          "totalQuestionsReviewed"
+        ),
+        totalQuestionsRetaken: sql<number>`SUM(${reviewSessions.questionsRetaken})`.as(
+          "totalQuestionsRetaken"
+        ),
+        avgImprovementRate: sql<number>`AVG(${reviewSessions.improvementRate})`.as(
+          "avgImprovementRate"
+        ),
+        totalStudyTime: sql<number>`SUM(${reviewSessions.sessionDuration})`.as("totalStudyTime"),
+      })
+      .from(reviewSessions)
+      .where(conditions);
+
+    return stats[0] || {
+      totalSessions: 0,
+      totalQuestionsReviewed: 0,
+      totalQuestionsRetaken: 0,
+      avgImprovementRate: 0,
+      totalStudyTime: 0,
+    };
+  } catch (error) {
+    console.error("[Database] Error getting review stats:", error);
+    return {
+      totalSessions: 0,
+      totalQuestionsReviewed: 0,
+      totalQuestionsRetaken: 0,
+      avgImprovementRate: 0,
+      totalStudyTime: 0,
+    };
   }
 }

@@ -34,6 +34,7 @@ export default function Subjects() {
     complementaryBibliography: "",
     googleDriveUrl: "",
     googleClassroomUrl: "",
+    computationalThinkingEnabled: false,
   });
   const [showCoursePlan, setShowCoursePlan] = useState(false);
   const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
@@ -192,7 +193,8 @@ export default function Subjects() {
     setFormData({ 
       name: "", 
       code: "", 
-      description: "", 
+      description: "",
+      computationalThinkingEnabled: false, 
       color: "#3b82f6",
       ementa: "",
       generalObjective: "",
@@ -225,6 +227,7 @@ export default function Subjects() {
       complementaryBibliography: formData.complementaryBibliography || undefined,
       googleDriveUrl: formData.googleDriveUrl || undefined,
       googleClassroomUrl: formData.googleClassroomUrl || undefined,
+      computationalThinkingEnabled: formData.computationalThinkingEnabled,
     };
     
     if (editingSubject) {
@@ -267,6 +270,7 @@ export default function Subjects() {
       complementaryBibliography: subject.complementaryBibliography || "",
       googleDriveUrl: subject.googleDriveUrl || "",
       googleClassroomUrl: subject.googleClassroomUrl || "",
+      computationalThinkingEnabled: subject.computationalThinkingEnabled || false,
     });
     setIsDialogOpen(true);
   };
@@ -559,6 +563,25 @@ export default function Subjects() {
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                       placeholder="#3b82f6"
                     />
+                  </div>
+                </div>
+                
+                {/* Toggle de Pensamento Computacional */}
+                <div className="flex items-center space-x-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <Checkbox
+                    id="computationalThinking"
+                    checked={formData.computationalThinkingEnabled}
+                    onCheckedChange={(checked) => 
+                      setFormData({ ...formData, computationalThinkingEnabled: checked as boolean })
+                    }
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="computationalThinking" className="text-sm font-medium cursor-pointer">
+                      Habilitar Pensamento Computacional
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Ative para permitir exercícios de PC nesta disciplina (Decomposição, Padrões, Abstração, Algoritmos)
+                    </p>
                   </div>
                 </div>
                 </TabsContent>
