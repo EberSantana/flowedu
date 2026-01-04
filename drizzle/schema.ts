@@ -466,6 +466,7 @@ export const students = mysqlTable("students", {
   avatarHeadAccessory: varchar("avatarHeadAccessory", { length: 20 }).default("none"), // Acessório de cabeça (none, bandana, headband, cap, glasses)
   avatarExpression: varchar("avatarExpression", { length: 20 }).default("neutral"), // Expressão facial (neutral, happy, determined, focused, victorious)
   avatarPose: varchar("avatarPose", { length: 20 }).default("standing"), // Pose (standing, fighting, punch, kick)
+  specialKimono: varchar("specialKimono", { length: 30 }).default("none"), // Kimono especial desbloqueável (none, golden, silver, patterned_dragon, patterned_tiger, patterned_sakura)
   avatarAccessories: text("avatarAccessories"), // JSON com acessórios desbloqueados
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

@@ -176,6 +176,13 @@
       "when": 1767564729255,
       "tag": "0024_chemical_wiccan",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1767570626246,
+      "tag": "0025_happy_celestials",
+      "breakpoints": true
     }
   ]
 }

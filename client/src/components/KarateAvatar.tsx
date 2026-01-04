@@ -5,7 +5,8 @@ export type BeltColor = 'white' | 'yellow' | 'orange' | 'green' | 'blue' | 'purp
 
 export type SkinTone = 'light' | 'medium' | 'tan' | 'dark' | 'darker' | 'darkest';
 export type HairStyle = 'short' | 'medium' | 'long' | 'bald' | 'ponytail';
-export type KimonoColor = 'white' | 'blue' | 'red' | 'black';
+export type KimonoColor = 'white' | 'blue' | 'red' | 'black' | 'gold' | 'silver';
+export type SpecialPattern = 'dragon' | 'tiger' | 'sakura';
 
 interface KarateAvatarProps {
   belt: BeltColor;
@@ -15,6 +16,9 @@ interface KarateAvatarProps {
   skinTone?: SkinTone;
   hairStyle?: HairStyle;
   kimonoColor?: KimonoColor;
+  hairColor?: string;
+  gender?: 'male' | 'female';
+  specialPattern?: SpecialPattern;
 }
 
 // Mapeamento de cores das faixas
@@ -53,6 +57,8 @@ const KIMONO_COLORS: Record<KimonoColor, { base: string; border: string }> = {
   blue: { base: '#3B82F6', border: '#1E40AF' },
   red: { base: '#EF4444', border: '#991B1B' },
   black: { base: '#1F2937', border: '#000000' },
+  gold: { base: '#FFD700', border: '#B8860B' },
+  silver: { base: '#C0C0C0', border: '#808080' },
 };
 
 export const KarateAvatar: React.FC<KarateAvatarProps> = ({
@@ -63,6 +69,9 @@ export const KarateAvatar: React.FC<KarateAvatarProps> = ({
   skinTone = 'light',
   hairStyle = 'short',
   kimonoColor = 'white',
+  hairColor = 'black',
+  gender = 'male',
+  specialPattern,
 }) => {
   const { width, height, fontSize } = SIZES[size];
   const beltColor = BELT_COLORS[belt];
@@ -71,13 +80,54 @@ export const KarateAvatar: React.FC<KarateAvatarProps> = ({
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
+      <style>{`
+        @keyframes breathe {
+          0%, 100% {
+            transform: translateY(0) scale(1);
+          }
+          50% {
+            transform: translateY(-2px) scale(1.01);
+          }
+        }
+
+        @keyframes blink {
+          0%, 90%, 100% {
+            opacity: 1;
+          }
+          95% {
+            opacity: 0;
+          }
+        }
+
+        @keyframes sway {
+          0%, 100% {
+            transform: rotate(-1deg);
+          }
+          50% {
+            transform: rotate(1deg);
+          }
+        }
+
+        .avatar-breathe {
+          animation: breathe 3s ease-in-out infinite;
+        }
+
+        .avatar-eyes {
+          animation: blink 4s ease-in-out infinite;
+        }
+
+        .avatar-body {
+          transform-origin: 60px 48px;
+          animation: sway 4s ease-in-out infinite;
+        }
+      `}</style>
       <svg
         width={width}
         height={height}
         viewBox="0 0 120 150"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="drop-shadow-lg"
+        className="drop-shadow-lg avatar-breathe"
       >
         {/* Cabeça */}
         <circle cx="60" cy="30" r="18" fill={skinColor.base} stroke={skinColor.shadow} strokeWidth="2" />
@@ -120,8 +170,10 @@ export const KarateAvatar: React.FC<KarateAvatarProps> = ({
         )}
         
         {/* Olhos */}
-        <circle cx="53" cy="30" r="2" fill="#000000" />
-        <circle cx="67" cy="30" r="2" fill="#000000" />
+        <g className="avatar-eyes">
+          <circle cx="53" cy="30" r="2" fill="#000000" />
+          <circle cx="67" cy="30" r="2" fill="#000000" />
+        </g>
         
         {/* Boca (sorriso) */}
         <path
@@ -133,100 +185,102 @@ export const KarateAvatar: React.FC<KarateAvatarProps> = ({
         />
         
         {/* Kimono (corpo) */}
-        <path
-          d="M 60 48 L 40 65 L 40 110 L 50 110 L 50 90 L 60 95 L 70 90 L 70 110 L 80 110 L 80 65 Z"
-          fill={kimono.base}
-          stroke={kimono.border}
-          strokeWidth="2"
-        />
+        <g className="avatar-body">
+          <path
+            d="M 60 48 L 40 65 L 40 110 L 50 110 L 50 90 L 60 95 L 70 90 L 70 110 L 80 110 L 80 65 Z"
+            fill={kimono.base}
+            stroke={kimono.border}
+            strokeWidth="2"
+          />
         
-        {/* Gola do kimono (V) */}
-        <path
-          d="M 50 48 L 60 58 L 70 48"
-          stroke={kimono.border}
-          strokeWidth="2"
-          fill="none"
-        />
+          {/* Gola do kimono (V) */}
+          <path
+            d="M 50 48 L 60 58 L 70 48"
+            stroke={kimono.border}
+            strokeWidth="2"
+            fill="none"
+          />
+          
+          {/* Faixa (cintura) */}
+          <rect
+            x="38"
+            y="75"
+            width="44"
+            height="8"
+            fill={beltColor.primary}
+            stroke={beltColor.secondary}
+            strokeWidth="1.5"
+            rx="1"
+          />
+          
+          {/* Nó da faixa */}
+          <rect
+            x="57"
+            y="73"
+            width="6"
+            height="12"
+            fill={beltColor.secondary}
+            rx="1"
+          />
+          
+          {/* Pontas da faixa */}
+          <rect
+            x="54"
+            y="83"
+            width="3"
+            height="10"
+            fill={beltColor.primary}
+            stroke={beltColor.secondary}
+            strokeWidth="0.5"
+          />
+          <rect
+            x="63"
+            y="83"
+            width="3"
+            height="10"
+            fill={beltColor.primary}
+            stroke={beltColor.secondary}
+            strokeWidth="0.5"
+          />
+          
+          {/* Braços */}
+          <path
+            d="M 40 65 L 25 85 L 28 88 L 43 70"
+            fill={skinColor.base}
+            stroke={skinColor.shadow}
+            strokeWidth="1.5"
+          />
+          <path
+            d="M 80 65 L 95 85 L 92 88 L 77 70"
+            fill={skinColor.base}
+            stroke={skinColor.shadow}
+            strokeWidth="1.5"
+          />
+          
+          {/* Mãos (punhos cerrados) */}
+          <circle cx="26" cy="87" r="5" fill={skinColor.base} stroke={skinColor.shadow} strokeWidth="1.5" />
+          <circle cx="94" cy="87" r="5" fill={skinColor.base} stroke={skinColor.shadow} strokeWidth="1.5" />
         
-        {/* Faixa (cintura) */}
-        <rect
-          x="38"
-          y="75"
-          width="44"
-          height="8"
-          fill={beltColor.primary}
-          stroke={beltColor.secondary}
-          strokeWidth="1.5"
-          rx="1"
-        />
-        
-        {/* Nó da faixa */}
-        <rect
-          x="57"
-          y="73"
-          width="6"
-          height="12"
-          fill={beltColor.secondary}
-          rx="1"
-        />
-        
-        {/* Pontas da faixa */}
-        <rect
-          x="54"
-          y="83"
-          width="3"
-          height="10"
-          fill={beltColor.primary}
-          stroke={beltColor.secondary}
-          strokeWidth="0.5"
-        />
-        <rect
-          x="63"
-          y="83"
-          width="3"
-          height="10"
-          fill={beltColor.primary}
-          stroke={beltColor.secondary}
-          strokeWidth="0.5"
-        />
-        
-        {/* Braços */}
-        <path
-          d="M 40 65 L 25 85 L 28 88 L 43 70"
-          fill={skinColor.base}
-          stroke={skinColor.shadow}
-          strokeWidth="1.5"
-        />
-        <path
-          d="M 80 65 L 95 85 L 92 88 L 77 70"
-          fill={skinColor.base}
-          stroke={skinColor.shadow}
-          strokeWidth="1.5"
-        />
-        
-        {/* Mãos (punhos cerrados) */}
-        <circle cx="26" cy="87" r="5" fill={skinColor.base} stroke={skinColor.shadow} strokeWidth="1.5" />
-        <circle cx="94" cy="87" r="5" fill={skinColor.base} stroke={skinColor.shadow} strokeWidth="1.5" />
-        
-        {/* Pernas */}
-        <rect
-          x="45"
-          y="110"
-          width="10"
-          height="30"
-          fill={kimono.base}
-          stroke={kimono.border}
-          strokeWidth="1.5"
-        />
-        <rect
-          x="65"
-          y="110"
-          width="10"
-          height="30"
-          fill={kimono.base}
-          stroke={kimono.border}
-          strokeWidth="1.5"
-        />
+          {/* Pernas */}
+          <rect
+            x="45"
+            y="110"
+            width="10"
+            height="30"
+            fill={kimono.base}
+            stroke={kimono.border}
+            strokeWidth="1.5"
+          />
+          <rect
+            x="65"
+            y="110"
+            width="10"
+            height="30"
+            fill={kimono.base}
+            stroke={kimono.border}
+            strokeWidth="1.5"
+          />
+        </g>
         
         {/* Pés */}
         <ellipse cx="50" cy="142" rx="8" ry="4" fill={skinColor.base} stroke={skinColor.shadow} strokeWidth="1.5" />

@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE students ADD COLUMN specialKimono VARCHAR(30) DEFAULT 'none' AFTER avatarPose;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute ALTER TABLE students ADD COLUMN specialKimono VARCHAR(30) DEFAULT 'none' AFTER avatarPose;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 520
+}

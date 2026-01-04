@@ -120,6 +120,28 @@ export function BeltTransitionAnimation({
           }
         }
 
+        @keyframes confettiFall {
+          0% {
+            opacity: 1;
+            transform: translateY(-50px) translateX(0) rotate(0deg);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(200px) translateX(var(--confetti-tx)) rotate(720deg);
+          }
+        }
+
+        @keyframes lightRayPulse {
+          0%, 100% {
+            opacity: 0.3;
+            transform: rotate(var(--ray-angle)) scaleY(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: rotate(var(--ray-angle)) scaleY(1.2);
+          }
+        }
+
         .belt-transition-container {
           animation: ${
             animationPhase === 'enter'
@@ -192,25 +214,51 @@ export function BeltTransitionAnimation({
           </div>
         </div>
 
-        {/* Raios de luz */}
+        {/* Raios de luz pulsantes */}
         {animationPhase === 'transition' && (
           <div className="absolute inset-0 flex items-center justify-center">
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
                 className="absolute"
                 style={{
-                  width: '2px',
-                  height: '120px',
+                  width: '3px',
+                  height: '150px',
                   background: `linear-gradient(to top, ${newColor.glow}, transparent)`,
                   left: '50%',
                   top: '50%',
-                  transform: `rotate(${(i / 8) * 360}deg)`,
+                  '--ray-angle': `${(i / 12) * 360}deg`,
                   transformOrigin: '0 0',
-                  opacity: 0.6,
-                }}
+                  animation: 'lightRayPulse 1s ease-in-out infinite',
+                  animationDelay: `${i * 0.08}s`,
+                } as React.CSSProperties}
               />
             ))}
+          </div>
+        )}
+
+        {/* Confetes caindo */}
+        {animationPhase === 'exit' && (
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            {Array.from({ length: 40 }).map((_, i) => {
+              const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#A8E6CF'];
+              const randomColor = colors[Math.floor(Math.random() * colors.length)];
+              const randomTx = (Math.random() - 0.5) * 300;
+              return (
+                <div
+                  key={i}
+                  className="absolute w-3 h-3 rounded-sm"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: '0',
+                    background: randomColor,
+                    '--confetti-tx': `${randomTx}px`,
+                    animation: 'confettiFall 2s ease-out forwards',
+                    animationDelay: `${Math.random() * 0.5}s`,
+                  } as React.CSSProperties}
+                />
+              );
+            })}
           </div>
         )}
       </div>

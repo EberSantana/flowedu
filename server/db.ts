@@ -5151,6 +5151,7 @@ export async function updateStudentAvatar(
     avatarHeadAccessory?: string;
     avatarExpression?: string;
     avatarPose?: string;
+    specialKimono?: string;
     avatarAccessories?: string;
   }
 ) {
