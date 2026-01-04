@@ -53,6 +53,8 @@ import { StudentLeaderboard } from "./pages/StudentLeaderboard";
 import StudentReview from "./pages/StudentReview";
 import AvatarTest from "./pages/AvatarTest";
 import { CustomizeAvatar } from "./pages/CustomizeAvatar";
+import Avatar3DDemo from "./pages/Avatar3DDemo";
+import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
 import StudentShop from "./pages/StudentShop";
 import BibleFooter from "./components/BibleFooter";
@@ -105,6 +107,8 @@ function Router() {
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
         <Route path={"/student/shop"} component={StudentShop} />
         <Route path={"/avatar-test"} component={AvatarTest} />
+        <Route path={"/avatar-3d-demo"} component={Avatar3DDemo} />
+        <Route path={"/student/customize-avatar-3d"} component={CustomizeAvatar3D} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
