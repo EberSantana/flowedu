@@ -4528,6 +4528,41 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return stats;
       }),
   }),
+
+  // ==================== STUDENT AVATAR CUSTOMIZATION ====================
+  studentAvatar: router({
+    // Obter avatar do aluno logado
+    getMyAvatar: studentProcedure
+      .query(async ({ ctx }) => {
+        const avatar = await db.getStudentAvatarByStudentId(ctx.studentSession.studentId);
+        if (!avatar) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Avatar não encontrado',
+          });
+        }
+        return avatar;
+      }),
+    
+    // Atualizar avatar do aluno logado
+    updateMyAvatar: studentProcedure
+      .input(z.object({
+        avatarSkinTone: z.string().optional(),
+        avatarKimonoColor: z.string().optional(),
+        avatarHairStyle: z.string().optional(),
+        avatarAccessories: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const updated = await db.updateStudentAvatar(ctx.studentSession.studentId, input);
+        if (!updated) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Erro ao atualizar avatar',
+          });
+        }
+        return updated;
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
@@ -4669,3 +4704,4 @@ Retorne um JSON com:
     };
   }
 }
+

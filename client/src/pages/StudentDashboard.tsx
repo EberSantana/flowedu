@@ -18,6 +18,8 @@ import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { KarateAvatar, type BeltColor } from "@/components/KarateAvatar";
+import { BeltUpgradeNotification } from "@/components/BeltUpgradeNotification";
+import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
 
 // Função helper para determinar a faixa baseada nos pontos
 function getBeltFromPoints(points: number): BeltColor {
@@ -46,18 +48,33 @@ function getNextBeltThreshold(points: number): number {
 export default function StudentDashboard() {
   const { student } = useStudentAuth();
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
+  const { data: stats } = trpc.gamification.getStudentStats.useQuery();
   
-  // Buscar pontos do aluno (por enquanto hardcoded como 0, depois integrar com gamificação)
-  const studentPoints = 0; // TODO: Integrar com sistema de gamificação
-  const currentBelt = getBeltFromPoints(studentPoints);
+  // Buscar pontos do aluno do sistema de gamificação
+  const studentPoints = stats?.totalPoints || 0;
+  const currentBelt = (stats?.currentBelt as BeltColor) || getBeltFromPoints(studentPoints);
   const nextThreshold = getNextBeltThreshold(studentPoints);
   const progressPercentage = (studentPoints / nextThreshold) * 100;
+
+  // Hook para detectar e exibir notificação de upgrade de faixa
+  const { upgradeData, clearNotification } = useBeltUpgradeNotification(currentBelt, studentPoints);
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
 
   return (
-    <StudentLayout>
+    <>
+      {/* Notificação de Upgrade de Faixa */}
+      {upgradeData && (
+        <BeltUpgradeNotification
+          oldBelt={upgradeData.oldBelt}
+          newBelt={upgradeData.newBelt}
+          totalPoints={upgradeData.totalPoints}
+          onClose={clearNotification}
+        />
+      )}
+
+      <StudentLayout>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header com Boas-vindas e Avatar de Karatê */}
         <div className="mb-10">
@@ -362,5 +379,6 @@ export default function StudentDashboard() {
         )}
       </div>
     </StudentLayout>
+    </>
   );
 }

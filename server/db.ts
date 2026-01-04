@@ -5005,3 +5005,57 @@ export async function getReviewStats(studentId: number, subjectId?: number) {
     };
   }
 }
+
+// ==================== AVATAR CUSTOMIZATION FUNCTIONS ====================
+
+export async function getStudentAvatarByStudentId(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  try {
+    const result = await db.select({
+      id: students.id,
+      registrationNumber: students.registrationNumber,
+      fullName: students.fullName,
+      avatarSkinTone: students.avatarSkinTone,
+      avatarKimonoColor: students.avatarKimonoColor,
+      avatarHairStyle: students.avatarHairStyle,
+      avatarAccessories: students.avatarAccessories,
+    })
+    .from(students)
+    .where(eq(students.id, studentId))
+    .limit(1);
+    
+    return result[0] || null;
+  } catch (error) {
+    console.error("Error getting student avatar:", error);
+    return null;
+  }
+}
+
+export async function updateStudentAvatar(
+  studentId: number,
+  avatarData: {
+    avatarSkinTone?: string;
+    avatarKimonoColor?: string;
+    avatarHairStyle?: string;
+    avatarAccessories?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  try {
+    await db.update(students)
+      .set({
+        ...avatarData,
+        updatedAt: new Date(),
+      })
+      .where(eq(students.id, studentId));
+    
+    return await getStudentAvatarByStudentId(studentId);
+  } catch (error) {
+    console.error("Error updating student avatar:", error);
+    return null;
+  }
+}

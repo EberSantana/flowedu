@@ -52,6 +52,7 @@ import { Leaderboard } from "./pages/Leaderboard";
 import { StudentLeaderboard } from "./pages/StudentLeaderboard";
 import StudentReview from "./pages/StudentReview";
 import AvatarTest from "./pages/AvatarTest";
+import { CustomizeAvatar } from "./pages/CustomizeAvatar";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -100,6 +101,7 @@ function Router() {
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
         <Route path={"/student-review"} component={StudentReview} />
         <Route path={"/avatar-test"} component={AvatarTest} />
+        <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />

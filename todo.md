@@ -184,8 +184,23 @@
 - [x] Criar página de teste com todas as variações
 - [x] Adicionar 4 tamanhos de avatar (sm, md, lg, xl)
 - [x] Documentar sistema de pontuação
-- [ ] Conectar avatar com sistema de pontos existente (gamificação)
-- [ ] Criar notificações de conquista de nova faixa
+- [x] Conectar avatar com sistema de pontos existente (gamificação)
+  - [x] Buscar pontos do aluno da tabela student_points
+  - [x] Calcular faixa automaticamente baseado em pontos
+  - [x] Atualizar avatar no Dashboard do aluno
+  - [x] Sincronizar com sistema de exercícios
+- [x] Criar interface de customização de avatares
+  - [x] Página de customização (/student/customize-avatar)
+  - [x] Seleção de tom de pele (6 opções)
+  - [x] Seleção de estilo de cabelo (5 opções)
+  - [x] Seleção de cor do kimono (4 opções)
+  - [x] Sistema de desbloqueio por nível
+  - [x] Salvar preferências no banco de dados
+- [x] Criar notificações de conquista de nova faixa
+  - [x] Detectar mudança de faixa ao ganhar pontos
+  - [x] Componente de notificação com animação
+  - [x] Toast especial para evolução de faixa
+  - [x] Animação especial para faixa preta
 - [ ] Implementar histórico de evolução do aluno
 - [ ] Adicionar animações de transição entre faixas
 
