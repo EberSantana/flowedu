@@ -3498,3 +3498,41 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Criar testes para toggle de PC por disciplina
 - [ ] Criar testes para estatísticas de PC
 - [ ] Validar visualização condicional na interface
+
+## 🥋 Sistema de Avatares de Karatê (Proposta Aprovada - 04/01/2026)
+
+### ✅ Análise e Planejamento
+- [x] Analisar viabilidade do sistema de avatares de karatê
+- [x] Criar documento completo de análise (ANALISE_AVATARES_KARATE.md)
+- [x] Definir arquitetura técnica e fases de implementação
+
+### Fase 1: MVP (2-3 dias) - PRÓXIMA IMPLEMENTAÇÃO
+- [ ] Criar componente KarateAvatar básico (SVG estático)
+- [ ] Implementar 8 variações de faixa (cores diferentes)
+- [ ] Exibir avatar no Dashboard do aluno
+- [ ] Adicionar campos no banco de dados (avatarSkinTone, avatarKimonoColor, avatarHairStyle, avatarAccessories)
+
+### Fase 2: Customização (2-3 dias)
+- [ ] Adicionar opções de tom de pele (6 tons)
+- [ ] Adicionar opções de cor de kimono (4 cores)
+- [ ] Adicionar opções de estilo de cabelo (5 estilos)
+- [ ] Criar página de editor de avatar (StudentAvatarEditor.tsx)
+- [ ] Salvar preferências de customização no banco
+
+### Fase 3: Acessórios (3-4 dias)
+- [ ] Implementar sistema de desbloqueio de acessórios por faixa
+- [ ] Criar 8 acessórios visuais (headband, luvas, protetor, nunchaku, aura, medalhas, brilho, título)
+- [ ] Adicionar animações de conquista de novo acessório
+- [ ] Implementar notificações de novos acessórios desbloqueados
+
+### Fase 4: Integração Completa (2-3 dias)
+- [ ] Adicionar avatares em todos os rankings
+- [ ] Implementar animações de transição de faixa
+- [ ] Criar galeria de acessórios no perfil do aluno
+- [ ] Adicionar histórico visual de evolução de faixas
+
+### Fase 5: Social (Futuro)
+- [ ] Implementar compartilhamento de avatar nas redes sociais
+- [ ] Adicionar comparação de avatares entre amigos
+- [ ] Criar desafios especiais para acessórios raros
+- [ ] Implementar avatar 3D (WebGL) para faixa preta

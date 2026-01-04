@@ -42,7 +42,7 @@ export default function SubjectCTStats() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <PageWrapper>
-        <div className="container mx-auto py-6 px-4 max-w-7xl">
+        <div className="max-w-7xl mx-auto py-6 px-4">
           {/* Breadcrumb */}
           <div className="mb-6">
             <Link href="/subjects">
