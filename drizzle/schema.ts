@@ -457,6 +457,7 @@ export const students = mysqlTable("students", {
   registrationNumber: varchar("registrationNumber", { length: 50 }).notNull(), // Matrícula do aluno
   fullName: varchar("fullName", { length: 255 }).notNull(), // Nome completo do aluno
   // Campos de customização do avatar de karatê
+  avatarGender: mysqlEnum("avatarGender", ["male", "female"]).default("male").notNull(), // Gênero do avatar (male, female)
   avatarSkinTone: varchar("avatarSkinTone", { length: 20 }).default("light"), // Tom de pele (light, medium, tan, dark, darker, darkest)
   avatarKimonoColor: varchar("avatarKimonoColor", { length: 20 }).default("white"), // Cor do kimono (white, blue, red, black)
   avatarHairStyle: varchar("avatarHairStyle", { length: 20 }).default("short"), // Estilo de cabelo (short, medium, long, bald, ponytail, mohawk)

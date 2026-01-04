@@ -173,85 +173,8 @@
     {
       "idx": 24,
       "version": "5",
-      "when": 1766617558108,
-      "tag": "0024_lazy_the_executioner",
-      "breakpoints": true
-    },
-    {
-      "idx": 25,
-      "version": "5",
-      "when": 1766617585746,
-      "tag": "0025_thin_talon",
-      "breakpoints": true
-    },
-    {
-      "idx": 26,
-      "version": "5",
-      "when": 1766773737854,
-      "tag": "0026_tearful_mandrill",
-      "breakpoints": true
-    },
-    {
-      "idx": 27,
-      "version": "5",
-      "when": 1766792004102,
-      "tag": "0027_lethal_blonde_phantom",
-      "breakpoints": true
-    },
-    {
-      "idx": 28,
-      "version": "5",
-      "when": 1767039733006,
-      "tag": "0028_curly_warbound",
-      "breakpoints": true
-    },
-    {
-      "idx": 29,
-      "version": "5",
-      "when": 1767047110905,
-      "tag": "0029_icy_vulcan",
-      "breakpoints": true
-    },
-    {
-      "idx": 30,
-      "version": "5",
-      "when": 1767054075775,
-      "tag": "0030_sparkling_changeling",
-      "breakpoints": true
-    },
-    {
-      "idx": 31,
-      "version": "5",
-      "when": 1767544101781,
-      "tag": "0031_spooky_cable",
-      "breakpoints": true
-    },
-    {
-      "idx": 32,
-      "version": "5",
-      "when": 1767551766646,
-      "tag": "0032_purple_champions",
-      "breakpoints": true
-    },
-    {
-      "idx": 33,
-      "version": "5",
-      "when": 1767557248751,
-      "tag": "0033_overconfident_power_pack",
-      "breakpoints": true
-    },
-    {
-      "idx": 34,
-      "version": "5",
-      "when": 1767560135510,
-      "tag": "0034_square_emma_frost",
-      "breakpoints": true
-    },
-    {
-      "idx": 35,
-      "version": "5",
-      "when": 1767562460223,
-      "tag": "0035_friendly_magdalene",
+      "when": 1767564729255,
+      "tag": "0024_chemical_wiccan",
       "breakpoints": true
     }
   ]

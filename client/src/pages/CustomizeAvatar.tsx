@@ -235,6 +235,7 @@ export function CustomizeAvatar() {
   const updateAvatarMutation = trpc.studentAvatar.updateMyAvatar.useMutation();
 
   // Estados de customização
+  const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
   const [selectedSkinTone, setSelectedSkinTone] = useState<string>('light');
   const [selectedHairStyle, setSelectedHairStyle] = useState<string>('short');
   const [selectedHairColor, setSelectedHairColor] = useState<string>('black');
@@ -251,6 +252,7 @@ export function CustomizeAvatar() {
   // Carregar preferências atuais
   useEffect(() => {
     if (studentData) {
+      setSelectedGender((studentData.avatarGender as 'male' | 'female') || 'male');
       setSelectedSkinTone(studentData.avatarSkinTone || 'light');
       setSelectedHairStyle(studentData.avatarHairStyle || 'short');
       setSelectedHairColor(studentData.avatarHairColor || 'black');
@@ -268,6 +270,7 @@ export function CustomizeAvatar() {
   const handleSave = async () => {
     try {
       await updateAvatarMutation.mutateAsync({
+        avatarGender: selectedGender,
         avatarSkinTone: selectedSkinTone,
         avatarHairStyle: selectedHairStyle,
         avatarHairColor: selectedHairColor,
@@ -464,6 +467,29 @@ export function CustomizeAvatar() {
 
                     {/* Aba Aparência */}
                     <TabsContent value="appearance" className="space-y-6">
+                      {/* Gênero do Avatar */}
+                      <CustomizationSection
+                        title="Gênero do Avatar"
+                        description="Escolha a apresentação visual do seu karateca"
+                        icon={<User className="w-4 h-4 text-indigo-600" />}
+                        iconBg="bg-indigo-100"
+                      >
+                        <div className="flex gap-4">
+                          <button
+                            onClick={() => setSelectedGender('male')}
+                            className={selectedGender === 'male' ? 'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200 bg-indigo-500 text-white shadow-lg scale-105' : 'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                          >
+                            👨 Masculino
+                          </button>
+                          <button
+                            onClick={() => setSelectedGender('female')}
+                            className={selectedGender === 'female' ? 'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200 bg-pink-500 text-white shadow-lg scale-105' : 'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                          >
+                            👩 Feminino
+                          </button>
+                        </div>
+                      </CustomizationSection>
+
                       {/* Tom de Pele */}
                       <CustomizationSection
                         title="Tom de Pele"

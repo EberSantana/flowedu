@@ -3694,3 +3694,19 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Integrar avatar 3D no Dashboard do Aluno (substituir avatar atual)
 - [x] Adicionar animações de celebração ao subir de faixa
 - [x] Testar e validar todas as melhorias
+
+
+### Seleção de Gênero do Avatar (Nova Solicitação)
+- [x] Adicionar campo avatarGender na tabela students
+- [x] Criar rota tRPC para atualizar gênero do avatar
+- [x] Implementar interface de seleção (botões Masculino/Feminino)
+- [x] Persistir seleção no banco de dados
+- [x] Atualizar Avatar3DDisplay para exibir avatar correto baseado no gênero
+- [x] Testar fluxo completo de seleção e persistência
+## Animações de Transição Entre Faixas (Nova Solicitação)
+- [x] Criar componente BeltTransitionAnimation.tsx
+- [x] Implementar animação de mudança de cor gradual
+- [x] Adicionar efeito de transformação/evolução
+- [x] Detectar mudança de faixa automaticamente
+- [x] Integrar animação no BeltUpgradeNotification
+- [x] Testar animações em todas as transições de faixa

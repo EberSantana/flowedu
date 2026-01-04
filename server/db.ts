@@ -5117,6 +5117,7 @@ export async function getStudentAvatarByStudentId(studentId: number) {
       id: students.id,
       registrationNumber: students.registrationNumber,
       fullName: students.fullName,
+      avatarGender: students.avatarGender,
       avatarSkinTone: students.avatarSkinTone,
       avatarKimonoColor: students.avatarKimonoColor,
       avatarHairStyle: students.avatarHairStyle,
@@ -5141,6 +5142,7 @@ export async function getStudentAvatarByStudentId(studentId: number) {
 export async function updateStudentAvatar(
   studentId: number,
   avatarData: {
+    avatarGender?: 'male' | 'female';
     avatarSkinTone?: string;
     avatarKimonoColor?: string;
     avatarHairStyle?: string;

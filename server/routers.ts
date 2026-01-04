@@ -4560,6 +4560,7 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
     // Atualizar avatar do aluno logado
     updateMyAvatar: studentProcedure
       .input(z.object({
+        avatarGender: z.enum(['male', 'female']).optional(),
         avatarSkinTone: z.string().optional(),
         avatarKimonoColor: z.string().optional(),
         avatarHairStyle: z.string().optional(),
