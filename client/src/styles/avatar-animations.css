@@ -1,0 +1,391 @@
+/* Animações do Avatar de Karatê Profissional */
+
+/* Animação idle - respiração suave */
+@keyframes avatar-idle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-avatar-idle {
+  animation: avatar-idle 3s ease-in-out infinite;
+}
+
+/* Animação de celebração */
+@keyframes avatar-celebrate {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  10% {
+    transform: translateY(-15px) rotate(-5deg) scale(1.05);
+  }
+  20% {
+    transform: translateY(-20px) rotate(5deg) scale(1.1);
+  }
+  30% {
+    transform: translateY(-15px) rotate(-3deg) scale(1.05);
+  }
+  40% {
+    transform: translateY(-10px) rotate(3deg) scale(1.02);
+  }
+  50% {
+    transform: translateY(-5px) rotate(0deg) scale(1);
+  }
+}
+
+.animate-avatar-celebrate {
+  animation: avatar-celebrate 1.5s ease-out;
+}
+
+/* Animação de level up */
+@keyframes avatar-levelup {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.15);
+    filter: brightness(1.3);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.5);
+  }
+  75% {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.animate-avatar-levelup {
+  animation: avatar-levelup 2s ease-out;
+}
+
+/* Animação de reverência */
+@keyframes avatar-bow {
+  0%, 100% {
+    transform: rotate(0deg);
+    transform-origin: bottom center;
+  }
+  50% {
+    transform: rotate(15deg);
+    transform-origin: bottom center;
+  }
+}
+
+.animate-avatar-bow {
+  animation: avatar-bow 1.5s ease-in-out;
+}
+
+/* Animação de soco */
+@keyframes avatar-punch {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(10px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-avatar-punch {
+  animation: avatar-punch 0.8s ease-out;
+}
+
+/* Animação das partículas */
+@keyframes particle {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-particle {
+  animation: particle 1s ease-out forwards;
+}
+
+/* Animação de brilho/sparkle */
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+/* Animação da sombra */
+@keyframes shadow-pulse {
+  0%, 100% {
+    transform: scaleX(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scaleX(0.9);
+    opacity: 0.1;
+  }
+}
+
+.animate-shadow-pulse {
+  animation: shadow-pulse 3s ease-in-out infinite;
+}
+
+/* Animação do balanço da faixa */
+@keyframes belt-sway {
+  0%, 100% {
+    transform: rotate(0deg);
+    transform-origin: top center;
+  }
+  50% {
+    transform: rotate(3deg);
+    transform-origin: top center;
+  }
+}
+
+.animate-belt-sway {
+  animation: belt-sway 2s ease-in-out infinite;
+}
+
+@keyframes belt-sway-reverse {
+  0%, 100% {
+    transform: rotate(0deg);
+    transform-origin: top center;
+  }
+  50% {
+    transform: rotate(-3deg);
+    transform-origin: top center;
+  }
+}
+
+.animate-belt-sway-reverse {
+  animation: belt-sway-reverse 2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+/* Animação de confetti */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+/* Animação de pulso de glow */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Animação de entrada suave */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+/* Animação de shake para erro */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Animação de bounce */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s ease-out forwards;
+}
+
+/* Animação de progresso */
+@keyframes progress-fill {
+  0% {
+    width: 0%;
+  }
+}
+
+.animate-progress-fill {
+  animation: progress-fill 1s ease-out forwards;
+}
+
+/* Animação de número contando */
+@keyframes count-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count-up {
+  animation: count-up 0.3s ease-out forwards;
+}
+
+/* Hover effects para cards */
+.card-hover-lift {
+  transition: all 0.3s ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Animação de rotação para ícones */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Animação de brilho passando */
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-shine {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shine 2s infinite;
+}
+
+/* Animação de escala suave */
+@keyframes scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-scale-pulse {
+  animation: scale-pulse 2s ease-in-out infinite;
+}
+
+/* Animação de badge conquistado */
+@keyframes badge-unlock {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-badge-unlock {
+  animation: badge-unlock 0.8s ease-out forwards;
+}
+
+/* Animação de estrelas caindo */
+@keyframes star-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200%) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-star-fall {
+  animation: star-fall 2s ease-in forwards;
+}
