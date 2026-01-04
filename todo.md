@@ -3756,3 +3756,5 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Remover item "Convites" do menu lateral (Sidebar)
 - [x] Remover rota /admin/invitations do App.tsx
 - [x] Verificar e limpar código relacionado a convites
+
+- [x] Melhorar portal do aluno com avatar de kimono 3D profissional e interações modernas
