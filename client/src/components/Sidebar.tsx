@@ -97,12 +97,7 @@ const teacherNavItems: NavItem[] = [
     href: "/teacher-review-answers",
     profileRestriction: "enthusiast",
   },
-  {
-    label: "Rankings",
-    icon: <Trophy className="h-5 w-5" />,
-    href: "/leaderboard",
-    profileRestriction: "enthusiast",
-  },
+  
   {
     label: "Trilhas de Aprendizagem",
     icon: <Route className="h-5 w-5" />,

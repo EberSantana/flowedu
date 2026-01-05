@@ -4493,15 +4493,15 @@ JSON (descrições MAX 15 chars):
           exercise.exerciseData
         );
         
-        // Adicionar pontos de gamificação
-        if (result.pointsEarned > 0) {
-          await db.addExercisePoints(
-            studentId,
-            exercise.subjectId,
-            result.pointsEarned,
-            `Exercício: ${exercise.title} (${result.correctAnswers}/${result.totalQuestions} acertos)`
-          );
-        }
+        // Gamificação removida - pontos não são mais adicionados
+        // if (result.pointsEarned > 0) {
+        //   await db.addExercisePoints(
+        //     studentId,
+        //     exercise.subjectId,
+        //     result.pointsEarned,
+        //     `Exercício: ${exercise.title} (${result.correctAnswers}/${result.totalQuestions} acertos)`
+        //   );
+        // }
         
         return result;
       }),

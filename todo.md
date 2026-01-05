@@ -4587,3 +4587,31 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Adicionar efeitos de profundidade, sombras e perspectiva 3D
 - [ ] Implementar interatividade (hover, rotação)
 - [ ] Integrar visualização 3D na página inicial do aluno
+
+
+## 🎯 Remoção de Gamificação - Plataforma Profissional
+
+### Portal do Aluno
+- [x] Remover sistema de pontos e badges do dashboard
+- [x] Remover texto "ganhar pontos e subir no ranking"
+- [x] Remover exibição de pontos nos exercícios
+- [x] Renomear "pontos" para "nível" no gráfico de pensamento computacional
+- [ ] Remover avatares customizáveis (se houver)
+- [ ] Remover rankings e leaderboards (componente existe mas não usado)
+- [ ] Remover conquistas e troféus (se houver)
+- [ ] Remover sistema de níveis/XP (se houver)
+
+### Portal do Professor
+- [x] Remover item "Rankings" do menu sidebar
+- [x] Desabilitar showGamification em todos os perfis
+- [ ] Remover visualizações de gamificação dos alunos (se houver)
+- [ ] Remover configurações de badges e pontos (se houver)
+- [ ] Limpar relatórios de gamificação (se houver)
+
+### Backend
+- [x] Comentar chamada addExercisePoints após conclusão de exercícios
+- [ ] Desativar rotas de gamificação (manter no código mas não usar no frontend)
+- [x] Remover cálculos de pontos em exercícios (pontos não são mais adicionados)
+
+### Sugestões de Melhorias Profissionais
+- [ ] Avaliar e sugerir melhorias focadas em produtividade e aprendizado

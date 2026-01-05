@@ -20,7 +20,7 @@ export interface DashboardConfig {
   showWeeklyChart: boolean;
   
   // Widgets específicos por perfil
-  showGamification: boolean;
+  showGamification: boolean; // DEPRECATED: Gamificação removida da plataforma
   showMethodologies: boolean;
   showProjects: boolean;
   showReports: boolean;
@@ -51,7 +51,7 @@ export function useAdaptiveDashboard(): DashboardConfig {
           showWeeklyChart: true,
           
           // Específicos
-          showGamification: false, // Ocultar gamificação
+          showGamification: false, // Gamificação removida
           showMethodologies: false,
           showProjects: false,
           showReports: true,
@@ -76,7 +76,7 @@ export function useAdaptiveDashboard(): DashboardConfig {
           showWeeklyChart: true,
           
           // Específicos
-          showGamification: true,
+          showGamification: false, // Gamificação removida
           showMethodologies: true, // Destacar metodologias ativas
           showProjects: true, // Destacar projetos
           showReports: false,
@@ -127,7 +127,7 @@ export function useAdaptiveDashboard(): DashboardConfig {
           showWeeklyChart: true,
           
           // Específicos (mostrar tudo)
-          showGamification: true,
+          showGamification: false, // Gamificação removida
           showMethodologies: true,
           showProjects: true,
           showReports: true,

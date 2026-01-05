@@ -469,10 +469,7 @@ function ExercisesTab({
                 <FileText className="h-4 w-4" />
                 <span>{exercise.questionCount || 0} questões</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Trophy className="h-4 w-4" />
-                <span>{exercise.totalPoints || 0} pontos</span>
-              </div>
+              
               {exercise.dueDate && (
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
@@ -543,10 +540,10 @@ function ComputationalThinkingTab({ subjectId }: { subjectId: number }) {
   }
   
   const radarData = [
-    { dimension: 'Decomposição', pontos: profile.decomposition },
-    { dimension: 'Padrões', pontos: profile.pattern_recognition },
-    { dimension: 'Abstração', pontos: profile.abstraction },
-    { dimension: 'Algoritmos', pontos: profile.algorithms },
+    { dimension: 'Decomposição', nível: profile.decomposition },
+    { dimension: 'Padrões', nível: profile.pattern_recognition },
+    { dimension: 'Abstração', nível: profile.abstraction },
+    { dimension: 'Algoritmos', nível: profile.algorithms },
   ];
   
   const average = Math.round(
@@ -629,8 +626,8 @@ function ComputationalThinkingTab({ subjectId }: { subjectId: number }) {
                   tick={{ fill: '#6b7280', fontSize: 12 }}
                 />
                 <Radar
-                  name="Suas Pontuações"
-                  dataKey="pontos"
+                  name="Seu Nível"
+                  dataKey="nível"
                   stroke="#6366f1"
                   fill="#6366f1"
                   fillOpacity={0.6}

@@ -127,7 +127,7 @@ export default function StudentExercises() {
               <div>
                 <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
                 <p className="text-orange-100 mt-1">
-                  Complete os exercícios para ganhar pontos e subir no ranking!
+                  Pratique e aprimore seus conhecimentos
                 </p>
               </div>
             </div>
@@ -255,15 +255,7 @@ export default function StudentExercises() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 text-sm bg-yellow-50 p-4 rounded-xl border border-yellow-100">
-                        <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Trophy className="w-5 h-5 text-yellow-600" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-lg">{exercise.totalPoints}</p>
-                          <p className="text-xs text-gray-600">pontos</p>
-                        </div>
-                      </div>
+                      
 
                       {exercise.timeLimit && (
                         <div className="flex items-center gap-3 text-sm bg-orange-50 p-4 rounded-xl border border-orange-100 col-span-2">
