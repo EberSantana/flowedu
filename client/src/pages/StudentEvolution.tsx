@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import StudentLayout from '../components/StudentLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Belt3DRealistic, BeltColor, BELT_COLORS } from '@/components/Belt3DRealistic';
+import { Belt3DWebGL } from '@/components/Belt3DWebGL';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import { AnimatedProgressBar } from '@/components/AnimatedProgressBar';
 import { showGamificationToast, useDetectLevelUp } from '@/components/GamificationToast';
@@ -65,6 +66,7 @@ export default function StudentEvolution() {
   const { student } = useStudentAuth();
   const [selectedBelt, setSelectedBelt] = useState<BeltColor | null>(null);
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [use3DWebGL, setUse3DWebGL] = useState(false);
   const [levelUpData, setLevelUpData] = useState<{
     oldBelt: any;
     newBelt: any;
@@ -137,9 +139,18 @@ export default function StudentEvolution() {
     <StudentLayout>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Minha Evolução</h1>
-          <p className="text-gray-500 mt-2">Acompanhe seu progresso no dojo</p>
+               <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Minha Evolução</h1>
+            <p className="text-gray-500 mt-2">Acompanhe seu progresso no dojo</p>
+          </div>
+          <button
+            onClick={() => setUse3DWebGL(!use3DWebGL)}
+            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            {use3DWebGL ? 'Modo CSS' : 'Modo WebGL 3D'}
+          </button>
         </div>
 
         {/* Card de Faixa Atual */}
@@ -166,13 +177,24 @@ export default function StudentEvolution() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
                     {currentBeltConfig?.label}
                   </h2>
-                  <Belt3DRealistic
-                    color={currentBelt}
-                    size="xl"
-                    animated={true}
-                    interactive={true}
-                    showLabel={false}
-                  />
+                  {use3DWebGL ? (
+                    <Belt3DWebGL
+                      color={currentBelt}
+                      size="lg"
+                      animated={true}
+                      interactive={true}
+                      autoRotate={false}
+                      showLabel={false}
+                    />
+                  ) : (
+                    <Belt3DRealistic
+                      color={currentBelt}
+                      size="xl"
+                      animated={true}
+                      interactive={true}
+                      showLabel={false}
+                    />
+                  )}
                 </div>
               </div>
 

@@ -46,6 +46,7 @@ import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentGamificationSimple from "./pages/StudentGamificationSimple";
 import GamificationDashboard from "./pages/GamificationDashboard";
 import StudentEvolution from "./pages/StudentEvolution";
+import Belt3DDemo from "./pages/Belt3DDemo";
 
 import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
@@ -109,6 +110,7 @@ function Router() {
         <Route path={"/teacher-belt/evolution"} component={TeacherEvolution} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
         <Route path={"/student-evolution"} component={StudentEvolution} />
+        <Route path={"/belt-3d-demo"} component={Belt3DDemo} />
         <Route path={"/student-subjects"} component={StudentSubjects} />
         <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
         <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />
