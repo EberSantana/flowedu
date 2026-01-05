@@ -64,7 +64,6 @@ const profiles: ProfileOption[] = [
       "Avaliação por competências",
     ],
     color: "bg-green-500",
-    badge: "Em breve",
   },
   {
     id: "organizational",
@@ -79,7 +78,6 @@ const profiles: ProfileOption[] = [
       "Integração com sistemas externos",
     ],
     color: "bg-orange-500",
-    badge: "Em breve",
   },
 ];
 
@@ -90,12 +88,6 @@ export default function ProfileSelection() {
   const updateProfileMutation = trpc.userProfile.updateProfile.useMutation();
 
   const handleSelectProfile = async (profileId: ProfileType) => {
-    // Perfis ainda não implementados
-    if (profileId === "interactive" || profileId === "organizational") {
-      toast.info("Este perfil estará disponível em breve!");
-      return;
-    }
-
     setSelectedProfile(profileId);
 
     try {
@@ -131,7 +123,7 @@ export default function ProfileSelection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {profiles.map((profile) => {
             const isSelected = currentProfile === profile.id;
-            const isDisabled = profile.badge === "Em breve";
+            const isDisabled = false;
 
             return (
               <Card

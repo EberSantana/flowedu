@@ -306,6 +306,13 @@
 - [x] Remover imports de invitations do db.ts
 - [x] Reiniciar servidor para limpar cache
 
+## Perfis de Professor (Tradicional, Entusiasta, Interativo, Organizacional)
+- [x] Implementar perfis "Interativo" e "Organizacional"
+  - [x] Atualizar schema do banco de dados com novos perfis
+  - [x] Atualizar lógica de backend para suportar todos os perfis
+  - [x] Criar interface de seleção de perfis com os 4 tipos
+  - [x] Testar funcionalidade completa
+
 ## Cadastro Manual de Professores
 - [x] Criar rota tRPC admin.createUser
 - [x] Validar e-mail único (rejeita duplicados)
