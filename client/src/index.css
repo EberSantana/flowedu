@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./styles/avatar-animations.css";
+@import "./styles/hd2d-animations.css";
 
 @custom-variant dark (&:is(.dark *));
 

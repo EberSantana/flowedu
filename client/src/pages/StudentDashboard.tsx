@@ -16,6 +16,8 @@ import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { type BeltColor } from "@/components/KarateAvatarPro";
 import { BeltUpgradeNotification } from "@/components/BeltUpgradeNotification";
 import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
+import { HD2DUnlockNotification } from "@/components/HD2DUnlockNotification";
+import { useHD2DUnlockDetection } from "@/hooks/useHD2DUnlockDetection";
 
 // Novos componentes profissionais
 import { StudentDashboardHeader } from "@/components/StudentDashboardHeader";
@@ -61,6 +63,9 @@ export default function StudentDashboard() {
 
   // Hook para detectar e exibir notificação de upgrade de faixa
   const { upgradeData, clearNotification } = useBeltUpgradeNotification(currentBelt, studentTechCoins);
+  
+  // Hook para detectar desbloqueio de personagens HD-2D
+  const { pendingUnlock, clearUnlock } = useHD2DUnlockDetection();
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
@@ -79,6 +84,14 @@ export default function StudentDashboard() {
           newBelt={upgradeData.newBelt}
           totalPoints={upgradeData.totalPoints}
           onClose={clearNotification}
+        />
+      )}
+      
+      {/* Notificação de Desbloqueio HD-2D */}
+      {pendingUnlock && (
+        <HD2DUnlockNotification
+          characterId={pendingUnlock.characterId}
+          onClose={clearUnlock}
         />
       )}
 

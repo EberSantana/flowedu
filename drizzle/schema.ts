@@ -468,6 +468,9 @@ export const students = mysqlTable("students", {
   avatarPose: varchar("avatarPose", { length: 20 }).default("standing"), // Pose (standing, fighting, punch, kick)
   specialKimono: varchar("specialKimono", { length: 30 }).default("none"), // Kimono especial desbloqueável (none, golden, silver, patterned_dragon, patterned_tiger, patterned_sakura)
   avatarAccessories: text("avatarAccessories"), // JSON com acessórios desbloqueados
+  // Campos HD-2D (Octopath Traveler II Style)
+  hd2dCharacterId: int("hd2dCharacterId").default(1).notNull(), // ID do personagem HD-2D (1-8)
+  hd2dUnlockedCharacters: text("hd2dUnlockedCharacters"), // JSON array de IDs desbloqueados
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

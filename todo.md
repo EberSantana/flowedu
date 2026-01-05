@@ -3985,3 +3985,51 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Sistema de desbloqueio progressivo de skills
 - [x] Notificações de novo título honorífico (função pronta)
 - [x] Testes automatizados (13 testes passando)
+
+
+## Sistema de Avatares HD-2D (Octopath Traveler II Style)
+
+### Fase 1: Design e Geração de Sprites
+- [ ] Gerar 8 sprites de personagens diversos (pixel art HD-2D)
+- [ ] Criar variações de faixas de karatê para cada personagem
+- [ ] Gerar assets de efeitos visuais (partículas, brilhos, sombras)
+- [ ] Criar sprite sheets para animações
+
+### Fase 2: Banco de Dados
+- [x] Adicionar campos: hd2dCharacterId, hd2dUnlockedCharacters
+- [x] Arquivo de configuração dos 8 personagens (shared/hd2d-characters.ts)
+- [x] Sistema de desbloqueio de personagens
+- [x] Rotas tRPC: getHD2DCharacter, changeHD2DCharacter, unlockHD2DCharacter
+
+### Fase 3: Componente Visual
+- [x] Componente HD2DAvatarDisplay.tsx
+- [x] Animações idle (respiração, piscar, balanço)
+- [x] Efeitos de iluminação volumétrica
+- [x] Partículas e brilhos dinâmicos
+- [x] Sombras suaves e profundidade
+- [x] Arquivo de animações CSS (hd2d-animations.css)
+- [x] Componente HD2DAvatarGallery para seleção
+
+### Fase 4: Customização
+- [x] Página de seleção de personagem (CustomizeHD2DAvatar.tsx)
+- [x] Sistema de visualização de personagens desbloqueados
+- [x] Preview em tempo real com confirmação
+- [x] Sistema de desbloqueio por pontos
+- [x] Barra de progresso para próximo personagem
+- [x] Estatísticas de desbloqueio
+- [x] Rota adicionada no App.tsx
+
+### Fase 5: Integração
+- [x] Integrar no StudentDashboard
+- [x] Botão de acesso rápido no header (StudentDashboardHeaderKimono)
+- [x] Sistema de notificações de desbloqueio (HD2DUnlockNotification)
+- [x] Hook de detecção automática (useHD2DUnlockDetection)
+- [x] Desbloqueio automático baseado em pontos
+- [x] Galeria de personagens (CustomizeHD2DAvatar)
+
+### Fase 6: Testes
+- [x] Testes vitest criados e passando (hd2d-avatar.test.ts)
+- [x] Validação de configurações dos personagens
+- [x] Testes de lógica de desbloqueio
+- [x] Verificação de TypeScript sem erros
+- [x] Servidor rodando corretamente

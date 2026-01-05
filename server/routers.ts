@@ -3323,6 +3323,69 @@ JSON (descrições MAX 15 chars):
         
         return results;
       }),
+
+    // ==================== HD-2D AVATAR SYSTEM ====================
+    
+    // Obter personagem HD-2D atual do aluno
+    getHD2DCharacter: studentProcedure
+      .query(async ({ ctx }) => {
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
+        if (!student) throw new Error("Aluno não encontrado");
+        
+        return {
+          characterId: student.hd2dCharacterId || 1,
+          unlockedCharacters: student.hd2dUnlockedCharacters 
+            ? JSON.parse(student.hd2dUnlockedCharacters) 
+            : [1],
+        };
+      }),
+    
+    // Trocar personagem HD-2D
+    changeHD2DCharacter: studentProcedure
+      .input(z.object({ characterId: z.number().min(1).max(8) }))
+      .mutation(async ({ ctx, input }) => {
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
+        if (!student) throw new Error("Aluno não encontrado");
+        
+        const unlockedCharacters = student.hd2dUnlockedCharacters 
+          ? JSON.parse(student.hd2dUnlockedCharacters)
+          : [1];
+        
+        if (!unlockedCharacters.includes(input.characterId)) {
+          throw new Error("Personagem não desbloqueado");
+        }
+        
+        return await db.updateStudent(
+          ctx.studentSession.studentId,
+          { hd2dCharacterId: input.characterId },
+          ctx.studentSession.professorId
+        );
+      }),
+    
+    // Desbloquear novo personagem HD-2D
+    unlockHD2DCharacter: studentProcedure
+      .input(z.object({ characterId: z.number().min(1).max(8) }))
+      .mutation(async ({ ctx, input }) => {
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
+        if (!student) throw new Error("Aluno não encontrado");
+        
+        const unlockedCharacters = student.hd2dUnlockedCharacters 
+          ? JSON.parse(student.hd2dUnlockedCharacters)
+          : [1];
+        
+        if (unlockedCharacters.includes(input.characterId)) {
+          throw new Error("Personagem já desbloqueado");
+        }
+        
+        unlockedCharacters.push(input.characterId);
+        unlockedCharacters.sort((a: number, b: number) => a - b);
+        
+        return await db.updateStudent(
+          ctx.studentSession.studentId,
+          { hd2dUnlockedCharacters: JSON.stringify(unlockedCharacters) },
+          ctx.studentSession.professorId
+        );
+      }),
   }),
 
   // Notifications

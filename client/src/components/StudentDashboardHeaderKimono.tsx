@@ -11,7 +11,8 @@ import {
   Palette,
   TrendingUp,
   Flame,
-  Award
+  Award,
+  Users
 } from 'lucide-react';
 
 interface StudentDashboardHeaderKimonoProps {
@@ -190,17 +191,29 @@ export const StudentDashboardHeaderKimono: React.FC<StudentDashboardHeaderKimono
               </div>
             </div>
 
-            {/* Botão de personalizar - Loja de Kimonos */}
-            <Link href="/student/kimono-shop">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-4 gap-2 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all shadow-sm"
-              >
-                <Palette className="w-4 h-4" />
-                Loja de Kimonos
-              </Button>
-            </Link>
+            {/* Botões de personalização */}
+            <div className="mt-4 flex gap-2">
+              <Link href="/student/kimono-shop">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all shadow-sm"
+                >
+                  <Palette className="w-4 h-4" />
+                  Kimonos
+                </Button>
+              </Link>
+              <Link href="/student/customize-hd2d-avatar">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-600 transition-all shadow-sm"
+                >
+                  <Users className="w-4 h-4" />
+                  Personagens HD-2D
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Seção de Informações */}

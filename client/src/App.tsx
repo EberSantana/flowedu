@@ -56,6 +56,7 @@ import AvatarTest from "./pages/AvatarTest";
 import { CustomizeAvatar } from "./pages/CustomizeAvatar";
 import Avatar3DDemo from "./pages/Avatar3DDemo";
 import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
+import CustomizeHD2DAvatar from "./pages/student/CustomizeHD2DAvatar";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
 import StudentShop from "./pages/StudentShop";
 import KimonoShop from "./pages/KimonoShop";
@@ -118,6 +119,7 @@ function Router() {
         <Route path={"/avatar-test"} component={AvatarTest} />
         <Route path={"/avatar-3d-demo"} component={Avatar3DDemo} />
         <Route path={"/student/customize-avatar-3d"} component={CustomizeAvatar3D} />
+        <Route path={"/student/customize-hd2d-avatar"} component={CustomizeHD2DAvatar} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
