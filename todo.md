@@ -4659,3 +4659,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Ajuste Modal de Personalização de Ações Rápidas
 - [x] Deixar opções não selecionadas disponíveis (não desabilitadas) no modal de personalização
+
+## Melhorias de Layout - Estatísticas de PC
+- [x] Melhorar layout da página de estatísticas de disciplina (Pensamento Computacional) - padronizar design e organização visual
