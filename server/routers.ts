@@ -3663,6 +3663,7 @@ JSON (descrições MAX 15 chars):
     getStudentStats: studentProcedure
       .query(async ({ ctx }) => {
         const points = await db.getOrCreateStudentPoints(ctx.studentSession.studentId);
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
         const ranking = await db.getClassRanking(100);
         const studentRank = ranking.findIndex(r => r.studentId === ctx.studentSession.studentId) + 1;
         
@@ -3672,6 +3673,9 @@ JSON (descrições MAX 15 chars):
           currentBelt: points?.currentBelt || 'white',
           streakDays: points?.streakDays || 0,
           rank: studentRank || null,
+          avatarSkinTone: student?.avatarSkinTone || 'light',
+          avatarKimonoColor: student?.avatarKimonoColor || 'white',
+          avatarHairStyle: student?.avatarHairStyle || 'short',
         };
       }),
     

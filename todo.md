@@ -4121,3 +4121,21 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Atualizar README com descrição dos 4 perfis
 - [ ] Criar guia de uso para cada perfil
 - [ ] Documentar diferenças entre perfis
+
+
+## Simplificação da Gamificação do Portal do Aluno (2025-01-04)
+
+### Objetivo
+Criar interface única, limpa e funcional focada no essencial: pontos, faixa, conquistas e ranking.
+
+### Tarefas
+- [x] Redesenhar StudentGamification.tsx com layout simplificado
+- [x] Card principal unificado (avatar + faixa + pontos + progresso + streak)
+- [x] Seção "Minhas Conquistas" com grid 3x3 de badges conquistados
+- [x] Seção "Minha Posição" com ranking simplificado (posição + top 3)
+- [x] Remover abas múltiplas (Tabs)
+- [x] Remover radar chart de PC da página de gamificação
+- [x] Remover histórico detalhado de 20 atividades
+- [x] Remover distribuição de faixas
+- [x] Testar responsividade mobile
+- [x] Validar carregamento e estados vazios
