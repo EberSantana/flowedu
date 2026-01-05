@@ -1,9 +1,23 @@
 # Sistema de Gestão de Tempo para Professores - TODO
 
+## 🛠️ Remoção de Gamificação
+
+- [x] Remover sistema de faixas/belts do painel do aluno
+- [x] Remover sistema de pontos e Tech Coins
+- [x] Remover avatares e customização
+- [x] Remover badges e conquistas
+- [x] Remover leaderboard/ranking
+- [x] Remover loja virtual
+- [x] Remover carteira virtual
+- [x] Remover páginas de gamificação do professor
+- [x] Limpar navegação e rotas
+- [x] Deixar ambiente profissional e objetivo
+
 ## 🐛 Bugs Críticos
 
 - [x] Corrigir validação de respostas no quiz - resposta correta sendo marcada como incorreta
 - [x] Corrigir exibição do enunciado das questões no quiz - enunciado não está aparecendo
+- [ ] BUG: Respostas corretas não estão sendo contabilizadas no contador de acertos do quiz (mostra 0 acertos mesmo quando a resposta está correta)
 
 - [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React)
 - [ ] Corrigir logout automático após 10 segundos no portal do aluno (em investigação - cookie configurado, refetch desabilitado, redirecionamento corrigido)

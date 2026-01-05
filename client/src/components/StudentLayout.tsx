@@ -10,13 +10,11 @@ import {
   Bell, 
   Home, 
   User, 
-  Trophy, 
   FileText, 
   Map,
   Menu,
   X,
-  Lightbulb,
-  TrendingUp
+  Lightbulb
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -64,8 +62,6 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths", color: "text-purple-600" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "text-orange-600" },
     { icon: Lightbulb, label: "Revisão Inteligente", path: "/student-review", color: "text-indigo-600" },
-    { icon: TrendingUp, label: "Minha Evolução", path: "/student-gamification", color: "text-amber-600" },
-    { icon: Trophy, label: "Rankings", path: "/student-leaderboard", color: "text-yellow-600" },
     { icon: Bell, label: "Avisos", path: "/student-announcements", color: "text-red-600" },
   ];
 

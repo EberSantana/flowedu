@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
@@ -23,8 +22,6 @@ import LearningPaths from "./pages/LearningPaths";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentSubjectView from "./pages/StudentSubjectView";
 import StudentSubjectDetails from "./pages/StudentSubjectDetails";
-// StudentWallet removido - simplificação do portal
-// HiddenAchievements removido - simplificação do portal
 import ManageEnrollments from "./pages/ManageEnrollments";
 import TopicMaterialsManager from "./pages/TopicMaterialsManager";
 import Students from "./pages/Students";
@@ -43,38 +40,16 @@ import StudentSubjects from "./pages/StudentSubjects";
 import StudentLearningPaths from "./pages/StudentLearningPaths";
 import StudentLearningPathDetail from "./pages/StudentLearningPathDetail";
 import StudentProfilePage from "./pages/StudentProfilePage";
-import StudentGamificationSimple from "./pages/StudentGamificationSimple";
-import GamificationDashboard from "./pages/GamificationDashboard";
-import StudentEvolution from "./pages/StudentEvolution";
-import Belt3DDemo from "./pages/Belt3DDemo";
-
 import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
 import StudentExerciseResults from "./pages/StudentExerciseResults";
 import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
 import TeacherReviewAnswers from "./pages/TeacherReviewAnswers";
-import { Leaderboard } from "./pages/Leaderboard";
-import { StudentLeaderboard } from "./pages/StudentLeaderboard";
 import StudentReview from "./pages/StudentReview";
-import AvatarTest from "./pages/AvatarTest";
-import { CustomizeAvatar } from "./pages/CustomizeAvatar";
-import Avatar3DDemo from "./pages/Avatar3DDemo";
-import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
-import CustomizeHD2DAvatar from "./pages/student/CustomizeHD2DAvatar";
-import StudentBeltHistory from "./pages/StudentBeltHistory";
-import BeltShowcase from "./pages/BeltShowcase";
-import TestBeltTransitions from "./pages/TestBeltTransitions";
-// StudentShop removido - simplificação do portal
-import KimonoShop from "./pages/KimonoShop";
-import { SubjectGamificationDashboard } from "./pages/SubjectGamificationDashboard";
-import ChooseSpecialization from "./pages/ChooseSpecialization";
-import SkillTree from "./pages/SkillTree";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
-import { TeacherBeltHome } from "./pages/TeacherBeltHome";
 import { TeacherAddActivity } from "./pages/TeacherAddActivity";
-import { TeacherEvolution } from "./pages/TeacherEvolution";
 
 function Router() {
   return (
@@ -105,48 +80,23 @@ function Router() {
         <Route path={"/profile"} component={Profile} />
         <Route path={"/profile-selection"} component={ProfileSelection} />
         <Route path={"/admin/users"} component={AdminUsers} />
-        <Route path={"/teacher-belt"} component={TeacherBeltHome} />
-        <Route path={"/teacher-belt/add-activity"} component={TeacherAddActivity} />
-        <Route path={"/teacher-belt/evolution"} component={TeacherEvolution} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
-        <Route path={"/student-evolution"} component={StudentEvolution} />
-        <Route path={"/belt-3d-demo"} component={Belt3DDemo} />
         <Route path={"/student-subjects"} component={StudentSubjects} />
         <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
         <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />
         <Route path={"/student-announcements"} component={StudentAnnouncements} />
         <Route path={"/student-profile"} component={StudentProfilePage} />
-        <Route path={"/student-gamification"} component={StudentGamificationSimple} />
-        <Route path={"/gamification-dashboard"} component={GamificationDashboard} />
-        <Route path={"/leaderboard"} component={Leaderboard} />
-        <Route path={"/student-leaderboard"} component={StudentLeaderboard} />
-
         <Route path={"/student-exercises"} component={StudentExercises} />
         <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
         <Route path={"/student-review"} component={StudentReview} />
-        <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
-        <Route path={"/student/belt-history"} component={StudentBeltHistory} />
-        <Route path={"/belt-showcase"} component={BeltShowcase} />
-        <Route path={"/test-belt-transitions"} component={TestBeltTransitions} />
-        {/* Rotas removidas - simplificação do portal */}
-        <Route path={"/student/kimono-shop"} component={KimonoShop} />
-
-
-        <Route path={"/student/choose-specialization"} component={ChooseSpecialization} />
-        <Route path={"/student/skill-tree"} component={SkillTree} />
-        <Route path={"/avatar-test"} component={AvatarTest} />
-        <Route path={"/avatar-3d-demo"} component={Avatar3DDemo} />
-        <Route path={"/student/customize-avatar-3d"} component={CustomizeAvatar3D} />
-        <Route path={"/student/customize-hd2d-avatar"} component={CustomizeHD2DAvatar} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
         <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
         <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
         <Route path={"/students"} component={Students} />
         <Route path={"/students/:id"} component={StudentProfile} />
-         <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
-        <Route path={"/subjects/:subjectId/gamification"} component={SubjectGamificationDashboard} />
+        <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>
@@ -163,7 +113,6 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <SidebarProvider>
           <TooltipProvider>
-            <Toaster />
             <Router />
           </TooltipProvider>
         </SidebarProvider>

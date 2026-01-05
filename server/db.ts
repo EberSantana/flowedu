@@ -4355,13 +4355,39 @@ export async function submitExerciseAttempt(
   
   // Corrigir questões objetivas
   let correctAnswers = 0;
-  const questions = exerciseData.exercises || [];
+  
+  // Tentar diferentes estruturas possíveis de exerciseData
+  let questions = [];
+  if (exerciseData.exercises && Array.isArray(exerciseData.exercises)) {
+    questions = exerciseData.exercises;
+  } else if (exerciseData.questions && Array.isArray(exerciseData.questions)) {
+    questions = exerciseData.questions;
+  } else if (Array.isArray(exerciseData)) {
+    questions = exerciseData;
+  }
   
   const detailedAnswers = answers.map((answer, idx) => {
     const question = questions[idx];
+    
+    // Proteção: se a questão não existe, retornar resposta inválida
+    if (!question) {
+      return {
+        attemptId,
+        questionNumber: idx + 1,
+        questionType: 'unknown',
+        studentAnswer: answer.answer || "",
+        correctAnswer: null,
+        isCorrect: null,
+        pointsAwarded: 0,
+      };
+    }
+    
     let isCorrect = false;
     
-    if (question.type === "objective" && question.correctAnswer) {
+    // Verificar se é questão objetiva (aceitar "objective" ou "multiple_choice")
+    const isObjectiveQuestion = question && (question.type === "objective" || question.type === "multiple_choice");
+    
+    if (isObjectiveQuestion && question.correctAnswer) {
       // Normalizar respostas para comparação
       const studentAns = answer.answer?.trim();
       const correctAns = question.correctAnswer.trim();
@@ -4381,7 +4407,9 @@ export async function submitExerciseAttempt(
         isCorrect = studentAns === correctLetter;
       }
       
-      if (isCorrect) correctAnswers++;
+      if (isCorrect) {
+        correctAnswers++;
+      }
     }
     
     return {
@@ -4390,7 +4418,7 @@ export async function submitExerciseAttempt(
       questionType: question.type,
       studentAnswer: answer.answer || "",
       correctAnswer: question.correctAnswer || null,
-      isCorrect: question.type === "objective" ? isCorrect : null,
+      isCorrect: isObjectiveQuestion ? isCorrect : null,
       pointsAwarded: isCorrect ? 10 : 0, // 10 pontos por questão correta
     };
   });
