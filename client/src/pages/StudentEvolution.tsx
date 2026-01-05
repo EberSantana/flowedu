@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import StudentLayout from '../components/StudentLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Belt3DRealistic, BeltColor, BELT_COLORS } from '@/components/Belt3DRealistic';
+import { LevelUpModal } from '@/components/LevelUpModal';
+import { AnimatedProgressBar } from '@/components/AnimatedProgressBar';
+import { showGamificationToast, useDetectLevelUp } from '@/components/GamificationToast';
+import { motion } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import { useStudentAuth } from '@/hooks/useStudentAuth';
 import { 
@@ -60,12 +64,47 @@ function getNextBeltThreshold(points: number): number {
 export default function StudentEvolution() {
   const { student } = useStudentAuth();
   const [selectedBelt, setSelectedBelt] = useState<BeltColor | null>(null);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [levelUpData, setLevelUpData] = useState<{
+    oldBelt: any;
+    newBelt: any;
+  } | null>(null);
+  const previousBeltRef = useRef<BeltColor | null>(null);
 
   // Buscar estatísticas do aluno
   const { data: stats, isLoading } = trpc.gamification.getStudentStats.useQuery();
 
   const totalPoints = stats?.totalPoints || 0;
   const currentBelt = getBeltFromPoints(totalPoints);
+
+  // Detectar mudança de faixa e mostrar modal
+  useEffect(() => {
+    if (previousBeltRef.current && previousBeltRef.current !== currentBelt) {
+      const oldBeltConfig = BELT_CONFIG.find(b => b.name === previousBeltRef.current);
+      const newBeltConfig = BELT_CONFIG.find(b => b.name === currentBelt);
+      
+      if (oldBeltConfig && newBeltConfig) {
+        setLevelUpData({
+          oldBelt: {
+            name: oldBeltConfig.name,
+            displayName: oldBeltConfig.label,
+            level: BELT_CONFIG.findIndex(b => b.name === oldBeltConfig.name) + 1,
+            color: oldBeltConfig.color,
+            icon: oldBeltConfig.icon
+          },
+          newBelt: {
+            name: newBeltConfig.name,
+            displayName: newBeltConfig.label,
+            level: BELT_CONFIG.findIndex(b => b.name === newBeltConfig.name) + 1,
+            color: newBeltConfig.color,
+            icon: newBeltConfig.icon
+          }
+        });
+        setShowLevelUpModal(true);
+      }
+    }
+    previousBeltRef.current = currentBelt;
+  }, [currentBelt]);
   const nextThreshold = getNextBeltThreshold(totalPoints);
   const currentBeltIndex = BELT_CONFIG.findIndex(b => b.name === currentBelt);
   const currentBeltConfig = BELT_CONFIG[currentBeltIndex];
@@ -104,6 +143,11 @@ export default function StudentEvolution() {
         </div>
 
         {/* Card de Faixa Atual */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
         <Card 
           className="border-2 shadow-xl overflow-hidden"
           style={{
@@ -143,41 +187,29 @@ export default function StudentEvolution() {
                   </div>
                 </div>
 
-                {/* Barra de Progresso */}
-                {currentBelt !== 'black' && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
+                {/* Barra de Progresso Animada */}
+                {currentBelt !== 'black' && nextBeltConfig && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                  >
+                    <div className="flex items-center justify-between text-sm mb-3">
                       <span className="flex items-center gap-2 text-gray-500">
                         <TrendingUp className="w-4 h-4" />
-                        Próxima faixa
-                      </span>
-                      <span className="font-medium text-gray-700">
-                        {totalPoints} / {nextThreshold}
+                        Próxima faixa: {nextBeltConfig.label}
                       </span>
                     </div>
-
-                    <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                      <div
-                        className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out"
-                        style={{
-                          width: `${progressPercent}%`,
-                          background: nextBeltConfig
-                            ? `linear-gradient(90deg, ${BELT_COLORS[currentBelt].primary} 0%, ${BELT_COLORS[nextBeltConfig.name as BeltColor].primary} 100%)`
-                            : BELT_COLORS[currentBelt].primary,
-                          boxShadow: `0 0 10px ${BELT_COLORS[currentBelt].glow}`
-                        }}
-                      >
-                        <div 
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                          style={{ animation: 'shimmer 2s ease-in-out infinite' }}
-                        />
-                      </div>
-                    </div>
-
-                    <p className="text-center text-gray-600">
-                      Faltam <span className="font-bold text-gray-800">{pointsToNext}</span> Tech Coins para a próxima faixa
-                    </p>
-                  </div>
+                    <AnimatedProgressBar
+                      currentPoints={totalPoints}
+                      minPoints={currentBeltMin}
+                      maxPoints={nextThreshold}
+                      currentColor={BELT_COLORS[currentBelt].primary}
+                      nextColor={BELT_COLORS[nextBeltConfig.name as BeltColor].primary}
+                      height={20}
+                      showPercentage={true}
+                    />
+                  </motion.div>
                 )}
 
                 {currentBelt === 'black' && (
@@ -192,8 +224,14 @@ export default function StudentEvolution() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Ranking da Turma */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -257,8 +295,14 @@ export default function StudentEvolution() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Jornada das Faixas */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -324,9 +368,15 @@ export default function StudentEvolution() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Estatísticas Detalhadas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        >
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-blue-700">
@@ -362,23 +412,19 @@ export default function StudentEvolution() {
               <div className="text-sm text-purple-600 mt-1">Precisão Média</div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Estilos CSS */}
-      <style>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          50% {
-            transform: translateX(100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
+      {/* Modal de Level Up */}
+      {showLevelUpModal && levelUpData && (
+        <LevelUpModal
+          isOpen={showLevelUpModal}
+          onClose={() => setShowLevelUpModal(false)}
+          oldBelt={levelUpData.oldBelt}
+          newBelt={levelUpData.newBelt}
+          totalPoints={totalPoints}
+        />
+      )}
     </StudentLayout>
   );
 }
