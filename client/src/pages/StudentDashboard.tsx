@@ -7,73 +7,39 @@ import {
   Clock, 
   GraduationCap, 
   AlertCircle, 
-  ArrowRight,
-  CheckCircle
+  ArrowRight
 } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
-import { type BeltColor } from "@/components/KarateAvatarPro";
 import { BeltUpgradeNotification } from "@/components/BeltUpgradeNotification";
 import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
-import { HD2DUnlockNotification } from "@/components/HD2DUnlockNotification";
-import { useHD2DUnlockDetection } from "@/hooks/useHD2DUnlockDetection";
 
-// Novos componentes profissionais
-import { StudentDashboardHeader } from "@/components/StudentDashboardHeader";
-import { StudentDashboardHeaderKimono } from "@/components/StudentDashboardHeaderKimono";
-import { GamifiedStatsCards } from "@/components/GamifiedStatsCards";
+// Componentes simplificados
+import { StudentDashboardHeaderSimple } from "@/components/StudentDashboardHeaderSimple";
 import { QuickActionsGrid } from "@/components/QuickActionsGrid";
-import { NextGoalsSection } from "@/components/NextGoalsSection";
 import { StudentAlerts } from "@/components/StudentAlerts";
-
-// Função helper para determinar a faixa baseada em Tech Coins
-function getBeltFromPoints(techCoins: number): BeltColor {
-  if (techCoins >= 5000) return 'black';      // Faixa Preta: 5000+
-  if (techCoins >= 2500) return 'brown';      // Faixa Marrom: 2500-4999
-  if (techCoins >= 1500) return 'purple';     // Faixa Roxa: 1500-2499
-  if (techCoins >= 1000) return 'blue';        // Faixa Azul: 1000-1499
-  if (techCoins >= 600) return 'green';       // Faixa Verde: 600-999
-  if (techCoins >= 300) return 'orange';      // Faixa Laranja: 300-599
-  if (techCoins >= 100) return 'yellow';      // Faixa Amarela: 100-299
-  return 'white';                          // Faixa Branca: 0-99
-}
-
-// Função helper para calcular Tech Coins para próxima faixa
-function getNextBeltThreshold(techCoins: number): number {
-  if (techCoins >= 5000) return 5000; // Já é faixa preta (máximo)
-  if (techCoins >= 2500) return 5000;
-  if (techCoins >= 1500) return 2500;
-  if (techCoins >= 1000) return 1500;
-  if (techCoins >= 600) return 1000;
-  if (techCoins >= 300) return 600;
-  if (techCoins >= 100) return 300;
-  return 100; // Próxima faixa é amarela
-}
+import { 
+  getBeltFromPoints, 
+  getNextBeltThreshold,
+  type BeltColor 
+} from "@/components/MinimalKarateAvatar";
 
 export default function StudentDashboard() {
   const { student } = useStudentAuth();
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
   const { data: stats } = trpc.gamification.getStudentStats.useQuery();
   
-  // Buscar Tech Coins do aluno (agora totalPoints retorna Tech Coins)
+  // Buscar Tech Coins do aluno
   const studentTechCoins = stats?.totalPoints || 0;
-  const currentBelt = (stats?.currentBelt as BeltColor) || getBeltFromPoints(studentTechCoins);
+  const currentBelt = getBeltFromPoints(studentTechCoins);
   const nextThreshold = getNextBeltThreshold(studentTechCoins);
 
   // Hook para detectar e exibir notificação de upgrade de faixa
   const { upgradeData, clearNotification } = useBeltUpgradeNotification(currentBelt, studentTechCoins);
-  
-  // Hook para detectar desbloqueio de personagens HD-2D
-  const { pendingUnlock, clearUnlock } = useHD2DUnlockDetection();
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
-
-  // Dados de customização do avatar (usar valores padrão ou do banco)
-  const avatarSkinTone = (student as any)?.avatarSkinTone || 'light';
-  const avatarHairStyle = (student as any)?.avatarHairStyle || 'short';
-  const avatarKimonoColor = (student as any)?.avatarKimonoColor || 'white';
 
   return (
     <>
@@ -86,14 +52,6 @@ export default function StudentDashboard() {
           onClose={clearNotification}
         />
       )}
-      
-      {/* Notificação de Desbloqueio HD-2D */}
-      {pendingUnlock && (
-        <HD2DUnlockNotification
-          characterId={pendingUnlock.characterId}
-          onClose={clearUnlock}
-        />
-      )}
 
       <StudentLayout>
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
@@ -102,13 +60,12 @@ export default function StudentDashboard() {
             <StudentAlerts />
           </div>
 
-          {/* Header Profissional com Avatar de Kimono */}
-          <StudentDashboardHeaderKimono
+          {/* Header Simplificado com Avatar Minimalista */}
+          <StudentDashboardHeaderSimple
             studentName={student?.fullName || 'Aluno'}
             currentBelt={currentBelt}
             totalPoints={studentTechCoins}
             nextBeltThreshold={nextThreshold}
-            streak={0}
           />
 
           {isLoading ? (
@@ -122,26 +79,8 @@ export default function StudentDashboard() {
             </div>
           ) : (
             <>
-              {/* Cards de Estatísticas Gamificados */}
-              <GamifiedStatsCards
-                activeSubjects={activeSubjects.length}
-                completedSubjects={completedSubjects.length}
-                totalSubjects={enrolledSubjects?.length || 0}
-                totalPoints={studentTechCoins}
-                exercisesCompleted={0}
-                badges={0}
-              />
-
               {/* Ações Rápidas */}
               <QuickActionsGrid />
-
-              {/* Próximas Metas */}
-              <NextGoalsSection
-                currentBelt={currentBelt}
-                totalPoints={studentTechCoins}
-                exercisesCompleted={0}
-                badgesEarned={0}
-              />
 
               {/* Minhas Disciplinas */}
               <div className="mb-10">
@@ -247,40 +186,21 @@ export default function StudentDashboard() {
                 )}
               </div>
 
-              {/* Disciplinas Concluídas */}
+              {/* Resumo de Progresso */}
               {completedSubjects.length > 0 && (
-                <div className="mt-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
-                      <CheckCircle className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">Disciplinas Concluídas</h2>
-                      <p className="text-sm text-gray-500">
-                        {completedSubjects.length} disciplina{completedSubjects.length !== 1 ? 's' : ''} finalizada{completedSubjects.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
+                <div className="mb-10">
+                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
                     <CardContent className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {completedSubjects.map((enrollment: any) => (
-                          <div
-                            key={enrollment.id}
-                            className="p-4 bg-white rounded-xl border border-green-200 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-gray-900 text-base line-clamp-1">
-                                {enrollment.subject?.name || 'Disciplina'}
-                              </h4>
-                              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                            </div>
-                            <p className="text-sm text-gray-500 font-mono">
-                              {enrollment.subject?.code || ''}
-                            </p>
-                          </div>
-                        ))}
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-green-100 rounded-xl">
+                          <GraduationCap className="w-8 h-8 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-lg">Disciplinas Concluídas</h3>
+                          <p className="text-gray-600">
+                            Você já completou <span className="font-bold text-green-600">{completedSubjects.length}</span> disciplina{completedSubjects.length !== 1 ? 's' : ''}!
+                          </p>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

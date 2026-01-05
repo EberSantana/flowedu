@@ -7,13 +7,12 @@ import {
   Trophy, 
   TrendingUp, 
   BookOpen, 
-  Palette,
   Brain,
   Target,
   Sparkles,
   ChevronRight,
   Star,
-  Swords
+  Lightbulb
 } from 'lucide-react';
 
 interface QuickAction {
@@ -43,16 +42,6 @@ const QUICK_ACTIONS: QuickAction[] = [
     points: 10,
   },
   {
-    id: 'rankings',
-    title: 'Rankings',
-    description: 'Ver sua classificação',
-    icon: <Trophy className="w-8 h-8" />,
-    href: '/student-leaderboard',
-    color: 'text-yellow-600',
-    gradient: 'from-yellow-50 to-amber-50',
-    hoverBorder: 'hover:border-yellow-300',
-  },
-  {
     id: 'trails',
     title: 'Trilhas',
     description: 'Acompanhar progresso',
@@ -73,25 +62,24 @@ const QUICK_ACTIONS: QuickAction[] = [
     hoverBorder: 'hover:border-blue-300',
   },
   {
-    id: 'customize',
-    title: 'Personalizar',
-    description: 'Customizar seu avatar',
-    icon: <Palette className="w-8 h-8" />,
-    href: '/student/customize-avatar',
-    color: 'text-pink-600',
-    gradient: 'from-pink-50 to-rose-50',
-    hoverBorder: 'hover:border-pink-300',
-  },
-  {
-    id: 'specialization',
-    title: 'Especialização',
-    description: 'Escolher seu caminho',
-    icon: <Swords className="w-8 h-8" />,
-    href: '/student/choose-specialization',
+    id: 'review',
+    title: 'Revisão',
+    description: 'Revisar conteúdos estudados',
+    icon: <Lightbulb className="w-8 h-8" />,
+    href: '/student-review',
     color: 'text-indigo-600',
     gradient: 'from-indigo-50 to-purple-50',
     hoverBorder: 'hover:border-indigo-300',
-    isNew: true,
+  },
+  {
+    id: 'rankings',
+    title: 'Rankings',
+    description: 'Ver sua classificação',
+    icon: <Trophy className="w-8 h-8" />,
+    href: '/student-leaderboard',
+    color: 'text-yellow-600',
+    gradient: 'from-yellow-50 to-amber-50',
+    hoverBorder: 'hover:border-yellow-300',
   },
 ];
 
@@ -188,7 +176,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
 }) => {
   const actions = showComputationalThinking 
     ? [
-        ...QUICK_ACTIONS.slice(0, 3),
+        ...QUICK_ACTIONS.slice(0, 2),
         {
           id: 'ct',
           title: 'Pensamento Computacional',
@@ -200,7 +188,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
           hoverBorder: 'hover:border-teal-300',
           badge: 'PC',
         },
-        ...QUICK_ACTIONS.slice(3),
+        ...QUICK_ACTIONS.slice(2),
       ]
     : QUICK_ACTIONS;
 

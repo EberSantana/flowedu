@@ -4183,3 +4183,33 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Validar widgets condicionais do Dashboard
 - [ ] Testar funcionalidades do perfil Interativo
 - [ ] Criar testes automatizados (vitest)
+
+
+## Simplificação do Portal do Aluno (Jan 2026)
+
+### 1. Remover Loja Dojo
+- [x] Remover página StudentShop.tsx
+- [x] Remover link da loja no menu lateral do aluno
+- [x] Remover rotas relacionadas à loja no App.tsx
+- [x] Limpar imports não utilizados
+
+### 2. Redesenhar Sistema de Avatar
+- [x] Simplificar avatar para mostrar apenas kimono + faixa
+- [x] Avatar deve mudar automaticamente conforme evolução de pontos
+- [x] Remover customizações complexas (cabelo, pele, acessórios)
+- [x] Manter apenas a progressão visual de faixas (branca → preta)
+- [x] Design limpo e minimalista
+
+### 3. Simplificar Gamificação
+- [x] Redesenhar página de gamificação do aluno
+- [x] Focar em: pontos totais, faixa atual, progresso para próxima faixa
+- [x] Simplificar ou remover sistema de badges complexo
+- [x] Manter ranking da turma (Top 3 + posição do aluno)
+- [x] Interface limpa sem abas múltiplas
+
+### 4. Melhorar Portal do Aluno
+- [x] Redesenhar Dashboard do aluno com foco em simplicidade
+- [x] Remover funcionalidades não essenciais
+- [x] Melhorar hierarquia visual
+- [x] Experiência mais direta e intuitiva
+

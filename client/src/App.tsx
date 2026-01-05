@@ -23,8 +23,8 @@ import LearningPaths from "./pages/LearningPaths";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentSubjectView from "./pages/StudentSubjectView";
 import StudentSubjectDetails from "./pages/StudentSubjectDetails";
-import StudentWallet from "./pages/StudentWallet";
-import HiddenAchievements from "./pages/HiddenAchievements";
+// StudentWallet removido - simplificação do portal
+// HiddenAchievements removido - simplificação do portal
 import ManageEnrollments from "./pages/ManageEnrollments";
 import TopicMaterialsManager from "./pages/TopicMaterialsManager";
 import Students from "./pages/Students";
@@ -42,7 +42,7 @@ import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
 import StudentLearningPaths from "./pages/StudentLearningPaths";
 import StudentProfilePage from "./pages/StudentProfilePage";
-import StudentGamification from "./pages/StudentGamification";
+import StudentGamificationSimple from "./pages/StudentGamificationSimple";
 import GamificationDashboard from "./pages/GamificationDashboard";
 
 import StudentExercises from "./pages/StudentExercises";
@@ -59,7 +59,7 @@ import Avatar3DDemo from "./pages/Avatar3DDemo";
 import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
 import CustomizeHD2DAvatar from "./pages/student/CustomizeHD2DAvatar";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
-import StudentShop from "./pages/StudentShop";
+// StudentShop removido - simplificação do portal
 import KimonoShop from "./pages/KimonoShop";
 import { SubjectGamificationDashboard } from "./pages/SubjectGamificationDashboard";
 import ChooseSpecialization from "./pages/ChooseSpecialization";
@@ -102,7 +102,7 @@ function Router() {
         <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
         <Route path={"/student-announcements"} component={StudentAnnouncements} />
         <Route path={"/student-profile"} component={StudentProfilePage} />
-        <Route path={"/student-gamification"} component={StudentGamification} />
+        <Route path={"/student-gamification"} component={StudentGamificationSimple} />
         <Route path={"/gamification-dashboard"} component={GamificationDashboard} />
         <Route path={"/leaderboard"} component={Leaderboard} />
         <Route path={"/student-leaderboard"} component={StudentLeaderboard} />
@@ -112,10 +112,10 @@ function Router() {
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
         <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
-        <Route path={"/student/shop"} component={StudentShop} />
+        {/* Rotas removidas - simplificação do portal */}
         <Route path={"/student/kimono-shop"} component={KimonoShop} />
-        <Route path={"/student/wallet"} component={StudentWallet} />
-        <Route path={"/student/hidden-achievements"} component={HiddenAchievements} />
+
+
         <Route path={"/student/choose-specialization"} component={ChooseSpecialization} />
         <Route path={"/student/skill-tree"} component={SkillTree} />
         <Route path={"/avatar-test"} component={AvatarTest} />
