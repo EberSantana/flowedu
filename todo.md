@@ -4392,3 +4392,45 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Integrar animação com sistema de level up existente
 - [x] Otimizar layout das Ações Rápidas para mobile (grid 1-2 colunas em telas pequenas)
 - [x] Testar responsividade em diferentes tamanhos de tela (mobile, tablet, desktop)
+
+## 🎮 Gamificação Avançada do Portal do Aluno - Faixas Interativas
+
+### Backend & Database
+- [x] Criar tabela de animações e efeitos especiais de faixas
+- [x] Adicionar campo de streak (dias consecutivos) na tabela student_points
+- [ ] Criar tabela de conquistas especiais (achievements)
+- [x] Implementar sistema de multiplicadores de pontos
+- [x] Criar tRPC procedure para obter dados de progressão
+- [x] Implementar sistema de ranking entre alunos
+
+### Frontend - Faixa Interativa e Animada
+- [x] Criar componente InteractiveBelt.tsx com animações realistas
+- [x] Implementar animação de "amarração" da faixa ao subir de nível
+- [x] Adicionar efeitos de partículas e brilho ao conquistar nova faixa
+- [x] Criar animação de hover 3D na faixa
+- [x] Implementar rotação e movimento da faixa ao interagir
+- [ ] Adicionar som de conquista ao subir de nível
+- [x] Criar modal especial de "Level Up" com animação cinematográfica
+
+### Frontend - Dashboard Gamificado
+- [x] Redesenhar dashboard do aluno com tema gamer
+- [x] Adicionar barra de experiência animada com efeitos visuais
+- [ ] Criar painel de conquistas com badges desbloqueáveis
+- [x] Implementar sistema de notificações toast estilo gamer
+- [x] Adicionar contador de streak com ícone de fogo
+- [ ] Criar seção de "Missões Diárias" com recompensas
+- [x] Implementar leaderboard com ranking dos top 10 alunos
+
+### Integração e Mecânicas de Jogo
+- [x] Integrar pontos com todas as atividades do sistema
+- [x] Criar sistema de multiplicadores (streak bonus, perfect score bonus)
+- [ ] Implementar conquistas especiais (primeira faixa, 100% de acerto, etc)
+- [ ] Adicionar recompensas por metas atingidas
+- [ ] Criar sistema de desafios semanais
+- [ ] Implementar badges especiais para eventos
+
+### Testes
+- [ ] Criar testes vitest para sistema de streak
+- [ ] Criar testes vitest para conquistas
+- [ ] Criar testes vitest para multiplicadores de pontos
+- [ ] Testar animações em diferentes dispositivos

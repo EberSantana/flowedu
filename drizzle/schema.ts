@@ -624,6 +624,13 @@ export const studentPoints = mysqlTable("student_points", {
   streakDays: int("streakDays").default(0).notNull(),
   lastActivityDate: timestamp("lastActivityDate"),
   honorificTitle: varchar("honorificTitle", { length: 100 }), // Título honorífico (Sensei, Mestre, etc)
+  // Campos de gamificação avançada
+  beltAnimationSeen: boolean("beltAnimationSeen").default(false).notNull(), // Se já viu a animação da faixa atual
+  lastBeltUpgrade: timestamp("lastBeltUpgrade"), // Data da última evolução de faixa
+  pointsMultiplier: double("pointsMultiplier").default(1.0).notNull(), // Multiplicador de pontos (1.0 = normal, 1.5 = 50% bonus)
+  consecutivePerfectScores: int("consecutivePerfectScores").default(0).notNull(), // Sequência de 100% de acerto
+  totalExercisesCompleted: int("totalExercisesCompleted").default(0).notNull(), // Total de exercícios concluídos
+  totalPerfectScores: int("totalPerfectScores").default(0).notNull(), // Total de 100% de acerto
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

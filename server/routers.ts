@@ -3787,6 +3787,65 @@ JSON (descrições MAX 15 chars):
           avatarSkinTone: student?.avatarSkinTone || 'light',
           avatarKimonoColor: student?.avatarKimonoColor || 'white',
           avatarHairStyle: student?.avatarHairStyle || 'short',
+          // Campos de gamificação avançada
+          beltAnimationSeen: points?.beltAnimationSeen || false,
+          lastBeltUpgrade: points?.lastBeltUpgrade || null,
+          pointsMultiplier: points?.pointsMultiplier || 1.0,
+          consecutivePerfectScores: points?.consecutivePerfectScores || 0,
+          totalExercisesCompleted: points?.totalExercisesCompleted || 0,
+          totalPerfectScores: points?.totalPerfectScores || 0,
+        };
+      }),
+    
+    // Marcar animação de faixa como vista
+    markBeltAnimationSeen: studentProcedure
+      .mutation(async ({ ctx }) => {
+        return await db.markBeltAnimationSeen(ctx.studentSession.studentId);
+      }),
+    
+    // Obter estatísticas detalhadas de gamificação
+    getDetailedStats: studentProcedure
+      .query(async ({ ctx }) => {
+        const points = await db.getOrCreateStudentPoints(ctx.studentSession.studentId);
+        const history = await db.getStudentPointsHistory(ctx.studentSession.studentId, 50);
+        const badges = await db.getStudentBadges(ctx.studentSession.studentId);
+        
+        // Calcular progresso para próxima faixa
+        const beltThresholds = [
+          { name: 'white', min: 0, max: 100 },
+          { name: 'yellow', min: 100, max: 300 },
+          { name: 'orange', min: 300, max: 600 },
+          { name: 'green', min: 600, max: 1000 },
+          { name: 'blue', min: 1000, max: 1500 },
+          { name: 'purple', min: 1500, max: 2100 },
+          { name: 'brown', min: 2100, max: 3000 },
+          { name: 'black', min: 3000, max: Infinity },
+        ];
+        
+        const currentBeltIndex = beltThresholds.findIndex(b => b.name === points?.currentBelt);
+        const nextBelt = currentBeltIndex < beltThresholds.length - 1 ? beltThresholds[currentBeltIndex + 1] : null;
+        const currentThreshold = beltThresholds[currentBeltIndex];
+        
+        const progressToNextBelt = nextBelt ? {
+          current: (points?.totalPoints || 0) - currentThreshold.min,
+          required: nextBelt.min - currentThreshold.min,
+          percentage: Math.min(100, Math.round(((points?.totalPoints || 0) - currentThreshold.min) / (nextBelt.min - currentThreshold.min) * 100)),
+          nextBeltName: nextBelt.name,
+          pointsNeeded: Math.max(0, nextBelt.min - (points?.totalPoints || 0)),
+        } : null;
+        
+        return {
+          totalPoints: points?.totalPoints || 0,
+          currentBelt: points?.currentBelt || 'white',
+          streakDays: points?.streakDays || 0,
+          pointsMultiplier: points?.pointsMultiplier || 1.0,
+          consecutivePerfectScores: points?.consecutivePerfectScores || 0,
+          totalExercisesCompleted: points?.totalExercisesCompleted || 0,
+          totalPerfectScores: points?.totalPerfectScores || 0,
+          lastBeltUpgrade: points?.lastBeltUpgrade || null,
+          progressToNextBelt,
+          recentActivity: history.slice(0, 10),
+          badgesCount: badges.length,
         };
       }),
     

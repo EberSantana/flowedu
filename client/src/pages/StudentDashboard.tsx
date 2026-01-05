@@ -14,6 +14,8 @@ import { Link } from "wouter";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { BeltUpgradeNotification } from "@/components/BeltUpgradeNotification";
 import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
+import { InteractiveBelt } from "@/components/InteractiveBelt";
+import { useState, useEffect } from "react";
 
 // Componentes simplificados
 import { StudentDashboardHeaderSimple } from "@/components/StudentDashboardHeaderSimple";
@@ -37,6 +39,42 @@ export default function StudentDashboard() {
 
   // Hook para detectar e exibir notificação de upgrade de faixa
   const { upgradeData, clearNotification } = useBeltUpgradeNotification(currentBelt, studentTechCoins);
+  
+  // Estado para animação de level up
+  const [showLevelUpAnimation, setShowLevelUpAnimation] = useState(false);
+  const [previousBelt, setPreviousBelt] = useState<string | null>(null);
+  
+  // Detectar mudança de faixa
+  useEffect(() => {
+    if (previousBelt && currentBelt !== previousBelt) {
+      setShowLevelUpAnimation(true);
+    }
+    setPreviousBelt(currentBelt);
+  }, [currentBelt]);
+  
+  // Calcular progresso para próxima faixa
+  const BELT_THRESHOLDS = [
+    { name: 'white', min: 0, max: 100 },
+    { name: 'yellow', min: 100, max: 300 },
+    { name: 'orange', min: 300, max: 600 },
+    { name: 'green', min: 600, max: 1000 },
+    { name: 'blue', min: 1000, max: 1500 },
+    { name: 'purple', min: 1500, max: 2500 },
+    { name: 'brown', min: 2500, max: 5000 },
+    { name: 'black', min: 5000, max: Infinity },
+  ];
+  
+  const currentBeltIndex = BELT_THRESHOLDS.findIndex(b => b.name === currentBelt);
+  const nextBelt = currentBeltIndex < BELT_THRESHOLDS.length - 1 ? BELT_THRESHOLDS[currentBeltIndex + 1] : null;
+  const currentThreshold = BELT_THRESHOLDS[currentBeltIndex];
+  
+  const progressToNextBelt = nextBelt ? {
+    current: studentTechCoins - currentThreshold.min,
+    required: nextBelt.min - currentThreshold.min,
+    percentage: Math.min(100, Math.round(((studentTechCoins - currentThreshold.min) / (nextBelt.min - currentThreshold.min)) * 100)),
+    nextBeltName: nextBelt.name,
+    pointsNeeded: Math.max(0, nextBelt.min - studentTechCoins),
+  } : null;
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
@@ -74,6 +112,27 @@ export default function StudentDashboard() {
             </div>
           ) : (
             <>
+              {/* Seção de Faixa Interativa Gamificada */}
+              <div className="mb-10">
+                <Card className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="text-center text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Sua Jornada de Aprendizado
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex justify-center py-8">
+                    <InteractiveBelt
+                      currentBelt={currentBelt}
+                      totalPoints={studentTechCoins}
+                      progressToNextBelt={progressToNextBelt}
+                      showLevelUpAnimation={showLevelUpAnimation}
+                      onAnimationComplete={() => setShowLevelUpAnimation(false)}
+                      size="xl"
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Ações Rápidas */}
               <QuickActionsGrid />
 

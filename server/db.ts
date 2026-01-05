@@ -2528,23 +2528,44 @@ export function calculateBelt(points: number): string {
  * Esta função agora retorna dados baseados em Tech Coins
  */
 export async function getOrCreateStudentPoints(studentId: number) {
-  // Migrado para usar Tech Coins
-  const wallet = await getStudentWallet(studentId);
-  if (!wallet) return null;
-  
-  // Calcular faixa baseado em Tech Coins acumulados
-  const belt = calculateBeltFromTechCoins(wallet.totalEarned);
-  
-  // Retornar formato compatível com sistema antigo
-  return {
-    studentId: wallet.studentId,
-    totalPoints: wallet.totalEarned, // Tech Coins acumulados = "pontos"
-    currentBelt: belt,
-    streakDays: 0, // TODO: Implementar streak separadamente
-    lastActivityDate: wallet.lastTransactionAt || wallet.createdAt,
-    createdAt: wallet.createdAt,
-    updatedAt: wallet.createdAt
-  };
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Buscar registro de pontos do aluno
+    const existing = await db.select().from(studentPoints)
+      .where(eq(studentPoints.studentId, studentId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Criar novo registro se não existir
+    await db.insert(studentPoints).values({
+      studentId,
+      totalPoints: 0,
+      currentBelt: 'white',
+      streakDays: 0,
+      lastActivityDate: null,
+      beltAnimationSeen: false,
+      lastBeltUpgrade: null,
+      pointsMultiplier: 1.0,
+      consecutivePerfectScores: 0,
+      totalExercisesCompleted: 0,
+      totalPerfectScores: 0,
+    });
+
+    // Buscar o registro recém-criado
+    const newRecord = await db.select().from(studentPoints)
+      .where(eq(studentPoints.studentId, studentId))
+      .limit(1);
+
+    return newRecord[0];
+  } catch (error) {
+    console.error("[Database] Error getting/creating student points:", error);
+    return null;
+  }
 }
 
 /**
@@ -7745,4 +7766,23 @@ export async function recordTopicProgress(
   });
 
   return { success: true };
+}
+
+/**
+ * Marcar animação de faixa como vista
+ */
+export async function markBeltAnimationSeen(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    await db.update(studentPoints)
+      .set({ beltAnimationSeen: true })
+      .where(eq(studentPoints.studentId, studentId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Error marking belt animation as seen:", error);
+    return null;
+  }
 }
