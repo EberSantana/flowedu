@@ -17,7 +17,7 @@
 
 - [x] Corrigir validação de respostas no quiz - resposta correta sendo marcada como incorreta
 - [x] Corrigir exibição do enunciado das questões no quiz - enunciado não está aparecendo
-- [ ] BUG: Respostas corretas não estão sendo contabilizadas no contador de acertos do quiz (mostra 0 acertos mesmo quando a resposta está correta)
+- [x] BUG: Respostas corretas não estão sendo contabilizadas no contador de acertos do quiz (mostra 0 acertos mesmo quando a resposta está correta) - CORRIGIDO: lógica de extração de letra da resposta do aluno
 
 - [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React)
 - [ ] Corrigir logout automático após 10 segundos no portal do aluno (em investigação - cookie configurado, refetch desabilitado, redirecionamento corrigido)
@@ -2997,7 +2997,8 @@
 ### Funcionalidades Extras
 - [ ] Permitir múltiplas tentativas (configurável pelo professor)
 - [ ] Mostrar gabarito após conclusão (configurável)
-- [ ] Estatísticas de desempenho por módulo
+- [x] Estatísticas de desempenho por módulo - Página StudentStats.tsx criada com resumo de exercícios, notas e progresso
+- [x] Feedback detalhado com explicações após cada resposta - Implementado para questões corretas e incorretas
 - [ ] Filtros: por disciplina, por status, por data
 - [ ] Sistema de dicas (consome pontos)
 

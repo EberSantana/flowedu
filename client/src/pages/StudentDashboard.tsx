@@ -12,7 +12,8 @@ import {
   Map,
   Lightbulb,
   Bell,
-  User
+  User,
+  BarChart3
 } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
@@ -31,6 +32,7 @@ export default function StudentDashboard() {
     { icon: Map, label: "Trilhas", path: "/student-learning-paths", color: "bg-purple-600", description: "Trilhas de aprendizagem" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "bg-orange-600", description: "Pratique e aprenda" },
     { icon: Lightbulb, label: "Revisão", path: "/student-review", color: "bg-indigo-600", description: "Revisão inteligente" },
+    { icon: BarChart3, label: "Estatísticas", path: "/student-stats", color: "bg-green-600", description: "Seu desempenho" },
   ];
 
   return (

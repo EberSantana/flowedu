@@ -4454,17 +4454,23 @@ export async function submitExerciseAttempt(
     
     const question = questions[answer.questionNumber - 1];
     
-    // Gerar feedback para questões objetivas erradas
-    if (answer.questionType === "objective" && answer.isCorrect === false) {
+    // Gerar feedback para questões objetivas
+    if (answer.questionType === "objective") {
       try {
-        const feedbackResponse = await generateQuestionFeedback(
-          question.question,
-          answer.studentAnswer,
-          answer.correctAnswer,
-          question.explanation || ""
-        );
-        aiFeedback = feedbackResponse.feedback;
-        studyTips = feedbackResponse.studyTips;
+        if (answer.isCorrect === false) {
+          // Feedback detalhado para respostas incorretas
+          const feedbackResponse = await generateQuestionFeedback(
+            question.question,
+            answer.studentAnswer,
+            answer.correctAnswer,
+            question.explanation || ""
+          );
+          aiFeedback = feedbackResponse.feedback;
+          studyTips = feedbackResponse.studyTips;
+        } else if (answer.isCorrect === true && question.explanation) {
+          // Para respostas corretas, mostrar a explicação do professor como reforço
+          aiFeedback = `Parabéns! Você acertou. ${question.explanation}`;
+        }
       } catch (error) {
         console.error("Erro ao gerar feedback com IA:", error);
       }

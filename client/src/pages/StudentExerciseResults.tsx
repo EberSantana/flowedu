@@ -320,19 +320,25 @@ export default function StudentExerciseResults() {
                     </div>
                   )}
 
-                  {/* Feedback com IA (apenas para questões erradas) */}
-                  {!isCorrect && question.aiFeedback && (
-                    <div className="p-5 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 shadow-md">
-                      <div className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-amber-600" />
-                        Feedback Personalizado:
+                  {/* Feedback com IA */}
+                  {question.aiFeedback && (
+                    <div className={`p-5 rounded-lg shadow-md border-2 ${
+                      isCorrect 
+                        ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-300" 
+                        : "bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300"
+                    }`}>
+                      <div className={`text-sm font-bold mb-3 flex items-center gap-2 ${
+                        isCorrect ? "text-green-900" : "text-amber-900"
+                      }`}>
+                        <Sparkles className={`w-5 h-5 ${isCorrect ? "text-green-600" : "text-amber-600"}`} />
+                        {isCorrect ? "Reforço de Aprendizado:" : "Feedback Personalizado:"}
                       </div>
                       <div className="text-gray-800 text-base leading-relaxed mb-3 bg-white/70 p-4 rounded-md">
                         {question.aiFeedback}
                       </div>
                       
-                      {/* Dicas de estudo */}
-                      {question.studyTips && (
+                      {/* Dicas de estudo (apenas para erradas) */}
+                      {!isCorrect && question.studyTips && (
                         <div className="mt-4 pt-4 border-t-2 border-amber-200">
                           <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                             <GraduationCap className="w-5 h-5 text-blue-600" />
