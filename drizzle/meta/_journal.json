@@ -190,6 +190,20 @@
       "when": 1767571637316,
       "tag": "0026_yellow_menace",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1767574981516,
+      "tag": "0027_mysterious_meltdown",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1767575317712,
+      "tag": "0028_moaning_agent_brand",
+      "breakpoints": true
     }
   ]
 }

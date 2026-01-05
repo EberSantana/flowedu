@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `weekly_challenges` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `description` text NOT NULL,\n  `challengeType` enum('code','logic','speed','precision','collaborative') NOT NULL,\n  `difficulty` enum('easy','medium','hard','expert') DEFAULT 'medium' NOT NULL,\n  `coinMultiplier` float NOT NULL DEFAULT 1.0,\n  `startDate` timestamp NOT NULL,\n  `endDate` timestamp NOT NULL,\n  `isActive` boolean DEFAULT true NOT NULL,\n  `createdBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `weekly_challenges_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `weekly_challenges` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `description` text NOT NULL,\n  `challengeType` enum('code','logic','speed','precision','collaborative') NOT NULL,\n  `difficulty` enum('easy','medium','hard','expert') DEFAULT 'medium' NOT NULL,\n  `coinMultiplier` float NOT NULL DEFAULT 1.0,\n  `startDate` timestamp NOT NULL,\n  `endDate` timestamp NOT NULL,\n  `isActive` boolean DEFAULT true NOT NULL,\n  `createdBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `weekly_challenges_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 212
+}

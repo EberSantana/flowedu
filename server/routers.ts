@@ -4836,6 +4836,101 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return dbInstance.select().from(shopItems).orderBy(shopItems.sortOrder);
       }),
   }),
+
+  // ==================== CONQUISTAS OCULTAS (EASTER EGGS) ====================
+  hiddenAchievements: router({
+    // Obter conquistas do aluno
+    getMyAchievements: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentHiddenAchievements(ctx.studentSession.studentId);
+      }),
+
+    // Obter todas as conquistas (para galeria)
+    getAll: studentProcedure
+      .query(async () => {
+        return db.getAllHiddenAchievements();
+      }),
+
+    // Registrar ação do aluno
+    trackAction: studentProcedure
+      .input(z.object({
+        actionType: z.string(),
+        actionData: z.any().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.trackStudentAction(
+          ctx.studentSession.studentId,
+          input.actionType,
+          input.actionData
+        );
+        
+        // Verificar se desbloqueou alguma conquista
+        const newAchievements = await db.checkAndUnlockAchievements(ctx.studentSession.studentId);
+        
+        return {
+          success: true,
+          newAchievements,
+        };
+      }),
+
+    // Verificar conquistas (chamado após ações importantes)
+    checkUnlocks: studentProcedure
+      .mutation(async ({ ctx }) => {
+        const newAchievements = await db.checkAndUnlockAchievements(ctx.studentSession.studentId);
+        return newAchievements;
+      }),
+  }),
+
+  // ==================== CARTEIRA DO ALUNO (TECH COINS) ====================
+  studentWallet: router({
+    // Obter carteira do aluno
+    getWallet: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentWallet(ctx.studentSession.studentId);
+      }),
+
+    // Obter histórico de transações
+    getTransactionHistory: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getWalletTransactions(ctx.studentSession.studentId);
+      }),
+
+    // Obter estatísticas da carteira
+    getWalletStats: studentProcedure
+      .query(async ({ ctx }) => {
+        const transactions = await db.getWalletTransactions(ctx.studentSession.studentId);
+        
+        if (transactions.length === 0) {
+          return {
+            averageDaily: 0,
+            maxEarned: 0,
+            maxSpent: 0,
+            totalTransactions: 0,
+          };
+        }
+
+        const earned = transactions.filter(t => t.type === 'earn' || t.type === 'bonus');
+        const spent = transactions.filter(t => t.type === 'spend' || t.type === 'penalty');
+
+        const maxEarned = earned.length > 0 ? Math.max(...earned.map(t => t.amount)) : 0;
+        const maxSpent = spent.length > 0 ? Math.max(...spent.map(t => t.amount)) : 0;
+
+        // Calcular média diária
+        const firstTransaction = transactions[transactions.length - 1];
+        const daysSinceFirst = Math.max(1, Math.ceil(
+          (Date.now() - new Date(firstTransaction.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+        ));
+        const totalEarned = earned.reduce((sum, t) => sum + t.amount, 0);
+        const averageDaily = totalEarned / daysSinceFirst;
+
+        return {
+          averageDaily,
+          maxEarned,
+          maxSpent,
+          totalTransactions: transactions.length,
+        };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

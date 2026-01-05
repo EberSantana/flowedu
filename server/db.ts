@@ -6012,7 +6012,279 @@ export async function getCoinTransactionHistory(studentId: number, limit: number
   }
 }
 
+/**
+ * Obter todas as transações da carteira do aluno (para página de carteira)
+ */
+export async function getWalletTransactions(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const transactions = await db.select({
+      id: coinTransactions.id,
+      amount: coinTransactions.amount,
+      type: coinTransactions.transactionType,
+      source: coinTransactions.source,
+      description: coinTransactions.description,
+      createdAt: coinTransactions.createdAt,
+    }).from(coinTransactions)
+      .where(eq(coinTransactions.studentId, studentId))
+      .orderBy(desc(coinTransactions.createdAt));
+    
+    return transactions;
+  } catch (error) {
+    console.error("[Database] Error getting wallet transactions:", error);
+    return [];
+  }
+}
+
 // studentOwnsItem já existe acima
+
+// ==================== CONQUISTAS OCULTAS (EASTER EGGS) ====================
+
+/**
+ * Registrar ação do aluno (para rastreamento de conquistas)
+ */
+export async function trackStudentAction(
+  studentId: number,
+  actionType: string,
+  actionData?: any
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const { studentActions } = await import('../drizzle/schema');
+    await db.insert(studentActions).values({
+      studentId,
+      actionType,
+      actionData: actionData ? JSON.stringify(actionData) : null,
+    });
+  } catch (error) {
+    console.error("[Database] Error tracking student action:", error);
+  }
+}
+
+/**
+ * Verificar e desbloquear conquistas ocultas
+ */
+export async function checkAndUnlockAchievements(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { hiddenAchievements, studentHiddenAchievements, studentActions } = await import('../drizzle/schema');
+    const unlockedAchievements: any[] = [];
+
+    // Buscar todas as conquistas ativas
+    const achievements = await db.select().from(hiddenAchievements)
+      .where(eq(hiddenAchievements.isActive, true));
+
+    // Buscar conquistas já desbloqueadas pelo aluno
+    const alreadyUnlocked = await db.select()
+      .from(studentHiddenAchievements)
+      .where(eq(studentHiddenAchievements.studentId, studentId));
+    
+    const unlockedIds = new Set(alreadyUnlocked.map(a => a.achievementId));
+
+    // Verificar cada conquista
+    for (const achievement of achievements) {
+      if (unlockedIds.has(achievement.id)) continue;
+
+      let shouldUnlock = false;
+
+      // Lógica de verificação por tipo de conquista
+      switch (achievement.code) {
+        case 'curious_clicker': {
+          const clicks = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'avatar_click')
+            ));
+          shouldUnlock = clicks.length >= 100;
+          break;
+        }
+
+        case 'night_owl': {
+          const midnightExercises = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'exercise_complete_midnight')
+            ));
+          shouldUnlock = midnightExercises.length > 0;
+          break;
+        }
+
+        case 'early_bird': {
+          const earlyExercises = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'exercise_complete_early')
+            ));
+          shouldUnlock = earlyExercises.length > 0;
+          break;
+        }
+
+        case 'perfectionist': {
+          const perfectStreaks = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'perfect_streak_10')
+            ));
+          shouldUnlock = perfectStreaks.length > 0;
+          break;
+        }
+
+        case 'explorer': {
+          const pageVisits = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'page_visit')
+            ));
+          const uniquePages = new Set(pageVisits.map((v: any) => {
+            try {
+              return JSON.parse(v.actionData || '{}').page;
+            } catch {
+              return null;
+            }
+          }).filter(Boolean));
+          shouldUnlock = uniquePages.size >= 10; // Pelo menos 10 páginas diferentes
+          break;
+        }
+
+        case 'speed_demon': {
+          const speedRecords = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'exercise_speed_record')
+            ));
+          shouldUnlock = speedRecords.length > 0;
+          break;
+        }
+
+        case 'marathon_runner': {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const todayExercises = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'exercise_complete'),
+              sql`DATE(${studentActions.createdAt}) = DATE(${today})`
+            ));
+          shouldUnlock = todayExercises.length >= 10;
+          break;
+        }
+
+        case 'weekend_warrior': {
+          const weekendExercises = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'exercise_complete_weekend')
+            ));
+          shouldUnlock = weekendExercises.length > 0;
+          break;
+        }
+
+        case 'holiday_hero': {
+          const holidayExercises = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'exercise_complete_holiday')
+            ));
+          shouldUnlock = holidayExercises.length > 0;
+          break;
+        }
+
+        case 'fire_streak': {
+          const streakActions = await db.select().from(studentActions)
+            .where(and(
+              eq(studentActions.studentId, studentId),
+              eq(studentActions.actionType, 'daily_streak_30')
+            ));
+          shouldUnlock = streakActions.length > 0;
+          break;
+        }
+      }
+
+      // Desbloquear conquista
+      if (shouldUnlock) {
+        await db.insert(studentHiddenAchievements).values({
+          studentId,
+          achievementId: achievement.id,
+        });
+
+        // Adicionar Tech Coins como recompensa
+        if (achievement.rewardCoins > 0) {
+          await addTechCoins(
+            studentId,
+            achievement.rewardCoins,
+            'hidden_achievement',
+            `Conquista desbloqueada: ${achievement.name}`,
+            { achievementId: achievement.id }
+          );
+        }
+
+        unlockedAchievements.push(achievement);
+      }
+    }
+
+    return unlockedAchievements;
+  } catch (error) {
+    console.error("[Database] Error checking achievements:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter conquistas ocultas do aluno
+ */
+export async function getStudentHiddenAchievements(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { hiddenAchievements, studentHiddenAchievements } = await import('../drizzle/schema');
+    
+    const achievements = await db.select({
+      id: hiddenAchievements.id,
+      code: hiddenAchievements.code,
+      name: hiddenAchievements.name,
+      description: hiddenAchievements.description,
+      icon: hiddenAchievements.icon,
+      rewardCoins: hiddenAchievements.rewardCoins,
+      rarity: hiddenAchievements.rarity,
+      unlockedAt: studentHiddenAchievements.unlockedAt,
+    })
+    .from(studentHiddenAchievements)
+    .innerJoin(
+      hiddenAchievements,
+      eq(studentHiddenAchievements.achievementId, hiddenAchievements.id)
+    )
+    .where(eq(studentHiddenAchievements.studentId, studentId));
+
+    return achievements;
+  } catch (error) {
+    console.error("[Database] Error getting student hidden achievements:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter todas as conquistas ocultas (para exibição)
+ */
+export async function getAllHiddenAchievements() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { hiddenAchievements } = await import('../drizzle/schema');
+    return db.select().from(hiddenAchievements)
+      .where(eq(hiddenAchievements.isActive, true));
+  } catch (error) {
+    console.error("[Database] Error getting all hidden achievements:", error);
+    return [];
+  }
+}
 
 /**
  * Seed inicial de itens da loja com Tech Coins

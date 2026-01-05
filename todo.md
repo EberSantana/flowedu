@@ -3895,3 +3895,63 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Atualizar sistema de badges para usar Tech Coins (pendente)
 - [x] Migrar dados existentes de pontos para Tech Coins (5 alunos migrados, 1.450 Tech Coins)
 - [ ] Remover referências antigas ao sistema de pontos (opcional - manter por compatibilidade)
+
+
+## 💰 Página de Carteira do Aluno (Tech Coins Wallet)
+- [x] Criar página StudentWallet.tsx
+- [x] Exibir saldo atual de Tech Coins com animação
+- [x] Mostrar total ganho (totalEarned) e total gasto (totalSpent)
+- [x] Implementar histórico de transações com filtros
+- [x] Adicionar gráficos de ganhos/gastos por período
+- [x] Mostrar estatísticas: média diária, maior ganho, maior gasto
+- [x] Adicionar filtro por tipo de transação (earned, spent, bonus, penalty)
+- [x] Adicionar link no menu lateral do Portal do Aluno
+- [x] Criar componente de card de transação com ícones
+- [x] Implementar paginação do histórico
+
+## 🎁 Sistema de Conquistas Ocultas (Easter Eggs)
+- [x] Criar tabela hidden_achievements no banco de dados
+- [x] Criar tabela student_hidden_achievements para rastreamento
+- [x] Implementar 10+ conquistas ocultas:
+  - [x] "Curioso" - Clicar 100 vezes no avatar
+  - [x] "Coruja Noturna" - Completar exercício à meia-noite (00:00-01:00)
+  - [x] "Madrugador" - Completar exercício antes das 6h
+  - [x] "Perfeccionista" - Sequência perfeita de 10 acertos
+  - [x] "Explorador" - Visitar todas as páginas do sistema
+  - [x] "Velocista Extremo" - Completar exercício em menos de 1 minuto
+  - [x] "Maratonista" - 10 exercícios no mesmo dia
+  - [x] "Fim de Semana" - Estudar no sábado ou domingo
+  - [x] "Feriado Dedicado" - Estudar em feriado nacional
+  - [x] "Sequência de Fogo" - 30 dias consecutivos de atividade
+- [x] Criar funções de verificação automática no backend
+- [x] Implementar sistema de recompensas (Tech Coins extras)
+- [ ] Criar notificações especiais para conquistas ocultas
+- [x] Adicionar página de galeria de conquistas ocultas
+- [x] Implementar indicadores de progresso secretos
+- [ ] Adicionar efeitos visuais especiais ao desbloquear
+
+## 🏆 Desafios Semanais CTF (Capture The Flag)
+- [x] Criar tabela weekly_challenges no banco de dados
+- [x] Criar tabela challenge_submissions para envios
+- [x] Criar tabela challenge_rankings para ranking semanal
+- [ ] Implementar geração automática de desafios semanais
+- [ ] Criar 5 tipos de desafios:
+  - [ ] Desafios de código (resolver problema de programação)
+  - [ ] Desafios de lógica (puzzles e enigmas)
+  - [ ] Desafios de velocidade (completar exercícios em tempo recorde)
+  - [ ] Desafios de precisão (100% de acerto em série de questões)
+  - [ ] Desafios colaborativos (turma precisa atingir meta coletiva)
+- [ ] Implementar sistema de multiplicadores de Tech Coins (1.5x, 2x, 3x)
+- [ ] Criar ranking semanal com top 10
+- [ ] Implementar recompensas especiais para top 3:
+  - [ ] 1º lugar: 500 Tech Coins + badge especial
+  - [ ] 2º lugar: 300 Tech Coins + badge
+  - [ ] 3º lugar: 200 Tech Coins + badge
+- [ ] Criar página de visualização de desafios ativos
+- [ ] Implementar timer de contagem regressiva para fim do desafio
+- [ ] Criar sistema de notificações para novos desafios
+- [ ] Adicionar histórico de desafios anteriores
+- [ ] Implementar página de ranking semanal
+- [ ] Criar badges especiais para vencedores de CTF
+- [ ] Adicionar link no menu lateral do Portal do Aluno
+- [ ] Implementar sistema de reset semanal automático (cron job)

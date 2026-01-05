@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json, float } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -1032,3 +1032,102 @@ export const coinTransactions = mysqlTable("coin_transactions", {
 
 export type CoinTransaction = typeof coinTransactions.$inferSelect;
 export type InsertCoinTransaction = typeof coinTransactions.$inferInsert;
+
+
+/**
+ * Conquistas Ocultas (Easter Eggs)
+ */
+export const hiddenAchievements = mysqlTable("hidden_achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(), // Código único (ex: 'curious_clicker')
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 50 }).notNull(), // Emoji ou ícone
+  rewardCoins: int("rewardCoins").default(0).notNull(),
+  rarity: mysqlEnum("rarity", ["common", "rare", "epic", "legendary"]).default("common").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type HiddenAchievement = typeof hiddenAchievements.$inferSelect;
+export type InsertHiddenAchievement = typeof hiddenAchievements.$inferInsert;
+
+/**
+ * Conquistas Ocultas desbloqueadas pelos alunos
+ */
+export const studentHiddenAchievements = mysqlTable("student_hidden_achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  achievementId: int("achievementId").notNull(),
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+  progress: int("progress").default(0), // Para conquistas com progresso (ex: 50/100 cliques)
+});
+
+export type StudentHiddenAchievement = typeof studentHiddenAchievements.$inferSelect;
+export type InsertStudentHiddenAchievement = typeof studentHiddenAchievements.$inferInsert;
+
+/**
+ * Rastreamento de ações dos alunos (para conquistas ocultas)
+ */
+export const studentActions = mysqlTable("student_actions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  actionType: varchar("actionType", { length: 50 }).notNull(), // 'avatar_click', 'page_visit', 'exercise_complete', etc
+  actionData: json("actionData"), // Dados adicionais da ação
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StudentAction = typeof studentActions.$inferSelect;
+export type InsertStudentAction = typeof studentActions.$inferInsert;
+
+
+/**
+ * Desafios Semanais CTF (Capture The Flag)
+ */
+export const weeklyChallenges = mysqlTable("weekly_challenges", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description").notNull(),
+  challengeType: mysqlEnum("challengeType", ["code", "logic", "speed", "precision", "collaborative"]).notNull(),
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard", "expert"]).default("medium").notNull(),
+  coinMultiplier: float("coinMultiplier").notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdBy: int("createdBy").notNull(), // Professor que criou
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WeeklyChallenge = typeof weeklyChallenges.$inferSelect;
+export type InsertWeeklyChallenge = typeof weeklyChallenges.$inferInsert;
+
+/**
+ * Submissões de desafios
+ */
+export const challengeSubmissions = mysqlTable("challenge_submissions", {
+  id: int("id").autoincrement().primaryKey(),
+  challengeId: int("challengeId").notNull(),
+  studentId: int("studentId").notNull(),
+  score: int("score").default(0).notNull(),
+  completionTime: int("completionTime"), // Tempo em segundos
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+});
+
+export type ChallengeSubmission = typeof challengeSubmissions.$inferSelect;
+export type InsertChallengeSubmission = typeof challengeSubmissions.$inferInsert;
+
+/**
+ * Ranking semanal de desafios
+ */
+export const challengeRankings = mysqlTable("challenge_rankings", {
+  id: int("id").autoincrement().primaryKey(),
+  challengeId: int("challengeId").notNull(),
+  studentId: int("studentId").notNull(),
+  rank: int("rank").notNull(),
+  totalScore: int("totalScore").notNull(),
+  rewardCoins: int("rewardCoins").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChallengeRanking = typeof challengeRankings.$inferSelect;
+export type InsertChallengeRanking = typeof challengeRankings.$inferInsert;

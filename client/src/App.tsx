@@ -22,6 +22,8 @@ import LearningPaths from "./pages/LearningPaths";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentSubjectView from "./pages/StudentSubjectView";
 import StudentSubjectDetails from "./pages/StudentSubjectDetails";
+import StudentWallet from "./pages/StudentWallet";
+import HiddenAchievements from "./pages/HiddenAchievements";
 import ManageEnrollments from "./pages/ManageEnrollments";
 import TopicMaterialsManager from "./pages/TopicMaterialsManager";
 import Students from "./pages/Students";
@@ -107,6 +109,8 @@ function Router() {
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
         <Route path={"/student/shop"} component={StudentShop} />
         <Route path={"/student/kimono-shop"} component={KimonoShop} />
+        <Route path={"/student/wallet"} component={StudentWallet} />
+        <Route path={"/student/hidden-achievements"} component={HiddenAchievements} />
         <Route path={"/avatar-test"} component={AvatarTest} />
         <Route path={"/avatar-3d-demo"} component={Avatar3DDemo} />
         <Route path={"/student/customize-avatar-3d"} component={CustomizeAvatar3D} />
