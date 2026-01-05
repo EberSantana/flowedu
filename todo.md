@@ -4434,3 +4434,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Criar testes vitest para conquistas
 - [ ] Criar testes vitest para multiplicadores de pontos
 - [ ] Testar animações em diferentes dispositivos
+
+## Ajuste de Layout - Portal do Aluno
+- [x] Integrar saudação "Bom dia" com nome do aluno no topo
+- [x] Remover seção duplicada do cabeçalho
+- [x] Ajustar layout da página inicial para apresentação mais limpa
