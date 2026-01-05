@@ -415,17 +415,19 @@ function QuestionReviewCard({
             </div>
 
             {/* Dicas Práticas */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-purple-800 mb-2">💡 Dicas Práticas</h5>
-              <ul className="space-y-2">
-                {studyTips.tips.map((tip: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-purple-600 font-bold">{index + 1}.</span>
-                    <span className="text-gray-700">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {studyTips.tips && studyTips.tips.length > 0 && (
+              <div className="mb-4">
+                <h5 className="font-semibold text-purple-800 mb-2">💡 Dicas Práticas</h5>
+                <ul className="space-y-2">
+                  {studyTips.tips.map((tip: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-purple-600 font-bold">{index + 1}.</span>
+                      <span className="text-gray-700">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Materiais Complementares */}
             {studyTips.resources && studyTips.resources.length > 0 && (

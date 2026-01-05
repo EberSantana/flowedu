@@ -2,8 +2,12 @@
 
 ## 🐛 Bugs Críticos
 
+- [x] Corrigir validação de respostas no quiz - resposta correta sendo marcada como incorreta
+- [x] Corrigir exibição do enunciado das questões no quiz - enunciado não está aparecendo
+
 - [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React)
 - [ ] Corrigir logout automático após 10 segundos no portal do aluno (em investigação - cookie configurado, refetch desabilitado, redirecionamento corrigido)
+- [x] Corrigir erro TypeError na página /student-review (QuestionReviewCard tentando fazer .map() em undefined)
 
 - [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
 - [x] Corrigir sobreposição de botões "Trilhas de Aprendizagem" e "Estatísticas de PC" nos cards de disciplinas
@@ -4562,3 +4566,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar opção de alternar entre versão CSS e WebGL
 - [x] Criar página de demonstração Belt3DDemo (/belt-3d-demo)
 - [ ] Otimizar performance para dispositivos móveis
+
+## Visualização 3D da Faixa no Portal do Aluno
+- [ ] Implementar visualização 3D realista e interativa da faixa (similar ao portal do aluno)
+- [ ] Adicionar efeitos de profundidade, sombras e perspectiva 3D
+- [ ] Implementar interatividade (hover, rotação)
+- [ ] Integrar visualização 3D na página inicial do aluno

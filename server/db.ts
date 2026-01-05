@@ -4363,9 +4363,24 @@ export async function submitExerciseAttempt(
     
     if (question.type === "objective" && question.correctAnswer) {
       // Normalizar respostas para comparação
-      const studentAns = answer.answer?.trim().toUpperCase();
-      const correctAns = question.correctAnswer.trim().toUpperCase();
+      const studentAns = answer.answer?.trim();
+      const correctAns = question.correctAnswer.trim();
+      
+      // Comparar diretamente (resposta completa)
       isCorrect = studentAns === correctAns;
+      
+      // Se não for igual, tentar comparar sem a letra (ex: "C) Texto" vs "Texto")
+      if (!isCorrect && correctAns.includes(')')) {
+        const correctAnsWithoutLetter = correctAns.substring(correctAns.indexOf(')') + 1).trim();
+        isCorrect = studentAns === correctAnsWithoutLetter;
+      }
+      
+      // Se ainda não for igual, tentar comparar apenas a letra (ex: "C" vs "C) Texto")
+      if (!isCorrect && correctAns.includes(')')) {
+        const correctLetter = correctAns.substring(0, correctAns.indexOf(')')).trim();
+        isCorrect = studentAns === correctLetter;
+      }
+      
       if (isCorrect) correctAnswers++;
     }
     
@@ -4514,7 +4529,10 @@ export async function getExerciseResults(attemptId: number) {
   
   // Combinar respostas com questões originais
   const questionsWithAnswers = answers.map((answer) => {
-    const originalQuestion = exerciseData.exercises?.find((q: any) => q.number === answer.questionNumber) || {};
+    // Buscar questão original pelo número (index + 1)
+    const originalQuestion = exerciseData.exercises?.[answer.questionNumber - 1] || 
+                            exerciseData.exercises?.find((q: any) => q.number === answer.questionNumber) || 
+                            {};
     return {
       // Dados da questão original
       question: originalQuestion.question || answer.questionType, // Mantido para compatibilidade
