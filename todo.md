@@ -4378,3 +4378,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar persistência de autenticação
 - [x] Corrigir problema de refetch automático - Implementado cookie separado para alunos
 - [x] Validar correção com testes manuais
+
+## Melhoria de Interface - Portal do Aluno
+- [x] Remover componente de avisos da tela principal do Dashboard do aluno (manter apenas na página Avisos)

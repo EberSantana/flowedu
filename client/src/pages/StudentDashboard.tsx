@@ -18,7 +18,7 @@ import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
 // Componentes simplificados
 import { StudentDashboardHeaderSimple } from "@/components/StudentDashboardHeaderSimple";
 import { QuickActionsGrid } from "@/components/QuickActionsGrid";
-import { StudentAlerts } from "@/components/StudentAlerts";
+
 import { 
   getBeltFromPoints, 
   getNextBeltThreshold,
@@ -55,11 +55,6 @@ export default function StudentDashboard() {
 
       <StudentLayout>
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-          {/* Alertas Importantes */}
-          <div className="mb-6">
-            <StudentAlerts />
-          </div>
-
           {/* Header Simplificado com Avatar Minimalista */}
           <StudentDashboardHeaderSimple
             studentName={student?.fullName || 'Aluno'}
