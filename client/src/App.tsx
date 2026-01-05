@@ -41,6 +41,7 @@ import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
 import StudentLearningPaths from "./pages/StudentLearningPaths";
+import StudentLearningPathDetail from "./pages/StudentLearningPathDetail";
 import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentGamificationSimple from "./pages/StudentGamificationSimple";
 import GamificationDashboard from "./pages/GamificationDashboard";
@@ -100,6 +101,7 @@ function Router() {
         <Route path={"/student-dashboard"} component={StudentDashboard} />
         <Route path={"/student-subjects"} component={StudentSubjects} />
         <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
+        <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />
         <Route path={"/student-announcements"} component={StudentAnnouncements} />
         <Route path={"/student-profile"} component={StudentProfilePage} />
         <Route path={"/student-gamification"} component={StudentGamificationSimple} />

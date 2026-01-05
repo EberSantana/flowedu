@@ -4220,3 +4220,75 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Melhorar hierarquia visual
 - [x] Experiência mais direta e intuitiva
 
+
+## 🎓 Melhorias da Plataforma de Aprendizagem - Fase 1
+
+### Backend - Estrutura de Dados
+- [x] Adicionar campo prerequisiteTopicIds na tabela learning_topics para pré-requisitos
+- [x] Adicionar campo contentType na tabela topic_materials (video, text, exercise, quiz, project)
+- [x] Adicionar campo difficulty na tabela learning_topics (easy, medium, hard)
+- [x] Criar tabela student_learning_journal para diário de aprendizagem
+- [x] Criar tabela student_topic_doubts para sistema de dúvidas
+- [ ] Adicionar campos visualizationMode e themeColor na tabela subjects
+- [x] Executar migrations do banco de dados
+
+### Backend - Rotas tRPC
+- [x] Criar rota student.getLearningPath para buscar trilha completa com progresso
+- [x] Criar rota student.updateTopicProgress para atualizar progresso de tópico
+- [x] Criar rota student.addJournalEntry para adicionar entrada no diário
+- [x] Criar rota student.submitDoubt para enviar dúvida ao professor
+- [x] Criar rota student.getStudyStatistics para estatísticas de estudo
+- [ ] Criar rota teacher.getStudentDoubts para professor visualizar dúvidas
+- [ ] Criar rota teacher.respondDoubt para professor responder dúvidas
+
+### Frontend - Redesign da Página de Trilhas
+- [x] Redesenhar StudentLearningPaths.tsx com visualização moderna
+- [x] Implementar mapa visual de trilha com nós conectados
+- [x] Adicionar sistema de desbloqueio progressivo de tópicos
+- [x] Criar componente de card de tópico com status visual
+- [x] Implementar indicadores de dificuldade (fácil, médio, difícil)
+- [x] Adicionar barra de progresso visual com marcos importantes
+- [x] Criar seção "Próximos Passos" com recomendações
+
+### Frontend - Diário de Aprendizagem
+- [x] Criar componente LearningJournal.tsx
+- [x] Implementar editor de anotações por tópico
+- [ ] Adicionar sistema de tags para organização
+- [ ] Criar visualização de histórico de entradas
+- [x] Integrar diário na página de detalhes do tópico
+
+### Frontend - Sistema de Dúvidas
+- [x] Criar componente DoubtSubmission.tsx
+- [x] Implementar formulário de envio de dúvidas
+- [ ] Adicionar visualização de dúvidas pendentes
+- [x] Criar notificação quando professor responder
+- [x] Integrar sistema de dúvidas na trilha
+
+### Frontend - Dashboard de Progresso
+- [x] Criar componente StudentProgressDashboard.tsx
+- [x] Implementar visualização de tempo de estudo
+- [x] Adicionar gráfico de progresso por módulo
+- [ ] Criar indicador de streak de dias estudando
+- [x] Adicionar métricas de tópicos completados/revisados
+
+### Frontend - Tipos de Conteúdo
+- [ ] Criar componente VideoContent.tsx para vídeos
+- [ ] Criar componente TextContent.tsx para textos
+- [ ] Criar componente ExerciseContent.tsx para exercícios
+- [ ] Criar componente QuizContent.tsx para quizzes
+- [ ] Criar componente ProjectContent.tsx para projetos práticos
+- [ ] Implementar seletor de tipo de conteúdo no material
+
+### Frontend - Responsividade Mobile
+- [ ] Otimizar visualização da trilha para mobile
+- [ ] Adaptar mapa visual para telas pequenas
+- [ ] Implementar navegação touch-friendly
+- [ ] Testar em diferentes tamanhos de tela
+- [ ] Garantir acessibilidade em dispositivos móveis
+
+### Testes
+- [ ] Criar testes para rotas de trilha de aprendizagem
+- [ ] Criar testes para sistema de dúvidas
+- [ ] Criar testes para diário de aprendizagem
+- [ ] Testar sistema de desbloqueio progressivo
+- [ ] Validar cálculo de estatísticas de estudo

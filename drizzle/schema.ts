@@ -282,6 +282,8 @@ export const learningTopics = mysqlTable("learning_topics", {
   practiceHours: int("practiceHours").default(0), // Horas de atividades práticas
   individualWorkHours: int("individualWorkHours").default(0), // Horas de trabalhos individuais
   teamWorkHours: int("teamWorkHours").default(0), // Horas de trabalhos em equipe
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).default("medium"), // Nível de dificuldade
+  prerequisiteTopicIds: text("prerequisiteTopicIds"), // JSON array de IDs de tópicos pré-requisitos
   orderIndex: int("orderIndex").default(0).notNull(),
   userId: int("userId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -351,6 +353,7 @@ export const topicMaterials = mysqlTable("topic_materials", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   type: mysqlEnum("type", ["pdf", "video", "link", "presentation", "document", "other"]).notNull(),
+  contentType: mysqlEnum("contentType", ["text", "video", "exercise", "quiz", "project"]).default("text"), // Tipo de conteúdo pedagógico
   url: text("url").notNull(), // URL do arquivo ou link externo
   fileSize: int("fileSize"), // Tamanho em bytes (para uploads)
   orderIndex: int("orderIndex").default(0).notNull(),
@@ -361,6 +364,45 @@ export const topicMaterials = mysqlTable("topic_materials", {
 
 export type TopicMaterial = typeof topicMaterials.$inferSelect;
 export type InsertTopicMaterial = typeof topicMaterials.$inferInsert;
+
+/**
+ * Diário de Aprendizagem do Aluno
+ */
+export const studentLearningJournal = mysqlTable("student_learning_journal", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  topicId: int("topicId").notNull(),
+  entryDate: timestamp("entryDate").defaultNow().notNull(),
+  content: text("content").notNull(), // Anotações do aluno
+  tags: text("tags"), // JSON array de tags para organização
+  mood: mysqlEnum("mood", ["great", "good", "neutral", "confused", "frustrated"]), // Estado emocional
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentLearningJournal = typeof studentLearningJournal.$inferSelect;
+export type InsertStudentLearningJournal = typeof studentLearningJournal.$inferInsert;
+
+/**
+ * Sistema de Dúvidas dos Alunos
+ */
+export const studentTopicDoubts = mysqlTable("student_topic_doubts", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  topicId: int("topicId").notNull(),
+  professorId: int("professorId").notNull(),
+  question: text("question").notNull(),
+  context: text("context"), // Contexto adicional da dúvida
+  status: mysqlEnum("status", ["pending", "answered", "resolved"]).default("pending").notNull(),
+  answer: text("answer"), // Resposta do professor
+  answeredAt: timestamp("answeredAt"),
+  isPrivate: boolean("isPrivate").default(true).notNull(), // Dúvida privada ou pública para turma
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentTopicDoubt = typeof studentTopicDoubts.$inferSelect;
+export type InsertStudentTopicDoubt = typeof studentTopicDoubts.$inferInsert;
 
 /**
  * Atividades/Exercícios por Tópico

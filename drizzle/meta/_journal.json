@@ -239,6 +239,13 @@
       "when": 1767580679327,
       "tag": "0033_petite_robbie_robertson",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1767582215030,
+      "tag": "0034_regular_grim_reaper",
+      "breakpoints": true
     }
   ]
 }

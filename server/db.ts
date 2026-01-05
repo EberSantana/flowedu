@@ -48,6 +48,10 @@ import {
   badges,
   studentBadges,
   gamificationNotifications,
+  studentLearningJournal,
+  studentTopicDoubts,
+  InsertStudentLearningJournal,
+  InsertStudentTopicDoubt,
   studentSpecializations,
   specializationSkills,
   studentSkills,
@@ -6727,4 +6731,383 @@ export async function seedSpecializationSkills() {
   } catch (error) {
     console.error("[seedSpecializationSkills] Error:", error);
   }
+}
+
+// ========== ENHANCED LEARNING PATHS (TRILHAS DE APRENDIZAGEM MELHORADAS) ==========
+
+/**
+ * Buscar trilha completa com progresso do aluno e pré-requisitos
+ */
+export async function getEnhancedLearningPath(studentId: number, subjectId: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar módulos da disciplina
+  const modules = await db.select().from(learningModules)
+    .where(and(eq(learningModules.subjectId, subjectId), eq(learningModules.userId, professorId)))
+    .orderBy(learningModules.orderIndex);
+  
+  // Buscar todos os tópicos e progresso do aluno
+  const modulesWithTopics = await Promise.all(
+    modules.map(async (module) => {
+      const topics = await db.select().from(learningTopics)
+        .where(and(eq(learningTopics.moduleId, module.id), eq(learningTopics.userId, professorId)))
+        .orderBy(learningTopics.orderIndex);
+      
+      // Buscar progresso do aluno para cada tópico
+      const topicsWithProgress = await Promise.all(
+        topics.map(async (topic) => {
+          const [progress] = await db.select().from(studentTopicProgress)
+            .where(and(
+              eq(studentTopicProgress.studentId, studentId),
+              eq(studentTopicProgress.topicId, topic.id)
+            ));
+          
+          // Buscar materiais do tópico
+          const materials = await db.select().from(topicMaterials)
+            .where(eq(topicMaterials.topicId, topic.id))
+            .orderBy(topicMaterials.orderIndex);
+          
+          // Verificar se tópico está desbloqueado (pré-requisitos completados)
+          let isUnlocked = true;
+          if (topic.prerequisiteTopicIds) {
+            try {
+              const prerequisiteIds = JSON.parse(topic.prerequisiteTopicIds);
+              if (prerequisiteIds && prerequisiteIds.length > 0) {
+                const prerequisiteProgress = await db.select().from(studentTopicProgress)
+                  .where(and(
+                    eq(studentTopicProgress.studentId, studentId),
+                    inArray(studentTopicProgress.topicId, prerequisiteIds)
+                  ));
+                
+                // Todos os pré-requisitos devem estar completados
+                isUnlocked = prerequisiteProgress.length === prerequisiteIds.length &&
+                  prerequisiteProgress.every(p => p.status === 'completed');
+              }
+            } catch (e) {
+              console.error('Error parsing prerequisiteTopicIds:', e);
+            }
+          }
+          
+          return {
+            ...topic,
+            progress: progress || null,
+            materials,
+            isUnlocked
+          };
+        })
+      );
+      
+      return {
+        ...module,
+        topics: topicsWithProgress
+      };
+    })
+  );
+  
+  return modulesWithTopics;
+}
+
+/**
+ * Atualizar progresso do aluno em um tópico
+ */
+export async function updateStudentTopicProgressEnhanced(data: {
+  studentId: number;
+  topicId: number;
+  status?: 'not_started' | 'in_progress' | 'completed';
+  selfAssessment?: 'understood' | 'have_doubts' | 'need_help';
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se já existe progresso
+  const [existing] = await db.select().from(studentTopicProgress)
+    .where(and(
+      eq(studentTopicProgress.studentId, data.studentId),
+      eq(studentTopicProgress.topicId, data.topicId)
+    ));
+  
+  if (existing) {
+    // Atualizar existente
+    await db.update(studentTopicProgress)
+      .set({
+        ...data,
+        completedAt: data.status === 'completed' ? new Date() : existing.completedAt,
+        updatedAt: new Date()
+      } as any)
+      .where(eq(studentTopicProgress.id, existing.id));
+    
+    return { success: true, id: existing.id };
+  } else {
+    // Criar novo
+    const [result] = await db.insert(studentTopicProgress)
+      .values({
+        studentId: data.studentId,
+        topicId: data.topicId,
+        status: data.status || 'not_started',
+        selfAssessment: data.selfAssessment,
+        notes: data.notes,
+        completedAt: data.status === 'completed' ? new Date() : null,
+      } as any);
+    
+    return { success: true, id: result.insertId };
+  }
+}
+
+/**
+ * Adicionar entrada no diário de aprendizagem
+ */
+export async function addJournalEntry(data: InsertStudentLearningJournal) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(studentLearningJournal)
+    .values(data as any);
+  
+  return { success: true, id: result.insertId };
+}
+
+/**
+ * Buscar entradas do diário por tópico
+ */
+export async function getJournalEntriesByTopic(studentId: number, topicId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const entries = await db.select().from(studentLearningJournal)
+    .where(and(
+      eq(studentLearningJournal.studentId, studentId),
+      eq(studentLearningJournal.topicId, topicId)
+    ))
+    .orderBy(desc(studentLearningJournal.entryDate));
+  
+  return entries;
+}
+
+/**
+ * Buscar todas as entradas do diário do aluno
+ */
+export async function getAllJournalEntries(studentId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const entries = await db.select().from(studentLearningJournal)
+    .where(eq(studentLearningJournal.studentId, studentId))
+    .orderBy(desc(studentLearningJournal.entryDate))
+    .limit(limit);
+  
+  return entries;
+}
+
+/**
+ * Enviar dúvida ao professor
+ */
+export async function submitDoubt(data: InsertStudentTopicDoubt) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(studentTopicDoubts)
+    .values(data as any);
+  
+  // Criar notificação para o professor
+  await createNotification({
+    userId: data.professorId,
+    title: 'Nova dúvida recebida',
+    message: `Um aluno enviou uma dúvida sobre um tópico`,
+    type: 'new_announcement',
+    relatedId: result.insertId
+  });
+  
+  return { success: true, id: result.insertId };
+}
+
+/**
+ * Buscar dúvidas do aluno
+ */
+export async function getStudentDoubts(studentId: number, topicId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let doubts;
+  
+  if (topicId) {
+    doubts = await db.select().from(studentTopicDoubts)
+      .where(and(
+        eq(studentTopicDoubts.studentId, studentId),
+        eq(studentTopicDoubts.topicId, topicId)
+      ))
+      .orderBy(desc(studentTopicDoubts.createdAt));
+  } else {
+    doubts = await db.select().from(studentTopicDoubts)
+      .where(eq(studentTopicDoubts.studentId, studentId))
+      .orderBy(desc(studentTopicDoubts.createdAt));
+  }
+  
+  return doubts;
+}
+
+/**
+ * Buscar dúvidas pendentes para o professor
+ */
+export async function getPendingDoubts(professorId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let doubts = await db.select({
+    doubt: studentTopicDoubts,
+    topic: learningTopics,
+    module: learningModules,
+    student: students
+  })
+  .from(studentTopicDoubts)
+  .innerJoin(learningTopics, eq(studentTopicDoubts.topicId, learningTopics.id))
+  .innerJoin(learningModules, eq(learningTopics.moduleId, learningModules.id))
+  .innerJoin(students, eq(studentTopicDoubts.studentId, students.id))
+  .where(and(
+    eq(studentTopicDoubts.professorId, professorId),
+    eq(studentTopicDoubts.status, 'pending')
+  ))
+  .orderBy(desc(studentTopicDoubts.createdAt));
+  
+  // Filtrar por disciplina se especificado
+  if (subjectId) {
+    doubts = doubts.filter(d => d.module.subjectId === subjectId);
+  }
+  
+  return doubts;
+}
+
+/**
+ * Responder dúvida do aluno
+ */
+export async function respondDoubt(doubtId: number, answer: string, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar a dúvida para pegar o studentId
+  const [doubt] = await db.select().from(studentTopicDoubts)
+    .where(and(
+      eq(studentTopicDoubts.id, doubtId),
+      eq(studentTopicDoubts.professorId, professorId)
+    ));
+  
+  if (!doubt) {
+    throw new Error("Dúvida não encontrada ou sem permissão");
+  }
+  
+  // Atualizar dúvida
+  await db.update(studentTopicDoubts)
+    .set({
+      answer,
+      status: 'answered',
+      answeredAt: new Date(),
+      updatedAt: new Date()
+    } as any)
+    .where(eq(studentTopicDoubts.id, doubtId));
+  
+  // Criar notificação para o aluno
+  await createNotification({
+    userId: doubt.studentId,
+    title: 'Sua dúvida foi respondida',
+    message: 'O professor respondeu sua dúvida',
+    type: 'feedback_received',
+    relatedId: doubtId
+  });
+  
+  return { success: true };
+}
+
+/**
+ * Buscar estatísticas de estudo do aluno
+ */
+export async function getStudyStatistics(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar matrículas do aluno
+  let enrollments = await db.select().from(studentEnrollments)
+    .where(eq(studentEnrollments.studentId, studentId));
+  
+  if (subjectId) {
+    enrollments = enrollments.filter(e => e.subjectId === subjectId);
+  }
+  
+  const subjectIds = enrollments.map(e => e.subjectId);
+  
+  if (subjectIds.length === 0) {
+    return {
+      totalTopics: 0,
+      completedTopics: 0,
+      inProgressTopics: 0,
+      notStartedTopics: 0,
+      totalHoursEstimated: 0,
+      journalEntries: 0,
+      pendingDoubts: 0,
+      answeredDoubts: 0
+    };
+  }
+  
+  // Buscar todos os módulos das disciplinas matriculadas
+  const modules = await db.select().from(learningModules)
+    .where(inArray(learningModules.subjectId, subjectIds));
+  
+  const moduleIds = modules.map(m => m.id);
+  
+  if (moduleIds.length === 0) {
+    return {
+      totalTopics: 0,
+      completedTopics: 0,
+      inProgressTopics: 0,
+      notStartedTopics: 0,
+      totalHoursEstimated: 0,
+      journalEntries: 0,
+      pendingDoubts: 0,
+      answeredDoubts: 0
+    };
+  }
+  
+  // Buscar todos os tópicos
+  const topics = await db.select().from(learningTopics)
+    .where(inArray(learningTopics.moduleId, moduleIds));
+  
+  const topicIds = topics.map(t => t.id);
+  
+  // Buscar progresso do aluno
+  const progress = await db.select().from(studentTopicProgress)
+    .where(and(
+      eq(studentTopicProgress.studentId, studentId),
+      inArray(studentTopicProgress.topicId, topicIds)
+    ));
+  
+  // Buscar entradas do diário
+  const journalCount = await db.select({ count: sql<number>`count(*)` })
+    .from(studentLearningJournal)
+    .where(and(
+      eq(studentLearningJournal.studentId, studentId),
+      inArray(studentLearningJournal.topicId, topicIds)
+    ));
+  
+  // Buscar dúvidas
+  const doubts = await db.select().from(studentTopicDoubts)
+    .where(and(
+      eq(studentTopicDoubts.studentId, studentId),
+      inArray(studentTopicDoubts.topicId, topicIds)
+    ));
+  
+  const completedTopics = progress.filter(p => p.status === 'completed').length;
+  const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
+  const notStartedTopics = topics.length - completedTopics - inProgressTopics;
+  const totalHoursEstimated = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+  
+  return {
+    totalTopics: topics.length,
+    completedTopics,
+    inProgressTopics,
+    notStartedTopics,
+    totalHoursEstimated,
+    journalEntries: journalCount[0]?.count || 0,
+    pendingDoubts: doubts.filter(d => d.status === 'pending').length,
+    answeredDoubts: doubts.filter(d => d.status === 'answered').length
+  };
 }

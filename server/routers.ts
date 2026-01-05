@@ -2756,6 +2756,111 @@ JSON (descrições MAX 15 chars):
       .mutation(async ({ ctx }) => {
         return await db.markAllStudentNotificationsAsRead(ctx.studentSession.studentId);
       }),
+    
+    // ==================== ENHANCED LEARNING PATHS ====================
+    
+    // Buscar trilha completa com progresso e pré-requisitos
+    getEnhancedLearningPath: studentProcedure
+      .input(z.object({ subjectId: z.number(), professorId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getEnhancedLearningPath(
+          ctx.studentSession.studentId,
+          input.subjectId,
+          input.professorId
+        );
+      }),
+    
+    // Atualizar progresso do tópico
+    updateTopicProgressEnhanced: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        status: z.enum(['not_started', 'in_progress', 'completed']).optional(),
+        selfAssessment: z.enum(['understood', 'have_doubts', 'need_help']).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateStudentTopicProgressEnhanced({
+          studentId: ctx.studentSession.studentId,
+          ...input,
+        });
+      }),
+    
+    // Diário de Aprendizagem
+    addJournalEntry: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        content: z.string(),
+        tags: z.string().optional(),
+        mood: z.enum(['great', 'good', 'neutral', 'confused', 'frustrated']).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.addJournalEntry({
+          studentId: ctx.studentSession.studentId,
+          topicId: input.topicId,
+          content: input.content,
+          tags: input.tags,
+          mood: input.mood,
+          entryDate: new Date(),
+        } as any);
+      }),
+    
+    getJournalEntriesByTopic: studentProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getJournalEntriesByTopic(
+          ctx.studentSession.studentId,
+          input.topicId
+        );
+      }),
+    
+    getAllJournalEntries: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getAllJournalEntries(
+          ctx.studentSession.studentId,
+          input.limit || 50
+        );
+      }),
+    
+    // Sistema de Dúvidas
+    submitDoubt: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        professorId: z.number(),
+        question: z.string(),
+        context: z.string().optional(),
+        isPrivate: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.submitDoubt({
+          studentId: ctx.studentSession.studentId,
+          topicId: input.topicId,
+          professorId: input.professorId,
+          question: input.question,
+          context: input.context,
+          isPrivate: input.isPrivate ?? true,
+          status: 'pending',
+        } as any);
+      }),
+    
+    getMyDoubts: studentProcedure
+      .input(z.object({ topicId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentDoubts(
+          ctx.studentSession.studentId,
+          input.topicId
+        );
+      }),
+    
+    // Estatísticas de Estudo
+    getStudyStatistics: studentProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudyStatistics(
+          ctx.studentSession.studentId,
+          input.subjectId
+        );
+      }),
   }),
 
   // Professor Materials Management
