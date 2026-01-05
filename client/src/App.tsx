@@ -45,6 +45,7 @@ import StudentLearningPathDetail from "./pages/StudentLearningPathDetail";
 import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentGamificationSimple from "./pages/StudentGamificationSimple";
 import GamificationDashboard from "./pages/GamificationDashboard";
+import StudentEvolution from "./pages/StudentEvolution";
 
 import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
@@ -70,6 +71,9 @@ import SkillTree from "./pages/SkillTree";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
+import { TeacherBeltHome } from "./pages/TeacherBeltHome";
+import { TeacherAddActivity } from "./pages/TeacherAddActivity";
+import { TeacherEvolution } from "./pages/TeacherEvolution";
 
 function Router() {
   return (
@@ -100,7 +104,11 @@ function Router() {
         <Route path={"/profile"} component={Profile} />
         <Route path={"/profile-selection"} component={ProfileSelection} />
         <Route path={"/admin/users"} component={AdminUsers} />
+        <Route path={"/teacher-belt"} component={TeacherBeltHome} />
+        <Route path={"/teacher-belt/add-activity"} component={TeacherAddActivity} />
+        <Route path={"/teacher-belt/evolution"} component={TeacherEvolution} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
+        <Route path={"/student-evolution"} component={StudentEvolution} />
         <Route path={"/student-subjects"} component={StudentSubjects} />
         <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
         <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />

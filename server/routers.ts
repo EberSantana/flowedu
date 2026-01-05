@@ -5591,6 +5591,152 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
       };
     }),
   }),
+
+  // ==================== TEACHER BELT SYSTEM ====================
+  teacherBelt: router({
+    // Obter pontos e faixa atual do professor
+    getMyProgress: protectedProcedure.query(async ({ ctx }) => {
+      const points = await db.getOrCreateTeacherPoints(ctx.user.id);
+      if (!points) throw new Error("Failed to get teacher points");
+
+      // Calcular progresso
+      const { calculateProgress } = await import("../shared/belt-system");
+      const progress = calculateProgress(points.totalPoints);
+
+      return {
+        ...points,
+        progress
+      };
+    }),
+
+    // Registrar nova atividade
+    addActivity: protectedProcedure
+      .input(z.object({
+        activityType: z.enum([
+          "class_taught",
+          "planning",
+          "grading",
+          "meeting",
+          "course_creation",
+          "material_creation",
+          "student_support",
+          "professional_dev",
+          "other"
+        ]),
+        title: z.string().min(1, "Título é obrigatório"),
+        description: z.string().optional(),
+        duration: z.number().optional(),
+        activityDate: z.string()
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Calcular pontos baseado no tipo de atividade
+        const { ACTIVITY_POINTS } = await import("../shared/belt-system");
+        const points = ACTIVITY_POINTS[input.activityType];
+
+        const result = await db.addTeacherActivity({
+          userId: ctx.user.id,
+          activityType: input.activityType,
+          title: input.title,
+          description: input.description,
+          points,
+          duration: input.duration,
+          activityDate: input.activityDate
+        });
+
+        return result;
+      }),
+
+    // Obter histórico de atividades
+    getActivitiesHistory: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50)
+      }))
+      .query(async ({ ctx, input }) => {
+        const activities = await db.getTeacherActivitiesHistory(ctx.user.id, input.limit);
+        return activities;
+      }),
+
+    // Obter histórico de evolução de faixas
+    getBeltHistory: protectedProcedure.query(async ({ ctx }) => {
+      const history = await db.getTeacherBeltHistory(ctx.user.id);
+      return history;
+    }),
+
+    // Obter estatísticas de atividades
+    getActivityStats: protectedProcedure.query(async ({ ctx }) => {
+      const stats = await db.getTeacherActivityStats(ctx.user.id);
+      return stats;
+    }),
+  }),
+
+  // ==================== GAMIFICAÇÃO 3D - FAIXAS DE KARATÊ ====================
+  gamification3D: router({
+    // Obter todas as faixas disponíveis
+    getAllBelts: publicProcedure.query(async () => {
+      return db.getAllBelts();
+    }),
+
+    // Obter progresso do aluno com faixa atual
+    getStudentProgress: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentProgressWithBelt(input.studentId);
+      }),
+
+    // Obter estatísticas completas de gamificação do aluno
+    getStudentStats: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentGamificationStats(input.studentId);
+      }),
+
+    // Adicionar pontos ao aluno
+    addPoints: studentProcedure
+      .input(z.object({
+        studentId: z.number(),
+        points: z.number().positive(),
+        reason: z.string()
+      }))
+      .mutation(async ({ input }) => {
+        const result = await db.addPointsToStudentGamification(
+          input.studentId,
+          input.points,
+          input.reason
+        );
+        
+        // Verificar conquistas automaticamente
+        await db.checkAndUnlockGamificationAchievements(input.studentId);
+        
+        return result;
+      }),
+
+    // Obter conquistas disponíveis
+    getAllAchievements: publicProcedure.query(async () => {
+      return db.getAllAchievements();
+    }),
+
+    // Obter conquistas do aluno
+    getStudentAchievements: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentAchievementsGamification(input.studentId);
+      }),
+
+    // Obter histórico de level ups
+    getLevelUpHistory: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentLevelUpHistory(input.studentId);
+      }),
+
+    // Marcar celebração de level up como vista
+    markLevelUpSeen: studentProcedure
+      .input(z.object({ levelUpId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.markLevelUpCelebrationSeen(input.levelUpId);
+        return { success: true };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 

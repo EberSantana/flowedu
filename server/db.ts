@@ -86,12 +86,33 @@ import {
   moduleBadges,
   InsertModuleBadge,
   specializationAchievements,
-  studentAchievements,
-  InsertStudentAchievement,
+  studentSpecializationAchievements,
+  InsertStudentSpecializationAchievement,
   learningRecommendations,
   InsertLearningRecommendation,
   topicProgressHistory,
-  InsertTopicProgressHistory
+  InsertTopicProgressHistory,
+  teacherPoints,
+  teacherActivitiesHistory,
+  teacherBeltHistory,
+  InsertTeacherPoints,
+  InsertTeacherActivitiesHistory,
+  InsertTeacherBeltHistory,
+  belts,
+  Belt,
+  InsertBelt,
+  studentProgress,
+  StudentProgress,
+  InsertStudentProgress,
+  achievements,
+  Achievement,
+  InsertAchievement,
+  studentAchievements,
+  StudentAchievement,
+  InsertStudentAchievement,
+  levelUpHistory,
+  LevelUpHistory,
+  InsertLevelUpHistory
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -7366,10 +7387,10 @@ export async function unlockAchievement(studentId: number, achievementId: number
   if (!db) throw new Error("Database not available");
 
   // Verificar se já foi desbloqueada
-  const existing = await db.select().from(studentAchievements)
+  const existing = await db.select().from(studentSpecializationAchievements)
     .where(and(
-      eq(studentAchievements.studentId, studentId),
-      eq(studentAchievements.achievementId, achievementId)
+      eq(studentSpecializationAchievements.studentId, studentId),
+      eq(studentSpecializationAchievements.achievementId, achievementId)
     ));
 
   if (existing.length > 0) {
@@ -7377,7 +7398,7 @@ export async function unlockAchievement(studentId: number, achievementId: number
   }
 
   // Desbloquear
-  await db.insert(studentAchievements).values({
+  await db.insert(studentSpecializationAchievements).values({
     studentId,
     achievementId,
     progress: 100
@@ -7402,8 +7423,8 @@ export async function getStudentAchievements(studentId: number) {
   if (!db) return [];
 
   const achievements = await db.select({
-    id: studentAchievements.id,
-    achievementId: studentAchievements.achievementId,
+    id: studentSpecializationAchievements.id,
+    achievementId: studentSpecializationAchievements.achievementId,
     code: specializationAchievements.code,
     name: specializationAchievements.name,
     description: specializationAchievements.description,
@@ -7411,13 +7432,13 @@ export async function getStudentAchievements(studentId: number) {
     rarity: specializationAchievements.rarity,
     specialization: specializationAchievements.specialization,
     points: specializationAchievements.points,
-    unlockedAt: studentAchievements.unlockedAt,
-    progress: studentAchievements.progress
+    unlockedAt: studentSpecializationAchievements.unlockedAt,
+    progress: studentSpecializationAchievements.progress
   })
-  .from(studentAchievements)
-  .innerJoin(specializationAchievements, eq(studentAchievements.achievementId, specializationAchievements.id))
-  .where(eq(studentAchievements.studentId, studentId))
-  .orderBy(desc(studentAchievements.unlockedAt));
+  .from(studentSpecializationAchievements)
+  .innerJoin(specializationAchievements, eq(studentSpecializationAchievements.achievementId, specializationAchievements.id))
+  .where(eq(studentSpecializationAchievements.studentId, studentId))
+  .orderBy(desc(studentSpecializationAchievements.unlockedAt));
 
   return achievements;
 }
@@ -7785,4 +7806,583 @@ export async function markBeltAnimationSeen(studentId: number) {
     console.error("[Database] Error marking belt animation as seen:", error);
     return null;
   }
+}
+
+// ==================== TEACHER BELT SYSTEM ====================
+
+/**
+ * Obter ou criar registro de pontos do professor
+ */
+export async function getOrCreateTeacherPoints(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    // Buscar registro existente
+    const existing = await db.select()
+      .from(teacherPoints)
+      .where(eq(teacherPoints.userId, userId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Criar novo registro
+    await db.insert(teacherPoints).values({
+      userId,
+      totalPoints: 0,
+      currentBelt: "white",
+      beltLevel: 1
+    });
+
+    const newRecord = await db.select()
+      .from(teacherPoints)
+      .where(eq(teacherPoints.userId, userId))
+      .limit(1);
+
+    return newRecord[0] || null;
+  } catch (error) {
+    console.error("[Database] Error getting/creating teacher points:", error);
+    return null;
+  }
+}
+
+/**
+ * Adicionar atividade e pontos ao professor
+ */
+export async function addTeacherActivity(data: {
+  userId: number;
+  activityType: "class_taught" | "planning" | "grading" | "meeting" | "course_creation" | "material_creation" | "student_support" | "professional_dev" | "other";
+  title: string;
+  description?: string;
+  points: number;
+  duration?: number;
+  activityDate: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Registrar atividade
+    await db.insert(teacherActivitiesHistory).values({
+      ...data,
+      activityDate: sql`${data.activityDate}`
+    });
+
+    // Atualizar pontos totais
+    const currentPoints = await getOrCreateTeacherPoints(data.userId);
+    if (!currentPoints) throw new Error("Failed to get teacher points");
+
+    const newTotalPoints = currentPoints.totalPoints + data.points;
+
+    // Calcular nova faixa
+    const { calculateBelt } = await import("../shared/belt-system");
+    const newBelt = calculateBelt(newTotalPoints);
+
+    // Verificar se houve mudança de faixa
+    const beltChanged = newBelt.level > currentPoints.beltLevel;
+
+    // Atualizar pontos e faixa
+    await db.update(teacherPoints)
+      .set({
+        totalPoints: newTotalPoints,
+        currentBelt: newBelt.color,
+        beltLevel: newBelt.level,
+        ...(beltChanged ? { lastBeltUpgrade: new Date() } : {})
+      })
+      .where(eq(teacherPoints.userId, data.userId));
+
+    // Registrar mudança de faixa se houver
+    if (beltChanged) {
+      await db.insert(teacherBeltHistory).values({
+        userId: data.userId,
+        previousBelt: currentPoints.currentBelt,
+        newBelt: newBelt.color,
+        previousLevel: currentPoints.beltLevel,
+        newLevel: newBelt.level,
+        pointsAtUpgrade: newTotalPoints
+      });
+    }
+
+    return {
+      success: true,
+      newTotalPoints,
+      beltChanged,
+      newBelt: beltChanged ? newBelt : null
+    };
+  } catch (error) {
+    console.error("[Database] Error adding teacher activity:", error);
+    throw error;
+  }
+}
+
+/**
+ * Obter histórico de atividades do professor
+ */
+export async function getTeacherActivitiesHistory(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const activities = await db.select()
+      .from(teacherActivitiesHistory)
+      .where(eq(teacherActivitiesHistory.userId, userId))
+      .orderBy(desc(teacherActivitiesHistory.activityDate))
+      .limit(limit);
+
+    return activities;
+  } catch (error) {
+    console.error("[Database] Error getting teacher activities history:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter histórico de evolução de faixas do professor
+ */
+export async function getTeacherBeltHistory(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const history = await db.select()
+      .from(teacherBeltHistory)
+      .where(eq(teacherBeltHistory.userId, userId))
+      .orderBy(desc(teacherBeltHistory.upgradedAt));
+
+    return history;
+  } catch (error) {
+    console.error("[Database] Error getting teacher belt history:", error);
+    return [];
+  }
+}
+
+/**
+ * Obter estatísticas de atividades do professor
+ */
+export async function getTeacherActivityStats(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const activities = await db.select()
+      .from(teacherActivitiesHistory)
+      .where(eq(teacherActivitiesHistory.userId, userId));
+
+    // Agrupar por tipo de atividade
+    const byType: Record<string, { count: number; totalPoints: number; totalDuration: number }> = {};
+
+    activities.forEach(activity => {
+      if (!byType[activity.activityType]) {
+        byType[activity.activityType] = { count: 0, totalPoints: 0, totalDuration: 0 };
+      }
+      byType[activity.activityType].count++;
+      byType[activity.activityType].totalPoints += activity.points;
+      byType[activity.activityType].totalDuration += activity.duration || 0;
+    });
+
+    return {
+      totalActivities: activities.length,
+      byType
+    };
+  } catch (error) {
+    console.error("[Database] Error getting teacher activity stats:", error);
+    return null;
+  }
+}
+
+
+// ==================== GAMIFICATION 3D BELTS SYSTEM ====================
+
+/**
+ * Obter todas as faixas disponíveis
+ */
+export async function getAllBelts() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(belts).orderBy(belts.level);
+}
+
+/**
+ * Obter faixa por ID
+ */
+export async function getBeltById(beltId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(belts).where(eq(belts.id, beltId)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * Obter faixa por nível
+ */
+export async function getBeltByLevel(level: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(belts).where(eq(belts.level, level)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * Obter progresso do aluno com informações da faixa atual
+ */
+export async function getStudentProgressWithBelt(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select({
+    progress: studentProgress,
+    belt: belts
+  })
+  .from(studentProgress)
+  .innerJoin(belts, eq(studentProgress.currentBeltId, belts.id))
+  .where(eq(studentProgress.studentId, studentId))
+  .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Criar ou obter progresso do aluno
+ */
+export async function getOrCreateStudentProgress(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se já existe
+  const existing = await db.select().from(studentProgress)
+    .where(eq(studentProgress.studentId, studentId))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    return existing[0];
+  }
+  
+  // Obter faixa branca (nível 1)
+  const whiteBelt = await getBeltByLevel(1);
+  if (!whiteBelt) throw new Error("White belt not found");
+  
+  // Criar novo progresso
+  await db.insert(studentProgress).values({
+    studentId,
+    currentBeltId: whiteBelt.id,
+    totalPoints: 0,
+    pointsInCurrentBelt: 0,
+    pointsMultiplier: 1.0,
+    streakDays: 0,
+    totalExercisesCompleted: 0,
+    totalPerfectScores: 0,
+    consecutivePerfectScores: 0,
+    averageAccuracy: 0.0
+  });
+  
+  const newProgress = await db.select().from(studentProgress)
+    .where(eq(studentProgress.studentId, studentId))
+    .limit(1);
+  
+  return newProgress[0];
+}
+
+/**
+ * Adicionar pontos ao aluno e verificar evolução de faixa (Sistema de Gamificação 3D)
+ */
+export async function addPointsToStudentGamification(studentId: number, points: number, reason: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Obter ou criar progresso
+  const progress = await getOrCreateStudentProgress(studentId);
+  
+  // Aplicar multiplicador
+  const finalPoints = Math.floor(points * progress.pointsMultiplier);
+  
+  // Atualizar pontos
+  const newTotalPoints = progress.totalPoints + finalPoints;
+  const newPointsInCurrentBelt = progress.pointsInCurrentBelt + finalPoints;
+  
+  // Verificar se deve evoluir de faixa
+  const currentBelt = await getBeltById(progress.currentBeltId);
+  if (!currentBelt) throw new Error("Current belt not found");
+  
+  const allBelts = await getAllBelts();
+  const nextBelt = allBelts.find(b => b.level === currentBelt.level + 1);
+  
+  let leveledUp = false;
+  let newBelt = currentBelt;
+  
+  if (nextBelt && newTotalPoints >= nextBelt.pointsRequired) {
+    // Evoluir para próxima faixa
+    await db.update(studentProgress)
+      .set({
+        currentBeltId: nextBelt.id,
+        totalPoints: newTotalPoints,
+        pointsInCurrentBelt: newTotalPoints - nextBelt.pointsRequired,
+        updatedAt: new Date()
+      })
+      .where(eq(studentProgress.studentId, studentId));
+    
+    // Registrar histórico de level up
+    await db.insert(levelUpHistory).values({
+      studentId,
+      fromBeltId: currentBelt.id,
+      toBeltId: nextBelt.id,
+      pointsAtLevelUp: newTotalPoints,
+      timeTaken: null, // Calcular depois se necessário
+      celebrationSeen: false
+    });
+    
+    leveledUp = true;
+    newBelt = nextBelt;
+  } else {
+    // Apenas atualizar pontos
+    await db.update(studentProgress)
+      .set({
+        totalPoints: newTotalPoints,
+        pointsInCurrentBelt: newPointsInCurrentBelt,
+        updatedAt: new Date()
+      })
+      .where(eq(studentProgress.studentId, studentId));
+  }
+  
+  // Registrar no histórico de pontos
+  await db.insert(pointsHistory).values({
+    studentId,
+    points: finalPoints,
+    reason,
+    activityType: 'exercise_completion',
+    relatedId: null
+  });
+  
+  return {
+    pointsAdded: finalPoints,
+    totalPoints: newTotalPoints,
+    leveledUp,
+    oldBelt: currentBelt,
+    newBelt: leveledUp ? newBelt : null
+  };
+}
+
+/**
+ * Obter todas as conquistas disponíveis
+ */
+export async function getAllAchievements() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(achievements).orderBy(achievements.category, achievements.requirement);
+}
+
+/**
+ * Obter conquistas desbloqueadas pelo aluno
+ */
+export async function getStudentAchievementsGamification(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    studentAchievement: studentAchievements,
+    achievement: achievements
+  })
+  .from(studentAchievements)
+  .innerJoin(achievements, eq(studentAchievements.achievementId, achievements.id))
+  .where(eq(studentAchievements.studentId, studentId))
+  .orderBy(desc(studentAchievements.unlockedAt));
+  
+  return result;
+}
+
+/**
+ * Desbloquear conquista para aluno
+ */
+export async function unlockAchievementForStudent(studentId: number, achievementCode: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar conquista
+  const achievement = await db.select().from(achievements)
+    .where(eq(achievements.code, achievementCode))
+    .limit(1);
+  
+  if (achievement.length === 0) {
+    throw new Error(`Achievement ${achievementCode} not found`);
+  }
+  
+  const achievementData = achievement[0];
+  
+  // Verificar se já foi desbloqueada
+  const existing = await db.select().from(studentAchievements)
+    .where(and(
+      eq(studentAchievements.studentId, studentId),
+      eq(studentAchievements.achievementId, achievementData.id)
+    ));
+  
+  if (existing.length > 0) {
+    return { alreadyUnlocked: true, achievement: achievementData };
+  }
+  
+  // Desbloquear
+  await db.insert(studentAchievements).values({
+    studentId,
+    achievementId: achievementData.id,
+    notificationSeen: false
+  });
+  
+  // Adicionar pontos de recompensa
+  if (achievementData.rewardPoints > 0) {
+    await addPointsToStudentGamification(studentId, achievementData.rewardPoints, `Conquista desbloqueada: ${achievementData.name}`);
+  }
+  
+  // Adicionar multiplicador permanente
+  if (achievementData.rewardMultiplier > 0) {
+    const progress = await getOrCreateStudentProgress(studentId);
+    await db.update(studentProgress)
+      .set({
+        pointsMultiplier: progress.pointsMultiplier + achievementData.rewardMultiplier,
+        updatedAt: new Date()
+      })
+      .where(eq(studentProgress.studentId, studentId));
+  }
+  
+  return { alreadyUnlocked: false, achievement: achievementData };
+}
+
+/**
+ * Verificar e desbloquear conquistas de gamificação automaticamente
+ */
+export async function checkAndUnlockGamificationAchievements(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const progress = await getOrCreateStudentProgress(studentId);
+  const allAchievements = await getAllAchievements();
+  const unlockedAchievements = await getStudentAchievementsGamification(studentId);
+  const unlockedIds = new Set(unlockedAchievements.map(ua => ua.achievement.id));
+  
+  const newlyUnlocked = [];
+  
+  for (const achievement of allAchievements) {
+    if (unlockedIds.has(achievement.id)) continue;
+    
+    let shouldUnlock = false;
+    
+    switch (achievement.category) {
+      case 'speed':
+        if (progress.fastestExerciseTime && progress.fastestExerciseTime <= achievement.requirement) {
+          shouldUnlock = true;
+        }
+        break;
+      case 'accuracy':
+        if (progress.averageAccuracy >= achievement.requirement) {
+          shouldUnlock = true;
+        }
+        break;
+      case 'streak':
+        if (progress.streakDays >= achievement.requirement) {
+          shouldUnlock = true;
+        }
+        break;
+      case 'completion':
+        if (progress.totalExercisesCompleted >= achievement.requirement) {
+          shouldUnlock = true;
+        }
+        break;
+      case 'special':
+        // Conquistas especiais (ex: alcançar faixa preta)
+        const currentBelt = await getBeltById(progress.currentBeltId);
+        if (currentBelt && currentBelt.level >= achievement.requirement) {
+          shouldUnlock = true;
+        }
+        break;
+    }
+    
+    if (shouldUnlock) {
+      await unlockAchievementForStudent(studentId, achievement.code);
+      newlyUnlocked.push(achievement);
+    }
+  }
+  
+  return newlyUnlocked;
+}
+
+/**
+ * Obter histórico de level ups do aluno
+ */
+export async function getStudentLevelUpHistory(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const history = await db.select({
+    levelUp: levelUpHistory,
+    fromBelt: {
+      id: belts.id,
+      name: belts.name,
+      displayName: belts.displayName,
+      level: belts.level,
+      color: belts.color,
+      icon: belts.icon
+    },
+    toBelt: belts
+  })
+  .from(levelUpHistory)
+  .innerJoin(belts, eq(levelUpHistory.fromBeltId, belts.id))
+  .where(eq(levelUpHistory.studentId, studentId))
+  .orderBy(desc(levelUpHistory.createdAt));
+  
+  return history;
+}
+
+/**
+ * Marcar celebração de level up como vista
+ */
+export async function markLevelUpCelebrationSeen(levelUpId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(levelUpHistory)
+    .set({ celebrationSeen: true })
+    .where(eq(levelUpHistory.id, levelUpId));
+}
+
+/**
+ * Obter estatísticas completas do aluno
+ */
+export async function getStudentGamificationStats(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const progressWithBelt = await getStudentProgressWithBelt(studentId);
+  if (!progressWithBelt) return null;
+  
+  const achievements = await getStudentAchievementsGamification(studentId);
+  const levelUpHistory = await getStudentLevelUpHistory(studentId);
+  const allBelts = await getAllBelts();
+  
+  // Calcular próxima faixa
+  const currentBelt = progressWithBelt.belt;
+  const nextBelt = allBelts.find(b => b.level === currentBelt.level + 1);
+  
+  const pointsToNextBelt = nextBelt 
+    ? nextBelt.pointsRequired - progressWithBelt.progress.totalPoints
+    : 0;
+  
+  const progressPercentage = nextBelt
+    ? ((progressWithBelt.progress.totalPoints - currentBelt.pointsRequired) / 
+       (nextBelt.pointsRequired - currentBelt.pointsRequired)) * 100
+    : 100;
+  
+  return {
+    progress: progressWithBelt.progress,
+    currentBelt: progressWithBelt.belt,
+    nextBelt,
+    pointsToNextBelt,
+    progressPercentage: Math.min(100, Math.max(0, progressPercentage)),
+    achievements: achievements.map(a => a.achievement),
+    levelUpHistory,
+    totalAchievements: achievements.length,
+    totalBelts: allBelts.length
+  };
 }

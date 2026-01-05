@@ -260,6 +260,13 @@
       "when": 1767624100126,
       "tag": "0036_same_unicorn",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1767625615317,
+      "tag": "0037_new_juggernaut",
+      "breakpoints": true
     }
   ]
 }

@@ -98,6 +98,72 @@ export type CalendarEvent = typeof calendarEvents.$inferSelect;
 export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;
 
 // TODO: Add your tables here*/
+
+/**
+ * Pontuação e Faixas dos Professores (Teacher Points & Belts)
+ * Sistema de gamificação profissional para professores
+ */
+export const teacherPoints = mysqlTable("teacher_points", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // FK para users
+  totalPoints: int("totalPoints").default(0).notNull(),
+  currentBelt: varchar("currentBelt", { length: 50 }).default("white").notNull(), // white, yellow, orange, green, blue, purple, brown, black
+  beltLevel: int("beltLevel").default(1).notNull(), // 1-8 (Branca a Preta)
+  lastBeltUpgrade: timestamp("lastBeltUpgrade"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TeacherPoints = typeof teacherPoints.$inferSelect;
+export type InsertTeacherPoints = typeof teacherPoints.$inferInsert;
+
+/**
+ * Histórico de Atividades dos Professores (Teacher Activities History)
+ * Registra todas as atividades que geraram pontos para professores
+ */
+export const teacherActivitiesHistory = mysqlTable("teacher_activities_history", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // FK para users
+  activityType: mysqlEnum("activityType", [
+    "class_taught",        // Aula ministrada
+    "planning",            // Planejamento de aula
+    "grading",             // Correção de atividades
+    "meeting",             // Reunião pedagógica
+    "course_creation",     // Criação de plano de curso
+    "material_creation",   // Criação de material didático
+    "student_support",     // Atendimento a alunos
+    "professional_dev",    // Desenvolvimento profissional
+    "other"                // Outras atividades
+  ]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  points: int("points").notNull(),
+  duration: int("duration"), // Duração em minutos
+  activityDate: date("activityDate").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TeacherActivitiesHistory = typeof teacherActivitiesHistory.$inferSelect;
+export type InsertTeacherActivitiesHistory = typeof teacherActivitiesHistory.$inferInsert;
+
+/**
+ * Histórico de Evolução de Faixas dos Professores (Teacher Belt History)
+ * Registra todas as mudanças de faixa
+ */
+export const teacherBeltHistory = mysqlTable("teacher_belt_history", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // FK para users
+  previousBelt: varchar("previousBelt", { length: 50 }).notNull(),
+  newBelt: varchar("newBelt", { length: 50 }).notNull(),
+  previousLevel: int("previousLevel").notNull(),
+  newLevel: int("newLevel").notNull(),
+  pointsAtUpgrade: int("pointsAtUpgrade").notNull(),
+  upgradedAt: timestamp("upgradedAt").defaultNow().notNull(),
+});
+
+export type TeacherBeltHistory = typeof teacherBeltHistory.$inferSelect;
+export type InsertTeacherBeltHistory = typeof teacherBeltHistory.$inferInsert;
+
 export const subjects = mysqlTable("subjects", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
@@ -787,6 +853,106 @@ export type BeltHistory = typeof beltHistory.$inferSelect;
 export type InsertBeltHistory = typeof beltHistory.$inferInsert;
 
 /**
+ * Faixas de Karatê (Belts System)
+ * Define todas as faixas disponíveis com requisitos de pontos
+ */
+export const belts = mysqlTable("belts", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(), // white, yellow, orange, green, blue, purple, brown, black
+  displayName: varchar("displayName", { length: 100 }).notNull(), // Nome em português
+  level: int("level").notNull().unique(), // 1-8
+  color: varchar("color", { length: 7 }).notNull(), // Cor hex
+  pointsRequired: int("pointsRequired").notNull(), // Pontos necessários para alcançar
+  description: text("description"), // Descrição da faixa
+  icon: varchar("icon", { length: 50 }), // Ícone/emoji da faixa
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Belt = typeof belts.$inferSelect;
+export type InsertBelt = typeof belts.$inferInsert;
+
+/**
+ * Progresso do Aluno (Student Progress)
+ * Armazena progresso detalhado, multiplicadores e estatísticas
+ */
+export const studentProgress = mysqlTable("student_progress", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull().unique(), // FK para students
+  currentBeltId: int("currentBeltId").notNull(), // FK para belts
+  totalPoints: int("totalPoints").default(0).notNull(),
+  pointsInCurrentBelt: int("pointsInCurrentBelt").default(0).notNull(), // Pontos desde a última evolução
+  pointsMultiplier: double("pointsMultiplier").default(1.0).notNull(), // Multiplicador ativo
+  streakDays: int("streakDays").default(0).notNull(),
+  lastActivityDate: date("lastActivityDate"),
+  totalExercisesCompleted: int("totalExercisesCompleted").default(0).notNull(),
+  totalPerfectScores: int("totalPerfectScores").default(0).notNull(),
+  consecutivePerfectScores: int("consecutivePerfectScores").default(0).notNull(),
+  fastestExerciseTime: int("fastestExerciseTime"), // Tempo em segundos
+  averageAccuracy: double("averageAccuracy").default(0.0).notNull(), // 0-100
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentProgress = typeof studentProgress.$inferSelect;
+export type InsertStudentProgress = typeof studentProgress.$inferInsert;
+
+/**
+ * Conquistas Disponíveis (Achievements)
+ * Catálogo de todas as conquistas desbloqueáveis
+ */
+export const achievements = mysqlTable("achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 50 }).notNull(), // Emoji ou classe de ícone
+  category: mysqlEnum("category", ["speed", "accuracy", "streak", "completion", "special"]).notNull(),
+  requirement: int("requirement").notNull(), // Valor necessário para desbloquear
+  rewardPoints: int("rewardPoints").default(0).notNull(), // Pontos bônus ao desbloquear
+  rewardMultiplier: double("rewardMultiplier").default(0.0).notNull(), // Multiplicador bônus (ex: 0.1 = +10%)
+  isHidden: boolean("isHidden").default(false).notNull(), // Conquista secreta
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * Conquistas Desbloqueadas (Student Achievements)
+ * Relaciona alunos com conquistas que desbloquearam
+ */
+export const studentAchievements = mysqlTable("student_achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  achievementId: int("achievementId").notNull(),
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+  notificationSeen: boolean("notificationSeen").default(false).notNull(),
+}, (table) => ({
+  uniqueAchievement: sql`UNIQUE KEY unique_student_achievement (studentId, achievementId)`,
+}));
+
+export type StudentAchievement = typeof studentAchievements.$inferSelect;
+export type InsertStudentAchievement = typeof studentAchievements.$inferInsert;
+
+/**
+ * Histórico de Level Up (Level Up History)
+ * Registra todas as evoluções de faixa com detalhes
+ */
+export const levelUpHistory = mysqlTable("level_up_history", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  fromBeltId: int("fromBeltId").notNull(),
+  toBeltId: int("toBeltId").notNull(),
+  pointsAtLevelUp: int("pointsAtLevelUp").notNull(),
+  timeTaken: int("timeTaken"), // Tempo em dias para evoluir
+  celebrationSeen: boolean("celebrationSeen").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LevelUpHistory = typeof levelUpHistory.$inferSelect;
+export type InsertLevelUpHistory = typeof levelUpHistory.$inferInsert;
+
+/**
  * ==================== PENSAMENTO COMPUTACIONAL ====================
  * Sistema de avaliação de Pensamento Computacional
  * 4 dimensões: Decomposição, Reconhecimento de Padrões, Abstração, Algoritmos
@@ -1385,10 +1551,10 @@ export type SpecializationAchievement = typeof specializationAchievements.$infer
 export type InsertSpecializationAchievement = typeof specializationAchievements.$inferInsert;
 
 /**
- * Conquistas Desbloqueadas pelos Alunos (Student Achievements)
+ * Conquistas de Especialização Desbloqueadas pelos Alunos (Student Specialization Achievements)
  * Relaciona alunos com conquistas de especialização que desbloquearam
  */
-export const studentAchievements = mysqlTable("student_achievements", {
+export const studentSpecializationAchievements = mysqlTable("student_specialization_achievements", {
   id: int("id").autoincrement().primaryKey(),
   studentId: int("studentId").notNull(), // FK para students
   achievementId: int("achievementId").notNull(), // FK para specialization_achievements
@@ -1398,8 +1564,8 @@ export const studentAchievements = mysqlTable("student_achievements", {
   uniqueStudentAchievement: unique().on(table.studentId, table.achievementId),
 }));
 
-export type StudentAchievement = typeof studentAchievements.$inferSelect;
-export type InsertStudentAchievement = typeof studentAchievements.$inferInsert;
+export type StudentSpecializationAchievement = typeof studentSpecializationAchievements.$inferSelect;
+export type InsertStudentSpecializationAchievement = typeof studentSpecializationAchievements.$inferInsert;
 
 /**
  * Recomendações Personalizadas de Aprendizagem (Learning Recommendations)
