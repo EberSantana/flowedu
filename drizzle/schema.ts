@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json, float } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json, float, double } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -577,6 +577,7 @@ export const studentPoints = mysqlTable("student_points", {
   currentBelt: varchar("currentBelt", { length: 50 }).default("white").notNull(), // white, yellow, orange, green, blue, purple, brown, black
   streakDays: int("streakDays").default(0).notNull(),
   lastActivityDate: timestamp("lastActivityDate"),
+  honorificTitle: varchar("honorificTitle", { length: 100 }), // Título honorífico (Sensei, Mestre, etc)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -600,6 +601,70 @@ export const pointsHistory = mysqlTable("points_history", {
 
 export type PointsHistory = typeof pointsHistory.$inferSelect;
 export type InsertPointsHistory = typeof pointsHistory.$inferInsert;
+
+/**
+ * Especializações dos Alunos (Student Specializations)
+ * Armazena a especialização escolhida pelo aluno
+ */
+export const studentSpecializations = mysqlTable("student_specializations", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull().unique(), // FK para students
+  specialization: mysqlEnum("specialization", [
+    "code_warrior",    // Guerreiro do Código (Backend/Algoritmos)
+    "interface_master", // Mestre das Interfaces (Frontend/UX)
+    "data_sage",       // Sábio dos Dados (Data Science/Analytics)
+    "system_architect" // Arquiteto de Sistemas (DevOps/Infraestrutura)
+  ]).notNull(),
+  chosenAt: timestamp("chosenAt").defaultNow().notNull(),
+  level: int("level").default(1).notNull(), // Nível dentro da especialização
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentSpecialization = typeof studentSpecializations.$inferSelect;
+export type InsertStudentSpecialization = typeof studentSpecializations.$inferInsert;
+
+/**
+ * Skills da Árvore de Especialização (Specialization Skills)
+ * Define as skills disponíveis em cada especialização
+ */
+export const specializationSkills = mysqlTable("specialization_skills", {
+  id: int("id").autoincrement().primaryKey(),
+  specialization: mysqlEnum("specialization", [
+    "code_warrior",
+    "interface_master",
+    "data_sage",
+    "system_architect"
+  ]).notNull(),
+  skillKey: varchar("skillKey", { length: 100 }).notNull(), // Identificador único da skill
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  tier: int("tier").notNull(), // Nível da skill (1-5)
+  requiredLevel: int("requiredLevel").notNull(), // Nível mínimo para desbloquear
+  bonusType: varchar("bonusType", { length: 50 }).notNull(), // points_multiplier, speed_bonus, accuracy_bonus
+  bonusValue: double("bonusValue").notNull(), // Valor do bônus (ex: 1.1 = +10%)
+  prerequisiteSkills: text("prerequisiteSkills"), // JSON array de skillKeys necessárias
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SpecializationSkill = typeof specializationSkills.$inferSelect;
+export type InsertSpecializationSkill = typeof specializationSkills.$inferInsert;
+
+/**
+ * Skills Desbloqueadas pelos Alunos (Student Skills)
+ * Registra quais skills cada aluno desbloqueou
+ */
+export const studentSkills = mysqlTable("student_skills", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  skillId: int("skillId").notNull(), // FK para specialization_skills
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+  isActive: boolean("isActive").default(true).notNull(), // Skill ativa
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StudentSkill = typeof studentSkills.$inferSelect;
+export type InsertStudentSkill = typeof studentSkills.$inferInsert;
 
 /**
  * Badges Disponíveis (Badges)

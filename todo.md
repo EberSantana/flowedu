@@ -3955,3 +3955,33 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [ ] Criar badges especiais para vencedores de CTF
 - [ ] Adicionar link no menu lateral do Portal do Aluno
 - [ ] Implementar sistema de reset semanal automático (cron job)
+
+## 🥋 Modelo Híbrido "Dojo Tech" - Sistema de Especializações
+
+### Fase 1: Banco de Dados
+- [x] Criar tabela student_specializations
+- [x] Criar tabela specialization_skills
+- [x] Criar tabela student_skills
+- [x] Adicionar campo honorificTitle em student_points
+
+### Fase 2: Backend
+- [x] Função chooseSpecialization()
+- [x] Função getStudentSpecialization()
+- [x] Função unlockSkill()
+- [x] Função getSkillTree()
+- [x] Função calculateBonusMultiplier()
+- [x] Função awardHonorificTitle()
+- [x] Rotas tRPC para especializações
+
+### Fase 3: Interface
+- [x] Página ChooseSpecialization.tsx
+- [x] Componente SkillTreeVisualization.tsx (SkillTree.tsx)
+- [x] Atualizar StudentDashboard com especialização
+- [x] Badge de especialização no perfil
+- [x] Indicador de bônus ativo
+
+### Fase 4: Integração
+- [x] Aplicar multiplicadores em exercícios (backend pronto)
+- [x] Sistema de desbloqueio progressivo de skills
+- [x] Notificações de novo título honorífico (função pronta)
+- [x] Testes automatizados (13 testes passando)

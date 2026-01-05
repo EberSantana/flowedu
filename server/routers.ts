@@ -4684,6 +4684,88 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
       }),
   }),
 
+  // ==================== ESPECIALIZAÇÕES (DOJO TECH) ====================
+  specializations: router({
+    // Escolher especialização
+    choose: studentProcedure
+      .input(z.object({
+        specialization: z.enum(['code_warrior', 'interface_master', 'data_sage', 'system_architect'])
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.chooseSpecialization(studentId, input.specialization);
+        return result;
+      }),
+
+    // Obter especialização do aluno
+    getMy: studentProcedure
+      .query(async ({ ctx }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const spec = await db.getStudentSpecialization(studentId);
+        return spec;
+      }),
+
+    // Obter árvore de skills da especialização
+    getSkillTree: studentProcedure
+      .input(z.object({
+        specialization: z.string()
+      }))
+      .query(async ({ input }) => {
+        const skills = await db.getSkillTree(input.specialization);
+        return skills;
+      }),
+
+    // Obter skills desbloqueadas do aluno
+    getMySkills: studentProcedure
+      .query(async ({ ctx }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const skills = await db.getStudentSkills(studentId);
+        return skills;
+      }),
+
+    // Desbloquear skill
+    unlockSkill: studentProcedure
+      .input(z.object({
+        skillId: z.number()
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.unlockSkill(studentId, input.skillId);
+        return result;
+      }),
+
+    // Calcular multiplicador de bônus
+    getBonusMultiplier: studentProcedure
+      .input(z.object({
+        bonusType: z.string()
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const multiplier = await db.calculateBonusMultiplier(studentId, input.bonusType);
+        return { multiplier };
+      }),
+
+    // Atualizar nível da especialização
+    updateLevel: studentProcedure
+      .mutation(async ({ ctx }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.updateSpecializationLevel(studentId);
+        return result;
+      }),
+  }),
+
   // ==================== LOJA DE ITENS ====================
   shop: router({
     // Listar itens da loja

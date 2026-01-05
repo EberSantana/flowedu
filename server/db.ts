@@ -48,6 +48,9 @@ import {
   badges,
   studentBadges,
   gamificationNotifications,
+  studentSpecializations,
+  specializationSkills,
+  studentSkills,
   computationalThinkingScores,
   ctExercises,
   ctSubmissions,
@@ -6425,5 +6428,289 @@ export async function seedShopItemsWithTechCoins() {
     console.log("[Database] New shop items with Tech Coins seeded successfully");
   } catch (error) {
     console.error("[Database] Error seeding shop items with tech coins:", error);
+  }
+}
+
+
+// ============================================
+// SPECIALIZATION SYSTEM (Dojo Tech)
+// ============================================
+
+/**
+ * Escolher especialização do aluno
+ */
+export async function chooseSpecialization(
+  studentId: number,
+  specialization: 'code_warrior' | 'interface_master' | 'data_sage' | 'system_architect'
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Verificar se já possui especialização
+    const existing = await db.select().from(studentSpecializations)
+      .where(eq(studentSpecializations.studentId, studentId));
+    
+    if (existing.length > 0) {
+      throw new Error("Aluno já possui uma especialização");
+    }
+
+    // Criar especialização
+    await db.insert(studentSpecializations).values({
+      studentId,
+      specialization,
+      level: 1
+    });
+
+    return { success: true, specialization };
+  } catch (error) {
+    console.error("[chooseSpecialization] Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar especialização do aluno
+ */
+export async function getStudentSpecialization(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [spec] = await db.select().from(studentSpecializations)
+      .where(eq(studentSpecializations.studentId, studentId));
+    
+    return spec || null;
+  } catch (error) {
+    console.error("[getStudentSpecialization] Error:", error);
+    return null;
+  }
+}
+
+/**
+ * Desbloquear skill para o aluno
+ */
+export async function unlockSkill(studentId: number, skillId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Verificar se já possui a skill
+    const existing = await db.select().from(studentSkills)
+      .where(and(
+        eq(studentSkills.studentId, studentId),
+        eq(studentSkills.skillId, skillId)
+      ));
+    
+    if (existing.length > 0) {
+      return { success: false, message: "Skill já desbloqueada" };
+    }
+
+    // Desbloquear skill
+    await db.insert(studentSkills).values({
+      studentId,
+      skillId,
+      isActive: true
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[unlockSkill] Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Buscar árvore de skills da especialização
+ */
+export async function getSkillTree(specialization: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const skills = await db.select().from(specializationSkills)
+      .where(eq(specializationSkills.specialization, specialization as any))
+      .orderBy(specializationSkills.tier, specializationSkills.requiredLevel);
+    
+    return skills;
+  } catch (error) {
+    console.error("[getSkillTree] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Buscar skills desbloqueadas do aluno
+ */
+export async function getStudentSkills(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const skills = await db.select({
+      id: studentSkills.id,
+      skillId: studentSkills.skillId,
+      unlockedAt: studentSkills.unlockedAt,
+      isActive: studentSkills.isActive,
+      skillKey: specializationSkills.skillKey,
+      name: specializationSkills.name,
+      description: specializationSkills.description,
+      tier: specializationSkills.tier,
+      bonusType: specializationSkills.bonusType,
+      bonusValue: specializationSkills.bonusValue
+    })
+    .from(studentSkills)
+    .innerJoin(specializationSkills, eq(studentSkills.skillId, specializationSkills.id))
+    .where(eq(studentSkills.studentId, studentId));
+    
+    return skills;
+  } catch (error) {
+    console.error("[getStudentSkills] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Calcular multiplicador de bônus total do aluno
+ */
+export async function calculateBonusMultiplier(studentId: number, bonusType: string) {
+  const db = await getDb();
+  if (!db) return 1.0;
+
+  try {
+    const skills = await db.select({
+      bonusType: specializationSkills.bonusType,
+      bonusValue: specializationSkills.bonusValue
+    })
+    .from(studentSkills)
+    .innerJoin(specializationSkills, eq(studentSkills.skillId, specializationSkills.id))
+    .where(and(
+      eq(studentSkills.studentId, studentId),
+      eq(studentSkills.isActive, true),
+      eq(specializationSkills.bonusType, bonusType)
+    ));
+
+    // Multiplicar todos os bônus
+    let multiplier = 1.0;
+    for (const skill of skills) {
+      multiplier *= skill.bonusValue;
+    }
+
+    return multiplier;
+  } catch (error) {
+    console.error("[calculateBonusMultiplier] Error:", error);
+    return 1.0;
+  }
+}
+
+/**
+ * Atribuir título honorífico ao aluno
+ */
+export async function awardHonorificTitle(studentId: number, title: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db.update(studentPoints)
+      .set({ honorificTitle: title })
+      .where(eq(studentPoints.studentId, studentId));
+
+    return { success: true, title };
+  } catch (error) {
+    console.error("[awardHonorificTitle] Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Verificar e atualizar nível da especialização baseado em pontos
+ */
+export async function updateSpecializationLevel(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const spec = await getStudentSpecialization(studentId);
+    if (!spec) return null;
+
+    const points = await getOrCreateStudentPoints(studentId);
+    if (!points) return null;
+
+    // Calcular nível baseado em pontos (a cada 500 pontos = 1 nível)
+    const newLevel = Math.floor(points.totalPoints / 500) + 1;
+
+    if (newLevel > spec.level) {
+      await db.update(studentSpecializations)
+        .set({ level: newLevel })
+        .where(eq(studentSpecializations.studentId, studentId));
+
+      // Verificar títulos honoríficos
+      if (newLevel >= 10) {
+        await awardHonorificTitle(studentId, "Mestre");
+      } else if (newLevel >= 20) {
+        await awardHonorificTitle(studentId, "Grão-Mestre");
+      } else if (newLevel >= 30) {
+        await awardHonorificTitle(studentId, "Sensei");
+      }
+
+      return { levelUp: true, newLevel, oldLevel: spec.level };
+    }
+
+    return { levelUp: false, currentLevel: spec.level };
+  } catch (error) {
+    console.error("[updateSpecializationLevel] Error:", error);
+    return null;
+  }
+}
+
+/**
+ * Seed inicial de skills para todas as especializações
+ */
+export async function seedSpecializationSkills() {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Verificar se já existem skills
+    const existing = await db.select().from(specializationSkills).limit(1);
+    if (existing.length > 0) {
+      console.log("[seedSpecializationSkills] Skills já existem, pulando seed");
+      return;
+    }
+
+    const skills = [
+      // CODE WARRIOR (Guerreiro do Código)
+      { specialization: 'code_warrior', skillKey: 'cw_algo_basic', name: 'Algoritmos Básicos', description: 'Domínio de estruturas básicas de algoritmos', tier: 1, requiredLevel: 1, bonusType: 'points_multiplier', bonusValue: 1.1, prerequisiteSkills: null },
+      { specialization: 'code_warrior', skillKey: 'cw_data_struct', name: 'Estruturas de Dados', description: 'Conhecimento avançado de arrays, listas e árvores', tier: 2, requiredLevel: 3, bonusType: 'points_multiplier', bonusValue: 1.15, prerequisiteSkills: JSON.stringify(['cw_algo_basic']) },
+      { specialization: 'code_warrior', skillKey: 'cw_optimization', name: 'Otimização de Código', description: 'Habilidade de escrever código eficiente', tier: 3, requiredLevel: 5, bonusType: 'accuracy_bonus', bonusValue: 1.2, prerequisiteSkills: JSON.stringify(['cw_data_struct']) },
+      { specialization: 'code_warrior', skillKey: 'cw_recursion', name: 'Recursão Avançada', description: 'Domínio de técnicas recursivas complexas', tier: 4, requiredLevel: 8, bonusType: 'points_multiplier', bonusValue: 1.25, prerequisiteSkills: JSON.stringify(['cw_optimization']) },
+      { specialization: 'code_warrior', skillKey: 'cw_master', name: 'Mestre dos Algoritmos', description: 'Domínio completo de algoritmos avançados', tier: 5, requiredLevel: 12, bonusType: 'points_multiplier', bonusValue: 1.5, prerequisiteSkills: JSON.stringify(['cw_recursion']) },
+
+      // INTERFACE MASTER (Mestre das Interfaces)
+      { specialization: 'interface_master', skillKey: 'im_html_css', name: 'HTML & CSS Básico', description: 'Fundamentos de marcação e estilização', tier: 1, requiredLevel: 1, bonusType: 'points_multiplier', bonusValue: 1.1, prerequisiteSkills: null },
+      { specialization: 'interface_master', skillKey: 'im_responsive', name: 'Design Responsivo', description: 'Criação de interfaces adaptáveis', tier: 2, requiredLevel: 3, bonusType: 'points_multiplier', bonusValue: 1.15, prerequisiteSkills: JSON.stringify(['im_html_css']) },
+      { specialization: 'interface_master', skillKey: 'im_ux_principles', name: 'Princípios de UX', description: 'Compreensão de experiência do usuário', tier: 3, requiredLevel: 5, bonusType: 'accuracy_bonus', bonusValue: 1.2, prerequisiteSkills: JSON.stringify(['im_responsive']) },
+      { specialization: 'interface_master', skillKey: 'im_animations', name: 'Animações e Transições', description: 'Domínio de animações CSS e JS', tier: 4, requiredLevel: 8, bonusType: 'points_multiplier', bonusValue: 1.25, prerequisiteSkills: JSON.stringify(['im_ux_principles']) },
+      { specialization: 'interface_master', skillKey: 'im_master', name: 'Mestre das Interfaces', description: 'Criação de experiências visuais excepcionais', tier: 5, requiredLevel: 12, bonusType: 'points_multiplier', bonusValue: 1.5, prerequisiteSkills: JSON.stringify(['im_animations']) },
+
+      // DATA SAGE (Sábio dos Dados)
+      { specialization: 'data_sage', skillKey: 'ds_sql_basic', name: 'SQL Básico', description: 'Consultas e manipulação de dados', tier: 1, requiredLevel: 1, bonusType: 'points_multiplier', bonusValue: 1.1, prerequisiteSkills: null },
+      { specialization: 'data_sage', skillKey: 'ds_analytics', name: 'Análise de Dados', description: 'Técnicas de análise e visualização', tier: 2, requiredLevel: 3, bonusType: 'points_multiplier', bonusValue: 1.15, prerequisiteSkills: JSON.stringify(['ds_sql_basic']) },
+      { specialization: 'data_sage', skillKey: 'ds_statistics', name: 'Estatística Aplicada', description: 'Domínio de métodos estatísticos', tier: 3, requiredLevel: 5, bonusType: 'accuracy_bonus', bonusValue: 1.2, prerequisiteSkills: JSON.stringify(['ds_analytics']) },
+      { specialization: 'data_sage', skillKey: 'ds_ml_intro', name: 'Introdução ao ML', description: 'Fundamentos de Machine Learning', tier: 4, requiredLevel: 8, bonusType: 'points_multiplier', bonusValue: 1.25, prerequisiteSkills: JSON.stringify(['ds_statistics']) },
+      { specialization: 'data_sage', skillKey: 'ds_master', name: 'Sábio dos Dados', description: 'Domínio completo de ciência de dados', tier: 5, requiredLevel: 12, bonusType: 'points_multiplier', bonusValue: 1.5, prerequisiteSkills: JSON.stringify(['ds_ml_intro']) },
+
+      // SYSTEM ARCHITECT (Arquiteto de Sistemas)
+      { specialization: 'system_architect', skillKey: 'sa_networking', name: 'Redes e Protocolos', description: 'Fundamentos de redes de computadores', tier: 1, requiredLevel: 1, bonusType: 'points_multiplier', bonusValue: 1.1, prerequisiteSkills: null },
+      { specialization: 'system_architect', skillKey: 'sa_devops', name: 'DevOps Básico', description: 'Práticas de integração e entrega contínua', tier: 2, requiredLevel: 3, bonusType: 'points_multiplier', bonusValue: 1.15, prerequisiteSkills: JSON.stringify(['sa_networking']) },
+      { specialization: 'system_architect', skillKey: 'sa_cloud', name: 'Cloud Computing', description: 'Arquitetura em nuvem', tier: 3, requiredLevel: 5, bonusType: 'accuracy_bonus', bonusValue: 1.2, prerequisiteSkills: JSON.stringify(['sa_devops']) },
+      { specialization: 'system_architect', skillKey: 'sa_security', name: 'Segurança de Sistemas', description: 'Práticas de segurança e criptografia', tier: 4, requiredLevel: 8, bonusType: 'points_multiplier', bonusValue: 1.25, prerequisiteSkills: JSON.stringify(['sa_cloud']) },
+      { specialization: 'system_architect', skillKey: 'sa_master', name: 'Arquiteto de Sistemas', description: 'Domínio completo de arquitetura de sistemas', tier: 5, requiredLevel: 12, bonusType: 'points_multiplier', bonusValue: 1.5, prerequisiteSkills: JSON.stringify(['sa_security']) },
+    ];
+
+    await db.insert(specializationSkills).values(skills as any);
+    console.log("[seedSpecializationSkills] Skills criadas com sucesso");
+  } catch (error) {
+    console.error("[seedSpecializationSkills] Error:", error);
   }
 }

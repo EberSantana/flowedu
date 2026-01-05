@@ -12,7 +12,8 @@ import {
   Target,
   Sparkles,
   ChevronRight,
-  Star
+  Star,
+  Swords
 } from 'lucide-react';
 
 interface QuickAction {
@@ -80,6 +81,16 @@ const QUICK_ACTIONS: QuickAction[] = [
     color: 'text-pink-600',
     gradient: 'from-pink-50 to-rose-50',
     hoverBorder: 'hover:border-pink-300',
+  },
+  {
+    id: 'specialization',
+    title: 'Especialização',
+    description: 'Escolher seu caminho',
+    icon: <Swords className="w-8 h-8" />,
+    href: '/student/choose-specialization',
+    color: 'text-indigo-600',
+    gradient: 'from-indigo-50 to-purple-50',
+    hoverBorder: 'hover:border-indigo-300',
     isNew: true,
   },
 ];

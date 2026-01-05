@@ -60,6 +60,8 @@ import StudentBeltHistory from "./pages/StudentBeltHistory";
 import StudentShop from "./pages/StudentShop";
 import KimonoShop from "./pages/KimonoShop";
 import { SubjectGamificationDashboard } from "./pages/SubjectGamificationDashboard";
+import ChooseSpecialization from "./pages/ChooseSpecialization";
+import SkillTree from "./pages/SkillTree";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -111,6 +113,8 @@ function Router() {
         <Route path={"/student/kimono-shop"} component={KimonoShop} />
         <Route path={"/student/wallet"} component={StudentWallet} />
         <Route path={"/student/hidden-achievements"} component={HiddenAchievements} />
+        <Route path={"/student/choose-specialization"} component={ChooseSpecialization} />
+        <Route path={"/student/skill-tree"} component={SkillTree} />
         <Route path={"/avatar-test"} component={AvatarTest} />
         <Route path={"/avatar-3d-demo"} component={Avatar3DDemo} />
         <Route path={"/student/customize-avatar-3d"} component={CustomizeAvatar3D} />
