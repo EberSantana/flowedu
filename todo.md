@@ -12,6 +12,7 @@
 - [x] Remover páginas de gamificação do professor
 - [x] Limpar navegação e rotas
 - [x] Deixar ambiente profissional e objetivo
+- [x] Remover botão de gamificação da página de gerenciamento de disciplinas
 
 ## 🐛 Bugs Críticos
 

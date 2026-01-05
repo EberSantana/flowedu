@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Brain, Trophy } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Brain } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
@@ -524,16 +524,6 @@ export default function Subjects() {
                         </Button>
                       </Link>
                     )}
-                    <Link href={`/subjects/${subject.id}/gamification`}>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700"
-                      >
-                        <Trophy className="mr-2 h-3 w-3" />
-                        Gamificação
-                      </Button>
-                    </Link>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
