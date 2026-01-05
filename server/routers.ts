@@ -4166,7 +4166,6 @@ JSON (descrições MAX 15 chars):
         // Analisar resposta com IA
         const analysis = await analyzeCTAnswer({
           dimension: exercise.dimension,
-          question: exercise.description,
           answer: input.answer,
           expectedAnswer: exercise.expectedAnswer || '',
         });
@@ -5204,100 +5203,399 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return { success: true, profile: input.profile };
       }),
   }),
-});
 
+  // ==================== GAMIFICAÇÃO AVANÇADA ====================
+  
+  /**
+   * Rotas para Badges por Módulo
+   */
+  moduleBadges: router({
+    // Calcular e atribuir badge de módulo
+    calculate: studentProcedure
+      .input(z.object({
+        moduleId: z.number().int().positive(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        const result = await db.calculateModuleBadge(studentId, input.moduleId);
+        
+        if (result && result.isNew) {
+          // Criar notificação de novo badge
+          await db.createGamificationNotification({
+            studentId,
+            type: 'badge_earned',
+            title: `Badge ${result.badgeLevel.toUpperCase()} conquistado!`,
+            message: `Você conquistou o badge ${result.badgeLevel} em um módulo!`
+          });
+        }
+        
+        return result;
+      }),
+
+    // Buscar badges do aluno
+    getMyBadges: studentProcedure.query(async ({ ctx }) => {
+      return db.getStudentModuleBadges(ctx.studentSession.studentId);
+    }),
+
+    // Buscar badges de um módulo (ranking)
+    getByModule: protectedProcedure
+      .input(z.object({
+        moduleId: z.number().int().positive(),
+      }))
+      .query(async ({ input }) => {
+        return db.getModuleBadgesByModule(input.moduleId);
+      }),
+  }),
+
+  /**
+   * Rotas para Conquistas por Especialização
+   */
+  specializationAchievements: router({
+    // Criar conquista (admin)
+    create: protectedProcedure
+      .input(z.object({
+        code: z.string().min(1),
+        specialization: z.enum(["code_warrior", "interface_master", "data_sage", "system_architect"]),
+        name: z.string().min(1),
+        description: z.string(),
+        icon: z.string(),
+        rarity: z.enum(["common", "rare", "epic", "legendary"]),
+        requirement: z.object({
+          type: z.string(),
+        }).passthrough(),
+        points: z.number().int().positive().default(50),
+      }))
+      .mutation(async ({ input }) => {
+        return db.createSpecializationAchievement(input);
+      }),
+
+    // Listar conquistas de uma especialização
+    getBySpecialization: publicProcedure
+      .input(z.object({
+        specialization: z.enum(["code_warrior", "interface_master", "data_sage", "system_architect"]),
+      }))
+      .query(async ({ input }) => {
+        return db.getSpecializationAchievements(input.specialization);
+      }),
+
+    // Buscar conquistas do aluno
+    getMyAchievements: studentProcedure.query(async ({ ctx }) => {
+      return db.getStudentAchievements(ctx.studentSession.studentId);
+    }),
+
+    // Verificar e desbloquear conquistas automaticamente
+    checkAndUnlock: studentProcedure.mutation(async ({ ctx }) => {
+      const studentId = ctx.studentSession.studentId;
+      const newAchievements = await db.checkAndUnlockSpecializationAchievements(studentId);
+      
+      // Criar notificações para novas conquistas
+      for (const achievement of newAchievements) {
+        await db.createGamificationNotification({
+          studentId,
+          type: 'achievement_unlocked',
+          title: `Conquista Desbloqueada: ${achievement.name}!`,
+          message: `Você desbloqueou a conquista ${achievement.rarity}: "${achievement.name}"! +${achievement.points} pontos`
+        });
+      }
+      
+      return newAchievements;
+    }),
+
+    // Desbloquear conquista manualmente (para testes ou admin)
+    unlock: protectedProcedure
+      .input(z.object({
+        studentId: z.number().int().positive(),
+        achievementId: z.number().int().positive(),
+      }))
+      .mutation(async ({ input }) => {
+        return db.unlockAchievement(input.studentId, input.achievementId);
+      }),
+  }),
+
+  /**
+   * Rotas para Recomendações Personalizadas com IA
+   */
+  learningRecommendations: router({
+    // Gerar recomendações personalizadas
+    generate: studentProcedure.mutation(async ({ ctx }) => {
+      try {
+        const recommendations = await db.generatePersonalizedRecommendations(ctx.studentSession.studentId);
+        return {
+          success: true,
+          recommendations,
+          count: recommendations.length
+        };
+      } catch (error) {
+        console.error("Error generating recommendations:", error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Erro ao gerar recomendações. Tente novamente.',
+        });
+      }
+    }),
+
+    // Buscar recomendações do aluno
+    getMyRecommendations: studentProcedure
+      .input(z.object({
+        status: z.enum(["pending", "accepted", "rejected", "completed"]).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentRecommendations(ctx.studentSession.studentId, input.status);
+      }),
+
+    // Atualizar status de recomendação
+    updateStatus: studentProcedure
+      .input(z.object({
+        recommendationId: z.number().int().positive(),
+        status: z.enum(["pending", "accepted", "rejected", "completed"]),
+      }))
+      .mutation(async ({ input }) => {
+        return db.updateRecommendationStatus(input.recommendationId, input.status);
+      }),
+
+    // Registrar progresso em tópico (usado para alimentar IA)
+    recordProgress: studentProcedure
+      .input(z.object({
+        topicId: z.number().int().positive(),
+        score: z.number().int().min(0).max(100),
+        timeSpent: z.number().int().positive(), // em minutos
+        attemptsCount: z.number().int().positive().default(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        await db.recordTopicProgress(
+          studentId,
+          input.topicId,
+          input.score,
+          input.timeSpent,
+          input.attemptsCount
+        );
+
+        // Após registrar progresso, verificar badges
+        // (badges serão calculados em outro momento)
+
+        return { success: true };
+      }),
+  }),
+
+  /**
+   * Rota combinada para inicializar dados de gamificação avançada
+   */
+  advancedGamification: router({
+    // Buscar todos os dados de gamificação avançada do aluno
+    getMyData: studentProcedure.query(async ({ ctx }) => {
+      const studentId = ctx.studentSession.studentId;
+      const [badges, achievements, recommendations] = await Promise.all([
+        db.getStudentModuleBadges(studentId),
+        db.getStudentAchievements(studentId),
+        db.getStudentRecommendations(studentId, 'pending')
+      ]);
+
+      return {
+        badges,
+        achievements,
+        recommendations,
+        stats: {
+          totalBadges: badges.length,
+          platinumBadges: badges.filter(b => b.badgeLevel === 'platinum').length,
+          goldBadges: badges.filter(b => b.badgeLevel === 'gold').length,
+          totalAchievements: achievements.length,
+          legendaryAchievements: achievements.filter(a => a.rarity === 'legendary').length,
+          pendingRecommendations: recommendations.length
+        }
+      };
+    }),
+
+    // Inicializar conquistas padrão do sistema (executar uma vez)
+    initializeDefaultAchievements: protectedProcedure.mutation(async () => {
+      const achievements = [
+        // Code Warrior
+        {
+          code: 'code_warrior_first_steps',
+          specialization: 'code_warrior' as const,
+          name: 'Primeiros Passos',
+          description: 'Complete seu primeiro módulo de programação',
+          icon: 'trophy',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'code_warrior_algorithm_master',
+          specialization: 'code_warrior' as const,
+          name: 'Mestre dos Algoritmos',
+          description: 'Conquiste 5 badges Platinum em módulos de algoritmos',
+          icon: 'crown',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+        {
+          code: 'code_warrior_perfectionist',
+          specialization: 'code_warrior' as const,
+          name: 'Perfeccionista',
+          description: 'Mantenha média acima de 95% em todos os módulos',
+          icon: 'star',
+          rarity: 'epic' as const,
+          requirement: { type: 'average_score', score: 95 },
+          points: 300
+        },
+
+        // Interface Master
+        {
+          code: 'interface_master_first_design',
+          specialization: 'interface_master' as const,
+          name: 'Primeiro Design',
+          description: 'Complete seu primeiro módulo de UI/UX',
+          icon: 'palette',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'interface_master_ux_guru',
+          specialization: 'interface_master' as const,
+          name: 'Guru de UX',
+          description: 'Conquiste 5 badges Platinum em módulos de interface',
+          icon: 'sparkles',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+
+        // Data Sage
+        {
+          code: 'data_sage_first_analysis',
+          specialization: 'data_sage' as const,
+          name: 'Primeira Análise',
+          description: 'Complete seu primeiro módulo de análise de dados',
+          icon: 'chart',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'data_sage_data_master',
+          specialization: 'data_sage' as const,
+          name: 'Mestre dos Dados',
+          description: 'Conquiste 5 badges Platinum em módulos de dados',
+          icon: 'database',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+
+        // System Architect
+        {
+          code: 'system_architect_first_system',
+          specialization: 'system_architect' as const,
+          name: 'Primeiro Sistema',
+          description: 'Complete seu primeiro módulo de arquitetura',
+          icon: 'building',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'system_architect_cloud_master',
+          specialization: 'system_architect' as const,
+          name: 'Mestre da Nuvem',
+          description: 'Conquiste 5 badges Platinum em módulos de sistemas',
+          icon: 'cloud',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+      ];
+
+      const created = [];
+      for (const achievement of achievements) {
+        try {
+          const id = await db.createSpecializationAchievement(achievement);
+          created.push({ id, ...achievement });
+        } catch (error) {
+          // Ignorar erros de duplicação
+          console.log(`Achievement ${achievement.code} already exists`);
+        }
+      }
+
+      return {
+        success: true,
+        created: created.length,
+        achievements: created
+      };
+    }),
+  }),
+});
 export type AppRouter = typeof appRouter;
+
 // ==================== FUNÇÕES AUXILIARES ====================
 
 /**
  * Analisar resposta de exercício de PC usando IA
  */
 async function analyzeCTAnswer(params: {
-  dimension: string;
-  question: string;
   answer: string;
   expectedAnswer: string;
-}) {
-  const { dimension, question, answer, expectedAnswer } = params;
+  dimension: string;
+}): Promise<{ score: number; feedback: string }> {
+  const { answer, expectedAnswer, dimension } = params;
 
-  // Mapear dimensões para português
-  const dimensionNames: Record<string, string> = {
-    decomposition: 'Decomposição',
-    pattern_recognition: 'Reconhecimento de Padrões',
-    abstraction: 'Abstração',
-    algorithms: 'Algoritmos',
-  };
-
-  const dimensionName = dimensionNames[dimension] || dimension;
-
-  // Prompt específico para cada dimensão
   const prompts: Record<string, string> = {
-    decomposition: `Você está avaliando a habilidade de DECOMPOSIÇÃO (dividir problemas complexos em partes menores).
+    decomposition: `Avalie esta resposta sobre DECOMPOSIÇÃO (quebrar problemas em partes menores):
 
-Questão: ${question}
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
 
-Resposta esperada: ${expectedAnswer}
+Critérios:
+- Identificou corretamente as partes do problema?
+- Organizou as partes de forma lógica?
+- Demonstrou compreensão de como dividir complexidade?
 
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno conseguiu identificar as partes principais do problema?
-2. A divisão proposta é lógica e facilita a resolução?
-3. As partes são independentes e bem definidas?
-
-Retorne um JSON com:
-- score: número de 0 a 100
+Retorne JSON com:
+- score: pontuação de 0-100
 - feedback: texto explicativo (máximo 200 caracteres)`,
 
-    pattern_recognition: `Você está avaliando a habilidade de RECONHECIMENTO DE PADRÕES.
+    pattern_recognition: `Avalie esta resposta sobre RECONHECIMENTO DE PADRÕES:
 
-Questão: ${question}
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
 
-Resposta esperada: ${expectedAnswer}
+Critérios:
+- Identificou padrões relevantes?
+- Explicou as similaridades encontradas?
+- Aplicou o padrão corretamente?
 
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno identificou padrões ou repetições?
-2. Os padrões identificados são relevantes?
-3. A explicação é clara?
-
-Retorne um JSON com:
-- score: número de 0 a 100
+Retorne JSON com:
+- score: pontuação de 0-100
 - feedback: texto explicativo (máximo 200 caracteres)`,
 
-    abstraction: `Você está avaliando a habilidade de ABSTRAÇÃO (focar no essencial, ignorar detalhes irrelevantes).
+    abstraction: `Avalie esta resposta sobre ABSTRAÇÃO (focar no essencial, ignorar detalhes):
 
-Questão: ${question}
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
 
-Resposta esperada: ${expectedAnswer}
+Critérios:
+- Identificou os elementos essenciais?
+- Removeu detalhes irrelevantes?
+- Criou uma representação simplificada?
 
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno focou nos aspectos essenciais?
-2. Detalhes irrelevantes foram ignorados?
-3. A abstração facilita o entendimento?
-
-Retorne um JSON com:
-- score: número de 0 a 100
+Retorne JSON com:
+- score: pontuação de 0-100
 - feedback: texto explicativo (máximo 200 caracteres)`,
 
-    algorithms: `Você está avaliando a habilidade de criar ALGORITMOS (sequência lógica de passos).
+    algorithms: `Avalie esta resposta sobre ALGORITMOS (sequência de passos):
 
-Questão: ${question}
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
 
-Resposta esperada: ${expectedAnswer}
+Critérios:
+- Definiu passos claros e ordenados?
+- A sequência resolve o problema?
+- É eficiente e lógica?
 
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. Os passos estão em ordem lógica?
-2. A sequência é completa e resolve o problema?
-3. Os passos são claros e executáveis?
-
-Retorne um JSON com:
-- score: número de 0 a 100
+Retorne JSON com:
+- score: pontuação de 0-100
 - feedback: texto explicativo (máximo 200 caracteres)`,
   };
 
@@ -5345,4 +5643,3 @@ Retorne um JSON com:
     };
   }
 }
-

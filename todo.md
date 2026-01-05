@@ -4293,3 +4293,60 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar sistema de desbloqueio progressivo
 - [ ] Validar cálculo de estatísticas de estudo
 - [x] Substituir avatar completo por faixa de karatê 3D profissional no Portal do Aluno e Rankings
+
+## 🎮 Gamificação Avançada - Fase 2
+
+### Sistema de Badges por Módulo
+- [ ] Criar tabela module_badges no banco de dados
+- [ ] Implementar tipos de badges por módulo (Bronze, Prata, Ouro, Platina)
+- [ ] Criar função calculateModuleBadge() baseada em desempenho
+- [ ] Implementar rotas tRPC para badges de módulos
+- [ ] Criar componente visual ModuleBadge.tsx
+- [ ] Integrar badges na página de trilhas de aprendizagem
+- [ ] Adicionar notificações ao conquistar novo badge de módulo
+
+### Sistema de Conquistas por Especialização
+- [ ] Criar tabela specialization_achievements no banco de dados
+- [ ] Definir conquistas específicas para Code Warrior (ex: "Mestre Algoritmos", "Ninja do Debug")
+- [ ] Definir conquistas específicas para Interface Master (ex: "Designer UX", "Mago CSS")
+- [ ] Definir conquistas específicas para Data Sage (ex: "Analista SQL", "Guru de Dados")
+- [ ] Definir conquistas específicas para System Architect (ex: "Arquiteto Cloud", "Mestre DevOps")
+- [ ] Implementar sistema de desbloqueio de conquistas
+- [ ] Criar rotas tRPC para conquistas por especialização
+- [ ] Criar componente SpecializationAchievements.tsx
+- [ ] Criar galeria de conquistas na página do aluno
+- [ ] Adicionar animações especiais para conquistas raras
+
+### Sistema de Recomendações Personalizadas com IA
+- [ ] Criar tabela learning_recommendations no banco de dados
+- [ ] Implementar função analyzeStudentProfile() com IA
+- [ ] Criar algoritmo de recomendação baseado em:
+  - [ ] Histórico de desempenho por tópico
+  - [ ] Padrão de erros e acertos
+  - [ ] Tempo médio de conclusão
+  - [ ] Preferências de especialização
+- [ ] Implementar rotas tRPC para recomendações
+- [ ] Criar componente RecommendedTopics.tsx
+- [ ] Integrar recomendações no Dashboard do aluno
+- [ ] Adicionar explicação do porquê da recomendação
+- [ ] Implementar sistema de feedback sobre recomendações
+
+### Integração e Testes
+- [ ] Criar testes para badges de módulos
+- [ ] Criar testes para conquistas por especialização
+- [ ] Criar testes para sistema de recomendações
+- [ ] Testar integração completa dos 3 sistemas
+- [ ] Validar performance das queries de IA
+- [ ] Criar documentação do sistema de gamificação avançada
+
+
+## 🥋 Melhorias Visuais do Sistema de Faixas - Fase 2
+
+- [x] Copiar imagens de referência de faixas de karatê para o projeto
+- [x] Criar componente BeltDisplay3D com faixas realistas (textura de tecido, nó)
+- [x] Implementar animação de rotação 3D ao passar mouse sobre faixa
+- [x] Criar sistema de badges especiais (Velocista, Perfeccionista, Mestre, Dedicado)
+- [x] Implementar efeito de partículas/brilho ao conquistar nova faixa (BeltLevelUpEffect)
+- [x] Integrar componente visual com sistema de pontos existente
+- [x] Criar página de demonstração (/belt-showcase)
+- [x] Criar hook useStudentBadges para cálculo automático de badges

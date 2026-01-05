@@ -1,7 +1,8 @@
 import { getBeltName, BELT_CONFIG, type BeltColor } from "./MinimalKarateAvatar";
-import { BeltDisplay } from "./KarateBelt3D";
+import BeltDisplay3D from "./BeltDisplay3D";
 import { Progress } from "@/components/ui/progress";
 import { Zap, TrendingUp } from "lucide-react";
+import { useStudentBadges } from "@/hooks/useStudentBadges";
 
 interface StudentDashboardHeaderSimpleProps {
   studentName: string;
@@ -16,6 +17,8 @@ export function StudentDashboardHeaderSimple({
   totalPoints,
   nextBeltThreshold,
 }: StudentDashboardHeaderSimpleProps) {
+  // Buscar badges automaticamente
+  const badges = useStudentBadges(1); // TODO: passar studentId real
   // Calcular progresso
   const currentBeltConfig = BELT_CONFIG.find(b => b.name === currentBelt);
   const currentBeltMin = currentBeltConfig?.minPoints || 0;
@@ -38,12 +41,12 @@ export function StudentDashboardHeaderSimple({
         <div className="flex flex-col md:flex-row items-center gap-6">
           {/* Faixa 3D */}
           <div className="flex-shrink-0">
-            <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-              <BeltDisplay 
-                color={currentBelt} 
-                label={`${totalPoints} Tech Coins`}
-                size="lg"
-                showLabel={false}
+            <div className="bg-white rounded-xl p-6 shadow-md border border-slate-200">
+              <BeltDisplay3D 
+                beltLevel={currentBelt} 
+                size="xl"
+                showBadges={true}
+                badges={badges}
               />
             </div>
           </div>

@@ -82,7 +82,16 @@ import {
   StudentWallet,
   InsertStudentWallet,
   CoinTransaction,
-  InsertCoinTransaction
+  InsertCoinTransaction,
+  moduleBadges,
+  InsertModuleBadge,
+  specializationAchievements,
+  studentAchievements,
+  InsertStudentAchievement,
+  learningRecommendations,
+  InsertLearningRecommendation,
+  topicProgressHistory,
+  InsertTopicProgressHistory
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -2807,6 +2816,32 @@ export async function getAllBadges() {
   } catch (error) {
     console.error("[Database] Error getting all badges:", error);
     return [];
+  }
+}
+
+// Criar notificação de gamificação
+export async function createGamificationNotification(data: {
+  studentId: number;
+  type: string;
+  title: string;
+  message: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const [result] = await db.insert(gamificationNotifications).values({
+      studentId: data.studentId,
+      type: data.type,
+      title: data.title,
+      message: data.message,
+      isRead: false
+    });
+
+    return result.insertId;
+  } catch (error) {
+    console.error("[Database] Error creating gamification notification:", error);
+    throw error;
   }
 }
 
@@ -7110,4 +7145,604 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
     pendingDoubts: doubts.filter(d => d.status === 'pending').length,
     answeredDoubts: doubts.filter(d => d.status === 'answered').length
   };
+}
+
+
+// ==================== GAMIFICAÇÃO AVANÇADA ====================
+
+/**
+ * Badges por Módulo
+ */
+
+// Calcular e atribuir badge de módulo baseado no desempenho
+export async function calculateModuleBadge(studentId: number, moduleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Buscar todos os tópicos do módulo
+  const topics = await db.select().from(learningTopics)
+    .where(eq(learningTopics.moduleId, moduleId));
+
+  if (topics.length === 0) {
+    return null;
+  }
+
+  const topicIds = topics.map(t => t.id);
+
+  // Buscar progresso do aluno nesses tópicos
+  const progress = await db.select().from(studentTopicProgress)
+    .where(and(
+      eq(studentTopicProgress.studentId, studentId),
+      inArray(studentTopicProgress.topicId, topicIds)
+    ));
+
+  // Buscar histórico de progresso para calcular tempo e pontuação
+  const history = await db.select().from(topicProgressHistory)
+    .where(and(
+      eq(topicProgressHistory.studentId, studentId),
+      inArray(topicProgressHistory.topicId, topicIds)
+    ));
+
+  const completedTopics = progress.filter(p => p.status === 'completed').length;
+  const completionPercentage = Math.round((completedTopics / topics.length) * 100);
+  
+  // Calcular pontuação média
+  const averageScore = history.length > 0
+    ? Math.round(history.reduce((sum, h) => sum + h.score, 0) / history.length)
+    : 0;
+
+  // Calcular tempo total gasto
+  const timeSpent = history.reduce((sum, h) => sum + h.timeSpent, 0);
+
+  // Determinar nível do badge
+  let badgeLevel: "bronze" | "silver" | "gold" | "platinum";
+  
+  if (completionPercentage === 100 && averageScore >= 95) {
+    badgeLevel = "platinum";
+  } else if (completionPercentage === 100 && averageScore >= 85) {
+    badgeLevel = "gold";
+  } else if (completionPercentage >= 80 && averageScore >= 70) {
+    badgeLevel = "silver";
+  } else if (completionPercentage >= 60) {
+    badgeLevel = "bronze";
+  } else {
+    return null; // Não atingiu requisitos mínimos
+  }
+
+  // Verificar se já existe badge para este módulo
+  const existing = await db.select().from(moduleBadges)
+    .where(and(
+      eq(moduleBadges.studentId, studentId),
+      eq(moduleBadges.moduleId, moduleId)
+    ));
+
+  if (existing.length > 0) {
+    // Atualizar se o novo badge for melhor
+    const currentBadge = existing[0];
+    const levels = ["bronze", "silver", "gold", "platinum"];
+    const currentLevel = levels.indexOf(currentBadge.badgeLevel);
+    const newLevel = levels.indexOf(badgeLevel);
+
+    if (newLevel > currentLevel) {
+      await db.update(moduleBadges)
+        .set({
+          badgeLevel,
+          completionPercentage,
+          averageScore,
+          timeSpent,
+          earnedAt: new Date()
+        })
+        .where(eq(moduleBadges.id, currentBadge.id));
+      
+      return { ...currentBadge, badgeLevel, upgraded: true };
+    }
+    return { ...currentBadge, upgraded: false };
+  }
+
+  // Criar novo badge
+  const [newBadge] = await db.insert(moduleBadges).values({
+    studentId,
+    moduleId,
+    badgeLevel,
+    completionPercentage,
+    averageScore,
+    timeSpent
+  });
+
+  return { id: newBadge.insertId, badgeLevel, upgraded: false, isNew: true };
+}
+
+// Buscar badges de módulos de um aluno
+export async function getStudentModuleBadges(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const badges = await db.select({
+    id: moduleBadges.id,
+    moduleId: moduleBadges.moduleId,
+    moduleName: learningModules.title,
+    subjectId: learningModules.subjectId,
+    badgeLevel: moduleBadges.badgeLevel,
+    completionPercentage: moduleBadges.completionPercentage,
+    averageScore: moduleBadges.averageScore,
+    timeSpent: moduleBadges.timeSpent,
+    earnedAt: moduleBadges.earnedAt
+  })
+  .from(moduleBadges)
+  .innerJoin(learningModules, eq(moduleBadges.moduleId, learningModules.id))
+  .where(eq(moduleBadges.studentId, studentId))
+  .orderBy(desc(moduleBadges.earnedAt));
+
+  return badges;
+}
+
+// Buscar badges de um módulo específico
+export async function getModuleBadgesByModule(moduleId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const badges = await db.select({
+    id: moduleBadges.id,
+    studentId: moduleBadges.studentId,
+    studentName: students.fullName,
+    badgeLevel: moduleBadges.badgeLevel,
+    completionPercentage: moduleBadges.completionPercentage,
+    averageScore: moduleBadges.averageScore,
+    timeSpent: moduleBadges.timeSpent,
+    earnedAt: moduleBadges.earnedAt
+  })
+  .from(moduleBadges)
+  .innerJoin(students, eq(moduleBadges.studentId, students.id))
+  .where(eq(moduleBadges.moduleId, moduleId))
+  .orderBy(desc(moduleBadges.averageScore));
+
+  return badges;
+}
+
+/**
+ * Conquistas por Especialização
+ */
+
+// Criar conquista de especialização (admin/sistema)
+export async function createSpecializationAchievement(data: {
+  code: string;
+  specialization: "code_warrior" | "interface_master" | "data_sage" | "system_architect";
+  name: string;
+  description: string;
+  icon: string;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  requirement: object;
+  points: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [result] = await db.insert(specializationAchievements).values({
+    ...data,
+    requirement: JSON.stringify(data.requirement)
+  });
+
+  return result.insertId;
+}
+
+// Buscar todas as conquistas de uma especialização
+export async function getSpecializationAchievements(specialization: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const achievements = await db.select().from(specializationAchievements)
+    .where(eq(specializationAchievements.specialization, specialization as any));
+
+  return achievements.map(a => ({
+    ...a,
+    requirement: JSON.parse(a.requirement)
+  }));
+}
+
+// Desbloquear conquista para um aluno
+export async function unlockAchievement(studentId: number, achievementId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Verificar se já foi desbloqueada
+  const existing = await db.select().from(studentAchievements)
+    .where(and(
+      eq(studentAchievements.studentId, studentId),
+      eq(studentAchievements.achievementId, achievementId)
+    ));
+
+  if (existing.length > 0) {
+    return { alreadyUnlocked: true };
+  }
+
+  // Desbloquear
+  await db.insert(studentAchievements).values({
+    studentId,
+    achievementId,
+    progress: 100
+  });
+
+  // Buscar detalhes da conquista para adicionar pontos
+  const achievement = await db.select().from(specializationAchievements)
+    .where(eq(specializationAchievements.id, achievementId));
+
+  if (achievement.length > 0) {
+    // Adicionar pontos ao aluno
+    const points = achievement[0].points;
+    await addPointsToStudent(studentId, points, `Conquista desbloqueada: ${achievement[0].name}`, 'achievement', achievementId);
+  }
+
+  return { success: true, isNew: true };
+}
+
+// Buscar conquistas desbloqueadas de um aluno
+export async function getStudentAchievements(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const achievements = await db.select({
+    id: studentAchievements.id,
+    achievementId: studentAchievements.achievementId,
+    code: specializationAchievements.code,
+    name: specializationAchievements.name,
+    description: specializationAchievements.description,
+    icon: specializationAchievements.icon,
+    rarity: specializationAchievements.rarity,
+    specialization: specializationAchievements.specialization,
+    points: specializationAchievements.points,
+    unlockedAt: studentAchievements.unlockedAt,
+    progress: studentAchievements.progress
+  })
+  .from(studentAchievements)
+  .innerJoin(specializationAchievements, eq(studentAchievements.achievementId, specializationAchievements.id))
+  .where(eq(studentAchievements.studentId, studentId))
+  .orderBy(desc(studentAchievements.unlockedAt));
+
+  return achievements;
+}
+
+// Verificar e desbloquear conquistas de especialização automaticamente
+export async function checkAndUnlockSpecializationAchievements(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Buscar especialização do aluno
+  const specialization = await db.select().from(studentSpecializations)
+    .where(eq(studentSpecializations.studentId, studentId));
+
+  if (specialization.length === 0) {
+    return [];
+  }
+
+  const spec = specialization[0].specialization;
+
+  // Buscar todas as conquistas da especialização
+  const achievements = await getSpecializationAchievements(spec);
+
+  // Buscar conquistas já desbloqueadas
+  const unlocked = await getStudentAchievements(studentId);
+  const unlockedIds = unlocked.map(u => u.achievementId);
+
+  const newlyUnlocked = [];
+
+  // Verificar cada conquista
+  for (const achievement of achievements) {
+    if (unlockedIds.includes(achievement.id)) continue;
+
+    const req = achievement.requirement as any;
+    let meetsRequirement = false;
+
+    // Verificar requisitos baseado no tipo
+    if (req.type === 'modules_completed') {
+      const badges = await getStudentModuleBadges(studentId);
+      const completedModules = badges.filter(b => b.completionPercentage === 100).length;
+      meetsRequirement = completedModules >= req.count;
+    } else if (req.type === 'platinum_badges') {
+      const badges = await getStudentModuleBadges(studentId);
+      const platinumCount = badges.filter(b => b.badgeLevel === 'platinum').length;
+      meetsRequirement = platinumCount >= req.count;
+    } else if (req.type === 'total_points') {
+      const points = await db.select().from(studentPoints)
+        .where(eq(studentPoints.studentId, studentId));
+      if (points.length > 0) {
+        meetsRequirement = points[0].totalPoints >= req.points;
+      }
+    } else if (req.type === 'average_score') {
+      const history = await db.select().from(topicProgressHistory)
+        .where(eq(topicProgressHistory.studentId, studentId));
+      if (history.length > 0) {
+        const avgScore = history.reduce((sum, h) => sum + h.score, 0) / history.length;
+        meetsRequirement = avgScore >= req.score;
+      }
+    }
+
+    if (meetsRequirement) {
+      await unlockAchievement(studentId, achievement.id);
+      newlyUnlocked.push(achievement);
+    }
+  }
+
+  return newlyUnlocked;
+}
+
+/**
+ * Recomendações Personalizadas com IA
+ */
+
+// Gerar recomendações personalizadas usando IA
+export async function generatePersonalizedRecommendations(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Buscar perfil do aluno
+  const student = await db.select().from(students)
+    .where(eq(students.id, studentId));
+
+  if (student.length === 0) {
+    throw new Error("Student not found");
+  }
+
+  // Buscar especialização
+  const specialization = await db.select().from(studentSpecializations)
+    .where(eq(studentSpecializations.studentId, studentId));
+
+  // Buscar histórico de progresso
+  const history = await db.select().from(topicProgressHistory)
+    .where(eq(topicProgressHistory.studentId, studentId))
+    .orderBy(desc(topicProgressHistory.completedAt))
+    .limit(20);
+
+  // Buscar tópicos já completados
+  const completedProgress = await db.select().from(studentTopicProgress)
+    .where(and(
+      eq(studentTopicProgress.studentId, studentId),
+      eq(studentTopicProgress.status, 'completed')
+    ));
+
+  const completedTopicIds = completedProgress.map(p => p.topicId);
+
+  // Buscar disciplinas matriculadas
+  const enrollments = await db.select().from(studentEnrollments)
+    .where(eq(studentEnrollments.studentId, studentId));
+
+  const subjectIds = enrollments.map(e => e.subjectId);
+
+  // Buscar todos os módulos das disciplinas
+  const modules = await db.select().from(learningModules)
+    .where(inArray(learningModules.subjectId, subjectIds));
+
+  const moduleIds = modules.map(m => m.id);
+
+  // Buscar tópicos disponíveis (não completados)
+  const availableTopics = await db.select({
+    id: learningTopics.id,
+    title: learningTopics.title,
+    description: learningTopics.description,
+    difficulty: learningTopics.difficulty,
+    moduleId: learningTopics.moduleId,
+    moduleName: learningModules.title,
+    estimatedHours: learningTopics.estimatedHours
+  })
+  .from(learningTopics)
+  .innerJoin(learningModules, eq(learningTopics.moduleId, learningModules.id))
+  .where(and(
+    inArray(learningTopics.moduleId, moduleIds),
+    completedTopicIds.length > 0 
+      ? sql`${learningTopics.id} NOT IN (${completedTopicIds.join(',')})` 
+      : sql`1=1`
+  ))
+  .limit(50);
+
+  if (availableTopics.length === 0) {
+    return [];
+  }
+
+  // Preparar dados para IA
+  const studentProfile = {
+    name: student[0].fullName,
+    specialization: specialization.length > 0 ? specialization[0].specialization : 'none',
+    specializationLevel: specialization.length > 0 ? specialization[0].level : 0,
+    recentPerformance: history.map(h => ({
+      score: h.score,
+      timeSpent: h.timeSpent,
+      attempts: h.attemptsCount
+    })),
+    averageScore: history.length > 0 
+      ? Math.round(history.reduce((sum, h) => sum + h.score, 0) / history.length)
+      : 0,
+    completedTopicsCount: completedTopicIds.length
+  };
+
+  // Chamar IA para gerar recomendações
+  const prompt = `Você é um assistente educacional especializado em recomendar tópicos de estudo personalizados.
+
+Perfil do Aluno:
+- Nome: ${studentProfile.name}
+- Especialização: ${studentProfile.specialization}
+- Nível: ${studentProfile.specializationLevel}
+- Pontuação média recente: ${studentProfile.averageScore}/100
+- Tópicos completados: ${studentProfile.completedTopicsCount}
+
+Tópicos Disponíveis:
+${availableTopics.map((t, i) => `${i + 1}. ${t.title} (${t.moduleName}) - Dificuldade: ${t.difficulty} - ${t.estimatedHours}h`).join('\n')}
+
+Baseado no perfil e desempenho do aluno, recomende os 5 melhores tópicos para ele estudar a seguir.
+Para cada recomendação, forneça:
+1. ID do tópico (número da lista acima)
+2. Razão da recomendação (1-2 frases explicando por que é adequado)
+3. Nível de confiança (0-100)
+4. Prioridade (low, medium, high, urgent)
+
+Responda APENAS com JSON válido no formato:
+{
+  "recommendations": [
+    {
+      "topicIndex": 1,
+      "reason": "explicação",
+      "confidence": 85,
+      "priority": "high"
+    }
+  ]
+}`;
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: "system", content: "Você é um assistente educacional que recomenda tópicos de estudo. Responda sempre com JSON válido." },
+        { role: "user", content: prompt }
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "recommendations",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              recommendations: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    topicIndex: { type: "integer" },
+                    reason: { type: "string" },
+                    confidence: { type: "integer" },
+                    priority: { type: "string", enum: ["low", "medium", "high", "urgent"] }
+                  },
+                  required: ["topicIndex", "reason", "confidence", "priority"],
+                  additionalProperties: false
+                }
+              }
+            },
+            required: ["recommendations"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const content = response.choices[0].message.content;
+    const aiResponse = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
+    const recommendations = aiResponse.recommendations;
+
+    // Limpar recomendações antigas pendentes
+    await db.delete(learningRecommendations)
+      .where(and(
+        eq(learningRecommendations.studentId, studentId),
+        eq(learningRecommendations.status, 'pending')
+      ));
+
+    // Salvar novas recomendações
+    const savedRecommendations = [];
+    for (const rec of recommendations) {
+      const topicIndex = rec.topicIndex - 1; // Converter para índice 0-based
+      if (topicIndex >= 0 && topicIndex < availableTopics.length) {
+        const topic = availableTopics[topicIndex];
+        
+        const [result] = await db.insert(learningRecommendations).values({
+          studentId,
+          topicId: topic.id,
+          reason: rec.reason,
+          confidence: rec.confidence,
+          priority: rec.priority,
+          basedOn: JSON.stringify({
+            averageScore: studentProfile.averageScore,
+            completedTopics: studentProfile.completedTopicsCount,
+            specialization: studentProfile.specialization,
+            recentPerformance: studentProfile.recentPerformance.slice(0, 5)
+          }),
+          status: 'pending'
+        });
+
+        savedRecommendations.push({
+          id: result.insertId,
+          topic,
+          reason: rec.reason,
+          confidence: rec.confidence,
+          priority: rec.priority
+        });
+      }
+    }
+
+    return savedRecommendations;
+  } catch (error) {
+    console.error("Error generating recommendations:", error);
+    throw error;
+  }
+}
+
+// Buscar recomendações de um aluno
+export async function getStudentRecommendations(studentId: number, status?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const recommendations = await db.select({
+    id: learningRecommendations.id,
+    topicId: learningRecommendations.topicId,
+    topicTitle: learningTopics.title,
+    topicDescription: learningTopics.description,
+    topicDifficulty: learningTopics.difficulty,
+    moduleId: learningTopics.moduleId,
+    moduleName: learningModules.title,
+    reason: learningRecommendations.reason,
+    confidence: learningRecommendations.confidence,
+    priority: learningRecommendations.priority,
+    basedOn: learningRecommendations.basedOn,
+    status: learningRecommendations.status,
+    createdAt: learningRecommendations.createdAt
+  })
+  .from(learningRecommendations)
+  .innerJoin(learningTopics, eq(learningRecommendations.topicId, learningTopics.id))
+  .innerJoin(learningModules, eq(learningTopics.moduleId, learningModules.id))
+  .where(
+    status 
+      ? and(
+          eq(learningRecommendations.studentId, studentId),
+          eq(learningRecommendations.status, status as any)
+        )
+      : eq(learningRecommendations.studentId, studentId)
+  )
+  .orderBy(desc(learningRecommendations.createdAt));
+
+  return recommendations.map(r => ({
+    ...r,
+    basedOn: JSON.parse(r.basedOn)
+  }));
+}
+
+// Atualizar status de recomendação
+export async function updateRecommendationStatus(
+  recommendationId: number,
+  status: "pending" | "accepted" | "rejected" | "completed"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(learningRecommendations)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(learningRecommendations.id, recommendationId));
+
+  return { success: true };
+}
+
+// Registrar progresso no histórico
+export async function recordTopicProgress(
+  studentId: number,
+  topicId: number,
+  score: number,
+  timeSpent: number,
+  attemptsCount: number = 1
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(topicProgressHistory).values({
+    studentId,
+    topicId,
+    score,
+    timeSpent,
+    attemptsCount
+  });
+
+  return { success: true };
 }

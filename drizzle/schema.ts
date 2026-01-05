@@ -1325,3 +1325,108 @@ export const projectActivities = mysqlTable("project_activities", {
 
 export type ProjectActivity = typeof projectActivities.$inferSelect;
 export type InsertProjectActivity = typeof projectActivities.$inferInsert;
+
+
+/**
+ * ==================== GAMIFICAÇÃO AVANÇADA ====================
+ * Sistema de badges por módulo, conquistas por especialização e recomendações personalizadas
+ */
+
+/**
+ * Badges por Módulo (Module Badges)
+ * Badges conquistados ao completar módulos com diferentes níveis de desempenho
+ */
+export const moduleBadges = mysqlTable("module_badges", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  moduleId: int("moduleId").notNull(), // FK para learning_modules
+  badgeLevel: mysqlEnum("badgeLevel", ["bronze", "silver", "gold", "platinum"]).notNull(),
+  completionPercentage: int("completionPercentage").notNull(), // 0-100
+  averageScore: int("averageScore").notNull(), // 0-100
+  timeSpent: int("timeSpent").notNull(), // Tempo total em minutos
+  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueStudentModule: unique().on(table.studentId, table.moduleId), // Um badge por aluno por módulo
+}));
+
+export type ModuleBadge = typeof moduleBadges.$inferSelect;
+export type InsertModuleBadge = typeof moduleBadges.$inferInsert;
+
+/**
+ * Conquistas por Especialização (Specialization Achievements)
+ * Conquistas únicas para cada especialização (Code Warrior, Interface Master, Data Sage, System Architect)
+ */
+export const specializationAchievements = mysqlTable("specialization_achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 100 }).notNull().unique(), // Ex: "code_warrior_algorithm_master"
+  specialization: mysqlEnum("specialization", [
+    "code_warrior",
+    "interface_master",
+    "data_sage",
+    "system_architect"
+  ]).notNull(),
+  name: varchar("name", { length: 255 }).notNull(), // Ex: "Mestre Algoritmos"
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 100 }).notNull(), // Nome do ícone
+  rarity: mysqlEnum("rarity", ["common", "rare", "epic", "legendary"]).notNull(),
+  requirement: text("requirement").notNull(), // JSON com critérios de desbloqueio
+  points: int("points").default(50).notNull(), // Pontos ganhos ao desbloquear
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SpecializationAchievement = typeof specializationAchievements.$inferSelect;
+export type InsertSpecializationAchievement = typeof specializationAchievements.$inferInsert;
+
+/**
+ * Conquistas Desbloqueadas pelos Alunos (Student Achievements)
+ * Relaciona alunos com conquistas de especialização que desbloquearam
+ */
+export const studentAchievements = mysqlTable("student_achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  achievementId: int("achievementId").notNull(), // FK para specialization_achievements
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+  progress: int("progress").default(100).notNull(), // 0-100 (100 = completo)
+}, (table) => ({
+  uniqueStudentAchievement: unique().on(table.studentId, table.achievementId),
+}));
+
+export type StudentAchievement = typeof studentAchievements.$inferSelect;
+export type InsertStudentAchievement = typeof studentAchievements.$inferInsert;
+
+/**
+ * Recomendações Personalizadas de Aprendizagem (Learning Recommendations)
+ * Sistema de IA que sugere próximos tópicos baseado no perfil do aluno
+ */
+export const learningRecommendations = mysqlTable("learning_recommendations", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  topicId: int("topicId").notNull(), // FK para learning_topics
+  reason: text("reason").notNull(), // Explicação da recomendação
+  confidence: int("confidence").notNull(), // 0-100 (confiança da IA)
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).notNull(),
+  basedOn: text("basedOn").notNull(), // JSON com fatores considerados
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "completed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningRecommendation = typeof learningRecommendations.$inferSelect;
+export type InsertLearningRecommendation = typeof learningRecommendations.$inferInsert;
+
+/**
+ * Histórico de Progresso por Tópico (Topic Progress History)
+ * Armazena dados históricos de desempenho para análise de IA
+ */
+export const topicProgressHistory = mysqlTable("topic_progress_history", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  topicId: int("topicId").notNull(), // FK para learning_topics
+  score: int("score").notNull(), // 0-100
+  timeSpent: int("timeSpent").notNull(), // Tempo em minutos
+  attemptsCount: int("attemptsCount").default(1).notNull(),
+  completedAt: timestamp("completedAt").defaultNow().notNull(),
+});
+
+export type TopicProgressHistory = typeof topicProgressHistory.$inferSelect;
+export type InsertTopicProgressHistory = typeof topicProgressHistory.$inferInsert;

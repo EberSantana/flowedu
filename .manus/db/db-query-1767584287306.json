@@ -1,0 +1,31 @@
+{
+  "query": "SHOW TABLES LIKE '%badge%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE '%badge%'",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "badges"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "ct_badges"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "studentBadges"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "student_badges"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "student_ct_badges"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "student_subject_badges"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)": "subject_badges"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%badge%)\nbadges\nct_badges\nstudentBadges\nstudent_badges\nstudent_ct_badges\nstudent_subject_badges\nsubject_badges\n",
+  "stderr": "",
+  "execution_time_ms": 93
+}
