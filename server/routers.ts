@@ -17,6 +17,9 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    // Rota específica para verificar sessão de aluno
+    studentSession: publicProcedure.query(opts => opts.ctx.studentSession),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -68,7 +71,10 @@ export const appRouter = router({
           
           // Configurar cookie de sessão
           const cookieOptions = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+          ctx.res.cookie(COOKIE_NAME, token, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+          });
           
           return {
             success: true,

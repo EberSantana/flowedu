@@ -2,6 +2,9 @@
 
 ## 🐛 Bugs Críticos
 
+- [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React)
+- [ ] Corrigir logout automático após 10 segundos no portal do aluno (em investigação - cookie configurado, refetch desabilitado, redirecionamento corrigido)
+
 - [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
 - [x] Corrigir sobreposição de botões "Trilhas de Aprendizagem" e "Estatísticas de PC" nos cards de disciplinas
 - [x] Padronizar página SubjectCTStats.tsx seguindo padrão UX (cards brancos com border-l-4, ícones circulares coloridos)

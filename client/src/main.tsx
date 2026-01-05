@@ -18,6 +18,14 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
+  // Não redirecionar se estiver em rotas de aluno
+  const isStudentRoute = window.location.pathname.startsWith('/student');
+  if (isStudentRoute) {
+    // Para rotas de aluno, redirecionar para login de aluno
+    window.location.href = '/student-login';
+    return;
+  }
+
   window.location.href = getLoginUrl();
 };
 
