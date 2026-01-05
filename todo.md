@@ -4350,3 +4350,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Integrar componente visual com sistema de pontos existente
 - [x] Criar página de demonstração (/belt-showcase)
 - [x] Criar hook useStudentBadges para cálculo automático de badges
+
+## 🎬 Animação de Transição Entre Faixas
+
+- [x] Criar componente BeltTransitionAnimation.tsx
+- [x] Implementar morphing suave de cores entre faixas
+- [x] Adicionar efeitos de brilho e partículas durante transição
+- [x] Criar raios de luz emanando da faixa
+- [x] Integrar com hook de detecção de level up
+- [x] Testar todas as transições (branca→amarela até marrom→preta)
+- [x] Adicionar animação especial para conquista da faixa preta

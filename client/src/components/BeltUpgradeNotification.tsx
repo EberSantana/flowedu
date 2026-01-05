@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { KarateAvatar, BeltColor } from '@/components/KarateAvatar';
 import { Sparkles, Trophy, Star } from 'lucide-react';
 import { CelebrationAnimation } from './CelebrationAnimation';
+import { BeltTransitionAnimation } from './BeltTransitionAnimation';
 
 interface BeltUpgradeNotificationProps {
   oldBelt: BeltColor;
@@ -39,21 +40,30 @@ export function BeltUpgradeNotification({
   totalPoints,
   onClose,
 }: BeltUpgradeNotificationProps) {
+  const [showTransition, setShowTransition] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const isBlackBelt = newBelt === 'black';
 
   useEffect(() => {
-    // Animação de entrada
-    setTimeout(() => setIsVisible(true), 100);
-    setTimeout(() => setShowCelebration(true), 500);
+    // Primeiro mostra a transição de morphing (5s)
+    // Depois mostra o card de notificação
+    const transitionTimer = setTimeout(() => {
+      setShowTransition(false);
+      // Animação de entrada do card
+      setTimeout(() => setIsVisible(true), 100);
+      setTimeout(() => setShowCelebration(true), 500);
+    }, 5000);
 
-    // Auto-fechar após 8 segundos
-    const timer = setTimeout(() => {
+    // Auto-fechar o card após 8 segundos (após a transição)
+    const closeTimer = setTimeout(() => {
       handleClose();
-    }, 8000);
+    }, 13000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(transitionTimer);
+      clearTimeout(closeTimer);
+    };
   }, []);
 
   const handleClose = () => {
@@ -63,6 +73,14 @@ export function BeltUpgradeNotification({
 
   return (
     <>
+      {/* Animação de Transição de Faixa (Morphing) */}
+      <BeltTransitionAnimation
+        oldBelt={oldBelt}
+        newBelt={newBelt}
+        isActive={showTransition}
+        onComplete={() => setShowTransition(false)}
+      />
+
       {/* Overlay escuro */}
       <div
         className={`fixed inset-0 bg-black/60 z-50 transition-opacity duration-500 ${

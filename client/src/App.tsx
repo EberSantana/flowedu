@@ -61,6 +61,7 @@ import CustomizeAvatar3D from "./pages/CustomizeAvatar3D";
 import CustomizeHD2DAvatar from "./pages/student/CustomizeHD2DAvatar";
 import StudentBeltHistory from "./pages/StudentBeltHistory";
 import BeltShowcase from "./pages/BeltShowcase";
+import TestBeltTransitions from "./pages/TestBeltTransitions";
 // StudentShop removido - simplificação do portal
 import KimonoShop from "./pages/KimonoShop";
 import { SubjectGamificationDashboard } from "./pages/SubjectGamificationDashboard";
@@ -116,6 +117,7 @@ function Router() {
         <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
         <Route path={"/belt-showcase"} component={BeltShowcase} />
+        <Route path={"/test-belt-transitions"} component={TestBeltTransitions} />
         {/* Rotas removidas - simplificação do portal */}
         <Route path={"/student/kimono-shop"} component={KimonoShop} />
 
