@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS student_learning_journal (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  topicId INT NOT NULL,\n  content TEXT NOT NULL,\n  tags JSON,\n  mood ENUM('great', 'good', 'neutral', 'confused', 'frustrated') DEFAULT 'neutral',\n  entryDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_student_topic (studentId, topicId),\n  INDEX idx_entry_date (entryDate)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS student_learning_journal (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  topicId INT NOT NULL,\n  content TEXT NOT NULL,\n  tags JSON,\n  mood ENUM('great', 'good', 'neutral', 'confused', 'frustrated') DEFAULT 'neutral',\n  entryDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_student_topic (studentId, topicId),\n  INDEX idx_entry_date (entryDate)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 186
+}

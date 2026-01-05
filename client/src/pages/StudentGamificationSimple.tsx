@@ -5,12 +5,12 @@ import { Trophy, Medal, TrendingUp, Zap } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
-  MinimalKarateAvatar, 
   getBeltFromPoints, 
   getNextBeltThreshold,
   BELT_CONFIG,
   type BeltColor 
 } from "@/components/MinimalKarateAvatar";
+import { BeltDisplay } from "@/components/KarateBelt3D";
 
 export default function StudentGamificationSimple() {
   const { data: stats, isLoading: statsLoading } = trpc.gamification.getStudentStats.useQuery();
@@ -61,10 +61,10 @@ export default function StudentGamificationSimple() {
         <Card className="overflow-hidden">
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-8">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Avatar Minimalista */}
+              {/* Faixa 3D */}
               <div className="flex-shrink-0">
                 <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
-                  <MinimalKarateAvatar belt={currentBelt} size="xl" />
+                  <BeltDisplay color={currentBelt} label="" size="xl" showLabel={false} />
                 </div>
               </div>
 
@@ -147,7 +147,7 @@ export default function StudentGamificationSimple() {
                           <p className="text-sm text-gray-500">{totalPoints} Tech Coins</p>
                         </div>
                       </div>
-                      <MinimalKarateAvatar belt={currentBelt} size="sm" />
+                      <BeltDisplay color={currentBelt} label="" size="sm" showLabel={false} />
                     </div>
                   </div>
                 )}
@@ -181,7 +181,7 @@ export default function StudentGamificationSimple() {
                               {student.totalPoints} Tech Coins • Faixa {BELT_CONFIG.find(b => b.name === studentBelt)?.label}
                             </p>
                           </div>
-                          <MinimalKarateAvatar belt={studentBelt} size="sm" />
+                          <BeltDisplay color={studentBelt} label="" size="sm" showLabel={false} />
                         </div>
                       );
                     })}

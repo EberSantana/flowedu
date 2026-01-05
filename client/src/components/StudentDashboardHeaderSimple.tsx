@@ -1,4 +1,5 @@
-import { MinimalKarateAvatar, getBeltName, BELT_CONFIG, type BeltColor } from "./MinimalKarateAvatar";
+import { getBeltName, BELT_CONFIG, type BeltColor } from "./MinimalKarateAvatar";
+import { BeltDisplay } from "./KarateBelt3D";
 import { Progress } from "@/components/ui/progress";
 import { Zap, TrendingUp } from "lucide-react";
 
@@ -35,10 +36,15 @@ export function StudentDashboardHeaderSimple({
     <div className="mb-8">
       <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 border border-slate-200">
         <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* Avatar */}
+          {/* Faixa 3D */}
           <div className="flex-shrink-0">
             <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-              <MinimalKarateAvatar belt={currentBelt} size="lg" />
+              <BeltDisplay 
+                color={currentBelt} 
+                label={`${totalPoints} Tech Coins`}
+                size="lg"
+                showLabel={false}
+              />
             </div>
           </div>
 

@@ -2,7 +2,8 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Calendar, TrendingUp, Award } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
-import { KarateAvatar, type BeltColor } from "@/components/KarateAvatar";
+import { type BeltColor } from "@/components/KarateAvatar";
+import { BeltDisplay } from "@/components/KarateBelt3D";
 
 // Configuração das faixas com labels em português
 const BELT_CONFIG: Record<BeltColor, { label: string; color: string; pointsRequired: number }> = {
@@ -63,7 +64,7 @@ export default function StudentBeltHistory() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-8">
-              <KarateAvatar belt={currentBelt} size="xl" showLabel={false} />
+              <BeltDisplay color={currentBelt} label="" size="xl" showLabel={false} />
               <div className="flex-1">
                 <div className="text-3xl font-bold text-gray-900 mb-2">
                   Faixa {BELT_CONFIG[currentBelt].label}
@@ -131,7 +132,7 @@ export default function StudentBeltHistory() {
                         }`}
                       >
                         <div className="flex items-center gap-4 mb-3">
-                          <KarateAvatar belt={belt} size="md" showLabel={false} />
+                          <BeltDisplay color={belt} label="" size="md" showLabel={false} />
                           <div className="flex-1">
                             <h3 className="text-xl font-bold text-gray-900">
                               Faixa {beltInfo.label}
@@ -202,7 +203,7 @@ export default function StudentBeltHistory() {
                     return (
                       <div key={beltKey} className="p-4 bg-white rounded-lg border-2 border-gray-200">
                         <div className="flex items-center gap-4 mb-3">
-                          <KarateAvatar belt={beltKey as BeltColor} size="sm" showLabel={false} />
+                          <BeltDisplay color={beltKey as BeltColor} label="" size="sm" showLabel={false} />
                           <div className="flex-1">
                             <div className="font-bold text-gray-900">Faixa {info.label}</div>
                             <div className="text-sm text-gray-600">

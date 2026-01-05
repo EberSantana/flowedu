@@ -4292,3 +4292,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Criar testes para diário de aprendizagem
 - [ ] Testar sistema de desbloqueio progressivo
 - [ ] Validar cálculo de estatísticas de estudo
+- [x] Substituir avatar completo por faixa de karatê 3D profissional no Portal do Aluno e Rankings
