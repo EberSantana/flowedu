@@ -4716,3 +4716,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Garantir consistência de cards, botões e elementos visuais
 - [x] Validar responsividade e acessibilidade
 - [x] Refazer layout e UX da página de análise de aprendizado
+
+## 🎨 Padronização de Design UX
+- [ ] Padronizar sistema de cores clean e profissional (neutro, baixo contraste)
