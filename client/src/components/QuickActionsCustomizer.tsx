@@ -120,8 +120,8 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
                 onDragEnd={handleDragEnd}
                 className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all cursor-move ${
                   action.enabled 
-                    ? 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-md' 
-                    : 'bg-gray-50 border-gray-100 opacity-60'
+                    ? 'bg-white border-blue-200 hover:border-blue-400 hover:shadow-md' 
+                    : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                 } ${draggedIndex === index ? 'opacity-50 scale-95' : ''}`}
               >
                 <GripVertical className="h-5 w-5 text-gray-400 flex-shrink-0" />

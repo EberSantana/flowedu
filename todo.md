@@ -4655,3 +4655,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Mostrar preview das ações ao personalizar
 - [x] Adicionar botão "Restaurar Padrão"
 - [x] Feedback visual ao salvar preferências (toast)
+
+## Ajuste Modal de Personalização de Ações Rápidas
+- [x] Deixar opções não selecionadas disponíveis (não desabilitadas) no modal de personalização
