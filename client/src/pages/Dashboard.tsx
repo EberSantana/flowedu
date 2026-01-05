@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import * as LucideIcons from "lucide-react";
 import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trpc } from "@/lib/trpc";
@@ -27,6 +28,7 @@ import { toast } from "sonner";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useOnboardingTour } from "@/components/OnboardingTour";
 import { useAdaptiveDashboard } from "@/hooks/useAdaptiveDashboard";
+import { QuickActionsCustomizer, QuickAction } from "@/components/QuickActionsCustomizer";
 // ProfileOnboarding removido - perfil único tradicional
 import {
   Chart as ChartJS,
@@ -150,6 +152,8 @@ export default function Dashboard() {
   
   // Estado de personalização do Dashboard
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const [isCustomizingActions, setIsCustomizingActions] = useState(false);
+  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   
   // Estados para controle de status de aulas
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
@@ -170,6 +174,24 @@ export default function Dashboard() {
   useEffect(() => {
     localStorage.setItem('dashboardWidgetVisibility', JSON.stringify(widgetVisibility));
   }, [widgetVisibility]);
+  
+  // Carregar preferências de ações rápidas
+  const { data: preferences } = trpc.dashboard.getQuickActionsPreferences.useQuery();
+  
+  useEffect(() => {
+    if (preferences?.actions) {
+      setQuickActions(preferences.actions);
+    } else {
+      // Ações padrão se não houver preferências salvas
+      setQuickActions([
+        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-blue-500 to-blue-600", enabled: true },
+        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-purple-500 to-purple-600", enabled: true },
+        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-green-500 to-green-600", enabled: true },
+        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-teal-500 to-teal-600", enabled: true },
+        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-red-500 to-red-600", enabled: true },
+      ]);
+    }
+  }, [preferences]);
   
   const toggleWidget = (widgetKey: string) => {
     setWidgetVisibility((prev: any) => ({ ...prev, [widgetKey]: !prev[widgetKey] }));
@@ -633,8 +655,21 @@ export default function Dashboard() {
           {widgetVisibility.quickActions && (
           <Card className="overflow-hidden" data-tour="quick-actions">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
-                <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
-                <CardDescription className="text-gray-600">Acesso rápido às funcionalidades principais</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
+                    <CardDescription className="text-gray-600">Acesso rápido às funcionalidades principais</CardDescription>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCustomizingActions(true)}
+                    className="gap-2"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Personalizar
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-6">
                 {/* Botão Próxima Aula em Destaque com Dropdown */}
@@ -717,84 +752,22 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Grid de Ações */}
+                {/* Grid de Ações Dinâmico */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                <Link href="/subjects">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <Plus className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Nova Disciplina</span>
-                    </div>
-                  </div>
-                </Link>
-                
-                <Link href="/schedule">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <CalendarIcon className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Grade Completa</span>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link href="/reports">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500 to-green-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <BarChart3 className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Relatórios</span>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link href="/tasks">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <CheckSquare className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Tarefas</span>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link href="/announcements">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-red-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <Bell className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Avisos</span>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Metodologias Ativas - destacar para perfil Interativo */}
-                {dashboardConfig.showMethodologies && (
-                <Link href="/active-methodologies">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <Lightbulb className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Metodologias Ativas</span>
-                    </div>
-                  </div>
-                </Link>
-                )}
-
-                {/* Ocultar Trilhas de Aprendizagem (gamificação) no perfil Tradicional */}
-                {dashboardConfig.showGamification && (
-                <Link href="/learning-paths">
-                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                      <TrendingUp className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm font-semibold text-center">Trilhas de Aprendizagem</span>
-                    </div>
-                  </div>
-                </Link>
-                )}
-
+                  {quickActions.filter(action => action.enabled).map((action) => {
+                    const IconComponent = (LucideIcons as any)[action.icon] || LucideIcons.HelpCircle;
+                    return (
+                      <Link key={action.id} href={action.href}>
+                        <div className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${action.color} p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32`}>
+                          <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                          <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                            <IconComponent className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                            <span className="text-sm font-semibold text-center">{action.label}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -1177,6 +1150,13 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Dialog de Personalização de Ações Rápidas */}
+      <QuickActionsCustomizer
+        open={isCustomizingActions}
+        onOpenChange={setIsCustomizingActions}
+        onSave={(actions) => setQuickActions(actions)}
+      />
     </>
   );
 }

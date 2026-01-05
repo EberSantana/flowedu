@@ -4634,3 +4634,24 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ### Limpeza
 - [ ] Remover referências a enthusiast, interactive, organizational
 - [ ] Simplificar código que verifica perfil do usuário
+
+
+## ⚙️ Personalização de Ações Rápidas
+
+### Frontend
+- [x] Criar modal/dialog de personalização de ações rápidas - QuickActionsCustomizer.tsx
+- [x] Implementar drag-and-drop para reordenar ações
+- [x] Implementar checkboxes para mostrar/ocultar ações
+- [x] Adicionar botão de personalização no Dashboard
+- [x] Aplicar preferências salvas ao carregar Dashboard
+
+### Backend
+- [x] Criar tabela dashboard_preferences no schema
+- [x] Criar rota para salvar preferências (saveQuickActionsPreferences)
+- [x] Criar rota para buscar preferências (getQuickActionsPreferences)
+- [x] Implementar funções no db.ts
+
+### UX
+- [x] Mostrar preview das ações ao personalizar
+- [x] Adicionar botão "Restaurar Padrão"
+- [x] Feedback visual ao salvar preferências (toast)

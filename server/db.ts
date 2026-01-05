@@ -112,7 +112,10 @@ import {
   InsertStudentAchievement,
   levelUpHistory,
   LevelUpHistory,
-  InsertLevelUpHistory
+  InsertLevelUpHistory,
+  dashboardPreferences,
+  DashboardPreference,
+  InsertDashboardPreference
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -8437,4 +8440,58 @@ export async function getStudentGamificationStats(studentId: number) {
     totalAchievements: achievements.length,
     totalBelts: allBelts.length
   };
+}
+
+
+// ==================== PREFERÊNCIAS DE DASHBOARD ====================
+
+export async function getQuickActionsPreferences(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const preferences = await db
+    .select()
+    .from(dashboardPreferences)
+    .where(eq(dashboardPreferences.userId, userId))
+    .limit(1);
+  
+  if (preferences.length === 0) {
+    return null;
+  }
+  
+  return {
+    actions: JSON.parse(preferences[0].quickActionsConfig)
+  };
+}
+
+export async function saveQuickActionsPreferences(userId: number, actions: any[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await db
+    .select()
+    .from(dashboardPreferences)
+    .where(eq(dashboardPreferences.userId, userId))
+    .limit(1);
+  
+  const config = JSON.stringify(actions);
+  
+  if (existing.length > 0) {
+    // Atualizar existente
+    await db
+      .update(dashboardPreferences)
+      .set({ 
+        quickActionsConfig: config,
+        updatedAt: new Date()
+      })
+      .where(eq(dashboardPreferences.userId, userId));
+  } else {
+    // Criar novo
+    await db.insert(dashboardPreferences).values({
+      userId,
+      quickActionsConfig: config
+    });
+  }
+  
+  return { success: true };
 }

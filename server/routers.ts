@@ -695,6 +695,27 @@ export const appRouter = router({
       
       return upcomingEvents;
     }),
+    
+    // Preferências de Ações Rápidas
+    getQuickActionsPreferences: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getQuickActionsPreferences(ctx.user.id);
+    }),
+    
+    saveQuickActionsPreferences: protectedProcedure
+      .input(z.object({
+        actions: z.array(z.object({
+          id: z.string(),
+          label: z.string(),
+          icon: z.string(),
+          href: z.string(),
+          color: z.string(),
+          enabled: z.boolean(),
+        })),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.saveQuickActionsPreferences(ctx.user.id, input.actions);
+        return { success: true };
+      }),
   }),
 
   schedule: router({

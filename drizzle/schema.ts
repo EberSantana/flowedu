@@ -1603,3 +1603,17 @@ export const topicProgressHistory = mysqlTable("topic_progress_history", {
 
 export type TopicProgressHistory = typeof topicProgressHistory.$inferSelect;
 export type InsertTopicProgressHistory = typeof topicProgressHistory.$inferInsert;
+
+/**
+ * Preferências de Dashboard do Professor
+ */
+export const dashboardPreferences = mysqlTable("dashboard_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // ID do professor
+  quickActionsConfig: text("quickActionsConfig").notNull(), // JSON com configuração das ações rápidas
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DashboardPreference = typeof dashboardPreferences.$inferSelect;
+export type InsertDashboardPreference = typeof dashboardPreferences.$inferInsert;
