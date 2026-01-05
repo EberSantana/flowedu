@@ -22,8 +22,8 @@ interface QuickAction {
   icon: React.ReactNode;
   href: string;
   color: string;
-  gradient: string;
-  hoverBorder: string;
+  bgColor: string;
+  iconBg: string;
   badge?: string;
   isNew?: boolean;
   points?: number;
@@ -34,52 +34,52 @@ const QUICK_ACTIONS: QuickAction[] = [
     id: 'exercises',
     title: 'Exercícios',
     description: 'Resolver atividades e ganhar pontos',
-    icon: <FileText className="w-8 h-8" />,
+    icon: <FileText className="w-6 h-6" />,
     href: '/student-exercises',
     color: 'text-orange-600',
-    gradient: 'from-orange-50 to-amber-50',
-    hoverBorder: 'hover:border-orange-300',
+    bgColor: 'bg-orange-50 hover:bg-orange-100',
+    iconBg: 'bg-orange-500',
     points: 10,
   },
   {
     id: 'trails',
     title: 'Trilhas',
     description: 'Acompanhar progresso',
-    icon: <TrendingUp className="w-8 h-8" />,
+    icon: <TrendingUp className="w-6 h-6" />,
     href: '/student-learning-paths',
     color: 'text-purple-600',
-    gradient: 'from-purple-50 to-violet-50',
-    hoverBorder: 'hover:border-purple-300',
+    bgColor: 'bg-purple-50 hover:bg-purple-100',
+    iconBg: 'bg-purple-500',
   },
   {
     id: 'subjects',
     title: 'Disciplinas',
     description: 'Ver todas as disciplinas',
-    icon: <BookOpen className="w-8 h-8" />,
+    icon: <BookOpen className="w-6 h-6" />,
     href: '/student-subjects',
     color: 'text-blue-600',
-    gradient: 'from-blue-50 to-indigo-50',
-    hoverBorder: 'hover:border-blue-300',
+    bgColor: 'bg-blue-50 hover:bg-blue-100',
+    iconBg: 'bg-blue-500',
   },
   {
     id: 'review',
     title: 'Revisão',
     description: 'Revisar conteúdos estudados',
-    icon: <Lightbulb className="w-8 h-8" />,
+    icon: <Lightbulb className="w-6 h-6" />,
     href: '/student-review',
     color: 'text-indigo-600',
-    gradient: 'from-indigo-50 to-purple-50',
-    hoverBorder: 'hover:border-indigo-300',
+    bgColor: 'bg-indigo-50 hover:bg-indigo-100',
+    iconBg: 'bg-indigo-500',
   },
   {
     id: 'rankings',
     title: 'Rankings',
     description: 'Ver sua classificação',
-    icon: <Trophy className="w-8 h-8" />,
+    icon: <Trophy className="w-6 h-6" />,
     href: '/student-leaderboard',
     color: 'text-yellow-600',
-    gradient: 'from-yellow-50 to-amber-50',
-    hoverBorder: 'hover:border-yellow-300',
+    bgColor: 'bg-yellow-50 hover:bg-yellow-100',
+    iconBg: 'bg-yellow-500',
   },
 ];
 
@@ -93,13 +93,13 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({ action, index }) => {
 
   return (
     <Link href={action.href}>
-      <Card 
+      <div 
         className={cn(
           'relative overflow-hidden cursor-pointer transition-all duration-300',
-          'border-2 hover:shadow-xl hover:-translate-y-1',
-          `bg-gradient-to-br ${action.gradient}`,
-          action.hoverBorder,
-          'group'
+          'rounded-2xl border-2 border-transparent',
+          'hover:shadow-lg hover:-translate-y-1',
+          action.bgColor,
+          'group h-full'
         )}
         style={{ 
           animationDelay: `${index * 50}ms`,
@@ -110,7 +110,7 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({ action, index }) => {
         {/* Badge "Novo" */}
         {action.isNew && (
           <div className="absolute top-3 right-3 z-10">
-            <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full shadow-lg animate-pulse">
+            <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full shadow-md">
               NOVO
             </span>
           </div>
@@ -119,50 +119,43 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({ action, index }) => {
         {/* Indicador de pontos */}
         {action.points && (
           <div className="absolute top-3 right-3 z-10">
-            <span className="flex items-center gap-1 px-2 py-1 text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full shadow-lg">
+            <span className="flex items-center gap-1 px-2 py-1 text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full shadow-md">
               <Sparkles className="w-3 h-3" />
-              +{action.points} pts
+              +{action.points}
             </span>
           </div>
         )}
 
-        {/* Decoração de fundo */}
-        <div className={cn(
-          'absolute -right-8 -bottom-8 w-32 h-32 rounded-full transition-all duration-500',
-          'bg-white/30 blur-2xl',
-          isHovered && 'scale-150'
-        )} />
-
-        <CardContent className="relative p-6">
+        <div className="relative p-5">
           {/* Ícone */}
           <div className={cn(
-            'w-16 h-16 rounded-2xl flex items-center justify-center mb-4',
-            'bg-white shadow-lg transition-all duration-300',
-            'group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl',
-            action.color
+            'w-12 h-12 rounded-xl flex items-center justify-center mb-4',
+            'text-white shadow-md transition-all duration-300',
+            'group-hover:scale-110',
+            action.iconBg
           )}>
             {action.icon}
           </div>
 
           {/* Texto */}
-          <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-gray-800">
+          <h3 className="font-bold text-gray-900 text-base mb-1.5">
             {action.title}
           </h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-gray-600 leading-snug">
             {action.description}
           </p>
 
           {/* Indicador de ação */}
           <div className={cn(
-            'flex items-center gap-1 text-sm font-semibold transition-all duration-300',
+            'flex items-center gap-1 text-sm font-semibold mt-3 transition-all duration-300',
             action.color,
             'opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
           )}>
             <span>Acessar</span>
             <ChevronRight className="w-4 h-4" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   );
 };
@@ -181,11 +174,11 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
           id: 'ct',
           title: 'Pensamento Computacional',
           description: 'Desenvolver habilidades de PC',
-          icon: <Brain className="w-8 h-8" />,
+          icon: <Brain className="w-6 h-6" />,
           href: '/student/computational-thinking',
           color: 'text-teal-600',
-          gradient: 'from-teal-50 to-cyan-50',
-          hoverBorder: 'hover:border-teal-300',
+          bgColor: 'bg-teal-50 hover:bg-teal-100',
+          iconBg: 'bg-teal-500',
           badge: 'PC',
         },
         ...QUICK_ACTIONS.slice(2),
@@ -205,8 +198,8 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
         </div>
       </div>
 
-      {/* Grid de ações */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      {/* Grid de ações - Padronizado e uniforme */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {actions.map((action, index) => (
           <QuickActionCard 
             key={action.id} 

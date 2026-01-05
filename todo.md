@@ -4381,3 +4381,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Melhoria de Interface - Portal do Aluno
 - [x] Remover componente de avisos da tela principal do Dashboard do aluno (manter apenas na página Avisos)
+
+## Melhorias de UX/UI - Dashboard do Aluno (05/01/2025)
+- [x] Padronizar Ações Rápidas com tamanho uniforme e design clean
+- [x] Criar nova versão melhorada da faixa 3D de karatê (mais realista)
