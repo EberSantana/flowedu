@@ -26,6 +26,8 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useOnboardingTour } from "@/components/OnboardingTour";
+import { useAdaptiveDashboard } from "@/hooks/useAdaptiveDashboard";
+import { ProfileOnboarding } from "@/components/ProfileOnboarding";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -89,6 +91,9 @@ export default function Dashboard() {
   
   // Tour interativo para novos usuários
   useOnboardingTour();
+  
+  // Configuração adaptativa baseada no perfil do professor
+  const dashboardConfig = useAdaptiveDashboard();
   const { data: subjects, isLoading: isLoadingSubjects } = trpc.subjects.list.useQuery();
   const { data: classes, isLoading: isLoadingClasses } = trpc.classes.list.useQuery();
   const { data: scheduledClasses, isLoading: isLoadingSchedule } = trpc.schedule.list.useQuery();
@@ -396,6 +401,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <ProfileOnboarding />
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-8 px-4">
@@ -414,10 +420,10 @@ export default function Dashboard() {
               </Avatar>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Bem-vindo, {user?.name || 'Professor'}!
+                  {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Visão geral do seu sistema de gestão de tempo
+                  {dashboardConfig.dashboardDescription}
                 </p>
               </div>
             </div>
@@ -768,6 +774,21 @@ export default function Dashboard() {
                   </div>
                 </Link>
 
+                {/* Metodologias Ativas - destacar para perfil Interativo */}
+                {dashboardConfig.showMethodologies && (
+                <Link href="/active-methodologies">
+                  <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                      <Lightbulb className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-semibold text-center">Metodologias Ativas</span>
+                    </div>
+                  </div>
+                </Link>
+                )}
+
+                {/* Ocultar Trilhas de Aprendizagem (gamificação) no perfil Tradicional */}
+                {dashboardConfig.showGamification && (
                 <Link href="/learning-paths">
                   <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32">
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -777,6 +798,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </Link>
+                )}
 
                 </div>
               </CardContent>

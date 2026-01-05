@@ -4139,3 +4139,47 @@ Criar interface única, limpa e funcional focada no essencial: pontos, faixa, co
 - [x] Remover distribuição de faixas
 - [x] Testar responsividade mobile
 - [x] Validar carregamento e estados vazios
+
+## Sistema de Perfis Adaptativos de Professor (2025-01-04)
+
+### Objetivo
+Implementar sistema completo de personalização por perfil: Dashboard adaptativo, onboarding guiado e perfil Interativo com metodologias ativas.
+
+### 1. Dashboard Adaptativo por Perfil
+- [x] Criar hook useAdaptiveDashboard para detectar perfil atual
+- [x] Implementar lógica de widgets condicionais baseada em perfil
+- [x] Perfil Tradicional: ocultar gamificação, destacar carga horária e calendário
+- [x] Perfil Entusiasta: mostrar todos os widgets (padrão atual)
+- [x] Perfil Interativo: destacar metodologias ativas e projetos
+- [x] Perfil Organizacional: destacar relatórios e automações
+- [x] Testar transição entre perfis sem perda de dados
+
+### 2. Onboarding Guiado por Perfil
+- [x] Criar componente ProfileOnboarding.tsx
+- [x] Implementar tour específico para perfil Tradicional (4-5 passos)
+- [x] Implementar tour específico para perfil Entusiasta (6-7 passos)
+- [x] Implementar tour específico para perfil Interativo (5-6 passos)
+- [x] Implementar tour específico para perfil Organizacional (5-6 passos)
+- [x] Sistema de skip e "não mostrar novamente"
+- [x] Persistência no localStorage por perfil
+- [x] Botão "Refazer Tour" no menu lateral
+
+### 3. Perfil Interativo - Metodologias Ativas
+- [x] Criar tabela interactive_projects no banco de dados
+- [x] Criar tabela project_students (relação N:N)
+- [x] Criar tabela collaborative_tools no banco de dados
+- [ ] Implementar CRUD de projetos interdisciplinares
+- [ ] Página InteractiveProjects.tsx com gestão de projetos
+- [ ] Sistema de atribuição de alunos a projetos
+- [ ] Biblioteca de ferramentas colaborativas (Padlet, Miro, Kahoot, etc)
+- [ ] Integração com metodologias ativas existentes
+- [ ] Dashboard de acompanhamento de projetos
+- [ ] Relatórios de engajamento por projeto
+
+### 4. Testes e Validação
+- [x] Testar troca de perfil em tempo real
+- [x] Validar persistência de dados ao migrar perfis
+- [x] Testar onboarding em todos os perfis
+- [x] Validar widgets condicionais do Dashboard
+- [ ] Testar funcionalidades do perfil Interativo
+- [ ] Criar testes automatizados (vitest)

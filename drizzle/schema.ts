@@ -1200,3 +1200,86 @@ export const challengeRankings = mysqlTable("challenge_rankings", {
 
 export type ChallengeRanking = typeof challengeRankings.$inferSelect;
 export type InsertChallengeRanking = typeof challengeRankings.$inferInsert;
+
+/**
+ * Projetos Interdisciplinares (Perfil Interativo)
+ */
+export const interactiveProjects = mysqlTable("interactive_projects", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Professor criador
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  objectives: text("objectives"), // Objetivos pedagógicos
+  subjects: text("subjects"), // Disciplinas envolvidas (JSON array)
+  methodology: varchar("methodology", { length: 100 }), // PBL, Design Thinking, etc.
+  startDate: date("startDate"),
+  endDate: date("endDate"),
+  status: mysqlEnum("status", ["planning", "active", "completed", "cancelled"]).default("planning").notNull(),
+  deliverables: text("deliverables"), // Entregas esperadas (JSON array)
+  resources: text("resources"), // Links de recursos (JSON array)
+  color: varchar("color", { length: 7 }).default("#3b82f6"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InteractiveProject = typeof interactiveProjects.$inferSelect;
+export type InsertInteractiveProject = typeof interactiveProjects.$inferInsert;
+
+/**
+ * Relação N:N entre Projetos e Alunos
+ */
+export const projectStudents = mysqlTable("project_students", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  studentId: int("studentId").notNull(),
+  role: varchar("role", { length: 100 }), // Papel do aluno no projeto
+  contribution: text("contribution"), // Descrição da contribuição
+  engagementScore: int("engagementScore").default(0), // 0-100
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProjectStudent = typeof projectStudents.$inferSelect;
+export type InsertProjectStudent = typeof projectStudents.$inferInsert;
+
+/**
+ * Ferramentas Colaborativas (biblioteca expandida)
+ */
+export const collaborativeTools = mysqlTable("collaborative_tools", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // Quiz, Colaboração, Apresentação, Mapa Mental, etc.
+  url: text("url").notNull(),
+  logoUrl: text("logoUrl"),
+  tips: text("tips"), // Dicas de uso pedagógico
+  isPremium: boolean("isPremium").default(false).notNull(), // Ferramenta paga?
+  isFavorite: boolean("isFavorite").default(false).notNull(),
+  usageCount: int("usageCount").default(0).notNull(), // Contador de usos
+  tags: text("tags"), // Tags para busca (JSON array)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CollaborativeTool = typeof collaborativeTools.$inferSelect;
+export type InsertCollaborativeTool = typeof collaborativeTools.$inferInsert;
+
+/**
+ * Atividades de Projetos (tarefas dentro de projetos)
+ */
+export const projectActivities = mysqlTable("project_activities", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  dueDate: date("dueDate"),
+  status: mysqlEnum("status", ["pending", "in_progress", "completed"]).default("pending").notNull(),
+  assignedStudents: text("assignedStudents"), // IDs dos alunos (JSON array)
+  toolId: int("toolId"), // Ferramenta colaborativa usada (opcional)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProjectActivity = typeof projectActivities.$inferSelect;
+export type InsertProjectActivity = typeof projectActivities.$inferInsert;

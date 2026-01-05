@@ -399,8 +399,10 @@ export default function Sidebar() {
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => {
-                          localStorage.removeItem('onboarding-tour-completed');
-                          window.location.href = '/';
+                          // Remover onboarding do perfil atual
+                          const profile = user?.profile || 'enthusiast';
+                          localStorage.removeItem(`onboarding_completed_${profile}`);
+                          window.location.reload();
                         }}
                         className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
                       >
@@ -459,8 +461,10 @@ export default function Sidebar() {
                   
                   <button
                     onClick={() => {
-                      localStorage.removeItem('onboarding-tour-completed');
-                      window.location.href = '/';
+                      // Remover onboarding do perfil atual
+                      const profile = user?.profile || 'enthusiast';
+                      localStorage.removeItem(`onboarding_completed_${profile}`);
+                      window.location.reload();
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200"
                   >
