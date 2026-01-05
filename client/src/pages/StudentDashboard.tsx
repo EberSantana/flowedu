@@ -25,28 +25,28 @@ import { QuickActionsGrid } from "@/components/QuickActionsGrid";
 import { NextGoalsSection } from "@/components/NextGoalsSection";
 import { StudentAlerts } from "@/components/StudentAlerts";
 
-// Função helper para determinar a faixa baseada nos pontos
-function getBeltFromPoints(points: number): BeltColor {
-  if (points >= 2000) return 'black';      // Faixa Preta: 2000+
-  if (points >= 1600) return 'brown';      // Faixa Marrom: 1600-1999
-  if (points >= 1200) return 'purple';     // Faixa Roxa: 1200-1599
-  if (points >= 900) return 'blue';        // Faixa Azul: 900-1199
-  if (points >= 600) return 'green';       // Faixa Verde: 600-899
-  if (points >= 400) return 'orange';      // Faixa Laranja: 400-599
-  if (points >= 200) return 'yellow';      // Faixa Amarela: 200-399
-  return 'white';                          // Faixa Branca: 0-199
+// Função helper para determinar a faixa baseada em Tech Coins
+function getBeltFromPoints(techCoins: number): BeltColor {
+  if (techCoins >= 5000) return 'black';      // Faixa Preta: 5000+
+  if (techCoins >= 2500) return 'brown';      // Faixa Marrom: 2500-4999
+  if (techCoins >= 1500) return 'purple';     // Faixa Roxa: 1500-2499
+  if (techCoins >= 1000) return 'blue';        // Faixa Azul: 1000-1499
+  if (techCoins >= 600) return 'green';       // Faixa Verde: 600-999
+  if (techCoins >= 300) return 'orange';      // Faixa Laranja: 300-599
+  if (techCoins >= 100) return 'yellow';      // Faixa Amarela: 100-299
+  return 'white';                          // Faixa Branca: 0-99
 }
 
-// Função helper para calcular pontos para próxima faixa
-function getNextBeltThreshold(points: number): number {
-  if (points >= 2000) return 2000; // Já é faixa preta (máximo)
-  if (points >= 1600) return 2000;
-  if (points >= 1200) return 1600;
-  if (points >= 900) return 1200;
-  if (points >= 600) return 900;
-  if (points >= 400) return 600;
-  if (points >= 200) return 400;
-  return 200; // Próxima faixa é amarela
+// Função helper para calcular Tech Coins para próxima faixa
+function getNextBeltThreshold(techCoins: number): number {
+  if (techCoins >= 5000) return 5000; // Já é faixa preta (máximo)
+  if (techCoins >= 2500) return 5000;
+  if (techCoins >= 1500) return 2500;
+  if (techCoins >= 1000) return 1500;
+  if (techCoins >= 600) return 1000;
+  if (techCoins >= 300) return 600;
+  if (techCoins >= 100) return 300;
+  return 100; // Próxima faixa é amarela
 }
 
 export default function StudentDashboard() {
@@ -54,13 +54,13 @@ export default function StudentDashboard() {
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
   const { data: stats } = trpc.gamification.getStudentStats.useQuery();
   
-  // Buscar pontos do aluno do sistema de gamificação
-  const studentPoints = stats?.totalPoints || 0;
-  const currentBelt = (stats?.currentBelt as BeltColor) || getBeltFromPoints(studentPoints);
-  const nextThreshold = getNextBeltThreshold(studentPoints);
+  // Buscar Tech Coins do aluno (agora totalPoints retorna Tech Coins)
+  const studentTechCoins = stats?.totalPoints || 0;
+  const currentBelt = (stats?.currentBelt as BeltColor) || getBeltFromPoints(studentTechCoins);
+  const nextThreshold = getNextBeltThreshold(studentTechCoins);
 
   // Hook para detectar e exibir notificação de upgrade de faixa
-  const { upgradeData, clearNotification } = useBeltUpgradeNotification(currentBelt, studentPoints);
+  const { upgradeData, clearNotification } = useBeltUpgradeNotification(currentBelt, studentTechCoins);
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
@@ -93,7 +93,7 @@ export default function StudentDashboard() {
           <StudentDashboardHeaderKimono
             studentName={student?.fullName || 'Aluno'}
             currentBelt={currentBelt}
-            totalPoints={studentPoints}
+            totalPoints={studentTechCoins}
             nextBeltThreshold={nextThreshold}
             streak={0}
           />
@@ -114,7 +114,7 @@ export default function StudentDashboard() {
                 activeSubjects={activeSubjects.length}
                 completedSubjects={completedSubjects.length}
                 totalSubjects={enrolledSubjects?.length || 0}
-                totalPoints={studentPoints}
+                totalPoints={studentTechCoins}
                 exercisesCompleted={0}
                 badges={0}
               />
@@ -125,7 +125,7 @@ export default function StudentDashboard() {
               {/* Próximas Metas */}
               <NextGoalsSection
                 currentBelt={currentBelt}
-                totalPoints={studentPoints}
+                totalPoints={studentTechCoins}
                 exercisesCompleted={0}
                 badgesEarned={0}
               />

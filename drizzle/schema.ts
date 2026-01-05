@@ -939,19 +939,22 @@ export type InsertReviewSession = typeof reviewSessions.$inferInsert;
 
 
 /**
- * Itens da loja para avatares
+ * Itens da loja (avatares, power-ups, certificados, etc)
  */
 export const shopItems = mysqlTable("shop_items", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   description: text("description"),
-  category: mysqlEnum("category", ["hat", "glasses", "accessory", "background", "special"]).notNull(),
-  price: int("price").notNull(), // Preço em pontos
+  category: mysqlEnum("category", ["hat", "glasses", "accessory", "background", "special", "power_up", "certificate", "unlock"]).notNull(),
+  price: int("price").notNull(), // Preço em Tech Coins
   imageUrl: text("imageUrl"), // URL da imagem do item
   svgData: text("svgData"), // Dados SVG para renderização no avatar
+  metadata: json("metadata"), // Configurações específicas do item
   requiredBelt: varchar("requiredBelt", { length: 20 }).default("white"), // Faixa mínima necessária
+  requiredPoints: int("requiredPoints").default(0).notNull(), // Pontos mínimos necessários
   isActive: boolean("isActive").default(true).notNull(),
-  isRare: boolean("isRare").default(false).notNull(), // Item raro/exclusivo
+  rarity: mysqlEnum("rarity", ["common", "rare", "epic", "legendary"]).default("common").notNull(),
+  stock: int("stock").default(-1).notNull(), // -1 = ilimitado
   sortOrder: int("sortOrder").default(0).notNull(), // Ordem de exibição
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -968,6 +971,7 @@ export const studentPurchasedItems = mysqlTable("student_purchased_items", {
   studentId: int("studentId").notNull(),
   itemId: int("itemId").notNull(),
   purchasedAt: timestamp("purchasedAt").defaultNow().notNull(),
+  isEquipped: boolean("isEquipped").default(false).notNull(),
 }, (table) => ({
   uniquePurchase: unique().on(table.studentId, table.itemId),
 }));
@@ -990,3 +994,41 @@ export const studentEquippedItems = mysqlTable("student_equipped_items", {
 
 export type StudentEquippedItem = typeof studentEquippedItems.$inferSelect;
 export type InsertStudentEquippedItem = typeof studentEquippedItems.$inferInsert;
+
+
+/**
+ * ===== SISTEMA DE TECH COINS (ECONOMIA VIRTUAL) =====
+ */
+
+/**
+ * Carteira de moedas do aluno
+ */
+export const studentWallets = mysqlTable("student_wallets", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull().unique(),
+  techCoins: int("techCoins").default(0).notNull(),
+  totalEarned: int("totalEarned").default(0).notNull(), // Total histórico ganho
+  totalSpent: int("totalSpent").default(0).notNull(),  // Total histórico gasto
+  lastTransactionAt: timestamp("lastTransactionAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StudentWallet = typeof studentWallets.$inferSelect;
+export type InsertStudentWallet = typeof studentWallets.$inferInsert;
+
+/**
+ * Histórico de transações de moedas
+ */
+export const coinTransactions = mysqlTable("coin_transactions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  amount: int("amount").notNull(), // Positivo = ganhou, Negativo = gastou
+  transactionType: mysqlEnum("transactionType", ["earn", "spend", "bonus", "penalty"]).notNull(),
+  source: varchar("source", { length: 100 }), // 'exercise_completion', 'daily_streak', 'shop_purchase', etc
+  description: text("description"),
+  metadata: json("metadata"), // Dados adicionais (exercise_id, item_id, etc)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CoinTransaction = typeof coinTransactions.$inferSelect;
+export type InsertCoinTransaction = typeof coinTransactions.$inferInsert;

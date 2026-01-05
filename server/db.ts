@@ -69,7 +69,13 @@ import {
   studentPurchasedItems,
   studentEquippedItems,
   ShopItem,
-  InsertShopItem
+  InsertShopItem,
+  studentWallets,
+  coinTransactions,
+  StudentWallet,
+  InsertStudentWallet,
+  CoinTransaction,
+  InsertCoinTransaction
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -2484,11 +2490,52 @@ export function calculateBelt(points: number): string {
       return belt.name;
     }
   }
-  return 'black'; // Máximo
+  return 'black';
 }
 
-// Obter ou criar pontuação do aluno
+/**
+ * Obter ou criar registro de pontos do aluno (MIGRADO PARA TECH COINS)
+ * Esta função agora retorna dados baseados em Tech Coins
+ */
 export async function getOrCreateStudentPoints(studentId: number) {
+  // Migrado para usar Tech Coins
+  const wallet = await getStudentWallet(studentId);
+  if (!wallet) return null;
+  
+  // Calcular faixa baseado em Tech Coins acumulados
+  const belt = calculateBeltFromTechCoins(wallet.totalEarned);
+  
+  // Retornar formato compatível com sistema antigo
+  return {
+    studentId: wallet.studentId,
+    totalPoints: wallet.totalEarned, // Tech Coins acumulados = "pontos"
+    currentBelt: belt,
+    streakDays: 0, // TODO: Implementar streak separadamente
+    lastActivityDate: wallet.lastTransactionAt || wallet.createdAt,
+    createdAt: wallet.createdAt,
+    updatedAt: wallet.createdAt
+  };
+}
+
+/**
+ * Calcular faixa baseado em Tech Coins acumulados
+ */
+function calculateBeltFromTechCoins(totalEarned: number): string {
+  if (totalEarned >= 5000) return 'black';
+  if (totalEarned >= 2500) return 'brown';
+  if (totalEarned >= 1500) return 'purple';
+  if (totalEarned >= 1000) return 'blue';
+  if (totalEarned >= 600) return 'green';
+  if (totalEarned >= 300) return 'orange';
+  if (totalEarned >= 100) return 'yellow';
+  return 'white';
+}
+
+/**
+ * DEPRECATED: Obter ou criar registro de pontos do aluno (VERSÃO ANTIGA)
+ * Use getOrCreateStudentPoints() que agora usa Tech Coins
+ */
+export async function getOrCreateStudentPointsOld(studentId: number) {
   const db = await getDb();
   if (!db) return null;
 
@@ -2522,7 +2569,7 @@ export async function getOrCreateStudentPoints(studentId: number) {
   }
 }
 
-// Adicionar pontos ao aluno
+// Adicionar pontos ao aluno (MIGRADO PARA TECH COINS)
 export async function addPointsToStudent(
   studentId: number,
   points: number,
@@ -2530,45 +2577,35 @@ export async function addPointsToStudent(
   activityType: string,
   relatedId?: number
 ) {
-  const db = await getDb();
-  if (!db) return null;
-
-  try {
-    // Obter pontuação atual
-    const current = await getOrCreateStudentPoints(studentId);
-    if (!current) return null;
-
-    const newTotalPoints = current.totalPoints + points;
-    const newBelt = calculateBelt(newTotalPoints);
-    const oldBelt = current.currentBelt;
-
-    // Atualizar pontuação
-    await db.update(studentPoints)
-      .set({
-        totalPoints: newTotalPoints,
-        currentBelt: newBelt,
-        updatedAt: new Date(),
-      })
-      .where(eq(studentPoints.studentId, studentId));
-
-    // Registrar no histórico
-    await db.insert(pointsHistory).values({
-      studentId,
-      points,
-      reason,
-      activityType,
-      relatedId,
-    });
-
-    // Se subiu de faixa, criar notificação e registrar no histórico
-    if (newBelt !== oldBelt) {
+  // Migrado para usar Tech Coins
+  const result = await addTechCoins(
+    studentId,
+    points, // Pontos agora são Tech Coins
+    activityType,
+    reason,
+    relatedId ? { relatedId } : undefined
+  );
+  
+  if (!result) return null;
+  
+  // Verificar mudança de faixa
+  const wallet = await getStudentWallet(studentId);
+  if (!wallet) return null;
+  
+  const newBelt = calculateBeltFromTechCoins(wallet.totalEarned);
+  const oldBelt = calculateBeltFromTechCoins(wallet.totalEarned - points);
+  
+  // Se mudou de faixa, criar notificação
+  if (newBelt !== oldBelt) {
+    const db = await getDb();
+    if (db) {
       const beltInfo = BELT_CONFIG.find(b => b.name === newBelt);
       
       // Registrar no histórico de faixas
       await db.insert(beltHistory).values({
         studentId,
         belt: newBelt,
-        pointsAtAchievement: newTotalPoints,
+        pointsAtAchievement: wallet.totalEarned,
       });
       
       // Criar notificação
@@ -2576,16 +2613,17 @@ export async function addPointsToStudent(
         studentId,
         type: 'belt_upgrade',
         title: `🥋 Nova Faixa: ${beltInfo?.label || newBelt}!`,
-        message: `Parabéns! Você alcançou a faixa ${beltInfo?.label || newBelt} com ${newTotalPoints} pontos!`,
+        message: `Parabéns! Você alcançou a faixa ${beltInfo?.label || newBelt} com ${wallet.totalEarned} Tech Coins!`,
         isRead: false,
       });
     }
-
-    return { newTotalPoints, newBelt, oldBelt };
-  } catch (error) {
-    console.error("[Database] Error adding points to student:", error);
-    return null;
   }
+
+  return { 
+    newTotalPoints: wallet.totalEarned, 
+    newBelt, 
+    oldBelt 
+  };
 }
 
 // Atualizar streak do aluno
@@ -5534,7 +5572,7 @@ export async function studentOwnsItem(studentId: number, itemId: number): Promis
 }
 
 /**
- * Comprar item da loja
+ * Comprar item da loja (usando Tech Coins)
  */
 export async function purchaseShopItem(studentId: number, itemId: number): Promise<{ success: boolean; message: string }> {
   const db = await getDb();
@@ -5556,45 +5594,40 @@ export async function purchaseShopItem(studentId: number, itemId: number): Promi
       return { success: false, message: "Você já possui este item" };
     }
 
-    // Verificar pontos do aluno
-    const points = await getOrCreateStudentPoints(studentId);
-    if (!points || points.totalPoints < item.price) {
-      return { success: false, message: `Pontos insuficientes. Você tem ${points?.totalPoints || 0} pontos, mas precisa de ${item.price}` };
+    // Verificar Tech Coins do aluno
+    const wallet = await getStudentWallet(studentId);
+    if (!wallet || wallet.techCoins < item.price) {
+      return { success: false, message: `Tech Coins insuficientes. Você tem ${wallet?.techCoins || 0} Tech Coins, mas precisa de ${item.price}` };
     }
 
     // Verificar faixa necessária
+    const points = await getOrCreateStudentPoints(studentId);
     const BELT_ORDER = ['white', 'yellow', 'orange', 'green', 'blue', 'purple', 'brown', 'black'];
-    const studentBeltIndex = BELT_ORDER.indexOf(points.currentBelt || 'white');
+    const studentBeltIndex = BELT_ORDER.indexOf(points?.currentBelt || 'white');
     const requiredBeltIndex = BELT_ORDER.indexOf(item.requiredBelt || 'white');
     
     if (studentBeltIndex < requiredBeltIndex) {
       return { success: false, message: `Você precisa da faixa ${item.requiredBelt} para comprar este item` };
     }
 
-    // Deduzir pontos
-    await db.update(studentPoints)
-      .set({ totalPoints: sql`${studentPoints.totalPoints} - ${item.price}` })
-      .where(eq(studentPoints.studentId, studentId));
+    // Verificar pontos mínimos necessários
+    if (item.requiredPoints && item.requiredPoints > 0) {
+      if (!points || points.totalPoints < item.requiredPoints) {
+        return { success: false, message: `Você precisa de pelo menos ${item.requiredPoints} pontos para comprar este item` };
+      }
+    }
 
-    // Registrar compra
-    await db.insert(studentPurchasedItems).values({
-      studentId,
-      itemId,
-    });
-
-    // Registrar no histórico de pontos
-    await db.insert(pointsHistory).values({
-      studentId,
-      points: -item.price,
-      activityType: 'shop_purchase',
-      reason: `Compra: ${item.name}`,
-      relatedId: itemId,
-    });
+    // Usar função spendTechCoins para processar a compra
+    const result = await spendTechCoins(studentId, item.price, itemId, `Compra: ${item.name}`);
+    
+    if (!result) {
+      return { success: false, message: "Erro ao processar compra" };
+    }
 
     return { success: true, message: `Item "${item.name}" comprado com sucesso!` };
   } catch (error) {
     console.error("[Database] Error purchasing item:", error);
-    return { success: false, message: "Erro ao processar compra" };
+    return { success: false, message: error instanceof Error ? error.message : "Erro ao processar compra" };
   }
 }
 
@@ -5789,37 +5822,336 @@ export async function seedShopItems() {
       { name: "Bandana Vermelha", description: "Uma bandana estilosa para treinos intensos", category: "hat", price: 50, requiredBelt: "white", sortOrder: 1 },
       { name: "Faixa na Cabeça", description: "Faixa tradicional de karateca", category: "hat", price: 75, requiredBelt: "yellow", sortOrder: 2 },
       { name: "Boné Esportivo", description: "Boné moderno para o dia a dia", category: "hat", price: 100, requiredBelt: "orange", sortOrder: 3 },
-      { name: "Chapéu Samurai", description: "Chapéu inspirado nos guerreiros samurais", category: "hat", price: 200, requiredBelt: "green", isRare: true, sortOrder: 4 },
-      { name: "Coroa de Campeão", description: "Para os verdadeiros mestres", category: "hat", price: 500, requiredBelt: "black", isRare: true, sortOrder: 5 },
+      { name: "Chapéu Samurai", description: "Chapéu inspirado nos guerreiros samurais", category: "hat", price: 200, requiredBelt: "green", rarity: "rare", sortOrder: 4 },
+      { name: "Coroa de Campeão", description: "Para os verdadeiros mestres", category: "hat", price: 500, requiredBelt: "black", rarity: "epic", sortOrder: 5 },
       
       // Óculos
       { name: "Óculos de Sol", description: "Óculos escuros estilosos", category: "glasses", price: 60, requiredBelt: "white", sortOrder: 10 },
       { name: "Óculos Esportivos", description: "Proteção para treinos ao ar livre", category: "glasses", price: 90, requiredBelt: "yellow", sortOrder: 11 },
-      { name: "Óculos Ninja", description: "Visão aguçada como um ninja", category: "glasses", price: 150, requiredBelt: "blue", isRare: true, sortOrder: 12 },
+      { name: "Óculos Ninja", description: "Visão aguçada como um ninja", category: "glasses", price: 150, requiredBelt: "blue", rarity: "rare", sortOrder: 12 },
       
       // Acessórios
       { name: "Medalha de Bronze", description: "Primeira conquista", category: "accessory", price: 30, requiredBelt: "white", sortOrder: 20 },
       { name: "Medalha de Prata", description: "Reconhecimento intermediário", category: "accessory", price: 80, requiredBelt: "green", sortOrder: 21 },
       { name: "Medalha de Ouro", description: "Excelência comprovada", category: "accessory", price: 150, requiredBelt: "purple", sortOrder: 22 },
-      { name: "Troféu de Mestre", description: "O maior reconhecimento", category: "accessory", price: 300, requiredBelt: "brown", isRare: true, sortOrder: 23 },
-      { name: "Dragão Dourado", description: "Símbolo de poder supremo", category: "accessory", price: 1000, requiredBelt: "black", isRare: true, sortOrder: 24 },
+      { name: "Troféu de Mestre", description: "O maior reconhecimento", category: "accessory", price: 300, requiredBelt: "brown", rarity: "epic", sortOrder: 23 },
+      { name: "Dragão Dourado", description: "Símbolo de poder supremo", category: "accessory", price: 1000, requiredBelt: "black", rarity: "legendary", sortOrder: 24 },
       
       // Fundos
       { name: "Dojo Tradicional", description: "Fundo de dojo japonês", category: "background", price: 100, requiredBelt: "yellow", sortOrder: 30 },
       { name: "Montanha Sagrada", description: "Cenário de montanha ao amanhecer", category: "background", price: 150, requiredBelt: "green", sortOrder: 31 },
       { name: "Templo Zen", description: "Ambiente de paz e concentração", category: "background", price: 200, requiredBelt: "blue", sortOrder: 32 },
-      { name: "Arena de Combate", description: "Palco para grandes batalhas", category: "background", price: 300, requiredBelt: "purple", isRare: true, sortOrder: 33 },
-      { name: "Céu Estrelado", description: "Treine sob as estrelas", category: "background", price: 400, requiredBelt: "brown", isRare: true, sortOrder: 34 },
+      { name: "Arena de Combate", description: "Palco para grandes batalhas", category: "background", price: 300, requiredBelt: "purple", rarity: "rare", sortOrder: 33 },
+      { name: "Céu Estrelado", description: "Treine sob as estrelas", category: "background", price: 400, requiredBelt: "brown", rarity: "epic", sortOrder: 34 },
       
       // Especiais
-      { name: "Aura de Fogo", description: "Efeito especial de chamas", category: "special", price: 500, requiredBelt: "purple", isRare: true, sortOrder: 40 },
-      { name: "Aura de Gelo", description: "Efeito especial de gelo", category: "special", price: 500, requiredBelt: "purple", isRare: true, sortOrder: 41 },
-      { name: "Aura Dourada", description: "Brilho de um verdadeiro mestre", category: "special", price: 800, requiredBelt: "black", isRare: true, sortOrder: 42 },
+      { name: "Aura de Fogo", description: "Efeito especial de chamas", category: "special", price: 500, requiredBelt: "purple", rarity: "epic", sortOrder: 40 },
+      { name: "Aura de Gelo", description: "Efeito especial de gelo", category: "special", price: 500, requiredBelt: "purple", rarity: "epic", sortOrder: 41 },
+      { name: "Aura Dourada", description: "Brilho de um verdadeiro mestre", category: "special", price: 800, requiredBelt: "black", rarity: "legendary", sortOrder: 42 },
     ];
 
     await db.insert(shopItems).values(initialItems);
     console.log("[Database] Shop items seeded successfully");
   } catch (error) {
     console.error("[Database] Error seeding shop items:", error);
+  }
+}
+
+
+/**
+ * ===== SISTEMA DE TECH COINS (ECONOMIA VIRTUAL) =====
+ */
+
+/**
+ * Obter carteira do aluno (cria se não existir)
+ */
+export async function getStudentWallet(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    let wallet = await db.select().from(studentWallets)
+      .where(eq(studentWallets.studentId, studentId))
+      .limit(1);
+    
+    if (!wallet[0]) {
+      // Criar carteira inicial
+      await db.insert(studentWallets).values({ 
+        studentId, 
+        techCoins: 0,
+        totalEarned: 0,
+        totalSpent: 0
+      });
+      
+      wallet = await db.select().from(studentWallets)
+        .where(eq(studentWallets.studentId, studentId))
+        .limit(1);
+    }
+    
+    return wallet[0];
+  } catch (error) {
+    console.error("[Database] Error getting student wallet:", error);
+    return null;
+  }
+}
+
+/**
+ * Adicionar Tech Coins ao aluno
+ */
+export async function addTechCoins(
+  studentId: number, 
+  amount: number, 
+  source: string, 
+  description: string, 
+  metadata?: any
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const wallet = await getStudentWallet(studentId);
+    if (!wallet) return null;
+    
+    // Criar transação
+    await db.insert(coinTransactions).values({
+      studentId,
+      amount,
+      transactionType: 'earn',
+      source,
+      description,
+      metadata: metadata ? JSON.stringify(metadata) : null
+    });
+    
+    // Atualizar carteira
+    await db.update(studentWallets)
+      .set({
+        techCoins: wallet.techCoins + amount,
+        totalEarned: wallet.totalEarned + amount,
+        lastTransactionAt: new Date()
+      })
+      .where(eq(studentWallets.studentId, studentId));
+    
+    return { success: true, newBalance: wallet.techCoins + amount };
+  } catch (error) {
+    console.error("[Database] Error adding tech coins:", error);
+    return null;
+  }
+}
+
+/**
+ * Gastar Tech Coins (comprar item)
+ */
+export async function spendTechCoins(
+  studentId: number, 
+  amount: number, 
+  itemId: number, 
+  description: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const wallet = await getStudentWallet(studentId);
+    if (!wallet) throw new Error('Wallet not found');
+    
+    if (wallet.techCoins < amount) {
+      throw new Error('Insufficient tech coins');
+    }
+    
+    // Criar transação
+    await db.insert(coinTransactions).values({
+      studentId,
+      amount: -amount,
+      transactionType: 'spend',
+      source: 'shop_purchase',
+      description,
+      metadata: JSON.stringify({ itemId })
+    });
+    
+    // Atualizar carteira
+    await db.update(studentWallets)
+      .set({
+        techCoins: wallet.techCoins - amount,
+        totalSpent: wallet.totalSpent + amount,
+        lastTransactionAt: new Date()
+      })
+      .where(eq(studentWallets.studentId, studentId));
+    
+    // Registrar compra
+    await db.insert(studentPurchasedItems).values({
+      studentId,
+      itemId
+    });
+    
+    return { success: true, newBalance: wallet.techCoins - amount };
+  } catch (error) {
+    console.error("[Database] Error spending tech coins:", error);
+    throw error;
+  }
+}
+
+// Funções de loja já existem acima (getShopItems, getStudentPurchasedItems, equipItem)
+
+/**
+ * Obter histórico de transações do aluno
+ */
+export async function getCoinTransactionHistory(studentId: number, limit: number = 20) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const transactions = await db.select().from(coinTransactions)
+      .where(eq(coinTransactions.studentId, studentId))
+      .orderBy(desc(coinTransactions.createdAt))
+      .limit(limit);
+    
+    return transactions;
+  } catch (error) {
+    console.error("[Database] Error getting coin transaction history:", error);
+    return [];
+  }
+}
+
+// studentOwnsItem já existe acima
+
+/**
+ * Seed inicial de itens da loja com Tech Coins
+ */
+export async function seedShopItemsWithTechCoins() {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Verificar se já existem itens com rarity definida
+    const existingRareItems = await db.select().from(shopItems)
+      .where(eq(shopItems.rarity, 'rare'))
+      .limit(1);
+    
+    if (existingRareItems.length > 0) {
+      console.log("[Database] Shop items with rarity already seeded");
+      return;
+    }
+
+    // Adicionar novos itens com sistema de raridade e Tech Coins
+    const newItems: InsertShopItem[] = [
+      // Power-ups (novos itens)
+      { 
+        name: "Dobro de XP (1h)", 
+        description: "Ganhe o dobro de pontos por 1 hora", 
+        category: "power_up", 
+        price: 100, 
+        rarity: "common",
+        requiredBelt: "white",
+        requiredPoints: 0,
+        stock: -1,
+        sortOrder: 100,
+        metadata: JSON.stringify({ duration: 3600, multiplier: 2 })
+      },
+      { 
+        name: "Triplo de XP (1h)", 
+        description: "Ganhe o triplo de pontos por 1 hora", 
+        category: "power_up", 
+        price: 250, 
+        rarity: "rare",
+        requiredBelt: "green",
+        requiredPoints: 500,
+        stock: -1,
+        sortOrder: 101,
+        metadata: JSON.stringify({ duration: 3600, multiplier: 3 })
+      },
+      { 
+        name: "Dica Extra", 
+        description: "Receba uma dica adicional em exercícios difíceis", 
+        category: "power_up", 
+        price: 50, 
+        rarity: "common",
+        requiredBelt: "white",
+        requiredPoints: 0,
+        stock: -1,
+        sortOrder: 102,
+        metadata: JSON.stringify({ type: "hint" })
+      },
+      { 
+        name: "Segunda Chance", 
+        description: "Tente novamente sem perder pontos", 
+        category: "power_up", 
+        price: 150, 
+        rarity: "rare",
+        requiredBelt: "yellow",
+        requiredPoints: 200,
+        stock: -1,
+        sortOrder: 103,
+        metadata: JSON.stringify({ type: "retry" })
+      },
+      
+      // Certificados especiais
+      { 
+        name: "Certificado de Excelência", 
+        description: "Certificado digital de excelência acadêmica", 
+        category: "certificate", 
+        price: 500, 
+        rarity: "epic",
+        requiredBelt: "purple",
+        requiredPoints: 1000,
+        stock: -1,
+        sortOrder: 200,
+        metadata: JSON.stringify({ type: "excellence" })
+      },
+      { 
+        name: "Certificado de Mestre", 
+        description: "Certificado de conclusão de trilha de especialização", 
+        category: "certificate", 
+        price: 1000, 
+        rarity: "legendary",
+        requiredBelt: "black",
+        requiredPoints: 3000,
+        stock: -1,
+        sortOrder: 201,
+        metadata: JSON.stringify({ type: "master" })
+      },
+      
+      // Unlocks (desbloqueios)
+      { 
+        name: "Tema Escuro Premium", 
+        description: "Desbloqueie o tema escuro exclusivo", 
+        category: "unlock", 
+        price: 200, 
+        rarity: "rare",
+        requiredBelt: "orange",
+        requiredPoints: 300,
+        stock: -1,
+        sortOrder: 300,
+        metadata: JSON.stringify({ type: "theme_dark" })
+      },
+      { 
+        name: "Avatar Animado", 
+        description: "Seu avatar ganha animações especiais", 
+        category: "unlock", 
+        price: 400, 
+        rarity: "epic",
+        requiredBelt: "blue",
+        requiredPoints: 800,
+        stock: -1,
+        sortOrder: 301,
+        metadata: JSON.stringify({ type: "animated_avatar" })
+      },
+      { 
+        name: "Título Personalizado", 
+        description: "Crie seu próprio título no perfil", 
+        category: "unlock", 
+        price: 300, 
+        rarity: "epic",
+        requiredBelt: "green",
+        requiredPoints: 600,
+        stock: -1,
+        sortOrder: 302,
+        metadata: JSON.stringify({ type: "custom_title" })
+      },
+    ];
+
+    await db.insert(shopItems).values(newItems);
+    console.log("[Database] New shop items with Tech Coins seeded successfully");
+  } catch (error) {
+    console.error("[Database] Error seeding shop items with tech coins:", error);
   }
 }

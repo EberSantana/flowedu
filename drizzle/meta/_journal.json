@@ -183,6 +183,13 @@
       "when": 1767570626246,
       "tag": "0025_happy_celestials",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1767571637316,
+      "tag": "0026_yellow_menace",
+      "breakpoints": true
     }
   ]
 }

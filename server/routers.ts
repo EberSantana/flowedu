@@ -3665,6 +3665,20 @@ JSON (descrições MAX 15 chars):
         return await db.markGamificationNotificationAsRead(input.notificationId);
       }),
     
+    // ==================== TECH COINS (MOEDA VIRTUAL) ====================
+    // Obter carteira do aluno
+    getWallet: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getStudentWallet(ctx.studentSession.studentId);
+      }),
+    
+    // Obter histórico de transações
+    getTransactionHistory: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getCoinTransactionHistory(ctx.studentSession.studentId, input.limit || 20);
+      }),
+    
     // ==================== TEACHER DASHBOARD (DASHBOARD DO PROFESSOR) ====================
     // Visão geral para o professor
     getTeacherOverview: protectedProcedure

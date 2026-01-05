@@ -3769,3 +3769,129 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Implementar sistema de desbloqueio por conquistas extraordinárias
 - [x] Adicionar micro-animações de idle (respiração, movimento sutil)
 - [x] Integrar animações com sistema de gamificação existente
+
+
+## 🎮 GAMIFICAÇÃO AVANÇADA - PRIORIDADE ALTA
+
+### Sistema de Tech Coins (Economia Virtual) - HOJE
+- [ ] Criar tabelas no banco de dados (student_wallets, coin_transactions, shop_items, student_purchased_items)
+- [ ] Implementar funções no server/db.ts (getStudentWallet, addTechCoins, spendTechCoins, getShopItems, equipItem)
+- [ ] Criar rotas tRPC no server/routers.ts (techCoins router completo)
+- [ ] Criar 15 itens iniciais na loja (kimonos, acessórios, power-ups)
+- [ ] Implementar interface StudentShop.tsx
+- [ ] Implementar widget de saldo de Tech Coins no header do aluno
+- [ ] Integrar recompensas de Tech Coins em exercícios completados
+- [ ] Criar testes unitários para sistema de moedas
+
+### Conquistas Ocultas (Easter Eggs) - HOJE
+- [ ] Criar tabelas no banco (hidden_achievements, student_hidden_achievements)
+- [ ] Definir 10 conquistas secretas iniciais (arqueólogo, debugger nato, etc)
+- [ ] Implementar sistema de detecção automática de conquistas
+- [ ] Criar notificação animada de desbloqueio
+- [ ] Interface para visualizar conquistas desbloqueadas
+- [ ] Adicionar recompensas em Tech Coins por conquista
+
+### Modo Hardcore - HOJE
+- [ ] Criar tabelas (hardcore_mode_configs, hardcore_attempts)
+- [ ] Adicionar multiplicadores aos exercícios existentes (1.5x, 2x, 3x)
+- [ ] Interface para ativar/desativar modo hardcore antes de exercício
+- [ ] Leaderboard separado para modo hardcore
+- [ ] Badges especiais para completar em modo hardcore
+- [ ] Criar 5 tipos de modo hardcore (time_attack, no_hints, one_shot, code_golf, retro_challenge)
+
+### Sistema de Especialização por Trilhas - SEMANA 1
+- [ ] Criar tabelas (specialization_tracks, track_levels, student_track_progress)
+- [ ] Definir 5 trilhas iniciais (Web, Segurança, Dados, DevOps, Mobile)
+- [ ] Criar 3 níveis por trilha (Iniciante, Intermediário, Avançado)
+- [ ] Definir requisitos de progressão (exercícios, projetos, pontos)
+- [ ] Implementar funções de progresso no backend
+- [ ] Interface StudentSpecializations.tsx
+- [ ] Página de detalhes de cada trilha
+- [ ] Sistema de certificados por nível
+- [ ] Badges visuais de especialização
+
+### Desafios Semanais CTF - SEMANA 1
+- [ ] Criar tabelas (weekly_challenges, challenge_submissions, challenge_teams, team_members)
+- [ ] Implementar funções de desafios no backend
+- [ ] Interface StudentWeeklyChallenges.tsx
+- [ ] Sistema de formação de equipes (3-4 alunos)
+- [ ] Interface de submissão de soluções (URL, texto, arquivos)
+- [ ] Painel do professor para criar desafios
+- [ ] Painel do professor para revisar submissões
+- [ ] Leaderboard de desafios semanais
+- [ ] Criar 4 desafios para primeira semana (2 individuais, 2 em equipe)
+- [ ] Sistema de recompensas automáticas (pontos + tech coins)
+
+### Mentoria Gamificada - SEMANA 2
+- [ ] Criar tabelas (mentorship_applications, mentorship_activities, mentor_stats)
+- [ ] Sistema de candidatura para mentor
+- [ ] Interface de aprovação de mentores (professor)
+- [ ] Registro de atividades de mentoria (forum_answer, code_review, tutorial, study_session)
+- [ ] Recompensas por mentoria (pontos + tech coins)
+- [ ] Badges de mentor (bronze, prata, ouro)
+- [ ] Ranking de melhores mentores
+- [ ] Sistema de avaliação de mentoria (rating 0-5)
+
+### Boss Battles (Avaliações Épicas) - SEMANA 2
+- [ ] Criar tabelas (boss_battles, boss_battle_attempts)
+- [ ] Sistema de 3 fases (Reconhecimento 20%, Combate 60%, Vitória 20%)
+- [ ] Interface épica de Boss Battle com narrativa
+- [ ] Sistema de vidas (3 tentativas)
+- [ ] Sistema de power-ups (compráveis com tech coins)
+- [ ] Rankings S/A/B/C (S: 95-100%, A: 85-94%, B: 70-84%, C: <70%)
+- [ ] Narrativa e arte dos bosses
+- [ ] Painel do professor para criar Boss Battles
+- [ ] Recompensas especiais por rank
+
+### Sistema de Temporadas e Eventos - SEMANA 3
+- [ ] Criar tabelas (game_seasons, season_rewards, student_season_progress, special_events, event_registrations)
+- [ ] Implementar sistema de temporadas (4 por ano)
+- [ ] Recompensas exclusivas por temporada
+- [ ] Eventos especiais (Hackathons, Code Week, Bug Hunt, Workshops)
+- [ ] Interface de eventos ativos
+- [ ] Sistema de inscrição em eventos
+- [ ] Ranking de temporada
+- [ ] Painel do professor para gerenciar eventos
+- [ ] Criar primeira temporada: "Fundamentos - Lógica + Algoritmos"
+
+### Testes e Qualidade
+- [ ] Criar testes unitários para Tech Coins
+- [ ] Criar testes para sistema de trilhas
+- [ ] Criar testes para desafios semanais
+- [ ] Testar fluxo completo de compra na loja
+- [ ] Testar progressão em trilhas
+- [ ] Testar submissão de desafios
+- [ ] Testar sistema de equipes
+- [ ] Validar performance com muitos usuários simultâneos
+
+### Design e Assets
+- [ ] Criar ícones para cada trilha de especialização
+- [ ] Criar arte dos Boss Battles (5 bosses iniciais)
+- [ ] Criar badges de conquistas ocultas (10 badges)
+- [ ] Criar animações de desbloqueio
+- [ ] Criar efeitos visuais de recompensas
+- [ ] Criar tutorial interativo das novas funcionalidades
+- [ ] Criar banners de temporadas
+
+### Métricas e Monitoramento
+- [ ] Dashboard de métricas de engajamento
+- [ ] Relatório de uso de Tech Coins
+- [ ] Relatório de progresso em trilhas
+- [ ] Relatório de participação em desafios
+- [ ] Analytics de conquistas mais desbloqueadas
+- [ ] Relatório de economia virtual (moedas em circulação)
+
+
+## 🔄 MUDANÇA CRÍTICA: Substituição de Pontos por Tech Coins
+
+### Decisão: Substituir completamente o sistema de pontos por Tech Coins
+- [x] Manter tabela student_wallets como fonte única de verdade
+- [x] Migrar lógica de progressão de faixa para usar totalEarned de Tech Coins
+- [x] Atualizar função de adicionar pontos para adicionar Tech Coins
+- [x] Atualizar função de compra para usar Tech Coins
+- [ ] Atualizar ranking para usar Tech Coins (pendente)
+- [x] Atualizar todas as recompensas de exercícios para dar Tech Coins
+- [x] Atualizar Dashboard do aluno para mostrar Tech Coins
+- [ ] Atualizar sistema de badges para usar Tech Coins (pendente)
+- [x] Migrar dados existentes de pontos para Tech Coins (5 alunos migrados, 1.450 Tech Coins)
+- [ ] Remover referências antigas ao sistema de pontos (opcional - manter por compatibilidade)

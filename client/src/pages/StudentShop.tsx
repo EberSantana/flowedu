@@ -72,7 +72,10 @@ type ShopItem = {
   svgData: string | null;
   requiredBelt: string | null;
   isActive: boolean;
-  isRare: boolean;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  requiredPoints: number;
+  stock: number;
+  metadata: unknown;
   sortOrder: number;
 };
 
@@ -316,8 +319,8 @@ export default function StudentShop() {
                     locked ? 'opacity-75 grayscale' : ''
                   } ${equipped ? 'ring-2 ring-purple-500' : ''}`}
                 >
-                  {/* Badge de Raro */}
-                  {item.isRare && (
+                  {/* Badge de Raridade */}
+                  {item.rarity !== 'common' && (
                     <div className="absolute top-2 right-2 z-10">
                       <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                         <Star className="h-3 w-3 mr-1" />
