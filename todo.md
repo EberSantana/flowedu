@@ -4715,3 +4715,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir componentes que não seguem o design system
 - [x] Garantir consistência de cards, botões e elementos visuais
 - [x] Validar responsividade e acessibilidade
+- [x] Refazer layout e UX da página de análise de aprendizado
