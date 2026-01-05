@@ -39,21 +39,21 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
   useEffect(() => {
     if (!isActive) return;
 
-    // Fase 1: Morphing (2s)
+    // Fase 1: Morphing (2.5s - mais tempo para transição suave)
     const morphTimer = setTimeout(() => {
       setPhase("celebration");
       generateParticles();
-    }, 2000);
+    }, 2500);
 
-    // Fase 2: Celebração (2s)
+    // Fase 2: Celebração (2.5s)
     const celebrationTimer = setTimeout(() => {
       setPhase("complete");
-    }, 4000);
+    }, 5000);
 
     // Fase 3: Auto-fechar (1s após complete)
     const completeTimer = setTimeout(() => {
       onComplete?.();
-    }, 5000);
+    }, 6000);
 
     return () => {
       clearTimeout(morphTimer);
@@ -63,7 +63,7 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
   }, [isActive, onComplete]);
 
   const generateParticles = () => {
-    const newParticles = Array.from({ length: 30 }, (_, i) => ({
+    const newParticles = Array.from({ length: 50 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -122,25 +122,28 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
 
             {/* Animação da Faixa */}
             <div className="relative w-96 h-32">
-              {/* Partículas de fundo */}
+              {/* Partículas de fundo - Confete Colorido */}
               {phase === "celebration" &&
                 particles.map((particle) => (
                   <motion.div
                     key={particle.id}
-                    initial={{ opacity: 0, scale: 0, x: "50%", y: "50%" }}
+                    initial={{ opacity: 0, scale: 0, x: "50%", y: "50%", rotate: 0 }}
                     animate={{
                       opacity: [0, 1, 0],
                       scale: [0, 1.5, 0],
                       x: `${particle.x}%`,
                       y: `${particle.y}%`,
+                      rotate: [0, 360]
                     }}
                     transition={{
-                      duration: 1.5,
+                      duration: 2,
                       delay: Math.random() * 0.5,
                       ease: "easeOut",
                     }}
-                    className="absolute w-2 h-2 rounded-full"
-                    style={{ backgroundColor: BELT_COLORS[newBelt] }}
+                    className="absolute w-3 h-3 rounded-full"
+                    style={{ 
+                      backgroundColor: ["#FFD700", "#FF6B6B", "#4ECDC4", "#95E1D3", BELT_COLORS[newBelt]][particle.id % 5]
+                    }}
                   />
                 ))}
 
@@ -188,17 +191,27 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
                     <linearGradient id="beltGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <motion.stop
                         offset="0%"
+                        initial={{ stopColor: BELT_COLORS[oldBelt] }}
                         animate={{
-                          stopColor: phase === "morphing" ? BELT_COLORS[newBelt] : BELT_COLORS[newBelt],
+                          stopColor: BELT_COLORS[newBelt],
                         }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
+                        transition={{ duration: 2.5, ease: "easeInOut" }}
+                      />
+                      <motion.stop
+                        offset="50%"
+                        initial={{ stopColor: BELT_COLORS[oldBelt] }}
+                        animate={{
+                          stopColor: BELT_COLORS[newBelt],
+                        }}
+                        transition={{ duration: 2.5, ease: "easeInOut", delay: 0.3 }}
                       />
                       <motion.stop
                         offset="100%"
+                        initial={{ stopColor: BELT_COLORS[oldBelt] }}
                         animate={{
-                          stopColor: phase === "morphing" ? BELT_COLORS[newBelt] : BELT_COLORS[newBelt],
+                          stopColor: BELT_COLORS[newBelt],
                         }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
+                        transition={{ duration: 2.5, ease: "easeInOut", delay: 0.6 }}
                       />
                     </linearGradient>
 
@@ -214,7 +227,7 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
                     </filter>
                   </defs>
 
-                  {/* Corpo da Faixa */}
+                  {/* Corpo da Faixa com Morphing Suave */}
                   <motion.rect
                     x="50"
                     y="35"
@@ -224,8 +237,14 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
                     fill="url(#beltGradient)"
                     filter="url(#shadow)"
                     initial={{ fill: BELT_COLORS[oldBelt] }}
-                    animate={{ fill: BELT_COLORS[newBelt] }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
+                    animate={{ 
+                      fill: BELT_COLORS[newBelt],
+                      scale: phase === "morphing" ? [1, 1.05, 1] : 1
+                    }}
+                    transition={{ 
+                      fill: { duration: 2.5, ease: "easeInOut" },
+                      scale: { duration: 2.5, ease: "easeInOut" }
+                    }}
                   />
 
                   {/* Brilho Superior */}
@@ -242,18 +261,24 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
                     />
                   )}
 
-                  {/* Nó da Faixa */}
+                  {/* Nó da Faixa com Pulsação */}
                   <motion.circle
                     cx="200"
                     cy="60"
                     r="20"
                     initial={{ fill: BELT_COLORS[oldBelt] }}
-                    animate={{ fill: BELT_COLORS[newBelt] }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
+                    animate={{ 
+                      fill: BELT_COLORS[newBelt],
+                      r: phase === "morphing" ? [20, 22, 20] : 20
+                    }}
+                    transition={{ 
+                      fill: { duration: 2.5, ease: "easeInOut" },
+                      r: { duration: 2.5, ease: "easeInOut" }
+                    }}
                     filter="url(#shadow)"
                   />
 
-                  {/* Pontas da Faixa */}
+                  {/* Pontas da Faixa com Movimento */}
                   <motion.rect
                     x="190"
                     y="80"
@@ -261,8 +286,14 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
                     height="30"
                     rx="4"
                     initial={{ fill: BELT_COLORS[oldBelt] }}
-                    animate={{ fill: BELT_COLORS[newBelt] }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
+                    animate={{ 
+                      fill: BELT_COLORS[newBelt],
+                      y: phase === "morphing" ? [80, 78, 80] : 80
+                    }}
+                    transition={{ 
+                      fill: { duration: 2.5, ease: "easeInOut" },
+                      y: { duration: 2.5, ease: "easeInOut", repeat: phase === "celebration" ? Infinity : 0 }
+                    }}
                   />
                   <motion.rect
                     x="202"
@@ -271,8 +302,14 @@ export function BeltTransitionAnimation({ oldBelt, newBelt, isActive, onComplete
                     height="30"
                     rx="4"
                     initial={{ fill: BELT_COLORS[oldBelt] }}
-                    animate={{ fill: BELT_COLORS[newBelt] }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
+                    animate={{ 
+                      fill: BELT_COLORS[newBelt],
+                      y: phase === "morphing" ? [80, 82, 80] : 80
+                    }}
+                    transition={{ 
+                      fill: { duration: 2.5, ease: "easeInOut" },
+                      y: { duration: 2.5, ease: "easeInOut", repeat: phase === "celebration" ? Infinity : 0 }
+                    }}
                   />
                 </svg>
               </motion.div>

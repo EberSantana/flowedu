@@ -126,10 +126,10 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({ action, index }) => {
           </div>
         )}
 
-        <div className="relative p-5">
+        <div className="relative p-4 sm:p-5">
           {/* Ícone */}
           <div className={cn(
-            'w-12 h-12 rounded-xl flex items-center justify-center mb-4',
+            'w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mb-3 sm:mb-4',
             'text-white shadow-md transition-all duration-300',
             'group-hover:scale-110',
             action.iconBg
@@ -138,16 +138,16 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({ action, index }) => {
           </div>
 
           {/* Texto */}
-          <h3 className="font-bold text-gray-900 text-base mb-1.5">
+          <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-1 sm:mb-1.5">
             {action.title}
           </h3>
-          <p className="text-sm text-gray-600 leading-snug">
+          <p className="text-xs sm:text-sm text-gray-600 leading-snug">
             {action.description}
           </p>
 
           {/* Indicador de ação */}
           <div className={cn(
-            'flex items-center gap-1 text-sm font-semibold mt-3 transition-all duration-300',
+            'flex items-center gap-1 text-xs sm:text-sm font-semibold mt-2 sm:mt-3 transition-all duration-300',
             action.color,
             'opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
           )}>
@@ -198,8 +198,8 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
         </div>
       </div>
 
-      {/* Grid de ações - Padronizado e uniforme */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* Grid de ações - Responsivo otimizado para mobile */}
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {actions.map((action, index) => (
           <QuickActionCard 
             key={action.id} 
@@ -209,17 +209,17 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
         ))}
       </div>
 
-      {/* Dica de gamificação */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
-        <div className="flex items-center gap-3">
+      {/* Dica de gamificação - Responsiva */}
+      <div className="mt-6 p-3 sm:p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
+        <div className="flex items-start sm:items-center gap-2 sm:gap-3">
           <div className="p-2 bg-yellow-100 rounded-lg">
             <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-800">
+            <p className="text-xs sm:text-sm font-semibold text-gray-800">
               Dica do dia
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-600">
               Complete exercícios diariamente para manter sua sequência e ganhar bônus de pontos!
             </p>
           </div>
