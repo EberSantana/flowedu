@@ -258,31 +258,6 @@ function OverviewTab({
         </Card>
 
         {/* Card de Gamificação */}
-        <Card className="border-l-4 border-l-green-500 shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Award className="h-5 w-5 text-green-500" />
-              Gamificação
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Pontos</span>
-                <span className="font-semibold text-green-600">0</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Faixa Atual</span>
-                <Badge className="bg-gray-200 text-gray-800">Branca</Badge>
-              </div>
-              <div className="flex items-center gap-1 text-sm text-gray-500">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span>Continue estudando para subir de faixa!</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Card de Atividades */}
         <Card className="border-l-4 border-l-purple-500 shadow-md">
           <CardHeader>

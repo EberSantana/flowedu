@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "../shared/const";
+import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, studentProcedure, router } from "./_core/trpc";
@@ -17,6 +17,9 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    // Rota específica para verificar sessão de aluno
+    studentSession: publicProcedure.query(opts => opts.ctx.studentSession),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -66,9 +69,12 @@ export const appRouter = router({
             { expiresIn: '7d' }
           );
           
-          // Configurar cookie de sessão
+          // Configurar cookie de sessão DE ALUNO (cookie separado)
           const cookieOptions = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+          ctx.res.cookie(STUDENT_COOKIE_NAME, token, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+          });
           
           return {
             success: true,
@@ -283,6 +289,17 @@ export const appRouter = router({
       return await db.getSubjectsByUserId(ctx.user.id);
     }),
     
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const subjects = await db.getSubjectsByUserId(ctx.user.id);
+        const subject = subjects.find(s => s.id === input.id);
+        if (!subject) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Disciplina não encontrada' });
+        }
+        return subject;
+      }),
+    
     create: protectedProcedure
       .input(z.object({
         name: z.string().min(1),
@@ -333,6 +350,13 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.deleteSubject(input.id, ctx.user.id);
         return { success: true };
+      }),
+    
+    toggleCT: protectedProcedure
+      .input(z.object({ id: z.number(), enabled: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const updated = await db.toggleSubjectCT(input.id, ctx.user.id, input.enabled);
+        return { success: true, subject: updated };
       }),
     
     // Subject Enrollments
@@ -671,6 +695,27 @@ export const appRouter = router({
       
       return upcomingEvents;
     }),
+    
+    // Preferências de Ações Rápidas
+    getQuickActionsPreferences: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getQuickActionsPreferences(ctx.user.id);
+    }),
+    
+    saveQuickActionsPreferences: protectedProcedure
+      .input(z.object({
+        actions: z.array(z.object({
+          id: z.string(),
+          label: z.string(),
+          icon: z.string(),
+          href: z.string(),
+          color: z.string(),
+          enabled: z.boolean(),
+        })),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.saveQuickActionsPreferences(ctx.user.id, input.actions);
+        return { success: true };
+      }),
   }),
 
   schedule: router({
@@ -2619,7 +2664,7 @@ JSON (descrições MAX 15 chars):
     // Logout de aluno
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true };
     }),
     
@@ -2737,6 +2782,111 @@ JSON (descrições MAX 15 chars):
     markAllNotificationsAsRead: studentProcedure
       .mutation(async ({ ctx }) => {
         return await db.markAllStudentNotificationsAsRead(ctx.studentSession.studentId);
+      }),
+    
+    // ==================== ENHANCED LEARNING PATHS ====================
+    
+    // Buscar trilha completa com progresso e pré-requisitos
+    getEnhancedLearningPath: studentProcedure
+      .input(z.object({ subjectId: z.number(), professorId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getEnhancedLearningPath(
+          ctx.studentSession.studentId,
+          input.subjectId,
+          input.professorId
+        );
+      }),
+    
+    // Atualizar progresso do tópico
+    updateTopicProgressEnhanced: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        status: z.enum(['not_started', 'in_progress', 'completed']).optional(),
+        selfAssessment: z.enum(['understood', 'have_doubts', 'need_help']).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateStudentTopicProgressEnhanced({
+          studentId: ctx.studentSession.studentId,
+          ...input,
+        });
+      }),
+    
+    // Diário de Aprendizagem
+    addJournalEntry: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        content: z.string(),
+        tags: z.string().optional(),
+        mood: z.enum(['great', 'good', 'neutral', 'confused', 'frustrated']).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.addJournalEntry({
+          studentId: ctx.studentSession.studentId,
+          topicId: input.topicId,
+          content: input.content,
+          tags: input.tags,
+          mood: input.mood,
+          entryDate: new Date(),
+        } as any);
+      }),
+    
+    getJournalEntriesByTopic: studentProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getJournalEntriesByTopic(
+          ctx.studentSession.studentId,
+          input.topicId
+        );
+      }),
+    
+    getAllJournalEntries: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getAllJournalEntries(
+          ctx.studentSession.studentId,
+          input.limit || 50
+        );
+      }),
+    
+    // Sistema de Dúvidas
+    submitDoubt: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        professorId: z.number(),
+        question: z.string(),
+        context: z.string().optional(),
+        isPrivate: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.submitDoubt({
+          studentId: ctx.studentSession.studentId,
+          topicId: input.topicId,
+          professorId: input.professorId,
+          question: input.question,
+          context: input.context,
+          isPrivate: input.isPrivate ?? true,
+          status: 'pending',
+        } as any);
+      }),
+    
+    getMyDoubts: studentProcedure
+      .input(z.object({ topicId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentDoubts(
+          ctx.studentSession.studentId,
+          input.topicId
+        );
+      }),
+    
+    // Estatísticas de Estudo
+    getStudyStatistics: studentProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudyStatistics(
+          ctx.studentSession.studentId,
+          input.subjectId
+        );
       }),
   }),
 
@@ -3305,6 +3455,69 @@ JSON (descrições MAX 15 chars):
         
         return results;
       }),
+
+    // ==================== HD-2D AVATAR SYSTEM ====================
+    
+    // Obter personagem HD-2D atual do aluno
+    getHD2DCharacter: studentProcedure
+      .query(async ({ ctx }) => {
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
+        if (!student) throw new Error("Aluno não encontrado");
+        
+        return {
+          characterId: student.hd2dCharacterId || 1,
+          unlockedCharacters: student.hd2dUnlockedCharacters 
+            ? JSON.parse(student.hd2dUnlockedCharacters) 
+            : [1],
+        };
+      }),
+    
+    // Trocar personagem HD-2D
+    changeHD2DCharacter: studentProcedure
+      .input(z.object({ characterId: z.number().min(1).max(8) }))
+      .mutation(async ({ ctx, input }) => {
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
+        if (!student) throw new Error("Aluno não encontrado");
+        
+        const unlockedCharacters = student.hd2dUnlockedCharacters 
+          ? JSON.parse(student.hd2dUnlockedCharacters)
+          : [1];
+        
+        if (!unlockedCharacters.includes(input.characterId)) {
+          throw new Error("Personagem não desbloqueado");
+        }
+        
+        return await db.updateStudent(
+          ctx.studentSession.studentId,
+          { hd2dCharacterId: input.characterId },
+          ctx.studentSession.professorId
+        );
+      }),
+    
+    // Desbloquear novo personagem HD-2D
+    unlockHD2DCharacter: studentProcedure
+      .input(z.object({ characterId: z.number().min(1).max(8) }))
+      .mutation(async ({ ctx, input }) => {
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
+        if (!student) throw new Error("Aluno não encontrado");
+        
+        const unlockedCharacters = student.hd2dUnlockedCharacters 
+          ? JSON.parse(student.hd2dUnlockedCharacters)
+          : [1];
+        
+        if (unlockedCharacters.includes(input.characterId)) {
+          throw new Error("Personagem já desbloqueado");
+        }
+        
+        unlockedCharacters.push(input.characterId);
+        unlockedCharacters.sort((a: number, b: number) => a - b);
+        
+        return await db.updateStudent(
+          ctx.studentSession.studentId,
+          { hd2dUnlockedCharacters: JSON.stringify(unlockedCharacters) },
+          ctx.studentSession.professorId
+        );
+      }),
   }),
 
   // Notifications
@@ -3582,6 +3795,7 @@ JSON (descrições MAX 15 chars):
     getStudentStats: studentProcedure
       .query(async ({ ctx }) => {
         const points = await db.getOrCreateStudentPoints(ctx.studentSession.studentId);
+        const student = await db.getStudentById(ctx.studentSession.studentId, ctx.studentSession.professorId);
         const ranking = await db.getClassRanking(100);
         const studentRank = ranking.findIndex(r => r.studentId === ctx.studentSession.studentId) + 1;
         
@@ -3591,6 +3805,68 @@ JSON (descrições MAX 15 chars):
           currentBelt: points?.currentBelt || 'white',
           streakDays: points?.streakDays || 0,
           rank: studentRank || null,
+          avatarSkinTone: student?.avatarSkinTone || 'light',
+          avatarKimonoColor: student?.avatarKimonoColor || 'white',
+          avatarHairStyle: student?.avatarHairStyle || 'short',
+          // Campos de gamificação avançada
+          beltAnimationSeen: points?.beltAnimationSeen || false,
+          lastBeltUpgrade: points?.lastBeltUpgrade || null,
+          pointsMultiplier: points?.pointsMultiplier || 1.0,
+          consecutivePerfectScores: points?.consecutivePerfectScores || 0,
+          totalExercisesCompleted: points?.totalExercisesCompleted || 0,
+          totalPerfectScores: points?.totalPerfectScores || 0,
+        };
+      }),
+    
+    // Marcar animação de faixa como vista
+    markBeltAnimationSeen: studentProcedure
+      .mutation(async ({ ctx }) => {
+        return await db.markBeltAnimationSeen(ctx.studentSession.studentId);
+      }),
+    
+    // Obter estatísticas detalhadas de gamificação
+    getDetailedStats: studentProcedure
+      .query(async ({ ctx }) => {
+        const points = await db.getOrCreateStudentPoints(ctx.studentSession.studentId);
+        const history = await db.getStudentPointsHistory(ctx.studentSession.studentId, 50);
+        const badges = await db.getStudentBadges(ctx.studentSession.studentId);
+        
+        // Calcular progresso para próxima faixa
+        const beltThresholds = [
+          { name: 'white', min: 0, max: 100 },
+          { name: 'yellow', min: 100, max: 300 },
+          { name: 'orange', min: 300, max: 600 },
+          { name: 'green', min: 600, max: 1000 },
+          { name: 'blue', min: 1000, max: 1500 },
+          { name: 'purple', min: 1500, max: 2100 },
+          { name: 'brown', min: 2100, max: 3000 },
+          { name: 'black', min: 3000, max: Infinity },
+        ];
+        
+        const currentBeltIndex = beltThresholds.findIndex(b => b.name === points?.currentBelt);
+        const nextBelt = currentBeltIndex < beltThresholds.length - 1 ? beltThresholds[currentBeltIndex + 1] : null;
+        const currentThreshold = beltThresholds[currentBeltIndex];
+        
+        const progressToNextBelt = nextBelt ? {
+          current: (points?.totalPoints || 0) - currentThreshold.min,
+          required: nextBelt.min - currentThreshold.min,
+          percentage: Math.min(100, Math.round(((points?.totalPoints || 0) - currentThreshold.min) / (nextBelt.min - currentThreshold.min) * 100)),
+          nextBeltName: nextBelt.name,
+          pointsNeeded: Math.max(0, nextBelt.min - (points?.totalPoints || 0)),
+        } : null;
+        
+        return {
+          totalPoints: points?.totalPoints || 0,
+          currentBelt: points?.currentBelt || 'white',
+          streakDays: points?.streakDays || 0,
+          pointsMultiplier: points?.pointsMultiplier || 1.0,
+          consecutivePerfectScores: points?.consecutivePerfectScores || 0,
+          totalExercisesCompleted: points?.totalExercisesCompleted || 0,
+          totalPerfectScores: points?.totalPerfectScores || 0,
+          lastBeltUpgrade: points?.lastBeltUpgrade || null,
+          progressToNextBelt,
+          recentActivity: history.slice(0, 10),
+          badgesCount: badges.length,
         };
       }),
     
@@ -3610,6 +3886,12 @@ JSON (descrições MAX 15 chars):
         return { earned, all, total: all.length };
       }),
     
+    // Obter histórico de evolução de faixas
+    getBeltHistory: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getStudentBeltHistory(ctx.studentSession.studentId);
+      }),
+    
     // Obter ranking da turma
     getClassRanking: studentProcedure
       .input(z.object({ limit: z.number().optional() }))
@@ -3619,9 +3901,12 @@ JSON (descrições MAX 15 chars):
     
     // Obter ranking da turma (versão para professores)
     getClassRankingTeacher: protectedProcedure
-      .input(z.object({ limit: z.number().optional() }))
+      .input(z.object({ 
+        limit: z.number().optional(),
+        subjectId: z.number().optional(),
+      }))
       .query(async ({ ctx, input }) => {
-        return await db.getClassRanking(input.limit || 10);
+        return await db.getClassRanking(input.limit || 10, input.subjectId);
       }),
     
     // Obter notificações de gamificação
@@ -3638,12 +3923,27 @@ JSON (descrições MAX 15 chars):
         return await db.markGamificationNotificationAsRead(input.notificationId);
       }),
     
+    // ==================== TECH COINS (MOEDA VIRTUAL) ====================
+    // Obter carteira do aluno
+    getWallet: studentProcedure
+      .query(async ({ ctx }) => {
+        return await db.getStudentWallet(ctx.studentSession.studentId);
+      }),
+    
+    // Obter histórico de transações
+    getTransactionHistory: studentProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getCoinTransactionHistory(ctx.studentSession.studentId, input.limit || 20);
+      }),
+    
     // ==================== TEACHER DASHBOARD (DASHBOARD DO PROFESSOR) ====================
     // Visão geral para o professor
     getTeacherOverview: protectedProcedure
-      .query(async ({ ctx }) => {
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
         const allBadges = await db.getAllBadges();
-        const totalEarned = await db.getTotalStudentsWithBadges();
+        const totalEarned = await db.getTotalStudentsWithBadges(input.subjectId);
         
         return {
           totalBadgesAvailable: allBadges.length,
@@ -3653,25 +3953,28 @@ JSON (descrições MAX 15 chars):
     
     // Estatísticas de badges
     getBadgeStats: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await db.getBadgeStatistics();
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getBadgeStatistics(input.subjectId);
       }),
     
     // Evolução temporal de pontos (4 semanas)
     getPointsEvolution: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await db.getPointsEvolutionData();
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getPointsEvolutionData(input.subjectId);
       }),
     
     // Gerar relatório PDF
     generateReport: protectedProcedure
-      .mutation(async ({ ctx }) => {
+      .input(z.object({ subjectId: z.number().optional() }))
+      .mutation(async ({ ctx, input }) => {
         const { generateGamificationReport } = await import('./gamification-report');
         
         // Coletar todos os dados
         const allBadges = await db.getAllBadges();
-        const totalEarned = await db.getTotalStudentsWithBadges();
-        const ranking = await db.getClassRanking(20);
+        const totalEarned = await db.getTotalStudentsWithBadges(input.subjectId);
+        const ranking = await db.getClassRanking(20, input.subjectId);
         const badgeStats = await db.getBadgeStatistics();
         const evolutionData = await db.getPointsEvolutionData();
         
@@ -3806,30 +4109,124 @@ JSON (descrições MAX 15 chars):
           input.days || 30
         );
       }),
+    
+    // ==================== GAMIFICAÇÃO POR DISCIPLINA ====================
+    // Obter ranking e estatísticas de gamificação de uma disciplina (professor)
+    getSubjectGamificationDashboard: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ input }) => {
+        const ranking = await db.getSubjectRanking(input.subjectId, 100);
+        const stats = await db.getSubjectRankingStats(input.subjectId);
+        
+        // Calcular distribuição de faixas
+        const BELT_CONFIG = [
+          { name: 'white', label: 'Branca', emoji: '⚪' },
+          { name: 'yellow', label: 'Amarela', emoji: '🟡' },
+          { name: 'orange', label: 'Laranja', emoji: '🟠' },
+          { name: 'green', label: 'Verde', emoji: '🟢' },
+          { name: 'blue', label: 'Azul', emoji: '🔵' },
+          { name: 'purple', label: 'Roxa', emoji: '🟣' },
+          { name: 'brown', label: 'Marrom', emoji: '🟤' },
+          { name: 'black', label: 'Preta', emoji: '⚫' },
+        ];
+        
+        const beltDistribution = BELT_CONFIG.map(belt => {
+          const count = ranking.filter(s => s.currentBelt === belt.name).length;
+          const percentage = stats.totalStudents > 0 ? (count / stats.totalStudents) * 100 : 0;
+          return { ...belt, count, percentage };
+        });
+        
+        // Obter badges da disciplina
+        const badges = await db.getAllBadges();
+        
+        return {
+          ranking: ranking.map((r, index) => ({
+            ...r,
+            position: index + 1,
+          })),
+          stats,
+          beltDistribution,
+          badges: badges || [],
+          totalStudents: stats.totalStudents,
+          activeStudents: ranking.filter(s => s.streakDays > 0).length,
+        };
+      }),
+    
+    // Obter dados de gamificação de uma disciplina para aluno
+    getSubjectGamificationStudent: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const ranking = await db.getSubjectRanking(input.subjectId, 100);
+        const stats = await db.getSubjectRankingStats(input.subjectId);
+        const studentPosition = ranking.findIndex(r => r.studentId === ctx.studentSession.studentId) + 1;
+        const studentData = ranking.find(r => r.studentId === ctx.studentSession.studentId);
+        
+        // Calcular distribuição de faixas
+        const BELT_CONFIG = [
+          { name: 'white', label: 'Branca', emoji: '⚪' },
+          { name: 'yellow', label: 'Amarela', emoji: '🟡' },
+          { name: 'orange', label: 'Laranja', emoji: '🟠' },
+          { name: 'green', label: 'Verde', emoji: '🟢' },
+          { name: 'blue', label: 'Azul', emoji: '🔵' },
+          { name: 'purple', label: 'Roxa', emoji: '🟣' },
+          { name: 'brown', label: 'Marrom', emoji: '🟤' },
+          { name: 'black', label: 'Preta', emoji: '⚫' },
+        ];
+        
+        const beltDistribution = BELT_CONFIG.map(belt => {
+          const count = ranking.filter(s => s.currentBelt === belt.name).length;
+          const percentage = stats.totalStudents > 0 ? (count / stats.totalStudents) * 100 : 0;
+          return { ...belt, count, percentage };
+        });
+        
+        // Obter badges da disciplina
+        const badges = await db.getAllBadges();
+        
+        return {
+          ranking: ranking.map((r, index) => ({
+            ...r,
+            position: index + 1,
+          })),
+          stats,
+          beltDistribution,
+          badges: badges || [],
+          studentPosition: studentPosition || null,
+          studentData: studentData || null,
+          totalStudents: stats.totalStudents,
+          activeStudents: ranking.filter(s => s.streakDays > 0).length,
+        };
+      }),
   }),
 
   // ==================== PENSAMENTO COMPUTACIONAL ====================
   computationalThinking: router({
-    // Buscar perfil de PC do aluno (4 dimensões)
+    // Buscar perfil de PC do aluno (4 dimensões) por disciplina
     getProfile: studentProcedure
-      .query(async ({ ctx }) => {
-        const profile = await db.getStudentCTProfile(ctx.studentSession.studentId);
+      .input(z.object({
+        subjectId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const profile = await db.getStudentCTProfile(ctx.studentSession.studentId, input.subjectId);
         return profile;
       }),
 
-    // Buscar média da turma (para professor)
+    // Buscar média da turma (para professor) por disciplina
     getClassAverage: protectedProcedure
-      .query(async ({ ctx }) => {
-        const average = await db.getClassCTAverage(ctx.user.id);
+      .input(z.object({
+        subjectId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const average = await db.getClassCTAverage(ctx.user.id, input.subjectId);
         return average;
       }),
 
-    // Buscar exercícios disponíveis
+    // Buscar exercícios disponíveis por disciplina
     getExercises: studentProcedure
       .input(z.object({
+        subjectId: z.number(),
         dimension: z.enum(['decomposition', 'pattern_recognition', 'abstraction', 'algorithms']).optional(),
         difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
-      }).optional())
+      }))
       .query(async ({ input }) => {
         const exercises = await db.getCTExercises(input);
         return exercises;
@@ -3838,13 +4235,14 @@ JSON (descrições MAX 15 chars):
     // Submeter resposta de exercício
     submitExercise: studentProcedure
       .input(z.object({
+        subjectId: z.number(),
         exerciseId: z.number(),
         answer: z.string(),
         timeSpent: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         // Buscar exercício
-        const exercises = await db.getCTExercises();
+        const exercises = await db.getCTExercises({ subjectId: input.subjectId });
         const exercise = exercises.find(e => e.id === input.exerciseId);
         
         if (!exercise) {
@@ -3854,7 +4252,6 @@ JSON (descrições MAX 15 chars):
         // Analisar resposta com IA
         const analysis = await analyzeCTAnswer({
           dimension: exercise.dimension,
-          question: exercise.description,
           answer: input.answer,
           expectedAnswer: exercise.expectedAnswer || '',
         });
@@ -3862,6 +4259,7 @@ JSON (descrições MAX 15 chars):
         // Submeter exercício
         await db.submitCTExercise({
           studentId: ctx.studentSession.studentId,
+          subjectId: input.subjectId,
           exerciseId: input.exerciseId,
           answer: input.answer,
           score: analysis.score,
@@ -3870,7 +4268,7 @@ JSON (descrições MAX 15 chars):
         });
 
         // Verificar e conceder badges automaticamente
-        await db.checkAndAwardCTBadges(ctx.studentSession.studentId);
+        await db.checkAndAwardCTBadges(ctx.studentSession.studentId, input.subjectId);
 
         return {
           score: analysis.score,
@@ -3903,9 +4301,10 @@ JSON (descrições MAX 15 chars):
         return badges;
       }),
 
-    // [PROFESSOR] Criar exercício de PC
+    // [PROFESSOR] Criar exercício de PC para uma disciplina
     createExercise: protectedProcedure
       .input(z.object({
+        subjectId: z.number(),
         title: z.string(),
         description: z.string(),
         dimension: z.enum(['decomposition', 'pattern_recognition', 'abstraction', 'algorithms']),
@@ -3922,16 +4321,19 @@ JSON (descrições MAX 15 chars):
         return { success: true, exerciseId: result };
       }),
 
-    // [PROFESSOR] Buscar estatísticas da turma
+    // [PROFESSOR] Buscar estatísticas da turma por disciplina
     getClassStats: protectedProcedure
-      .query(async ({ ctx }) => {
+      .input(z.object({
+        subjectId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
         // Buscar todos os alunos do professor
         const teacherStudents = await db.getStudentsByUser(ctx.user.id);
         
-        // Buscar perfil de cada aluno
+        // Buscar perfil de cada aluno para a disciplina específica
         const profiles = await Promise.all(
           teacherStudents.map(async (student: any) => {
-            const profile = await db.getStudentCTProfile(student.id);
+            const profile = await db.getStudentCTProfile(student.id, input.subjectId);
             return {
               studentId: student.id,
               studentName: student.name,
@@ -3940,14 +4342,28 @@ JSON (descrições MAX 15 chars):
           })
         );
 
-        // Calcular média da turma
-        const average = await db.getClassCTAverage(ctx.user.id);
+        // Calcular média da turma para a disciplina
+        const average = await db.getClassCTAverage(ctx.user.id, input.subjectId);
 
         return {
           students: profiles,
           classAverage: average,
           totalStudents: teacherStudents.length,
         };
+      }),
+    
+    // [PROFESSOR] Obter estatísticas completas de PC por disciplina
+    getSubjectStats: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getCTStatsBySubject(ctx.user.id, input.subjectId);
+      }),
+    
+    // [ALUNO] Obter evolução temporal do PC em uma disciplina
+    getStudentEvolution: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getStudentCTEvolution(ctx.studentSession.studentId, input.subjectId);
       }),
   }),
 
@@ -4026,6 +4442,17 @@ JSON (descrições MAX 15 chars):
         const exercises = await db.listAvailableExercises(studentId, input.subjectId);
         return exercises;
       }),
+    
+    // Alias para listAvailable (compatibilidade)
+    listBySubject: studentProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const exercises = await db.listAvailableExercises(studentId, input.subjectId);
+        return exercises;
+      }),
 
     // Listar exercícios por módulo
     listByModule: studentProcedure
@@ -4087,15 +4514,15 @@ JSON (descrições MAX 15 chars):
           exercise.exerciseData
         );
         
-        // Adicionar pontos de gamificação
-        if (result.pointsEarned > 0) {
-          await db.addExercisePoints(
-            studentId,
-            exercise.subjectId,
-            result.pointsEarned,
-            `Exercício: ${exercise.title} (${result.correctAnswers}/${result.totalQuestions} acertos)`
-          );
-        }
+        // Gamificação removida - pontos não são mais adicionados
+        // if (result.pointsEarned > 0) {
+        //   await db.addExercisePoints(
+        //     studentId,
+        //     exercise.subjectId,
+        //     result.pointsEarned,
+        //     `Exercício: ${exercise.title} (${result.correctAnswers}/${result.totalQuestions} acertos)`
+        //   );
+        // }
         
         return result;
       }),
@@ -4293,122 +4720,6 @@ JSON (descrições MAX 15 chars):
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
   studentReview: router({
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno conseguiu identificar as partes principais do problema?
-2. A divisão proposta é lógica e facilita a resolução?
-3. As partes são independentes e bem definidas?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-
-    pattern_recognition: `Você está avaliando a habilidade de RECONHECIMENTO DE PADRÕES.
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno identificou padrões ou repetições?
-2. Os padrões identificados são relevantes?
-3. A explicação é clara?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-
-    abstraction: `Você está avaliando a habilidade de ABSTRAÇÃO (focar no essencial, ignorar detalhes irrelevantes).
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. O aluno focou nos aspectos essenciais?
-2. Detalhes irrelevantes foram ignorados?
-3. A abstração facilita o entendimento?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-
-    algorithms: `Você está avaliando a habilidade de criar ALGORITMOS (sequência lógica de passos).
-
-Questão: ${question}
-
-Resposta esperada: ${expectedAnswer}
-
-Resposta do aluno: ${answer}
-
-Avalie a resposta considerando:
-1. Os passos estão em ordem lógica?
-2. A sequência é completa e resolve o problema?
-3. Os passos são claros e executáveis?
-
-Retorne um JSON com:
-- score: número de 0 a 100
-- feedback: texto explicativo (máximo 200 caracteres)`,
-  };
-
-  try {
-    const response = await invokeLLM({
-      messages: [
-        { role: 'system', content: 'Você é um avaliador de Pensamento Computacional. Seja justo e construtivo.' },
-        { role: 'user', content: prompts[dimension] || prompts.decomposition },
-      ],
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'ct_evaluation',
-          strict: true,
-          schema: {
-            type: 'object',
-            properties: {
-              score: { type: 'integer', description: 'Pontuação de 0 a 100' },
-              feedback: { type: 'string', description: 'Feedback construtivo' },
-            },
-            required: ['score', 'feedback'],
-            additionalProperties: false,
-          },
-        },
-      },
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content || typeof content !== 'string') {
-      throw new Error('Resposta vazia da IA');
-    }
-
-    const result = JSON.parse(content);
-    return {
-      score: Math.min(100, Math.max(0, result.score)),
-      feedback: result.feedback,
-    };
-  } catch (error) {
-    console.error('[CT Analysis] Error analyzing answer:', error);
-    // Fallback: pontuação baseada em comprimento da resposta
-    const score = Math.min(100, Math.max(20, answer.length * 2));
-    return {
-      score,
-      feedback: 'Resposta recebida. Continue praticando!',
-    };
-  }
-}
-
-
-  // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
-  studentReview: router({
     // Listar questões erradas com filtros
     getWrongAnswers: studentProcedure
       .input(
@@ -4588,6 +4899,1225 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return stats;
       }),
   }),
-});
 
+  // ==================== STUDENT AVATAR CUSTOMIZATION ====================
+  studentAvatar: router({
+    // Obter avatar do aluno logado
+    getMyAvatar: studentProcedure
+      .query(async ({ ctx }) => {
+        const avatar = await db.getStudentAvatarByStudentId(ctx.studentSession.studentId);
+        if (!avatar) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Avatar não encontrado',
+          });
+        }
+        return avatar;
+      }),
+    
+    // Atualizar avatar do aluno logado
+    updateMyAvatar: studentProcedure
+      .input(z.object({
+        avatarGender: z.enum(['male', 'female']).optional(),
+        avatarSkinTone: z.string().optional(),
+        avatarKimonoColor: z.string().optional(),
+        avatarHairStyle: z.string().optional(),
+        avatarHairColor: z.string().optional(),
+        avatarKimonoStyle: z.string().optional(),
+        avatarHeadAccessory: z.string().optional(),
+        avatarExpression: z.string().optional(),
+        avatarPose: z.string().optional(),
+        avatarAccessories: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const updated = await db.updateStudentAvatar(ctx.studentSession.studentId, input);
+        if (!updated) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Erro ao atualizar avatar',
+          });
+        }
+        return updated;
+      }),
+  }),
+
+  // ==================== ESPECIALIZAÇÕES (DOJO TECH) ====================
+  specializations: router({
+    // Escolher especialização
+    choose: studentProcedure
+      .input(z.object({
+        specialization: z.enum(['code_warrior', 'interface_master', 'data_sage', 'system_architect'])
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.chooseSpecialization(studentId, input.specialization);
+        return result;
+      }),
+
+    // Obter especialização do aluno
+    getMy: studentProcedure
+      .query(async ({ ctx }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const spec = await db.getStudentSpecialization(studentId);
+        return spec;
+      }),
+
+    // Obter árvore de skills da especialização
+    getSkillTree: studentProcedure
+      .input(z.object({
+        specialization: z.string()
+      }))
+      .query(async ({ input }) => {
+        const skills = await db.getSkillTree(input.specialization);
+        return skills;
+      }),
+
+    // Obter skills desbloqueadas do aluno
+    getMySkills: studentProcedure
+      .query(async ({ ctx }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const skills = await db.getStudentSkills(studentId);
+        return skills;
+      }),
+
+    // Desbloquear skill
+    unlockSkill: studentProcedure
+      .input(z.object({
+        skillId: z.number()
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.unlockSkill(studentId, input.skillId);
+        return result;
+      }),
+
+    // Calcular multiplicador de bônus
+    getBonusMultiplier: studentProcedure
+      .input(z.object({
+        bonusType: z.string()
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const multiplier = await db.calculateBonusMultiplier(studentId, input.bonusType);
+        return { multiplier };
+      }),
+
+    // Atualizar nível da especialização
+    updateLevel: studentProcedure
+      .mutation(async ({ ctx }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.updateSpecializationLevel(studentId);
+        return result;
+      }),
+  }),
+
+  // ==================== LOJA DE ITENS ====================
+  shop: router({
+    // Listar itens da loja
+    getItems: studentProcedure
+      .input(z.object({
+        category: z.string().optional(),
+        requiredBelt: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const items = await db.getShopItems(input);
+        return items;
+      }),
+
+    // Buscar item específico
+    getItem: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .query(async ({ input }) => {
+        const item = await db.getShopItemById(input.itemId);
+        if (!item) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Item não encontrado',
+          });
+        }
+        return item;
+      }),
+
+    // Comprar item
+    purchase: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.purchaseShopItem(ctx.studentSession.studentId, input.itemId);
+        if (!result.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: result.message,
+          });
+        }
+        return result;
+      }),
+
+    // Listar meus itens comprados
+    getMyItems: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentPurchasedItems(ctx.studentSession.studentId);
+      }),
+
+    // Listar itens equipados
+    getEquippedItems: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentEquippedItems(ctx.studentSession.studentId);
+      }),
+
+    // Equipar item
+    equip: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.equipItem(ctx.studentSession.studentId, input.itemId);
+        if (!result.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: result.message,
+          });
+        }
+        return result;
+      }),
+
+    // Desequipar item
+    unequip: studentProcedure
+      .input(z.object({ slot: z.enum(['hat', 'glasses', 'accessory', 'background']) }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.unequipItem(ctx.studentSession.studentId, input.slot);
+        if (!result.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: result.message,
+          });
+        }
+        return result;
+      }),
+
+    // Verificar se possui item
+    ownsItem: studentProcedure
+      .input(z.object({ itemId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.studentOwnsItem(ctx.studentSession.studentId, input.itemId);
+      }),
+
+    // Seed inicial de itens (admin)
+    seedItems: protectedProcedure
+      .mutation(async () => {
+        await db.seedShopItems();
+        return { success: true, message: 'Itens da loja criados com sucesso!' };
+      }),
+
+    // Admin: Criar item
+    createItem: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        description: z.string().optional(),
+        category: z.enum(['hat', 'glasses', 'accessory', 'background', 'special']),
+        price: z.number().min(1),
+        imageUrl: z.string().optional(),
+        svgData: z.string().optional(),
+        requiredBelt: z.string().optional(),
+        isRare: z.boolean().optional(),
+        sortOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.createShopItem(input as any);
+        return { success: true };
+      }),
+
+    // Admin: Atualizar item
+    updateItem: protectedProcedure
+      .input(z.object({
+        itemId: z.number(),
+        data: z.object({
+          name: z.string().optional(),
+          description: z.string().optional(),
+          category: z.enum(['hat', 'glasses', 'accessory', 'background', 'special']).optional(),
+          price: z.number().optional(),
+          imageUrl: z.string().optional(),
+          svgData: z.string().optional(),
+          requiredBelt: z.string().optional(),
+          isActive: z.boolean().optional(),
+          isRare: z.boolean().optional(),
+          sortOrder: z.number().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateShopItem(input.itemId, input.data as any);
+        return { success: true };
+      }),
+
+    // Admin: Deletar item
+    deleteItem: protectedProcedure
+      .input(z.object({ itemId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteShopItem(input.itemId);
+        return { success: true };
+      }),
+
+    // Admin: Listar todos os itens (incluindo inativos)
+    getAllItems: protectedProcedure
+      .query(async () => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) return [];
+        const { shopItems } = await import('../drizzle/schema');
+        return dbInstance.select().from(shopItems).orderBy(shopItems.sortOrder);
+      }),
+  }),
+
+  // ==================== CONQUISTAS OCULTAS (EASTER EGGS) ====================
+  hiddenAchievements: router({
+    // Obter conquistas do aluno
+    getMyAchievements: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentHiddenAchievements(ctx.studentSession.studentId);
+      }),
+
+    // Obter todas as conquistas (para galeria)
+    getAll: studentProcedure
+      .query(async () => {
+        return db.getAllHiddenAchievements();
+      }),
+
+    // Registrar ação do aluno
+    trackAction: studentProcedure
+      .input(z.object({
+        actionType: z.string(),
+        actionData: z.any().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.trackStudentAction(
+          ctx.studentSession.studentId,
+          input.actionType,
+          input.actionData
+        );
+        
+        // Verificar se desbloqueou alguma conquista
+        const newAchievements = await db.checkAndUnlockAchievements(ctx.studentSession.studentId);
+        
+        return {
+          success: true,
+          newAchievements,
+        };
+      }),
+
+    // Verificar conquistas (chamado após ações importantes)
+    checkUnlocks: studentProcedure
+      .mutation(async ({ ctx }) => {
+        const newAchievements = await db.checkAndUnlockAchievements(ctx.studentSession.studentId);
+        return newAchievements;
+      }),
+  }),
+
+  // ==================== CARTEIRA DO ALUNO (TECH COINS) ====================
+  studentWallet: router({
+    // Obter carteira do aluno
+    getWallet: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getStudentWallet(ctx.studentSession.studentId);
+      }),
+
+    // Obter histórico de transações
+    getTransactionHistory: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getWalletTransactions(ctx.studentSession.studentId);
+      }),
+
+    // Obter estatísticas da carteira
+    getWalletStats: studentProcedure
+      .query(async ({ ctx }) => {
+        const transactions = await db.getWalletTransactions(ctx.studentSession.studentId);
+        
+        if (transactions.length === 0) {
+          return {
+            averageDaily: 0,
+            maxEarned: 0,
+            maxSpent: 0,
+            totalTransactions: 0,
+          };
+        }
+
+        const earned = transactions.filter(t => t.type === 'earn' || t.type === 'bonus');
+        const spent = transactions.filter(t => t.type === 'spend' || t.type === 'penalty');
+
+        const maxEarned = earned.length > 0 ? Math.max(...earned.map(t => t.amount)) : 0;
+        const maxSpent = spent.length > 0 ? Math.max(...spent.map(t => t.amount)) : 0;
+
+        // Calcular média diária
+        const firstTransaction = transactions[transactions.length - 1];
+        const daysSinceFirst = Math.max(1, Math.ceil(
+          (Date.now() - new Date(firstTransaction.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+        ));
+        const totalEarned = earned.reduce((sum, t) => sum + t.amount, 0);
+        const averageDaily = totalEarned / daysSinceFirst;
+
+        return {
+          averageDaily,
+          maxEarned,
+          maxSpent,
+          totalTransactions: transactions.length,
+        };
+      }),
+  }),
+
+  // ========== PERFIS DE USUÁRIO ==========
+  userProfile: router({
+    // Buscar perfil atual do usuário
+    getProfile: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await db.getUserProfile(ctx.user.id);
+      return { profile: profile || 'traditional' }; // Perfil único
+    }),
+
+    // Atualizar perfil do usuário (apenas traditional)
+    updateProfile: protectedProcedure
+      .input(z.object({
+        profile: z.enum(['traditional']), // Perfil único
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUserProfileType(ctx.user.id, input.profile);
+        return { success: true, profile: input.profile };
+      }),
+  }),
+
+  // ==================== GAMIFICAÇÃO AVANÇADA ====================
+  
+  /**
+   * Rotas para Badges por Módulo
+   */
+  moduleBadges: router({
+    // Calcular e atribuir badge de módulo
+    calculate: studentProcedure
+      .input(z.object({
+        moduleId: z.number().int().positive(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        const result = await db.calculateModuleBadge(studentId, input.moduleId);
+        
+        if (result && result.isNew) {
+          // Criar notificação de novo badge
+          await db.createGamificationNotification({
+            studentId,
+            type: 'badge_earned',
+            title: `Badge ${result.badgeLevel.toUpperCase()} conquistado!`,
+            message: `Você conquistou o badge ${result.badgeLevel} em um módulo!`
+          });
+        }
+        
+        return result;
+      }),
+
+    // Buscar badges do aluno
+    getMyBadges: studentProcedure.query(async ({ ctx }) => {
+      return db.getStudentModuleBadges(ctx.studentSession.studentId);
+    }),
+
+    // Buscar badges de um módulo (ranking)
+    getByModule: protectedProcedure
+      .input(z.object({
+        moduleId: z.number().int().positive(),
+      }))
+      .query(async ({ input }) => {
+        return db.getModuleBadgesByModule(input.moduleId);
+      }),
+  }),
+
+  /**
+   * Rotas para Conquistas por Especialização
+   */
+  specializationAchievements: router({
+    // Criar conquista (admin)
+    create: protectedProcedure
+      .input(z.object({
+        code: z.string().min(1),
+        specialization: z.enum(["code_warrior", "interface_master", "data_sage", "system_architect"]),
+        name: z.string().min(1),
+        description: z.string(),
+        icon: z.string(),
+        rarity: z.enum(["common", "rare", "epic", "legendary"]),
+        requirement: z.object({
+          type: z.string(),
+        }).passthrough(),
+        points: z.number().int().positive().default(50),
+      }))
+      .mutation(async ({ input }) => {
+        return db.createSpecializationAchievement(input);
+      }),
+
+    // Listar conquistas de uma especialização
+    getBySpecialization: publicProcedure
+      .input(z.object({
+        specialization: z.enum(["code_warrior", "interface_master", "data_sage", "system_architect"]),
+      }))
+      .query(async ({ input }) => {
+        return db.getSpecializationAchievements(input.specialization);
+      }),
+
+    // Buscar conquistas do aluno
+    getMyAchievements: studentProcedure.query(async ({ ctx }) => {
+      return db.getStudentAchievements(ctx.studentSession.studentId);
+    }),
+
+    // Verificar e desbloquear conquistas automaticamente
+    checkAndUnlock: studentProcedure.mutation(async ({ ctx }) => {
+      const studentId = ctx.studentSession.studentId;
+      const newAchievements = await db.checkAndUnlockSpecializationAchievements(studentId);
+      
+      // Criar notificações para novas conquistas
+      for (const achievement of newAchievements) {
+        await db.createGamificationNotification({
+          studentId,
+          type: 'achievement_unlocked',
+          title: `Conquista Desbloqueada: ${achievement.name}!`,
+          message: `Você desbloqueou a conquista ${achievement.rarity}: "${achievement.name}"! +${achievement.points} pontos`
+        });
+      }
+      
+      return newAchievements;
+    }),
+
+    // Desbloquear conquista manualmente (para testes ou admin)
+    unlock: protectedProcedure
+      .input(z.object({
+        studentId: z.number().int().positive(),
+        achievementId: z.number().int().positive(),
+      }))
+      .mutation(async ({ input }) => {
+        return db.unlockAchievement(input.studentId, input.achievementId);
+      }),
+  }),
+
+  /**
+   * Rotas para Recomendações Personalizadas com IA
+   */
+  learningRecommendations: router({
+    // Gerar recomendações personalizadas
+    generate: studentProcedure.mutation(async ({ ctx }) => {
+      try {
+        const recommendations = await db.generatePersonalizedRecommendations(ctx.studentSession.studentId);
+        return {
+          success: true,
+          recommendations,
+          count: recommendations.length
+        };
+      } catch (error) {
+        console.error("Error generating recommendations:", error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Erro ao gerar recomendações. Tente novamente.',
+        });
+      }
+    }),
+
+    // Buscar recomendações do aluno
+    getMyRecommendations: studentProcedure
+      .input(z.object({
+        status: z.enum(["pending", "accepted", "rejected", "completed"]).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentRecommendations(ctx.studentSession.studentId, input.status);
+      }),
+
+    // Atualizar status de recomendação
+    updateStatus: studentProcedure
+      .input(z.object({
+        recommendationId: z.number().int().positive(),
+        status: z.enum(["pending", "accepted", "rejected", "completed"]),
+      }))
+      .mutation(async ({ input }) => {
+        return db.updateRecommendationStatus(input.recommendationId, input.status);
+      }),
+
+    // Registrar progresso em tópico (usado para alimentar IA)
+    recordProgress: studentProcedure
+      .input(z.object({
+        topicId: z.number().int().positive(),
+        score: z.number().int().min(0).max(100),
+        timeSpent: z.number().int().positive(), // em minutos
+        attemptsCount: z.number().int().positive().default(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        await db.recordTopicProgress(
+          studentId,
+          input.topicId,
+          input.score,
+          input.timeSpent,
+          input.attemptsCount
+        );
+
+        // Após registrar progresso, verificar badges
+        // (badges serão calculados em outro momento)
+
+        return { success: true };
+      }),
+  }),
+
+  /**
+   * Rota combinada para inicializar dados de gamificação avançada
+   */
+  advancedGamification: router({
+    // Buscar todos os dados de gamificação avançada do aluno
+    getMyData: studentProcedure.query(async ({ ctx }) => {
+      const studentId = ctx.studentSession.studentId;
+      const [badges, achievements, recommendations] = await Promise.all([
+        db.getStudentModuleBadges(studentId),
+        db.getStudentAchievements(studentId),
+        db.getStudentRecommendations(studentId, 'pending')
+      ]);
+
+      return {
+        badges,
+        achievements,
+        recommendations,
+        stats: {
+          totalBadges: badges.length,
+          platinumBadges: badges.filter(b => b.badgeLevel === 'platinum').length,
+          goldBadges: badges.filter(b => b.badgeLevel === 'gold').length,
+          totalAchievements: achievements.length,
+          legendaryAchievements: achievements.filter(a => a.rarity === 'legendary').length,
+          pendingRecommendations: recommendations.length
+        }
+      };
+    }),
+
+    // Inicializar conquistas padrão do sistema (executar uma vez)
+    initializeDefaultAchievements: protectedProcedure.mutation(async () => {
+      const achievements = [
+        // Code Warrior
+        {
+          code: 'code_warrior_first_steps',
+          specialization: 'code_warrior' as const,
+          name: 'Primeiros Passos',
+          description: 'Complete seu primeiro módulo de programação',
+          icon: 'trophy',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'code_warrior_algorithm_master',
+          specialization: 'code_warrior' as const,
+          name: 'Mestre dos Algoritmos',
+          description: 'Conquiste 5 badges Platinum em módulos de algoritmos',
+          icon: 'crown',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+        {
+          code: 'code_warrior_perfectionist',
+          specialization: 'code_warrior' as const,
+          name: 'Perfeccionista',
+          description: 'Mantenha média acima de 95% em todos os módulos',
+          icon: 'star',
+          rarity: 'epic' as const,
+          requirement: { type: 'average_score', score: 95 },
+          points: 300
+        },
+
+        // Interface Master
+        {
+          code: 'interface_master_first_design',
+          specialization: 'interface_master' as const,
+          name: 'Primeiro Design',
+          description: 'Complete seu primeiro módulo de UI/UX',
+          icon: 'palette',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'interface_master_ux_guru',
+          specialization: 'interface_master' as const,
+          name: 'Guru de UX',
+          description: 'Conquiste 5 badges Platinum em módulos de interface',
+          icon: 'sparkles',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+
+        // Data Sage
+        {
+          code: 'data_sage_first_analysis',
+          specialization: 'data_sage' as const,
+          name: 'Primeira Análise',
+          description: 'Complete seu primeiro módulo de análise de dados',
+          icon: 'chart',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'data_sage_data_master',
+          specialization: 'data_sage' as const,
+          name: 'Mestre dos Dados',
+          description: 'Conquiste 5 badges Platinum em módulos de dados',
+          icon: 'database',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+
+        // System Architect
+        {
+          code: 'system_architect_first_system',
+          specialization: 'system_architect' as const,
+          name: 'Primeiro Sistema',
+          description: 'Complete seu primeiro módulo de arquitetura',
+          icon: 'building',
+          rarity: 'common' as const,
+          requirement: { type: 'modules_completed', count: 1 },
+          points: 50
+        },
+        {
+          code: 'system_architect_cloud_master',
+          specialization: 'system_architect' as const,
+          name: 'Mestre da Nuvem',
+          description: 'Conquiste 5 badges Platinum em módulos de sistemas',
+          icon: 'cloud',
+          rarity: 'legendary' as const,
+          requirement: { type: 'platinum_badges', count: 5 },
+          points: 500
+        },
+      ];
+
+      const created = [];
+      for (const achievement of achievements) {
+        try {
+          const id = await db.createSpecializationAchievement(achievement);
+          created.push({ id, ...achievement });
+        } catch (error) {
+          // Ignorar erros de duplicação
+          console.log(`Achievement ${achievement.code} already exists`);
+        }
+      }
+
+      return {
+        success: true,
+        created: created.length,
+        achievements: created
+      };
+    }),
+  }),
+
+  // ==================== TEACHER BELT SYSTEM ====================
+  teacherBelt: router({
+    // Obter pontos e faixa atual do professor
+    getMyProgress: protectedProcedure.query(async ({ ctx }) => {
+      const points = await db.getOrCreateTeacherPoints(ctx.user.id);
+      if (!points) throw new Error("Failed to get teacher points");
+
+      // Calcular progresso
+      const { calculateProgress } = await import("../shared/belt-system");
+      const progress = calculateProgress(points.totalPoints);
+
+      return {
+        ...points,
+        progress
+      };
+    }),
+
+    // Registrar nova atividade
+    addActivity: protectedProcedure
+      .input(z.object({
+        activityType: z.enum([
+          "class_taught",
+          "planning",
+          "grading",
+          "meeting",
+          "course_creation",
+          "material_creation",
+          "student_support",
+          "professional_dev",
+          "other"
+        ]),
+        title: z.string().min(1, "Título é obrigatório"),
+        description: z.string().optional(),
+        duration: z.number().optional(),
+        activityDate: z.string()
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Calcular pontos baseado no tipo de atividade
+        const { ACTIVITY_POINTS } = await import("../shared/belt-system");
+        const points = ACTIVITY_POINTS[input.activityType];
+
+        const result = await db.addTeacherActivity({
+          userId: ctx.user.id,
+          activityType: input.activityType,
+          title: input.title,
+          description: input.description,
+          points,
+          duration: input.duration,
+          activityDate: input.activityDate
+        });
+
+        return result;
+      }),
+
+    // Obter histórico de atividades
+    getActivitiesHistory: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50)
+      }))
+      .query(async ({ ctx, input }) => {
+        const activities = await db.getTeacherActivitiesHistory(ctx.user.id, input.limit);
+        return activities;
+      }),
+
+    // Obter histórico de evolução de faixas
+    getBeltHistory: protectedProcedure.query(async ({ ctx }) => {
+      const history = await db.getTeacherBeltHistory(ctx.user.id);
+      return history;
+    }),
+
+    // Obter estatísticas de atividades
+    getActivityStats: protectedProcedure.query(async ({ ctx }) => {
+      const stats = await db.getTeacherActivityStats(ctx.user.id);
+      return stats;
+    }),
+  }),
+
+  // ==================== GAMIFICAÇÃO 3D - FAIXAS DE KARATÊ ====================
+  gamification3D: router({
+    // Obter todas as faixas disponíveis
+    getAllBelts: publicProcedure.query(async () => {
+      return db.getAllBelts();
+    }),
+
+    // Obter progresso do aluno com faixa atual
+    getStudentProgress: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentProgressWithBelt(input.studentId);
+      }),
+
+    // Obter estatísticas completas de gamificação do aluno
+    getStudentStats: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentGamificationStats(input.studentId);
+      }),
+
+    // Adicionar pontos ao aluno
+    addPoints: studentProcedure
+      .input(z.object({
+        studentId: z.number(),
+        points: z.number().positive(),
+        reason: z.string()
+      }))
+      .mutation(async ({ input }) => {
+        const result = await db.addPointsToStudentGamification(
+          input.studentId,
+          input.points,
+          input.reason
+        );
+        
+        // Verificar conquistas automaticamente
+        await db.checkAndUnlockGamificationAchievements(input.studentId);
+        
+        return result;
+      }),
+
+    // Obter conquistas disponíveis
+    getAllAchievements: publicProcedure.query(async () => {
+      return db.getAllAchievements();
+    }),
+
+    // Obter conquistas do aluno
+    getStudentAchievements: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentAchievementsGamification(input.studentId);
+      }),
+
+    // Obter histórico de level ups
+    getLevelUpHistory: studentProcedure
+      .input(z.object({ studentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStudentLevelUpHistory(input.studentId);
+      }),
+
+    // Marcar celebração de level up como vista
+    markLevelUpSeen: studentProcedure
+      .input(z.object({ levelUpId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.markLevelUpCelebrationSeen(input.levelUpId);
+        return { success: true };
+      }),
+  }),
+
+  /**
+   * Sistema de Análise de Aprendizado com IA
+   */
+  analytics: router({
+    // Registrar comportamento do aluno
+    recordBehavior: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        subjectId: z.number().optional(),
+        behaviorType: z.enum([
+          'exercise_completion',
+          'quiz_attempt',
+          'topic_access',
+          'material_download',
+          'doubt_posted',
+          'comment_posted',
+          'assignment_submission',
+          'attendance',
+          'late_submission',
+          'improvement_shown',
+          'struggle_detected',
+          'engagement_high',
+          'engagement_low'
+        ]),
+        behaviorData: z.any().optional(),
+        score: z.number().optional(),
+        metadata: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.recordStudentBehavior({
+          ...input,
+          userId: ctx.user.id,
+        });
+      }),
+
+    // Obter insights de um aluno
+    getStudentInsights: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        includeDismissed: z.boolean().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentInsights(
+          input.studentId,
+          ctx.user.id,
+          input.includeDismissed
+        );
+      }),
+
+    // Gerar análise completa de um aluno
+    analyzeStudent: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        subjectId: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { analyzeLearningBehavior } = await import('./learningAnalytics');
+        
+        // Buscar dados do aluno
+        const student = await db.getStudentById(input.studentId, ctx.user.id);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Aluno não encontrado' });
+        }
+
+        // Buscar comportamentos recentes
+        const recentBehaviors = await db.getRecentBehaviors(input.studentId, ctx.user.id, 30);
+
+        // Buscar exercícios recentes
+        const recentExercises = await db.getStudentExerciseHistory(input.studentId, input.subjectId);
+
+        // Preparar dados para análise
+        const behaviorData = {
+          studentId: student.id,
+          studentName: student.fullName,
+          subjectName: input.subjectId ? 'Disciplina' : undefined,
+          recentBehaviors: recentBehaviors.map(b => ({
+            type: b.behaviorType,
+            date: b.recordedAt.toISOString(),
+            score: b.score || undefined,
+            metadata: b.metadata || undefined,
+          })),
+          recentExercises: recentExercises.slice(0, 10).map(e => ({
+            title: 'Exercício',
+            score: e.attempt.score || 0,
+            completedAt: e.attempt.completedAt?.toISOString() || new Date().toISOString(),
+            timeSpent: e.attempt.timeSpent || undefined,
+          })),
+        };
+
+        // Analisar com IA
+        const analysis = await analyzeLearningBehavior(behaviorData);
+
+        // Salvar insights gerados
+        for (const alert of analysis.alerts) {
+          await db.createAlert({
+            studentId: input.studentId,
+            userId: ctx.user.id,
+            subjectId: input.subjectId,
+            alertType: 'needs_attention',
+            severity: alert.severity,
+            title: alert.type,
+            message: alert.message,
+            recommendedAction: analysis.recommendations.join('\n'),
+          });
+        }
+
+        // Salvar padrões detectados
+        for (const pattern of analysis.patterns) {
+          await db.saveLearningPattern({
+            studentId: input.studentId,
+            userId: ctx.user.id,
+            subjectId: input.subjectId,
+            patternType: 'engagement_pattern',
+            patternDescription: pattern.description,
+            confidence: pattern.confidence,
+            evidence: JSON.stringify([pattern.type]),
+          });
+        }
+
+        // Salvar insight geral
+        await db.saveAIInsight({
+          studentId: input.studentId,
+          userId: ctx.user.id,
+          subjectId: input.subjectId,
+          insightType: 'recommendation',
+          title: 'Análise de Comportamento',
+          description: analysis.overallAssessment,
+          actionable: true,
+          actionSuggestion: analysis.recommendations.join('\n'),
+          priority: analysis.alerts.length > 0 ? 'high' : 'medium',
+          confidence: analysis.confidence,
+          relatedData: JSON.stringify({
+            strengths: analysis.strengths,
+            weaknesses: analysis.weaknesses,
+          }),
+        });
+
+        return analysis;
+      }),
+
+    // Obter padrões de aprendizado
+    getLearningPatterns: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentLearningPatterns(input.studentId, ctx.user.id);
+      }),
+
+    // Obter alertas pendentes
+    getAlerts: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getPendingAlerts(ctx.user.id);
+      }),
+
+    // Obter alertas de um aluno
+    getStudentAlerts: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        includeResolved: z.boolean().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentAlerts(
+          input.studentId,
+          ctx.user.id,
+          input.includeResolved
+        );
+      }),
+
+    // Reconhecer alerta
+    acknowledgeAlert: protectedProcedure
+      .input(z.object({
+        alertId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.acknowledgeAlert(input.alertId, ctx.user.id);
+      }),
+
+    // Resolver alerta
+    resolveAlert: protectedProcedure
+      .input(z.object({
+        alertId: z.number(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.resolveAlert(input.alertId, ctx.user.id, input.notes);
+      }),
+
+    // Obter estatísticas de alertas
+    getAlertStatistics: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getAlertStatistics(ctx.user.id);
+      }),
+
+    // Obter métricas de desempenho
+    getPerformanceMetrics: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        metricType: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentPerformanceMetrics(
+          input.studentId,
+          ctx.user.id,
+          input.metricType
+        );
+      }),
+
+    // Dispensar insight
+    dismissInsight: protectedProcedure
+      .input(z.object({
+        insightId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.dismissInsight(input.insightId, ctx.user.id);
+      }),
+
+    // Obter análise da turma
+    getClassAnalytics: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        // Buscar todos os alunos
+        const students = await db.getStudentsByUser(ctx.user.id);
+        
+        // Buscar alertas críticos
+        const allAlerts = await db.getPendingAlerts(ctx.user.id);
+        const criticalAlerts = allAlerts.filter(a => a.severity === 'critical' || a.severity === 'urgent');
+        
+        // Buscar insights recentes
+        const recentInsights = [];
+        for (const student of students.slice(0, 10)) {
+          const insights = await db.getStudentInsights(student.id, ctx.user.id, false);
+          recentInsights.push(...insights.slice(0, 2));
+        }
+        
+        return {
+          totalStudents: students.length,
+          criticalAlerts: criticalAlerts.length,
+          recentInsights: recentInsights.slice(0, 10),
+          studentsNeedingAttention: criticalAlerts.map(a => a.studentId).filter((v, i, a) => a.indexOf(v) === i).length,
+        };
+      }),
+  }),
+});
 export type AppRouter = typeof appRouter;
+
+// ==================== FUNÇÕES AUXILIARES ====================
+
+/**
+ * Analisar resposta de exercício de PC usando IA
+ */
+async function analyzeCTAnswer(params: {
+  answer: string;
+  expectedAnswer: string;
+  dimension: string;
+}): Promise<{ score: number; feedback: string }> {
+  const { answer, expectedAnswer, dimension } = params;
+
+  const prompts: Record<string, string> = {
+    decomposition: `Avalie esta resposta sobre DECOMPOSIÇÃO (quebrar problemas em partes menores):
+
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
+
+Critérios:
+- Identificou corretamente as partes do problema?
+- Organizou as partes de forma lógica?
+- Demonstrou compreensão de como dividir complexidade?
+
+Retorne JSON com:
+- score: pontuação de 0-100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    pattern_recognition: `Avalie esta resposta sobre RECONHECIMENTO DE PADRÕES:
+
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
+
+Critérios:
+- Identificou padrões relevantes?
+- Explicou as similaridades encontradas?
+- Aplicou o padrão corretamente?
+
+Retorne JSON com:
+- score: pontuação de 0-100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    abstraction: `Avalie esta resposta sobre ABSTRAÇÃO (focar no essencial, ignorar detalhes):
+
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
+
+Critérios:
+- Identificou os elementos essenciais?
+- Removeu detalhes irrelevantes?
+- Criou uma representação simplificada?
+
+Retorne JSON com:
+- score: pontuação de 0-100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+
+    algorithms: `Avalie esta resposta sobre ALGORITMOS (sequência de passos):
+
+Resposta do aluno: "${answer}"
+Resposta esperada: "${expectedAnswer}"
+
+Critérios:
+- Definiu passos claros e ordenados?
+- A sequência resolve o problema?
+- É eficiente e lógica?
+
+Retorne JSON com:
+- score: pontuação de 0-100
+- feedback: texto explicativo (máximo 200 caracteres)`,
+  };
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: 'system', content: 'Você é um avaliador de Pensamento Computacional. Seja justo e construtivo.' },
+        { role: 'user', content: prompts[dimension] || prompts.decomposition },
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'ct_evaluation',
+          strict: true,
+          schema: {
+            type: 'object',
+            properties: {
+              score: { type: 'integer', description: 'Pontuação de 0 a 100' },
+              feedback: { type: 'string', description: 'Feedback construtivo' },
+            },
+            required: ['score', 'feedback'],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content || typeof content !== 'string') {
+      throw new Error('Resposta vazia da IA');
+    }
+
+    const result = JSON.parse(content);
+    return {
+      score: Math.min(100, Math.max(0, result.score)),
+      feedback: result.feedback,
+    };
+  } catch (error) {
+    console.error('[CT Analysis] Error analyzing answer:', error);
+    // Fallback: pontuação baseada em comprimento da resposta
+    const score = Math.min(100, Math.max(20, answer.length * 2));
+    return {
+      score,
+      feedback: 'Resposta recebida. Continue praticando!',
+    };
+  }
+}

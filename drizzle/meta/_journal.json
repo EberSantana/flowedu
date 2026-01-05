@@ -281,6 +281,20 @@
       "when": 1767644386414,
       "tag": "0039_kind_ultimo",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1767650106178,
+      "tag": "0040_light_shocker",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "5",
+      "when": 1767650183554,
+      "tag": "0041_icy_scorpion",
+      "breakpoints": true
     }
   ]
 }

@@ -33,15 +33,7 @@ export function TeacherAddActivity() {
 
   const addActivityMutation = trpc.teacherBelt.addActivity.useMutation({
     onSuccess: (data) => {
-      utils.teacherBelt.getMyProgress.invalidate();
-      
-      if (data.beltChanged && data.newBelt) {
-      toast.success(`🎉 Nova Faixa Conquistada! Parabéns! Você alcançou a ${data.newBelt.name}!`, {
-        duration: 5000,
-      });
-      } else {
-        toast.success(`Atividade registrada! +${getPointsForType(activityType)} pontos adicionados`);
-      }
+      toast.success(`Atividade registrada com sucesso!`);
 
       // Limpar formulário
       setActivityType("");
@@ -81,7 +73,7 @@ export function TeacherAddActivity() {
       <div className="container mx-auto max-w-2xl">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/teacher-belt">
+          <Link href="/dashboard">
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
