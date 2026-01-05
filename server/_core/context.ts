@@ -3,7 +3,7 @@ import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
 import jwt from "jsonwebtoken";
 import { ENV } from "./env";
-import { COOKIE_NAME } from "../../shared/const";
+import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../../shared/const";
 
 type StudentSession = {
   userType: 'student';
@@ -32,12 +32,13 @@ export async function createContext(
   let studentSession: StudentSession | null = null;
   let userType: 'teacher' | 'student' | null = null;
 
-  // Tentar extrair cookie de sessão
+  // Tentar extrair cookie de sessão de ALUNO primeiro (cookie separado)
   const cookies = opts.req.headers.cookie;
   if (cookies) {
-    const cookieMatch = cookies.match(new RegExp(`${COOKIE_NAME}=([^;]+)`));
-    if (cookieMatch) {
-      const token = cookieMatch[1];
+    // Priorizar cookie de aluno
+    const studentCookieMatch = cookies.match(new RegExp(`${STUDENT_COOKIE_NAME}=([^;]+)`));
+    if (studentCookieMatch) {
+      const token = studentCookieMatch[1];
       
       try {
         const decoded = jwt.verify(token, ENV.cookieSecret) as any;
@@ -54,7 +55,7 @@ export async function createContext(
           userType = 'student';
         }
       } catch (error) {
-        // Token inválido ou expirado, tentar autenticação de professor
+        // Token inválido ou expirado
       }
     }
   }

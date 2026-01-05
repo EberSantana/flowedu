@@ -207,7 +207,7 @@
 - [x] Adicionar botão "Personalizar Avatar" no Dashboard do aluno
 - [x] Criar histórico de evolução de faixas com linha do tempo
 - [x] Implementar badges especiais para conquistas extraordinárias (Velocista, Perfeccionista, etc)
-- [ ] Adicionar animações de transição entre faixas
+- [ ] Adicionar animações de transição entre faixas (futuro)
 
 ## Sistema Administrativo e Multiusuário
 - [x] Criar página de gerenciamento de usuários (admin)
@@ -4363,3 +4363,18 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Integrar com hook de detecção de level up
 - [x] Testar todas as transições (branca→amarela até marrom→preta)
 - [x] Adicionar animação especial para conquista da faixa preta
+
+## 🎨 Nova Faixa 3D Realista para Portal do Aluno
+- [x] Criar componente BeltBadge3D.tsx com faixa 3D inspirada na referência
+- [x] Implementar efeitos de textura de tecido realista
+- [x] Adicionar sombras e profundidade 3D
+- [ ] Criar animação sutil de movimento
+- [x] Integrar nova faixa no Dashboard do aluno
+- [x] Substituir faixa antiga pela nova versão 3D
+
+## 🐛 Correção de Instabilidade do Portal do Aluno
+- [x] Investigar causa raiz do logout automático
+- [x] Verificar configuração de cookies e sessão
+- [x] Testar persistência de autenticação
+- [x] Corrigir problema de refetch automático - Implementado cookie separado para alunos
+- [x] Validar correção com testes manuais

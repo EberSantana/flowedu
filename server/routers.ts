@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "../shared/const";
+import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, studentProcedure, router } from "./_core/trpc";
@@ -69,9 +69,9 @@ export const appRouter = router({
             { expiresIn: '7d' }
           );
           
-          // Configurar cookie de sessão
+          // Configurar cookie de sessão DE ALUNO (cookie separado)
           const cookieOptions = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie(COOKIE_NAME, token, {
+          ctx.res.cookie(STUDENT_COOKIE_NAME, token, {
             ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
           });
@@ -2643,7 +2643,7 @@ JSON (descrições MAX 15 chars):
     // Logout de aluno
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true };
     }),
     
