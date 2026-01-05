@@ -12,11 +12,11 @@ import {
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
-import { BeltUpgradeNotification } from "@/components/BeltUpgradeNotification";
+import { LevelUpModalCinematic } from "@/components/LevelUpModalCinematic";
 import { useBeltUpgradeNotification } from "@/hooks/useBeltUpgradeNotification";
 
-// Componentes simplificados
-import { StudentDashboardHeaderSimple } from "@/components/StudentDashboardHeaderSimple";
+// Componentes
+import { LearningJourneyCard } from "@/components/LearningJourneyCard";
 import { QuickActionsGrid } from "@/components/QuickActionsGrid";
 
 import { 
@@ -24,6 +24,12 @@ import {
   getNextBeltThreshold,
   type BeltColor 
 } from "@/components/MinimalKarateAvatar";
+import { BeltColor as Belt3DColor } from "@/components/Belt3DRealistic";
+
+// Converter BeltColor para Belt3DColor
+function convertBeltColor(belt: BeltColor): Belt3DColor {
+  return belt as Belt3DColor;
+}
 
 export default function StudentDashboard() {
   const { student } = useStudentAuth();
@@ -44,11 +50,12 @@ export default function StudentDashboard() {
 
   return (
     <>
-      {/* Notificação de Upgrade de Faixa */}
+      {/* Modal Cinematográfico de Level Up */}
       {upgradeData && (
-        <BeltUpgradeNotification
-          oldBelt={upgradeData.oldBelt}
-          newBelt={upgradeData.newBelt}
+        <LevelUpModalCinematic
+          isOpen={true}
+          oldBelt={convertBeltColor(upgradeData.oldBelt)}
+          newBelt={convertBeltColor(upgradeData.newBelt)}
           totalPoints={upgradeData.totalPoints}
           onClose={clearNotification}
         />
@@ -56,12 +63,12 @@ export default function StudentDashboard() {
 
       <StudentLayout>
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-          {/* Header Simplificado com Avatar Minimalista */}
-          <StudentDashboardHeaderSimple
-            studentName={student?.fullName || 'Aluno'}
-            currentBelt={currentBelt}
+          {/* Card de Jornada de Aprendizado com Faixa 3D */}
+          <LearningJourneyCard
+            currentBelt={convertBeltColor(currentBelt)}
             totalPoints={studentTechCoins}
             nextBeltThreshold={nextThreshold}
+            className="mb-8"
           />
 
           {isLoading ? (

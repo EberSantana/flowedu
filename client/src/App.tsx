@@ -122,6 +122,7 @@ function Router() {
         <Route path={"/student-exercises"} component={StudentExercises} />
         <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
+        <Route path={"/student-review"} component={StudentReview} />
         <Route path={"/student/customize-avatar"} component={CustomizeAvatar} />
         <Route path={"/student/belt-history"} component={StudentBeltHistory} />
         <Route path={"/belt-showcase"} component={BeltShowcase} />

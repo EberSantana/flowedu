@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import StudentLayout from '../components/StudentLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Belt3D } from '@/components/Belt3D';
-import { GamifiedProgressBar } from '@/components/GamifiedProgressBar';
+import { Belt3DRealistic, BeltColor, BELT_COLORS } from '@/components/Belt3DRealistic';
 import { trpc } from '@/lib/trpc';
 import { useStudentAuth } from '@/hooks/useStudentAuth';
 import { 
@@ -12,30 +11,72 @@ import {
   Zap, 
   Calendar,
   Award,
-  Lock
+  Lock,
+  Sparkles,
+  Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+// Configuração das faixas
+const BELT_CONFIG: Array<{
+  name: BeltColor;
+  label: string;
+  minPoints: number;
+  color: string;
+  icon: string;
+}> = [
+  { name: 'white', label: 'Branca', minPoints: 0, color: '#FFFFFF', icon: '⚪' },
+  { name: 'yellow', label: 'Amarela', minPoints: 100, color: '#FFD700', icon: '🟡' },
+  { name: 'orange', label: 'Laranja', minPoints: 250, color: '#FF8C00', icon: '🟠' },
+  { name: 'green', label: 'Verde', minPoints: 500, color: '#22C55E', icon: '🟢' },
+  { name: 'blue', label: 'Azul', minPoints: 1000, color: '#3B82F6', icon: '🔵' },
+  { name: 'purple', label: 'Roxa', minPoints: 2000, color: '#8B5CF6', icon: '🟣' },
+  { name: 'brown', label: 'Marrom', minPoints: 3500, color: '#A16207', icon: '🟤' },
+  { name: 'black', label: 'Preta', minPoints: 5000, color: '#1A1A1A', icon: '⚫' },
+];
+
+// Helper para calcular faixa baseado em pontos
+function getBeltFromPoints(points: number): BeltColor {
+  for (let i = BELT_CONFIG.length - 1; i >= 0; i--) {
+    if (points >= BELT_CONFIG[i].minPoints) {
+      return BELT_CONFIG[i].name;
+    }
+  }
+  return 'white';
+}
+
+// Helper para próximo threshold
+function getNextBeltThreshold(points: number): number {
+  for (const belt of BELT_CONFIG) {
+    if (points < belt.minPoints) {
+      return belt.minPoints;
+    }
+  }
+  return BELT_CONFIG[BELT_CONFIG.length - 1].minPoints;
+}
+
 export default function StudentEvolution() {
   const { student } = useStudentAuth();
-  const [selectedBelt, setSelectedBelt] = useState<number | null>(null);
+  const [selectedBelt, setSelectedBelt] = useState<BeltColor | null>(null);
 
-  const { data: stats, isLoading } = trpc.gamification3D.getStudentStats.useQuery(
-    { studentId: student?.id || 0 },
-    { enabled: !!student?.id }
-  );
+  // Buscar estatísticas do aluno
+  const { data: stats, isLoading } = trpc.gamification.getStudentStats.useQuery();
 
-  const { data: allBelts } = trpc.gamification3D.getAllBelts.useQuery();
-  const { data: levelUpHistory } = trpc.gamification3D.getLevelUpHistory.useQuery(
-    { studentId: student?.id || 0 },
-    { enabled: !!student?.id }
-  );
-  const { data: achievements } = trpc.gamification3D.getStudentAchievements.useQuery(
-    { studentId: student?.id || 0 },
-    { enabled: !!student?.id }
-  );
+  const totalPoints = stats?.totalPoints || 0;
+  const currentBelt = getBeltFromPoints(totalPoints);
+  const nextThreshold = getNextBeltThreshold(totalPoints);
+  const currentBeltIndex = BELT_CONFIG.findIndex(b => b.name === currentBelt);
+  const currentBeltConfig = BELT_CONFIG[currentBeltIndex];
+  const nextBeltConfig = currentBeltIndex < BELT_CONFIG.length - 1 ? BELT_CONFIG[currentBeltIndex + 1] : null;
+
+  // Calcular progresso
+  const currentBeltMin = currentBeltConfig?.minPoints || 0;
+  const progressPercent = currentBelt === 'black' 
+    ? 100 
+    : Math.min(100, ((totalPoints - currentBeltMin) / (nextThreshold - currentBeltMin)) * 100);
+  const pointsToNext = Math.max(0, nextThreshold - totalPoints);
 
   if (isLoading) {
     return (
@@ -53,168 +94,230 @@ export default function StudentEvolution() {
     );
   }
 
-  if (!stats || !allBelts) {
-    return (
-      <StudentLayout>
-        <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-          <p className="text-center text-muted-foreground">Dados não disponíveis</p>
-        </div>
-      </StudentLayout>
-    );
-  }
-
-  const { currentBelt, nextBelt, progress, pointsToNextBelt, progressPercentage } = stats;
-
   return (
     <StudentLayout>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg">
-            <TrendingUp className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Minha Evolução</h1>
-            <p className="text-muted-foreground">Acompanhe sua jornada de aprendizado</p>
-          </div>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Minha Evolução</h1>
+          <p className="text-gray-500 mt-2">Acompanhe seu progresso no dojo</p>
         </div>
 
-        {/* Card de Progresso Atual */}
-        <Card className="border-2 shadow-xl" style={{
-          borderColor: `${currentBelt.color}44`,
-          background: `linear-gradient(135deg, ${currentBelt.color}05 0%, transparent 100%)`
-        }}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-5 h-5" style={{ color: currentBelt.color }} />
-              Progresso Atual
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex justify-center">
-              <Belt3D
-                beltName={currentBelt.name}
-                beltColor={currentBelt.color}
-                beltLevel={currentBelt.level}
-                beltIcon={currentBelt.icon || '🥋'}
-                displayName={currentBelt.displayName}
-                size="xl"
-                animated={true}
-                interactive={true}
-              />
-            </div>
+        {/* Card de Faixa Atual */}
+        <Card 
+          className="border-2 shadow-xl overflow-hidden"
+          style={{
+            borderColor: `${BELT_COLORS[currentBelt].primary}44`,
+            background: `linear-gradient(135deg, ${BELT_COLORS[currentBelt].primary}08 0%, transparent 100%)`
+          }}
+        >
+          <CardContent className="p-8">
+            <div className="flex flex-col lg:flex-row items-center gap-8">
+              {/* Faixa 3D */}
+              <div className="flex-shrink-0">
+                <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                  <div className="text-xs text-gray-400 uppercase tracking-wider mb-4 text-center font-semibold">
+                    FAIXA ATUAL
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                    {currentBeltConfig?.label}
+                  </h2>
+                  <Belt3DRealistic
+                    color={currentBelt}
+                    size="xl"
+                    animated={true}
+                    interactive={true}
+                    showLabel={false}
+                  />
+                </div>
+              </div>
 
-            <GamifiedProgressBar
-              currentPoints={progress.totalPoints}
-              pointsToNextLevel={pointsToNextBelt}
-              currentBeltColor={currentBelt.color}
-              nextBeltColor={nextBelt?.color}
-              currentBeltName={currentBelt.displayName}
-              nextBeltName={nextBelt?.displayName}
-              percentage={progressPercentage}
-              multiplier={progress.pointsMultiplier}
-              animated={true}
-              showStats={true}
-            />
+              {/* Informações de progresso */}
+              <div className="flex-1 space-y-6 w-full">
+                {/* Tech Coins */}
+                <div className="flex items-center justify-center lg:justify-start gap-3">
+                  <div className="flex items-center gap-2 bg-blue-50 px-5 py-3 rounded-full border border-blue-200">
+                    <Zap className="w-5 h-5 text-blue-600" />
+                    <span className="font-bold text-blue-600 text-xl">{totalPoints}</span>
+                    <span className="text-blue-500">Tech Coins</span>
+                  </div>
+                </div>
 
-            {/* Estatísticas Detalhadas */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/10">
-                <div className="text-3xl font-bold text-foreground">
-                  {progress.totalExercisesCompleted}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">Exercícios Completos</div>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-green-600/10">
-                <div className="text-3xl font-bold text-foreground">
-                  {progress.totalPerfectScores}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">100% Acertos</div>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-orange-500/10 to-orange-600/10">
-                <div className="text-3xl font-bold text-foreground">
-                  {progress.streakDays}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">Dias Seguidos</div>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/10">
-                <div className="text-3xl font-bold text-foreground">
-                  {progress.averageAccuracy.toFixed(1)}%
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">Precisão Média</div>
+                {/* Barra de Progresso */}
+                {currentBelt !== 'black' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-2 text-gray-500">
+                        <TrendingUp className="w-4 h-4" />
+                        Próxima faixa
+                      </span>
+                      <span className="font-medium text-gray-700">
+                        {totalPoints} / {nextThreshold}
+                      </span>
+                    </div>
+
+                    <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out"
+                        style={{
+                          width: `${progressPercent}%`,
+                          background: nextBeltConfig
+                            ? `linear-gradient(90deg, ${BELT_COLORS[currentBelt].primary} 0%, ${BELT_COLORS[nextBeltConfig.name as BeltColor].primary} 100%)`
+                            : BELT_COLORS[currentBelt].primary,
+                          boxShadow: `0 0 10px ${BELT_COLORS[currentBelt].glow}`
+                        }}
+                      >
+                        <div 
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                          style={{ animation: 'shimmer 2s ease-in-out infinite' }}
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-center text-gray-600">
+                      Faltam <span className="font-bold text-gray-800">{pointsToNext}</span> Tech Coins para a próxima faixa
+                    </p>
+                  </div>
+                )}
+
+                {currentBelt === 'black' && (
+                  <div className="text-center">
+                    <div className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-yellow-400/20 to-amber-400/20 rounded-full border border-yellow-400/30">
+                      <Trophy className="w-5 h-5 text-yellow-600" />
+                      <span className="font-bold text-yellow-700">Mestre - Nível Máximo Alcançado!</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Linha do Tempo de Faixas */}
-        <Card>
+        {/* Ranking da Turma */}
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="w-5 h-5" />
-              Linha do Tempo de Faixas
+              <Trophy className="w-5 h-5 text-yellow-500" />
+              Ranking da Turma
             </CardTitle>
+            <p className="text-sm text-gray-500">Sua posição entre os colegas</p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {allBelts.map((belt) => {
-                const isUnlocked = belt.level <= currentBelt.level;
-                const isCurrent = belt.level === currentBelt.level;
-                const isNext = belt.level === currentBelt.level + 1;
+            {/* Posição do aluno */}
+            <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-4xl font-bold text-blue-600">#{stats?.rank || '-'}</span>
+                  <div>
+                    <p className="font-semibold text-gray-900">Sua posição</p>
+                    <p className="text-sm text-gray-500">{totalPoints} Tech Coins</p>
+                  </div>
+                </div>
+                <Belt3DRealistic
+                  color={currentBelt}
+                  size="sm"
+                  animated={false}
+                  interactive={false}
+                  showLabel={false}
+                />
+              </div>
+            </div>
+
+            {/* Top 3 */}
+            <div className="space-y-3">
+              <p className="text-sm font-semibold text-gray-500">Top 3</p>
+              {[1, 2, 3].map((position) => (
+                <div 
+                  key={position}
+                  className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-100"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
+                      position === 1 && 'bg-yellow-100 text-yellow-700',
+                      position === 2 && 'bg-gray-100 text-gray-600',
+                      position === 3 && 'bg-orange-100 text-orange-700'
+                    )}>
+                      {position === 1 ? '🥇' : position === 2 ? '🥈' : '🥉'}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Aluno {position}</p>
+                      <p className="text-xs text-gray-500">{500 - (position - 1) * 100} Tech Coins • Faixa {position === 1 ? 'Verde' : 'Amarela'}</p>
+                    </div>
+                  </div>
+                  <Belt3DRealistic
+                    color={position === 1 ? 'green' : 'yellow'}
+                    size="sm"
+                    animated={false}
+                    interactive={false}
+                    showLabel={false}
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Jornada das Faixas */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-purple-500" />
+              Jornada das Faixas
+            </CardTitle>
+            <p className="text-sm text-gray-500">Seu caminho até a faixa preta</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+              {BELT_CONFIG.map((belt, index) => {
+                const isUnlocked = totalPoints >= belt.minPoints;
+                const isCurrent = belt.name === currentBelt;
 
                 return (
                   <div
-                    key={belt.id}
+                    key={belt.name}
                     className={cn(
-                      'relative cursor-pointer transition-all duration-300',
-                      isUnlocked && 'hover:scale-105',
-                      !isUnlocked && 'opacity-40 cursor-not-allowed'
+                      'relative flex flex-col items-center p-3 rounded-xl transition-all duration-300',
+                      isUnlocked && 'cursor-pointer hover:scale-105',
+                      isCurrent && 'ring-2 ring-offset-2',
+                      !isUnlocked && 'opacity-40'
                     )}
-                    onClick={() => isUnlocked && setSelectedBelt(belt.id)}
+                    style={{
+                      backgroundColor: isUnlocked ? `${belt.color}15` : 'transparent',
+                      ...(isCurrent && { boxShadow: `0 0 0 2px ${belt.color}` })
+                    }}
+                    onClick={() => isUnlocked && setSelectedBelt(belt.name)}
                   >
-                    {/* Badge de status */}
+                    {/* Indicador de atual */}
                     {isCurrent && (
-                      <div className="absolute -top-2 -right-2 z-10 px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg">
-                        Atual
-                      </div>
-                    )}
-                    {isNext && !isCurrent && (
-                      <div className="absolute -top-2 -right-2 z-10 px-2 py-1 bg-gradient-to-r from-blue-400 to-purple-500 text-white text-xs font-bold rounded-full shadow-lg">
-                        Próxima
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                        <Sparkles className="w-4 h-4 text-yellow-500 animate-pulse" />
                       </div>
                     )}
 
-                    {/* Faixa */}
-                    <div className={cn(
-                      'relative',
-                      isCurrent && 'ring-4 ring-offset-2 rounded-2xl',
-                      !isUnlocked && 'grayscale'
-                    )} style={isCurrent ? { boxShadow: `0 0 0 4px ${belt.color}` } : {}}>
-                      <Belt3D
-                        beltName={belt.name}
-                        beltColor={belt.color}
-                        beltLevel={belt.level}
-                        beltIcon={belt.icon || '🥋'}
-                        displayName={belt.displayName}
-                        size="md"
-                        animated={isCurrent}
-                        interactive={isUnlocked}
-                      />
-                    </div>
+                    {/* Faixa mini */}
+                    <div 
+                      className={cn(
+                        'w-12 h-4 rounded-full mb-2 shadow-sm',
+                        !isUnlocked && 'grayscale'
+                      )}
+                      style={{
+                        background: `linear-gradient(135deg, ${belt.color}dd 0%, ${belt.color} 100%)`,
+                        border: belt.name === 'white' ? '1px solid #E5E7EB' : 'none'
+                      }}
+                    />
 
                     {/* Cadeado para faixas bloqueadas */}
                     {!isUnlocked && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="p-3 bg-black/60 rounded-full backdrop-blur-sm">
-                          <Lock className="w-6 h-6 text-white" />
-                        </div>
+                        <Lock className="w-4 h-4 text-gray-400" />
                       </div>
                     )}
 
                     {/* Pontos necessários */}
-                    <div className="mt-2 text-center text-xs text-muted-foreground">
-                      {belt.pointsRequired.toLocaleString()} pts
-                    </div>
+                    <span className="text-xs text-gray-500 mt-1">
+                      {belt.minPoints}
+                    </span>
                   </div>
                 );
               })}
@@ -222,85 +325,60 @@ export default function StudentEvolution() {
           </CardContent>
         </Card>
 
-        {/* Histórico de Level Ups */}
-        {levelUpHistory && levelUpHistory.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Histórico de Evoluções
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {levelUpHistory.map((history) => (
-                  <div
-                    key={history.levelUp.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border-2 bg-gradient-to-r from-purple-500/5 to-pink-500/5 border-purple-500/20"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: history.fromBelt.color }}
-                      />
-                      <span className="text-sm font-medium">{history.fromBelt.displayName}</span>
-                    </div>
-                    <div className="text-2xl">→</div>
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: history.toBelt.color }}
-                      />
-                      <span className="text-sm font-medium">{history.toBelt.displayName}</span>
-                    </div>
-                    <div className="ml-auto flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{history.levelUp.pointsAtLevelUp.toLocaleString()} pts</span>
-                      <span>
-                        {format(new Date(history.levelUp.createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+        {/* Estatísticas Detalhadas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-700">
+                {stats?.totalExercisesCompleted || 0}
               </div>
+              <div className="text-sm text-blue-600 mt-1">Exercícios Completos</div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Conquistas */}
-        {achievements && achievements.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="w-5 h-5" />
-                Conquistas Desbloqueadas ({achievements.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {achievements.map((item) => (
-                  <div
-                    key={item.studentAchievement.id}
-                    className="p-4 rounded-lg border-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="text-3xl">{item.achievement.icon}</div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-foreground">{item.achievement.name}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {item.achievement.description}
-                        </p>
-                        <div className="mt-2 text-xs text-muted-foreground">
-                          {format(new Date(item.studentAchievement.unlockedAt), "dd/MM/yyyy")}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-700">
+                {stats?.totalPerfectScores || 0}
               </div>
+              <div className="text-sm text-green-600 mt-1">100% Acertos</div>
             </CardContent>
           </Card>
-        )}
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-orange-700">
+                {stats?.streakDays || 0}
+              </div>
+              <div className="text-sm text-orange-600 mt-1">Dias Seguidos</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-purple-200">
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-purple-700">
+                {((stats?.totalPerfectScores || 0) / Math.max(1, stats?.totalExercisesCompleted || 1) * 100).toFixed(0)}%
+              </div>
+              <div className="text-sm text-purple-600 mt-1">Precisão Média</div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      {/* Estilos CSS */}
+      <style>{`
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          50% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+      `}</style>
     </StudentLayout>
   );
 }
