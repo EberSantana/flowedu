@@ -411,6 +411,12 @@ export const appRouter = router({
         
         return result;
       }),
+    
+    // Contar avisos por disciplina
+    getAnnouncementCounts: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getAnnouncementCountsBySubject(ctx.user.id);
+      }),
   }),
 
   classes: router({

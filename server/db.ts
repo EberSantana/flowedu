@@ -1994,6 +1994,27 @@ export async function getAnnouncementsByUser(userId: number) {
   return result;
 }
 
+export async function getAnnouncementCountsBySubject(userId: number): Promise<Record<number, number>> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({
+    subjectId: announcements.subjectId,
+    count: sql<number>`COUNT(*)`
+  })
+    .from(announcements)
+    .where(eq(announcements.userId, userId))
+    .groupBy(announcements.subjectId);
+  
+  // Converter array para objeto { subjectId: count }
+  const counts: Record<number, number> = {};
+  for (const row of result) {
+    counts[row.subjectId] = Number(row.count);
+  }
+  
+  return counts;
+}
+
 export async function getAnnouncementsForStudent(studentId: number, subjectId?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

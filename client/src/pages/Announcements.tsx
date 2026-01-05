@@ -16,6 +16,7 @@ export function Announcements() {
 
   const { data: announcements, isLoading } = trpc.announcements.list.useQuery();
   const { data: subjects } = trpc.subjects.list.useQuery();
+  const { data: announcementCounts } = trpc.subjects.getAnnouncementCounts.useQuery();
   const utils = trpc.useUtils();
 
   const createMutation = trpc.announcements.create.useMutation({
@@ -143,11 +144,14 @@ export function Announcements() {
                     disabled={!!editingId}
                   >
                     <option value="">Selecione uma disciplina</option>
-                    {subjects?.map((subject: any) => (
-                      <option key={subject.id} value={subject.id}>
-                        {subject.name} ({subject.code})
-                      </option>
-                    ))}
+                    {subjects?.map((subject: any) => {
+                      const count = announcementCounts?.[subject.id] || 0;
+                      return (
+                        <option key={subject.id} value={subject.id}>
+                          {subject.name} ({subject.code}){count > 0 ? ` - ${count} aviso${count > 1 ? 's' : ''}` : ''}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 
