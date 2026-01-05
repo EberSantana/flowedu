@@ -879,8 +879,7 @@
 - [ ] Implementar rotas tRPC (list, create, update, delete)
 - [ ] Criar página frontend com grid de cards
 - [ ] Adicionar busca e filtros por categoria
-- [ ] Implementar modal de criação/edição
-- [ ] Adicionar botão de exclusão com confirmação
+- [ ] Implementar modal de criação/edição- [x] Adicionar botão de análise com IAconfirmação
 - [ ] Criar menu "Metodologias Ativas" na sidebar
 - [ ] Adicionar botão de ação rápida no Dashboard
 - [ ] Popular banco com ferramentas pré-cadastradas
@@ -2499,8 +2498,7 @@
 
 ## Sistema de Notificações para Alunos
 - [ ] Criar tabela de notificações no banco de dados
-- [ ] Implementar rotas tRPC para notificações (listar, marcar como lida, contar não lidas)
-- [ ] Criar componente de sino de notificações no header do aluno
+- [ ] Implementar rotas tRPC para notificações (listar, marcar como lida, contar não lidas)- [x] Criar componente de alertas e notificaçõesno header do aluno
 - [ ] Criar dropdown/modal de notificações
 - [ ] Gerar notificações automaticamente ao criar avisos
 - [ ] Gerar notificações automaticamente ao criar tarefas
@@ -3622,7 +3620,7 @@ Todas as correções TypeScript foram implementadas com sucesso:
 
 ### Dashboard do Aluno Profissional
 - [ ] Redesenhar header com avatar em destaque e animações
-- [ ] Criar cards de estatísticas com gradientes modernos e micro-animações
+- [x] Criar cards de estatísticas geraisadientes modernos e micro-animações
 - [ ] Implementar barra de progresso animada com efeitos visuais
 - [ ] Adicionar indicadores de conquista com animações de entrada
 - [ ] Criar seção de "Próximas Metas" com visual gamificado
@@ -4662,3 +4660,48 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Melhorias de Layout - Estatísticas de PC
 - [x] Melhorar layout da página de estatísticas de disciplina (Pensamento Computacional) - padronizar design e organização visual
+
+
+## 🧠 Sistema de Análise de Aprendizado com IA
+
+### 📊 Backend - Banco de Dados
+- [x] Criar tabela `student_behaviors` para registrar comportamentos dos alunos
+- [x] Criar tabela `learning_patterns` para armazenar padrões identificados
+- [x] Criar tabela `ai_insights` para insights gerados pela IA
+- [x] Criar tabela `performance_metrics` para métricas de desempenho
+- [x] Criar tabela `alerts` para alertas e notificações automáticas
+
+### 🤖 Backend - Funções de IA
+- [x] Implementar função de análise de comportamento com LLM
+- [x] Implementar função de detecção de padrões de aprendizado
+- [x] Implementar função de geração de insights personalizados
+- [ ] Implementar função de previsão de desempenho
+- [ ] Implementar sistema de alertas inteligentes
+
+### 🔌 Backend - Rotas tRPC
+- [x] Criar rota `analytics.recordBehavior` para registrar comportamentos
+- [x] Criar rota `analytics.getStudentInsights` para obter insights de um aluno
+- [x] Criar rota `analytics.getClassAnalytics` para análise da turma
+- [x] Criar rota `analytics.getLearningPatterns` para padrões identificados
+- [x] Criar rota `analytics.getAlerts` para alertas pendentes
+- [x] Criar rota `analytics.analyzeStudent` para análise completa
+
+### 🎨 Frontend - Interface do Professor
+- [x] Criar página de Dashboard de Análise de Aprendizado
+- [x] Implementar visualização de insights por aluno
+- [ ] Implementar gráficos de evolução e tendências
+- [ ] Criar seção de alertas e recomendações
+- [ ] Implementar filtros por turma, período e tipo de métrica
+- [ ] Criar modal de detalhes do aluno com histórico completo
+- [ ] Implementar exportação de relatórios em PDF
+
+### 🧪 Testes
+- [ ] Criar testes para funções de análise com IA
+- [ ] Criar testes para rotas tRPC de analytics
+- [ ] Testar geração de insights com dados reais
+- [ ] Validar sistema de alertas
+
+### 📚 Documentação
+- [ ] Documentar estrutura de dados de análise
+- [ ] Documentar uso das funções de IA
+- [ ] Criar guia de uso para professores

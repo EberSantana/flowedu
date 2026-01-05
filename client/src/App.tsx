@@ -18,6 +18,7 @@ import AdminUsers from "./pages/AdminUsers";
 import ActiveMethodologies from "./pages/ActiveMethodologies";
 import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
+import { LearningAnalytics } from "./pages/LearningAnalytics";
 import LearningPaths from "./pages/LearningPaths";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentSubjectView from "./pages/StudentSubjectView";
@@ -72,6 +73,7 @@ function Router() {
         <Route path={"/schedule"} component={Schedule} />
         <Route path={"/calendar"} component={Calendar} />
         <Route path={"/reports"} component={Reports} />
+        <Route path={"/learning-analytics"} component={LearningAnalytics} />
         <Route path="/exercise-performance" component={ExercisePerformanceReport} />
         <Route path="/teacher-review-answers" component={TeacherReviewAnswers} />
         <Route path={"/learning-paths"} component={LearningPaths} />

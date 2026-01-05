@@ -11,7 +11,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  profile: mysqlEnum("profile", ["traditional"]).default("traditional").notNull(), // Perfil único profissional
+  profile: mysqlEnum("profile", ["traditional", "enthusiast", "interactive", "organizational"]).default("traditional").notNull(), // Perfil profissional do professor
   active: boolean("active").default(true).notNull(),
   approvalStatus: mysqlEnum("approvalStatus", ["approved", "pending", "rejected"]).default("approved").notNull(),
   inviteCode: varchar("inviteCode", { length: 20 }), // Código de convite usado no cadastro
@@ -1617,3 +1617,176 @@ export const dashboardPreferences = mysqlTable("dashboard_preferences", {
 
 export type DashboardPreference = typeof dashboardPreferences.$inferSelect;
 export type InsertDashboardPreference = typeof dashboardPreferences.$inferInsert;
+
+/**
+ * Sistema de Análise de Aprendizado com IA
+ * Monitora comportamento, padrões e evolução dos alunos
+ */
+
+/**
+ * Comportamentos dos Alunos
+ * Registra ações e comportamentos observados
+ */
+export const studentBehaviors = mysqlTable("student_behaviors", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  userId: int("userId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId"), // FK para subjects (opcional)
+  behaviorType: mysqlEnum("behaviorType", [
+    "exercise_completion",    // Conclusão de exercício
+    "quiz_attempt",           // Tentativa de quiz
+    "topic_access",           // Acesso a tópico
+    "material_download",      // Download de material
+    "doubt_posted",           // Dúvida postada
+    "comment_posted",         // Comentário postado
+    "assignment_submission",  // Submissão de tarefa
+    "attendance",             // Presença em aula
+    "late_submission",        // Submissão atrasada
+    "improvement_shown",      // Melhoria demonstrada
+    "struggle_detected",      // Dificuldade detectada
+    "engagement_high",        // Alto engajamento
+    "engagement_low"          // Baixo engajamento
+  ]).notNull(),
+  behaviorData: json("behaviorData"), // Dados adicionais do comportamento (JSON)
+  score: float("score"), // Pontuação associada (se aplicável)
+  metadata: text("metadata"), // Metadados adicionais
+  recordedAt: timestamp("recordedAt").defaultNow().notNull(),
+});
+
+export type StudentBehavior = typeof studentBehaviors.$inferSelect;
+export type InsertStudentBehavior = typeof studentBehaviors.$inferInsert;
+
+/**
+ * Padrões de Aprendizado Identificados
+ * Armazena padrões detectados pela IA
+ */
+export const learningPatterns = mysqlTable("learning_patterns", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  userId: int("userId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId"), // FK para subjects (opcional)
+  patternType: mysqlEnum("patternType", [
+    "learning_pace",          // Ritmo de aprendizado
+    "preferred_time",         // Horário preferido
+    "difficulty_areas",       // Áreas de dificuldade
+    "strength_areas",         // Áreas de força
+    "engagement_pattern",     // Padrão de engajamento
+    "submission_pattern",     // Padrão de submissão
+    "improvement_trend",      // Tendência de melhoria
+    "struggle_pattern",       // Padrão de dificuldade
+    "consistency",            // Consistência
+    "collaboration"           // Colaboração
+  ]).notNull(),
+  patternDescription: text("patternDescription").notNull(), // Descrição do padrão
+  confidence: float("confidence").notNull(), // Confiança da IA (0-1)
+  evidence: json("evidence"), // Evidências que suportam o padrão (JSON)
+  detectedAt: timestamp("detectedAt").defaultNow().notNull(),
+  lastUpdated: timestamp("lastUpdated").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningPattern = typeof learningPatterns.$inferSelect;
+export type InsertLearningPattern = typeof learningPatterns.$inferInsert;
+
+/**
+ * Insights Gerados pela IA
+ * Armazena insights e recomendações personalizadas
+ */
+export const aiInsights = mysqlTable("ai_insights", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  userId: int("userId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId"), // FK para subjects (opcional)
+  insightType: mysqlEnum("insightType", [
+    "recommendation",         // Recomendação
+    "prediction",             // Previsão
+    "alert",                  // Alerta
+    "strength",               // Ponto forte
+    "weakness",               // Ponto fraco
+    "opportunity",            // Oportunidade
+    "risk",                   // Risco
+    "achievement",            // Conquista
+    "trend"                   // Tendência
+  ]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(), // Título do insight
+  description: text("description").notNull(), // Descrição detalhada
+  actionable: boolean("actionable").default(false).notNull(), // Se requer ação
+  actionSuggestion: text("actionSuggestion"), // Sugestão de ação
+  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  confidence: float("confidence").notNull(), // Confiança da IA (0-1)
+  relatedData: json("relatedData"), // Dados relacionados (JSON)
+  dismissed: boolean("dismissed").default(false).notNull(), // Se foi dispensado pelo professor
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+});
+
+export type AIInsight = typeof aiInsights.$inferSelect;
+export type InsertAIInsight = typeof aiInsights.$inferInsert;
+
+/**
+ * Métricas de Desempenho
+ * Armazena métricas calculadas periodicamente
+ */
+export const performanceMetrics = mysqlTable("performance_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  userId: int("userId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId"), // FK para subjects (opcional)
+  metricType: mysqlEnum("metricType", [
+    "overall_performance",    // Desempenho geral
+    "exercise_accuracy",      // Precisão em exercícios
+    "quiz_performance",       // Desempenho em quizzes
+    "attendance_rate",        // Taxa de presença
+    "submission_rate",        // Taxa de submissão
+    "engagement_score",       // Pontuação de engajamento
+    "improvement_rate",       // Taxa de melhoria
+    "consistency_score",      // Pontuação de consistência
+    "collaboration_score",    // Pontuação de colaboração
+    "ct_skills"               // Habilidades de PC
+  ]).notNull(),
+  value: double("value").notNull(), // Valor da métrica
+  previousValue: double("previousValue"), // Valor anterior (para comparação)
+  trend: mysqlEnum("trend", ["improving", "stable", "declining"]), // Tendência
+  percentile: float("percentile"), // Percentil em relação à turma
+  calculatedAt: timestamp("calculatedAt").defaultNow().notNull(),
+  periodStart: date("periodStart").notNull(), // Início do período
+  periodEnd: date("periodEnd").notNull(), // Fim do período
+});
+
+export type PerformanceMetric = typeof performanceMetrics.$inferSelect;
+export type InsertPerformanceMetric = typeof performanceMetrics.$inferInsert;
+
+/**
+ * Alertas Automáticos
+ * Sistema de alertas e notificações inteligentes
+ */
+export const alerts = mysqlTable("alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  userId: int("userId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId"), // FK para subjects (opcional)
+  alertType: mysqlEnum("alertType", [
+    "performance_drop",       // Queda de desempenho
+    "low_engagement",         // Baixo engajamento
+    "missed_deadlines",       // Prazos perdidos
+    "struggling",             // Dificuldade
+    "at_risk",                // Em risco
+    "exceptional_progress",   // Progresso excepcional
+    "needs_attention",        // Precisa de atenção
+    "pattern_change",         // Mudança de padrão
+    "milestone_reached",      // Marco alcançado
+    "inactivity"              // Inatividade
+  ]).notNull(),
+  severity: mysqlEnum("severity", ["info", "warning", "urgent", "critical"]).default("info").notNull(),
+  title: varchar("title", { length: 255 }).notNull(), // Título do alerta
+  message: text("message").notNull(), // Mensagem detalhada
+  recommendedAction: text("recommendedAction"), // Ação recomendada
+  relatedInsightId: int("relatedInsightId"), // FK para aiInsights (opcional)
+  acknowledged: boolean("acknowledged").default(false).notNull(), // Se foi reconhecido
+  acknowledgedAt: timestamp("acknowledgedAt"), // Quando foi reconhecido
+  resolved: boolean("resolved").default(false).notNull(), // Se foi resolvido
+  resolvedAt: timestamp("resolvedAt"), // Quando foi resolvido
+  notes: text("notes"), // Notas do professor
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Alert = typeof alerts.$inferSelect;
+export type InsertAlert = typeof alerts.$inferInsert;

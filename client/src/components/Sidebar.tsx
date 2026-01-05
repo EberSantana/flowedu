@@ -23,7 +23,8 @@ import {
   HelpCircle,
   Megaphone,
   KeyRound,
-  Trophy
+  Trophy,
+  Brain
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -84,6 +85,11 @@ const teacherNavItems: NavItem[] = [
     label: "Relatórios",
     icon: <BarChart3 className="h-5 w-5" />,
     href: "/reports",
+  },
+  {
+    label: "Análise de Aprendizado",
+    icon: <Brain className="h-5 w-5" />,
+    href: "/learning-analytics",
   },
   {
     label: "Desempenho em Exercícios",

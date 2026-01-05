@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users MODIFY COLUMN profile ENUM('traditional', 'enthusiast', 'interactive', 'organizational') NOT NULL DEFAULT 'traditional'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute ALTER TABLE users MODIFY COLUMN profile ENUM('traditional', 'enthusiast', 'interactive', 'organizational') NOT NULL DEFAULT 'traditional'",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 226
+}

@@ -115,7 +115,22 @@ import {
   InsertLevelUpHistory,
   dashboardPreferences,
   DashboardPreference,
-  InsertDashboardPreference
+  InsertDashboardPreference,
+  studentBehaviors,
+  StudentBehavior,
+  InsertStudentBehavior,
+  learningPatterns,
+  LearningPattern,
+  InsertLearningPattern,
+  aiInsights,
+  AIInsight,
+  InsertAIInsight,
+  performanceMetrics,
+  PerformanceMetric,
+  InsertPerformanceMetric,
+  alerts,
+  Alert,
+  InsertAlert
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -8494,4 +8509,300 @@ export async function saveQuickActionsPreferences(userId: number, actions: any[]
   }
   
   return { success: true };
+}
+
+
+/**
+ * ============================================
+ * SISTEMA DE ANÁLISE DE APRENDIZADO COM IA
+ * ============================================
+ */
+
+/**
+ * Registrar comportamento do aluno
+ */
+export async function recordStudentBehavior(data: InsertStudentBehavior) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(studentBehaviors).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+/**
+ * Buscar comportamentos recentes de um aluno
+ */
+export async function getRecentBehaviors(studentId: number, userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(studentBehaviors)
+    .where(and(
+      eq(studentBehaviors.studentId, studentId),
+      eq(studentBehaviors.userId, userId)
+    ))
+    .orderBy(desc(studentBehaviors.recordedAt))
+    .limit(limit);
+}
+
+/**
+ * Buscar comportamentos por tipo
+ */
+export async function getBehaviorsByType(
+  studentId: number, 
+  userId: number, 
+  behaviorType: string
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(studentBehaviors)
+    .where(and(
+      eq(studentBehaviors.studentId, studentId),
+      eq(studentBehaviors.userId, userId),
+      eq(studentBehaviors.behaviorType, behaviorType as any)
+    ))
+    .orderBy(desc(studentBehaviors.recordedAt));
+}
+
+/**
+ * Salvar padrão de aprendizado identificado
+ */
+export async function saveLearningPattern(data: InsertLearningPattern) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(learningPatterns).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+/**
+ * Buscar padrões de aprendizado de um aluno
+ */
+export async function getStudentLearningPatterns(studentId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(learningPatterns)
+    .where(and(
+      eq(learningPatterns.studentId, studentId),
+      eq(learningPatterns.userId, userId)
+    ))
+    .orderBy(desc(learningPatterns.detectedAt));
+}
+
+/**
+ * Atualizar padrão de aprendizado existente
+ */
+export async function updateLearningPattern(
+  id: number, 
+  userId: number, 
+  data: Partial<InsertLearningPattern>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(learningPatterns)
+    .set({ ...data, lastUpdated: new Date() })
+    .where(and(
+      eq(learningPatterns.id, id),
+      eq(learningPatterns.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+/**
+ * Salvar insight gerado pela IA
+ */
+export async function saveAIInsight(data: InsertAIInsight) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(aiInsights).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+/**
+ * Buscar insights de um aluno
+ */
+export async function getStudentInsights(studentId: number, userId: number, includeDismissed: boolean = false) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    eq(aiInsights.studentId, studentId),
+    eq(aiInsights.userId, userId)
+  ];
+  
+  if (!includeDismissed) {
+    conditions.push(eq(aiInsights.dismissed, false));
+  }
+  
+  return await db.select().from(aiInsights)
+    .where(and(...conditions))
+    .orderBy(desc(aiInsights.generatedAt));
+}
+
+/**
+ * Marcar insight como dispensado
+ */
+export async function dismissInsight(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(aiInsights)
+    .set({ dismissed: true })
+    .where(and(
+      eq(aiInsights.id, id),
+      eq(aiInsights.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+/**
+ * Salvar métrica de desempenho
+ */
+export async function savePerformanceMetric(data: InsertPerformanceMetric) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(performanceMetrics).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+/**
+ * Buscar métricas de desempenho de um aluno
+ */
+export async function getStudentPerformanceMetrics(
+  studentId: number, 
+  userId: number,
+  metricType?: string
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    eq(performanceMetrics.studentId, studentId),
+    eq(performanceMetrics.userId, userId)
+  ];
+  
+  if (metricType) {
+    conditions.push(eq(performanceMetrics.metricType, metricType as any));
+  }
+  
+  return await db.select().from(performanceMetrics)
+    .where(and(...conditions))
+    .orderBy(desc(performanceMetrics.calculatedAt));
+}
+
+/**
+ * Criar alerta
+ */
+export async function createAlert(data: InsertAlert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(alerts).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+/**
+ * Buscar alertas pendentes do professor
+ */
+export async function getPendingAlerts(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(alerts)
+    .where(and(
+      eq(alerts.userId, userId),
+      eq(alerts.acknowledged, false)
+    ))
+    .orderBy(desc(alerts.createdAt));
+}
+
+/**
+ * Buscar alertas de um aluno
+ */
+export async function getStudentAlerts(studentId: number, userId: number, includeResolved: boolean = false) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    eq(alerts.studentId, studentId),
+    eq(alerts.userId, userId)
+  ];
+  
+  if (!includeResolved) {
+    conditions.push(eq(alerts.resolved, false));
+  }
+  
+  return await db.select().from(alerts)
+    .where(and(...conditions))
+    .orderBy(desc(alerts.createdAt));
+}
+
+/**
+ * Reconhecer alerta
+ */
+export async function acknowledgeAlert(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(alerts)
+    .set({ 
+      acknowledged: true,
+      acknowledgedAt: new Date()
+    })
+    .where(and(
+      eq(alerts.id, id),
+      eq(alerts.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+/**
+ * Resolver alerta
+ */
+export async function resolveAlert(id: number, userId: number, notes?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(alerts)
+    .set({ 
+      resolved: true,
+      resolvedAt: new Date(),
+      notes: notes || undefined
+    })
+    .where(and(
+      eq(alerts.id, id),
+      eq(alerts.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+/**
+ * Buscar estatísticas de alertas
+ */
+export async function getAlertStatistics(userId: number) {
+  const db = await getDb();
+  if (!db) return { total: 0, pending: 0, critical: 0, urgent: 0 };
+  
+  const allAlerts = await db.select().from(alerts)
+    .where(eq(alerts.userId, userId));
+  
+  const pending = allAlerts.filter(a => !a.acknowledged).length;
+  const critical = allAlerts.filter(a => a.severity === 'critical' && !a.resolved).length;
+  const urgent = allAlerts.filter(a => a.severity === 'urgent' && !a.resolved).length;
+  
+  return {
+    total: allAlerts.length,
+    pending,
+    critical,
+    urgent
+  };
 }

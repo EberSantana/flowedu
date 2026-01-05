@@ -5758,6 +5758,252 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return { success: true };
       }),
   }),
+
+  /**
+   * Sistema de Análise de Aprendizado com IA
+   */
+  analytics: router({
+    // Registrar comportamento do aluno
+    recordBehavior: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        subjectId: z.number().optional(),
+        behaviorType: z.enum([
+          'exercise_completion',
+          'quiz_attempt',
+          'topic_access',
+          'material_download',
+          'doubt_posted',
+          'comment_posted',
+          'assignment_submission',
+          'attendance',
+          'late_submission',
+          'improvement_shown',
+          'struggle_detected',
+          'engagement_high',
+          'engagement_low'
+        ]),
+        behaviorData: z.any().optional(),
+        score: z.number().optional(),
+        metadata: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.recordStudentBehavior({
+          ...input,
+          userId: ctx.user.id,
+        });
+      }),
+
+    // Obter insights de um aluno
+    getStudentInsights: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        includeDismissed: z.boolean().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentInsights(
+          input.studentId,
+          ctx.user.id,
+          input.includeDismissed
+        );
+      }),
+
+    // Gerar análise completa de um aluno
+    analyzeStudent: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        subjectId: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { analyzeLearningBehavior } = await import('./learningAnalytics');
+        
+        // Buscar dados do aluno
+        const student = await db.getStudentById(input.studentId, ctx.user.id);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Aluno não encontrado' });
+        }
+
+        // Buscar comportamentos recentes
+        const recentBehaviors = await db.getRecentBehaviors(input.studentId, ctx.user.id, 30);
+
+        // Buscar exercícios recentes
+        const recentExercises = await db.getStudentExerciseHistory(input.studentId, input.subjectId);
+
+        // Preparar dados para análise
+        const behaviorData = {
+          studentId: student.id,
+          studentName: student.fullName,
+          subjectName: input.subjectId ? 'Disciplina' : undefined,
+          recentBehaviors: recentBehaviors.map(b => ({
+            type: b.behaviorType,
+            date: b.recordedAt.toISOString(),
+            score: b.score || undefined,
+            metadata: b.metadata || undefined,
+          })),
+          recentExercises: recentExercises.slice(0, 10).map(e => ({
+            title: 'Exercício',
+            score: e.attempt.score || 0,
+            completedAt: e.attempt.completedAt?.toISOString() || new Date().toISOString(),
+            timeSpent: e.attempt.timeSpent || undefined,
+          })),
+        };
+
+        // Analisar com IA
+        const analysis = await analyzeLearningBehavior(behaviorData);
+
+        // Salvar insights gerados
+        for (const alert of analysis.alerts) {
+          await db.createAlert({
+            studentId: input.studentId,
+            userId: ctx.user.id,
+            subjectId: input.subjectId,
+            alertType: 'needs_attention',
+            severity: alert.severity,
+            title: alert.type,
+            message: alert.message,
+            recommendedAction: analysis.recommendations.join('\n'),
+          });
+        }
+
+        // Salvar padrões detectados
+        for (const pattern of analysis.patterns) {
+          await db.saveLearningPattern({
+            studentId: input.studentId,
+            userId: ctx.user.id,
+            subjectId: input.subjectId,
+            patternType: 'engagement_pattern',
+            patternDescription: pattern.description,
+            confidence: pattern.confidence,
+            evidence: JSON.stringify([pattern.type]),
+          });
+        }
+
+        // Salvar insight geral
+        await db.saveAIInsight({
+          studentId: input.studentId,
+          userId: ctx.user.id,
+          subjectId: input.subjectId,
+          insightType: 'recommendation',
+          title: 'Análise de Comportamento',
+          description: analysis.overallAssessment,
+          actionable: true,
+          actionSuggestion: analysis.recommendations.join('\n'),
+          priority: analysis.alerts.length > 0 ? 'high' : 'medium',
+          confidence: analysis.confidence,
+          relatedData: JSON.stringify({
+            strengths: analysis.strengths,
+            weaknesses: analysis.weaknesses,
+          }),
+        });
+
+        return analysis;
+      }),
+
+    // Obter padrões de aprendizado
+    getLearningPatterns: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentLearningPatterns(input.studentId, ctx.user.id);
+      }),
+
+    // Obter alertas pendentes
+    getAlerts: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getPendingAlerts(ctx.user.id);
+      }),
+
+    // Obter alertas de um aluno
+    getStudentAlerts: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        includeResolved: z.boolean().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentAlerts(
+          input.studentId,
+          ctx.user.id,
+          input.includeResolved
+        );
+      }),
+
+    // Reconhecer alerta
+    acknowledgeAlert: protectedProcedure
+      .input(z.object({
+        alertId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.acknowledgeAlert(input.alertId, ctx.user.id);
+      }),
+
+    // Resolver alerta
+    resolveAlert: protectedProcedure
+      .input(z.object({
+        alertId: z.number(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.resolveAlert(input.alertId, ctx.user.id, input.notes);
+      }),
+
+    // Obter estatísticas de alertas
+    getAlertStatistics: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getAlertStatistics(ctx.user.id);
+      }),
+
+    // Obter métricas de desempenho
+    getPerformanceMetrics: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        metricType: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentPerformanceMetrics(
+          input.studentId,
+          ctx.user.id,
+          input.metricType
+        );
+      }),
+
+    // Dispensar insight
+    dismissInsight: protectedProcedure
+      .input(z.object({
+        insightId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.dismissInsight(input.insightId, ctx.user.id);
+      }),
+
+    // Obter análise da turma
+    getClassAnalytics: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        // Buscar todos os alunos
+        const students = await db.getStudentsByUser(ctx.user.id);
+        
+        // Buscar alertas críticos
+        const allAlerts = await db.getPendingAlerts(ctx.user.id);
+        const criticalAlerts = allAlerts.filter(a => a.severity === 'critical' || a.severity === 'urgent');
+        
+        // Buscar insights recentes
+        const recentInsights = [];
+        for (const student of students.slice(0, 10)) {
+          const insights = await db.getStudentInsights(student.id, ctx.user.id, false);
+          recentInsights.push(...insights.slice(0, 2));
+        }
+        
+        return {
+          totalStudents: students.length,
+          criticalAlerts: criticalAlerts.length,
+          recentInsights: recentInsights.slice(0, 10),
+          studentsNeedingAttention: criticalAlerts.map(a => a.studentId).filter((v, i, a) => a.indexOf(v) === i).length,
+        };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 
