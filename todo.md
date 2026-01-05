@@ -4705,3 +4705,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Documentar estrutura de dados de análise
 - [ ] Documentar uso das funções de IA
 - [ ] Criar guia de uso para professores
+- [x] Adicionar badge de contador de avisos não lidos no menu lateral do portal do aluno
+
+## 🎨 Análise e Correção de Layout - Análise de Aprendizado
+
+- [x] Analisar página de análise de aprendizado e identificar inconsistências
+- [x] Verificar se segue o padrão visual das demais páginas (cores, tipografia, espaçamentos)
+- [x] Padronizar estrutura de layout (Sidebar + PageWrapper)
+- [x] Corrigir componentes que não seguem o design system
+- [x] Garantir consistência de cards, botões e elementos visuais
+- [x] Validar responsividade e acessibilidade

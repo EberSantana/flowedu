@@ -114,74 +114,98 @@ export function LearningAnalytics() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen">
       <Sidebar />
       <PageWrapper>
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-                <Brain className="h-8 w-8 text-purple-600" />
-                Análise de Aprendizado com IA
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Monitore comportamento, padrões e evolução dos seus alunos
-              </p>
+        <div className="max-w-7xl mx-auto py-6 px-4 space-y-6">
+          {/* Header com Gradiente */}
+          <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl shadow-lg p-6 text-white">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                <Brain className="h-8 w-8 text-white" />
+              </div>
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold mb-1">
+                  Análise de Aprendizado com IA
+                </h1>
+                <p className="text-purple-100 text-lg">
+                  Monitore comportamento, padrões e evolução dos seus alunos
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Estatísticas Gerais */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <Card className="bg-white shadow-md hover:shadow-xl transition-all duration-300 border-0 overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  Total de Alunos
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total de Alunos
+                  </CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{classAnalytics?.totalStudents || 0}</div>
+                <div className="text-3xl font-bold text-gray-900">{classAnalytics?.totalStudents || 0}</div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white shadow-md hover:shadow-xl transition-all duration-300 border-0 overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  Alertas Críticos
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Alertas Críticos
+                  </CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-3xl font-bold text-red-600">
                   {alertStats?.critical || 0}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white shadow-md hover:shadow-xl transition-all duration-300 border-0 overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-orange-600"></div>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Target className="h-4 w-4 text-orange-600" />
-                  Precisam Atenção
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Precisam Atenção
+                  </CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Target className="h-5 w-5 text-orange-600" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-3xl font-bold text-orange-600">
                   {classAnalytics?.studentsNeedingAttention || 0}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white shadow-md hover:shadow-xl transition-all duration-300 border-0 overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-yellow-600" />
-                  Insights Recentes
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Insights Recentes
+                  </CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Lightbulb className="h-5 w-5 text-yellow-600" />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-3xl font-bold text-gray-900">
                   {classAnalytics?.recentInsights?.length || 0}
                 </div>
               </CardContent>
@@ -189,10 +213,12 @@ export function LearningAnalytics() {
           </div>
 
           {/* Seleção de Aluno e Análise */}
-          <Card>
+          <Card className="bg-white shadow-md border-l-4 border-purple-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-purple-600" />
+                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-purple-600" />
+                </div>
                 Análise Individual
               </CardTitle>
               <CardDescription>

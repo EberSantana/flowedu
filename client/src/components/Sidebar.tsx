@@ -167,6 +167,12 @@ export default function Sidebar() {
     enabled: !isStudent, // Desabilita para alunos
   });
   
+  // Query para avisos não lidos (badge de notificação) - apenas para alunos
+  const { data: unreadAnnouncementsCount } = trpc.announcements.getUnreadCount.useQuery(undefined, {
+    refetchInterval: 30000, // Atualiza a cada 30 segundos
+    enabled: isStudent, // Habilita apenas para alunos
+  });
+  
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       window.location.href = "/";
@@ -284,7 +290,15 @@ export default function Sidebar() {
                 {filteredNavItems.map((item) => {
                   const isActive = location === item.href;
                   const isCalendar = item.href === '/calendar';
-                  const notificationCount = isCalendar && upcomingEvents ? upcomingEvents.length : 0;
+                  const isAnnouncements = item.href === '/student/announcements';
+                  
+                  // Contador de notificações
+                  let notificationCount = 0;
+                  if (isCalendar && upcomingEvents) {
+                    notificationCount = upcomingEvents.length;
+                  } else if (isAnnouncements && unreadAnnouncementsCount !== undefined) {
+                    notificationCount = unreadAnnouncementsCount;
+                  }
                   
                   const linkContent = (
                     <Link
@@ -309,7 +323,7 @@ export default function Sidebar() {
                         {item.icon}
                       </span>
                       {!isCompact && <span className="font-medium">{item.label}</span>}
-                      {isCalendar && notificationCount > 0 && (
+                      {(isCalendar || isAnnouncements) && notificationCount > 0 && (
                         <span className={`
                           flex items-center justify-center
                           bg-red-500 text-white text-[10px] font-bold rounded-full
