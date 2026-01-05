@@ -290,13 +290,13 @@ export default function Sidebar() {
                 {filteredNavItems.map((item) => {
                   const isActive = location === item.href;
                   const isCalendar = item.href === '/calendar';
-                  const isAnnouncements = item.href === '/student/announcements';
+                  const isAnnouncementsMenu = item.label === 'Avisos'; // Usar label ao invés de href
                   
                   // Contador de notificações
                   let notificationCount = 0;
                   if (isCalendar && upcomingEvents) {
                     notificationCount = upcomingEvents.length;
-                  } else if (isAnnouncements && unreadAnnouncementsCount !== undefined) {
+                  } else if (isAnnouncementsMenu && unreadAnnouncementsCount !== undefined) {
                     notificationCount = unreadAnnouncementsCount;
                   }
                   
@@ -323,7 +323,7 @@ export default function Sidebar() {
                         {item.icon}
                       </span>
                       {!isCompact && <span className="font-medium">{item.label}</span>}
-                      {(isCalendar || isAnnouncements) && notificationCount > 0 && (
+                      {(isCalendar || isAnnouncementsMenu) && notificationCount > 0 && (
                         <span className={`
                           flex items-center justify-center
                           bg-red-500 text-white text-[10px] font-bold rounded-full
