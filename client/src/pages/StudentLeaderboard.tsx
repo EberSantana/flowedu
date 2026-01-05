@@ -66,24 +66,27 @@ export function StudentLeaderboard() {
 
   return (
     <StudentLayout>
-        <div className="container py-8 max-w-7xl">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-3 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg">
-                <Trophy className="w-8 h-8 text-white" />
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <Trophy className="h-8 w-8" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-gray-900">Rankings</h1>
-                <p className="text-lg text-gray-600 mt-1">
+                <h1 className="text-4xl font-bold">Rankings</h1>
+                <p className="text-yellow-100 mt-1">
                   Veja sua posição e os melhores alunos da turma
                 </p>
               </div>
             </div>
           </div>
+        </div>
 
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
           {/* Filtro de disciplina */}
-          <Card className="mb-6 border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+          <Card className="mb-6 border-l-4 border-blue-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-blue-600" />
@@ -118,7 +121,7 @@ export function StudentLeaderboard() {
                 Minha Posição
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow">
+                <Card className="border-l-4 border-purple-500">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-semibold text-gray-700">
@@ -143,7 +146,7 @@ export function StudentLeaderboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+                <Card className="border-l-4 border-blue-500">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-semibold text-gray-700">
@@ -158,7 +161,7 @@ export function StudentLeaderboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
+                <Card className="border-l-4 border-green-500">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-semibold text-gray-700">
@@ -175,7 +178,7 @@ export function StudentLeaderboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow">
+                <Card className="border-l-4 border-orange-500">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-semibold text-gray-700">
@@ -207,7 +210,7 @@ export function StudentLeaderboard() {
 
           {/* Top 3 - Pódio */}
           {selectedSubjectId && topPerformers.length > 0 && (
-            <Card className="mb-6 border-l-4 border-l-yellow-500 hover:shadow-lg transition-shadow">
+            <Card className="mb-6 border-l-4 border-yellow-500">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="w-6 h-6 text-yellow-600" />
@@ -246,7 +249,7 @@ export function StudentLeaderboard() {
           )}
 
           {/* Ranking completo (Top 10) */}
-          <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+          <Card className="border-l-4 border-blue-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -333,6 +336,7 @@ export function StudentLeaderboard() {
             </CardContent>
           </Card>
         </div>
+      </div>
     </StudentLayout>
   );
 }

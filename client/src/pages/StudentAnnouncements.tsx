@@ -25,18 +25,31 @@ export function StudentAnnouncements() {
 
   return (
     <StudentLayout>
+      <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Avisos</h1>
-          <p className="text-gray-600">Anúncios importantes dos seus professores</p>
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <Megaphone className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Avisos</h1>
+                <p className="text-blue-100 mt-1">
+                  Anúncios importantes dos seus professores
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="space-y-4">
-          {isLoading ? (
-            <div className="text-center py-12 text-gray-500">Carregando avisos...</div>
-          ) : announcements && announcements.length > 0 ? (
-            announcements.map((announcement: any) => (
+        <div className="container mx-auto py-8 px-4">
+          {/* Content */}
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-500">Carregando avisos...</div>
+            ) : announcements && announcements.length > 0 ? (
+              announcements.map((announcement: any) => (
               <div
                 key={announcement.id}
                 className={`bg-white p-5 rounded-lg border-2 shadow-sm transition-all ${
@@ -98,7 +111,7 @@ export function StudentAnnouncements() {
                 </div>
               </div>
             ))
-          ) : (
+            ) : (
             <div className="text-center py-16 bg-white rounded-lg border border-gray-200">
               <Megaphone className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg font-medium">Nenhum aviso disponível</p>
@@ -106,8 +119,10 @@ export function StudentAnnouncements() {
                 Seus professores ainda não postaram avisos
               </p>
             </div>
-          )}
+            )}
+          </div>
         </div>
+      </div>
     </StudentLayout>
   );
 }

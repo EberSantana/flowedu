@@ -60,24 +60,27 @@ export default function StudentLearningPaths() {
 
   return (
     <StudentLayout>
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-              <Map className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Trilhas de Aprendizagem</h1>
-              <p className="text-lg text-gray-600 mt-1">
-                Acompanhe seu progresso e domine cada disciplina passo a passo
-              </p>
+        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <Map className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Trilhas de Aprendizagem</h1>
+                <p className="text-blue-100 mt-1">
+                  Acompanhe seu progresso e domine cada disciplina passo a passo
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Cards de Estatísticas Globais */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
+          {/* Cards de Estatísticas Globais */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50 to-white">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -137,18 +140,18 @@ export default function StudentLearningPaths() {
               <p className="text-sm text-gray-600 mt-1">{stats?.pendingDoubts || 0} dúvidas pendentes</p>
             </CardContent>
           </Card>
-        </div>
+          </div>
 
-        {/* Lista de Disciplinas com Trilhas */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
+          {/* Lista de Disciplinas com Trilhas */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Target className="w-6 h-6 text-blue-600" />
               Suas Trilhas de Aprendizagem
             </h2>
-          </div>
+            </div>
 
-          {activeSubjects.length === 0 ? (
+            {activeSubjects.length === 0 ? (
             <Card className="bg-white shadow-lg">
               <CardContent className="py-12 text-center">
                 <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -160,8 +163,8 @@ export default function StudentLearningPaths() {
                 </p>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {activeSubjects.map((enrollment) => {
                 const subject = enrollment.subject;
                 if (!subject) return null;
@@ -262,12 +265,12 @@ export default function StudentLearningPaths() {
                   </Card>
                 );
               })}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
 
-        {/* Recursos Adicionais */}
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {/* Recursos Adicionais */}
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
           <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-200 hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-blue-900">
@@ -321,6 +324,7 @@ export default function StudentLearningPaths() {
               </Button>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </StudentLayout>

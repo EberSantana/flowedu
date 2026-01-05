@@ -28,21 +28,34 @@ export default function StudentSubjects() {
 
   return (
     <StudentLayout>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Minhas Disciplinas</h1>
-        <p className="text-gray-600">Acompanhe todas as suas disciplinas matriculadas</p>
-      </div>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <BookOpen className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Minhas Disciplinas</h1>
+                <p className="text-green-100 mt-1">
+                  Acompanhe todas as suas disciplinas matriculadas
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {isLoading ? (
-        <div className="text-center py-12">
+        <div className="container mx-auto py-8 px-4">
+          {isLoading ? (
+            <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Carregando suas disciplinas...</p>
-        </div>
-      ) : (
-        <>
-          {/* Disciplinas Ativas */}
-          <Card className="bg-white mb-6">
+            </div>
+          ) : (
+            <>
+            {/* Disciplinas Ativas */}
+            <Card className="bg-white mb-6">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-green-600" />
@@ -212,8 +225,10 @@ export default function StudentSubjects() {
               </CardContent>
             </Card>
           )}
-        </>
-      )}
+          </>
+          )}
+        </div>
+      </div>
     </StudentLayout>
   );
 }

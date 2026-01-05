@@ -116,26 +116,29 @@ export default function StudentExercises() {
 
   return (
     <StudentLayout>
-      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Cabeçalho */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <FileText className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Exercícios Disponíveis</h1>
-              <p className="text-lg text-gray-600 mt-1">
-                Complete os exercícios para ganhar pontos e subir no ranking!
-              </p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <FileText className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
+                <p className="text-orange-100 mt-1">
+                  Complete os exercícios para ganhar pontos e subir no ranking!
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Barra de Busca e Filtros */}
-        <div className="mb-8 space-y-4">
-          {/* Busca */}
-          <div className="relative max-w-md">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
+          {/* Barra de Busca e Filtros */}
+          <div className="mb-8 space-y-4">
+            {/* Busca */}
+            <div className="relative max-w-md">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <Input
               type="text"
@@ -144,9 +147,9 @@ export default function StudentExercises() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
             />
-          </div>
+            </div>
 
-          {/* Filtro por Disciplina */}
+            {/* Filtro por Disciplina */}
           {enrollments && enrollments.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -176,19 +179,19 @@ export default function StudentExercises() {
               </div>
             </div>
           )}
-        </div>
+          </div>
 
-        {/* Contador de Resultados */}
-        {searchQuery && (
+          {/* Contador de Resultados */}
+          {searchQuery && (
           <div className="mb-6">
             <p className="text-sm text-gray-600">
               <span className="font-semibold text-gray-900">{filteredExercises.length}</span> exercício(s) encontrado(s)
             </p>
           </div>
-        )}
+          )}
 
-        {/* Lista de Exercícios */}
-        {filteredExercises && filteredExercises.length === 0 ? (
+          {/* Lista de Exercícios */}
+          {filteredExercises && filteredExercises.length === 0 ? (
           <Card className="border-2 border-dashed border-gray-300">
             <CardContent className="py-20 text-center">
               <div className="mx-auto w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-8 shadow-inner">
@@ -219,9 +222,9 @@ export default function StudentExercises() {
               )}
             </CardContent>
           </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredExercises.map((exercise: any) => (
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredExercises.map((exercise: any) => (
               <Card 
                 key={exercise.id} 
                 className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-blue-300 flex flex-col group"
@@ -323,9 +326,10 @@ export default function StudentExercises() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </StudentLayout>
   );

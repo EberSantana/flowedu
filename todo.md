@@ -4526,3 +4526,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar multiplicadores de pontos e estatísticas detalhadas
 - [x] Criar detecção automática de mudança de nível
 
+
+## Padronização de Design - Portal do Aluno
+- [x] Padronizar design da página Rankings com o padrão de Revisão Inteligente
+- [x] Padronizar design da página Avisos com o padrão de Revisão Inteligente
+- [x] Padronizar design da página Exercícios com o padrão de Revisão Inteligente
+- [x] Padronizar design da página Trilha com o padrão de Revisão Inteligente
+- [x] Padronizar design da página Minhas Disciplinas com o padrão de Revisão Inteligente
