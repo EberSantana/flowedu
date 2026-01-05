@@ -4720,3 +4720,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🎨 Padronização de Design UX
 - [ ] Padronizar sistema de cores clean e profissional (neutro, baixo contraste)
 - [x] Corrigir marcação visual (badge) de avisos não lidos no ícone de notificações
+- [x] Implementar filtro de avisos por disciplina na página de avisos para alunos

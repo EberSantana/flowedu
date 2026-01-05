@@ -3619,8 +3619,11 @@ JSON (descrições MAX 15 chars):
     
     // Aluno: Listar avisos das disciplinas matriculadas
     getForStudent: studentProcedure
-      .query(async ({ ctx }) => {
-        return await db.getAnnouncementsForStudent(ctx.studentSession.studentId);
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getAnnouncementsForStudent(ctx.studentSession.studentId, input?.subjectId);
       }),
     
     // Aluno: Contar avisos não lidos

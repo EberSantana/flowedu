@@ -1994,11 +1994,18 @@ export async function getAnnouncementsByUser(userId: number) {
   return result;
 }
 
-export async function getAnnouncementsForStudent(studentId: number) {
+export async function getAnnouncementsForStudent(studentId: number, subjectId?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   // Buscar avisos das disciplinas em que o aluno está matriculado
+  const conditions = [eq(subjectEnrollments.studentId, studentId)];
+  
+  // Se subjectId for fornecido, adicionar filtro por disciplina
+  if (subjectId !== undefined && subjectId !== null) {
+    conditions.push(eq(announcements.subjectId, subjectId));
+  }
+  
   const result = await db.select({
     id: announcements.id,
     title: announcements.title,
@@ -2016,7 +2023,7 @@ export async function getAnnouncementsForStudent(studentId: number) {
       eq(announcementReads.announcementId, announcements.id),
       eq(announcementReads.studentId, studentId)
     ))
-    .where(eq(subjectEnrollments.studentId, studentId))
+    .where(and(...conditions))
     .orderBy(desc(announcements.isImportant), desc(announcements.createdAt));
   
   return result;

@@ -1,11 +1,18 @@
 import { trpc } from "../lib/trpc";
-import { AlertCircle, Megaphone, CheckCircle } from "lucide-react";
+import { AlertCircle, Megaphone, CheckCircle, Filter } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { toast } from "sonner";
 import StudentLayout from '../components/StudentLayout';
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 export function StudentAnnouncements() {
-  const { data: announcements, isLoading } = trpc.announcements.getForStudent.useQuery();
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | undefined>(undefined);
+  
+  const { data: announcements, isLoading } = trpc.announcements.getForStudent.useQuery(
+    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+  );
+  const { data: enrolledSubjects } = trpc.student.getEnrolledSubjects.useQuery();
   const utils = trpc.useUtils();
 
   const markAsReadMutation = trpc.announcements.markAsRead.useMutation({
@@ -44,6 +51,41 @@ export function StudentAnnouncements() {
         </div>
 
         <div className="container mx-auto py-8 px-4">
+          {/* Filtro de Disciplina */}
+          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm mb-6">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Filter className="w-5 h-5" />
+                <span className="font-medium">Filtrar por disciplina:</span>
+              </div>
+              <Select
+                value={selectedSubjectId?.toString() || "all"}
+                onValueChange={(value) => setSelectedSubjectId(value === "all" ? undefined : Number(value))}
+              >
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Todas as disciplinas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as disciplinas</SelectItem>
+                  {enrolledSubjects?.map((enrollment: any) => (
+                    <SelectItem key={enrollment.subjectId} value={enrollment.subjectId.toString()}>
+                      {enrollment.subject?.name || 'Disciplina'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedSubjectId && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedSubjectId(undefined)}
+                >
+                  Limpar filtro
+                </Button>
+              )}
+            </div>
+          </div>
+
           {/* Content */}
           <div className="space-y-4">
             {isLoading ? (
