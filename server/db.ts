@@ -561,6 +561,20 @@ export async function updateUserRole(userId: number, role: "admin" | "user") {
   return { success: true };
 }
 
+export async function updateUserProfileType(userId: number, profile: "traditional" | "enthusiast" | "interactive" | "organizational") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ profile }).where(eq(users.id, userId));
+  return { success: true };
+}
+
+export async function getUserProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select({ profile: users.profile }).from(users).where(eq(users.id, userId)).limit(1);
+  return result.length > 0 ? result[0].profile : undefined;
+}
+
 
 export async function checkEmailAlreadyRegistered(email: string) {
   const db = await getDb();

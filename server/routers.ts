@@ -5076,6 +5076,25 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         };
       }),
   }),
+
+  // ========== PERFIS DE USUÁRIO ==========
+  userProfile: router({
+    // Buscar perfil atual do usuário
+    getProfile: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await db.getUserProfile(ctx.user.id);
+      return { profile: profile || 'enthusiast' };
+    }),
+
+    // Atualizar perfil do usuário
+    updateProfile: protectedProcedure
+      .input(z.object({
+        profile: z.enum(['traditional', 'enthusiast', 'interactive', 'organizational']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUserProfileType(ctx.user.id, input.profile);
+        return { success: true, profile: input.profile };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

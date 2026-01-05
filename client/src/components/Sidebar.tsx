@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import NotificationBell from "@/components/NotificationBell";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import {
   Tooltip,
   TooltipContent,
@@ -44,6 +45,7 @@ interface NavItem {
   icon: React.ReactNode;
   href: string;
   adminOnly?: boolean;
+  profileRestriction?: "enthusiast" | "interactive" | "organizational"; // Perfil mínimo necessário
 }
 
 // Menu para professores (completo)
@@ -87,21 +89,25 @@ const teacherNavItems: NavItem[] = [
     label: "Desempenho em Exercícios",
     icon: <Target className="h-5 w-5" />,
     href: "/exercise-performance",
+    profileRestriction: "enthusiast",
   },
   {
     label: "Revisão de Respostas",
     icon: <CheckCircle2 className="h-5 w-5" />,
     href: "/teacher-review-answers",
+    profileRestriction: "enthusiast",
   },
   {
     label: "Rankings",
     icon: <Trophy className="h-5 w-5" />,
     href: "/leaderboard",
+    profileRestriction: "enthusiast",
   },
   {
     label: "Trilhas de Aprendizagem",
     icon: <Route className="h-5 w-5" />,
     href: "/learning-paths",
+    profileRestriction: "enthusiast",
   },
   {
     label: "Metodologias",
@@ -122,6 +128,7 @@ const teacherNavItems: NavItem[] = [
     label: "Gamificação",
     icon: <Trophy className="h-5 w-5" />,
     href: "/gamification-dashboard",
+    profileRestriction: "enthusiast",
   },
   {
     label: "Usuários",
@@ -153,6 +160,7 @@ const studentNavItems: NavItem[] = [
 export default function Sidebar() {
   const [location] = useLocation();
   const { user } = useAuth();
+  const { profile } = useUserProfile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
   
@@ -184,9 +192,23 @@ export default function Sidebar() {
   // Selecionar menu baseado no tipo de usuário
   const navItems = isStudent ? studentNavItems : teacherNavItems;
   
-  const filteredNavItems = navItems.filter(
-    (item) => !item.adminOnly || user?.role === "admin"
-  );
+  // Filtrar itens baseado em permissões e perfil
+  const filteredNavItems = navItems.filter((item) => {
+    // Filtro de admin
+    if (item.adminOnly && user?.role !== "admin") return false;
+    
+    // Filtro de perfil (apenas para professores)
+    if (!isStudent && item.profileRestriction && profile) {
+      const profileOrder = ["traditional", "enthusiast", "interactive", "organizational"];
+      const userProfileIndex = profileOrder.indexOf(profile);
+      const requiredProfileIndex = profileOrder.indexOf(item.profileRestriction);
+      
+      // Se o perfil do usuário é menor que o requerido, ocultar
+      if (userProfileIndex < requiredProfileIndex) return false;
+    }
+    
+    return true;
+  });
 
   return (
     <>

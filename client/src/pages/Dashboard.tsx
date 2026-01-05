@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
@@ -422,6 +422,12 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex gap-2 items-center">
+              <Link href="/profile-selection">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <UserCog className="h-4 w-4" />
+                  Perfil
+                </Button>
+              </Link>
               <LogoutButton />
               {isCustomizing && (
                 <Button

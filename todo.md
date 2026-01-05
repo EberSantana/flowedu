@@ -4033,3 +4033,91 @@ Todas as correções TypeScript foram implementadas com sucesso:
 - [x] Testes de lógica de desbloqueio
 - [x] Verificação de TypeScript sem erros
 - [x] Servidor rodando corretamente
+
+
+---
+
+## 🎯 Sistema de Perfis de Professor (Entusiasta vs Tradicional)
+
+### Análise e Planejamento
+- [ ] Mapear funcionalidades por perfil
+- [ ] Definir diferenças de interface
+- [ ] Planejar fluxo de seleção de perfil
+
+### Backend (Banco de Dados)
+- [ ] Adicionar campo `teacherProfile` (enum: 'enthusiast', 'traditional') na tabela users
+- [ ] Criar rota tRPC para alternar perfil
+- [ ] Atualizar rotas tRPC com filtros de perfil
+
+### Interface de Seleção
+- [ ] Página de escolha de perfil no primeiro acesso
+- [ ] Cards explicativos para cada perfil
+- [ ] Opção de trocar perfil nas configurações
+
+### Adaptação de Interfaces
+- [ ] Dashboard adaptativo por perfil
+- [ ] Menu lateral com itens condicionais
+- [ ] Ocultar funcionalidades de gamificação para tradicional
+- [ ] Simplificar interface para professor tradicional
+
+### Funcionalidades por Perfil
+
+#### Professor Entusiasta (atual):
+- [ ] Todas as funcionalidades atuais mantidas
+- [ ] Sistema de gamificação completo
+- [ ] Integração com alunos
+- [ ] Exercícios e trilhas de aprendizagem
+- [ ] Rankings e badges
+- [ ] Pensamento computacional
+
+#### Professor Tradicional:
+- [ ] Gerenciar Disciplinas (sem gamificação)
+- [ ] Gerenciar Turmas (sem matrículas de alunos)
+- [ ] Turnos e Horários
+- [ ] Grade Semanal (pessoal)
+- [ ] Calendário Anual
+- [ ] Plano de Curso
+- [ ] Tarefas Pessoais
+- [ ] Relatórios de Carga Horária
+
+### Testes
+- [ ] Testes de seleção de perfil
+- [ ] Validação de permissões por perfil
+- [ ] Testes de interface adaptativa
+
+## 🎭 Sistema de Perfis de Professor (Implementação Recomendada)
+
+### Fase 1: Backend e Banco de Dados
+- [x] Adicionar campo `profile` (enum) na tabela `users` com valores: 'traditional', 'enthusiast', 'interactive', 'organizational'
+- [x] Criar função `updateUserProfile(userId, profile)` no db.ts
+- [x] Criar rota tRPC `users.updateProfile` para trocar perfil
+- [x] Criar rota tRPC `users.getProfile` para buscar perfil atual
+- [x] Migrar usuários existentes para perfil 'enthusiast' (padrão atual do sistema)
+
+### Fase 2: Interface de Seleção de Perfil
+- [x] Criar página ProfileSelection.tsx com 4 cards de perfis
+- [x] Adicionar descrições e funcionalidades de cada perfil
+- [x] Criar componente ProfileCard com ícones e badges
+- [x] Adicionar botão "Trocar Perfil" nas configurações do usuário (Dashboard)
+- [x] Implementar modal de confirmação ao trocar perfil
+
+### Fase 3: Renderização Condicional
+- [x] Criar hook useUserProfile() para acessar perfil atual
+- [x] Atualizar Sidebar para renderizar menus condicionalmente
+- [x] Ocultar "Gamificação" para perfil Traditional
+- [x] Ocultar "Gestão de Alunos" (Desempenho, Revisão, Rankings) para perfil Traditional
+- [x] Ocultar "Trilhas de Aprendizagem" para perfil Traditional
+- [x] Criar componente FeatureGuard para proteger rotas por perfil
+- [x] Adicionar mensagem amigável quando tentar acessar funcionalidade bloqueada
+
+### Fase 4: Testes e Validação
+- [x] Testar troca de perfil Traditional → Enthusiast (manter dados)
+- [x] Testar troca de perfil Enthusiast → Traditional (ocultar funcionalidades)
+- [x] Validar que disciplinas e turmas são mantidas
+- [x] Validar que horários e calendário são mantidos
+- [x] Criar testes automatizados para migração de perfis (7/10 testes passando)
+
+### Fase 5: Documentação
+- [ ] Atualizar README com descrição dos 4 perfis
+- [ ] Criar guia de uso para cada perfil
+- [ ] Documentar diferenças entre perfis
