@@ -595,7 +595,7 @@ export async function updateUserRole(userId: number, role: "admin" | "user") {
   return { success: true };
 }
 
-export async function updateUserProfileType(userId: number, profile: "traditional" | "enthusiast" | "interactive" | "organizational") {
+export async function updateUserProfileType(userId: number, profile: "traditional") {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ profile }).where(eq(users.id, userId));

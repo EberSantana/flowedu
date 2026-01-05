@@ -5255,13 +5255,13 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
     // Buscar perfil atual do usuário
     getProfile: protectedProcedure.query(async ({ ctx }) => {
       const profile = await db.getUserProfile(ctx.user.id);
-      return { profile: profile || 'enthusiast' };
+      return { profile: profile || 'traditional' }; // Perfil único
     }),
 
-    // Atualizar perfil do usuário
+    // Atualizar perfil do usuário (apenas traditional)
     updateProfile: protectedProcedure
       .input(z.object({
-        profile: z.enum(['traditional', 'enthusiast', 'interactive', 'organizational']),
+        profile: z.enum(['traditional']), // Perfil único
       }))
       .mutation(async ({ ctx, input }) => {
         await db.updateUserProfileType(ctx.user.id, input.profile);

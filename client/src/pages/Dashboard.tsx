@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useOnboardingTour } from "@/components/OnboardingTour";
 import { useAdaptiveDashboard } from "@/hooks/useAdaptiveDashboard";
-import { ProfileOnboarding } from "@/components/ProfileOnboarding";
+// ProfileOnboarding removido - perfil único tradicional
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -401,7 +401,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <ProfileOnboarding />
+      {/* ProfileOnboarding removido - perfil único tradicional */}
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-8 px-4">
@@ -428,12 +428,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex gap-2 items-center">
-              <Link href="/profile-selection">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <UserCog className="h-4 w-4" />
-                  Perfil
-                </Button>
-              </Link>
+              {/* Botão de perfil removido - perfil único tradicional */}
               <LogoutButton />
               {isCustomizing && (
                 <Button

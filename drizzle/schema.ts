@@ -11,7 +11,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  profile: mysqlEnum("profile", ["traditional", "enthusiast", "interactive", "organizational"]).default("enthusiast").notNull(),
+  profile: mysqlEnum("profile", ["traditional"]).default("traditional").notNull(), // Perfil único profissional
   active: boolean("active").default(true).notNull(),
   approvalStatus: mysqlEnum("approvalStatus", ["approved", "pending", "rejected"]).default("approved").notNull(),
   inviteCode: varchar("inviteCode", { length: 20 }), // Código de convite usado no cadastro

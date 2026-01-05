@@ -13,7 +13,7 @@ import Shifts from "./pages/Shifts";
 import TimeSlots from "./pages/TimeSlots";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
-import ProfileSelection from "./pages/ProfileSelection";
+// ProfileSelection removido - perfil único tradicional
 import AdminUsers from "./pages/AdminUsers";
 import ActiveMethodologies from "./pages/ActiveMethodologies";
 import Tasks from "./pages/Tasks";
@@ -79,7 +79,7 @@ function Router() {
         <Route path={"/tasks"} component={Tasks} />
         <Route path={"/announcements"} component={Announcements} />
         <Route path={"/profile"} component={Profile} />
-        <Route path={"/profile-selection"} component={ProfileSelection} />
+        {/* ProfileSelection removido - perfil único tradicional */}
         <Route path={"/admin/users"} component={AdminUsers} />
         <Route path={"/student-dashboard"} component={StudentDashboard} />
         <Route path={"/student-subjects"} component={StudentSubjects} />

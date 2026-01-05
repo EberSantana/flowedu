@@ -4615,3 +4615,22 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ### Sugestões de Melhorias Profissionais
 - [ ] Avaliar e sugerir melhorias focadas em produtividade e aprendizado
+
+
+## 👤 Simplificação de Perfis - Apenas Tradicional
+
+### Frontend
+- [x] Simplificar useAdaptiveDashboard para retornar apenas configuração tradicional
+- [x] Remover página de seleção de perfil (ProfileSelection) - rota removida
+- [x] Remover componente ProfileOnboarding - import removido do Dashboard
+- [x] Remover lógica de profileRestriction no Sidebar
+- [x] Atualizar Dashboard para não usar perfis - botão de perfil removido
+
+### Backend
+- [x] Definir perfil padrão como 'traditional' para todos os usuários
+- [x] Remover enum de perfis - mantido apenas 'traditional' no schema
+- [x] Atualizar função updateUserProfileType para aceitar apenas 'traditional'
+
+### Limpeza
+- [ ] Remover referências a enthusiast, interactive, organizational
+- [ ] Simplificar código que verifica perfil do usuário

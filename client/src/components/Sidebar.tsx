@@ -45,7 +45,7 @@ interface NavItem {
   icon: React.ReactNode;
   href: string;
   adminOnly?: boolean;
-  profileRestriction?: "enthusiast" | "interactive" | "organizational"; // Perfil mínimo necessário
+  // profileRestriction removido - perfil único tradicional
 }
 
 // Menu para professores (completo)
@@ -89,20 +89,17 @@ const teacherNavItems: NavItem[] = [
     label: "Desempenho em Exercícios",
     icon: <Target className="h-5 w-5" />,
     href: "/exercise-performance",
-    profileRestriction: "enthusiast",
   },
   {
     label: "Revisão de Respostas",
     icon: <CheckCircle2 className="h-5 w-5" />,
     href: "/teacher-review-answers",
-    profileRestriction: "enthusiast",
   },
   
   {
     label: "Trilhas de Aprendizagem",
     icon: <Route className="h-5 w-5" />,
     href: "/learning-paths",
-    profileRestriction: "enthusiast",
   },
   {
     label: "Metodologias",
@@ -119,12 +116,7 @@ const teacherNavItems: NavItem[] = [
     icon: <Megaphone className="h-5 w-5" />,
     href: "/announcements",
   },
-  {
-    label: "Gamificação",
-    icon: <Trophy className="h-5 w-5" />,
-    href: "/gamification-dashboard",
-    profileRestriction: "enthusiast",
-  },
+  
   {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
@@ -192,15 +184,7 @@ export default function Sidebar() {
     // Filtro de admin
     if (item.adminOnly && user?.role !== "admin") return false;
     
-    // Filtro de perfil (apenas para professores)
-    if (!isStudent && item.profileRestriction && profile) {
-      const profileOrder = ["traditional", "enthusiast", "interactive", "organizational"];
-      const userProfileIndex = profileOrder.indexOf(profile);
-      const requiredProfileIndex = profileOrder.indexOf(item.profileRestriction);
-      
-      // Se o perfil do usuário é menor que o requerido, ocultar
-      if (userProfileIndex < requiredProfileIndex) return false;
-    }
+    // Filtro de perfil removido - perfil único tradicional
     
     return true;
   });
@@ -395,8 +379,8 @@ export default function Sidebar() {
                       <button
                         onClick={() => {
                           // Remover onboarding do perfil atual
-                          const profile = user?.profile || 'enthusiast';
-                          localStorage.removeItem(`onboarding_completed_${profile}`);
+                          // Perfil único tradicional
+                          localStorage.removeItem('onboarding_completed_traditional');
                           window.location.reload();
                         }}
                         className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
@@ -457,8 +441,8 @@ export default function Sidebar() {
                   <button
                     onClick={() => {
                       // Remover onboarding do perfil atual
-                      const profile = user?.profile || 'enthusiast';
-                      localStorage.removeItem(`onboarding_completed_${profile}`);
+// Perfil único tradicional
+                      localStorage.removeItem('onboarding_completed_traditional');
                       window.location.reload();
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200"
