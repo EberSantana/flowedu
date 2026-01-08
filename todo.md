@@ -21,7 +21,7 @@
 - [x] BUG: Respostas corretas não estão sendo contabilizadas no contador de acertos do quiz (mostra 0 acertos mesmo quando a resposta está correta) - CORRIGIDO: lógica de extração de letra da resposta do aluno
 
 - [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React)
-- [ ] Corrigir logout automático após 10 segundos no portal do aluno (em investigação - cookie configurado, refetch desabilitado, redirecionamento corrigido)
+- [x] Corrigir logout automático após 10 segundos no portal do aluno (CORRIGIDO: configurado QueryClient para evitar refetch excessivo)
 - [x] Corrigir erro TypeError na página /student-review (QuestionReviewCard tentando fazer .map() em undefined)
 
 - [x] Corrigir erro de attemptId undefined na página de resultados de exercícios (/student-exercises/:id/results/undefined)
@@ -39,7 +39,7 @@
 - [x] Criar página TeacherReviewAnswers.tsx com interface de revisão
 - [x] Adicionar link "Revisão de Respostas" no menu Sidebar
 - [x] Criar testes automatizados para validação inteligente (8 testes passando)
-- [ ] Adicionar notificações para professor quando houver respostas pendentes
+- [x] Adicionar notificações para professor quando houver respostas pendentes (CONCLUÍDO: badge vermelho no menu lateral)
 
 ## Banco de Dados
 - [x] Criar tabela de disciplinas (subjects)
@@ -82,7 +82,7 @@
 - [x] Edição de aulas agendadas
 - [x] Exclusão de aulas agendadas
 - [x] Visualização de carga horária por professor
-- [ ] Exportação de grade de horários
+- [x] Exportação de grade de horários (CONCLUÍDO: PDF, Excel/CSV e Calendário .ics)
 
 ## Testes
 - [x] Criar testes para rotas de disciplinas
@@ -119,7 +119,7 @@
 - [x] Implementar CRUD completo de turnos (criar, editar, excluir)
 - [x] Criar página de gerenciamento de horários por turno
 - [x] Implementar CRUD completo de horários (criar, editar, excluir)
-- [ ] Adicionar validação de horários sobrepostos
+- [x] Adicionar validação de horários sobrepostos (CONCLUÍDO: validação completa com verificação de sobreposição)
 - [x] Adicionar link de configuração no dashboard
 - [ ] Adicionar botão de inicialização com dados padrão
 
@@ -2621,7 +2621,7 @@
 - [x] Adicionar botão de exercícios em cada card de módulo
 
 ## Bugs
-- [ ] Corrigir logout automático após cadastro de professor (sistema desloga depois de um tempo)
+- [x] Corrigir logout automático após cadastro de professor (CORRIGIDO: removido polling excessivo na página de registro)
 - [x] Corrigir logout automático após cadastro de professor (invalidar cache e forçar reload completo)
 - [x] Corrigir erro de JSON malformado na geração de mapas mentais
 - [x] Implementar exportação de provas e exercícios em PDF e Word (DOCX)

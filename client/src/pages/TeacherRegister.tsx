@@ -14,36 +14,21 @@ export default function TeacherRegister() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [isVerifyingSession, setIsVerifyingSession] = useState(false);
 
   const utils = trpc.useUtils();
-  
-  // Query para verificar sessão após cadastro
-  const { data: sessionData } = trpc.auth.me.useQuery(undefined, {
-    enabled: isVerifyingSession,
-    refetchInterval: isVerifyingSession ? 500 : false,
-  });
-
-  // Redirecionar quando sessão for confirmada
-  useEffect(() => {
-    if (isVerifyingSession && sessionData) {
-      window.location.href = "/dashboard";
-    }
-  }, [isVerifyingSession, sessionData]);
 
   const registerMutation = trpc.auth.registerTeacher.useMutation({
     onSuccess: async () => {
       toast.success("Conta criada com sucesso!");
       setIsRegistered(true);
       
-      // Invalidar cache e começar verificação de sessão
+      // Invalidar cache e redirecionar após pequeno delay
       await utils.auth.me.invalidate();
-      setIsVerifyingSession(true);
       
-      // Fallback: redirecionar após 3 segundos se verificação não funcionar
+      // Redirecionar após 1.5 segundos
       setTimeout(() => {
         window.location.href = "/dashboard";
-      }, 3000);
+      }, 1500);
     },
     onError: (error) => {
       toast.error(error.message);

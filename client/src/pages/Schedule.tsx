@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Calendar, ArrowLeft, Plus, Trash2, Download } from "lucide-react";
+import { Calendar, ArrowLeft, Plus, Trash2, Download, FileText, FileSpreadsheet } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -181,6 +181,138 @@ export default function Schedule() {
     setFilterSubjectId("all");
     setFilterClassId("all");
     setFilterShiftId("all");
+  };
+
+  const exportToPDF = () => {
+    if (!fullSchedule) {
+      toast.error("Nenhuma aula para exportar");
+      return;
+    }
+
+    // Criar conteúdo HTML para impressão
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error("Erro ao abrir janela de impressão");
+      return;
+    }
+
+    let htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Grade de Horários</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; color: #7c3aed; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+          th { background-color: #7c3aed; color: white; font-weight: bold; }
+          tr:nth-child(even) { background-color: #f9f9f9; }
+          .shift-header { background-color: #e9d5ff; font-weight: bold; padding: 8px; margin-top: 20px; }
+          @media print {
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Grade de Horários</h1>
+        <p style="text-align: center;">Gerado em: ${new Date().toLocaleDateString('pt-BR')}</p>
+    `;
+
+    fullSchedule.shifts.forEach(shift => {
+      const shiftSlots = fullSchedule.timeSlots.filter(slot => slot.shiftId === shift.id);
+      if (shiftSlots.length === 0) return;
+
+      htmlContent += `<div class="shift-header">${shift.name}</div>`;
+      htmlContent += '<table><thead><tr><th>Horário</th>';
+      
+      DAYS_OF_WEEK.forEach(day => {
+        htmlContent += `<th>${day.name}</th>`;
+      });
+      
+      htmlContent += '</tr></thead><tbody>';
+
+      shiftSlots.forEach(slot => {
+        htmlContent += `<tr><td><strong>${slot.startTime} - ${slot.endTime}</strong></td>`;
+        
+        DAYS_OF_WEEK.forEach(day => {
+          const scheduledClass = fullSchedule.scheduledClasses.find(
+            sc => sc.timeSlotId === slot.id && sc.dayOfWeek === day.id
+          );
+          
+          if (scheduledClass) {
+            const subject = fullSchedule.subjects.find(s => s.id === scheduledClass.subjectId);
+            const classInfo = fullSchedule.classes.find(c => c.id === scheduledClass.classId);
+            htmlContent += `<td><strong>${subject?.code || ''}</strong><br/>${classInfo?.name || ''}</td>`;
+          } else {
+            htmlContent += '<td>-</td>';
+          }
+        });
+        
+        htmlContent += '</tr>';
+      });
+      
+      htmlContent += '</tbody></table>';
+    });
+
+    htmlContent += `
+        <div style="margin-top: 30px; text-align: center;">
+          <button onclick="window.print()" style="padding: 10px 20px; background-color: #7c3aed; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Imprimir / Salvar como PDF</button>
+        </div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    toast.success("Abrindo visualização para impressão/PDF");
+  };
+
+  const exportToExcel = () => {
+    if (!fullSchedule) {
+      toast.error("Nenhuma aula para exportar");
+      return;
+    }
+
+    // Criar conteúdo CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Turno,Horário,Segunda,Terça,Quarta,Quinta,Sexta,Sábado\n";
+
+    fullSchedule.shifts.forEach(shift => {
+      const shiftSlots = fullSchedule.timeSlots.filter(slot => slot.shiftId === shift.id);
+      if (shiftSlots.length === 0) return;
+
+      shiftSlots.forEach(slot => {
+        let row = `${shift.name},"${slot.startTime} - ${slot.endTime}"`;
+        
+        DAYS_OF_WEEK.forEach(day => {
+          const scheduledClass = fullSchedule.scheduledClasses.find(
+            sc => sc.timeSlotId === slot.id && sc.dayOfWeek === day.id
+          );
+          
+          if (scheduledClass) {
+            const subject = fullSchedule.subjects.find(s => s.id === scheduledClass.subjectId);
+            const classInfo = fullSchedule.classes.find(c => c.id === scheduledClass.classId);
+            row += `,"${subject?.code || ''} - ${classInfo?.name || ''}"`;  
+          } else {
+            row += ',"-"';
+          }
+        });
+        
+        csvContent += row + "\n";
+      });
+    });
+
+    // Download do arquivo CSV
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `grade_horarios_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success("Grade exportada para Excel/CSV com sucesso!");
   };
 
   const exportToCalendar = () => {
@@ -357,14 +489,32 @@ export default function Schedule() {
                 <Calendar className="h-8 w-8 text-purple-600" />
                 Grade de Horários
               </h1>
-              <Button
-                onClick={exportToCalendar}
-                className="bg-green-600 hover:bg-green-700 text-white"
-                size="lg"
-              >
-                <Download className="mr-2 h-5 w-5" />
-                Exportar para Calendário
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={exportToPDF}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  size="lg"
+                >
+                  <FileText className="mr-2 h-5 w-5" />
+                  PDF
+                </Button>
+                <Button
+                  onClick={exportToExcel}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  size="lg"
+                >
+                  <FileSpreadsheet className="mr-2 h-5 w-5" />
+                  Excel
+                </Button>
+                <Button
+                  onClick={exportToCalendar}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size="lg"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Calendário
+                </Button>
+              </div>
             </div>
           </div>
 

@@ -435,6 +435,62 @@ export async function deleteTimeSlot(id: number, userId: number) {
   );
 }
 
+export async function checkTimeSlotOverlap(
+  shiftId: number,
+  startTime: string,
+  endTime: string,
+  userId: number,
+  excludeId?: number
+) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  // Buscar todos os horários do mesmo turno
+  const conditions = [
+    eq(timeSlots.shiftId, shiftId),
+    eq(timeSlots.userId, userId)
+  ];
+  
+  if (excludeId) {
+    // @ts-ignore
+    conditions.push(ne(timeSlots.id, excludeId));
+  }
+  
+  const existingSlots = await db.select().from(timeSlots).where(
+    and(...conditions)
+  );
+  
+  // Converter horários para minutos para facilitar comparação
+  const [startHour, startMin] = startTime.split(':').map(Number);
+  const [endHour, endMin] = endTime.split(':').map(Number);
+  const newStartMinutes = startHour * 60 + startMin;
+  const newEndMinutes = endHour * 60 + endMin;
+  
+  // Verificar sobreposição com cada horário existente
+  for (const slot of existingSlots) {
+    const [existStartHour, existStartMin] = slot.startTime.split(':').map(Number);
+    const [existEndHour, existEndMin] = slot.endTime.split(':').map(Number);
+    const existStartMinutes = existStartHour * 60 + existStartMin;
+    const existEndMinutes = existEndHour * 60 + existEndMin;
+    
+    // Verifica se há sobreposição:
+    // - Novo horário começa durante um horário existente
+    // - Novo horário termina durante um horário existente
+    // - Novo horário engloba completamente um horário existente
+    const overlaps = (
+      (newStartMinutes >= existStartMinutes && newStartMinutes < existEndMinutes) ||
+      (newEndMinutes > existStartMinutes && newEndMinutes <= existEndMinutes) ||
+      (newStartMinutes <= existStartMinutes && newEndMinutes >= existEndMinutes)
+    );
+    
+    if (overlaps) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
 // ========== SCHEDULED CLASSES ==========
 
 export async function createScheduledClass(data: InsertScheduledClass) {
@@ -613,7 +669,7 @@ export async function updateUserRole(userId: number, role: "admin" | "user") {
   return { success: true };
 }
 
-export async function updateUserProfileType(userId: number, profile: "traditional") {
+export async function updateUserProfileType(userId: number, profile: "traditional" | "enthusiast" | "interactive" | "organizational") {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ profile }).where(eq(users.id, userId));

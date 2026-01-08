@@ -175,6 +175,12 @@ export default function Sidebar() {
     enabled: isStudent, // Habilita apenas para alunos
   });
   
+  // Query para respostas pendentes de revisão (badge de notificação) - apenas para professores
+  const { data: pendingReviewsData } = trpc.teacherExercises.countPendingReviews.useQuery(undefined, {
+    refetchInterval: 60000, // Atualiza a cada 60 segundos
+    enabled: !isStudent, // Habilita apenas para professores
+  });
+  
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       window.location.href = "/";
@@ -310,6 +316,7 @@ export default function Sidebar() {
                   const isActive = location === item.href;
                   const isCalendar = item.href === '/calendar';
                   const isAnnouncementsMenu = item.label === 'Avisos'; // Usar label ao invés de href
+                  const isReviewAnswers = item.href === '/teacher-review-answers';
                   
                   // Contador de notificações
                   let notificationCount = 0;
@@ -317,6 +324,8 @@ export default function Sidebar() {
                     notificationCount = upcomingEvents.length;
                   } else if (isAnnouncementsMenu && unreadAnnouncementsCount !== undefined) {
                     notificationCount = unreadAnnouncementsCount;
+                  } else if (isReviewAnswers && pendingReviewsData) {
+                    notificationCount = pendingReviewsData.count;
                   }
                   
                   const linkContent = (
@@ -342,7 +351,7 @@ export default function Sidebar() {
                         {item.icon}
                       </span>
                       {!isCompact && <span className="font-medium">{item.label}</span>}
-                      {(isCalendar || isAnnouncementsMenu) && notificationCount > 0 && (
+                      {(isCalendar || isAnnouncementsMenu || isReviewAnswers) && notificationCount > 0 && (
                         <span className={`
                           flex items-center justify-center
                           bg-red-500 text-white text-[10px] font-bold rounded-full

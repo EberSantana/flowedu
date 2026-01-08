@@ -518,6 +518,34 @@ export const appRouter = router({
         endTime: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Validar formato de horário (HH:MM)
+        const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!timeRegex.test(input.startTime) || !timeRegex.test(input.endTime)) {
+          throw new Error("Formato de horário inválido. Use HH:MM (ex: 08:00)");
+        }
+        
+        // Validar que startTime < endTime
+        const [startHour, startMin] = input.startTime.split(':').map(Number);
+        const [endHour, endMin] = input.endTime.split(':').map(Number);
+        const startMinutes = startHour * 60 + startMin;
+        const endMinutes = endHour * 60 + endMin;
+        
+        if (startMinutes >= endMinutes) {
+          throw new Error("Horário de início deve ser anterior ao horário de término");
+        }
+        
+        // Verificar sobreposição com outros horários do mesmo turno
+        const hasOverlap = await db.checkTimeSlotOverlap(
+          input.shiftId,
+          input.startTime,
+          input.endTime,
+          ctx.user.id
+        );
+        
+        if (hasOverlap) {
+          throw new Error("Este horário se sobrepõe a outro horário já cadastrado neste turno");
+        }
+        
         await db.createTimeSlot({
           ...input,
           userId: ctx.user.id,
@@ -535,6 +563,49 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
+        
+        // Se está atualizando horários, validar
+        if (data.startTime || data.endTime) {
+          // Buscar horário atual
+          const current = await db.getTimeSlotById(id, ctx.user.id);
+          if (!current) {
+            throw new Error("Horário não encontrado");
+          }
+          
+          const startTime = data.startTime || current.startTime;
+          const endTime = data.endTime || current.endTime;
+          const shiftId = data.shiftId || current.shiftId;
+          
+          // Validar formato
+          const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+          if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+            throw new Error("Formato de horário inválido. Use HH:MM (ex: 08:00)");
+          }
+          
+          // Validar que startTime < endTime
+          const [startHour, startMin] = startTime.split(':').map(Number);
+          const [endHour, endMin] = endTime.split(':').map(Number);
+          const startMinutes = startHour * 60 + startMin;
+          const endMinutes = endHour * 60 + endMin;
+          
+          if (startMinutes >= endMinutes) {
+            throw new Error("Horário de início deve ser anterior ao horário de término");
+          }
+          
+          // Verificar sobreposição (excluindo o próprio registro)
+          const hasOverlap = await db.checkTimeSlotOverlap(
+            shiftId,
+            startTime,
+            endTime,
+            ctx.user.id,
+            id
+          );
+          
+          if (hasOverlap) {
+            throw new Error("Este horário se sobrepõe a outro horário já cadastrado neste turno");
+          }
+        }
+        
         await db.updateTimeSlot(id, ctx.user.id, data);
         return { success: true };
       }),
@@ -5288,10 +5359,10 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
       return { profile: profile || 'traditional' }; // Perfil único
     }),
 
-    // Atualizar perfil do usuário (apenas traditional)
+    // Atualizar perfil do usuário
     updateProfile: protectedProcedure
       .input(z.object({
-        profile: z.enum(['traditional']), // Perfil único
+        profile: z.enum(['traditional', 'enthusiast', 'interactive', 'organizational']),
       }))
       .mutation(async ({ ctx, input }) => {
         await db.updateUserProfileType(ctx.user.id, input.profile);
