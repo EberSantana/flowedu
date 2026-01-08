@@ -129,422 +129,490 @@ export function LearningAnalytics() {
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Sidebar />
       <PageWrapper>
-        <div className="max-w-7xl mx-auto py-8 px-6 space-y-8">
-          {/* Header Moderno */}
-          <div className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-90 rounded-2xl"></div>
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-10"></div>
-            
-            <div className="relative px-8 py-10">
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/30">
-                  <Brain className="h-10 w-10 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
-                    Análise de Aprendizado com IA
-                  </h1>
-                  <p className="text-indigo-100 text-lg font-medium">
-                    Monitore comportamento, padrões e evolução dos seus alunos com inteligência artificial
-                  </p>
-                </div>
-                <div className="hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-3 rounded-xl border border-white/20">
-                  <Sparkles className="h-5 w-5 text-yellow-300" />
-                  <span className="text-white font-semibold">Powered by AI</span>
-                </div>
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                <Brain className="h-7 w-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-slate-900 mb-1">
+                  Análise de Aprendizado com IA
+                </h1>
+                <p className="text-slate-600">
+                  Monitore comportamento, padrões e evolução dos seus alunos com inteligência artificial
+                </p>
+              </div>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-2 rounded-lg border border-indigo-200">
+                <Sparkles className="h-5 w-5 text-indigo-600" />
+                <span className="text-indigo-700 font-semibold text-sm">Powered by AI</span>
               </div>
             </div>
           </div>
 
-          {/* Estatísticas em Grid Moderno */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group bg-gradient-to-br from-blue-500 to-blue-600">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <CardContent className="pt-6 relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Users className="h-6 w-6 text-white" />
+          {/* Estatísticas em Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
                   </div>
-                  <BarChart3 className="h-8 w-8 text-white/30" />
+                  <BarChart3 className="h-5 w-5 text-slate-400" />
                 </div>
-                <p className="text-blue-100 text-sm font-medium mb-1">Total de Alunos</p>
-                <p className="text-4xl font-bold text-white">{classAnalytics?.totalStudents || 0}</p>
+                <p className="text-slate-600 text-sm font-medium mb-1">Total de Alunos</p>
+                <p className="text-3xl font-bold text-slate-900">{classAnalytics?.totalStudents || 0}</p>
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group bg-gradient-to-br from-red-500 to-red-600">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <CardContent className="pt-6 relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <AlertTriangle className="h-6 w-6 text-white" />
+            <Card className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
                   </div>
-                  <AlertCircle className="h-8 w-8 text-white/30" />
+                  <AlertCircle className="h-5 w-5 text-slate-400" />
                 </div>
-                <p className="text-red-100 text-sm font-medium mb-1">Alertas Críticos</p>
-                <p className="text-4xl font-bold text-white">{alertStats?.critical || 0}</p>
+                <p className="text-slate-600 text-sm font-medium mb-1">Alertas Críticos</p>
+                <p className="text-3xl font-bold text-slate-900">{alertStats?.critical || 0}</p>
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group bg-gradient-to-br from-orange-500 to-orange-600">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <CardContent className="pt-6 relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Target className="h-6 w-6 text-white" />
+            <Card className="border-l-4 border-l-orange-500 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Target className="h-6 w-6 text-orange-600" />
                   </div>
-                  <Activity className="h-8 w-8 text-white/30" />
+                  <Activity className="h-5 w-5 text-slate-400" />
                 </div>
-                <p className="text-orange-100 text-sm font-medium mb-1">Precisam Atenção</p>
-                <p className="text-4xl font-bold text-white">{classAnalytics?.studentsNeedingAttention || 0}</p>
+                <p className="text-slate-600 text-sm font-medium mb-1">Precisam Atenção</p>
+                <p className="text-3xl font-bold text-slate-900">{classAnalytics?.studentsNeedingAttention || 0}</p>
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group bg-gradient-to-br from-yellow-500 to-yellow-600">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <CardContent className="pt-6 relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Lightbulb className="h-6 w-6 text-white" />
+            <Card className="border-l-4 border-l-yellow-500 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <Lightbulb className="h-6 w-6 text-yellow-600" />
                   </div>
-                  <Sparkles className="h-8 w-8 text-white/30" />
+                  <Sparkles className="h-5 w-5 text-slate-400" />
                 </div>
-                <p className="text-yellow-100 text-sm font-medium mb-1">Insights Recentes</p>
-                <p className="text-4xl font-bold text-white">{classAnalytics?.recentInsights?.length || 0}</p>
+                <p className="text-slate-600 text-sm font-medium mb-1">Insights Recentes</p>
+                <p className="text-3xl font-bold text-slate-900">{classAnalytics?.recentInsights?.length || 0}</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Seleção de Aluno - Design Melhorado */}
-          <Card className="border-0 shadow-lg bg-white">
-            <CardHeader className="border-b bg-gradient-to-r from-purple-50 to-indigo-50">
+          {/* Seleção de Aluno */}
+          <Card className="shadow-sm">
+            <CardHeader className="border-b bg-slate-50">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-md">
-                  <Activity className="h-6 w-6 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Análise Individual com IA</CardTitle>
-                  <CardDescription className="text-base">
-                    Selecione um aluno para gerar análise detalhada e personalizada
-                  </CardDescription>
+                  <CardTitle>Análise Individual</CardTitle>
+                  <CardDescription>Selecione um aluno para análise detalhada com IA</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Selecione o Aluno
-                  </label>
                   <Select
-                    value={selectedStudent?.toString()}
-                    onValueChange={(value) => setSelectedStudent(parseInt(value))}
+                    value={selectedStudent?.toString() || ""}
+                    onValueChange={(value) => setSelectedStudent(Number(value))}
                   >
-                    <SelectTrigger className="h-12 text-base border-2 hover:border-purple-300 transition-colors">
-                      <SelectValue placeholder="Escolha um aluno da lista" />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione um aluno..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {students?.map((student) => (
-                        <SelectItem key={student.id} value={student.id.toString()} className="text-base py-3">
-                          {student.fullName}
-                        </SelectItem>
-                      ))}
+                      {loadingStudents ? (
+                        <SelectItem value="loading" disabled>Carregando...</SelectItem>
+                      ) : students && students.length > 0 ? (
+                        students.map((student) => (
+                          <SelectItem key={student.id} value={student.id.toString()}>
+                            {student.fullName}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="empty" disabled>Nenhum aluno cadastrado</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="flex items-end">
-                  <Button
-                    onClick={handleAnalyzeStudent}
-                    disabled={!selectedStudent || isAnalyzing}
-                    size="lg"
-                    className="h-12 px-8 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <Clock className="h-5 w-5 mr-2 animate-spin" />
-                        Analisando...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-5 w-5 mr-2" />
-                        Analisar com IA
-                        <ArrowRight className="h-5 w-5 ml-2" />
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Button
+                  onClick={handleAnalyzeStudent}
+                  disabled={!selectedStudent || isAnalyzing}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Activity className="mr-2 h-4 w-4 animate-spin" />
+                      Analisando...
+                    </>
+                  ) : (
+                    <>
+                      <Brain className="mr-2 h-4 w-4" />
+                      Analisar com IA
+                    </>
+                  )}
+                </Button>
               </div>
-
-              {selectedStudentData && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                      {selectedStudentData.fullName.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">{selectedStudentData.fullName}</p>
-                      <p className="text-sm text-gray-600">Matrícula: {selectedStudentData.registrationNumber}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
-          {/* Tabs com Resultados - Design Melhorado */}
+          {/* Tabs de Análise */}
           {selectedStudent && (
-            <Card className="border-0 shadow-lg bg-white">
-              <Tabs defaultValue="insights" className="w-full">
-                <div className="border-b bg-gray-50 px-6 pt-4">
-                  <TabsList className="grid w-full max-w-2xl grid-cols-3 h-12 bg-white border shadow-sm">
-                    <TabsTrigger value="insights" className="text-base font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                      <Lightbulb className="h-4 w-4 mr-2" />
-                      Insights ({studentInsights?.length || 0})
-                    </TabsTrigger>
-                    <TabsTrigger value="alerts" className="text-base font-medium data-[state=active]:bg-orange-600 data-[state=active]:text-white">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      Alertas ({studentAlerts?.length || 0})
-                    </TabsTrigger>
-                    <TabsTrigger value="patterns" className="text-base font-medium data-[state=active]:bg-green-600 data-[state=active]:text-white">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Padrões ({learningPatterns?.length || 0})
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
+            <Tabs defaultValue="insights" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-slate-100">
+                <TabsTrigger value="insights" className="data-[state=active]:bg-white">
+                  <Lightbulb className="h-4 w-4 mr-2" />
+                  Insights
+                </TabsTrigger>
+                <TabsTrigger value="alerts" className="data-[state=active]:bg-white">
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Alertas
+                </TabsTrigger>
+                <TabsTrigger value="patterns" className="data-[state=active]:bg-white">
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Padrões
+                </TabsTrigger>
+              </TabsList>
 
-                {/* Tab de Insights */}
-                <TabsContent value="insights" className="p-6">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-4">
-                      {studentInsights && studentInsights.length > 0 ? (
-                        studentInsights.map((insight) => (
-                          <Card key={insight.id} className="border-l-4 shadow-md hover:shadow-lg transition-all duration-300" style={{
-                            borderLeftColor: insight.priority === 'critical' ? '#ef4444' :
-                              insight.priority === 'high' ? '#f97316' :
-                              insight.priority === 'medium' ? '#3b82f6' : '#6b7280'
-                          }}>
-                            <CardHeader className="pb-3">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-3">
-                                    {getPriorityIcon(insight.priority)}
-                                    <CardTitle className="text-lg font-semibold text-gray-900">
-                                      {insight.title}
-                                    </CardTitle>
-                                  </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    <Badge variant={getPriorityColor(insight.priority)} className="text-xs font-semibold">
-                                      {insight.priority.toUpperCase()}
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      {insight.insightType}
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-xs">
-                                      <Sparkles className="h-3 w-3 mr-1" />
-                                      Confiança: {Math.round(insight.confidence * 100)}%
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => dismissInsightMutation.mutate({ insightId: insight.id })}
-                                  className="hover:bg-red-50 hover:text-red-600"
-                                >
-                                  <XCircle className="h-5 w-5" />
-                                </Button>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                              <p className="text-base text-gray-700 leading-relaxed">{insight.description}</p>
-                              {insight.actionable && insight.actionSuggestion && (
-                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
-                                  <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                      <Lightbulb className="h-4 w-4 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                      <p className="text-sm font-semibold text-blue-900 mb-1">
-                                        Ação Sugerida
-                                      </p>
-                                      <p className="text-sm text-blue-800 leading-relaxed">{insight.actionSuggestion}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
-                                <Clock className="h-3 w-3" />
-                                Gerado em {new Date(insight.generatedAt).toLocaleString('pt-BR')}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))
-                      ) : (
-                        <Card className="border-2 border-dashed">
-                          <CardContent className="py-16 text-center">
-                            <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
-                              <Lightbulb className="h-8 w-8 text-purple-600" />
-                            </div>
-                            <p className="text-lg font-medium text-gray-900 mb-2">Nenhum insight disponível</p>
-                            <p className="text-gray-600">Clique em "Analisar com IA" para gerar insights personalizados</p>
-                          </CardContent>
-                        </Card>
-                      )}
+              {/* Tab: Insights */}
+              <TabsContent value="insights" className="mt-4">
+                <Card className="shadow-sm">
+                  <CardHeader className="border-b bg-slate-50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Lightbulb className="h-5 w-5 text-yellow-600" />
+                          Insights Gerados pela IA
+                        </CardTitle>
+                        <CardDescription>
+                          {selectedStudentData?.fullName}
+                        </CardDescription>
+                      </div>
+                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                        {studentInsights?.length || 0} insights
+                      </Badge>
                     </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                {/* Tab de Alertas */}
-                <TabsContent value="alerts" className="p-6">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-4">
-                      {studentAlerts && studentAlerts.length > 0 ? (
-                        studentAlerts.map((alert) => (
-                          <Card key={alert.id} className="border-l-4 shadow-md hover:shadow-lg transition-all duration-300" style={{
-                            borderLeftColor: alert.severity === 'critical' ? '#ef4444' :
-                              alert.severity === 'urgent' ? '#f97316' :
-                              alert.severity === 'warning' ? '#eab308' : '#3b82f6'
-                          }}>
-                            <CardHeader className="pb-3">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-3">
-                                    <AlertTriangle className="h-5 w-5 text-orange-500" />
-                                    <CardTitle className="text-lg font-semibold text-gray-900">
-                                      {alert.title}
-                                    </CardTitle>
-                                  </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    <Badge className={`${getSeverityColor(alert.severity)} text-white text-xs font-semibold`}>
-                                      {alert.severity.toUpperCase()}
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <ScrollArea className="h-[400px] pr-4">
+                      {!studentInsights || studentInsights.length === 0 ? (
+                        <div className="text-center py-12">
+                          <Lightbulb className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-500">Nenhum insight disponível ainda</p>
+                          <p className="text-sm text-slate-400 mt-1">Clique em "Analisar com IA" para gerar insights</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {studentInsights.map((insight: any) => (
+                            <Card key={insight.id} className="border-l-4 border-l-yellow-500 shadow-sm">
+                              <CardContent className="pt-4">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    {getPriorityIcon(insight.priority)}
+                                    <Badge variant={getPriorityColor(insight.priority) as any}>
+                                      {insight.priority}
                                     </Badge>
                                     <Badge variant="outline" className="text-xs">
-                                      {alert.alertType.replace(/_/g, ' ')}
+                                      {insight.category}
                                     </Badge>
-                                    {alert.acknowledged && (
-                                      <Badge variant="secondary" className="text-xs">
-                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                        Reconhecido
-                                      </Badge>
-                                    )}
-                                    {alert.resolved && (
-                                      <Badge className="bg-green-600 text-white text-xs">
-                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                        Resolvido
-                                      </Badge>
-                                    )}
                                   </div>
+                                  <span className="text-xs text-slate-500">
+                                    {new Date(insight.generatedAt).toLocaleDateString('pt-BR')}
+                                  </span>
                                 </div>
+                                <h4 className="font-semibold text-slate-900 mb-2">{insight.title}</h4>
+                                <p className="text-sm text-slate-600 mb-3">{insight.description}</p>
+                                {insight.recommendations && (
+                                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                    <p className="text-xs font-semibold text-blue-900 mb-1">Recomendações:</p>
+                                    <p className="text-xs text-blue-700">{insight.recommendations}</p>
+                                  </div>
+                                )}
+                                {insight.confidence && (
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-xs text-slate-500">Confiança:</span>
+                                    <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                      <div
+                                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full"
+                                        style={{ width: `${insight.confidence}%` }}
+                                      />
+                                    </div>
+                                    <span className="text-xs font-semibold text-slate-700">{insight.confidence}%</span>
+                                  </div>
+                                )}
+                                {!insight.dismissed && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => dismissInsightMutation.mutate({ insightId: insight.id })}
+                                    className="text-xs"
+                                  >
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Dispensar
+                                  </Button>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Tab: Alertas */}
+              <TabsContent value="alerts" className="mt-4">
+                <Card className="shadow-sm">
+                  <CardHeader className="border-b bg-slate-50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <AlertTriangle className="h-5 w-5 text-orange-600" />
+                          Alertas de Desempenho
+                        </CardTitle>
+                        <CardDescription>
+                          {selectedStudentData?.fullName}
+                        </CardDescription>
+                      </div>
+                      <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+                        {studentAlerts?.length || 0} alertas
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <ScrollArea className="h-[400px] pr-4">
+                      {!studentAlerts || studentAlerts.length === 0 ? (
+                        <div className="text-center py-12">
+                          <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
+                          <p className="text-slate-500">Nenhum alerta ativo</p>
+                          <p className="text-sm text-slate-400 mt-1">O aluno está com bom desempenho</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {studentAlerts.map((alert: any) => (
+                            <Card key={alert.id} className="border-l-4 border-l-orange-500 shadow-sm">
+                              <CardContent className="pt-4">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <div className={`w-2 h-2 rounded-full ${getSeverityColor(alert.severity)}`} />
+                                    <Badge variant="outline" className="text-xs">
+                                      {alert.type}
+                                    </Badge>
+                                  </div>
+                                  <span className="text-xs text-slate-500">
+                                    {new Date(alert.detectedAt).toLocaleDateString('pt-BR')}
+                                  </span>
+                                </div>
+                                <h4 className="font-semibold text-slate-900 mb-2">{alert.title}</h4>
+                                <p className="text-sm text-slate-600 mb-3">{alert.message}</p>
+                                {alert.metrics && (
+                                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-3">
+                                    <p className="text-xs font-semibold text-slate-700 mb-1">Métricas:</p>
+                                    <pre className="text-xs text-slate-600 whitespace-pre-wrap">
+                                      {JSON.stringify(alert.metrics, null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+                                <div className="flex gap-2">
+                                  {alert.status === 'active' && (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => acknowledgeAlertMutation.mutate({ alertId: alert.id })}
+                                        className="text-xs"
+                                      >
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Reconhecer
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
+                                        className="text-xs bg-green-600 hover:bg-green-700"
+                                      >
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Resolver
+                                      </Button>
+                                    </>
+                                  )}
+                                  {alert.status === 'acknowledged' && (
+                                    <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                                      Reconhecido
+                                    </Badge>
+                                  )}
+                                  {alert.status === 'resolved' && (
+                                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                                      Resolvido
+                                    </Badge>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Tab: Padrões */}
+              <TabsContent value="patterns" className="mt-4">
+                <Card className="shadow-sm">
+                  <CardHeader className="border-b bg-slate-50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <TrendingUp className="h-5 w-5 text-blue-600" />
+                          Padrões de Aprendizado
+                        </CardTitle>
+                        <CardDescription>
+                          {selectedStudentData?.fullName}
+                        </CardDescription>
+                      </div>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {learningPatterns?.length || 0} padrões
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <ScrollArea className="h-[400px] pr-4">
+                      {!learningPatterns || learningPatterns.length === 0 ? (
+                        <div className="text-center py-12">
+                          <Activity className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-500">Nenhum padrão identificado ainda</p>
+                          <p className="text-sm text-slate-400 mt-1">Dados insuficientes para análise de padrões</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {learningPatterns.map((pattern: any) => (
+                            <Card key={pattern.id} className="border-l-4 border-l-blue-500 shadow-sm">
+                              <CardContent className="pt-4">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <TrendingUp className="h-4 w-4 text-blue-600" />
+                                    <Badge variant="outline" className="text-xs">
+                                      {pattern.patternType}
+                                    </Badge>
+                                  </div>
+                                  <span className="text-xs text-slate-500">
+                                    {new Date(pattern.identifiedAt).toLocaleDateString('pt-BR')}
+                                  </span>
+                                </div>
+                                <h4 className="font-semibold text-slate-900 mb-2">{pattern.title}</h4>
+                                <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
+                                {pattern.frequency && (
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Clock className="h-4 w-4 text-slate-400" />
+                                    <span className="text-xs text-slate-600">
+                                      Frequência: <strong>{pattern.frequency}</strong>
+                                    </span>
+                                  </div>
+                                )}
+                                {pattern.impact && (
+                                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-purple-900 mb-1">Impacto:</p>
+                                    <p className="text-xs text-purple-700">{pattern.impact}</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          )}
+
+          {/* Alertas Gerais da Turma */}
+          {!selectedStudent && (
+            <Card className="shadow-sm">
+              <CardHeader className="border-b bg-slate-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-600" />
+                      Alertas Gerais da Turma
+                    </CardTitle>
+                    <CardDescription>Situações que requerem atenção imediata</CardDescription>
+                  </div>
+                  <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                    {alerts?.length || 0} alertas
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <ScrollArea className="h-[400px] pr-4">
+                  {!alerts || alerts.length === 0 ? (
+                    <div className="text-center py-12">
+                      <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
+                      <p className="text-slate-500">Nenhum alerta ativo</p>
+                      <p className="text-sm text-slate-400 mt-1">Tudo está funcionando bem</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {alerts.map((alert: any) => (
+                        <Card key={alert.id} className="border-l-4 border-l-red-500 shadow-sm">
+                          <CardContent className="pt-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${getSeverityColor(alert.severity)}`} />
+                                <Badge variant="outline" className="text-xs">
+                                  {alert.type}
+                                </Badge>
+                                <span className="text-xs text-slate-600">
+                                  {alert.student?.fullName}
+                                </span>
                               </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                              <p className="text-base text-gray-700 leading-relaxed">{alert.message}</p>
-                              {alert.recommendedAction && (
-                                <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-100">
-                                  <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                      <Target className="h-4 w-4 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                      <p className="text-sm font-semibold text-orange-900 mb-1">
-                                        Ação Recomendada
-                                      </p>
-                                      <p className="text-sm text-orange-800 leading-relaxed">{alert.recommendedAction}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              <div className="flex flex-wrap gap-2 pt-2">
-                                {!alert.acknowledged && (
+                              <span className="text-xs text-slate-500">
+                                {new Date(alert.detectedAt).toLocaleDateString('pt-BR')}
+                              </span>
+                            </div>
+                            <h4 className="font-semibold text-slate-900 mb-2">{alert.title}</h4>
+                            <p className="text-sm text-slate-600 mb-3">{alert.message}</p>
+                            <div className="flex gap-2">
+                              {alert.status === 'active' && (
+                                <>
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() => acknowledgeAlertMutation.mutate({ alertId: alert.id })}
-                                    className="hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
+                                    className="text-xs"
                                   >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    <CheckCircle className="h-3 w-3 mr-1" />
                                     Reconhecer
                                   </Button>
-                                )}
-                                {!alert.resolved && (
                                   <Button
                                     size="sm"
                                     onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
-                                    className="bg-green-600 hover:bg-green-700"
+                                    className="text-xs bg-green-600 hover:bg-green-700"
                                   >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Marcar como Resolvido
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Resolver
                                   </Button>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
-                                <Clock className="h-3 w-3" />
-                                Criado em {new Date(alert.createdAt).toLocaleString('pt-BR')}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))
-                      ) : (
-                        <Card className="border-2 border-dashed">
-                          <CardContent className="py-16 text-center">
-                            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                              <CheckCircle className="h-8 w-8 text-green-600" />
+                                </>
+                              )}
                             </div>
-                            <p className="text-lg font-medium text-gray-900 mb-2">Nenhum alerta ativo</p>
-                            <p className="text-gray-600">Este aluno não possui alertas no momento</p>
                           </CardContent>
                         </Card>
-                      )}
+                      ))}
                     </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                {/* Tab de Padrões */}
-                <TabsContent value="patterns" className="p-6">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-4">
-                      {learningPatterns && learningPatterns.length > 0 ? (
-                        learningPatterns.map((pattern) => (
-                          <Card key={pattern.id} className="border-l-4 border-l-green-500 shadow-md hover:shadow-lg transition-all duration-300">
-                            <CardHeader className="pb-3">
-                              <div className="flex items-center gap-3 mb-3">
-                                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                                  <TrendingUp className="h-5 w-5 text-green-600" />
-                                </div>
-                                <CardTitle className="text-lg font-semibold text-gray-900">
-                                  {pattern.patternType.replace(/_/g, ' ').toUpperCase()}
-                                </CardTitle>
-                              </div>
-                              <Badge variant="secondary" className="w-fit">
-                                <Sparkles className="h-3 w-3 mr-1" />
-                                Confiança: {Math.round(pattern.confidence * 100)}%
-                              </Badge>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                              <p className="text-base text-gray-700 leading-relaxed">{pattern.patternDescription}</p>
-                              <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
-                                <Clock className="h-3 w-3" />
-                                Detectado em {new Date(pattern.detectedAt).toLocaleString('pt-BR')}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))
-                      ) : (
-                        <Card className="border-2 border-dashed">
-                          <CardContent className="py-16 text-center">
-                            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                              <TrendingUp className="h-8 w-8 text-green-600" />
-                            </div>
-                            <p className="text-lg font-medium text-gray-900 mb-2">Nenhum padrão identificado</p>
-                            <p className="text-gray-600">Clique em "Analisar com IA" para detectar padrões de aprendizado</p>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
+                  )}
+                </ScrollArea>
+              </CardContent>
             </Card>
           )}
         </div>
@@ -552,3 +620,5 @@ export function LearningAnalytics() {
     </div>
   );
 }
+
+export default LearningAnalytics;

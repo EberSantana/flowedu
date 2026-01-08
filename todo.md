@@ -4890,3 +4890,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar animações sutis (fade-in, slide-up) em cards e estados vazios
 - [x] Testar responsividade em diferentes tamanhos (320px, 768px, 1024px)
 - [x] Validar modais e formulários em dispositivos mobile
+- [x] Padronizar página de Análise de Aprendizado com IA (LearningAnalytics) - corrigir centralização e alinhar com design das demais páginas
