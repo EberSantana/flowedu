@@ -256,11 +256,13 @@ export default function Reports() {
     <PageWrapper>
       <Sidebar />
       <div className="flex-1 overflow-auto">
-        <div className="container mx-auto py-8 px-4">
-          {/* Header */}
-          <div className="mb-8">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
+          {/* Header com animação fade-in */}
+          <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-blue-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <BarChart3 className="h-8 w-8 text-blue-600" />
+              </div>
               Relatórios de Aulas
             </h1>
             <p className="text-gray-600 mt-2">
@@ -268,16 +270,16 @@ export default function Reports() {
             </p>
           </div>
           
-          {/* Filtros */}
-          <Card className="mb-6">
-            <CardHeader>
+          {/* Filtros com animação */}
+          <Card className="mb-6 border-l-4 border-l-blue-500 shadow-md animate-in fade-in slide-in-from-top-4 duration-500 delay-100">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-white">
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
+                <Calendar className="h-5 w-5 text-blue-600" />
                 Filtros
               </CardTitle>
               <CardDescription>Selecione o período e disciplina para visualizar</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -320,7 +322,7 @@ export default function Reports() {
                 <div className="flex items-end">
                   <Button 
                     onClick={exportToPDF}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-blue-600 hover:bg-blue-700 transition-all hover:scale-105"
                     disabled={isLoading || !stats}
                   >
                     <FileDown className="h-4 w-4 mr-2" />
@@ -331,11 +333,11 @@ export default function Reports() {
             </CardContent>
           </Card>
           
-          {/* Cards de Estatísticas */}
+          {/* Cards de Estatísticas com animação escalonada */}
           {stats && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <Card className="border-l-4 border-l-blue-500">
+                <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600">Total de Aulas</CardTitle>
                   </CardHeader>
@@ -345,7 +347,7 @@ export default function Reports() {
                   </CardContent>
                 </Card>
                 
-                <Card className="border-l-4 border-l-green-500">
+                <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600">Aulas Dadas</CardTitle>
                   </CardHeader>
@@ -357,7 +359,7 @@ export default function Reports() {
                   </CardContent>
                 </Card>
                 
-                <Card className="border-l-4 border-l-yellow-500">
+                <Card className="border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600">Não Dadas</CardTitle>
                   </CardHeader>
@@ -369,7 +371,7 @@ export default function Reports() {
                   </CardContent>
                 </Card>
                 
-                <Card className="border-l-4 border-l-red-500">
+                <Card className="border-l-4 border-l-red-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[400ms]">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600">Canceladas</CardTitle>
                   </CardHeader>
@@ -381,7 +383,7 @@ export default function Reports() {
                   </CardContent>
                 </Card>
                 
-                <Card className="border-l-4 border-l-gray-500">
+                <Card className="border-l-4 border-l-gray-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[500ms]">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600">Pendentes</CardTitle>
                   </CardHeader>
@@ -394,19 +396,21 @@ export default function Reports() {
                 </Card>
               </div>
               
-              {/* Gráficos */}
+              {/* Gráficos com animação */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 {/* Gráfico de Pizza */}
                 {pieChartData && (
-                  <Card>
-                    <CardHeader>
+                  <Card className="shadow-md hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-left-4 duration-500 delay-[600ms]">
+                    <CardHeader className="bg-gradient-to-r from-purple-50 to-white border-b">
                       <CardTitle className="flex items-center gap-2">
-                        <PieChart className="h-5 w-5" />
+                        <div className="p-1.5 bg-purple-100 rounded-lg">
+                          <PieChart className="h-5 w-5 text-purple-600" />
+                        </div>
                         Distribuição Geral
                       </CardTitle>
                       <CardDescription>Proporção de aulas por status</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <div className="h-[300px] flex items-center justify-center">
                         <Pie data={pieChartData} options={{ maintainAspectRatio: false }} />
                       </div>
@@ -416,15 +420,17 @@ export default function Reports() {
                 
                 {/* Gráfico de Barras */}
                 {barChartData && stats.bySubject.length > 0 && (
-                  <Card>
-                    <CardHeader>
+                  <Card className="shadow-md hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-right-4 duration-500 delay-[600ms]">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b">
                       <CardTitle className="flex items-center gap-2">
-                        <BarChart3 className="h-5 w-5" />
+                        <div className="p-1.5 bg-green-100 rounded-lg">
+                          <BarChart3 className="h-5 w-5 text-green-600" />
+                        </div>
                         Por Disciplina
                       </CardTitle>
                       <CardDescription>Comparação entre disciplinas</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <div className="h-[300px]">
                         <Bar 
                           data={barChartData} 
@@ -442,46 +448,50 @@ export default function Reports() {
                 )}
               </div>
               
-              {/* Tabela Detalhada por Disciplina */}
+              {/* Tabela Detalhada por Disciplina com animação */}
               {stats.bySubject && stats.bySubject.length > 0 && (
-                <Card>
-                  <CardHeader>
+                <Card className="shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[700ms]">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-white border-b">
                     <CardTitle>Detalhamento por Disciplina</CardTitle>
                     <CardDescription>Estatísticas completas de cada disciplina</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="border-b">
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Disciplina</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Total</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Dadas</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Não Dadas</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Canceladas</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Pendentes</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Taxa de Conclusão</th>
+                          <tr className="border-b-2 border-gray-200">
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700 bg-gray-50">Disciplina</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gray-50">Total</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gray-50">Dadas</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gray-50">Não Dadas</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gray-50">Canceladas</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gray-50">Pendentes</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gray-50">Taxa de Conclusão</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {stats.bySubject.map((subject) => (
-                            <tr key={subject.subjectId} className="border-b hover:bg-gray-50">
+                          {stats.bySubject.map((subject, index) => (
+                            <tr 
+                              key={subject.subjectId} 
+                              className="border-b hover:bg-gray-50 transition-colors duration-200"
+                              style={{ animationDelay: `${800 + index * 50}ms` }}
+                            >
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <div 
-                                    className="w-3 h-3 rounded-full" 
+                                    className="w-3 h-3 rounded-full shadow-sm" 
                                     style={{ backgroundColor: subject.subjectColor }}
                                   />
                                   <span className="font-medium">{subject.subjectName}</span>
                                 </div>
                               </td>
-                              <td className="text-center py-3 px-4">{subject.total}</td>
+                              <td className="text-center py-3 px-4 font-medium">{subject.total}</td>
                               <td className="text-center py-3 px-4 text-green-600 font-semibold">{subject.given}</td>
                               <td className="text-center py-3 px-4 text-yellow-600 font-semibold">{subject.notGiven}</td>
                               <td className="text-center py-3 px-4 text-red-600 font-semibold">{subject.cancelled}</td>
-                              <td className="text-center py-3 px-4 text-gray-600">{subject.pending}</td>
+                              <td className="text-center py-3 px-4 text-gray-600 font-medium">{subject.pending}</td>
                               <td className="text-center py-3 px-4">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shadow-sm">
                                   {subject.total > 0 ? `${((subject.given / subject.total) * 100).toFixed(1)}%` : '0%'}
                                 </span>
                               </td>
@@ -494,12 +504,12 @@ export default function Reports() {
                 </Card>
               )}
               
-              {/* Mensagem quando não há dados */}
+              {/* Mensagem quando não há dados com animação */}
               {stats.total === 0 && (
-                <Card>
+                <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <CardContent className="py-12">
                     <div className="text-center">
-                      <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-pulse" />
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         Nenhuma aula encontrada
                       </h3>
@@ -513,9 +523,9 @@ export default function Reports() {
             </>
           )}
           
-          {/* Loading State */}
+          {/* Loading State com animação */}
           {isLoading && (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-12 animate-in fade-in duration-300">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">Carregando relatórios...</p>
