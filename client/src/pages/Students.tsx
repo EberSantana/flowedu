@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '../lib/trpc';
 import { Button } from '../components/ui/button';
+import { LoadingButton } from '../components/ui/loading-button';
+import { EmptyState } from '../components/ui/empty-state';
+import { SkeletonTable } from '../components/ui/skeleton-card';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Label } from '../components/ui/label';
@@ -151,13 +154,13 @@ export default function Students() {
   return (
     <DashboardLayout>
       <PageWrapper>
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Gerenciar Matrículas</h1>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Gerenciar Matrículas</h1>
           <p className="text-gray-600">Cadastre e gerencie os alunos matriculados</p>
         </div>
 
         {/* Barra de Ações */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <Input
@@ -169,7 +172,7 @@ export default function Students() {
           </div>
           <Button
             onClick={() => setShowForm(!showForm)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto min-h-[44px]"
           >
             <UserPlus className="h-4 w-4 mr-2" />
             {showForm ? 'Cancelar' : 'Novo Aluno'}
@@ -177,7 +180,7 @@ export default function Students() {
           <Button
             onClick={handleExportDOCX}
             variant="outline"
-            className="border-blue-600 text-blue-600 hover:bg-blue-50"
+            className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto min-h-[44px]"
             disabled={exportDOCXMutation.isFetching || students.length === 0}
           >
             <Download className="h-4 w-4 mr-2" />
@@ -186,7 +189,7 @@ export default function Students() {
           <Button
             onClick={handleExportPDF}
             variant="outline"
-            className="border-red-600 text-red-600 hover:bg-red-50"
+            className="border-red-600 text-red-600 hover:bg-red-50 w-full sm:w-auto min-h-[44px]"
             disabled={exportPDFMutation.isFetching || students.length === 0}
           >
             <FileText className="h-4 w-4 mr-2" />
@@ -228,9 +231,13 @@ export default function Students() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                  <LoadingButton 
+                    type="submit" 
+                    loading={createMutation.isPending || updateMutation.isPending}
+                    loadingText={editingId ? 'Atualizando...' : 'Cadastrando...'}
+                  >
                     {editingId ? 'Atualizar' : 'Cadastrar'}
-                  </Button>
+                  </LoadingButton>
                   <Button type="button" variant="outline" onClick={resetForm}>
                     Cancelar
                   </Button>
@@ -250,18 +257,18 @@ export default function Students() {
         <Card>
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="p-8 text-center text-gray-500">Carregando...</div>
+              <div className="p-6">
+                <SkeletonTable rows={5} />
+              </div>
             ) : filteredStudents.length === 0 ? (
-              <div className="p-8 text-center">
-                <UserPlus className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600 mb-2">
-                  {searchTerm ? 'Nenhum aluno encontrado' : 'Nenhum aluno cadastrado'}
-                </p>
-                {!searchTerm && (
-                  <Button onClick={() => setShowForm(true)} variant="outline" size="sm">
-                    Cadastrar primeiro aluno
-                  </Button>
-                )}
+              <div className="p-8">
+                <EmptyState
+                  icon={UserPlus}
+                  title={searchTerm ? 'Nenhum aluno encontrado' : 'Nenhum aluno cadastrado'}
+                  description={searchTerm ? 'Tente buscar com outros termos.' : 'Comece cadastrando seu primeiro aluno para gerenciar matrículas.'}
+                  actionLabel={!searchTerm ? 'Cadastrar Primeiro Aluno' : undefined}
+                  onAction={!searchTerm ? () => setShowForm(true) : undefined}
+                />
               </div>
             ) : (
               <div className="overflow-x-auto">

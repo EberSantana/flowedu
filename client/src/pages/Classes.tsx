@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -91,24 +94,30 @@ export default function Classes() {
     <>
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
-        <div className="container mx-auto py-8">
-          <div className="mb-6 flex items-center justify-between">
+        <div className="container mx-auto py-4 sm:py-6 lg:py-8">
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <Users className="h-8 w-8 text-green-600" />
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                <Users className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-green-600" />
                 Gerenciar Turmas
               </h1>
             </div>
-            <Button onClick={() => setIsDialogOpen(true)} size="lg">
+            <Button 
+              onClick={() => setIsDialogOpen(true)} 
+              size="lg"
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Nova Turma
             </Button>
           </div>
 
         {isLoading ? (
-          <div className="text-center py-12">Carregando...</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <SkeletonCard count={6} />
+          </div>
         ) : classes && classes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {classes.map((classItem) => (
               <Card key={classItem.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow">
                 <CardHeader>
@@ -143,16 +152,13 @@ export default function Classes() {
             ))}
           </div>
         ) : (
-          <Card className="bg-white shadow-lg">
-            <CardContent className="py-12 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">Nenhuma turma cadastrada ainda.</p>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Criar Primeira Turma
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={Users}
+            title="Nenhuma turma cadastrada"
+            description="Comece criando sua primeira turma para organizar seus alunos e aulas."
+            actionLabel="Criar Primeira Turma"
+            onAction={() => setIsDialogOpen(true)}
+          />
         )}
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -201,9 +207,13 @@ export default function Classes() {
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <LoadingButton 
+                  type="submit"
+                  loading={createMutation.isPending || updateMutation.isPending}
+                  loadingText={editingClass ? "Atualizando..." : "Criando..."}
+                >
                   {editingClass ? "Atualizar" : "Criar"}
-                </Button>
+                </LoadingButton>
               </DialogFooter>
             </form>
           </DialogContent>

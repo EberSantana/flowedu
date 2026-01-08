@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -294,15 +297,15 @@ export default function Subjects() {
     <>
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="container mx-auto py-8">
-          <div className="mb-6 flex items-center justify-between">
+        <div className="container mx-auto py-4 sm:py-6 lg:py-8">
+          <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <BookOpen className="h-8 w-8 text-blue-600" />
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                <BookOpen className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-600" />
                 Gerenciar Disciplinas
               </h1>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               {selectedSubjects.length > 0 ? (
                 <>
                   <Button 
@@ -327,12 +330,12 @@ export default function Subjects() {
                     onClick={() => setIsQuickEnrollOpen(true)} 
                     size="lg"
                     variant="outline"
-                    className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800"
+                    className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 w-full sm:w-auto min-h-[44px]"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Matricular Alunos
                   </Button>
-                  <Button onClick={() => setIsDialogOpen(true)} size="lg">
+                  <Button onClick={() => setIsDialogOpen(true)} size="lg" className="w-full sm:w-auto min-h-[44px]">
                     <Plus className="mr-2 h-4 w-4" />
                     Nova Disciplina
                   </Button>
@@ -342,9 +345,11 @@ export default function Subjects() {
           </div>
 
         {isLoading ? (
-          <div className="text-center py-12">Carregando...</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            <SkeletonCard count={6} />
+          </div>
         ) : subjects && subjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {subjects.map((subject) => (
               <Card key={subject.id} className="bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full">
                 <CardHeader className="pb-3">
@@ -549,16 +554,13 @@ export default function Subjects() {
             ))}
           </div>
         ) : (
-          <Card className="bg-white shadow-lg">
-            <CardContent className="py-12 text-center">
-              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">Nenhuma disciplina cadastrada ainda.</p>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Criar Primeira Disciplina
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={BookOpen}
+            title="Nenhuma disciplina cadastrada"
+            description="Comece criando sua primeira disciplina para organizar seu conteúdo e trilhas de aprendizagem."
+            actionLabel="Criar Primeira Disciplina"
+            onAction={() => setIsDialogOpen(true)}
+          />
         )}
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -40,7 +42,7 @@ export default function Schedule() {
   const [selectedClassForStatus, setSelectedClassForStatus] = useState<any>(null);
   const [statusReason, setStatusReason] = useState("");
 
-  const { data: fullSchedule, isLoading } = trpc.schedule.getFullSchedule.useQuery();
+  const { data: fullSchedule, isLoading, error } = trpc.schedule.getFullSchedule.useQuery();
   
   // Obter semana e ano atuais
   const currentWeek = useMemo(() => {
