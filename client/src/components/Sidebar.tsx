@@ -34,6 +34,8 @@ import { useState } from "react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import NotificationBell from "@/components/NotificationBell";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { Search, Command as CommandIcon } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Tooltip,
   TooltipContent,
@@ -255,6 +257,23 @@ export default function Sidebar() {
                 <p className="text-sm text-muted-foreground mt-1">
                   Professor & Aluno
                 </p>
+                <button
+                  onClick={() => {
+                    const event = new KeyboardEvent('keydown', {
+                      key: 'k',
+                      metaKey: true,
+                      bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                  }}
+                  className="mt-3 w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="flex-1 text-left">Buscar...</span>
+                  <kbd className="px-2 py-0.5 text-xs bg-background rounded border border-border">
+                    ⌘K
+                  </kbd>
+                </button>
               </>
             )}
           </div>
@@ -414,6 +433,10 @@ export default function Sidebar() {
                       <p>Refazer Tour</p>
                     </TooltipContent>
                   </Tooltip>
+                  
+                  <div className="flex items-center justify-center">
+                    <ThemeToggle />
+                  </div>
                   
                   <Tooltip>
                     <TooltipTrigger asChild>

@@ -4722,3 +4722,119 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir marcação visual (badge) de avisos não lidos no ícone de notificações
 - [x] Implementar filtro de avisos por disciplina na página de avisos para alunos
 - [x] Adicionar contador de avisos por disciplina no seletor (ex: "Matemática (3 avisos)")
+
+## 🎨 Melhorias de UX/UI - Experiência do Usuário
+
+### Busca Global e Navegação Rápida
+- [ ] Implementar busca global com atalho Cmd+K (ou Ctrl+K)
+- [ ] Criar componente CommandPalette com resultados em tempo real
+- [ ] Indexar todas as páginas e funcionalidades para busca
+- [ ] Adicionar breadcrumbs em todas as páginas
+- [ ] Implementar sistema de favoritos no menu lateral
+- [ ] Adicionar atalhos de teclado para navegação rápida
+- [ ] Criar página de ajuda com todos os atalhos disponíveis
+
+### Dark Mode e Temas Personalizáveis
+- [ ] Implementar toggle de dark mode no header
+- [ ] Criar sistema de temas personalizáveis (claro, escuro, automático)
+- [ ] Persistir preferência de tema no localStorage
+- [ ] Ajustar todas as cores para funcionar em ambos os modos
+- [ ] Adicionar transições suaves entre temas
+- [ ] Criar paleta de cores acessível (contraste WCAG AA)
+- [ ] Implementar modo de alto contraste para acessibilidade
+
+### Onboarding e Tour Guiado
+- [ ] Criar wizard de onboarding para novos usuários
+- [ ] Implementar tour guiado com tooltips interativos (usando Shepherd.js ou similar)
+- [ ] Adicionar checklist de primeiros passos no dashboard
+- [ ] Criar página de boas-vindas personalizada
+- [ ] Implementar sistema de dicas contextuais
+- [ ] Adicionar vídeos tutoriais curtos
+- [ ] Criar modo "primeira vez" que destaca funcionalidades principais
+
+### Feedback Visual e Animações
+- [ ] Melhorar sistema de toasts com animações suaves
+- [ ] Adicionar loading states em todas as ações
+- [ ] Implementar progress bars para operações longas
+- [ ] Criar micro-interactions em botões e cards
+- [ ] Adicionar animações de transição entre páginas
+- [ ] Implementar skeleton loaders para carregamento
+- [ ] Adicionar animações de sucesso/erro personalizadas
+- [ ] Implementar confetti ou celebração visual para conquistas
+
+### Melhorias Gerais de UI
+- [ ] Adicionar estados vazios (empty states) em todas as listas
+- [ ] Implementar confirmações elegantes para ações destrutivas
+- [ ] Melhorar responsividade mobile em todas as páginas
+- [ ] Adicionar tooltips informativos em campos complexos
+- [ ] Implementar sistema de notificações in-app
+- [ ] Criar página de atalhos e ajuda rápida
+- [ ] Adicionar indicadores de progresso para tarefas longas
+- [ ] Implementar modo de foco/concentração (oculta elementos secundários)
+
+### Acessibilidade
+- [ ] Garantir navegação completa por teclado
+- [ ] Adicionar labels ARIA em todos os componentes interativos
+- [ ] Implementar skip links para navegação rápida
+- [ ] Testar com leitores de tela
+- [ ] Adicionar modo de alto contraste
+- [ ] Garantir tamanho mínimo de toque (44x44px) em mobile
+- [ ] Implementar foco visível em todos os elementos interativos
+
+### Performance e Otimização
+- [ ] Implementar lazy loading de componentes pesados
+- [ ] Otimizar imagens e assets
+- [ ] Adicionar cache inteligente de dados
+- [ ] Implementar virtual scrolling em listas longas
+- [ ] Reduzir bundle size com code splitting
+- [ ] Adicionar service worker para modo offline básico
+
+
+## ✅ Melhorias de UX/UI Implementadas (Janeiro 2026)
+
+### Busca Global e Navegação Rápida
+- [x] Implementar busca global com atalho Cmd+K (ou Ctrl+K)
+- [x] Criar componente CommandPalette com resultados em tempo real
+- [x] Indexar todas as páginas e funcionalidades para busca
+- [x] Criar componente Breadcrumbs para navegação contextual
+- [x] Adicionar indicador de busca no Sidebar
+- [x] Adicionar atalhos de teclado para navegação rápida
+
+### Dark Mode e Temas Personalizáveis
+- [x] Implementar toggle de dark mode no header
+- [x] Criar sistema de temas personalizáveis (claro, escuro, automático)
+- [x] Persistir preferência de tema no localStorage
+- [x] Ajustar todas as cores para funcionar em ambos os modos
+- [x] Adicionar transições suaves entre temas
+- [x] Implementar detecção automática de preferência do sistema
+- [x] Adicionar componente ThemeToggle no Sidebar
+
+### Onboarding e Tour Guiado
+- [x] Criar tour guiado com tooltips interativos (usando react-joyride)
+- [x] Implementar GuidedTour no Dashboard
+- [x] Adicionar sistema de conclusão de tour (localStorage)
+- [x] Criar passos do tour para principais funcionalidades
+- [x] Adicionar botão "Refazer Tour" no Sidebar
+
+### Feedback Visual e Animações
+- [x] Criar arquivo de animações customizadas (animations.css)
+- [x] Implementar animações de entrada (fadeIn, slideIn, scaleIn)
+- [x] Adicionar animações de sucesso e loading
+- [x] Criar componente EnhancedToast com animações
+- [x] Implementar LoadingSpinner melhorado
+- [x] Criar skeleton loaders (Card, List, Table)
+- [x] Adicionar ProgressBar component
+- [x] Criar componente EmptyState para estados vazios
+- [x] Implementar micro-interactions (wiggle, heartbeat, shake)
+- [x] Adicionar hover effects (lift, glow)
+- [x] Implementar stagger animations para listas
+
+### Componentes de UI Criados
+- [x] CommandPalette - Busca global com Cmd+K
+- [x] Breadcrumbs - Navegação contextual
+- [x] ThemeToggle - Alternador de temas
+- [x] GuidedTour - Tour interativo para novos usuários
+- [x] EnhancedToast - Toasts melhorados com animações
+- [x] LoadingSpinner - Spinners e skeleton loaders
+- [x] EmptyState - Estados vazios com ilustrações
+- [x] ProgressBar - Barra de progresso animada

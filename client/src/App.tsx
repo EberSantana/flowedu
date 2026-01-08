@@ -51,6 +51,7 @@ import StudentStats from "./pages/StudentStats";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
+import { CommandPalette } from "./components/CommandPalette";
 import { TeacherAddActivity } from "./pages/TeacherAddActivity";
 
 function Router() {
@@ -107,6 +108,7 @@ function Router() {
       <OfflineIndicator />
       <BibleFooter />
       <InstallPWA />
+      <CommandPalette />
     </>
   );
 }
@@ -114,7 +116,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="system" switchable={true}>
         <SidebarProvider>
           <TooltipProvider>
             <Router />
