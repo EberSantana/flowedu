@@ -2563,6 +2563,7 @@
 ## Bugs Reportados - 18/12/2025
 - [ ] Corrigir erro que faz sair do sistema na página de Trilha de Aprendizagem do aluno
 - [ ] Exibir materiais cadastrados pelo professor na Trilha de Aprendizagem do aluno
+- [x] Corrigir: quando aluno coloca nova dúvida, nada acontece no portal do professor (dúvidas não aparecem em tempo real) - CORRIGIDO: adicionado refetchInterval de 10 segundos na página Questions.tsx
 
 
 ## Correções 18/12/2025 - Sessão 2

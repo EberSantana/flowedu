@@ -16,9 +16,13 @@ export default function Questions() {
   const { data: questions, isLoading } = trpc.questions.list.useQuery({
     status: statusFilter,
     priority: priorityFilter,
+  }, {
+    refetchInterval: 10000, // Atualizar a cada 10 segundos
   });
   
-  const { data: stats } = trpc.questions.statistics.useQuery();
+  const { data: stats } = trpc.questions.statistics.useQuery(undefined, {
+    refetchInterval: 10000, // Atualizar a cada 10 segundos
+  });
   const { data: subjects } = trpc.subjects.list.useQuery();
 
   const getStatusBadge = (status: string) => {
