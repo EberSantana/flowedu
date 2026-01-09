@@ -10,6 +10,7 @@
  */
 
 import { invokeLLM } from "./_core/llm";
+import { getCachedAnalysis, setCachedAnalysis } from "./aiCache";
 
 export interface OpenAnswerAnalysis {
   score: number; // 0-100
@@ -32,9 +33,24 @@ export interface AnalyzeOpenAnswerParams {
  * Analisa uma resposta aberta usando IA
  */
 export async function analyzeOpenAnswer(
-  params: AnalyzeOpenAnswerParams
+  params: AnalyzeOpenAnswerParams,
+  userId?: number // ID do usuário para cache (opcional)
 ): Promise<OpenAnswerAnalysis> {
   const { question, studentAnswer, correctAnswer, context } = params;
+
+  // Verifica cache se userId foi fornecido
+  if (userId) {
+    const cached = await getCachedAnalysis<OpenAnswerAnalysis>(
+      userId,
+      "open_answer",
+      { question, studentAnswer, correctAnswer, context }
+    );
+
+    if (cached.found && cached.data) {
+      console.log(`[Cache] Análise encontrada no cache (hits: ${cached.hitCount})`);
+      return cached.data;
+    }
+  }
 
   // Validação de entrada
   if (!studentAnswer || studentAnswer.trim().length === 0) {
@@ -155,6 +171,20 @@ Analise a resposta do aluno e retorne um JSON com a seguinte estrutura:
     analysis.score = Math.max(0, Math.min(100, analysis.score));
     analysis.confidence = Math.max(0, Math.min(100, analysis.confidence));
     analysis.needsReview = analysis.confidence < 70;
+
+    // Armazena no cache se userId foi fornecido
+    if (userId) {
+      await setCachedAnalysis(
+        {
+          userId,
+          analysisType: "open_answer",
+          data: { question, studentAnswer, correctAnswer, context },
+          expiresInDays: 30, // Cache expira em 30 dias
+        },
+        analysis
+      );
+      console.log("[Cache] Análise armazenada no cache");
+    }
 
     return analysis;
   } catch (error) {

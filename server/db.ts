@@ -4607,7 +4607,7 @@ export async function submitExerciseAttempt(
           studentAnswer: answer.studentAnswer,
           correctAnswer: answer.correctAnswer,
           context: question.explanation || undefined,
-        });
+        }, attempt[0].studentId); // Passa studentId para habilitar cache
         
         aiScore = analysis.score;
         aiConfidence = analysis.confidence;

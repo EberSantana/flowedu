@@ -97,6 +97,29 @@ export const calendarEvents = mysqlTable("calendar_events", {
 export type CalendarEvent = typeof calendarEvents.$inferSelect;
 export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;
 
+/**
+ * Tabela de cache de análises de IA
+ * Armazena resultados de análises para evitar reprocessamento
+ */
+export const aiAnalysisCache = mysqlTable("ai_analysis_cache", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Dono da análise
+  cacheKey: varchar("cacheKey", { length: 255 }).notNull(), // Hash único do conteúdo analisado
+  analysisType: varchar("analysisType", { length: 50 }).notNull(), // Tipo de análise (ex: 'open_answer', 'learning_analysis')
+  inputData: text("inputData").notNull(), // Dados de entrada (JSON)
+  resultData: text("resultData").notNull(), // Resultado da análise (JSON)
+  expiresAt: timestamp("expiresAt"), // Data de expiração do cache (null = sem expiração)
+  hitCount: int("hitCount").default(0).notNull(), // Número de vezes que o cache foi usado
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  lastAccessedAt: timestamp("lastAccessedAt").defaultNow().notNull(),
+}, (table) => ({
+  // Índice único para busca rápida por tipo e chave
+  uniqueCache: unique().on(table.userId, table.analysisType, table.cacheKey),
+}));
+
+export type AiAnalysisCache = typeof aiAnalysisCache.$inferSelect;
+export type InsertAiAnalysisCache = typeof aiAnalysisCache.$inferInsert;
+
 // TODO: Add your tables here*/
 
 /**

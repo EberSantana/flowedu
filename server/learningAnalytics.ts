@@ -5,6 +5,7 @@
 
 import { invokeLLM } from "./_core/llm";
 import type { Message } from "./_core/llm";
+import { getCachedAnalysis, setCachedAnalysis } from "./aiCache";
 
 /**
  * Dados de comportamento do aluno para análise
@@ -61,8 +62,23 @@ export interface BehaviorAnalysisResult {
  * @returns Análise detalhada com insights e recomendações
  */
 export async function analyzeLearningBehavior(
-  data: StudentBehaviorData
+  data: StudentBehaviorData,
+  userId?: number // ID do usuário para cache (opcional)
 ): Promise<BehaviorAnalysisResult> {
+  // Verifica cache se userId foi fornecido
+  if (userId) {
+    const cached = await getCachedAnalysis<BehaviorAnalysisResult>(
+      userId,
+      "learning_behavior",
+      data
+    );
+
+    if (cached.found && cached.data) {
+      console.log(`[Cache] Análise de comportamento encontrada no cache (hits: ${cached.hitCount})`);
+      return cached.data;
+    }
+  }
+
   const prompt = `Você é um especialista em análise de aprendizado e pedagogia. Analise os dados de comportamento do aluno abaixo e forneça insights detalhados.
 
 **Dados do Aluno:**
@@ -191,6 +207,21 @@ Seja específico, prático e focado em ações que o professor pode tomar.`;
     }
 
     const result: BehaviorAnalysisResult = JSON.parse(content);
+    
+    // Armazena no cache se userId foi fornecido
+    if (userId) {
+      await setCachedAnalysis(
+        {
+          userId,
+          analysisType: "learning_behavior",
+          data,
+          expiresInDays: 7, // Cache expira em 7 dias (comportamento muda mais rápido)
+        },
+        result
+      );
+      console.log("[Cache] Análise de comportamento armazenada no cache");
+    }
+    
     return result;
   } catch (error) {
     console.error("Erro ao analisar comportamento:", error);
