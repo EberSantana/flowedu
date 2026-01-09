@@ -29,6 +29,7 @@
 - [x] Padronizar página SubjectCTStats.tsx seguindo padrão UX (cards brancos com border-l-4, ícones circulares coloridos)
 - [x] Centralizar layout da página SubjectCTStats.tsx (aplicar container mx-auto com max-width)
 - [x] Corrigir erro: procedimento tRPC teacherExercises.getStatistics não encontrado
+- [x] Adicionar filtro por disciplina na página de Análise de Aprendizado com IA
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 

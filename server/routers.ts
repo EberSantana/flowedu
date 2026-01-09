@@ -3149,7 +3149,11 @@ JSON (descrições MAX 15 chars):
       }),
     
     list: protectedProcedure
-      .query(async ({ ctx }) => {
+      .input(z.object({ subjectId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (input?.subjectId) {
+          return await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+        }
         return await db.getStudentsByUser(ctx.user.id);
       }),
     

@@ -29,10 +29,15 @@ import { toast } from "sonner";
 
 export function LearningAnalytics() {
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Queries
-  const { data: students, isLoading: loadingStudents } = trpc.students.list.useQuery();
+  const { data: subjects } = trpc.subjects.list.useQuery();
+  const { data: students, isLoading: loadingStudents } = trpc.students.list.useQuery(
+    { subjectId: selectedSubject! },
+    { enabled: !!selectedSubject }
+  );
   const { data: classAnalytics } = trpc.analytics.getClassAnalytics.useQuery({});
   const { data: alerts } = trpc.analytics.getAlerts.useQuery();
   const { data: alertStats } = trpc.analytics.getAlertStatistics.useQuery();
@@ -226,7 +231,34 @@ export function LearningAnalytics() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                    Disciplina
+                  </label>
+                  <Select
+                    value={selectedSubject?.toString() || ""}
+                    onValueChange={(value) => {
+                      setSelectedSubject(Number(value));
+                      setSelectedStudent(null);
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-12">
+                      <SelectValue placeholder="Selecione a disciplina..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects && subjects.length > 0 ? (
+                        subjects.map((subject: any) => (
+                          <SelectItem key={subject.id} value={subject.id.toString()}>
+                            {subject.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="empty" disabled>Nenhuma disciplina cadastrada</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="md:col-span-2">
                   <label className="text-sm font-medium text-slate-700 mb-2 block">
                     Selecionar Aluno
@@ -234,9 +266,10 @@ export function LearningAnalytics() {
                   <Select
                     value={selectedStudent?.toString() || ""}
                     onValueChange={(value) => setSelectedStudent(Number(value))}
+                    disabled={!selectedSubject}
                   >
                     <SelectTrigger className="w-full h-12">
-                      <SelectValue placeholder="Escolha um aluno para analisar..." />
+                      <SelectValue placeholder={selectedSubject ? "Escolha um aluno..." : "Selecione uma disciplina primeiro"} />
                     </SelectTrigger>
                     <SelectContent>
                       {loadingStudents ? (
@@ -248,7 +281,7 @@ export function LearningAnalytics() {
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="empty" disabled>Nenhum aluno cadastrado</SelectItem>
+                        <SelectItem value="empty" disabled>Nenhum aluno nesta disciplina</SelectItem>
                       )}
                     </SelectContent>
                   </Select>
