@@ -249,9 +249,11 @@ export function LearningAnalytics() {
                     <SelectContent>
                       {subjects && subjects.length > 0 ? (
                         subjects.map((subject: any) => (
-                          <SelectItem key={subject.id} value={subject.id.toString()}>
-                            {subject.name}
-                          </SelectItem>
+                          subject.id ? (
+                            <SelectItem key={subject.id} value={subject.id.toString()}>
+                              {subject.name}
+                            </SelectItem>
+                          ) : null
                         ))
                       ) : (
                         <SelectItem value="empty" disabled>Nenhuma disciplina cadastrada</SelectItem>
@@ -276,9 +278,11 @@ export function LearningAnalytics() {
                         <SelectItem value="loading" disabled>Carregando...</SelectItem>
                       ) : students && students.length > 0 ? (
                         students.map((student) => (
-                          <SelectItem key={student.id} value={student.id.toString()}>
-                            {student.fullName}
-                          </SelectItem>
+                          student.id ? (
+                            <SelectItem key={student.id} value={student.id.toString()}>
+                              {student.fullName}
+                            </SelectItem>
+                          ) : null
                         ))
                       ) : (
                         <SelectItem value="empty" disabled>Nenhum aluno nesta disciplina</SelectItem>

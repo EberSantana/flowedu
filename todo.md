@@ -4918,3 +4918,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar rotas no App.tsx para páginas de dúvidas
 - [x] Testar fluxo completo de envio e resposta de dúvidas
 - [x] Testar notificações em tempo real
+- [x] BUG: Análise de Aprendizado com IA não mostra alunos após selecionar disciplina - CORRIGIDO: adicionado campo id no retorno de getStudentsBySubject
