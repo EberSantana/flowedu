@@ -130,8 +130,11 @@ import {
   InsertPerformanceMetric,
   alerts,
   Alert,
-  InsertAlert
-} from "../drizzle/schema";
+  InsertAlert,
+  questions,
+  questionAnswers,
+  InsertQuestion,
+  InsertQuestionAnswer,} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -8889,4 +8892,249 @@ export async function getAlertStatistics(userId: number) {
     critical,
     urgent
   };
+}
+
+
+/**
+ * ========================================
+ * SISTEMA DE DÚVIDAS E RESPOSTAS
+ * ========================================
+ */
+
+/**
+ * Criar nova dúvida
+ */
+export async function createQuestion(data: InsertQuestion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(questions).values(data);
+  return result[0].insertId;
+}
+
+/**
+ * Buscar dúvidas do professor (todas as dúvidas das suas disciplinas)
+ */
+export async function getQuestionsByTeacher(userId: number, filters?: {
+  status?: 'pending' | 'answered' | 'resolved';
+  subjectId?: number;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(questions.userId, userId)];
+  
+  if (filters?.status) {
+    conditions.push(eq(questions.status, filters.status));
+  }
+  if (filters?.subjectId) {
+    conditions.push(eq(questions.subjectId, filters.subjectId));
+  }
+  if (filters?.priority) {
+    conditions.push(eq(questions.priority, filters.priority));
+  }
+  
+  const result = await db.select({
+    question: questions,
+    student: students,
+    subject: subjects,
+    class: classes,
+  })
+  .from(questions)
+  .leftJoin(students, eq(questions.studentId, students.id))
+  .leftJoin(subjects, eq(questions.subjectId, subjects.id))
+  .leftJoin(classes, eq(questions.classId, classes.id))
+  .where(and(...conditions))
+  .orderBy(desc(questions.createdAt));
+  
+  return result;
+}
+
+/**
+ * Buscar dúvidas do aluno
+ */
+export async function getQuestionsByStudent(studentId: number, filters?: {
+  status?: 'pending' | 'answered' | 'resolved';
+  subjectId?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(questions.studentId, studentId)];
+  
+  if (filters?.status) {
+    conditions.push(eq(questions.status, filters.status));
+  }
+  if (filters?.subjectId) {
+    conditions.push(eq(questions.subjectId, filters.subjectId));
+  }
+  
+  const result = await db.select({
+    question: questions,
+    subject: subjects,
+    class: classes,
+  })
+  .from(questions)
+  .leftJoin(subjects, eq(questions.subjectId, subjects.id))
+  .leftJoin(classes, eq(questions.classId, classes.id))
+  .where(and(...conditions))
+  .orderBy(desc(questions.createdAt));
+  
+  return result;
+}
+
+/**
+ * Buscar dúvida por ID com detalhes completos
+ */
+export async function getQuestionById(questionId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select({
+    question: questions,
+    student: students,
+    subject: subjects,
+    class: classes,
+  })
+  .from(questions)
+  .leftJoin(students, eq(questions.studentId, students.id))
+  .leftJoin(subjects, eq(questions.subjectId, subjects.id))
+  .leftJoin(classes, eq(questions.classId, classes.id))
+  .where(eq(questions.id, questionId))
+  .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Incrementar contador de visualizações
+ */
+export async function incrementQuestionViewCount(questionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(questions)
+    .set({ viewCount: sql`${questions.viewCount} + 1` })
+    .where(eq(questions.id, questionId));
+}
+
+/**
+ * Criar resposta para dúvida
+ */
+export async function createQuestionAnswer(data: InsertQuestionAnswer) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(questionAnswers).values(data);
+  
+  // Atualizar status da dúvida para "answered"
+  await db.update(questions)
+    .set({ 
+      status: 'answered',
+      answeredAt: new Date()
+    })
+    .where(eq(questions.id, data.questionId));
+  
+  return result[0].insertId;
+}
+
+/**
+ * Buscar respostas de uma dúvida
+ */
+export async function getAnswersByQuestion(questionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    answer: questionAnswers,
+    teacher: users,
+  })
+  .from(questionAnswers)
+  .leftJoin(users, eq(questionAnswers.userId, users.id))
+  .where(eq(questionAnswers.questionId, questionId))
+  .orderBy(desc(questionAnswers.createdAt));
+  
+  return result;
+}
+
+/**
+ * Marcar dúvida como resolvida
+ */
+export async function markQuestionAsResolved(questionId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(questions)
+    .set({ 
+      status: 'resolved',
+      resolvedAt: new Date()
+    })
+    .where(and(
+      eq(questions.id, questionId),
+      eq(questions.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+/**
+ * Marcar resposta como aceita (melhor resposta)
+ */
+export async function markAnswerAsAccepted(answerId: number, questionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Desmarcar todas as respostas anteriores como aceitas
+  await db.update(questionAnswers)
+    .set({ isAccepted: false })
+    .where(eq(questionAnswers.questionId, questionId));
+  
+  // Marcar a resposta atual como aceita
+  await db.update(questionAnswers)
+    .set({ isAccepted: true })
+    .where(eq(questionAnswers.id, answerId));
+  
+  return { success: true };
+}
+
+/**
+ * Buscar estatísticas de dúvidas do professor
+ */
+export async function getQuestionStatistics(userId: number) {
+  const db = await getDb();
+  if (!db) return { total: 0, pending: 0, answered: 0, resolved: 0, urgent: 0 };
+  
+  const allQuestions = await db.select().from(questions)
+    .where(eq(questions.userId, userId));
+  
+  const pending = allQuestions.filter(q => q.status === 'pending').length;
+  const answered = allQuestions.filter(q => q.status === 'answered').length;
+  const resolved = allQuestions.filter(q => q.status === 'resolved').length;
+  const urgent = allQuestions.filter(q => q.priority === 'urgent' && q.status === 'pending').length;
+  
+  return {
+    total: allQuestions.length,
+    pending,
+    answered,
+    resolved,
+    urgent
+  };
+}
+
+/**
+ * Atualizar prioridade da dúvida
+ */
+export async function updateQuestionPriority(questionId: number, priority: 'low' | 'normal' | 'high' | 'urgent', userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(questions)
+    .set({ priority })
+    .where(and(
+      eq(questions.id, questionId),
+      eq(questions.userId, userId)
+    ));
+  
+  return { success: true };
 }

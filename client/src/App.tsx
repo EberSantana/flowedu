@@ -53,6 +53,10 @@ import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
 import { CommandPalette } from "./components/CommandPalette";
 import { TeacherAddActivity } from "./pages/TeacherAddActivity";
+import Questions from "./pages/Questions";
+import QuestionDetail from "./pages/QuestionDetail";
+import StudentSubmitQuestion from "./pages/StudentSubmitQuestion";
+import StudentMyQuestions from "./pages/StudentMyQuestions";
 
 function Router() {
   return (
@@ -102,6 +106,10 @@ function Router() {
         <Route path={"/students"} component={Students} />
         <Route path={"/students/:id"} component={StudentProfile} />
         <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
+        <Route path={"/questions"} component={Questions} />
+        <Route path={"/questions/:id"} component={QuestionDetail} />
+        <Route path={"/student/submit-question"} component={StudentSubmitQuestion} />
+        <Route path={"/student/my-questions"} component={StudentMyQuestions} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

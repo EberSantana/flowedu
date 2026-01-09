@@ -1790,3 +1790,46 @@ export const alerts = mysqlTable("alerts", {
 
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = typeof alerts.$inferInsert;
+
+/**
+ * Dúvidas dos Alunos
+ * Sistema de perguntas e respostas entre alunos e professores
+ */
+export const questions = mysqlTable("questions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  userId: int("userId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId").notNull(), // FK para subjects
+  classId: int("classId"), // FK para classes (opcional)
+  title: varchar("title", { length: 255 }).notNull(), // Título/assunto da dúvida
+  content: text("content").notNull(), // Conteúdo detalhado da dúvida
+  status: mysqlEnum("status", ["pending", "answered", "resolved"]).default("pending").notNull(),
+  priority: mysqlEnum("priority", ["low", "normal", "high", "urgent"]).default("normal").notNull(),
+  isAnonymous: boolean("isAnonymous").default(false).notNull(), // Se a dúvida é anônima
+  viewCount: int("viewCount").default(0).notNull(), // Número de visualizações
+  answeredAt: timestamp("answeredAt"), // Quando foi respondida
+  resolvedAt: timestamp("resolvedAt"), // Quando foi marcada como resolvida
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Question = typeof questions.$inferSelect;
+export type InsertQuestion = typeof questions.$inferInsert;
+
+/**
+ * Respostas às Dúvidas
+ * Respostas dos professores às dúvidas dos alunos
+ */
+export const questionAnswers = mysqlTable("question_answers", {
+  id: int("id").autoincrement().primaryKey(),
+  questionId: int("questionId").notNull(), // FK para questions
+  userId: int("userId").notNull(), // FK para users (professor que respondeu)
+  content: text("content").notNull(), // Conteúdo da resposta
+  isAccepted: boolean("isAccepted").default(false).notNull(), // Se foi marcada como resposta aceita
+  helpful: int("helpful").default(0).notNull(), // Contador de "útil"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type QuestionAnswer = typeof questionAnswers.$inferSelect;
+export type InsertQuestionAnswer = typeof questionAnswers.$inferInsert;

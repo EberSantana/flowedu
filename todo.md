@@ -4891,3 +4891,28 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar responsividade em diferentes tamanhos (320px, 768px, 1024px)
 - [x] Validar modais e formulários em dispositivos mobile
 - [x] Padronizar página de Análise de Aprendizado com IA (LearningAnalytics) - corrigir centralização e alinhar com design das demais páginas
+- [x] Corrigir centralização da página de Análise de Aprendizado para manter consistência com demais páginas
+
+## 🔍 Investigação de Problema de Visualização
+- [ ] Analisar captura de tela fornecida pelo usuário mostrando interface "Análise de Aprendizado com IA"
+- [ ] Verificar se a captura corresponde ao projeto teacher_schedule_system ou outro projeto
+- [ ] Identificar causa do problema de visualização reportado
+- [ ] Implementar correções necessárias se aplicável
+- [x] Ajustar layout da página "Análise de Aprendizado com IA" para ter margens adequadas e centralização consistente com "Trilhas de Aprendizagem"
+
+## Sistema de Notificações de Dúvidas em Tempo Real
+
+- [x] Criar schema de banco de dados para tabela de dúvidas (questions)
+- [x] Criar schema de banco de dados para tabela de respostas (answers)
+- [x] Implementar helpers de banco de dados para dúvidas em server/db.ts
+- [x] Criar procedimento tRPC para enviar dúvida (questions.submit)
+- [x] Criar procedimento tRPC para responder dúvida (questions.answer)
+- [x] Criar procedimento tRPC para listar dúvidas (questions.list)
+- [x] Criar procedimento tRPC para obter detalhes de dúvida (questions.getById)
+- [x] Implementar sistema de notificações em tempo real usando notifyOwner
+- [x] Criar página de listagem de dúvidas para professores
+- [x] Criar página de detalhes de dúvida com formulário de resposta
+- [x] Criar formulário para alunos enviarem dúvidas
+- [x] Adicionar rotas no App.tsx para páginas de dúvidas
+- [x] Testar fluxo completo de envio e resposta de dúvidas
+- [x] Testar notificações em tempo real

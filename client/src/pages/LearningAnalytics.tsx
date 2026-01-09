@@ -128,106 +128,115 @@ export function LearningAnalytics() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Sidebar />
-      <PageWrapper>
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                <Brain className="h-7 w-7 text-white" />
+      <PageWrapper className="flex-1">
+        <div className="max-w-7xl mx-auto py-8 px-6 space-y-8">
+          {/* Header Centralizado */}
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                <Brain className="h-10 w-10 text-white" />
               </div>
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-slate-900 mb-1">
-                  Análise de Aprendizado com IA
-                </h1>
-                <p className="text-slate-600">
-                  Monitore comportamento, padrões e evolução dos seus alunos com inteligência artificial
-                </p>
-              </div>
-              <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-2 rounded-lg border border-indigo-200">
-                <Sparkles className="h-5 w-5 text-indigo-600" />
-                <span className="text-indigo-700 font-semibold text-sm">Powered by AI</span>
-              </div>
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-slate-900 mb-2">
+                Análise de Aprendizado com IA
+              </h1>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Monitore comportamento, padrões e evolução dos seus alunos com inteligência artificial
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-3 rounded-full border border-indigo-200 shadow-sm">
+              <Sparkles className="h-5 w-5 text-indigo-600" />
+              <span className="text-indigo-700 font-semibold">Powered by AI</span>
             </div>
           </div>
 
           {/* Estatísticas em Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="border-t-4 border-t-blue-500 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-blue-600" />
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Users className="h-8 w-8 text-blue-600" />
                   </div>
-                  <BarChart3 className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-slate-600 text-sm font-medium mb-1">Total de Alunos</p>
+                    <p className="text-4xl font-bold text-slate-900">{classAnalytics?.totalStudents || 0}</p>
+                  </div>
                 </div>
-                <p className="text-slate-600 text-sm font-medium mb-1">Total de Alunos</p>
-                <p className="text-3xl font-bold text-slate-900">{classAnalytics?.totalStudents || 0}</p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-t-4 border-t-red-500 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                    <AlertTriangle className="h-8 w-8 text-red-600" />
                   </div>
-                  <AlertCircle className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-slate-600 text-sm font-medium mb-1">Alertas Críticos</p>
+                    <p className="text-4xl font-bold text-slate-900">{alertStats?.critical || 0}</p>
+                  </div>
                 </div>
-                <p className="text-slate-600 text-sm font-medium mb-1">Alertas Críticos</p>
-                <p className="text-3xl font-bold text-slate-900">{alertStats?.critical || 0}</p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-orange-500 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-t-4 border-t-orange-500 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                    <Target className="h-6 w-6 text-orange-600" />
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Target className="h-8 w-8 text-orange-600" />
                   </div>
-                  <Activity className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-slate-600 text-sm font-medium mb-1">Precisam Atenção</p>
+                    <p className="text-4xl font-bold text-slate-900">{classAnalytics?.studentsNeedingAttention || 0}</p>
+                  </div>
                 </div>
-                <p className="text-slate-600 text-sm font-medium mb-1">Precisam Atenção</p>
-                <p className="text-3xl font-bold text-slate-900">{classAnalytics?.studentsNeedingAttention || 0}</p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-yellow-500 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-t-4 border-t-yellow-500 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                    <Lightbulb className="h-6 w-6 text-yellow-600" />
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <Lightbulb className="h-8 w-8 text-yellow-600" />
                   </div>
-                  <Sparkles className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-slate-600 text-sm font-medium mb-1">Insights Recentes</p>
+                    <p className="text-4xl font-bold text-slate-900">{classAnalytics?.recentInsights?.length || 0}</p>
+                  </div>
                 </div>
-                <p className="text-slate-600 text-sm font-medium mb-1">Insights Recentes</p>
-                <p className="text-3xl font-bold text-slate-900">{classAnalytics?.recentInsights?.length || 0}</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Seleção de Aluno */}
-          <Card className="shadow-sm">
-            <CardHeader className="border-b bg-slate-50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <CardTitle>Análise Individual</CardTitle>
-                  <CardDescription>Selecione um aluno para análise detalhada com IA</CardDescription>
+          {/* Seleção de Aluno - Layout Horizontal Equilibrado */}
+          <Card className="shadow-lg border-2 border-slate-200">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-md">
+                    <Activity className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Análise Individual</CardTitle>
+                    <CardDescription>Selecione um aluno para análise detalhada com IA</CardDescription>
+                  </div>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                    Selecionar Aluno
+                  </label>
                   <Select
                     value={selectedStudent?.toString() || ""}
                     onValueChange={(value) => setSelectedStudent(Number(value))}
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione um aluno..." />
+                    <SelectTrigger className="w-full h-12">
+                      <SelectValue placeholder="Escolha um aluno para analisar..." />
                     </SelectTrigger>
                     <SelectContent>
                       {loadingStudents ? (
@@ -247,55 +256,70 @@ export function LearningAnalytics() {
                 <Button
                   onClick={handleAnalyzeStudent}
                   disabled={!selectedStudent || isAnalyzing}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md"
+                  size="lg"
                 >
                   {isAnalyzing ? (
                     <>
-                      <Activity className="mr-2 h-4 w-4 animate-spin" />
+                      <Activity className="h-5 w-5 mr-2 animate-spin" />
                       Analisando...
                     </>
                   ) : (
                     <>
-                      <Brain className="mr-2 h-4 w-4" />
+                      <Sparkles className="h-5 w-5 mr-2" />
                       Analisar com IA
                     </>
                   )}
                 </Button>
               </div>
+
+              {selectedStudentData && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                      {selectedStudentData.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">{selectedStudentData.fullName}</p>
+                      <p className="text-sm text-slate-600">Aluno selecionado para análise</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Tabs de Análise */}
+          {/* Tabs de Análise - Quando aluno selecionado */}
           {selectedStudent && (
             <Tabs defaultValue="insights" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-slate-100">
-                <TabsTrigger value="insights" className="data-[state=active]:bg-white">
-                  <Lightbulb className="h-4 w-4 mr-2" />
-                  Insights
+              <TabsList className="grid w-full grid-cols-3 h-14 bg-slate-100 p-1 rounded-lg">
+                <TabsTrigger value="insights" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md">
+                  <Lightbulb className="h-4 w-4" />
+                  <span className="hidden sm:inline">Insights</span>
                 </TabsTrigger>
-                <TabsTrigger value="alerts" className="data-[state=active]:bg-white">
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  Alertas
+                <TabsTrigger value="alerts" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span className="hidden sm:inline">Alertas</span>
                 </TabsTrigger>
-                <TabsTrigger value="patterns" className="data-[state=active]:bg-white">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Padrões
+                <TabsTrigger value="patterns" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-md">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="hidden sm:inline">Padrões</span>
                 </TabsTrigger>
               </TabsList>
 
               {/* Tab: Insights */}
-              <TabsContent value="insights" className="mt-4">
-                <Card className="shadow-sm">
-                  <CardHeader className="border-b bg-slate-50">
+              <TabsContent value="insights" className="mt-6">
+                <Card className="shadow-lg">
+                  <CardHeader className="border-b bg-gradient-to-r from-yellow-50 to-orange-50">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <Lightbulb className="h-5 w-5 text-yellow-600" />
-                          Insights Gerados pela IA
-                        </CardTitle>
-                        <CardDescription>
-                          {selectedStudentData?.fullName}
-                        </CardDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center">
+                          <Lightbulb className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle>Insights Gerados pela IA</CardTitle>
+                          <CardDescription>Recomendações personalizadas baseadas em análise de dados</CardDescription>
+                        </div>
                       </div>
                       <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
                         {studentInsights?.length || 0} insights
@@ -303,25 +327,24 @@ export function LearningAnalytics() {
                     </div>
                   </CardHeader>
                   <CardContent className="pt-6">
-                    <ScrollArea className="h-[400px] pr-4">
+                    <ScrollArea className="h-[500px] pr-4">
                       {!studentInsights || studentInsights.length === 0 ? (
-                        <div className="text-center py-12">
-                          <Lightbulb className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500">Nenhum insight disponível ainda</p>
-                          <p className="text-sm text-slate-400 mt-1">Clique em "Analisar com IA" para gerar insights</p>
+                        <div className="text-center py-16">
+                          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                            <Lightbulb className="h-10 w-10 text-slate-400" />
+                          </div>
+                          <p className="text-slate-500 text-lg font-medium">Nenhum insight disponível</p>
+                          <p className="text-sm text-slate-400 mt-2">Clique em "Analisar com IA" para gerar insights</p>
                         </div>
                       ) : (
-                        <div className="space-y-4">
+                        <div className="grid gap-4">
                           {studentInsights.map((insight: any) => (
-                            <Card key={insight.id} className="border-l-4 border-l-yellow-500 shadow-sm">
+                            <Card key={insight.id} className="border-l-4 border-l-yellow-500 shadow-sm hover:shadow-md transition-shadow">
                               <CardContent className="pt-4">
-                                <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-start justify-between mb-3">
                                   <div className="flex items-center gap-2">
                                     {getPriorityIcon(insight.priority)}
-                                    <Badge variant={getPriorityColor(insight.priority) as any}>
-                                      {insight.priority}
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
+                                    <Badge variant={getPriorityColor(insight.priority) as any} className="text-xs">
                                       {insight.category}
                                     </Badge>
                                   </div>
@@ -329,36 +352,31 @@ export function LearningAnalytics() {
                                     {new Date(insight.generatedAt).toLocaleDateString('pt-BR')}
                                   </span>
                                 </div>
-                                <h4 className="font-semibold text-slate-900 mb-2">{insight.title}</h4>
-                                <p className="text-sm text-slate-600 mb-3">{insight.description}</p>
-                                {insight.recommendations && (
-                                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                                    <p className="text-xs font-semibold text-blue-900 mb-1">Recomendações:</p>
-                                    <p className="text-xs text-blue-700">{insight.recommendations}</p>
-                                  </div>
-                                )}
-                                {insight.confidence && (
-                                  <div className="flex items-center gap-2 mb-3">
-                                    <span className="text-xs text-slate-500">Confiança:</span>
-                                    <div className="flex-1 bg-slate-200 rounded-full h-2">
-                                      <div
-                                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full"
-                                        style={{ width: `${insight.confidence}%` }}
-                                      />
+                                <h4 className="font-semibold text-slate-900 mb-2 text-lg">{insight.title}</h4>
+                                <p className="text-sm text-slate-600 mb-4 leading-relaxed">{insight.description}</p>
+                                {insight.recommendation && (
+                                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-3">
+                                    <div className="flex items-start gap-2">
+                                      <ArrowRight className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                      <div>
+                                        <p className="text-xs font-semibold text-blue-900 mb-1">Recomendação:</p>
+                                        <p className="text-sm text-blue-700 leading-relaxed">{insight.recommendation}</p>
+                                      </div>
                                     </div>
-                                    <span className="text-xs font-semibold text-slate-700">{insight.confidence}%</span>
                                   </div>
                                 )}
-                                {!insight.dismissed && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => dismissInsightMutation.mutate({ insightId: insight.id })}
-                                    className="text-xs"
-                                  >
-                                    <XCircle className="h-3 w-3 mr-1" />
-                                    Dispensar
-                                  </Button>
+                                {insight.status === 'active' && (
+                                  <div className="flex gap-2 pt-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => dismissInsightMutation.mutate({ insightId: insight.id })}
+                                      className="text-xs"
+                                    >
+                                      <XCircle className="h-3 w-3 mr-1" />
+                                      Dispensar
+                                    </Button>
+                                  </div>
                                 )}
                               </CardContent>
                             </Card>
@@ -371,40 +389,42 @@ export function LearningAnalytics() {
               </TabsContent>
 
               {/* Tab: Alertas */}
-              <TabsContent value="alerts" className="mt-4">
-                <Card className="shadow-sm">
-                  <CardHeader className="border-b bg-slate-50">
+              <TabsContent value="alerts" className="mt-6">
+                <Card className="shadow-lg">
+                  <CardHeader className="border-b bg-gradient-to-r from-red-50 to-orange-50">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <AlertTriangle className="h-5 w-5 text-orange-600" />
-                          Alertas de Desempenho
-                        </CardTitle>
-                        <CardDescription>
-                          {selectedStudentData?.fullName}
-                        </CardDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
+                          <AlertTriangle className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle>Alertas do Aluno</CardTitle>
+                          <CardDescription>Situações que requerem atenção imediata</CardDescription>
+                        </div>
                       </div>
-                      <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
                         {studentAlerts?.length || 0} alertas
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-6">
-                    <ScrollArea className="h-[400px] pr-4">
+                    <ScrollArea className="h-[500px] pr-4">
                       {!studentAlerts || studentAlerts.length === 0 ? (
-                        <div className="text-center py-12">
-                          <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
-                          <p className="text-slate-500">Nenhum alerta ativo</p>
-                          <p className="text-sm text-slate-400 mt-1">O aluno está com bom desempenho</p>
+                        <div className="text-center py-16">
+                          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="h-10 w-10 text-green-500" />
+                          </div>
+                          <p className="text-slate-500 text-lg font-medium">Nenhum alerta ativo</p>
+                          <p className="text-sm text-slate-400 mt-2">Este aluno está com bom desempenho</p>
                         </div>
                       ) : (
-                        <div className="space-y-4">
+                        <div className="grid gap-4">
                           {studentAlerts.map((alert: any) => (
-                            <Card key={alert.id} className="border-l-4 border-l-orange-500 shadow-sm">
+                            <Card key={alert.id} className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow">
                               <CardContent className="pt-4">
-                                <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-start justify-between mb-3">
                                   <div className="flex items-center gap-2">
-                                    <div className={`w-2 h-2 rounded-full ${getSeverityColor(alert.severity)}`} />
+                                    <div className={`w-3 h-3 rounded-full ${getSeverityColor(alert.severity)}`} />
                                     <Badge variant="outline" className="text-xs">
                                       {alert.type}
                                     </Badge>
@@ -413,49 +433,29 @@ export function LearningAnalytics() {
                                     {new Date(alert.detectedAt).toLocaleDateString('pt-BR')}
                                   </span>
                                 </div>
-                                <h4 className="font-semibold text-slate-900 mb-2">{alert.title}</h4>
-                                <p className="text-sm text-slate-600 mb-3">{alert.message}</p>
-                                {alert.metrics && (
-                                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-3">
-                                    <p className="text-xs font-semibold text-slate-700 mb-1">Métricas:</p>
-                                    <pre className="text-xs text-slate-600 whitespace-pre-wrap">
-                                      {JSON.stringify(alert.metrics, null, 2)}
-                                    </pre>
+                                <h4 className="font-semibold text-slate-900 mb-2 text-lg">{alert.title}</h4>
+                                <p className="text-sm text-slate-600 mb-4 leading-relaxed">{alert.message}</p>
+                                {alert.status === 'active' && (
+                                  <div className="flex gap-2 pt-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => acknowledgeAlertMutation.mutate({ alertId: alert.id })}
+                                      className="text-xs"
+                                    >
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Reconhecer
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
+                                      className="text-xs bg-green-600 hover:bg-green-700"
+                                    >
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Resolver
+                                    </Button>
                                   </div>
                                 )}
-                                <div className="flex gap-2">
-                                  {alert.status === 'active' && (
-                                    <>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => acknowledgeAlertMutation.mutate({ alertId: alert.id })}
-                                        className="text-xs"
-                                      >
-                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                        Reconhecer
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
-                                        className="text-xs bg-green-600 hover:bg-green-700"
-                                      >
-                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                        Resolver
-                                      </Button>
-                                    </>
-                                  )}
-                                  {alert.status === 'acknowledged' && (
-                                    <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                                      Reconhecido
-                                    </Badge>
-                                  )}
-                                  {alert.status === 'resolved' && (
-                                    <Badge variant="outline" className="bg-green-50 text-green-700">
-                                      Resolvido
-                                    </Badge>
-                                  )}
-                                </div>
                               </CardContent>
                             </Card>
                           ))}
@@ -467,41 +467,43 @@ export function LearningAnalytics() {
               </TabsContent>
 
               {/* Tab: Padrões */}
-              <TabsContent value="patterns" className="mt-4">
-                <Card className="shadow-sm">
-                  <CardHeader className="border-b bg-slate-50">
+              <TabsContent value="patterns" className="mt-6">
+                <Card className="shadow-lg">
+                  <CardHeader className="border-b bg-gradient-to-r from-purple-50 to-pink-50">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <TrendingUp className="h-5 w-5 text-blue-600" />
-                          Padrões de Aprendizado
-                        </CardTitle>
-                        <CardDescription>
-                          {selectedStudentData?.fullName}
-                        </CardDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                          <TrendingUp className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle>Padrões de Aprendizado</CardTitle>
+                          <CardDescription>Comportamentos e tendências identificados ao longo do tempo</CardDescription>
+                        </div>
                       </div>
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
                         {learningPatterns?.length || 0} padrões
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-6">
-                    <ScrollArea className="h-[400px] pr-4">
+                    <ScrollArea className="h-[500px] pr-4">
                       {!learningPatterns || learningPatterns.length === 0 ? (
-                        <div className="text-center py-12">
-                          <Activity className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500">Nenhum padrão identificado ainda</p>
-                          <p className="text-sm text-slate-400 mt-1">Dados insuficientes para análise de padrões</p>
+                        <div className="text-center py-16">
+                          <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                            <TrendingUp className="h-10 w-10 text-slate-400" />
+                          </div>
+                          <p className="text-slate-500 text-lg font-medium">Nenhum padrão identificado</p>
+                          <p className="text-sm text-slate-400 mt-2">Mais dados são necessários para identificar padrões</p>
                         </div>
                       ) : (
-                        <div className="space-y-4">
+                        <div className="grid gap-4">
                           {learningPatterns.map((pattern: any) => (
-                            <Card key={pattern.id} className="border-l-4 border-l-blue-500 shadow-sm">
+                            <Card key={pattern.id} className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-shadow">
                               <CardContent className="pt-4">
-                                <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-start justify-between mb-3">
                                   <div className="flex items-center gap-2">
-                                    <TrendingUp className="h-4 w-4 text-blue-600" />
-                                    <Badge variant="outline" className="text-xs">
+                                    <TrendingUp className="h-4 w-4 text-purple-600" />
+                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
                                       {pattern.patternType}
                                     </Badge>
                                   </div>
@@ -509,20 +511,20 @@ export function LearningAnalytics() {
                                     {new Date(pattern.identifiedAt).toLocaleDateString('pt-BR')}
                                   </span>
                                 </div>
-                                <h4 className="font-semibold text-slate-900 mb-2">{pattern.title}</h4>
-                                <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
+                                <h4 className="font-semibold text-slate-900 mb-2 text-lg">{pattern.title}</h4>
+                                <p className="text-sm text-slate-600 mb-4 leading-relaxed">{pattern.description}</p>
                                 {pattern.frequency && (
-                                  <div className="flex items-center gap-2 mb-2">
+                                  <div className="flex items-center gap-2 mb-3 text-sm">
                                     <Clock className="h-4 w-4 text-slate-400" />
-                                    <span className="text-xs text-slate-600">
-                                      Frequência: <strong>{pattern.frequency}</strong>
+                                    <span className="text-slate-600">
+                                      Frequência: <strong className="text-slate-900">{pattern.frequency}</strong>
                                     </span>
                                   </div>
                                 )}
                                 {pattern.impact && (
-                                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
                                     <p className="text-xs font-semibold text-purple-900 mb-1">Impacto:</p>
-                                    <p className="text-xs text-purple-700">{pattern.impact}</p>
+                                    <p className="text-sm text-purple-700 leading-relaxed">{pattern.impact}</p>
                                   </div>
                                 )}
                               </CardContent>
@@ -537,17 +539,19 @@ export function LearningAnalytics() {
             </Tabs>
           )}
 
-          {/* Alertas Gerais da Turma */}
+          {/* Alertas Gerais da Turma - Quando nenhum aluno selecionado */}
           {!selectedStudent && (
-            <Card className="shadow-sm">
-              <CardHeader className="border-b bg-slate-50">
+            <Card className="shadow-lg">
+              <CardHeader className="border-b bg-gradient-to-r from-red-50 to-orange-50">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
-                      Alertas Gerais da Turma
-                    </CardTitle>
-                    <CardDescription>Situações que requerem atenção imediata</CardDescription>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
+                      <AlertTriangle className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle>Alertas Gerais da Turma</CardTitle>
+                      <CardDescription>Situações que requerem atenção imediata</CardDescription>
+                    </div>
                   </div>
                   <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
                     {alerts?.length || 0} alertas
@@ -555,25 +559,27 @@ export function LearningAnalytics() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                <ScrollArea className="h-[400px] pr-4">
+                <ScrollArea className="h-[500px] pr-4">
                   {!alerts || alerts.length === 0 ? (
-                    <div className="text-center py-12">
-                      <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
-                      <p className="text-slate-500">Nenhum alerta ativo</p>
-                      <p className="text-sm text-slate-400 mt-1">Tudo está funcionando bem</p>
+                    <div className="text-center py-16">
+                      <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="h-10 w-10 text-green-500" />
+                      </div>
+                      <p className="text-slate-500 text-lg font-medium">Nenhum alerta ativo</p>
+                      <p className="text-sm text-slate-400 mt-2">Tudo está funcionando bem</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="grid gap-4">
                       {alerts.map((alert: any) => (
-                        <Card key={alert.id} className="border-l-4 border-l-red-500 shadow-sm">
+                        <Card key={alert.id} className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow">
                           <CardContent className="pt-4">
-                            <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${getSeverityColor(alert.severity)}`} />
+                                <div className={`w-3 h-3 rounded-full ${getSeverityColor(alert.severity)}`} />
                                 <Badge variant="outline" className="text-xs">
                                   {alert.type}
                                 </Badge>
-                                <span className="text-xs text-slate-600">
+                                <span className="text-sm text-slate-600 font-medium">
                                   {alert.student?.fullName}
                                 </span>
                               </div>
@@ -581,31 +587,29 @@ export function LearningAnalytics() {
                                 {new Date(alert.detectedAt).toLocaleDateString('pt-BR')}
                               </span>
                             </div>
-                            <h4 className="font-semibold text-slate-900 mb-2">{alert.title}</h4>
-                            <p className="text-sm text-slate-600 mb-3">{alert.message}</p>
-                            <div className="flex gap-2">
-                              {alert.status === 'active' && (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => acknowledgeAlertMutation.mutate({ alertId: alert.id })}
-                                    className="text-xs"
-                                  >
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Reconhecer
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
-                                    className="text-xs bg-green-600 hover:bg-green-700"
-                                  >
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Resolver
-                                  </Button>
-                                </>
-                              )}
-                            </div>
+                            <h4 className="font-semibold text-slate-900 mb-2 text-lg">{alert.title}</h4>
+                            <p className="text-sm text-slate-600 mb-4 leading-relaxed">{alert.message}</p>
+                            {alert.status === 'active' && (
+                              <div className="flex gap-2 pt-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => acknowledgeAlertMutation.mutate({ alertId: alert.id })}
+                                  className="text-xs"
+                                >
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Reconhecer
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
+                                  className="text-xs bg-green-600 hover:bg-green-700"
+                                >
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Resolver
+                                </Button>
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       ))}

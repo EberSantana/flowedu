@@ -6084,6 +6084,152 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         };
       }),
   }),
+
+  // Sistema de Dúvidas e Respostas
+  questions: router({
+    // Enviar nova dúvida (aluno)
+    submit: studentProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        classId: z.number().optional(),
+        title: z.string().min(5, "Título deve ter pelo menos 5 caracteres"),
+        content: z.string().min(10, "Conteúdo deve ter pelo menos 10 caracteres"),
+        priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal'),
+        isAnonymous: z.boolean().default(false),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Sessão de aluno não encontrada' });
+        }
+        
+        const studentId = ctx.studentSession.studentId;
+        const userId = ctx.studentSession.professorId;
+        
+        // Criar dúvida
+        const questionId = await db.createQuestion({
+          studentId,
+          userId,
+          subjectId: input.subjectId,
+          classId: input.classId,
+          title: input.title,
+          content: input.content,
+          priority: input.priority,
+          isAnonymous: input.isAnonymous,
+          status: 'pending',
+          viewCount: 0,
+        });
+        
+        // Buscar informações para notificação
+        const student = await db.getStudentById(studentId, userId);
+        const subject = await db.getSubjectById(input.subjectId, userId);
+        
+        // Enviar notificação para o professor
+        try {
+          const studentName = input.isAnonymous ? 'Aluno Anônimo' : (student?.fullName || 'Aluno');
+          const subjectName = subject?.name || 'Disciplina';
+          
+          const { notifyOwner } = await import('./_core/notification');
+          await notifyOwner({
+            title: `📝 Nova Dúvida - ${subjectName}`,
+            content: `**${studentName}** enviou uma dúvida:\n\n**Assunto:** ${input.title}\n\n**Prévia:** ${input.content.substring(0, 150)}${input.content.length > 150 ? '...' : ''}\n\n[Responder Agora](${ENV.appUrl}/questions/${questionId})`,
+          });
+        } catch (error) {
+          console.error('Erro ao enviar notificação:', error);
+          // Não falhar a operação se a notificação falhar
+        }
+        
+        return { questionId, success: true };
+      }),
+    
+    // Listar dúvidas (professor)
+    list: protectedProcedure
+      .input(z.object({
+        status: z.enum(['pending', 'answered', 'resolved']).optional(),
+        subjectId: z.number().optional(),
+        priority: z.enum(['low', 'normal', 'high', 'urgent']).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getQuestionsByTeacher(ctx.user.id, input);
+      }),
+    
+    // Listar dúvidas do aluno
+    listByStudent: studentProcedure
+      .input(z.object({
+        status: z.enum(['pending', 'answered', 'resolved']).optional(),
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Sessão de aluno não encontrada' });
+        }
+        
+        return db.getQuestionsByStudent(ctx.studentSession.studentId, input);
+      }),
+    
+    // Obter detalhes de uma dúvida
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        // Incrementar contador de visualizações
+        await db.incrementQuestionViewCount(input.id);
+        
+        const question = await db.getQuestionById(input.id);
+        const answers = await db.getAnswersByQuestion(input.id);
+        
+        return { question, answers };
+      }),
+    
+    // Responder dúvida (professor)
+    answer: protectedProcedure
+      .input(z.object({
+        questionId: z.number(),
+        content: z.string().min(10, "Resposta deve ter pelo menos 10 caracteres"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const answerId = await db.createQuestionAnswer({
+          questionId: input.questionId,
+          userId: ctx.user.id,
+          content: input.content,
+          isAccepted: false,
+          helpful: 0,
+        });
+        
+        return { answerId, success: true };
+      }),
+    
+    // Marcar dúvida como resolvida (professor)
+    markResolved: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.markQuestionAsResolved(input.id, ctx.user.id);
+      }),
+    
+    // Marcar resposta como aceita (professor)
+    acceptAnswer: protectedProcedure
+      .input(z.object({
+        answerId: z.number(),
+        questionId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.markAnswerAsAccepted(input.answerId, input.questionId);
+      }),
+    
+    // Atualizar prioridade (professor)
+    updatePriority: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        priority: z.enum(['low', 'normal', 'high', 'urgent']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.updateQuestionPriority(input.id, input.priority, ctx.user.id);
+      }),
+    
+    // Estatísticas de dúvidas (professor)
+    statistics: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getQuestionStatistics(ctx.user.id);
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 
