@@ -71,7 +71,7 @@ export default function ExercisePerformanceReport() {
   // @ts-ignore - Rota existe no backend
   const { data: stats, isLoading } = trpc.teacherExercises.getStatistics.useQuery(
     {
-      subjectId: selectedSubject,
+      subjectId: selectedSubject!,
       exerciseId: selectedExercise,
     },
     { enabled: !!selectedSubject }

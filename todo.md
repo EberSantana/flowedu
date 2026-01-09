@@ -28,6 +28,7 @@
 - [x] Corrigir sobreposição de botões "Trilhas de Aprendizagem" e "Estatísticas de PC" nos cards de disciplinas
 - [x] Padronizar página SubjectCTStats.tsx seguindo padrão UX (cards brancos com border-l-4, ícones circulares coloridos)
 - [x] Centralizar layout da página SubjectCTStats.tsx (aplicar container mx-auto com max-width)
+- [x] Corrigir erro: procedimento tRPC teacherExercises.getStatistics não encontrado
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 

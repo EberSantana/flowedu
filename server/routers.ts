@@ -4796,6 +4796,189 @@ JSON (descrições MAX 15 chars):
         const answer = await getAnswerDetails(input.answerId);
         return answer;
       }),
+
+    // Obter estatísticas de desempenho dos alunos
+    getStatistics: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        exerciseId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error("Database not available");
+        
+        const { studentExercises, studentExerciseAttempts, students } = await import("../drizzle/schema");
+        
+        // Construir condições de filtro
+        const exerciseConditions = [
+          eq(studentExercises.teacherId, ctx.user.id),
+          eq(studentExercises.subjectId, input.subjectId),
+        ];
+        
+        if (input.exerciseId) {
+          exerciseConditions.push(eq(studentExercises.id, input.exerciseId));
+        }
+        
+        // Buscar exercícios filtrados
+        const exercises = await db_instance
+          .select()
+          .from(studentExercises)
+          .where(and(...exerciseConditions));
+        
+        if (exercises.length === 0) {
+          return null;
+        }
+        
+        const exerciseIds = exercises.map(e => e.id);
+        
+        // Buscar todas as tentativas dos exercícios filtrados
+        const attempts = await db_instance
+          .select({
+            id: studentExerciseAttempts.id,
+            exerciseId: studentExerciseAttempts.exerciseId,
+            studentId: studentExerciseAttempts.studentId,
+            score: studentExerciseAttempts.score,
+            status: studentExerciseAttempts.status,
+            completedAt: studentExerciseAttempts.completedAt,
+          })
+          .from(studentExerciseAttempts)
+          .where(
+            sql`${studentExerciseAttempts.exerciseId} IN (${sql.join(exerciseIds.map(id => sql`${id}`), sql`, `)})`
+          );
+        
+        // Buscar informações dos alunos
+        const uniqueStudentIds = Array.from(new Set(attempts.map(a => a.studentId)));
+        const studentsData = uniqueStudentIds.length > 0 ? await db_instance
+          .select({
+            id: students.id,
+            fullName: students.fullName,
+            registrationNumber: students.registrationNumber,
+          })
+          .from(students)
+          .where(
+            sql`${students.id} IN (${sql.join(uniqueStudentIds.map(id => sql`${id}`), sql`, `)})`
+          ) : [];
+        
+        // Calcular estatísticas
+        const totalStudents = uniqueStudentIds.length;
+        const completedAttempts = attempts.filter(a => a.status === 'completed');
+        const completionRate = totalStudents > 0 ? (completedAttempts.length / attempts.length) * 100 : 0;
+        
+        const scores = completedAttempts.map(a => a.score || 0);
+        const averageScore = scores.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / scores.length : 0;
+        
+        // Distribuição de notas
+        const scoreRanges = [
+          { name: '0-20%', min: 0, max: 20, count: 0 },
+          { name: '21-40%', min: 21, max: 40, count: 0 },
+          { name: '41-60%', min: 41, max: 60, count: 0 },
+          { name: '61-80%', min: 61, max: 80, count: 0 },
+          { name: '81-100%', min: 81, max: 100, count: 0 },
+        ];
+        
+        scores.forEach(score => {
+          const range = scoreRanges.find(r => score >= r.min && score <= r.max);
+          if (range) range.count++;
+        });
+        
+        // Desempenho por exercício
+        const exercisePerformance = exercises.map(exercise => {
+          const exerciseAttempts = completedAttempts.filter(a => a.exerciseId === exercise.id);
+          const exerciseScores = exerciseAttempts.map(a => a.score || 0);
+          const exerciseAvg = exerciseScores.length > 0 
+            ? exerciseScores.reduce((sum, s) => sum + s, 0) / exerciseScores.length 
+            : 0;
+          
+          return {
+            exerciseTitle: exercise.title,
+            averageScore: Math.round(exerciseAvg * 10) / 10,
+            attempts: exerciseAttempts.length,
+          };
+        });
+        
+        // Alunos com dificuldades (média < 60%)
+        const studentPerformance = new Map<number, { scores: number[], attempts: number }>();
+        
+        completedAttempts.forEach(attempt => {
+          if (!studentPerformance.has(attempt.studentId)) {
+            studentPerformance.set(attempt.studentId, { scores: [], attempts: 0 });
+          }
+          const perf = studentPerformance.get(attempt.studentId)!;
+          perf.scores.push(attempt.score || 0);
+          perf.attempts++;
+        });
+        
+        const studentsWithDifficultiesList = [];
+        for (const [studentId, perf] of Array.from(studentPerformance.entries())) {
+          const avgScore = perf.scores.reduce((sum: number, s: number) => sum + s, 0) / perf.scores.length;
+          if (avgScore < 60) {
+            const studentInfo = studentsData.find(s => s.id === studentId);
+            studentsWithDifficultiesList.push({
+              studentId,
+              studentName: studentInfo?.fullName || 'Desconhecido',
+              registrationNumber: studentInfo?.registrationNumber || 'N/A',
+              averageScore: Math.round(avgScore * 10) / 10,
+              attempts: perf.attempts,
+            });
+          }
+        }
+        
+        // Evolução temporal (últimos 30 dias)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const recentAttempts = completedAttempts.filter(a => 
+          a.completedAt && new Date(a.completedAt) >= thirtyDaysAgo
+        );
+        
+        const temporalData = new Map<string, { scores: number[], total: number, completed: number }>();
+        
+        recentAttempts.forEach(attempt => {
+          if (!attempt.completedAt) return;
+          const date = new Date(attempt.completedAt).toISOString().split('T')[0];
+          if (!temporalData.has(date)) {
+            temporalData.set(date, { scores: [], total: 0, completed: 0 });
+          }
+          const data = temporalData.get(date)!;
+          data.scores.push(attempt.score || 0);
+          data.completed++;
+        });
+        
+        const temporalEvolution = Array.from(temporalData.entries())
+          .map(([date, data]) => ({
+            date,
+            averageScore: Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length) * 10) / 10,
+            completionRate: Math.round((data.completed / data.total) * 100 * 10) / 10,
+          }))
+          .sort((a, b) => a.date.localeCompare(b.date));
+        
+        // Desempenho de todos os alunos
+        const allStudentsPerformance = [];
+        for (const [studentId, perf] of Array.from(studentPerformance.entries())) {
+          const avgScore = perf.scores.reduce((sum: number, s: number) => sum + s, 0) / perf.scores.length;
+          const studentInfo = studentsData.find(s => s.id === studentId);
+          allStudentsPerformance.push({
+            studentId,
+            studentName: studentInfo?.fullName || 'Desconhecido',
+            registrationNumber: studentInfo?.registrationNumber || 'N/A',
+            averageScore: Math.round(avgScore * 10) / 10,
+            completedExercises: perf.attempts,
+          });
+        }
+        
+        return {
+          totalStudents,
+          totalExercises: exercises.length,
+          completionRate: Math.round(completionRate * 10) / 10,
+          averageScore: Math.round(averageScore * 10) / 10,
+          studentsWithDifficulties: studentsWithDifficultiesList.length,
+          studentsWithDifficultiesList,
+          scoreDistribution: scoreRanges,
+          exercisePerformance,
+          temporalEvolution,
+          allStudentsPerformance,
+        };
+      }),
   }),
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
