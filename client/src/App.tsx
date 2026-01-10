@@ -45,7 +45,7 @@ import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
 import StudentExerciseResults from "./pages/StudentExerciseResults";
 import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
-import TeacherReviewAnswers from "./pages/TeacherReviewAnswers";
+
 import StudentReview from "./pages/StudentReview";
 import StudentSmartReview from "./pages/StudentSmartReview";
 import StudentSmartReviewItem from "./pages/StudentSmartReviewItem";
@@ -85,7 +85,7 @@ function Router() {
         <Route path={"/reports"} component={Reports} />
         <Route path={"/learning-analytics"} component={LearningAnalytics} />
         <Route path="/exercise-performance" component={ExercisePerformanceReport} />
-        <Route path="/teacher-review-answers" component={TeacherReviewAnswers} />
+
         <Route path={"/learning-paths"} component={LearningPaths} />
         <Route path={"/active-methodologies"} component={ActiveMethodologies} />
         <Route path={"/tasks"} component={Tasks} />

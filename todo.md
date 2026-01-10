@@ -5047,3 +5047,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Modo de revisão rápida (apenas exercícios errados)
 - [ ] Modo de revisão completa (todos os exercícios)
 - [ ] Sistema de marcação de exercícios favoritos
+
+## 🗑️ Remoção de Revisão Inteligente
+
+- [x] Remover funcionalidade de Revisão Inteligente do sistema

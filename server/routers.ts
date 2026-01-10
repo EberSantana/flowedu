@@ -4758,48 +4758,6 @@ JSON (descrições MAX 15 chars):
         return { success: true };
       }),
 
-    // Listar respostas que precisam de revisão manual
-    getPendingReviews: protectedProcedure
-      .query(async ({ ctx }) => {
-        const { getPendingReviewAnswers } = await import("./db-review-answers");
-        const pendingReviews = await getPendingReviewAnswers(ctx.user.id);
-        return pendingReviews;
-      }),
-
-    // Contar respostas pendentes de revisão
-    countPendingReviews: protectedProcedure
-      .query(async ({ ctx }) => {
-        const { countPendingReviews } = await import("./db-review-answers");
-        const count = await countPendingReviews(ctx.user.id);
-        return { count };
-      }),
-
-    // Revisar e ajustar nota de uma resposta aberta
-    reviewAnswer: protectedProcedure
-      .input(z.object({
-        answerId: z.number(),
-        finalScore: z.number().min(0).max(100),
-        teacherFeedback: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const { reviewAnswer } = await import("./db-review-answers");
-        const result = await reviewAnswer(
-          input.answerId,
-          ctx.user.id,
-          input.finalScore,
-          input.teacherFeedback
-        );
-        return result;
-      }),
-
-    // Buscar detalhes de uma resposta específica
-    getAnswerDetails: protectedProcedure
-      .input(z.object({ answerId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        const { getAnswerDetails } = await import("./db-review-answers");
-        const answer = await getAnswerDetails(input.answerId);
-        return answer;
-      }),
 
     // Obter estatísticas de desempenho dos alunos
     getStatistics: protectedProcedure
