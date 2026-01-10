@@ -4509,6 +4509,10 @@ export async function submitExerciseAttempt(
     // Verificar se é questão objetiva (aceitar "objective" ou "multiple_choice")
     const isObjectiveQuestion = question && (question.type === "objective" || question.type === "multiple_choice");
     
+    // Variáveis para armazenar as respostas normalizadas
+    let normalizedStudentAnswer = answer.answer || "";
+    let normalizedCorrectAnswer = question.correctAnswer || null;
+    
     if (isObjectiveQuestion && question.correctAnswer) {
       // Normalizar respostas para comparação
       const studentAns = answer.answer?.trim();
@@ -4532,14 +4536,18 @@ export async function submitExerciseAttempt(
       if (isCorrect) {
         correctAnswers++;
       }
+      
+      // CORREÇÃO: Salvar apenas as letras normalizadas no banco para consistência
+      normalizedStudentAnswer = studentLetter;
+      normalizedCorrectAnswer = correctLetter;
     }
     
     return {
       attemptId,
       questionNumber: idx + 1,
       questionType: question.type,
-      studentAnswer: answer.answer || "",
-      correctAnswer: question.correctAnswer || null,
+      studentAnswer: normalizedStudentAnswer,
+      correctAnswer: normalizedCorrectAnswer,
       isCorrect: isObjectiveQuestion ? isCorrect : null,
       pointsAwarded: isCorrect ? 10 : 0, // 10 pontos por questão correta
     };
