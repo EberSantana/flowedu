@@ -448,112 +448,70 @@ function QuestionReviewCard({
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        {/* Comparação de Respostas */}
-        <div className="mb-6 grid md:grid-cols-2 gap-4">
-          {/* Sua Resposta */}
+        {/* Status da Resposta */}
+        <div className="mb-6">
           <div className={`p-4 ${isCorrect ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'} rounded-lg`}>
             <div className="flex items-center gap-2 mb-2">
               {isCorrect ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
               ) : (
-                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertCircle className="h-5 w-5 text-red-600" />
               )}
-              <h4 className={`font-semibold ${isCorrect ? 'text-green-900' : 'text-red-900'}`}>Sua Resposta</h4>
+              <h4 className={`font-semibold text-lg ${isCorrect ? 'text-green-900' : 'text-red-900'}`}>
+                {isCorrect ? 'Resposta Correta! ✓' : 'Resposta Incorreta ✗'}
+              </h4>
             </div>
-            <p className="text-gray-800">{answer.studentAnswer}</p>
-          </div>
-
-          {/* Resposta Correta */}
-          <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <h4 className="font-semibold text-green-900">Resposta Correta</h4>
-            </div>
-            <p className="text-gray-800">{answer.correctAnswer}</p>
           </div>
         </div>
 
-        {/* Feedback e Análise da IA */}
+        {/* Feedback Personalizado */}
         {answer.aiFeedback && (
           <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded-lg">
             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-600" />
-              Análise Inteligente
+              💬 Feedback Personalizado
             </h4>
             <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{answer.aiFeedback}</p>
           </div>
         )}
 
-        {/* Recursos de Aprendizado Contínuo */}
+        {/* Recursos de Aprendizado */}
         {showStudyResources && studyResources && (
-          <div className="mb-6 p-5 bg-gradient-to-br from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-lg">
-            <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-purple-600" />
-              Recursos de Aprendizado Contínuo
-            </h4>
-
-            <div className="space-y-4">
-              {/* Explicação */}
-              {studyResources.conceptExplanation && (
-                <div>
-                  <h5 className="font-medium text-purple-900 mb-1.5">Entenda o Conceito</h5>
-                  <p className="text-gray-700 leading-relaxed">{studyResources.conceptExplanation}</p>
-                </div>
-              )}
-
-              {/* Outras Respostas Válidas (para questões abertas) */}
-              {studyResources.alternativeAnswers && studyResources.alternativeAnswers.length > 0 && (
-                <div>
-                  <h5 className="font-medium text-purple-900 mb-1.5">Outras Formas de Responder</h5>
-                  <ul className="space-y-1.5 ml-1">
-                    {studyResources.alternativeAnswers.map((alt: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-700">
-                        <span className="text-purple-600 font-medium mt-0.5">•</span>
-                        <span>{alt}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Dicas de Como Estudar Mais */}
-              {studyResources.tips && studyResources.tips.length > 0 && (
-                <div>
-                  <h5 className="font-medium text-purple-900 mb-1.5">Como Estudar Este Tópico</h5>
-                  <ul className="space-y-1.5 ml-1">
-                    {studyResources.tips.map((tip: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-700">
-                        <span className="text-purple-600 font-medium mt-0.5">•</span>
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Materiais e Estratégia */}
-              <div className="grid md:grid-cols-2 gap-4">
-                {studyResources.suggestedMaterials && studyResources.suggestedMaterials.length > 0 && (
-                  <div className="p-3 bg-white/60 rounded-lg">
-                    <h5 className="font-medium text-purple-900 mb-1.5">Materiais Recomendados</h5>
-                    <ul className="space-y-1 text-sm">
-                      {studyResources.suggestedMaterials.map((material: any, index: number) => (
-                        <li key={index} className="text-gray-700">
-                          <span className="font-medium">{material.type}:</span> {material.description}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {studyResources.reviewStrategy && (
-                  <div className="p-3 bg-white/60 rounded-lg">
-                    <h5 className="font-medium text-purple-900 mb-1.5">Estratégia de Estudo</h5>
-                    <p className="text-sm text-gray-700">{studyResources.reviewStrategy}</p>
-                  </div>
-                )}
+          <div className="mb-6 space-y-4">
+            {/* Dicas de Estudo */}
+            {studyResources.tips && studyResources.tips.length > 0 && (
+              <div className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-l-4 border-yellow-500 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-600" />
+                  💡 Dicas de Estudo
+                </h4>
+                <ul className="space-y-2 ml-1">
+                  {studyResources.tips.map((tip: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-700">
+                      <span className="text-yellow-600 font-medium mt-0.5">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            )}
+
+            {/* Explicação e Resposta Esperada */}
+            {studyResources.conceptExplanation && (
+              <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-purple-600" />
+                  📝 Explicação e Resposta Esperada
+                </h4>
+                <p className="text-gray-700 leading-relaxed mb-3">{studyResources.conceptExplanation}</p>
+                
+                {/* Resposta Correta */}
+                <div className="mt-3 p-3 bg-white/60 rounded-lg">
+                  <h5 className="font-medium text-purple-900 mb-1.5">Resposta Esperada:</h5>
+                  <p className="text-gray-800 font-medium">{answer.correctAnswer}</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -566,7 +524,7 @@ function QuestionReviewCard({
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
               <Lightbulb className="h-4 w-4 mr-2" />
-              {loadingResources ? "Gerando recursos..." : "Como Estudar Este Tópico?"}
+              {loadingResources ? "Gerando recursos..." : "Ver Dicas e Explicação"}
             </Button>
           )}
 

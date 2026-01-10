@@ -4960,3 +4960,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Na revisão inteligente, mostrar todas as questões agrupadas por tipo (não apenas uma por vez)
 - [x] Corrigir classificação de tipos de questão - todas estão sendo marcadas como "Dissertativa" quando deveriam respeitar o tipo original (múltipla escolha, verdadeiro/falso, etc.)
+- [x] Simplificar Revisão Inteligente para mostrar apenas: respostas corretas/erradas, feedback personalizado, dicas de estudo, explicação e resposta esperada
