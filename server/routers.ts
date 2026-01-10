@@ -5025,13 +5025,13 @@ JSON (descrições MAX 15 chars):
             messages: [
               {
                 role: "system",
-                content: `Você é um tutor educacional especializado em criar dicas de estudo personalizadas.
-Seu objetivo é ajudar o aluno a entender onde errou e como melhorar.
-Seja empático, construtivo e específico nas suas orientações.`,
+                content: `Você é um tutor educacional especializado em aprendizado contínuo.
+Seu objetivo é ajudar o aluno a entender o conceito profundamente e fornecer recursos para estudo autônomo.
+Seja empático, construtivo e focado em desenvolver autonomia de aprendizado.`,
               },
               {
                 role: "user",
-                content: `Analise o erro do aluno e forneça dicas de estudo personalizadas:
+                content: `Analise a resposta do aluno e forneça recursos de aprendizado contínuo:
 
 Questão: ${input.questionText}
 
@@ -5042,12 +5042,13 @@ Resposta do aluno: ${input.studentAnswer}
 Tipo de questão: ${input.questionType}
 
 Forneça:
-1. Uma explicação clara do conceito que o aluno precisa revisar
-2. Dicas específicas de estudo (3-5 dicas práticas)
-3. Sugestões de materiais complementares (tipos de recursos: vídeos, artigos, exercícios)
-4. Uma estratégia de revisão recomendada
+1. Uma explicação clara do conceito fundamental
+2. ${input.questionType === 'open' ? 'Outras formas válidas de responder esta questão (2-3 alternativas)' : 'Conceitos relacionados que o aluno deve dominar'}
+3. Dicas de COMO estudar este tópico de forma efetiva (3-5 dicas práticas focadas em métodos de estudo)
+4. Sugestões de materiais complementares (tipos de recursos: vídeos, artigos, exercícios)
+5. Uma estratégia de estudo recomendada para dominar este conceito
 
-Seja específico e prático. Foque em ajudar o aluno a realmente entender o conceito.`,
+Foque em desenvolver autonomia de aprendizado e pensamento crítico, não apenas em corrigir o erro.`,
               },
             ],
             response_format: {
@@ -5060,11 +5061,16 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
                   properties: {
                     conceptExplanation: {
                       type: "string",
-                      description: "Explicação clara do conceito que precisa ser revisado",
+                      description: "Explicação clara do conceito fundamental",
+                    },
+                    alternativeAnswers: {
+                      type: "array",
+                      description: "Outras formas válidas de responder (para questões abertas) ou conceitos relacionados (para múltipla escolha)",
+                      items: { type: "string" },
                     },
                     studyTips: {
                       type: "array",
-                      description: "Lista de 3-5 dicas práticas de estudo",
+                      description: "Lista de 3-5 dicas práticas de COMO estudar este tópico",
                       items: { type: "string" },
                     },
                     suggestedMaterials: {
@@ -5085,10 +5091,10 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
                     },
                     reviewStrategy: {
                       type: "string",
-                      description: "Estratégia de revisão recomendada",
+                      description: "Estratégia de estudo recomendada para dominar este conceito",
                     },
                   },
-                  required: ["conceptExplanation", "studyTips", "suggestedMaterials", "reviewStrategy"],
+                  required: ["conceptExplanation", "alternativeAnswers", "studyTips", "suggestedMaterials", "reviewStrategy"],
                   additionalProperties: false,
                 },
               },

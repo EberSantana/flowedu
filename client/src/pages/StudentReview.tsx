@@ -319,35 +319,38 @@ function QuestionReviewCard({
   answer: any;
   onMarkAsReviewed: (id: number) => void;
 }) {
-  const [showStudyTips, setShowStudyTips] = useState(false);
+  const [showStudyResources, setShowStudyResources] = useState(false);
 
-  const getStudyTipsMutation = trpc.studentReview.getStudyTips.useMutation();
-  const [studyTips, setStudyTips] = useState<any>(null);
-  const [loadingTips, setLoadingTips] = useState(false);
+  const getStudyResourcesMutation = trpc.studentReview.getStudyTips.useMutation();
+  const [studyResources, setStudyResources] = useState<any>(null);
+  const [loadingResources, setLoadingResources] = useState(false);
 
-  const handleGetTips = async () => {
-    setLoadingTips(true);
-    setShowStudyTips(true);
-    toastFn.info("🤖 Gerando dicas personalizadas... A IA está analisando sua resposta.");
+  const handleGetStudyResources = async () => {
+    setLoadingResources(true);
+    setShowStudyResources(true);
+    toastFn.info("🤖 Gerando recursos de aprendizado... A IA está preparando um guia personalizado.");
     
     try {
-      const result = await getStudyTipsMutation.mutateAsync({
+      const result = await getStudyResourcesMutation.mutateAsync({
         answerId: answer.id,
         questionText: answer.correctAnswer,
         studentAnswer: answer.studentAnswer,
         correctAnswer: answer.correctAnswer,
         questionType: answer.questionType,
       });
-      setStudyTips(result);
-      setLoadingTips(false);
+      setStudyResources(result);
+      setLoadingResources(false);
     } catch (error) {
-      setLoadingTips(false);
-      toastFn.error("❌ Erro ao gerar dicas. Tente novamente em alguns instantes.");
+      setLoadingResources(false);
+      toastFn.error("❌ Erro ao gerar recursos. Tente novamente em alguns instantes.");
     }
   };
 
+  // Determinar se a resposta está correta
+  const isCorrect = answer.isCorrect === 1 || answer.isCorrect === true;
+
   return (
-    <Card className="border-l-4 border-red-500 hover:shadow-lg transition-shadow">
+    <Card className={`border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'} hover:shadow-lg transition-shadow`}>
       <CardHeader className="bg-gray-50">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -374,10 +377,14 @@ function QuestionReviewCard({
         {/* Comparação de Respostas */}
         <div className="mb-6 grid md:grid-cols-2 gap-4">
           {/* Sua Resposta */}
-          <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+          <div className={`p-4 ${isCorrect ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'} rounded-lg`}>
             <div className="flex items-center gap-2 mb-2">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <h4 className="font-semibold text-red-900">Sua Resposta</h4>
+              {isCorrect ? (
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-red-600" />
+              )}
+              <h4 className={`font-semibold ${isCorrect ? 'text-green-900' : 'text-red-900'}`}>Sua Resposta</h4>
             </div>
             <p className="text-gray-800">{answer.studentAnswer}</p>
           </div>
@@ -403,29 +410,44 @@ function QuestionReviewCard({
           </div>
         )}
 
-        {/* Dicas de Estudo Personalizadas */}
-        {showStudyTips && studyTips && (
+        {/* Recursos de Aprendizado Contínuo */}
+        {showStudyResources && studyResources && (
           <div className="mb-6 p-5 bg-gradient-to-br from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-lg">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-purple-600" />
-              Guia de Estudo Personalizado
+              Recursos de Aprendizado Contínuo
             </h4>
 
             <div className="space-y-4">
               {/* Explicação */}
-              {studyTips.explanation && (
+              {studyResources.conceptExplanation && (
                 <div>
-                  <h5 className="font-medium text-purple-900 mb-1.5">Explicação</h5>
-                  <p className="text-gray-700 leading-relaxed">{studyTips.explanation}</p>
+                  <h5 className="font-medium text-purple-900 mb-1.5">Entenda o Conceito</h5>
+                  <p className="text-gray-700 leading-relaxed">{studyResources.conceptExplanation}</p>
                 </div>
               )}
 
-              {/* Dicas Práticas */}
-              {studyTips.tips && studyTips.tips.length > 0 && (
+              {/* Outras Respostas Válidas (para questões abertas) */}
+              {studyResources.alternativeAnswers && studyResources.alternativeAnswers.length > 0 && (
                 <div>
-                  <h5 className="font-medium text-purple-900 mb-1.5">Dicas Práticas</h5>
+                  <h5 className="font-medium text-purple-900 mb-1.5">Outras Formas de Responder</h5>
                   <ul className="space-y-1.5 ml-1">
-                    {studyTips.tips.map((tip: string, index: number) => (
+                    {studyResources.alternativeAnswers.map((alt: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2 text-gray-700">
+                        <span className="text-purple-600 font-medium mt-0.5">•</span>
+                        <span>{alt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Dicas de Como Estudar Mais */}
+              {studyResources.tips && studyResources.tips.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-purple-900 mb-1.5">Como Estudar Este Tópico</h5>
+                  <ul className="space-y-1.5 ml-1">
+                    {studyResources.tips.map((tip: string, index: number) => (
                       <li key={index} className="flex items-start gap-2 text-gray-700">
                         <span className="text-purple-600 font-medium mt-0.5">•</span>
                         <span>{tip}</span>
@@ -437,21 +459,23 @@ function QuestionReviewCard({
 
               {/* Materiais e Estratégia */}
               <div className="grid md:grid-cols-2 gap-4">
-                {studyTips.resources && studyTips.resources.length > 0 && (
+                {studyResources.suggestedMaterials && studyResources.suggestedMaterials.length > 0 && (
                   <div className="p-3 bg-white/60 rounded-lg">
-                    <h5 className="font-medium text-purple-900 mb-1.5">Materiais</h5>
+                    <h5 className="font-medium text-purple-900 mb-1.5">Materiais Recomendados</h5>
                     <ul className="space-y-1 text-sm">
-                      {studyTips.resources.map((resource: string, index: number) => (
-                        <li key={index} className="text-gray-700">• {resource}</li>
+                      {studyResources.suggestedMaterials.map((material: any, index: number) => (
+                        <li key={index} className="text-gray-700">
+                          <span className="font-medium">{material.type}:</span> {material.description}
+                        </li>
                       ))}
                     </ul>
                   </div>
                 )}
 
-                {studyTips.strategy && (
+                {studyResources.reviewStrategy && (
                   <div className="p-3 bg-white/60 rounded-lg">
-                    <h5 className="font-medium text-purple-900 mb-1.5">Estratégia</h5>
-                    <p className="text-sm text-gray-700">{studyTips.strategy}</p>
+                    <h5 className="font-medium text-purple-900 mb-1.5">Estratégia de Estudo</h5>
+                    <p className="text-sm text-gray-700">{studyResources.reviewStrategy}</p>
                   </div>
                 )}
               </div>
@@ -461,14 +485,14 @@ function QuestionReviewCard({
 
         {/* Botões de Ação */}
         <div className="flex flex-wrap gap-3 mt-6">
-          {!showStudyTips && (
+          {!showStudyResources && (
             <Button
-              onClick={handleGetTips}
-              disabled={loadingTips}
+              onClick={handleGetStudyResources}
+              disabled={loadingResources}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
               <Lightbulb className="h-4 w-4 mr-2" />
-              {loadingTips ? "Gerando dicas..." : "Obter Dicas de IA"}
+              {loadingResources ? "Gerando recursos..." : "Como Estudar Este Tópico?"}
             </Button>
           )}
 
