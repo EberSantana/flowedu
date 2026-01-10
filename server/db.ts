@@ -5496,6 +5496,74 @@ export async function getReviewStats(studentId: number, subjectId?: number) {
   }
 }
 
+/**
+ * Salvar material de estudo detalhado para uma questão
+ */
+export async function saveDetailedStudyMaterial(
+  answerId: number,
+  material: {
+    detailedExplanation: string;
+    studyStrategy: string;
+    relatedConcepts: string; // JSON string
+    additionalResources: string; // JSON string
+    practiceExamples: string; // JSON string
+    commonMistakes: string; // JSON string
+    timeToMaster: number;
+    memorizationTips: string; // JSON string
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db
+      .update(studentExerciseAnswers)
+      .set({
+        detailedExplanation: material.detailedExplanation,
+        studyStrategy: material.studyStrategy,
+        relatedConcepts: material.relatedConcepts,
+        additionalResources: material.additionalResources,
+        practiceExamples: material.practiceExamples,
+        commonMistakes: material.commonMistakes,
+        timeToMaster: material.timeToMaster,
+        lastReviewedAt: new Date(),
+        reviewCount: sql`${studentExerciseAnswers.reviewCount} + 1`,
+      })
+      .where(eq(studentExerciseAnswers.id, answerId));
+
+    return true;
+  } catch (error) {
+    console.error("[Database] Error saving detailed study material:", error);
+    throw error;
+  }
+}
+
+/**
+ * Atualizar status de domínio de uma questão
+ */
+export async function updateMasteryStatus(
+  answerId: number,
+  status: "not_started" | "studying" | "practicing" | "mastered"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    await db
+      .update(studentExerciseAnswers)
+      .set({
+        masteryStatus: status,
+        lastReviewedAt: new Date(),
+      })
+      .where(eq(studentExerciseAnswers.id, answerId));
+
+    return true;
+  } catch (error) {
+    console.error("[Database] Error updating mastery status:", error);
+    throw error;
+  }
+}
+
 // ==================== AVATAR CUSTOMIZATION FUNCTIONS ====================
 
 export async function getStudentAvatarByStudentId(studentId: number) {

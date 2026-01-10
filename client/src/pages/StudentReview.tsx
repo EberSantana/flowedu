@@ -12,6 +12,14 @@ import {
   Clock,
   Target,
   Sparkles,
+  GraduationCap,
+  Brain,
+  ListChecks,
+  FileText,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +33,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast as toastFn } from "sonner";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export default function StudentReview() {
-
   // Filtros
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
   const [selectedQuestionType, setSelectedQuestionType] = useState<string | null>(null);
+  
+  // Estado para controlar questões expandidas
+  const [expandedQuestions, setExpandedQuestions] = useState<Set<number>>(new Set());
+  
+  // Estado para controlar carregamento de material de estudo
+  const [loadingMaterial, setLoadingMaterial] = useState<Set<number>>(new Set());
 
   // Queries
   const { data: subjects, isLoading: loadingSubjects } =
@@ -48,19 +66,50 @@ export default function StudentReview() {
   const { data: stats, isLoading: loadingStats } =
     trpc.studentReview.getStats.useQuery({});
 
-  const { data: errorPatterns, isLoading: loadingPatterns } =
-    trpc.studentReview.getErrorPatterns.useQuery({});
-
-  // Mutations
-  const markAsReviewedMutation = trpc.studentReview.markAsReviewed.useMutation({
-    onSuccess: () => {
+  // Mutation para gerar material de estudo detalhado
+  const generateMaterialMutation = trpc.studentReview.generateDetailedStudyMaterial.useMutation({
+    onSuccess: (data, variables) => {
+      setLoadingMaterial((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(variables.answerId);
+        return newSet;
+      });
       refetchAnswers();
-      toastFn.success("✅ Questão marcada como revisada! Continue revisando para melhorar seu desempenho.");
+      toastFn.success("✨ Material de estudo gerado com sucesso!");
+    },
+    onError: (error, variables) => {
+      setLoadingMaterial((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(variables.answerId);
+        return newSet;
+      });
+      toastFn.error("Erro ao gerar material de estudo. Tente novamente.");
     },
   });
 
-  const handleMarkAsReviewed = (answerId: number) => {
-    markAsReviewedMutation.mutate({ answerId });
+  const handleGenerateMaterial = (answer: any) => {
+    setLoadingMaterial((prev) => new Set(prev).add(answer.id));
+    generateMaterialMutation.mutate({
+      answerId: answer.id,
+      questionText: answer.questionText || answer.question,
+      studentAnswer: answer.studentAnswer,
+      correctAnswer: answer.correctAnswer,
+      questionType: answer.questionType,
+      subjectName: answer.subjectName,
+      moduleName: answer.moduleName,
+    });
+  };
+
+  const toggleQuestion = (answerId: number) => {
+    setExpandedQuestions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(answerId)) {
+        newSet.delete(answerId);
+      } else {
+        newSet.add(answerId);
+      }
+      return newSet;
+    });
   };
 
   // Mapeamento de tipos para labels
@@ -69,40 +118,19 @@ export default function StudentReview() {
     true_false: "Verdadeiro/Falso",
     fill_blank: "Preencher Lacunas",
     open: "Dissertativa",
-    other: "Outros"
-  };
-
-  // Mapeamento de estilos por tipo
-  const typeStyles: Record<string, { badge: string; border: string }> = {
-    multiple_choice: {
-      badge: "bg-blue-50 text-blue-700 border-blue-300",
-      border: "border-blue-300"
-    },
-    true_false: {
-      badge: "bg-green-50 text-green-700 border-green-300",
-      border: "border-green-300"
-    },
-    fill_blank: {
-      badge: "bg-orange-50 text-orange-700 border-orange-300",
-      border: "border-orange-300"
-    },
-    open: {
-      badge: "bg-purple-50 text-purple-700 border-purple-300",
-      border: "border-purple-300"
-    },
-    other: {
-      badge: "bg-gray-50 text-gray-700 border-gray-300",
-      border: "border-gray-300"
-    }
+    objective: "Múltipla Escolha",
+    subjective: "Dissertativa",
+    other: "Outros",
   };
 
   // Agrupar questões por tipo
-  const groupedQuestions = allAnswers?.reduce((acc: any, answer: any) => {
-    const type = answer.questionType || "other";
-    if (!acc[type]) acc[type] = [];
-    acc[type].push(answer);
-    return acc;
-  }, {}) || {};
+  const groupedQuestions =
+    allAnswers?.reduce((acc: any, answer: any) => {
+      const type = answer.questionType || "other";
+      if (!acc[type]) acc[type] = [];
+      acc[type].push(answer);
+      return acc;
+    }, {}) || {};
 
   return (
     <StudentLayout>
@@ -117,79 +145,58 @@ export default function StudentReview() {
               <div>
                 <h1 className="text-4xl font-bold">Revisão Inteligente</h1>
                 <p className="text-purple-100 mt-1">
-                  Revise todas as questões dos seus exercícios com dicas personalizadas de IA
+                  Material de estudo completo para cada questão dos seus exercícios
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto py-8 px-4">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
           {/* Cards de Estatísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {loadingStats ? (
               <>
-                {[1, 2, 3, 4].map((i) => (
+                {[1, 2, 3].map((i) => (
                   <Skeleton key={i} className="h-32" />
                 ))}
               </>
             ) : (
               <>
-                <Card className="border-l-4 border-red-500">
+                <Card className="border-l-4 border-purple-500">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-red-500" />
-                      Questões Erradas
+                      <BookOpen className="h-4 w-4 text-purple-500" />
+                      Total de Questões
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-gray-900">
-                      {stats?.totalQuestionsReviewed || 0}
+                      {allAnswers?.length || 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Para revisar
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-l-4 border-green-500">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      Já Revisadas
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-gray-900">
-                      {stats?.totalQuestionsRetaken || 0}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Concluídas
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Disponíveis para revisão</p>
                   </CardContent>
                 </Card>
 
                 <Card className="border-l-4 border-blue-500">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <Target className="h-4 w-4 text-blue-500" />
-                      Taxa de Melhoria
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      Tempo de Estudo
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-gray-900">
-                      {stats?.avgImprovementRate || 0}%
+                      {stats?.totalStudyTime || 0}min
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Progresso
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Tempo total investido</p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-purple-500">
+                <Card className="border-l-4 border-green-500">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-purple-500" />
+                      <TrendingUp className="h-4 w-4 text-green-500" />
                       Sessões de Revisão
                     </CardTitle>
                   </CardHeader>
@@ -197,51 +204,12 @@ export default function StudentReview() {
                     <div className="text-3xl font-bold text-gray-900">
                       {stats?.totalSessions || 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Realizadas
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Sessões completas</p>
                   </CardContent>
                 </Card>
               </>
             )}
           </div>
-
-          {/* Análise de Padrões de Erro */}
-          {errorPatterns && errorPatterns.errorsByModule && errorPatterns.errorsByModule.length > 0 && (
-            <Card className="mb-8 border-orange-200 bg-orange-50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-800">
-                  <TrendingUp className="h-5 w-5" />
-                  Análise de Padrões de Erro
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {errorPatterns.errorsByModule.map((pattern: any, index: number) => (
-                    <div
-                      key={index}
-                      className="bg-white p-4 rounded-lg border border-orange-200"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900 mb-1">
-                            Módulo: {pattern.moduleName || 'Geral'}
-                          </h4>
-
-                          <p className="text-sm text-gray-700">
-                            {pattern.count} erro(s) identificado(s)
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                          {pattern.count} erros
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Filtros */}
           <Card className="mb-8">
@@ -293,9 +261,10 @@ export default function StudentReview() {
                     <SelectContent>
                       <SelectItem value="all">Todos os tipos</SelectItem>
                       <SelectItem value="multiple_choice">Múltipla Escolha</SelectItem>
+                      <SelectItem value="objective">Múltipla Escolha</SelectItem>
                       <SelectItem value="true_false">Verdadeiro/Falso</SelectItem>
-                      <SelectItem value="fill_blank">Preencher Lacunas</SelectItem>
                       <SelectItem value="open">Dissertativa</SelectItem>
+                      <SelectItem value="subjective">Dissertativa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -303,12 +272,12 @@ export default function StudentReview() {
                 <div className="flex items-end">
                   <Button
                     variant="outline"
-                    className="w-full"
                     onClick={() => {
                       setSelectedSubject(null);
                       setSelectedModule(null);
                       setSelectedQuestionType(null);
                     }}
+                    className="w-full"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Limpar Filtros
@@ -318,226 +287,391 @@ export default function StudentReview() {
             </CardContent>
           </Card>
 
-          {/* Lista de Questões Agrupadas por Tipo */}
-          <div className="space-y-8">
-            {loadingAnswers ? (
-              <>
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-64" />
-                ))}
-              </>
-            ) : allAnswers && allAnswers.length > 0 ? (
-              <>
-                {Object.entries(groupedQuestions).map(([type, questions]: [string, any]) => {
-                  const styles = typeStyles[type] || typeStyles.other;
-                  return (
-                    <div key={type} className="space-y-4">
-                      {/* Cabeçalho do Grupo */}
-                      <div className={`flex items-center gap-3 pb-3 border-b-2 ${styles.border}`}>
-                        <Badge 
-                          variant="outline" 
-                          className={`${styles.badge} text-base px-4 py-1.5`}
-                        >
-                          {typeLabels[type] || type}
-                        </Badge>
-                        <span className="text-sm text-gray-600">
-                          {questions.length} questão(s)
-                        </span>
-                      </div>
+          {/* Lista de Questões */}
+          {loadingAnswers ? (
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-64" />
+              ))}
+            </div>
+          ) : allAnswers && allAnswers.length === 0 ? (
+            <Card className="border-2 border-dashed border-gray-300">
+              <CardContent className="py-20 text-center">
+                <div className="mx-auto w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-8 shadow-inner">
+                  <BookOpen className="w-14 h-14 text-gray-400" />
+                </div>
+                <h3 className="text-3xl font-bold mb-4 text-gray-900">
+                  Nenhuma questão para revisar
+                </h3>
+                <p className="text-gray-600 text-lg max-w-md mx-auto">
+                  Complete alguns exercícios para ter questões disponíveis para revisão.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                  <FileText className="w-8 h-8 text-purple-600" />
+                  Material de Estudo Completo
+                </h2>
+                <p className="text-gray-600 text-base">
+                  Clique em cada questão para ver explicações detalhadas, estratégias de estudo e recursos complementares
+                </p>
+              </div>
 
-                      {/* Questões do Grupo */}
-                      <div className="space-y-4 ml-4">
-                        {questions.map((answer: any) => (
-                          <QuestionReviewCard
-                            key={answer.id}
-                            answer={answer}
-                            onMarkAsReviewed={handleMarkAsReviewed}
-                          />
-                        ))}
+              {allAnswers?.map((answer: any, index: number) => {
+                const isCorrect = answer.isCorrect;
+                const isExpanded = expandedQuestions.has(answer.id);
+                const isLoadingMaterial = loadingMaterial.has(answer.id);
+                const hasMaterial = answer.detailedExplanation && answer.studyStrategy;
+
+                return (
+                  <Card
+                    key={answer.id}
+                    className={`border-l-4 shadow-lg ${
+                      isCorrect
+                        ? "border-l-green-500 bg-green-50/20"
+                        : "border-l-orange-500 bg-orange-50/20"
+                    }`}
+                  >
+                    <CardHeader className="bg-white/90 pb-4">
+                      <div className="flex items-start gap-4">
+                        {/* Número da questão */}
+                        <div
+                          className={`flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-lg flex-shrink-0 ${
+                            isCorrect ? "bg-green-600" : "bg-orange-600"
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+
+                        <div className="flex-1">
+                          {/* Badges de status */}
+                          <div className="flex items-center gap-2 mb-3 flex-wrap">
+                            {isCorrect ? (
+                              <Badge className="bg-green-100 text-green-800 border border-green-300 px-3 py-1">
+                                <CheckCircle2 className="w-4 h-4 mr-1" />
+                                Acertou
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-orange-100 text-orange-800 border border-orange-300 px-3 py-1">
+                                <AlertCircle className="w-4 h-4 mr-1" />
+                                Errou
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className="text-gray-600">
+                              {typeLabels[answer.questionType] || "Outro"}
+                            </Badge>
+                            {answer.subjectName && (
+                              <Badge variant="outline" className="text-blue-600">
+                                {answer.subjectName}
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Enunciado da questão */}
+                          <CardTitle className="text-xl font-bold text-gray-900 leading-relaxed mb-4">
+                            {answer.questionText || answer.question}
+                          </CardTitle>
+
+                          {/* Botão para expandir/recolher */}
+                          <Collapsible open={isExpanded} onOpenChange={() => toggleQuestion(answer.id)}>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-between"
+                                onClick={() => toggleQuestion(answer.id)}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <Sparkles className="w-4 h-4" />
+                                  {isExpanded ? "Ocultar" : "Ver"} Material de Estudo Completo
+                                </span>
+                                {isExpanded ? (
+                                  <ChevronUp className="w-5 h-5" />
+                                ) : (
+                                  <ChevronDown className="w-5 h-5" />
+                                )}
+                              </Button>
+                            </CollapsibleTrigger>
+
+                            <CollapsibleContent className="mt-6">
+                              <CardContent className="pt-0 space-y-6">
+                                {/* Respostas */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div
+                                    className={`p-5 rounded-lg border-2 ${
+                                      isCorrect
+                                        ? "bg-green-50 border-green-300"
+                                        : "bg-orange-50 border-orange-300"
+                                    }`}
+                                  >
+                                    <div className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                      {isCorrect ? (
+                                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                      ) : (
+                                        <AlertCircle className="w-5 h-5 text-orange-600" />
+                                      )}
+                                      Sua resposta:
+                                    </div>
+                                    <div className="text-gray-900 text-base leading-relaxed bg-white/70 p-4 rounded-md">
+                                      {answer.studentAnswer || (
+                                        <em className="text-gray-500">Não respondida</em>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="p-5 rounded-lg border-2 bg-blue-50 border-blue-300">
+                                    <div className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                      <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                                      Resposta correta:
+                                    </div>
+                                    <div className="text-gray-900 text-base leading-relaxed font-medium bg-white/70 p-4 rounded-md">
+                                      {answer.correctAnswer}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Botão para gerar material (se ainda não tiver) */}
+                                {!hasMaterial && !isLoadingMaterial && (
+                                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border-2 border-purple-200">
+                                    <div className="flex items-start gap-4">
+                                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <Sparkles className="w-6 h-6 text-purple-600" />
+                                      </div>
+                                      <div className="flex-1">
+                                        <h3 className="text-lg font-bold text-purple-900 mb-2">
+                                          Gerar Material de Estudo Completo
+                                        </h3>
+                                        <p className="text-purple-700 mb-4">
+                                          Clique no botão abaixo para gerar explicações detalhadas,
+                                          estratégias de estudo, recursos complementares e muito mais!
+                                        </p>
+                                        <Button
+                                          onClick={() => handleGenerateMaterial(answer)}
+                                          className="bg-purple-600 hover:bg-purple-700"
+                                        >
+                                          <Sparkles className="w-4 h-4 mr-2" />
+                                          Gerar Material de Estudo
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Loading do material */}
+                                {isLoadingMaterial && (
+                                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-lg border-2 border-purple-200 text-center">
+                                    <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+                                    <h3 className="text-lg font-bold text-purple-900 mb-2">
+                                      Gerando material de estudo...
+                                    </h3>
+                                    <p className="text-purple-700">
+                                      A IA está criando explicações detalhadas e recursos personalizados
+                                      para você. Isso pode levar alguns segundos.
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Material de Estudo Detalhado */}
+                                {hasMaterial && !isLoadingMaterial && (
+                                  <div className="space-y-6">
+                                    {/* Explicação Detalhada */}
+                                    {answer.detailedExplanation && (
+                                      <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300">
+                                        <div className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                                          <Brain className="w-6 h-6 text-blue-600" />
+                                          Explicação Detalhada do Conceito
+                                        </div>
+                                        <div className="text-gray-800 text-base leading-relaxed bg-white/60 p-5 rounded-md whitespace-pre-wrap">
+                                          {answer.detailedExplanation}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Estratégia de Estudo */}
+                                    {answer.studyStrategy && (
+                                      <div className="p-6 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300">
+                                        <div className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
+                                          <Target className="w-6 h-6 text-green-600" />
+                                          Como Estudar Este Tópico
+                                        </div>
+                                        <div className="text-gray-800 text-base leading-relaxed bg-white/60 p-5 rounded-md whitespace-pre-wrap">
+                                          {answer.studyStrategy}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Conceitos Relacionados */}
+                                    {answer.relatedConcepts && (
+                                      <div className="p-6 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-300">
+                                        <div className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+                                          <ListChecks className="w-6 h-6 text-purple-600" />
+                                          Conceitos Relacionados para Revisar
+                                        </div>
+                                        <div className="space-y-2">
+                                          {JSON.parse(answer.relatedConcepts).map(
+                                            (concept: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="flex items-start gap-3 bg-white/60 p-4 rounded-md"
+                                              >
+                                                <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                  <span className="text-xs font-bold text-purple-700">
+                                                    {idx + 1}
+                                                  </span>
+                                                </div>
+                                                <span className="text-gray-800 text-base leading-relaxed">
+                                                  {concept}
+                                                </span>
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Recursos Complementares */}
+                                    {answer.additionalResources && (
+                                      <div className="p-6 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300">
+                                        <div className="text-lg font-bold text-amber-900 mb-4 flex items-center gap-2">
+                                          <BookOpen className="w-6 h-6 text-amber-600" />
+                                          Recursos Complementares
+                                        </div>
+                                        <div className="space-y-3">
+                                          {JSON.parse(answer.additionalResources).map(
+                                            (resource: any, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="bg-white/60 p-4 rounded-md border-l-4 border-amber-400"
+                                              >
+                                                <div className="flex items-start gap-3">
+                                                  <Badge className="bg-amber-100 text-amber-800 border-amber-300">
+                                                    {resource.type}
+                                                  </Badge>
+                                                  <div className="flex-1">
+                                                    <div className="font-semibold text-gray-900 mb-1">
+                                                      {resource.title}
+                                                    </div>
+                                                    <div className="text-gray-700 text-sm">
+                                                      {resource.description}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Exemplos Práticos */}
+                                    {answer.practiceExamples && (
+                                      <div className="p-6 rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 border-2 border-cyan-300">
+                                        <div className="text-lg font-bold text-cyan-900 mb-4 flex items-center gap-2">
+                                          <Zap className="w-6 h-6 text-cyan-600" />
+                                          Exemplos Práticos para Praticar
+                                        </div>
+                                        <div className="space-y-3">
+                                          {JSON.parse(answer.practiceExamples).map(
+                                            (example: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="bg-white/60 p-4 rounded-md border-l-4 border-cyan-400"
+                                              >
+                                                <div className="flex items-start gap-3">
+                                                  <div className="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <span className="text-sm font-bold text-cyan-700">
+                                                      {idx + 1}
+                                                    </span>
+                                                  </div>
+                                                  <span className="text-gray-800 text-base leading-relaxed flex-1">
+                                                    {example}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Erros Comuns */}
+                                    {answer.commonMistakes && (
+                                      <div className="p-6 rounded-lg bg-gradient-to-br from-red-50 to-pink-50 border-2 border-red-300">
+                                        <div className="text-lg font-bold text-red-900 mb-4 flex items-center gap-2">
+                                          <AlertCircle className="w-6 h-6 text-red-600" />
+                                          Erros Comuns e Como Evitá-los
+                                        </div>
+                                        <div className="space-y-3">
+                                          {JSON.parse(answer.commonMistakes).map(
+                                            (mistake: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="bg-white/60 p-4 rounded-md border-l-4 border-red-400"
+                                              >
+                                                <div className="flex items-start gap-3">
+                                                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <AlertCircle className="w-4 h-4 text-red-600" />
+                                                  </div>
+                                                  <span className="text-gray-800 text-base leading-relaxed flex-1">
+                                                    {mistake}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Tempo Estimado e Dicas de Memorização */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      {answer.timeToMaster && (
+                                        <div className="p-5 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-300">
+                                          <div className="text-sm font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                                            <Clock className="w-5 h-5 text-indigo-600" />
+                                            Tempo Estimado para Domínio
+                                          </div>
+                                          <div className="text-3xl font-bold text-indigo-700">
+                                            {answer.timeToMaster} minutos
+                                          </div>
+                                          <p className="text-sm text-indigo-600 mt-2">
+                                            Tempo recomendado de estudo dedicado
+                                          </p>
+                                        </div>
+                                      )}
+
+                                      {answer.reviewCount !== undefined && (
+                                        <div className="p-5 rounded-lg bg-gradient-to-br from-teal-50 to-green-50 border-2 border-teal-300">
+                                          <div className="text-sm font-bold text-teal-900 mb-3 flex items-center gap-2">
+                                            <RefreshCw className="w-5 h-5 text-teal-600" />
+                                            Vezes Revisadas
+                                          </div>
+                                          <div className="text-3xl font-bold text-teal-700">
+                                            {answer.reviewCount}
+                                          </div>
+                                          <p className="text-sm text-teal-600 mt-2">
+                                            Continue revisando para fixar!
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </>
-            ) : (
-              <Card className="border-2 border-dashed border-gray-300">
-                <CardContent className="py-16 text-center">
-                  <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Parabéns! 🎉
-                  </h3>
-                  <p className="text-gray-600">
-                    Você ainda não tem questões para revisar. Complete alguns exercícios primeiro!
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                    </CardHeader>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </StudentLayout>
-  );
-}
-
-// Componente de Card de Questão
-function QuestionReviewCard({
-  answer,
-  onMarkAsReviewed,
-}: {
-  answer: any;
-  onMarkAsReviewed: (id: number) => void;
-}) {
-  const [showStudyResources, setShowStudyResources] = useState(false);
-
-  const getStudyResourcesMutation = trpc.studentReview.getStudyTips.useMutation();
-  const [studyResources, setStudyResources] = useState<any>(null);
-  const [loadingResources, setLoadingResources] = useState(false);
-
-  const handleGetStudyResources = async () => {
-    setLoadingResources(true);
-    setShowStudyResources(true);
-    toastFn.info("🤖 Gerando recursos de aprendizado... A IA está preparando um guia personalizado.");
-    
-    try {
-      const result = await getStudyResourcesMutation.mutateAsync({
-        answerId: answer.id,
-        questionText: answer.correctAnswer,
-        studentAnswer: answer.studentAnswer,
-        correctAnswer: answer.correctAnswer,
-        questionType: answer.questionType,
-      });
-      setStudyResources(result);
-      setLoadingResources(false);
-    } catch (error) {
-      setLoadingResources(false);
-      toastFn.error("❌ Erro ao gerar recursos. Tente novamente em alguns instantes.");
-    }
-  };
-
-  // Determinar se a resposta está correta
-  const isCorrect = answer.isCorrect === 1 || answer.isCorrect === true;
-
-  return (
-    <Card className={`border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'} hover:shadow-lg transition-shadow`}>
-      <CardHeader className="bg-gray-50">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg mb-2">{answer.exerciseTitle}</CardTitle>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                Questão {answer.questionNumber}
-              </Badge>
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                {answer.questionType === "multiple_choice"
-                  ? "Múltipla Escolha"
-                  : answer.questionType === "true_false"
-                  ? "Verdadeiro/Falso"
-                  : answer.questionType === "fill_blank"
-                  ? "Preencher Lacunas"
-                  : answer.questionType === "open"
-                  ? "Dissertativa"
-                  : "Outro"}
-              </Badge>
-              {answer.aiScore !== null && (
-                <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-                  Nota IA: {answer.aiScore}%
-                </Badge>
-              )}
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-6">
-        {/* Status da Resposta */}
-        <div className="mb-6">
-          <div className={`p-4 ${isCorrect ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'} rounded-lg`}>
-            <div className="flex items-center gap-2 mb-2">
-              {isCorrect ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-red-600" />
-              )}
-              <h4 className={`font-semibold text-lg ${isCorrect ? 'text-green-900' : 'text-red-900'}`}>
-                {isCorrect ? 'Resposta Correta! ✓' : 'Resposta Incorreta ✗'}
-              </h4>
-            </div>
-          </div>
-        </div>
-
-        {/* Feedback Personalizado */}
-        {answer.aiFeedback && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded-lg">
-            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-blue-600" />
-              💬 Feedback Personalizado
-            </h4>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{answer.aiFeedback}</p>
-          </div>
-        )}
-
-        {/* Recursos de Aprendizado */}
-        {showStudyResources && studyResources && (
-          <div className="mb-6 space-y-4">
-            {/* Dicas de Estudo */}
-            {studyResources.tips && studyResources.tips.length > 0 && (
-              <div className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-l-4 border-yellow-500 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-600" />
-                  💡 Dicas de Estudo
-                </h4>
-                <ul className="space-y-2 ml-1">
-                  {studyResources.tips.map((tip: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-yellow-600 font-medium mt-0.5">•</span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Explicação e Resposta Esperada */}
-            {studyResources.conceptExplanation && (
-              <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-purple-600" />
-                  📝 Explicação e Resposta Esperada
-                </h4>
-                <p className="text-gray-700 leading-relaxed mb-3">{studyResources.conceptExplanation}</p>
-                
-                {/* Resposta Correta */}
-                <div className="mt-3 p-3 bg-white/60 rounded-lg">
-                  <h5 className="font-medium text-purple-900 mb-1.5">Resposta Esperada:</h5>
-                  <p className="text-gray-800 font-medium">{answer.correctAnswer}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Botões de Ação */}
-        <div className="flex flex-wrap gap-3 mt-6">
-          {!showStudyResources && (
-            <Button
-              onClick={handleGetStudyResources}
-              disabled={loadingResources}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-            >
-              <Lightbulb className="h-4 w-4 mr-2" />
-              {loadingResources ? "Gerando recursos..." : "Ver Dicas e Explicação"}
-            </Button>
-          )}
-
-          <Button
-            variant="outline"
-            onClick={() => onMarkAsReviewed(answer.id)}
-            className="border-green-300 text-green-700 hover:bg-green-50"
-          >
-            <CheckCircle2 className="h-4 w-4 mr-2" />
-            Marcar como Revisada
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

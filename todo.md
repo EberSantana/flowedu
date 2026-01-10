@@ -4963,3 +4963,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Simplificar Revisão Inteligente para mostrar apenas: respostas corretas/erradas, feedback personalizado, dicas de estudo, explicação e resposta esperada
 
 - [x] Salvar automaticamente todos os resultados (acertos e erros) na Revisão Inteligente ao finalizar exercício
+
+
+## 📚 Reformulação da Revisão Intelige## 📚 Reformulação da Revisão Inteligente - Modelo de Exercícios para Estudo
+
+- [x] Reformular Revisão Inteligente para seguir modelo de exercícios
+- [x] Adicionar campo de dicas completas para cada questão de revisão
+- [x] Manter questões apenas para estudo futuro (não avaliação)
+- [x] Incluir material complementar e explicações detalhadas
+- [x] Atualizar schema do banco para suportar dicas e material de estudo
+- [x] Reformular interface seguindo padrão de exercícios
+- [x] Adicionar seção de "Como Estudar Este Tópico" com estratégias personalizadas
+- [x] Incluir recursos adicionais (vídeos, artigos, exemplos práticos) quando aplicável

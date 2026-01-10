@@ -5189,6 +5189,177 @@ Foque em desenvolver autonomia de aprendizado e pensamento crítico, não apenas
         const stats = await db.getReviewStats(studentId, input.subjectId);
         return stats;
       }),
+
+    // Gerar material de estudo detalhado para uma questão (modelo de exercícios)
+    generateDetailedStudyMaterial: studentProcedure
+      .input(
+        z.object({
+          answerId: z.number(),
+          questionText: z.string(),
+          studentAnswer: z.string(),
+          correctAnswer: z.string(),
+          questionType: z.string(),
+          subjectName: z.string().optional(),
+          moduleName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        try {
+          const response = await invokeLLM({
+            messages: [
+              {
+                role: "system",
+                content: `Você é um tutor educacional especializado em criar material de estudo completo e detalhado.
+Seu objetivo é transformar cada questão em uma oportunidade de aprendizado profundo, fornecendo:
+- Explicações detalhadas dos conceitos
+- Estratégias personalizadas de estudo
+- Recursos complementares
+- Exemplos práticos
+- Identificação de erros comuns
+
+Seja didático, empático e focado em desenvolver autonomia de aprendizado.`,
+              },
+              {
+                role: "user",
+                content: `Crie um material de estudo COMPLETO e DETALHADO para esta questão:
+
+Disciplina: ${input.subjectName || "Não especificada"}
+Módulo: ${input.moduleName || "Não especificado"}
+
+Questão: ${input.questionText}
+
+Resposta correta: ${input.correctAnswer}
+
+Resposta do aluno: ${input.studentAnswer}
+
+Tipo de questão: ${input.questionType}
+
+Forneça um material de estudo COMPLETO com:
+
+1. **Explicação Detalhada do Conceito** (3-5 parágrafos explicando o conceito fundamental de forma clara e didática)
+
+2. **Estratégia de Estudo Personalizada** (passo a passo de COMO estudar este tópico de forma efetiva, com 5-7 passos concretos)
+
+3. **Conceitos Relacionados** (lista de 4-6 conceitos que o aluno deve dominar para entender completamente este tópico)
+
+4. **Recursos Complementares** (5-7 sugestões de materiais: vídeos, artigos, exercícios, livros, etc. - seja específico sobre o tipo e conteúdo)
+
+5. **Exemplos Práticos** (3-4 exemplos práticos que o aluno pode usar para praticar e fixar o conceito)
+
+6. **Erros Comuns** (lista de 4-5 erros comuns que estudantes cometem neste tipo de questão e como evitá-los)
+
+7. **Tempo Estimado para Domínio** (estimativa realista em minutos de quanto tempo o aluno precisa dedicar para dominar este conceito)
+
+8. **Dicas de Memorização** (técnicas mnemônicas, associações, macetes para lembrar do conceito)
+
+Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo autônomo.`,
+              },
+            ],
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "detailed_study_material",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    detailedExplanation: {
+                      type: "string",
+                      description: "Explicação detalhada do conceito (3-5 parágrafos)",
+                    },
+                    studyStrategy: {
+                      type: "string",
+                      description: "Estratégia personalizada de estudo (passo a passo com 5-7 passos)",
+                    },
+                    relatedConcepts: {
+                      type: "array",
+                      description: "Lista de 4-6 conceitos relacionados",
+                      items: { type: "string" },
+                    },
+                    additionalResources: {
+                      type: "array",
+                      description: "Lista de 5-7 recursos complementares",
+                      items: {
+                        type: "object",
+                        properties: {
+                          type: {
+                            type: "string",
+                            description: "Tipo de recurso (vídeo, artigo, exercício, livro, etc)",
+                          },
+                          title: { type: "string", description: "Título ou descrição do recurso" },
+                          description: { type: "string", description: "Detalhes sobre o conteúdo" },
+                        },
+                        required: ["type", "title", "description"],
+                        additionalProperties: false,
+                      },
+                    },
+                    practiceExamples: {
+                      type: "array",
+                      description: "Lista de 3-4 exemplos práticos",
+                      items: { type: "string" },
+                    },
+                    commonMistakes: {
+                      type: "array",
+                      description: "Lista de 4-5 erros comuns e como evitá-los",
+                      items: { type: "string" },
+                    },
+                    timeToMaster: {
+                      type: "number",
+                      description: "Tempo estimado em minutos para dominar o conceito",
+                    },
+                    memorizationTips: {
+                      type: "array",
+                      description: "Técnicas de memorização e macetes",
+                      items: { type: "string" },
+                    },
+                  },
+                  required: [
+                    "detailedExplanation",
+                    "studyStrategy",
+                    "relatedConcepts",
+                    "additionalResources",
+                    "practiceExamples",
+                    "commonMistakes",
+                    "timeToMaster",
+                    "memorizationTips",
+                  ],
+                  additionalProperties: false,
+                },
+              },
+            },
+          });
+
+          const content = response.choices[0]?.message?.content;
+          if (!content || typeof content !== "string") {
+            throw new Error("Resposta vazia da IA");
+          }
+
+          const result = JSON.parse(content);
+
+          // Salvar material de estudo no banco de dados
+          await db.saveDetailedStudyMaterial(input.answerId, {
+            detailedExplanation: result.detailedExplanation,
+            studyStrategy: result.studyStrategy,
+            relatedConcepts: JSON.stringify(result.relatedConcepts),
+            additionalResources: JSON.stringify(result.additionalResources),
+            practiceExamples: JSON.stringify(result.practiceExamples),
+            commonMistakes: JSON.stringify(result.commonMistakes),
+            timeToMaster: result.timeToMaster,
+            memorizationTips: JSON.stringify(result.memorizationTips),
+          });
+
+          return result;
+        } catch (error) {
+          console.error("[Review] Error generating detailed study material:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Erro ao gerar material de estudo. Tente novamente.",
+          });
+        }
+      }),
   }),
 
   // ==================== STUDENT AVATAR CUSTOMIZATION ====================

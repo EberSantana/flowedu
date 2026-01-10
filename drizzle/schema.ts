@@ -1219,6 +1219,18 @@ export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
   reviewedBy: int("reviewedBy"), // ID do professor que revisou manualmente
   reviewedAt: timestamp("reviewedAt"), // Data da revisão manual
   finalScore: int("finalScore"), // Nota final após revisão manual (se houver)
+  // Campos para Revisão Inteligente - Modelo de Exercícios para Estudo
+  detailedExplanation: text("detailedExplanation"), // Explicação detalhada do conceito (gerada por IA)
+  studyStrategy: text("studyStrategy"), // Estratégia personalizada de como estudar este tópico
+  relatedConcepts: text("relatedConcepts"), // Conceitos relacionados que o aluno deve revisar (JSON array)
+  additionalResources: text("additionalResources"), // Recursos complementares: vídeos, artigos, exemplos (JSON array)
+  practiceExamples: text("practiceExamples"), // Exemplos práticos para o aluno praticar (JSON array)
+  commonMistakes: text("commonMistakes"), // Erros comuns neste tipo de questão (gerado por IA)
+  difficultyLevel: int("difficultyLevel"), // Nível de dificuldade percebido pelo aluno (1-5)
+  timeToMaster: int("timeToMaster"), // Tempo estimado para dominar o conceito (em minutos)
+  masteryStatus: mysqlEnum("masteryStatus", ["not_started", "studying", "practicing", "mastered"]).default("not_started"), // Status de domínio do conceito
+  lastReviewedAt: timestamp("lastReviewedAt"), // Última vez que o aluno revisou esta questão
+  reviewCount: int("reviewCount").default(0).notNull(), // Quantas vezes o aluno revisou
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
