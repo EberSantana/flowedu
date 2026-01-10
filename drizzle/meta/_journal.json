@@ -323,6 +323,13 @@
       "when": 1768081785163,
       "tag": "0045_gigantic_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "5",
+      "when": 1768083586186,
+      "tag": "0046_crazy_scorpion",
+      "breakpoints": true
     }
   ]
 }

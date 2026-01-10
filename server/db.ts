@@ -134,7 +134,19 @@ import {
   questions,
   questionAnswers,
   InsertQuestion,
-  InsertQuestionAnswer,} from "../drizzle/schema";
+  InsertQuestionAnswer,
+  practiceQuestions,
+  practiceQuestionAttempts,
+  practiceQuestionFeedback,
+  practiceQuestionHints,
+  PracticeQuestion,
+  InsertPracticeQuestion,
+  PracticeQuestionAttempt,
+  InsertPracticeQuestionAttempt,
+  PracticeQuestionFeedback,
+  InsertPracticeQuestionFeedback,
+  PracticeQuestionHint,
+  InsertPracticeQuestionHint,} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -9855,4 +9867,294 @@ export async function getReviewItemDetails(queueItemId: number, studentId: numbe
     ));
 
   return queueItem;
+}
+
+// ========== PRACTICE QUESTIONS ==========
+
+/**
+ * Criar uma nova questão de prática
+ */
+export async function createPracticeQuestion(data: InsertPracticeQuestion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(practiceQuestions).values(data);
+  const insertId = Number(result[0].insertId);
+  
+  const [created] = await db.select()
+    .from(practiceQuestions)
+    .where(eq(practiceQuestions.id, insertId));
+  
+  return created;
+}
+
+/**
+ * Listar questões de prática por professor
+ */
+export async function getPracticeQuestionsByTeacher(
+  userId: number,
+  filters?: {
+    subjectId?: number;
+    difficulty?: string;
+    belt?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { eq, and } = await import("drizzle-orm");
+  
+  const conditions = [eq(practiceQuestions.userId, userId)];
+  
+  if (filters?.subjectId) {
+    conditions.push(eq(practiceQuestions.subjectId, filters.subjectId));
+  }
+  if (filters?.difficulty) {
+    conditions.push(eq(practiceQuestions.difficulty, filters.difficulty as any));
+  }
+  if (filters?.belt) {
+    conditions.push(eq(practiceQuestions.belt, filters.belt as any));
+  }
+  
+  return db.select()
+    .from(practiceQuestions)
+    .where(and(...conditions))
+    .orderBy(practiceQuestions.createdAt);
+}
+
+/**
+ * Obter detalhes de uma questão de prática
+ */
+export async function getPracticeQuestionById(questionId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [question] = await db.select()
+    .from(practiceQuestions)
+    .where(eq(practiceQuestions.id, questionId));
+  
+  return question || null;
+}
+
+/**
+ * Salvar tentativa de resolução de questão
+ */
+export async function savePracticeQuestionAttempt(data: InsertPracticeQuestionAttempt) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(practiceQuestionAttempts).values(data);
+  const insertId = Number(result[0].insertId);
+  
+  const [created] = await db.select()
+    .from(practiceQuestionAttempts)
+    .where(eq(practiceQuestionAttempts.id, insertId));
+  
+  return created;
+}
+
+/**
+ * Listar tentativas de um aluno
+ */
+export async function getStudentPracticeAttempts(
+  studentId: number,
+  filters?: {
+    practiceQuestionId?: number;
+    status?: string;
+    beltAtAttempt?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { eq, and, desc } = await import("drizzle-orm");
+  
+  const conditions = [eq(practiceQuestionAttempts.studentId, studentId)];
+  
+  if (filters?.practiceQuestionId) {
+    conditions.push(eq(practiceQuestionAttempts.practiceQuestionId, filters.practiceQuestionId));
+  }
+  if (filters?.status) {
+    conditions.push(eq(practiceQuestionAttempts.status, filters.status as any));
+  }
+  if (filters?.beltAtAttempt) {
+    conditions.push(eq(practiceQuestionAttempts.beltAtAttempt, filters.beltAtAttempt));
+  }
+  
+  return db.select({
+    attempt: practiceQuestionAttempts,
+    question: practiceQuestions,
+  })
+    .from(practiceQuestionAttempts)
+    .leftJoin(practiceQuestions, eq(practiceQuestionAttempts.practiceQuestionId, practiceQuestions.id))
+    .where(and(...conditions))
+    .orderBy(desc(practiceQuestionAttempts.createdAt));
+}
+
+/**
+ * Obter detalhes de uma tentativa específica
+ */
+export async function getPracticeAttemptById(attemptId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [result] = await db.select({
+    attempt: practiceQuestionAttempts,
+    question: practiceQuestions,
+  })
+    .from(practiceQuestionAttempts)
+    .leftJoin(practiceQuestions, eq(practiceQuestionAttempts.practiceQuestionId, practiceQuestions.id))
+    .where(eq(practiceQuestionAttempts.id, attemptId));
+  
+  return result || null;
+}
+
+/**
+ * Adicionar feedback do professor
+ */
+export async function addPracticeQuestionFeedback(data: InsertPracticeQuestionFeedback) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(practiceQuestionFeedback).values(data);
+  const insertId = Number(result[0].insertId);
+  
+  const [created] = await db.select()
+    .from(practiceQuestionFeedback)
+    .where(eq(practiceQuestionFeedback.id, insertId));
+  
+  return created;
+}
+
+/**
+ * Obter feedback de uma tentativa
+ */
+export async function getPracticeQuestionFeedback(attemptId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [feedback] = await db.select()
+    .from(practiceQuestionFeedback)
+    .where(eq(practiceQuestionFeedback.attemptId, attemptId));
+  
+  return feedback || null;
+}
+
+/**
+ * Gerar dica de IA para uma tentativa
+ */
+export async function generateAIHintForAttempt(attemptId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar detalhes da tentativa
+  const attemptData = await getPracticeAttemptById(attemptId);
+  if (!attemptData) throw new Error("Attempt not found");
+  
+  const { attempt, question } = attemptData;
+  
+  // Montar prompt para IA
+  const prompt = `Você é um tutor educacional experiente. Analise a resposta do aluno e forneça uma dica construtiva e encorajadora.
+
+Questão: ${question?.title}
+Enunciado: ${question?.description}
+Resposta esperada: ${question?.expectedAnswer || "Não especificada"}
+
+Resposta do aluno: ${attempt.answerText || "Resposta em formato de mídia (foto/áudio)"}
+Tempo gasto: ${Math.floor(attempt.timeSpent / 60)} minutos
+Status: ${attempt.status}
+Faixa do aluno: ${attempt.beltAtAttempt}
+Dificuldade da questão: ${attempt.difficultyAtAttempt}
+
+Forneça uma dica que:
+1. Seja encorajadora e positiva
+2. Identifique pontos fortes da resposta (se houver)
+3. Sugira áreas específicas de melhoria
+4. Recomende estratégias de estudo ou conceitos para revisar
+5. Seja adequada ao nível do aluno (faixa ${attempt.beltAtAttempt})
+
+Limite a dica a 200 palavras.`;
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: "system", content: "Você é um tutor educacional experiente e encorajador." },
+        { role: "user", content: prompt },
+      ],
+    });
+    
+    const content = response.choices[0]?.message?.content;
+    const hintText = typeof content === 'string' ? content : "Não foi possível gerar uma dica no momento.";
+    
+    // Salvar dica no banco
+    await db.insert(practiceQuestionHints).values({
+      attemptId: Number(attemptId),
+      hintText: hintText,
+      hintType: "improvement",
+      confidence: 85,
+      analysisData: JSON.stringify({
+        timeSpent: attempt.timeSpent,
+        status: attempt.status,
+        belt: attempt.beltAtAttempt,
+        difficulty: attempt.difficultyAtAttempt,
+      }),
+    });
+    
+    return hintText;
+  } catch (error) {
+    console.error("[AI Hint] Error generating hint:", error);
+    throw new Error("Falha ao gerar dica de IA");
+  }
+}
+
+/**
+ * Obter dicas de IA para uma tentativa
+ */
+export async function getAIHintsForAttempt(attemptId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { desc } = await import("drizzle-orm");
+  
+  return db.select()
+    .from(practiceQuestionHints)
+    .where(eq(practiceQuestionHints.attemptId, attemptId))
+    .orderBy(desc(practiceQuestionHints.generatedAt));
+}
+
+/**
+ * Obter estatísticas de questões de um aluno
+ */
+export async function getPracticeQuestionStats(studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { count, avg, sum } = await import("drizzle-orm");
+  
+  const [stats] = await db.select({
+    totalAttempts: count(practiceQuestionAttempts.id),
+    avgTimeSpent: avg(practiceQuestionAttempts.timeSpent),
+    avgScore: avg(practiceQuestionAttempts.score),
+  })
+    .from(practiceQuestionAttempts)
+    .where(eq(practiceQuestionAttempts.studentId, studentId));
+  
+  // Contar por status
+  const statusCounts = await db.select({
+    status: practiceQuestionAttempts.status,
+    count: count(practiceQuestionAttempts.id),
+  })
+    .from(practiceQuestionAttempts)
+    .where(eq(practiceQuestionAttempts.studentId, studentId))
+    .groupBy(practiceQuestionAttempts.status);
+  
+  return {
+    totalAttempts: Number(stats.totalAttempts) || 0,
+    avgTimeSpent: Number(stats.avgTimeSpent) || 0,
+    avgScore: Number(stats.avgScore) || 0,
+    byStatus: statusCounts.reduce((acc, item) => {
+      acc[item.status] = Number(item.count);
+      return acc;
+    }, {} as Record<string, number>),
+  };
 }

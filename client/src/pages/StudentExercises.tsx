@@ -16,7 +16,9 @@ import {
   Search,
   Filter,
   Award,
-  FileText
+  FileText,
+  TrendingUp,
+  Zap
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,8 +41,8 @@ export default function StudentExercises() {
   const getStatusBadge = (exercise: any) => {
     if (!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts) {
       return (
-        <Badge variant="destructive" className="gap-1.5 px-3 py-1.5 text-sm font-semibold">
-          <XCircle className="w-4 h-4" />
+        <Badge variant="destructive" className="gap-1.5 px-3 py-1 text-xs font-semibold">
+          <XCircle className="w-3.5 h-3.5" />
           Esgotado
         </Badge>
       );
@@ -50,16 +52,16 @@ export default function StudentExercises() {
       const score = exercise.lastAttempt.score;
       if (score >= exercise.passingScore) {
         return (
-          <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-green-600 hover:bg-green-700">
-            <CheckCircle2 className="w-4 h-4" />
-            Aprovado ({score}%)
+          <Badge className="gap-1.5 px-3 py-1 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Aprovado {score}%
           </Badge>
         );
       } else {
         return (
-          <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-semibold">
-            <AlertCircle className="w-4 h-4" />
-            Reprovado ({score}%)
+          <Badge variant="secondary" className="gap-1.5 px-3 py-1 text-xs font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200">
+            <AlertCircle className="w-3.5 h-3.5" />
+            Reprovado {score}%
           </Badge>
         );
       }
@@ -67,16 +69,16 @@ export default function StudentExercises() {
 
     if (exercise.lastAttempt?.status === "in_progress") {
       return (
-        <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm font-semibold border-blue-300 text-blue-700">
-          <Clock className="w-4 h-4" />
+        <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs font-semibold border-blue-400 text-blue-700 bg-blue-50">
+          <Clock className="w-3.5 h-3.5" />
           Em Andamento
         </Badge>
       );
     }
 
     return (
-      <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700">
-        <BookOpen className="w-4 h-4" />
+      <Badge className="gap-1.5 px-3 py-1 text-xs font-semibold bg-blue-500 hover:bg-blue-600 text-white">
+        <Zap className="w-3.5 h-3.5" />
         Disponível
       </Badge>
     );
@@ -103,9 +105,9 @@ export default function StudentExercises() {
           <div className="space-y-8">
             <Skeleton className="h-20 w-full max-w-2xl" />
             <Skeleton className="h-14 w-full max-w-md" />
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Skeleton key={i} className="h-96" />
+                <Skeleton key={i} className="h-80" />
               ))}
             </div>
           </div>
@@ -116,208 +118,236 @@ export default function StudentExercises() {
 
   return (
     <StudentLayout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white py-12 px-4">
-          <div className="container mx-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                <FileText className="h-8 w-8" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+        {/* Header Moderno */}
+        <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white py-16 px-4 relative overflow-hidden">
+          {/* Elementos decorativos de fundo */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+            <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl"></div>
+          </div>
+          
+          <div className="container mx-auto relative z-10">
+            <div className="flex items-center gap-4 mb-3">
+              <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm border border-white/30 shadow-xl">
+                <FileText className="h-10 w-10" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
-                <p className="text-orange-100 mt-1">
-                  Pratique e aprimore seus conhecimentos
+                <h1 className="text-5xl font-extrabold tracking-tight">Exercícios Disponíveis</h1>
+                <p className="text-blue-100 mt-2 text-lg font-medium">
+                  Pratique, aprenda e aprimore seus conhecimentos
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto py-8 px-4 max-w-7xl">
-          {/* Barra de Busca e Filtros */}
-          <div className="mb-8 space-y-4">
-            {/* Busca */}
-            <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Buscar exercícios..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            />
+        <div className="container mx-auto py-10 px-4 max-w-7xl">
+          {/* Barra de Busca e Filtros - Design Aprimorado */}
+          <div className="mb-10 space-y-6">
+            {/* Busca com design moderno */}
+            <div className="relative max-w-xl">
+              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Buscar exercícios por título ou descrição..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-14 h-14 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl shadow-sm bg-white"
+              />
             </div>
 
-            {/* Filtro por Disciplina */}
-          {enrollments && enrollments.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Filter className="w-5 h-5 text-gray-600" />
-                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Filtrar por Disciplina
-                </h2>
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <Button
-                  variant={selectedSubject === undefined ? "default" : "outline"}
-                  onClick={() => setSelectedSubject(undefined)}
-                  className="h-11 px-5 font-medium"
-                >
-                  Todas as Disciplinas
-                </Button>
-                {enrollments.map((enrollment: any) => (
+            {/* Filtro por Disciplina com design cards */}
+            {enrollments && enrollments.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <Filter className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-800">
+                    Filtrar por Disciplina
+                  </h2>
+                </div>
+                <div className="flex gap-3 flex-wrap">
                   <Button
-                    key={enrollment.subject.id}
-                    variant={selectedSubject === enrollment.subject.id ? "default" : "outline"}
-                    onClick={() => setSelectedSubject(enrollment.subject.id)}
-                    className="h-11 px-5 font-medium"
+                    variant={selectedSubject === undefined ? "default" : "outline"}
+                    onClick={() => setSelectedSubject(undefined)}
+                    className="h-11 px-6 font-semibold rounded-xl transition-all hover:scale-105"
                   >
-                    {enrollment.subject.name}
+                    Todas as Disciplinas
                   </Button>
-                ))}
+                  {enrollments.map((enrollment: any) => (
+                    <Button
+                      key={enrollment.subject.id}
+                      variant={selectedSubject === enrollment.subject.id ? "default" : "outline"}
+                      onClick={() => setSelectedSubject(enrollment.subject.id)}
+                      className="h-11 px-6 font-semibold rounded-xl transition-all hover:scale-105"
+                    >
+                      {enrollment.subject.name}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
 
           {/* Contador de Resultados */}
           {searchQuery && (
-          <div className="mb-6">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{filteredExercises.length}</span> exercício(s) encontrado(s)
-            </p>
-          </div>
+            <div className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
+              <p className="text-sm text-blue-800">
+                <span className="font-bold text-blue-900 text-lg">{filteredExercises.length}</span> exercício(s) encontrado(s) para "{searchQuery}"
+              </p>
+            </div>
           )}
 
           {/* Lista de Exercícios */}
           {filteredExercises && filteredExercises.length === 0 ? (
-          <Card className="border-2 border-dashed border-gray-300">
-            <CardContent className="py-20 text-center">
-              <div className="mx-auto w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-8 shadow-inner">
-                <BookOpen className="w-14 h-14 text-gray-400" />
-              </div>
-              <h3 className="text-3xl font-bold mb-4 text-gray-900">
-                Nenhum exercício disponível
-              </h3>
-              <p className="text-gray-600 text-lg max-w-md mx-auto mb-8">
-                {searchQuery 
-                  ? "Nenhum exercício corresponde à sua busca. Tente outros termos."
-                  : "Aguarde seu professor publicar novos exercícios para esta disciplina."}
-              </p>
-              {enrollments && enrollments.length === 0 && (
-                <div className="mt-8 p-6 bg-yellow-50 border-2 border-yellow-200 rounded-xl max-w-lg mx-auto">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <AlertCircle className="w-6 h-6 text-yellow-600" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-yellow-900 mb-2 text-lg">Atenção</p>
-                      <p className="text-sm text-yellow-800">
-                        Você não está matriculado em nenhuma disciplina. Entre em contato com seu professor para se matricular.
-                      </p>
-                    </div>
-                  </div>
+            <Card className="border-2 border-dashed border-gray-300 bg-white shadow-lg">
+              <CardContent className="py-24 text-center">
+                <div className="mx-auto w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mb-8 shadow-inner">
+                  <BookOpen className="w-16 h-16 text-blue-500" />
                 </div>
-              )}
-            </CardContent>
-          </Card>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredExercises.map((exercise: any) => (
-              <Card 
-                key={exercise.id} 
-                className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-blue-300 flex flex-col group"
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <CardTitle className="text-xl font-bold text-gray-900 leading-tight flex-1">
-                      {exercise.title}
-                    </CardTitle>
-                    {getStatusBadge(exercise)}
+                <h3 className="text-3xl font-bold mb-4 text-gray-900">
+                  Nenhum exercício disponível
+                </h3>
+                <p className="text-gray-600 text-lg max-w-md mx-auto mb-8">
+                  {searchQuery 
+                    ? "Nenhum exercício corresponde à sua busca. Tente outros termos."
+                    : "Aguarde seu professor publicar novos exercícios para esta disciplina."}
+                </p>
+                {enrollments && enrollments.length === 0 && (
+                  <div className="mt-8 p-6 bg-amber-50 border-2 border-amber-300 rounded-2xl max-w-lg mx-auto shadow-md">
+                    <div className="flex items-start gap-4">
+                      <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <AlertCircle className="w-7 h-7 text-amber-600" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-bold text-amber-900 mb-2 text-lg">Atenção</p>
+                        <p className="text-sm text-amber-800">
+                          Você não está matriculado em nenhuma disciplina. Entre em contato com seu professor para se matricular.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <CardDescription className="text-base text-gray-600 line-clamp-3 min-h-[4.5rem]">
-                    {exercise.description || "Sem descrição"}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="flex-1 flex flex-col">
-                  <div className="space-y-4 flex-1">
-                    {/* Grid de Informações */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-3 text-sm bg-blue-50 p-4 rounded-xl border border-blue-100">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-5 h-5 text-blue-600" />
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {filteredExercises.map((exercise: any) => (
+                <Card 
+                  key={exercise.id} 
+                  className="hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-blue-400 flex flex-col group bg-white rounded-2xl overflow-hidden hover:-translate-y-1"
+                >
+                  <CardHeader className="pb-4 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <CardTitle className="text-lg font-bold text-gray-900 leading-tight flex-1 line-clamp-2">
+                        {exercise.title}
+                      </CardTitle>
+                      {getStatusBadge(exercise)}
+                    </div>
+                    <CardDescription className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+                      {exercise.description || "Sem descrição"}
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent className="flex-1 flex flex-col pt-5">
+                    <div className="space-y-3 flex-1">
+                      {/* Grid de Informações - Design Compacto */}
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* Questões */}
+                        <div className="flex items-center gap-2 text-sm bg-blue-50 p-3 rounded-xl border border-blue-100">
+                          <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <BookOpen className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900 text-base">{exercise.totalQuestions}</p>
+                            <p className="text-xs text-gray-600">questões</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-lg">{exercise.totalQuestions}</p>
-                          <p className="text-xs text-gray-600">questões</p>
+
+                        {/* Nota Mínima */}
+                        <div className="flex items-center gap-2 text-sm bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                          <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <Target className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900 text-base">{exercise.passingScore}%</p>
+                            <p className="text-xs text-gray-600">nota mín.</p>
+                          </div>
                         </div>
                       </div>
 
-                      
-
+                      {/* Tempo Limite */}
                       {exercise.timeLimit && (
-                        <div className="flex items-center gap-3 text-sm bg-orange-50 p-4 rounded-xl border border-orange-100 col-span-2">
-                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Clock className="w-5 h-5 text-orange-600" />
+                        <div className="flex items-center gap-3 text-sm bg-orange-50 p-3 rounded-xl border border-orange-100">
+                          <div className="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <Clock className="w-4 h-4 text-white" />
                           </div>
                           <div>
-                            <p className="font-bold text-gray-900 text-lg">{exercise.timeLimit} minutos</p>
+                            <p className="font-bold text-gray-900 text-base">{exercise.timeLimit} minutos</p>
                             <p className="text-xs text-gray-600">tempo limite</p>
                           </div>
                         </div>
                       )}
 
-                      <div className="flex items-center gap-3 text-sm bg-green-50 p-4 rounded-xl border border-green-100 col-span-2">
-                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Target className="w-5 h-5 text-green-600" />
+                      {/* Tentativas */}
+                      <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-9 h-9 bg-purple-500 rounded-lg flex items-center justify-center shadow-sm">
+                            <Award className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700">Tentativas</span>
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-lg">{exercise.passingScore}%</p>
-                          <p className="text-xs text-gray-600">nota mínima para aprovação</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tentativas */}
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-purple-600" />
-                        <span className="text-sm font-medium text-gray-700">Tentativas:</span>
-                      </div>
-                      <span className="text-sm font-bold text-gray-900">
-                        {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
-                      </span>
-                    </div>
-
-                    {/* Data de Disponibilidade */}
-                    {exercise.availableFrom && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500 p-3 bg-gray-50 rounded-lg">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          Disponível desde {new Date(exercise.availableFrom).toLocaleDateString('pt-BR')}
+                        <span className="text-sm font-bold text-gray-900 bg-white px-3 py-1 rounded-lg shadow-sm">
+                          {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
                         </span>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Botão de Ação */}
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <Button
-                      onClick={() => handleStartExercise(exercise.id)}
-                      disabled={!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts}
-                      className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg group-hover:shadow-xl transition-all"
-                    >
-                      {exercise.lastAttempt?.status === "in_progress" 
-                        ? "Continuar Exercício" 
-                        : exercise.lastAttempt?.status === "completed"
-                        ? "Tentar Novamente"
-                        : "Iniciar Exercício"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                      {/* Data de Disponibilidade */}
+                      {exercise.availableFrom && (
+                        <div className="flex items-center gap-2 text-xs text-gray-500 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <span>
+                            Disponível desde {new Date(exercise.availableFrom).toLocaleDateString('pt-BR')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Botão de Ação - Design Aprimorado */}
+                    <div className="mt-5 pt-4 border-t border-gray-100">
+                      <Button
+                        onClick={() => handleStartExercise(exercise.id)}
+                        disabled={!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts}
+                        className="w-full h-12 text-base font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all rounded-xl group-hover:scale-[1.02]"
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          {exercise.lastAttempt?.status === "in_progress" 
+                            ? (
+                              <>
+                                <TrendingUp className="w-5 h-5" />
+                                Continuar Exercício
+                              </>
+                            )
+                            : exercise.lastAttempt?.status === "completed"
+                            ? (
+                              <>
+                                <Trophy className="w-5 h-5" />
+                                Tentar Novamente
+                              </>
+                            )
+                            : (
+                              <>
+                                <Zap className="w-5 h-5" />
+                                Iniciar Exercício
+                              </>
+                            )}
+                        </span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}

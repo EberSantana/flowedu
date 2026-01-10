@@ -6797,6 +6797,152 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         return db.respondDoubt(input.doubtId, input.answer, ctx.user.id);
       }),
   }),
+
+  // ========== PRACTICE QUESTIONS ==========
+  practiceQuestions: router({
+    // Criar nova questão de prática (apenas professores)
+    create: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        title: z.string().min(1, "Título é obrigatório"),
+        description: z.string().min(1, "Enunciado é obrigatório"),
+        difficulty: z.enum(["easy", "medium", "hard", "expert"]).default("medium"),
+        belt: z.enum(["white", "yellow", "orange", "green", "blue", "purple", "brown", "black"]).default("white"),
+        tags: z.string().optional(),
+        expectedAnswer: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        return db.createPracticeQuestion({
+          userId: ctx.user.id,
+          ...input,
+        });
+      }),
+    
+    // Listar questões do professor
+    listByTeacher: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        difficulty: z.string().optional(),
+        belt: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        return db.getPracticeQuestionsByTeacher(ctx.user.id, input);
+      }),
+    
+    // Obter detalhes de uma questão
+    getById: protectedProcedure
+      .input(z.object({ questionId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getPracticeQuestionById(input.questionId);
+      }),
+    
+    // Submeter tentativa de resolução (alunos)
+    submitAttempt: studentProcedure
+      .input(z.object({
+        practiceQuestionId: z.number(),
+        answerText: z.string().optional(),
+        answerPhotoUrl: z.string().optional(),
+        answerAudioUrl: z.string().optional(),
+        startTime: z.string(),
+        endTime: z.string(),
+        beltAtAttempt: z.string().optional(),
+        difficultyAtAttempt: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const startTime = new Date(input.startTime);
+        const endTime = new Date(input.endTime);
+        const timeSpent = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+        
+        return db.savePracticeQuestionAttempt({
+          practiceQuestionId: input.practiceQuestionId,
+          studentId: ctx.studentSession.studentId,
+          answerText: input.answerText,
+          answerPhotoUrl: input.answerPhotoUrl,
+          answerAudioUrl: input.answerAudioUrl,
+          startTime,
+          endTime,
+          timeSpent,
+          beltAtAttempt: input.beltAtAttempt,
+          difficultyAtAttempt: input.difficultyAtAttempt,
+          status: "pending_review",
+        });
+      }),
+    
+    // Listar tentativas do aluno
+    listMyAttempts: studentProcedure
+      .input(z.object({
+        practiceQuestionId: z.number().optional(),
+        status: z.string().optional(),
+        beltAtAttempt: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        return db.getStudentPracticeAttempts(ctx.studentSession.studentId, input);
+      }),
+    
+    // Obter detalhes de uma tentativa
+    getAttemptById: protectedProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getPracticeAttemptById(input.attemptId);
+      }),
+    
+    // Adicionar feedback do professor
+    addFeedback: protectedProcedure
+      .input(z.object({
+        attemptId: z.number(),
+        feedbackText: z.string().min(1, "Feedback é obrigatório"),
+        score: z.number().min(0).max(100).optional(),
+        suggestions: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        return db.addPracticeQuestionFeedback({
+          attemptId: input.attemptId,
+          teacherId: ctx.user.id,
+          feedbackText: input.feedbackText,
+          score: input.score,
+          suggestions: input.suggestions,
+        });
+      }),
+    
+    // Obter feedback de uma tentativa
+    getFeedback: protectedProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getPracticeQuestionFeedback(input.attemptId);
+      }),
+    
+    // Gerar dica de IA
+    generateAIHint: studentProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.generateAIHintForAttempt(input.attemptId);
+      }),
+    
+    // Obter dicas de IA
+    getAIHints: protectedProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAIHintsForAttempt(input.attemptId);
+      }),
+    
+    // Obter estatísticas do aluno
+    getMyStats: studentProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.studentSession) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        return db.getPracticeQuestionStats(ctx.studentSession.studentId);
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 

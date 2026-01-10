@@ -5051,3 +5051,97 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🗑️ Remoção de Revisão Inteligente
 
 - [x] Remover funcionalidade de Revisão Inteligente do sistema
+- [x] Melhorar design e layout da página de Exercícios Disponíveis
+
+## Sistema de Registro Automático de Questões Resolvidas com IA
+
+### Backend - Schema e Banco de Dados
+- [x] Criar tabela questions (id, userId, subjectId, title, description, difficulty, belt, createdAt)
+- [x] Criar tabela question_attempts (id, questionId, studentId, answerText, answerPhotoUrl, answerAudioUrl, startTime, endTime, timeSpent, status, isCorrect, createdAt)
+- [x] Criar tabela question_feedback (id, attemptId, teacherId, feedbackText, score, createdAt)
+- [x] Criar tabela ai_hints (id, attemptId, hintText, confidence, generatedAt)
+- [x] Executar migrations do banco de dados
+
+### Backend - Helpers e Procedimentos tRPC
+- [x] Criar função createQuestion no db.ts
+- [x] Criar função saveQuestionAttempt no db.ts
+- [x] Criar função getStudentAttempts no db.ts (com filtros)
+- [x] Criar função getAttemptDetails no db.ts
+- [x] Criar função addTeacherFeedback no db.ts
+- [x] Criar função generateAIHint usando invokeLLM
+- [x] Criar procedimento tRPC questions.create (protegido)
+- [x] Criar procedimento tRPC questions.submitAttempt (protegido)
+- [x] Criar procedimento tRPC questions.listMyAttempts (protegido)
+- [x] Criar procedimento tRPC questions.getAttemptById (protegido)
+- [x] Criar procedimento tRPC questions.addFeedback (protegido, apenas professores)
+- [x] Criar procedimento tRPC questions.getAIHint (protegido)
+
+### Frontend - Interface de Resolução de Questões
+- [x] Criar página QuestionSolve.tsx para resolver questões
+- [x] Implementar formulário com campos de texto para resposta
+- [x] Adicionar upload de foto da resposta (integração S3)
+- [x] Adicionar gravação/upload de áudio da resposta (integração S3)
+- [x] Implementar timer para rastrear tempo gasto
+- [x] Adicionar seleção de faixa e nível de dificuldade
+- [x] Criar botão "Finalizar Questão" com salvamento automático
+- [x] Implementar feedback visual de sucesso/erro
+
+### Frontend - Histórico e Visualização
+- [x] Criar página QuestionHistory.tsx para listar questões resolvidas
+- [x] Implementar filtros por faixa, nível, status (correta/incorreta/parcial)
+- [x] Adicionar ordenação por data, tempo gasto
+- [x] Criar card de questão com resumo (título, status, tempo, data)
+- [x] Implementar modal de detalhes da questão
+- [x] Exibir resposta do aluno (texto/foto/áudio)
+- [x] Exibir feedback do professor quando disponível
+- [x] Exibir dicas de IA geradas
+
+### Frontend - Dashboard de Estatísticas
+- [x] Criar seção de estatísticas no dashboard do aluno
+- [x] Exibir total de questões resolvidas
+- [x] Exibir taxa de acerto (corretas/total)
+- [x] Exibir tempo médio de resolução
+- [ ] Criar gráfico de progresso por faixa
+- [ ] Criar gráfico de desempenho ao longo do tempo
+
+### Integração com IA
+- [x] Implementar análise de desempenho do aluno usando LLM
+- [x] Gerar dicas personalizadas baseadas em erros comuns
+- [x] Sugerir áreas de melhoria baseadas no histórico
+- [x] Criar sistema de confiança para dicas de IA (0-100%)
+- [ ] Implementar cache de dicas para evitar regeneração
+
+### Integração com Storage S3
+- [x] Implementar upload de fotos usando storagePut
+- [x] Implementar upload de áudios usando storagePut
+- [x] Adicionar validação de tamanho de arquivo (máx 16MB)
+- [x] Adicionar validação de formato (imagens: jpg, png, webp; áudio: mp3, wav, m4a)
+- [x] Salvar URLs públicas no banco de dados
+- [x] Implementar visualização de fotos no histórico
+- [x] Implementar player de áudio no histórico
+
+### Testes
+- [ ] Criar testes para saveQuestionAttempt
+- [ ] Criar testes para generateAIHint
+- [ ] Criar testes para filtros de histórico
+- [ ] Validar fluxo completo de resolução de questão
+- [ ] Testar upload de mídia para S3
+- [ ] Testar geração de dicas de IA
+
+### Navegação e Integração
+- [x] Adicionar link "Resolver Questões" no menu do aluno (rotas criadas)
+- [x] Adicionar link "Histórico de Questões" no menu do aluno (rotas criadas)
+- [x] Adicionar links no menu lateral do aluno (StudentLayout)
+- [x] Adicionar link no menu do professor (Sidebar.tsx)
+- [ ] Integrar estatísticas no dashboard principal
+- [ ] Adicionar notificações quando professor adicionar feedback
+
+### Página do Professor
+- [x] Criar página TeacherPracticeQuestions.tsx
+- [x] Implementar formulário de criação de questões
+- [x] Implementar listagem de questões do professor
+- [x] Implementar filtros por dificuldade e faixa
+- [x] Implementar modal de detalhes da questão
+- [x] Criar página TeacherReviewAttempts.tsx (estrutura pronta)
+- [x] Implementar formulário de feedback manual
+- [x] Adicionar link no menu do professor (Sidebar.tsx)

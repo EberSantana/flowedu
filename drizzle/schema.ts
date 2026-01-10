@@ -2096,3 +2096,107 @@ export const reviewNotifications = mysqlTable("review_notifications", {
 
 export type ReviewNotification = typeof reviewNotifications.$inferSelect;
 export type InsertReviewNotification = typeof reviewNotifications.$inferInsert;
+
+/**
+ * Questões de Prática Criadas pelos Professores
+ * Banco de questões para os alunos resolverem e praticarem
+ */
+export const practiceQuestions = mysqlTable("practice_questions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Professor que criou
+  subjectId: int("subjectId"), // Disciplina relacionada (opcional)
+  
+  // Conteúdo da Questão
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(), // Enunciado completo
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard", "expert"]).default("medium").notNull(),
+  belt: mysqlEnum("belt", ["white", "yellow", "orange", "green", "blue", "purple", "brown", "black"]).default("white").notNull(),
+  
+  // Metadados
+  tags: text("tags"), // JSON array de tags para categorização
+  expectedAnswer: text("expectedAnswer"), // Resposta esperada (opcional, para referência)
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PracticeQuestion = typeof practiceQuestions.$inferSelect;
+export type InsertPracticeQuestion = typeof practiceQuestions.$inferInsert;
+
+/**
+ * Tentativas de Resolução de Questões de Prática
+ * Registro automático de cada vez que um aluno resolve uma questão
+ */
+export const practiceQuestionAttempts = mysqlTable("practice_question_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  practiceQuestionId: int("practiceQuestionId").notNull(),
+  studentId: int("studentId").notNull(),
+  
+  // Resposta do Aluno
+  answerText: text("answerText"), // Resposta em texto
+  answerPhotoUrl: text("answerPhotoUrl"), // URL da foto da resposta (S3)
+  answerAudioUrl: text("answerAudioUrl"), // URL do áudio da resposta (S3)
+  
+  // Tempo e Performance
+  startTime: timestamp("startTime").notNull(),
+  endTime: timestamp("endTime").notNull(),
+  timeSpent: int("timeSpent").notNull(), // Tempo em segundos
+  
+  // Status e Avaliação
+  status: mysqlEnum("status", ["correct", "incorrect", "partial", "pending_review"]).default("pending_review").notNull(),
+  isCorrect: boolean("isCorrect").default(false),
+  score: int("score"), // Nota de 0-100 (quando aplicável)
+  
+  // Faixa e Nível no momento da resolução
+  beltAtAttempt: varchar("beltAtAttempt", { length: 50 }),
+  difficultyAtAttempt: varchar("difficultyAtAttempt", { length: 50 }),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PracticeQuestionAttempt = typeof practiceQuestionAttempts.$inferSelect;
+export type InsertPracticeQuestionAttempt = typeof practiceQuestionAttempts.$inferInsert;
+
+/**
+ * Feedback dos Professores nas Questões de Prática
+ * Professores podem adicionar feedback personalizado nas respostas
+ */
+export const practiceQuestionFeedback = mysqlTable("practice_question_feedback", {
+  id: int("id").autoincrement().primaryKey(),
+  attemptId: int("attemptId").notNull().unique(), // FK para question_attempts
+  teacherId: int("teacherId").notNull(), // Professor que deu o feedback
+  
+  // Feedback
+  feedbackText: text("feedbackText").notNull(),
+  score: int("score"), // Nota ajustada pelo professor (0-100)
+  suggestions: text("suggestions"), // Sugestões de melhoria
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PracticeQuestionFeedback = typeof practiceQuestionFeedback.$inferSelect;
+export type InsertPracticeQuestionFeedback = typeof practiceQuestionFeedback.$inferInsert;
+
+/**
+ * Dicas de IA para Questões de Prática
+ * IA analisa o desempenho e gera dicas personalizadas
+ */
+export const practiceQuestionHints = mysqlTable("practice_question_hints", {
+  id: int("id").autoincrement().primaryKey(),
+  attemptId: int("attemptId").notNull(), // FK para question_attempts
+  
+  // Dica Gerada pela IA
+  hintText: text("hintText").notNull(),
+  hintType: mysqlEnum("hintType", ["improvement", "encouragement", "concept_review", "strategy"]).default("improvement").notNull(),
+  confidence: int("confidence").default(80).notNull(), // Confiança da IA (0-100)
+  
+  // Análise
+  analysisData: text("analysisData"), // JSON com análise detalhada
+  
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+});
+
+export type PracticeQuestionHint = typeof practiceQuestionHints.$inferSelect;
+export type InsertPracticeQuestionHint = typeof practiceQuestionHints.$inferInsert;
