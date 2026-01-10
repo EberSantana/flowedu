@@ -37,12 +37,12 @@ export default function StudentReview() {
   const { data: subjects, isLoading: loadingSubjects } =
     trpc.subjectGamification.getMySubjects.useQuery();
 
-  const { data: wrongAnswers, isLoading: loadingAnswers, refetch: refetchAnswers } =
-    trpc.studentReview.getWrongAnswers.useQuery({
+  const { data: allAnswers, isLoading: loadingAnswers, refetch: refetchAnswers } =
+    trpc.studentReview.getAllAnswersForReview.useQuery({
       subjectId: selectedSubject || undefined,
       moduleId: selectedModule || undefined,
       questionType: selectedQuestionType || undefined,
-      limit: 20,
+      limit: 100,
     });
 
   const { data: stats, isLoading: loadingStats } =
@@ -97,7 +97,7 @@ export default function StudentReview() {
   };
 
   // Agrupar questões por tipo
-  const groupedQuestions = wrongAnswers?.reduce((acc: any, answer: any) => {
+  const groupedQuestions = allAnswers?.reduce((acc: any, answer: any) => {
     const type = answer.questionType || "other";
     if (!acc[type]) acc[type] = [];
     acc[type].push(answer);
@@ -117,7 +117,7 @@ export default function StudentReview() {
               <div>
                 <h1 className="text-4xl font-bold">Revisão Inteligente</h1>
                 <p className="text-purple-100 mt-1">
-                  Revise questões erradas com dicas personalizadas de IA
+                  Revise todas as questões dos seus exercícios com dicas personalizadas de IA
                 </p>
               </div>
             </div>
@@ -318,7 +318,7 @@ export default function StudentReview() {
             </CardContent>
           </Card>
 
-          {/* Lista de Questões Erradas Agrupadas por Tipo */}
+          {/* Lista de Questões Agrupadas por Tipo */}
           <div className="space-y-8">
             {loadingAnswers ? (
               <>
@@ -326,7 +326,7 @@ export default function StudentReview() {
                   <Skeleton key={i} className="h-64" />
                 ))}
               </>
-            ) : wrongAnswers && wrongAnswers.length > 0 ? (
+            ) : allAnswers && allAnswers.length > 0 ? (
               <>
                 {Object.entries(groupedQuestions).map(([type, questions]: [string, any]) => {
                   const styles = typeStyles[type] || typeStyles.other;
@@ -367,7 +367,7 @@ export default function StudentReview() {
                     Parabéns! 🎉
                   </h3>
                   <p className="text-gray-600">
-                    Você não tem questões erradas para revisar no momento.
+                    Você ainda não tem questões para revisar. Complete alguns exercícios primeiro!
                   </p>
                 </CardContent>
               </Card>

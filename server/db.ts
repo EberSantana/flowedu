@@ -5147,6 +5147,78 @@ export async function getStudentRankHistory(studentId: number, subjectId: number
 // ==================== REVIEW SYSTEM ====================
 
 /**
+ * Buscar TODAS as questões de um aluno (acertos e erros) para revisão inteligente
+ */
+export async function getAllAnswersForReview(
+  studentId: number,
+  filters?: {
+    subjectId?: number;
+    moduleId?: number;
+    questionType?: string;
+    limit?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Aplicar filtros opcionais - REMOVIDO o filtro de isCorrect = false
+    const conditions = [
+      eq(studentExerciseAttempts.studentId, studentId),
+      eq(studentExerciseAttempts.status, "completed"), // Apenas exercícios finalizados
+    ];
+
+    if (filters?.subjectId) {
+      conditions.push(eq(studentExercises.subjectId, filters.subjectId));
+    }
+
+    if (filters?.moduleId) {
+      conditions.push(eq(studentExercises.moduleId, filters.moduleId));
+    }
+
+    if (filters?.questionType) {
+      conditions.push(eq(studentExerciseAnswers.questionType, filters.questionType));
+    }
+
+    const results = await db
+      .select({
+        id: studentExerciseAnswers.id,
+        attemptId: studentExerciseAnswers.attemptId,
+        questionNumber: studentExerciseAnswers.questionNumber,
+        questionType: studentExerciseAnswers.questionType,
+        studentAnswer: studentExerciseAnswers.studentAnswer,
+        correctAnswer: studentExerciseAnswers.correctAnswer,
+        isCorrect: studentExerciseAnswers.isCorrect,
+        pointsAwarded: studentExerciseAnswers.pointsAwarded,
+        aiFeedback: studentExerciseAnswers.aiFeedback,
+        studyTips: studentExerciseAnswers.studyTips,
+        aiScore: studentExerciseAnswers.aiScore,
+        aiConfidence: studentExerciseAnswers.aiConfidence,
+        aiAnalysis: studentExerciseAnswers.aiAnalysis,
+        createdAt: studentExerciseAnswers.createdAt,
+        exerciseId: studentExerciseAttempts.exerciseId,
+        subjectId: studentExercises.subjectId,
+        moduleId: studentExercises.moduleId,
+        exerciseTitle: studentExercises.title,
+      })
+      .from(studentExerciseAnswers)
+      .innerJoin(
+        studentExerciseAttempts,
+        eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+      )
+      .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+      .where(and(...conditions))
+      .orderBy(desc(studentExerciseAnswers.createdAt))
+      .limit(filters?.limit || 100);
+
+    return results;
+  } catch (error) {
+    console.error("[Database] Error getting all answers for review:", error);
+    return [];
+  }
+}
+
+/**
  * Buscar questões erradas de um aluno com filtros
  */
 export async function getWrongAnswers(

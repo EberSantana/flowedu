@@ -4987,6 +4987,24 @@ JSON (descrições MAX 15 chars):
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
   studentReview: router({
+    // Listar TODAS as questões (acertos e erros) para revisão inteligente
+    getAllAnswersForReview: studentProcedure
+      .input(
+        z.object({
+          subjectId: z.number().optional(),
+          moduleId: z.number().optional(),
+          questionType: z.string().optional(),
+          limit: z.number().optional().default(100),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const allAnswers = await db.getAllAnswersForReview(studentId, input);
+        return allAnswers;
+      }),
+
     // Listar questões erradas com filtros
     getWrongAnswers: studentProcedure
       .input(
