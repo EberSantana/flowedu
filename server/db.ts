@@ -4514,20 +4514,20 @@ export async function submitExerciseAttempt(
       const studentAns = answer.answer?.trim();
       const correctAns = question.correctAnswer.trim();
       
-      // Comparar diretamente (resposta completa)
-      isCorrect = studentAns === correctAns;
-      
-      // Se não for igual, tentar comparar sem a letra (ex: "C) Texto" vs "Texto")
-      if (!isCorrect && correctAns.includes(')')) {
-        const correctAnsWithoutLetter = correctAns.substring(correctAns.indexOf(')') + 1).trim();
-        isCorrect = studentAns === correctAnsWithoutLetter;
+      // Extrair letra da resposta do aluno (se houver formato "C) Texto")
+      let studentLetter = studentAns;
+      if (studentAns && studentAns.includes(')')) {
+        studentLetter = studentAns.substring(0, studentAns.indexOf(')')).trim();
       }
       
-      // Se ainda não for igual, tentar comparar apenas a letra (ex: "C" vs "C) Texto")
-      if (!isCorrect && correctAns.includes(')')) {
-        const correctLetter = correctAns.substring(0, correctAns.indexOf(')')).trim();
-        isCorrect = studentAns === correctLetter;
+      // Extrair letra da resposta correta (se houver formato "C) Texto")
+      let correctLetter = correctAns;
+      if (correctAns.includes(')')) {
+        correctLetter = correctAns.substring(0, correctAns.indexOf(')')).trim();
       }
+      
+      // Comparar as letras extraídas (ignorando o texto completo)
+      isCorrect = studentLetter === correctLetter;
       
       if (isCorrect) {
         correctAnswers++;

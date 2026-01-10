@@ -57,6 +57,9 @@ import Questions from "./pages/Questions";
 import QuestionDetail from "./pages/QuestionDetail";
 import StudentSubmitQuestion from "./pages/StudentSubmitQuestion";
 import StudentMyQuestions from "./pages/StudentMyQuestions";
+import StudentLearningJournal from "./pages/StudentLearningJournal";
+import StudentDoubts from "./pages/StudentDoubts";
+import StudentStatistics from "./pages/StudentStatistics";
 
 function Router() {
   return (
@@ -110,6 +113,9 @@ function Router() {
         <Route path={"/questions/:id"} component={QuestionDetail} />
         <Route path={"/student/submit-question"} component={StudentSubmitQuestion} />
         <Route path={"/student/my-questions"} component={StudentMyQuestions} />
+        <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
+        <Route path={"/student/doubts"} component={StudentDoubts} />
+        <Route path={"/student/statistics"} component={StudentStatistics} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

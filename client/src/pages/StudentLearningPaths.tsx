@@ -282,10 +282,12 @@ export default function StudentLearningPaths() {
               <p className="text-sm text-gray-600 mb-4">
                 Registre suas reflexões, anotações e insights sobre cada tópico estudado.
               </p>
-              <Button variant="outline" size="sm" className="w-full border-blue-300 text-blue-600 hover:bg-blue-50">
-                <FileText className="w-4 h-4 mr-2" />
-                Acessar Diário
-              </Button>
+              <Link href="/student/learning-journal">
+                <Button variant="outline" size="sm" className="w-full border-blue-300 text-blue-600 hover:bg-blue-50">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Acessar Diário
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -300,10 +302,12 @@ export default function StudentLearningPaths() {
               <p className="text-sm text-gray-600 mb-4">
                 Envie suas dúvidas aos professores e acompanhe as respostas.
               </p>
-              <Button variant="outline" size="sm" className="w-full border-purple-300 text-purple-600 hover:bg-purple-50">
-                <Lightbulb className="w-4 h-4 mr-2" />
-                Ver Dúvidas ({stats?.pendingDoubts || 0})
-              </Button>
+              <Link href="/student/doubts">
+                <Button variant="outline" size="sm" className="w-full border-purple-300 text-purple-600 hover:bg-purple-50">
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Ver Dúvidas ({stats?.pendingDoubts || 0})
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -318,10 +322,12 @@ export default function StudentLearningPaths() {
               <p className="text-sm text-gray-600 mb-4">
                 Acompanhe seu desempenho e evolução em todas as disciplinas.
               </p>
-              <Button variant="outline" size="sm" className="w-full border-green-300 text-green-600 hover:bg-green-50">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Ver Estatísticas
-              </Button>
+              <Link href="/student/statistics">
+                <Button variant="outline" size="sm" className="w-full border-green-300 text-green-600 hover:bg-green-50">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Ver Estatísticas
+                </Button>
+              </Link>
             </CardContent>
           </Card>
           </div>

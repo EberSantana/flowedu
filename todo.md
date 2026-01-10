@@ -4927,3 +4927,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
   - [x] Implementar helpers de cache no servidor
   - [x] Integrar cache nas procedures de análise existentes
   - [x] Criar testes automatizados para o sistema de cache
+
+
+## 🚨 Bugs Críticos - Trilhas de Aprendizagem (Reportado em 10/01/2026)
+
+- [x] **BUG CRÍTICO**: Revisão Inteligente marcando respostas corretas como incorretas - corrigir lógica de validação de respostas (CORRIGIDO: extração correta de letras das respostas)
+- [x] Implementar funcionalidade de Diário de Aprendizagem (botão "Acessar Diário" sem funcionalidade) - CONCLUÍDO
+- [x] Implementar funcionalidade de Minhas Dúvidas (botão "Ver Dúvidas" sem funcionalidade) - CONCLUÍDO
+- [x] Implementar funcionalidade de Estatísticas (botão "Ver Estatísticas" sem funcionalidade) - CONCLUÍDO

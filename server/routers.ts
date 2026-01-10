@@ -6417,6 +6417,96 @@ Seja específico e prático. Foque em ajudar o aluno a realmente entender o conc
         return db.getQuestionStatistics(ctx.user.id);
       }),
   }),
+
+  // ==================== DIÁRIO DE APRENDIZAGEM ====================
+  learningJournal: router({
+    // Adicionar entrada no diário
+    addEntry: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        content: z.string().min(1, "Conteúdo é obrigatório"),
+        tags: z.string().optional(),
+        mood: z.enum(["great", "good", "neutral", "confused", "frustrated"]).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.addJournalEntry({
+          studentId: ctx.studentSession.studentId,
+          topicId: input.topicId,
+          content: input.content,
+          tags: input.tags,
+          mood: input.mood,
+        });
+      }),
+
+    // Buscar todas as entradas do aluno
+    getMyEntries: studentProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getAllJournalEntries(ctx.studentSession.studentId, input.limit);
+      }),
+
+    // Buscar entradas por tópico
+    getEntriesByTopic: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getJournalEntriesByTopic(ctx.studentSession.studentId, input.topicId);
+      }),
+  }),
+
+  // ==================== SISTEMA DE DÚVIDAS ====================
+  studentDoubts: router({
+    // Enviar dúvida
+    submitDoubt: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        professorId: z.number(),
+        question: z.string().min(1, "Pergunta é obrigatória"),
+        context: z.string().optional(),
+        isPrivate: z.boolean().optional().default(true),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.submitDoubt({
+          studentId: ctx.studentSession.studentId,
+          topicId: input.topicId,
+          professorId: input.professorId,
+          question: input.question,
+          context: input.context,
+          isPrivate: input.isPrivate,
+        });
+      }),
+
+    // Buscar minhas dúvidas
+    getMyDoubts: studentProcedure
+      .input(z.object({
+        topicId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getStudentDoubts(ctx.studentSession.studentId, input.topicId);
+      }),
+
+    // Buscar dúvidas pendentes (professor)
+    getPendingDoubts: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getPendingDoubts(ctx.user.id, input.subjectId);
+      }),
+
+    // Responder dúvida (professor)
+    respondDoubt: protectedProcedure
+      .input(z.object({
+        doubtId: z.number(),
+        answer: z.string().min(1, "Resposta é obrigatória"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.respondDoubt(input.doubtId, input.answer, ctx.user.id);
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 
