@@ -372,21 +372,29 @@ function QuestionReviewCard({
       </CardHeader>
       <CardContent className="pt-6">
         {/* Resposta do Aluno */}
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
-            <AlertCircle className="h-4 w-4" />
-            Sua Resposta (Incorreta)
-          </h4>
-          <p className="text-gray-700">{answer.studentAnswer}</p>
+        <div className="mb-4 p-4 bg-red-50 border-2 border-red-400 rounded-lg shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-red-500 text-white rounded-full p-1.5">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <h4 className="font-bold text-red-900 text-lg">
+              Sua Resposta (Incorreta)
+            </h4>
+          </div>
+          <p className="text-gray-800 font-medium">{answer.studentAnswer}</p>
         </div>
 
         {/* Resposta Correta */}
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4" />
-            Resposta Correta
-          </h4>
-          <p className="text-gray-700">{answer.correctAnswer}</p>
+        <div className="mb-4 p-4 bg-green-50 border-2 border-green-400 rounded-lg shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-green-500 text-white rounded-full p-1.5">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <h4 className="font-bold text-green-900 text-lg">
+              Resposta Correta
+            </h4>
+          </div>
+          <p className="text-gray-800 font-medium">{answer.correctAnswer}</p>
         </div>
 
         {/* Feedback da IA (se existir) */}

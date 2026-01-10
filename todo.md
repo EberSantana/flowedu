@@ -4936,3 +4936,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar funcionalidade de Diário de Aprendizagem (botão "Acessar Diário" sem funcionalidade) - CONCLUÍDO
 - [x] Implementar funcionalidade de Minhas Dúvidas (botão "Ver Dúvidas" sem funcionalidade) - CONCLUÍDO
 - [x] Implementar funcionalidade de Estatísticas (botão "Ver Estatísticas" sem funcionalidade) - CONCLUÍDO
+
+## 🔧 Melhorias de Dados e Interface de Revisão
+
+- [x] Criar migração de dados para normalizar respostas antigas (formato "C) Texto" para "C")
+- [x] Implementar indicadores visuais verde/vermelho mais claros na interface de revisão
