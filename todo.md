@@ -4955,3 +4955,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
   - [x] Sugestões de outras respostas válidas (quando aplicável)
   - [x] Dicas personalizadas de como estudar mais o tópico
   - [x] Recursos de aprendizado baseados no desempenho do aluno
+
+## 🐛 Bugs Reportados - Revisão Inteligente
+
+- [x] Na revisão inteligente, mostrar todas as questões agrupadas por tipo (não apenas uma por vez)
+- [x] Corrigir classificação de tipos de questão - todas estão sendo marcadas como "Dissertativa" quando deveriam respeitar o tipo original (múltipla escolha, verdadeiro/falso, etc.)

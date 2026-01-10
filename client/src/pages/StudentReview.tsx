@@ -63,6 +63,47 @@ export default function StudentReview() {
     markAsReviewedMutation.mutate({ answerId });
   };
 
+  // Mapeamento de tipos para labels
+  const typeLabels: Record<string, string> = {
+    multiple_choice: "Múltipla Escolha",
+    true_false: "Verdadeiro/Falso",
+    fill_blank: "Preencher Lacunas",
+    open: "Dissertativa",
+    other: "Outros"
+  };
+
+  // Mapeamento de estilos por tipo
+  const typeStyles: Record<string, { badge: string; border: string }> = {
+    multiple_choice: {
+      badge: "bg-blue-50 text-blue-700 border-blue-300",
+      border: "border-blue-300"
+    },
+    true_false: {
+      badge: "bg-green-50 text-green-700 border-green-300",
+      border: "border-green-300"
+    },
+    fill_blank: {
+      badge: "bg-orange-50 text-orange-700 border-orange-300",
+      border: "border-orange-300"
+    },
+    open: {
+      badge: "bg-purple-50 text-purple-700 border-purple-300",
+      border: "border-purple-300"
+    },
+    other: {
+      badge: "bg-gray-50 text-gray-700 border-gray-300",
+      border: "border-gray-300"
+    }
+  };
+
+  // Agrupar questões por tipo
+  const groupedQuestions = wrongAnswers?.reduce((acc: any, answer: any) => {
+    const type = answer.questionType || "other";
+    if (!acc[type]) acc[type] = [];
+    acc[type].push(answer);
+    return acc;
+  }, {}) || {};
+
   return (
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
@@ -252,6 +293,8 @@ export default function StudentReview() {
                     <SelectContent>
                       <SelectItem value="all">Todos os tipos</SelectItem>
                       <SelectItem value="multiple_choice">Múltipla Escolha</SelectItem>
+                      <SelectItem value="true_false">Verdadeiro/Falso</SelectItem>
+                      <SelectItem value="fill_blank">Preencher Lacunas</SelectItem>
                       <SelectItem value="open">Dissertativa</SelectItem>
                     </SelectContent>
                   </Select>
@@ -275,8 +318,8 @@ export default function StudentReview() {
             </CardContent>
           </Card>
 
-          {/* Lista de Questões Erradas */}
-          <div className="space-y-6">
+          {/* Lista de Questões Erradas Agrupadas por Tipo */}
+          <div className="space-y-8">
             {loadingAnswers ? (
               <>
                 {[1, 2, 3].map((i) => (
@@ -284,13 +327,38 @@ export default function StudentReview() {
                 ))}
               </>
             ) : wrongAnswers && wrongAnswers.length > 0 ? (
-              wrongAnswers.map((answer: any) => (
-                <QuestionReviewCard
-                  key={answer.id}
-                  answer={answer}
-                  onMarkAsReviewed={handleMarkAsReviewed}
-                />
-              ))
+              <>
+                {Object.entries(groupedQuestions).map(([type, questions]: [string, any]) => {
+                  const styles = typeStyles[type] || typeStyles.other;
+                  return (
+                    <div key={type} className="space-y-4">
+                      {/* Cabeçalho do Grupo */}
+                      <div className={`flex items-center gap-3 pb-3 border-b-2 ${styles.border}`}>
+                        <Badge 
+                          variant="outline" 
+                          className={`${styles.badge} text-base px-4 py-1.5`}
+                        >
+                          {typeLabels[type] || type}
+                        </Badge>
+                        <span className="text-sm text-gray-600">
+                          {questions.length} questão(s)
+                        </span>
+                      </div>
+
+                      {/* Questões do Grupo */}
+                      <div className="space-y-4 ml-4">
+                        {questions.map((answer: any) => (
+                          <QuestionReviewCard
+                            key={answer.id}
+                            answer={answer}
+                            onMarkAsReviewed={handleMarkAsReviewed}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
             ) : (
               <Card className="border-2 border-dashed border-gray-300">
                 <CardContent className="py-16 text-center">
@@ -362,7 +430,13 @@ function QuestionReviewCard({
               <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
                 {answer.questionType === "multiple_choice"
                   ? "Múltipla Escolha"
-                  : "Dissertativa"}
+                  : answer.questionType === "true_false"
+                  ? "Verdadeiro/Falso"
+                  : answer.questionType === "fill_blank"
+                  ? "Preencher Lacunas"
+                  : answer.questionType === "open"
+                  ? "Dissertativa"
+                  : "Outro"}
               </Badge>
               {answer.aiScore !== null && (
                 <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
