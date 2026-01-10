@@ -371,94 +371,91 @@ function QuestionReviewCard({
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        {/* Resposta do Aluno */}
-        <div className="mb-4 p-4 bg-red-50 border-2 border-red-400 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="bg-red-500 text-white rounded-full p-1.5">
-              <AlertCircle className="h-5 w-5" />
+        {/* Comparação de Respostas */}
+        <div className="mb-6 grid md:grid-cols-2 gap-4">
+          {/* Sua Resposta */}
+          <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <h4 className="font-semibold text-red-900">Sua Resposta</h4>
             </div>
-            <h4 className="font-bold text-red-900 text-lg">
-              Sua Resposta (Incorreta)
-            </h4>
+            <p className="text-gray-800">{answer.studentAnswer}</p>
           </div>
-          <p className="text-gray-800 font-medium">{answer.studentAnswer}</p>
+
+          {/* Resposta Correta */}
+          <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <h4 className="font-semibold text-green-900">Resposta Correta</h4>
+            </div>
+            <p className="text-gray-800">{answer.correctAnswer}</p>
+          </div>
         </div>
 
-        {/* Resposta Correta */}
-        <div className="mb-4 p-4 bg-green-50 border-2 border-green-400 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="bg-green-500 text-white rounded-full p-1.5">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-            <h4 className="font-bold text-green-900 text-lg">
-              Resposta Correta
-            </h4>
-          </div>
-          <p className="text-gray-800 font-medium">{answer.correctAnswer}</p>
-        </div>
-
-        {/* Feedback da IA (se existir) */}
+        {/* Feedback e Análise da IA */}
         {answer.aiFeedback && (
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Feedback da IA
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-blue-600" />
+              Análise Inteligente
             </h4>
-            <p className="text-gray-700 whitespace-pre-wrap">{answer.aiFeedback}</p>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{answer.aiFeedback}</p>
           </div>
         )}
 
-        {/* Dicas de Estudo */}
+        {/* Dicas de Estudo Personalizadas */}
         {showStudyTips && studyTips && (
-          <div className="mb-4 p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg">
-            <h4 className="font-bold text-purple-900 mb-4 flex items-center gap-2 text-lg">
-              <Lightbulb className="h-5 w-5" />
-              Dicas de Estudo Personalizadas
+          <div className="mb-6 p-5 bg-gradient-to-br from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-purple-600" />
+              Guia de Estudo Personalizado
             </h4>
 
-            {/* Explicação do Conceito */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-purple-800 mb-2">📚 Explicação do Conceito</h5>
-              <p className="text-gray-700 leading-relaxed">{studyTips.explanation}</p>
+            <div className="space-y-4">
+              {/* Explicação */}
+              {studyTips.explanation && (
+                <div>
+                  <h5 className="font-medium text-purple-900 mb-1.5">Explicação</h5>
+                  <p className="text-gray-700 leading-relaxed">{studyTips.explanation}</p>
+                </div>
+              )}
+
+              {/* Dicas Práticas */}
+              {studyTips.tips && studyTips.tips.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-purple-900 mb-1.5">Dicas Práticas</h5>
+                  <ul className="space-y-1.5 ml-1">
+                    {studyTips.tips.map((tip: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2 text-gray-700">
+                        <span className="text-purple-600 font-medium mt-0.5">•</span>
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Materiais e Estratégia */}
+              <div className="grid md:grid-cols-2 gap-4">
+                {studyTips.resources && studyTips.resources.length > 0 && (
+                  <div className="p-3 bg-white/60 rounded-lg">
+                    <h5 className="font-medium text-purple-900 mb-1.5">Materiais</h5>
+                    <ul className="space-y-1 text-sm">
+                      {studyTips.resources.map((resource: string, index: number) => (
+                        <li key={index} className="text-gray-700">• {resource}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {studyTips.strategy && (
+                  <div className="p-3 bg-white/60 rounded-lg">
+                    <h5 className="font-medium text-purple-900 mb-1.5">Estratégia</h5>
+                    <p className="text-sm text-gray-700">{studyTips.strategy}</p>
+                  </div>
+                )}
+              </div>
             </div>
-
-            {/* Dicas Práticas */}
-            {studyTips.tips && studyTips.tips.length > 0 && (
-              <div className="mb-4">
-                <h5 className="font-semibold text-purple-800 mb-2">💡 Dicas Práticas</h5>
-                <ul className="space-y-2">
-                  {studyTips.tips.map((tip: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-purple-600 font-bold">{index + 1}.</span>
-                      <span className="text-gray-700">{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Materiais Complementares */}
-            {studyTips.resources && studyTips.resources.length > 0 && (
-              <div className="mb-4">
-                <h5 className="font-semibold text-purple-800 mb-2">📖 Materiais Complementares</h5>
-                <ul className="space-y-2">
-                  {studyTips.resources.map((resource: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-purple-600">•</span>
-                      <span className="text-gray-700">{resource}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Estratégia de Revisão */}
-            {studyTips.strategy && (
-              <div className="p-3 bg-white rounded-lg border border-purple-200">
-                <h5 className="font-semibold text-purple-800 mb-2">🎯 Estratégia Recomendada</h5>
-                <p className="text-gray-700">{studyTips.strategy}</p>
-              </div>
-            )}
           </div>
         )}
 
