@@ -24,29 +24,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          trpc: ['@trpc/client', '@trpc/react-query'],
-        },
-      },
-    },
-    sourcemap: false,
-    minify: 'esbuild',
-    chunkSizeWarningLimit: 1000,
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', '@trpc/client', '@trpc/react-query'],
-    exclude: [],
   },
   server: {
     host: true,
-    hmr: {
-      overlay: true,
-      protocol: 'wss',
-      clientPort: 443,
-    },
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",

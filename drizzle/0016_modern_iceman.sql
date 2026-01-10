@@ -1,1 +1,0 @@
-ALTER TABLE `subjectEnrollments` ADD `status` enum('active','completed','dropped') DEFAULT 'active' NOT NULL;

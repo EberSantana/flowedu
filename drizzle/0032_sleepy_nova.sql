@@ -1,1 +1,0 @@
-ALTER TABLE `users` ADD `profile` enum('traditional','enthusiast','interactive','organizational') DEFAULT 'enthusiast' NOT NULL;

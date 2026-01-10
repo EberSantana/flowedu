@@ -1,8 +1,0 @@
-{
-  "query": "ALTER TABLE subjects \nADD COLUMN ementa TEXT AFTER userId,\nADD COLUMN generalObjective TEXT AFTER ementa,\nADD COLUMN specificObjectives TEXT AFTER generalObjective,\nADD COLUMN programContent TEXT AFTER specificObjectives,\nADD COLUMN basicBibliography TEXT AFTER programContent,\nADD COLUMN complementaryBibliography TEXT AFTER basicBibliography;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute ALTER TABLE subjects \nADD COLUMN ementa TEXT AFTER userId,\nADD COLUMN generalObjective TEXT AFTER ementa,\nADD COLUMN specificObjectives TEXT AFTER generalObjective,\nADD COLUMN programContent TEXT AFTER specificObjectives,\nADD COLUMN basicBibliography TEXT AFTER programContent,\nADD COLUMN complementaryBibliography TEXT AFTER basicBibliography;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'ementa' in 'subjects'"
-  ]
-}

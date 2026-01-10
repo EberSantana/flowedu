@@ -1,1 +1,0 @@
-ALTER TABLE `students` MODIFY COLUMN `hd2dUnlockedCharacters` text;

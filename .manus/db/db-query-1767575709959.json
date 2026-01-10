@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE student_specializations (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL UNIQUE,\n  specialization ENUM('code_warrior', 'interface_master', 'data_sage', 'system_architect') NOT NULL,\n  chosenAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  level INT NOT NULL DEFAULT 1,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE student_specializations (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL UNIQUE,\n  specialization ENUM('code_warrior', 'interface_master', 'data_sage', 'system_architect') NOT NULL,\n  chosenAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  level INT NOT NULL DEFAULT 1,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 186
-}

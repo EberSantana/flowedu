@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `gamification_notifications` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `studentId` int NOT NULL,\n  `type` varchar(50) NOT NULL,\n  `title` varchar(255) NOT NULL,\n  `message` text NOT NULL,\n  `isRead` tinyint(1) DEFAULT 0 NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `gamification_notifications` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `studentId` int NOT NULL,\n  `type` varchar(50) NOT NULL,\n  `title` varchar(255) NOT NULL,\n  `message` text NOT NULL,\n  `isRead` tinyint(1) DEFAULT 0 NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 237
-}
