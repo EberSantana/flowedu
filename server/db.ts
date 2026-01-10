@@ -4650,6 +4650,48 @@ export async function submitExerciseAttempt(
   // Verificar e conceder badges especiais
   await checkAllSpecialBadges(attempt[0].studentId, timeSpent, new Date());
   
+  // INTEGRAÇÃO COM REVISÃO INTELIGENTE
+  // Adicionar questões erradas à fila de revisão automática
+  const exercise = await db
+    .select()
+    .from(studentExercises)
+    .where(eq(studentExercises.id, attempt[0].exerciseId))
+    .limit(1);
+  
+  if (exercise[0]) {
+    // Buscar IDs das respostas recém-inseridas para adicionar à fila
+    const insertedAnswers = await db
+      .select()
+      .from(studentExerciseAnswers)
+      .where(eq(studentExerciseAnswers.attemptId, attemptId));
+    
+    // Adicionar questões erradas à fila de revisão inteligente
+    for (const answer of insertedAnswers) {
+      // Apenas questões objetivas erradas ou subjetivas com baixa pontuação
+      const shouldAddToQueue = 
+        (answer.questionType === "objective" && answer.isCorrect === false) ||
+        (answer.questionType === "subjective" && answer.aiScore && answer.aiScore < 70);
+      
+      if (shouldAddToQueue) {
+        try {
+          // Calcular dificuldade inicial baseada na pontuação
+          const initialDifficulty = answer.aiScore ? (100 - answer.aiScore) : 80;
+          
+          await addToReviewQueue({
+            studentId: attempt[0].studentId,
+            answerId: answer.id,
+            exerciseId: attempt[0].exerciseId,
+            subjectId: exercise[0].subjectId,
+            initialDifficulty,
+          });
+        } catch (error) {
+          console.error("Erro ao adicionar questão à fila de revisão:", error);
+          // Não falhar a submissão se houver erro na fila de revisão
+        }
+      }
+    }
+  }
+  
   return {
     attemptId,
     score,
@@ -9302,4 +9344,552 @@ export async function updateQuestionPriority(questionId: number, priority: 'low'
     ));
   
   return { success: true };
+}
+
+// ==================== SMART REVIEW SYSTEM ====================
+
+/**
+ * Adicionar item à fila de revisão inteligente
+ * Implementa algoritmo de repetição espaçada (Spaced Repetition)
+ */
+export async function addToReviewQueue(data: {
+  studentId: number;
+  answerId: number;
+  exerciseId: number;
+  subjectId: number;
+  initialDifficulty?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { smartReviewQueue } = await import("../drizzle/schema");
+
+  // Calcular próxima data de revisão (1 dia após erro)
+  const nextReviewDate = new Date();
+  nextReviewDate.setDate(nextReviewDate.getDate() + 1);
+
+  const priority = data.initialDifficulty || 70; // Prioridade alta para itens errados
+
+  const [result] = await db.insert(smartReviewQueue).values({
+    studentId: data.studentId,
+    answerId: data.answerId,
+    exerciseId: data.exerciseId,
+    subjectId: data.subjectId,
+    easeFactor: 2.5, // Fator inicial
+    interval: 1, // 1 dia
+    repetitions: 0,
+    priority,
+    difficultyScore: data.initialDifficulty || 50,
+    nextReviewDate,
+    status: "pending",
+  }).onDuplicateKeyUpdate({
+    set: {
+      nextReviewDate,
+      priority,
+      updatedAt: new Date(),
+    }
+  });
+
+  return result.insertId;
+}
+
+/**
+ * Obter fila de revisão priorizada para um aluno
+ * Retorna itens ordenados por prioridade e data de revisão
+ */
+export async function getReviewQueue(studentId: number, subjectId?: number, limit: number = 20) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { smartReviewQueue } = await import("../drizzle/schema");
+  const { and, eq, lte, desc } = await import("drizzle-orm");
+
+  const conditions = [
+    eq(smartReviewQueue.studentId, studentId),
+    eq(smartReviewQueue.status, "pending"),
+    lte(smartReviewQueue.nextReviewDate, new Date()),
+  ];
+
+  if (subjectId) {
+    conditions.push(eq(smartReviewQueue.subjectId, subjectId));
+  }
+
+  const queue = await db
+    .select({
+      id: smartReviewQueue.id,
+      answerId: smartReviewQueue.answerId,
+      exerciseId: smartReviewQueue.exerciseId,
+      subjectId: smartReviewQueue.subjectId,
+      priority: smartReviewQueue.priority,
+      difficultyScore: smartReviewQueue.difficultyScore,
+      nextReviewDate: smartReviewQueue.nextReviewDate,
+      reviewCount: smartReviewQueue.reviewCount,
+      successRate: smartReviewQueue.successRate,
+      easeFactor: smartReviewQueue.easeFactor,
+      interval: smartReviewQueue.interval,
+    })
+    .from(smartReviewQueue)
+    .where(and(...conditions))
+    .orderBy(desc(smartReviewQueue.priority), smartReviewQueue.nextReviewDate)
+    .limit(limit);
+
+  return queue;
+}
+
+/**
+ * Calcular novo intervalo usando algoritmo SM-2 (SuperMemo 2)
+ * @param quality - Qualidade da resposta (0-5): 0=total blackout, 5=perfect response
+ * @param easeFactor - Fator de facilidade atual
+ * @param interval - Intervalo atual em dias
+ * @param repetitions - Número de repetições bem-sucedidas
+ */
+function calculateSM2(quality: number, easeFactor: number, interval: number, repetitions: number) {
+  // Calcular novo fator de facilidade
+  let newEaseFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  
+  // Limitar fator de facilidade entre 1.3 e 2.5
+  if (newEaseFactor < 1.3) newEaseFactor = 1.3;
+  
+  let newInterval: number;
+  let newRepetitions: number;
+
+  if (quality < 3) {
+    // Resposta incorreta - reiniciar
+    newRepetitions = 0;
+    newInterval = 1;
+  } else {
+    // Resposta correta
+    newRepetitions = repetitions + 1;
+    
+    if (newRepetitions === 1) {
+      newInterval = 1;
+    } else if (newRepetitions === 2) {
+      newInterval = 6;
+    } else {
+      newInterval = Math.round(interval * newEaseFactor);
+    }
+  }
+
+  return { newEaseFactor, newInterval, newRepetitions };
+}
+
+/**
+ * Registrar revisão e atualizar algoritmo
+ */
+export async function recordReview(data: {
+  studentId: number;
+  queueItemId: number;
+  answerId: number;
+  exerciseId: number;
+  wasCorrect: boolean;
+  timeSpent: number;
+  selfRating?: "again" | "hard" | "good" | "easy";
+  confidenceLevel?: number;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { smartReviewQueue, reviewHistory } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  // Buscar item da fila
+  const [queueItem] = await db
+    .select()
+    .from(smartReviewQueue)
+    .where(eq(smartReviewQueue.id, data.queueItemId));
+
+  if (!queueItem) throw new Error("Queue item not found");
+
+  // Mapear selfRating para quality (0-5)
+  let quality = 3; // Padrão: good
+  if (data.selfRating === "again") quality = 0;
+  else if (data.selfRating === "hard") quality = 2;
+  else if (data.selfRating === "good") quality = 3;
+  else if (data.selfRating === "easy") quality = 5;
+  else if (!data.wasCorrect) quality = 1;
+  else quality = 4;
+
+  // Calcular novos valores usando SM-2
+  const { newEaseFactor, newInterval, newRepetitions } = calculateSM2(
+    quality,
+    queueItem.easeFactor,
+    queueItem.interval,
+    queueItem.repetitions
+  );
+
+  // Calcular próxima data de revisão
+  const nextReviewDate = new Date();
+  nextReviewDate.setDate(nextReviewDate.getDate() + newInterval);
+
+  // Calcular nova taxa de sucesso
+  const totalReviews = queueItem.reviewCount + 1;
+  const successCount = data.wasCorrect ? 
+    Math.round((queueItem.successRate / 100) * queueItem.reviewCount) + 1 :
+    Math.round((queueItem.successRate / 100) * queueItem.reviewCount);
+  const newSuccessRate = Math.round((successCount / totalReviews) * 100);
+
+  // Calcular nova prioridade (0-100)
+  // Maior prioridade para itens com baixa taxa de sucesso
+  const newPriority = Math.max(0, Math.min(100, 100 - newSuccessRate));
+
+  // Determinar novo status
+  let newStatus: "pending" | "reviewing" | "mastered" | "archived" = "pending";
+  if (newSuccessRate >= 90 && newRepetitions >= 5) {
+    newStatus = "mastered";
+  }
+
+  // Registrar no histórico
+  await db.insert(reviewHistory).values({
+    studentId: data.studentId,
+    queueItemId: data.queueItemId,
+    answerId: data.answerId,
+    exerciseId: data.exerciseId,
+    wasCorrect: data.wasCorrect,
+    timeSpent: data.timeSpent,
+    confidenceLevel: data.confidenceLevel,
+    selfRating: data.selfRating,
+    notes: data.notes,
+    previousEaseFactor: queueItem.easeFactor,
+    newEaseFactor,
+    previousInterval: queueItem.interval,
+    newInterval,
+  });
+
+  // Atualizar item na fila
+  await db
+    .update(smartReviewQueue)
+    .set({
+      easeFactor: newEaseFactor,
+      interval: newInterval,
+      repetitions: newRepetitions,
+      lastReviewedAt: new Date(),
+      nextReviewDate,
+      reviewCount: totalReviews,
+      successRate: newSuccessRate,
+      priority: newPriority,
+      status: newStatus,
+      updatedAt: new Date(),
+    })
+    .where(eq(smartReviewQueue.id, data.queueItemId));
+
+  // Atualizar estatísticas do aluno
+  await updateReviewStatistics(data.studentId, data.wasCorrect, data.timeSpent);
+
+  return { newInterval, newEaseFactor, newStatus, newSuccessRate };
+}
+
+/**
+ * Atualizar estatísticas de revisão do aluno
+ */
+export async function updateReviewStatistics(
+  studentId: number,
+  wasCorrect: boolean,
+  timeSpent: number,
+  subjectId?: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { reviewStatistics } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+
+  const conditions = [eq(reviewStatistics.studentId, studentId)];
+  if (subjectId) {
+    conditions.push(eq(reviewStatistics.subjectId, subjectId));
+  }
+
+  // Buscar estatísticas existentes
+  const [existing] = await db
+    .select()
+    .from(reviewStatistics)
+    .where(and(...conditions));
+
+  const today = new Date().toISOString().split('T')[0];
+
+  if (existing) {
+    // Atualizar estatísticas existentes
+    const newTotalReviews = existing.totalReviewsCompleted + 1;
+    const newTotalTime = existing.totalTimeSpent + timeSpent;
+    const newCorrect = wasCorrect ? existing.correctReviews + 1 : existing.correctReviews;
+    const newIncorrect = wasCorrect ? existing.incorrectReviews : existing.incorrectReviews + 1;
+    const newSuccessRate = Math.round((newCorrect / newTotalReviews) * 100);
+    const newAverageTime = Math.round(newTotalTime / newTotalReviews);
+
+    // Calcular streak
+    const lastReview = existing.lastReviewDate?.toISOString().split('T')[0];
+    let newStreak = existing.currentStreak;
+    
+    if (lastReview !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      if (lastReview === yesterdayStr) {
+        newStreak += 1;
+      } else {
+        newStreak = 1;
+      }
+    }
+
+    const newLongestStreak = Math.max(existing.longestStreak, newStreak);
+
+    // Atualizar progresso diário e semanal
+    const newDailyProgress = lastReview === today ? existing.dailyProgress + 1 : 1;
+    const newWeeklyProgress = existing.weeklyProgress + 1;
+
+    await db
+      .update(reviewStatistics)
+      .set({
+        totalReviewsCompleted: newTotalReviews,
+        totalTimeSpent: newTotalTime,
+        averageSessionTime: newAverageTime,
+        correctReviews: newCorrect,
+        incorrectReviews: newIncorrect,
+        successRate: newSuccessRate,
+        currentStreak: newStreak,
+        longestStreak: newLongestStreak,
+        lastReviewDate: new Date(today),
+        dailyProgress: newDailyProgress,
+        weeklyProgress: newWeeklyProgress,
+        updatedAt: new Date(),
+      })
+      .where(and(...conditions));
+  } else {
+    // Criar novas estatísticas
+    await db.insert(reviewStatistics).values({
+      studentId,
+      subjectId: subjectId || null,
+      totalReviewsCompleted: 1,
+      totalTimeSpent: timeSpent,
+      averageSessionTime: timeSpent,
+      correctReviews: wasCorrect ? 1 : 0,
+      incorrectReviews: wasCorrect ? 0 : 1,
+      successRate: wasCorrect ? 100 : 0,
+      currentStreak: 1,
+      longestStreak: 1,
+      lastReviewDate: new Date(today),
+      dailyProgress: 1,
+      weeklyProgress: 1,
+    });
+  }
+}
+
+/**
+ * Obter estatísticas de revisão do aluno
+ */
+export async function getReviewStatistics(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { reviewStatistics, smartReviewQueue } = await import("../drizzle/schema");
+  const { eq, and, count } = await import("drizzle-orm");
+
+  const conditions = [eq(reviewStatistics.studentId, studentId)];
+  if (subjectId) {
+    conditions.push(eq(reviewStatistics.subjectId, subjectId));
+  }
+
+  const [stats] = await db
+    .select()
+    .from(reviewStatistics)
+    .where(and(...conditions));
+
+  // Contar itens por status
+  const queueConditions = [eq(smartReviewQueue.studentId, studentId)];
+  if (subjectId) {
+    queueConditions.push(eq(smartReviewQueue.subjectId, subjectId));
+  }
+
+  const [pendingCount] = await db
+    .select({ count: count() })
+    .from(smartReviewQueue)
+    .where(and(...queueConditions, eq(smartReviewQueue.status, "pending")));
+
+  const [masteredCount] = await db
+    .select({ count: count() })
+    .from(smartReviewQueue)
+    .where(and(...queueConditions, eq(smartReviewQueue.status, "mastered")));
+
+  return {
+    ...stats,
+    itemsPending: pendingCount?.count || 0,
+    itemsMastered: masteredCount?.count || 0,
+  };
+}
+
+/**
+ * Obter histórico de revisões do aluno
+ */
+export async function getReviewHistory(studentId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { reviewHistory } = await import("../drizzle/schema");
+  const { eq, desc } = await import("drizzle-orm");
+
+  const history = await db
+    .select()
+    .from(reviewHistory)
+    .where(eq(reviewHistory.studentId, studentId))
+    .orderBy(desc(reviewHistory.reviewedAt))
+    .limit(limit);
+
+  return history;
+}
+
+/**
+ * Criar sessão de estudo
+ */
+export async function createStudySession(data: {
+  studentId: number;
+  subjectId?: number;
+  sessionType: "quick_review" | "full_review" | "focused_practice" | "random_practice";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { studySessions } = await import("../drizzle/schema");
+
+  const [result] = await db.insert(studySessions).values({
+    studentId: data.studentId,
+    subjectId: data.subjectId || null,
+    sessionType: data.sessionType,
+    status: "in_progress",
+  });
+
+  return result.insertId;
+}
+
+/**
+ * Finalizar sessão de estudo
+ */
+export async function completeStudySession(
+  sessionId: number,
+  data: {
+    totalItems: number;
+    itemsCompleted: number;
+    itemsCorrect: number;
+    totalTime: number;
+    pointsEarned: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { studySessions } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const averageTimePerItem = data.itemsCompleted > 0 
+    ? Math.round(data.totalTime / data.itemsCompleted)
+    : 0;
+
+  const sessionScore = data.totalItems > 0
+    ? Math.round((data.itemsCorrect / data.totalItems) * 100)
+    : 0;
+
+  await db
+    .update(studySessions)
+    .set({
+      totalItems: data.totalItems,
+      itemsCompleted: data.itemsCompleted,
+      itemsCorrect: data.itemsCorrect,
+      totalTime: data.totalTime,
+      averageTimePerItem,
+      sessionScore,
+      pointsEarned: data.pointsEarned,
+      status: "completed",
+      completedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(studySessions.id, sessionId));
+}
+
+/**
+ * Criar tags de conteúdo
+ */
+export async function createContentTag(data: {
+  userId: number;
+  subjectId: number;
+  name: string;
+  description?: string;
+  color?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contentTags } = await import("../drizzle/schema");
+
+  const [result] = await db.insert(contentTags).values(data);
+  return result.insertId;
+}
+
+/**
+ * Listar tags de conteúdo
+ */
+export async function listContentTags(userId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contentTags } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+
+  const conditions = [eq(contentTags.userId, userId)];
+  if (subjectId) {
+    conditions.push(eq(contentTags.subjectId, subjectId));
+  }
+
+  const tags = await db
+    .select()
+    .from(contentTags)
+    .where(and(...conditions));
+
+  return tags;
+}
+
+/**
+ * Associar tag a exercício
+ */
+export async function addExerciseTag(exerciseId: number, tagId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { exerciseTags } = await import("../drizzle/schema");
+
+  await db.insert(exerciseTags).values({
+    exerciseId,
+    tagId,
+  }).onDuplicateKeyUpdate({
+    set: { createdAt: new Date() }
+  });
+}
+
+/**
+ * Obter detalhes completos de um item da fila de revisão
+ * Inclui informações do exercício e da resposta original
+ */
+export async function getReviewItemDetails(queueItemId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { smartReviewQueue, studentExercises, studentExerciseAnswers, subjects } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+
+  const [queueItem] = await db
+    .select({
+      queueItem: smartReviewQueue,
+      exercise: studentExercises,
+      answer: studentExerciseAnswers,
+      subject: subjects,
+    })
+    .from(smartReviewQueue)
+    .leftJoin(studentExercises, eq(smartReviewQueue.exerciseId, studentExercises.id))
+    .leftJoin(studentExerciseAnswers, eq(smartReviewQueue.answerId, studentExerciseAnswers.id))
+    .leftJoin(subjects, eq(smartReviewQueue.subjectId, subjects.id))
+    .where(and(
+      eq(smartReviewQueue.id, queueItemId),
+      eq(smartReviewQueue.studentId, studentId)
+    ));
+
+  return queueItem;
 }

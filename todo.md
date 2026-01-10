@@ -4975,3 +4975,75 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Reformular interface seguindo padrão de exercícios
 - [x] Adicionar seção de "Como Estudar Este Tópico" com estratégias personalizadas
 - [x] Incluir recursos adicionais (vídeos, artigos, exemplos práticos) quando aplicável
+
+
+## 🧠 Sistema de Revisão Inteligente - Refatoração Completa
+
+### Backend - Schema e Database
+- [x] Refatorar tabela de exercícios para suportar múltiplos tipos (múltipla escolha, dissertativa, V/F)
+- [x] Adicionar tabela de revisões inteligentes (smart_review_queue) com algoritmo de espaçamento
+- [x] Adicionar campos de metadados: dificuldade, tags, categoria, tempo estimado
+- [x] Criar índices para otimizar consultas de revisão por aluno
+- [x] Adicionar campo lastReviewDate e nextReviewDate nas respostas
+- [x] Criar tabela review_history para histórico de revisões
+- [x] Criar tabela review_statistics para estatísticas agregadas
+- [x] Criar tabela content_tags para categorização de conteúdo
+- [x] Criar tabela study_sessions para sessões de estudo
+- [x] Criar tabela review_notifications para lembretes
+
+### Backend - Algoritmo de Revisão Inteligente
+- [x] Implementar algoritmo de repetição espaçada SM-2 (SuperMemo 2)
+- [x] Calcular intervalos de revisão baseados em desempenho (acertos/erros)
+- [x] Priorizar exercícios com baixo desempenho histórico
+- [x] Sistema de pontuação de dificuldade adaptativa (easeFactor)
+- [x] Gerar recomendações personalizadas por aluno (fila priorizada)
+
+### Backend - tRPC Procedures para Revisão
+- [x] Criar procedure smartReview.getQueue (lista priorizada de exercícios para revisar)
+- [x] Criar procedure smartReview.getStatistics (estatísticas de revisão do aluno)
+- [x] Criar procedure smartReview.recordReview (registrar revisão concluída)
+- [x] Criar procedure smartReview.getHistory (histórico de revisões)
+- [x] Criar procedure smartReview.getItemDetails (detalhes do item da fila)
+- [x] Criar procedure smartReview.createSession (criar sessão de estudo)
+- [x] Criar procedure smartReview.completeSession (finalizar sessão)
+- [x] Criar procedure smartReview.addToQueue (adicionar item à fila)
+- [ ] Criar procedure teacherReview.getClassReviewStats (estatísticas da turma)
+
+### Frontend - Interface de Revisão do Aluno
+- [x] Criar página StudentSmartReview.tsx com lista de exercícios priorizados
+- [x] Implementar filtros: por matéria (subjectId)
+- [x] Adicionar indicadores visuais de prioridade (cores, badges)
+- [x] Criar componente de estatísticas de revisão (cards de progresso)
+- [x] Criar página StudentSmartReviewItem.tsx para revisão individual
+- [x] Implementar auto-avaliação (again, hard, good, easy)
+- [x] Adicionar sistema de anotações durante revisão
+- [x] Exibir progresso diário e semanal com metas
+- [x] Mostrar streak de dias consecutivos
+- [x] Adicionar rotas no App.tsx
+- [ ] Implementar sistema de notificações para revisões pendentes
+- [ ] Adicionar cronômetro de estudo durante revisão
+
+### Frontend - Interface do Professor
+- [ ] Adicionar seção de analytics de revisão no dashboard do professor
+- [ ] Visualização de quais alunos estão revisando regularmente
+- [ ] Relatório de exercícios mais revisados
+- [ ] Identificar alunos que precisam de atenção (baixa taxa de revisão)
+
+### Gamificação da Revisão
+- [ ] Sistema de streaks (dias consecutivos de revisão)
+- [ ] Badges especiais para revisão consistente
+- [ ] Pontos extras por completar revisões no prazo
+- [ ] Desafios semanais de revisão
+
+### Testes e Qualidade
+- [ ] Testes unitários para algoritmo de repetição espaçada
+- [ ] Testes para cálculo de prioridade de revisão
+- [ ] Testes de integração para fluxo completo de revisão
+- [ ] Validação de performance com grande volume de dados
+
+### UI/UX da Revisão
+- [ ] Design de cards de exercícios para revisão
+- [ ] Animações de feedback ao completar revisão
+- [ ] Modo de revisão rápida (apenas exercícios errados)
+- [ ] Modo de revisão completa (todos os exercícios)
+- [ ] Sistema de marcação de exercícios favoritos

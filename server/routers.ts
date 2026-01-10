@@ -4986,6 +4986,143 @@ JSON (descrições MAX 15 chars):
   }),
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
+  smartReview: router({
+    // Obter fila de revisão priorizada (algoritmo SM-2)
+    getQueue: studentProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        limit: z.number().optional().default(20),
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const queue = await db.getReviewQueue(studentId, input.subjectId, input.limit);
+        return queue;
+      }),
+
+    // Obter detalhes de um item da fila
+    getItemDetails: studentProcedure
+      .input(z.object({ queueItemId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const details = await db.getReviewItemDetails(input.queueItemId, studentId);
+        return details;
+      }),
+
+    // Registrar revisão e atualizar algoritmo
+    recordReview: studentProcedure
+      .input(z.object({
+        queueItemId: z.number(),
+        answerId: z.number(),
+        exerciseId: z.number(),
+        wasCorrect: z.boolean(),
+        timeSpent: z.number(),
+        selfRating: z.enum(["again", "hard", "good", "easy"]).optional(),
+        confidenceLevel: z.number().min(1).max(5).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const result = await db.recordReview({
+          studentId,
+          ...input,
+        });
+
+        return result;
+      }),
+
+    // Obter estatísticas de revisão
+    getStatistics: studentProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const stats = await db.getReviewStatistics(studentId, input.subjectId);
+        return stats;
+      }),
+
+    // Obter histórico de revisões
+    getHistory: studentProcedure
+      .input(z.object({ limit: z.number().optional().default(50) }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const history = await db.getReviewHistory(studentId, input.limit);
+        return history;
+      }),
+
+    // Criar sessão de estudo
+    createSession: studentProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        sessionType: z.enum(["quick_review", "full_review", "focused_practice", "random_practice"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const sessionId = await db.createStudySession({
+          studentId,
+          ...input,
+        });
+
+        return { sessionId };
+      }),
+
+    // Finalizar sessão de estudo
+    completeSession: studentProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        totalItems: z.number(),
+        itemsCompleted: z.number(),
+        itemsCorrect: z.number(),
+        totalTime: z.number(),
+        pointsEarned: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        await db.completeStudySession(input.sessionId, {
+          totalItems: input.totalItems,
+          itemsCompleted: input.itemsCompleted,
+          itemsCorrect: input.itemsCorrect,
+          totalTime: input.totalTime,
+          pointsEarned: input.pointsEarned,
+        });
+
+        return { success: true };
+      }),
+
+    // Adicionar item à fila de revisão (quando aluno erra exercício)
+    addToQueue: studentProcedure
+      .input(z.object({
+        answerId: z.number(),
+        exerciseId: z.number(),
+        subjectId: z.number(),
+        initialDifficulty: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+
+        const queueId = await db.addToReviewQueue({
+          studentId,
+          ...input,
+        });
+
+        return { queueId };
+      }),
+  }),
+
+  // ==================== SISTEMA DE REVISÃO LEGADO ====================
   studentReview: router({
     // Listar TODAS as questões (acertos e erros) para revisão inteligente
     getAllAnswersForReview: studentProcedure

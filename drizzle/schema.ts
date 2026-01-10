@@ -1868,3 +1868,231 @@ export const questionAnswers = mysqlTable("question_answers", {
 
 export type QuestionAnswer = typeof questionAnswers.$inferSelect;
 export type InsertQuestionAnswer = typeof questionAnswers.$inferInsert;
+
+/**
+ * ========================================
+ * SISTEMA DE REVISÃO INTELIGENTE
+ * ========================================
+ * Implementa algoritmo de repetição espaçada (Spaced Repetition System)
+ * para otimizar o aprendizado dos alunos através de revisões programadas
+ */
+
+/**
+ * Fila de Revisão Inteligente
+ * Armazena exercícios priorizados para cada aluno baseado em desempenho
+ */
+export const smartReviewQueue = mysqlTable("smart_review_queue", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  answerId: int("answerId").notNull(), // FK para student_exercise_answers
+  exerciseId: int("exerciseId").notNull(), // FK para student_exercises
+  subjectId: int("subjectId").notNull(), // FK para subjects
+  
+  // Algoritmo de Repetição Espaçada
+  easeFactor: float("easeFactor").default(2.5).notNull(), // Fator de facilidade (1.3 - 2.5+)
+  interval: int("interval").default(1).notNull(), // Intervalo até próxima revisão (em dias)
+  repetitions: int("repetitions").default(0).notNull(), // Número de repetições bem-sucedidas
+  
+  // Priorização
+  priority: int("priority").default(50).notNull(), // Prioridade 0-100 (maior = mais urgente)
+  difficultyScore: int("difficultyScore").default(50).notNull(), // Dificuldade percebida 0-100
+  
+  // Datas de Controle
+  lastReviewedAt: timestamp("lastReviewedAt"), // Última revisão
+  nextReviewDate: timestamp("nextReviewDate").notNull(), // Próxima revisão programada
+  addedToQueueAt: timestamp("addedToQueueAt").defaultNow().notNull(),
+  
+  // Metadados
+  reviewCount: int("reviewCount").default(0).notNull(), // Total de revisões realizadas
+  successRate: int("successRate").default(0).notNull(), // Taxa de acerto nas revisões (0-100)
+  status: mysqlEnum("status", ["pending", "reviewing", "mastered", "archived"]).default("pending").notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  // Índice único: cada resposta aparece apenas uma vez na fila por aluno
+  uniqueStudentAnswer: unique().on(table.studentId, table.answerId),
+}));
+
+export type SmartReviewQueue = typeof smartReviewQueue.$inferSelect;
+export type InsertSmartReviewQueue = typeof smartReviewQueue.$inferInsert;
+
+/**
+ * Histórico de Revisões
+ * Registra cada sessão de revisão do aluno
+ */
+export const reviewHistory = mysqlTable("review_history", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  queueItemId: int("queueItemId").notNull(), // FK para smart_review_queue
+  answerId: int("answerId").notNull(), // FK para student_exercise_answers
+  exerciseId: int("exerciseId").notNull(),
+  
+  // Resultado da Revisão
+  wasCorrect: boolean("wasCorrect").notNull(), // Acertou na revisão?
+  timeSpent: int("timeSpent").notNull(), // Tempo gasto em segundos
+  confidenceLevel: int("confidenceLevel"), // Nível de confiança do aluno (1-5)
+  
+  // Feedback do Aluno
+  selfRating: mysqlEnum("selfRating", ["again", "hard", "good", "easy"]), // Auto-avaliação (estilo Anki)
+  notes: text("notes"), // Anotações do aluno durante revisão
+  
+  // Atualização do Algoritmo
+  previousEaseFactor: float("previousEaseFactor"),
+  newEaseFactor: float("newEaseFactor"),
+  previousInterval: int("previousInterval"),
+  newInterval: int("newInterval"),
+  
+  reviewedAt: timestamp("reviewedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReviewHistory = typeof reviewHistory.$inferSelect;
+export type InsertReviewHistory = typeof reviewHistory.$inferInsert;
+
+/**
+ * Estatísticas de Revisão por Aluno
+ * Agregação de métricas de desempenho em revisões
+ */
+export const reviewStatistics = mysqlTable("review_statistics", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull().unique(),
+  subjectId: int("subjectId"), // null = estatísticas gerais
+  
+  // Métricas Gerais
+  totalReviewsCompleted: int("totalReviewsCompleted").default(0).notNull(),
+  totalTimeSpent: int("totalTimeSpent").default(0).notNull(), // Em segundos
+  averageSessionTime: int("averageSessionTime").default(0).notNull(), // Em segundos
+  
+  // Taxa de Sucesso
+  correctReviews: int("correctReviews").default(0).notNull(),
+  incorrectReviews: int("incorrectReviews").default(0).notNull(),
+  successRate: int("successRate").default(0).notNull(), // Porcentagem 0-100
+  
+  // Streak e Consistência
+  currentStreak: int("currentStreak").default(0).notNull(), // Dias consecutivos
+  longestStreak: int("longestStreak").default(0).notNull(),
+  lastReviewDate: date("lastReviewDate"),
+  
+  // Progresso
+  itemsMastered: int("itemsMastered").default(0).notNull(), // Itens dominados
+  itemsInProgress: int("itemsInProgress").default(0).notNull(),
+  itemsPending: int("itemsPending").default(0).notNull(),
+  
+  // Metas e Desempenho
+  dailyGoal: int("dailyGoal").default(10).notNull(), // Meta diária de revisões
+  weeklyGoal: int("weeklyGoal").default(50).notNull(),
+  dailyProgress: int("dailyProgress").default(0).notNull(), // Progresso do dia atual
+  weeklyProgress: int("weeklyProgress").default(0).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReviewStatistics = typeof reviewStatistics.$inferSelect;
+export type InsertReviewStatistics = typeof reviewStatistics.$inferInsert;
+
+/**
+ * Tags de Conteúdo para Organização
+ * Permite categorizar exercícios e respostas para revisão temática
+ */
+export const contentTags = mysqlTable("content_tags", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Professor que criou a tag
+  subjectId: int("subjectId").notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  color: varchar("color", { length: 7 }).default("#3b82f6"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueTag: unique().on(table.userId, table.subjectId, table.name),
+}));
+
+export type ContentTag = typeof contentTags.$inferSelect;
+export type InsertContentTag = typeof contentTags.$inferInsert;
+
+/**
+ * Relacionamento entre Exercícios e Tags
+ */
+export const exerciseTags = mysqlTable("exercise_tags", {
+  id: int("id").autoincrement().primaryKey(),
+  exerciseId: int("exerciseId").notNull(), // FK para student_exercises
+  tagId: int("tagId").notNull(), // FK para content_tags
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueExerciseTag: unique().on(table.exerciseId, table.tagId),
+}));
+
+export type ExerciseTag = typeof exerciseTags.$inferSelect;
+export type InsertExerciseTag = typeof exerciseTags.$inferInsert;
+
+/**
+ * Sessões de Estudo do Aluno
+ * Registra sessões completas de revisão para analytics
+ */
+export const studySessions = mysqlTable("study_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  subjectId: int("subjectId"),
+  
+  // Dados da Sessão
+  sessionType: mysqlEnum("sessionType", ["quick_review", "full_review", "focused_practice", "random_practice"]).notNull(),
+  totalItems: int("totalItems").default(0).notNull(),
+  itemsCompleted: int("itemsCompleted").default(0).notNull(),
+  itemsCorrect: int("itemsCorrect").default(0).notNull(),
+  
+  // Tempo
+  totalTime: int("totalTime").default(0).notNull(), // Em segundos
+  averageTimePerItem: int("averageTimePerItem").default(0).notNull(),
+  
+  // Resultado
+  sessionScore: int("sessionScore").default(0).notNull(), // Porcentagem 0-100
+  pointsEarned: int("pointsEarned").default(0).notNull(),
+  
+  // Controle
+  status: mysqlEnum("status", ["in_progress", "completed", "abandoned"]).default("in_progress").notNull(),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudySession = typeof studySessions.$inferSelect;
+export type InsertStudySession = typeof studySessions.$inferInsert;
+
+/**
+ * Notificações de Revisão
+ * Lembretes automáticos para o aluno revisar conteúdo
+ */
+export const reviewNotifications = mysqlTable("review_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  
+  // Conteúdo da Notificação
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  notificationType: mysqlEnum("notificationType", [
+    "daily_reminder",
+    "overdue_items",
+    "streak_milestone",
+    "mastery_achieved",
+    "goal_completed"
+  ]).notNull(),
+  
+  // Dados Relacionados
+  relatedSubjectId: int("relatedSubjectId"),
+  relatedExerciseId: int("relatedExerciseId"),
+  itemsCount: int("itemsCount").default(0), // Número de itens pendentes
+  
+  // Controle
+  isRead: boolean("isRead").default(false).notNull(),
+  isSent: boolean("isSent").default(false).notNull(),
+  sentAt: timestamp("sentAt"),
+  readAt: timestamp("readAt"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReviewNotification = typeof reviewNotifications.$inferSelect;
+export type InsertReviewNotification = typeof reviewNotifications.$inferInsert;

@@ -47,6 +47,8 @@ import StudentExerciseResults from "./pages/StudentExerciseResults";
 import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
 import TeacherReviewAnswers from "./pages/TeacherReviewAnswers";
 import StudentReview from "./pages/StudentReview";
+import StudentSmartReview from "./pages/StudentSmartReview";
+import StudentSmartReviewItem from "./pages/StudentSmartReviewItem";
 import StudentStats from "./pages/StudentStats";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
@@ -101,6 +103,8 @@ function Router() {
         <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
         <Route path={"/student-review"} component={StudentReview} />
+        <Route path={"/student/smart-review"} component={StudentSmartReview} />
+        <Route path={"/student/smart-review/:id"} component={StudentSmartReviewItem} />
         <Route path={"/student-stats"} component={StudentStats} />
         <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
         <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />

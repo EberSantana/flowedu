@@ -316,6 +316,13 @@
       "when": 1768079726172,
       "tag": "0044_bored_vanisher",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "5",
+      "when": 1768081785163,
+      "tag": "0045_gigantic_thunderball",
+      "breakpoints": true
     }
   ]
 }
