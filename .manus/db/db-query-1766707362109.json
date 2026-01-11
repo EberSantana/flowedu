@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `ct_badges` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `badgeKey` varchar(50) NOT NULL UNIQUE,\n  `name` varchar(100) NOT NULL,\n  `description` text,\n  `dimension` varchar(50),\n  `requiredScore` int NOT NULL,\n  `iconUrl` varchar(255),\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `ct_badges` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `badgeKey` varchar(50) NOT NULL UNIQUE,\n  `name` varchar(100) NOT NULL,\n  `description` text,\n  `dimension` varchar(50),\n  `requiredScore` int NOT NULL,\n  `iconUrl` varchar(255),\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 72
+}

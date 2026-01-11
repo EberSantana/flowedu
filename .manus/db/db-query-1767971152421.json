@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `ai_analysis_cache` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`cacheKey` varchar(255) NOT NULL,\n\t`analysisType` varchar(50) NOT NULL,\n\t`inputData` text NOT NULL,\n\t`resultData` text NOT NULL,\n\t`expiresAt` timestamp,\n\t`hitCount` int NOT NULL DEFAULT 0,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`lastAccessedAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `ai_analysis_cache_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `ai_analysis_cache_userId_analysisType_cacheKey_unique` UNIQUE(`userId`,`analysisType`,`cacheKey`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE `ai_analysis_cache` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`cacheKey` varchar(255) NOT NULL,\n\t`analysisType` varchar(50) NOT NULL,\n\t`inputData` text NOT NULL,\n\t`resultData` text NOT NULL,\n\t`expiresAt` timestamp,\n\t`hitCount` int NOT NULL DEFAULT 0,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`lastAccessedAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `ai_analysis_cache_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `ai_analysis_cache_userId_analysisType_cacheKey_unique` UNIQUE(`userId`,`analysisType`,`cacheKey`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 245
+}

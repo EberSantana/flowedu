@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/avatar-animations.css";
+@import "./styles/hd2d-animations.css";
+@import "./styles/animations.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,74 +46,106 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
+  /* Primary - Cinza azulado neutro e discreto */
+  --primary: oklch(0.45 0.03 240);
+  --primary-foreground: oklch(0.98 0 0);
+  
+  /* Success - Verde acinzentado suave */
+  --success: oklch(0.55 0.06 150);
+  --success-foreground: oklch(0.98 0 0);
+  
+  /* Warning - Amarelo acinzentado discreto */
+  --warning: oklch(0.65 0.08 80);
+  --warning-foreground: oklch(0.25 0 0);
+  
+  /* Info - Azul acinzentado suave */
+  --info: oklch(0.52 0.05 235);
+  --info-foreground: oklch(0.98 0 0);
+  
+  /* Sidebar - Tons neutros */
+  --sidebar-primary: oklch(0.42 0.03 240);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  
+  /* Charts - Paleta neutra e profissional */
+  --chart-1: oklch(0.50 0.04 240);
+  --chart-2: oklch(0.55 0.05 200);
+  --chart-3: oklch(0.58 0.04 160);
+  --chart-4: oklch(0.52 0.05 280);
+  --chart-5: oklch(0.54 0.04 320);
+  --radius: 0.5rem;
+  --background: oklch(0.98 0.002 240);
+  --foreground: oklch(0.28 0.01 240);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
+  --card-foreground: oklch(0.28 0.01 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  --popover-foreground: oklch(0.28 0.01 240);
+  --secondary: oklch(0.95 0.005 240);
+  --secondary-foreground: oklch(0.35 0.01 240);
+  --muted: oklch(0.96 0.005 240);
+  --muted-foreground: oklch(0.50 0.01 240);
+  --accent: oklch(0.94 0.008 240);
+  --accent-foreground: oklch(0.30 0.01 240);
+  --destructive: oklch(0.50 0.12 20);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.88 0.005 240);
+  --input: oklch(0.90 0.005 240);
+  --ring: oklch(0.48 0.04 240);
+  --sidebar: oklch(0.97 0.003 240);
+  --sidebar-foreground: oklch(0.32 0.01 240);
+  --sidebar-accent: oklch(0.93 0.008 240);
+  --sidebar-accent-foreground: oklch(0.28 0.01 240);
+  --sidebar-border: oklch(0.88 0.005 240);
+  --sidebar-ring: oklch(0.48 0.04 240);
 }
 
 .dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
+  /* Primary - Cinza azulado claro para dark mode */
+  --primary: oklch(0.58 0.04 240);
+  --primary-foreground: oklch(0.15 0 0);
+  
+  /* Success - Verde acinzentado */
+  --success: oklch(0.60 0.07 150);
+  --success-foreground: oklch(0.15 0 0);
+  
+  /* Warning - Amarelo acinzentado */
+  --warning: oklch(0.68 0.09 80);
+  --warning-foreground: oklch(0.15 0 0);
+  
+  /* Info - Azul acinzentado */
+  --info: oklch(0.60 0.06 235);
+  --info-foreground: oklch(0.15 0 0);
+  
+  /* Sidebar - Tons escuros neutros */
+  --sidebar-primary: oklch(0.55 0.04 240);
+  --sidebar-foreground: oklch(0.82 0.01 240);
+  --background: oklch(0.16 0.008 240);
+  --foreground: oklch(0.85 0.01 240);
+  --card: oklch(0.20 0.01 240);
+  --card-foreground: oklch(0.85 0.01 240);
+  --popover: oklch(0.20 0.01 240);
+  --popover-foreground: oklch(0.85 0.01 240);
+  --secondary: oklch(0.24 0.01 240);
+  --secondary-foreground: oklch(0.75 0.01 240);
+  --muted: oklch(0.28 0.01 240);
+  --muted-foreground: oklch(0.65 0.01 240);
+  --accent: oklch(0.28 0.012 240);
+  --accent-foreground: oklch(0.88 0.01 240);
+  --destructive: oklch(0.55 0.14 20);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: oklch(0.32 0.01 240);
+  --input: oklch(0.30 0.012 240);
+  --ring: oklch(0.52 0.05 240);
+  --chart-1: oklch(0.50 0.04 240);
+  --chart-2: oklch(0.55 0.05 200);
+  --chart-3: oklch(0.58 0.04 160);
+  --chart-4: oklch(0.52 0.05 280);
+  --chart-5: oklch(0.54 0.04 320);
+  --sidebar: oklch(0.18 0.01 240);
+  --sidebar-foreground: oklch(0.82 0.01 240);
+  --sidebar-accent: oklch(0.26 0.012 240);
+  --sidebar-accent-foreground: oklch(0.92 0.01 240);
+  --sidebar-border: oklch(0.32 0.01 240);
+  --sidebar-ring: oklch(0.52 0.05 240);
 }
 
 @layer base {
@@ -174,4 +209,343 @@
       max-width: 1280px; /* Standard content width */
     }
   }
+  
+  /* Cores semânticas - Success */
+  .bg-success {
+    background-color: var(--success);
+    color: var(--success-foreground);
+  }
+  .text-success {
+    color: var(--success);
+  }
+  .border-success {
+    border-color: var(--success);
+  }
+  
+  /* Cores semânticas - Warning */
+  .bg-warning {
+    background-color: var(--warning);
+    color: var(--warning-foreground);
+  }
+  .text-warning {
+    color: var(--warning);
+  }
+  .border-warning {
+    border-color: var(--warning);
+  }
+  
+  /* Cores semânticas - Info */
+  .bg-info {
+    background-color: var(--info);
+    color: var(--info-foreground);
+  }
+  .text-info {
+    color: var(--info);
+  }
+  .border-info {
+    border-color: var(--info);
+  }
+}
+
+/* ===== ESTILOS DE IMPRESSÃO ===== */
+@media print {
+  /* Ocultar elementos desnecessários */
+  nav, aside, header, footer, 
+  button, .sidebar, 
+  .no-print,
+  [role="dialog"] > div:first-child, /* Overlay do modal */
+  [data-radix-scroll-area-viewport] {
+    display: none !important;
+  }
+  
+  /* Mostrar apenas o conteúdo do modal */
+  [role="dialog"] {
+    position: static !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Remover limitações de altura do ScrollArea */
+  [data-radix-scroll-area-root] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Garantir que o conteúdo seja exibido completamente */
+  .space-y-6 {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Permitir quebras de página naturais */
+  .border-l-4 {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Ajustar margens para impressão */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+  
+  /* Garantir que o corpo do documento use toda a página */
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+  
+  /* Estilizar cabeçalho do plano de curso para impressão */
+  h1, h2, h3 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+  
+  /* Melhorar legibilidade do texto impresso */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  /* Garantir que bordas coloridas sejam impressas */
+  .border-blue-500,
+  .border-green-500,
+  .border-purple-500,
+  .border-orange-500,
+  .border-red-500,
+  .border-pink-500 {
+    border-left-width: 4px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Scrollbar customizada para widgets do Dashboard */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* ===== SHEPHERD TOUR CUSTOM STYLES ===== */
+.shepherd-modal-overlay-container {
+  z-index: 9998;
+}
+
+.shepherd-element {
+  z-index: 9999;
+  max-width: 500px;
+}
+
+.shepherd-content-custom {
+  padding: 0.5rem;
+}
+
+.shepherd-content-custom h2,
+.shepherd-content-custom h3 {
+  margin: 0;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+  display: none;
+}
+
+.shepherd-footer {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.shepherd-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.shepherd-button:not(.shepherd-button-secondary) {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.shepherd-button:not(.shepherd-button-secondary):hover {
+  opacity: 0.9;
+}
+
+.shepherd-button-secondary {
+  background-color: transparent;
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.shepherd-button-secondary:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* ===== ANIMAÇÕES SUTIS PARA UI/UX ===== */
+
+/* Animação fade-in com slide-up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animação fade-in com slide-down */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animação fade-in com slide-left */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animação fade-in com slide-right */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animação de escala suave */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Classes de animação */
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.5s ease-out forwards;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.5s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Delays escalonados para animações em sequência */
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+/* Transições suaves para hover */
+.smooth-hover {
+  transition: all 0.3s ease;
+}
+
+.smooth-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Efeito de pulso suave */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Transição suave para estados vazios */
+.empty-state {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Hover com elevação suave */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }

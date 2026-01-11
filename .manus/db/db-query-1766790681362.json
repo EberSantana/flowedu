@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS student_exercise_attempts (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  exerciseId INT NOT NULL,\n  studentId INT NOT NULL,\n  attemptNumber INT NOT NULL,\n  answers JSON NOT NULL,\n  score INT NOT NULL,\n  correctAnswers INT NOT NULL,\n  totalQuestions INT NOT NULL,\n  pointsEarned INT NOT NULL,\n  timeSpent INT,\n  status ENUM('in_progress', 'completed', 'abandoned') NOT NULL DEFAULT 'in_progress',\n  startedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  completedAt TIMESTAMP,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS student_exercise_attempts (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  exerciseId INT NOT NULL,\n  studentId INT NOT NULL,\n  attemptNumber INT NOT NULL,\n  answers JSON NOT NULL,\n  score INT NOT NULL,\n  correctAnswers INT NOT NULL,\n  totalQuestions INT NOT NULL,\n  pointsEarned INT NOT NULL,\n  timeSpent INT,\n  status ENUM('in_progress', 'completed', 'abandoned') NOT NULL DEFAULT 'in_progress',\n  startedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  completedAt TIMESTAMP,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 212
+}

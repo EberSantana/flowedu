@@ -1,0 +1,15 @@
+{
+  "query": "SELECT se.subjectId, se.userId as professorId, s.name as subjectName\nFROM subjectEnrollments se\nINNER JOIN subjects s ON se.subjectId = s.id\nWHERE se.studentId = (SELECT id FROM students WHERE registrationNumber = '2024001');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.subjectId, se.userId as professorId, s.name as subjectName\nFROM subjectEnrollments se\nINNER JOIN subjects s ON se.subjectId = s.id\nWHERE se.studentId = (SELECT id FROM students WHERE registrationNumber = '2024001');",
+  "rows": [
+    {
+      "subjectId": "5",
+      "professorId": "1",
+      "subjectName": "Segurança da Informação"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tprofessorId\tsubjectName\n5\t1\tSegurança da Informação\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

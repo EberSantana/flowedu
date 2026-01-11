@@ -7,6 +7,8 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import uploadMaterialRouter from "../upload-material";
+import extractPdfRouter from "../extract-pdf";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -35,6 +37,10 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  // Upload material endpoint
+  app.use("/api", uploadMaterialRouter);
+  // Extract PDF text endpoint
+  app.use("/api", extractPdfRouter);
   // tRPC API
   app.use(
     "/api/trpc",

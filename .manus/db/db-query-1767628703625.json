@@ -1,0 +1,30 @@
+{
+  "query": "SELECT * FROM student_exercises LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM student_exercises LIMIT 5;",
+  "rows": [
+    {
+      "id": "300001",
+      "moduleId": "1",
+      "subjectId": "1",
+      "teacherId": "1",
+      "title": "Exercício de Teste - Revisão",
+      "description": "Exercício para testar sistema de revisão",
+      "exerciseData": "\"{\\\"questions\\\":[{\\\"id\\\":1,\\\"text\\\":\\\"Qual é a capital do Brasil?\\\",\\\"type\\\":\\\"multiple_choice\\\",\\\"options\\\":[\\\"São Paulo\\\",\\\"Rio de Janeiro\\\",\\\"Brasília\\\",\\\"Salvador\\\"],\\\"correctAnswer\\\":\\\"Brasília\\\"}]}\"",
+      "totalQuestions": "1",
+      "totalPoints": "100",
+      "passingScore": "60",
+      "maxAttempts": "3",
+      "timeLimit": "NULL",
+      "showAnswersAfter": "1",
+      "availableFrom": "2025-12-30 23:15:54",
+      "availableTo": "NULL",
+      "status": "published",
+      "createdAt": "2025-12-30 23:15:54",
+      "updatedAt": "2025-12-30 23:15:54"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tmoduleId\tsubjectId\tteacherId\ttitle\tdescription\texerciseData\ttotalQuestions\ttotalPoints\tpassingScore\tmaxAttempts\ttimeLimit\tshowAnswersAfter\tavailableFrom\tavailableTo\tstatus\tcreatedAt\tupdatedAt\n300001\t1\t1\t1\tExercício de Teste - Revisão\tExercício para testar sistema de revisão\t\"{\\\"questions\\\":[{\\\"id\\\":1,\\\"text\\\":\\\"Qual é a capital do Brasil?\\\",\\\"type\\\":\\\"multiple_choice\\\",\\\"options\\\":[\\\"São Paulo\\\",\\\"Rio de Janeiro\\\",\\\"Brasília\\\",\\\"Salvador\\\"],\\\"correctAnswer\\\":\\\"Brasília\\\"}]}\"\t1\t100\t60\t3\tNULL\t1\t2025-12-30 23:15:54\tNULL\tpublished\t2025-12-30 23:15:54\t2025-12-30 23:15:54\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

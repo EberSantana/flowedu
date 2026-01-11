@@ -1,0 +1,90 @@
+{
+  "query": "SELECT lm.id, lm.title, lm.subjectId, lm.userId, s.id as subject_id, s.name as subjectName \nFROM learning_modules lm \nLEFT JOIN subjects s ON lm.subjectId = s.id \nWHERE lm.subjectId IN (SELECT id FROM subjects WHERE id LIKE '%120001%' OR name LIKE '%Inform%')\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT lm.id, lm.title, lm.subjectId, lm.userId, s.id as subject_id, s.name as subjectName \nFROM learning_modules lm \nLEFT JOIN subjects s ON lm.subjectId = s.id \nWHERE lm.subjectId IN (SELECT id FROM subjects WHERE id LIKE '%120001%' OR name LIKE '%Inform%')\nLIMIT 20;",
+  "rows": [
+    {
+      "id": "60016",
+      "title": "Módulo 1: Fundamentos e Princípios da Segurança da Informação",
+      "subjectId": "5",
+      "userId": "1",
+      "subject_id": "5",
+      "subjectName": "Segurança da Informação"
+    },
+    {
+      "id": "60017",
+      "title": "Módulo 2: Segurança em Aplicações e Ambientes",
+      "subjectId": "5",
+      "userId": "1",
+      "subject_id": "5",
+      "subjectName": "Segurança da Informação"
+    },
+    {
+      "id": "60018",
+      "title": "Módulo 3: Governança, Padrões e Estratégias de Segurança",
+      "subjectId": "5",
+      "userId": "1",
+      "subject_id": "5",
+      "subjectName": "Segurança da Informação"
+    },
+    {
+      "id": "60019",
+      "title": "Módulo 4: Segurança no Ciclo de Desenvolvimento de Software (SDLC)",
+      "subjectId": "5",
+      "userId": "1",
+      "subject_id": "5",
+      "subjectName": "Segurança da Informação"
+    },
+    {
+      "id": "60020",
+      "title": "Módulo 5: Auditoria em Sistemas de Informação",
+      "subjectId": "5",
+      "userId": "1",
+      "subject_id": "5",
+      "subjectName": "Segurança da Informação"
+    },
+    {
+      "id": "120001",
+      "title": "Módulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais",
+      "subjectId": "120001",
+      "userId": "1",
+      "subject_id": "120001",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "120002",
+      "title": "Módulo 2: Editor de Texto - Fundamentos e Formatação",
+      "subjectId": "120001",
+      "userId": "1",
+      "subject_id": "120001",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "120003",
+      "title": "Módulo 3: Editor de Texto - Estrutura e Layout Avançado",
+      "subjectId": "120001",
+      "userId": "1",
+      "subject_id": "120001",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "120004",
+      "title": "Módulo 4: Editor de Planilhas - Cálculo e Análise de Dados",
+      "subjectId": "120001",
+      "userId": "1",
+      "subject_id": "120001",
+      "subjectName": "Informática Básica"
+    },
+    {
+      "id": "120005",
+      "title": "Módulo 5: Editor de Apresentação de Slides",
+      "subjectId": "120001",
+      "userId": "1",
+      "subject_id": "120001",
+      "subjectName": "Informática Básica"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tsubjectId\tuserId\tsubject_id\tsubjectName\n60016\tMódulo 1: Fundamentos e Princípios da Segurança da Informação\t5\t1\t5\tSegurança da Informação\n60017\tMódulo 2: Segurança em Aplicações e Ambientes\t5\t1\t5\tSegurança da Informação\n60018\tMódulo 3: Governança, Padrões e Estratégias de Segurança\t5\t1\t5\tSegurança da Informação\n60019\tMódulo 4: Segurança no Ciclo de Desenvolvimento de Software (SDLC)\t5\t1\t5\tSegurança da Informação\n60020\tMódulo 5: Auditoria em Sistemas de Informação\t5\t1\t5\tSegurança da Informação\n120001\tMódulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais\t120001\t1\t120001\tInformática Básica\n120002\tMódulo 2: Editor de Texto - Fundamentos e Formatação\t120001\t1\t120001\tInformática Básica\n120003\tMódulo 3: Editor de Texto - Estrutura e Layout Avançado\t120001\t1\t120001\tInformática Básica\n120004\tMódulo 4: Editor de Planilhas - Cálculo e Análise de Dados\t120001\t1\t120001\tInformática Básica\n120005\tMódulo 5: Editor de Apresentação de Slides\t120001\t1\t120001\tInformática Básica\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total_ativos FROM users WHERE active = 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total_ativos FROM users WHERE active = 1",
+  "rows": [
+    {
+      "total_ativos": "24"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_ativos\n24\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

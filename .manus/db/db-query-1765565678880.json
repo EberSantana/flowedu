@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS topic_materials (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  topicId INT NOT NULL,\n  professorId INT NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  description TEXT,\n  type ENUM('pdf', 'video', 'link', 'document', 'presentation', 'other') NOT NULL,\n  url TEXT NOT NULL,\n  fileSize INT,\n  isRequired BOOLEAN DEFAULT FALSE,\n  orderIndex INT DEFAULT 0,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS topic_materials (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  topicId INT NOT NULL,\n  professorId INT NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  description TEXT,\n  type ENUM('pdf', 'video', 'link', 'document', 'presentation', 'other') NOT NULL,\n  url TEXT NOT NULL,\n  fileSize INT,\n  isRequired BOOLEAN DEFAULT FALSE,\n  orderIndex INT DEFAULT 0,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 200
+}

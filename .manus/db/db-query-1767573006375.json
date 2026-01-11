@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `coin_transactions` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`studentId` int NOT NULL,\n\t`amount` int NOT NULL,\n\t`transactionType` enum('earn','spend','bonus','penalty') NOT NULL,\n\t`source` varchar(100),\n\t`description` text,\n\t`metadata` json,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `coin_transactions_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `coin_transactions` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`studentId` int NOT NULL,\n\t`amount` int NOT NULL,\n\t`transactionType` enum('earn','spend','bonus','penalty') NOT NULL,\n\t`source` varchar(100),\n\t`description` text,\n\t`metadata` json,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `coin_transactions_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 292
+}

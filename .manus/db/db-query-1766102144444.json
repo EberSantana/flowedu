@@ -1,0 +1,45 @@
+{
+  "query": "SELECT DISTINCT s.registrationNumber, s.fullName, se.subjectId, sub.name as subjectName, se.userId\nFROM students s\nINNER JOIN subjectEnrollments se ON se.studentId = s.id\nINNER JOIN subjects sub ON sub.id = se.subjectId\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT DISTINCT s.registrationNumber, s.fullName, se.subjectId, sub.name as subjectName, se.userId\nFROM students s\nINNER JOIN subjectEnrollments se ON se.studentId = s.id\nINNER JOIN subjects sub ON sub.id = se.subjectId\nLIMIT 5;",
+  "rows": [
+    {
+      "registrationNumber": "2023308369",
+      "fullName": "LARISSA SANTOS DA COSTA",
+      "subjectId": "120001",
+      "subjectName": "Informática Básica",
+      "userId": "1"
+    },
+    {
+      "registrationNumber": "2023327800",
+      "fullName": "ANGELA SABRINA COSTA DA SILVA",
+      "subjectId": "120001",
+      "subjectName": "Informática Básica",
+      "userId": "1"
+    },
+    {
+      "registrationNumber": "2023318472",
+      "fullName": "PAULO JOSE MORAES DE SENA",
+      "subjectId": "120001",
+      "subjectName": "Informática Básica",
+      "userId": "1"
+    },
+    {
+      "registrationNumber": "2023317958",
+      "fullName": "DOUGLAS DANIEL APARICIO",
+      "subjectId": "120001",
+      "subjectName": "Informática Básica",
+      "userId": "1"
+    },
+    {
+      "registrationNumber": "2023305957",
+      "fullName": "MATEUS SAMIRO DOS SANTOS",
+      "subjectId": "120001",
+      "subjectName": "Informática Básica",
+      "userId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "registrationNumber\tfullName\tsubjectId\tsubjectName\tuserId\n2023308369\tLARISSA SANTOS DA COSTA\t120001\tInformática Básica\t1\n2023327800\tANGELA SABRINA COSTA DA SILVA\t120001\tInformática Básica\t1\n2023318472\tPAULO JOSE MORAES DE SENA\t120001\tInformática Básica\t1\n2023317958\tDOUGLAS DANIEL APARICIO\t120001\tInformática Básica\t1\n2023305957\tMATEUS SAMIRO DOS SANTOS\t120001\tInformática Básica\t1\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

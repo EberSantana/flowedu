@@ -1,0 +1,11 @@
+{
+  "query": "SELECT \n  se.id,\n  se.title,\n  se.subjectId,\n  se.status,\n  se.availableFrom,\n  se.availableTo,\n  NOW() as current_time\nFROM student_exercises se\nWHERE se.status = 'published'\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT \n  se.id,\n  se.title,\n  se.subjectId,\n  se.status,\n  se.availableFrom,\n  se.availableTo,\n  NOW() as current_time\nFROM student_exercises se\nWHERE se.status = 'published'\nLIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 8 column 24 near \"current_time",
+    "FROM student_exercises se",
+    "WHERE se.status = 'published'",
+    "LIMIT 10\""
+  ]
+}

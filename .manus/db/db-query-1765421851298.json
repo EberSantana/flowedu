@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, name, email, openId, loginMethod, role, createdAt FROM users WHERE (name IS NULL OR name = '' OR name = 'Sem nome') AND active = 1 ORDER BY createdAt DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, email, openId, loginMethod, role, createdAt FROM users WHERE (name IS NULL OR name = '' OR name = 'Sem nome') AND active = 1 ORDER BY createdAt DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "150811",
+      "name": "NULL",
+      "email": "NULL",
+      "openId": "7sChm8RBMMiktScwVezDbQ",
+      "loginMethod": "NULL",
+      "role": "admin",
+      "createdAt": "2025-12-11 02:57:22"
+    },
+    {
+      "id": "150810",
+      "name": "NULL",
+      "email": "NULL",
+      "openId": "7sChm8RBMMiktScwVezDbQ",
+      "loginMethod": "NULL",
+      "role": "admin",
+      "createdAt": "2025-12-11 02:57:08"
+    },
+    {
+      "id": "150809",
+      "name": "NULL",
+      "email": "NULL",
+      "openId": "7sChm8RBMMiktScwVezDbQ",
+      "loginMethod": "NULL",
+      "role": "admin",
+      "createdAt": "2025-12-11 02:57:08"
+    },
+    {
+      "id": "150808",
+      "name": "NULL",
+      "email": "NULL",
+      "openId": "7sChm8RBMMiktScwVezDbQ",
+      "loginMethod": "NULL",
+      "role": "admin",
+      "createdAt": "2025-12-11 02:57:00"
+    },
+    {
+      "id": "150807",
+      "name": "NULL",
+      "email": "NULL",
+      "openId": "7sChm8RBMMiktScwVezDbQ",
+      "loginMethod": "NULL",
+      "role": "admin",
+      "createdAt": "2025-12-11 02:56:21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\topenId\tloginMethod\trole\tcreatedAt\n150811\tNULL\tNULL\t7sChm8RBMMiktScwVezDbQ\tNULL\tadmin\t2025-12-11 02:57:22\n150810\tNULL\tNULL\t7sChm8RBMMiktScwVezDbQ\tNULL\tadmin\t2025-12-11 02:57:08\n150809\tNULL\tNULL\t7sChm8RBMMiktScwVezDbQ\tNULL\tadmin\t2025-12-11 02:57:08\n150808\tNULL\tNULL\t7sChm8RBMMiktScwVezDbQ\tNULL\tadmin\t2025-12-11 02:57:00\n150807\tNULL\tNULL\t7sChm8RBMMiktScwVezDbQ\tNULL\tadmin\t2025-12-11 02:56:21\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}
