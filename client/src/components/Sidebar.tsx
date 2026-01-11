@@ -159,9 +159,9 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
   
-  // Detectar tipo de usuário baseado na rota atual
-  // Se está em rotas de aluno (/student-dashboard, /student/*), é aluno
-  const isStudent = location.startsWith('/student');
+  // Detectar tipo de usuário baseado na sessão real (não apenas na URL)
+  const { data: studentSession } = trpc.auth.studentSession.useQuery();
+  const isStudent = !!studentSession;
   
   // Query para eventos próximos (badge de notificação) - apenas para professores
   const { data: upcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery(undefined, {

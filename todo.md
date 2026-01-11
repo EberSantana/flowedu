@@ -31,6 +31,7 @@
 - [x] Centralizar layout da página SubjectCTStats.tsx (aplicar container mx-auto com max-width)
 - [x] Corrigir erro: procedimento tRPC teacherExercises.getStatistics não encontrado
 - [x] Adicionar filtro por disciplina na página de Análise de Aprendizado com IA
+- [x] CRÍTICO: Caderno de exercícios não está visível no portal do aluno - CORRIGIDO: modificada detecção de tipo de usuário no Sidebar para usar sessão real (tRPC) ao invés de URL
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 
