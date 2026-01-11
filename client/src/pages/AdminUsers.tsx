@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,7 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft, Trash2, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { Users, Shield, Mail, Calendar, AlertCircle, ArrowLeft, Trash2, RefreshCw, Eye, EyeOff, Search, X } from "lucide-react";
+import { AdvancedPagination, usePagination } from "@/components/ui/advanced-pagination";
+import { SearchFilter } from "@/components/ui/advanced-filters";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
 import { getLoginUrl } from "@/const";
@@ -42,14 +45,16 @@ export default function AdminUsers() {
   const { data: activeUsers, isLoading: activeLoading, refetch: refetchActive } = trpc.admin.listActiveUsers.useQuery();
   const { data: inactiveUsers, isLoading: inactiveLoading, refetch: refetchInactive } = trpc.admin.listInactiveUsers.useQuery();
   
-  let allUsers = showInactive ? inactiveUsers : activeUsers;
+  const baseUsers = showInactive ? inactiveUsers : activeUsers;
   const usersLoading = showInactive ? inactiveLoading : activeLoading;
   
   // Aplicar filtros
-  if (allUsers) {
+  const filteredUsers = useMemo(() => {
+    let result = baseUsers || [];
+    
     // Filtro de busca
     if (searchTerm) {
-      allUsers = allUsers.filter((u) => 
+      result = result.filter((u) => 
         u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email?.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -57,9 +62,22 @@ export default function AdminUsers() {
     
     // Filtro de papel
     if (roleFilter !== "all") {
-      allUsers = allUsers.filter((u) => u.role === roleFilter);
+      result = result.filter((u) => u.role === roleFilter);
     }
-  }
+    
+    return result;
+  }, [baseUsers, searchTerm, roleFilter]);
+  
+  // Paginação
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    paginatedItems: allUsers,
+    onPageChange,
+    onItemsPerPageChange,
+  } = usePagination(filteredUsers, 10);
   
   const refetch = () => {
     refetchActive();
@@ -516,6 +534,19 @@ export default function AdminUsers() {
                 ))}
               </TableBody>
             </Table>
+            
+            {/* Paginação */}
+            <AdvancedPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={onPageChange}
+              onItemsPerPageChange={onItemsPerPageChange}
+              showItemsPerPage={true}
+              showTotalItems={true}
+              itemsPerPageOptions={[5, 10, 20, 50]}
+            />
           </CardContent>
         </Card>
         </div>

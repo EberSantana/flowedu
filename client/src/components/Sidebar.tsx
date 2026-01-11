@@ -495,6 +495,11 @@ export default function Sidebar() {
                     <span className="text-sm">Refazer Tour</span>
                   </button>
                   
+                  <div className="flex items-center gap-3 px-4 py-2">
+                    <ThemeToggle />
+                    <span className="text-sm text-muted-foreground">Tema</span>
+                  </div>
+                  
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200"

@@ -5068,3 +5068,31 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar visualização de feedback e sugestões de estudo
 - [x] Adicionar sistema de marcação de questões favoritas
 - [x] Adicionar testes vitest para funcionalidades do caderno
+
+
+## Melhorias de UX - Implementação Atual
+
+### Dark Mode
+- [x] Implementar toggle de dark mode no header
+- [x] Criar sistema de temas (claro, escuro, automático)
+- [x] Persistir preferência de tema no localStorage
+- [x] Ajustar todas as cores para funcionar em ambos os modos
+- [x] Adicionar transições suaves en### Skeleton Loaders
+- [x] Criar componente Skeleton base reutilizável
+- [x] Implementar skeleton para cards de disciplinas
+- [x] Implementar skeleton para lista de turmas
+- [x] Implementar skeleton para grade de horários
+- [x] Implementar skeleton para dashbo### Paginação e Filtros Avançados
+- [x] Criar componente de paginação reutilizável
+- [x] Implementar paginação na lista de disciplinas
+- [x] Implementar paginação na lista de turmas
+- [x] Implementar paginação na lista de usuários[ ] Criar componente de filtros avançados
+- [ ] Implementar filtros na grade de horários
+- [ ] Implementar ordenação por colunas
+
+### Testes de Agendamento
+- [x] Criar testes para rotas de agendamento de aulas
+- [x] Criar testes para validação de conflitos de horários
+- [x] Criar testes para edição de aulas agendadas
+- [x] Criar testes para exclusão de aulas agendadas
+- [x] Testar cenários de sobreposição de horários

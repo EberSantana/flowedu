@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { SubjectsListSkeleton } from "@/components/ui/skeleton-loaders";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Brain } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Brain, Search, X } from "lucide-react";
+import { AdvancedPagination, usePagination } from "@/components/ui/advanced-pagination";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
 import { Link } from "wouter";
@@ -46,6 +47,7 @@ export default function Subjects() {
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>([]);
   const [isBulkEnrollOpen, setIsBulkEnrollOpen] = useState(false);
   const [bulkEnrollData, setBulkEnrollData] = useState({ registrationNumber: "", fullName: "" });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const exportToPDF = () => {
     if (!viewingCoursePlan) return;
@@ -128,10 +130,34 @@ export default function Subjects() {
     toast.success("PDF exportado com sucesso!");
   };
 
-  const { data: subjects, isLoading } = trpc.subjects.list.useQuery();
+  const { data: subjectsData, isLoading } = trpc.subjects.list.useQuery();
   const { data: enrollmentCounts = {} } = trpc.subjects.getEnrollmentCounts.useQuery();
   // Query e estado removidos - botão agora redireciona diretamente para página de detalhes
   const utils = trpc.useUtils();
+  
+  // Filtrar disciplinas
+  const filteredSubjects = useMemo(() => {
+    if (!subjectsData) return [];
+    if (!searchTerm) return subjectsData;
+    
+    const term = searchTerm.toLowerCase();
+    return subjectsData.filter((s) => 
+      s.name.toLowerCase().includes(term) ||
+      s.code.toLowerCase().includes(term) ||
+      s.description?.toLowerCase().includes(term)
+    );
+  }, [subjectsData, searchTerm]);
+  
+  // Paginação
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    paginatedItems: subjects,
+    onPageChange,
+    onItemsPerPageChange,
+  } = usePagination(filteredSubjects, 9);
 
   const createMutation = trpc.subjects.create.useMutation({
     onSuccess: () => {
@@ -343,12 +369,38 @@ export default function Subjects() {
               )}
             </div>
           </div>
+          
+          {/* Campo de Busca */}
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Buscar disciplinas por nome, código ou descrição..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-9"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            {searchTerm && (
+              <p className="text-sm text-muted-foreground mt-2">
+                {totalItems} resultado{totalItems !== 1 ? 's' : ''} encontrado{totalItems !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-            <SkeletonCard count={6} />
-          </div>
+          <SubjectsListSkeleton count={6} />
         ) : subjects && subjects.length > 0 ? (
+          <>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {subjects.map((subject) => (
               <Card key={subject.id} className="bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full">
@@ -553,6 +605,28 @@ export default function Subjects() {
               </Card>
             ))}
           </div>
+          
+          {/* Paginação */}
+          <AdvancedPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={onPageChange}
+            onItemsPerPageChange={onItemsPerPageChange}
+            showItemsPerPage={true}
+            showTotalItems={true}
+            itemsPerPageOptions={[6, 9, 12, 24]}
+          />
+        </>
+        ) : searchTerm ? (
+          <EmptyState
+            icon={Search}
+            title="Nenhum resultado encontrado"
+            description={`Não encontramos disciplinas com "${searchTerm}". Tente outro termo de busca.`}
+            actionLabel="Limpar Busca"
+            onAction={() => setSearchTerm("")}
+          />
         ) : (
           <EmptyState
             icon={BookOpen}
