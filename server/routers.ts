@@ -80,8 +80,7 @@ export const appRouter = router({
   // ============================================================
   teachers: router({
     getCurrent: protectedProcedure.query(async ({ ctx }) => {
-      const teacher = await db.getTeacherByUserId(ctx.user.id);
-      return teacher ?? null;
+      return await db.getTeacherByUserId(ctx.user.id);
     }),
 
     getById: protectedProcedure

@@ -42,8 +42,7 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider
         defaultTheme="light"
-        defaultColorTheme="blue"
-        switchable
+        // switchable
       >
         <TooltipProvider>
           <Toaster />

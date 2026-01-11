@@ -21,8 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Calendar, BookOpen, GraduationCap, ListTodo, Award, User, Palette, Sun, Moon } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { LayoutDashboard, LogOut, PanelLeft, Calendar, BookOpen, GraduationCap, ListTodo, Award, User } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -226,8 +225,7 @@ function DashboardLayoutContent({
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <ThemeSelector />
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"
@@ -266,49 +264,6 @@ function DashboardLayoutContent({
         )}
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
-     </>
-  );
-}
-
-function ThemeSelector() {
-  const { theme, colorTheme, setColorTheme, toggleTheme } = useTheme();
-
-  const colorThemes = [
-    { value: "blue", label: "Azul", color: "rgb(37, 99, 235)" },
-    { value: "emerald", label: "Esmeralda", color: "rgb(16, 185, 129)" },
-    { value: "violet", label: "Violeta", color: "rgb(139, 92, 246)" },
-    { value: "rose", label: "Rosa", color: "rgb(244, 63, 94)" },
-    { value: "orange", label: "Laranja", color: "rgb(249, 115, 22)" },
-  ];
-
-  return (
-    <>
-      <div className="px-2 py-1.5">
-        <p className="text-xs font-medium text-muted-foreground px-2 mb-2">Aparência</p>
-        <div className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-accent/50 cursor-pointer" onClick={toggleTheme}>
-          <div className="flex items-center gap-2">
-            {theme === "light" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            <span className="text-sm">Tema {theme === "light" ? "Claro" : "Escuro"}</span>
-          </div>
-        </div>
-      </div>
-      <div className="px-2 py-1.5">
-        <p className="text-xs font-medium text-muted-foreground px-2 mb-2">Cor do Tema</p>
-        <div className="grid grid-cols-5 gap-2 px-2">
-          {colorThemes.map((ct) => (
-            <button
-              key={ct.value}
-              onClick={() => setColorTheme(ct.value as any)}
-              className={`h-8 w-8 rounded-md border-2 transition-all hover:scale-110 ${
-                colorTheme === ct.value ? "border-foreground ring-2 ring-ring ring-offset-2" : "border-transparent"
-              }`}
-              style={{ backgroundColor: ct.color }}
-              title={ct.label}
-            />
-          ))}
-        </div>
-      </div>
-      <div className="h-px bg-border my-1" />
     </>
   );
 }
