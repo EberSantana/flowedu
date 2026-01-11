@@ -5051,3 +5051,19 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🗑️ Remoção de Revisão Inteligente
 
 - [x] Remover funcionalidade de Revisão Inteligente do sistema
+
+## Melhorias de UX - Distribuição Semanal
+- [x] Redesenhar seção de Distribuição Semanal com UX mais profissional e clean
+
+## 📚 Caderno de Exercícios para Alunos
+
+- [x] Estender schema do banco de dados com histórico de questões e feedback
+- [x] Criar helpers de banco de dados para histórico de questões
+- [x] Implementar procedures tRPC para listar questões respondidas
+- [x] Implementar procedure tRPC para gerar feedback de IA personalizado
+- [x] Implementar procedure tRPC para marcar questões para revisão
+- [x] Criar página de caderno de exercícios no frontend
+- [x] Implementar filtros (certas/erradas/para revisar)
+- [x] Implementar visualização de feedback e sugestões de estudo
+- [x] Adicionar sistema de marcação de questões favoritas
+- [x] Adicionar testes vitest para funcionalidades do caderno

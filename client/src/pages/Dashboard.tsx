@@ -1062,13 +1062,47 @@ export default function Dashboard() {
 
           {/* Gráfico de Distribuição Semanal */}
           {widgetVisibility.weeklyChart && scheduledClasses && scheduledClasses.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Distribuição Semanal</CardTitle>
-                <CardDescription>Quantidade de aulas em cada dia da semana</CardDescription>
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-blue-50">
+                      <BarChart3 className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-gray-900">Distribuição Semanal</CardTitle>
+                      <CardDescription className="text-sm text-gray-500 mt-0.5">Carga horária por dia da semana</CardDescription>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-blue-600">{totalScheduledClasses}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">aulas/semana</div>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="h-64">
+              <CardContent className="pt-2">
+                {/* Barra de estatísticas resumidas */}
+                <div className="grid grid-cols-5 gap-2 mb-6">
+                  {DAYS_OF_WEEK.map((day, index) => {
+                    const count = scheduledClasses?.filter(c => c.dayOfWeek === index).length || 0;
+                    const percentage = totalScheduledClasses > 0 ? (count / totalScheduledClasses) * 100 : 0;
+                    return (
+                      <div key={day} className="text-center">
+                        <div className="text-xs font-medium text-gray-500 mb-1">{day.substring(0, 3)}</div>
+                        <div className="text-lg font-bold text-gray-900">{count}</div>
+                        <div className="h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Gráfico de linha */}
+                <div className="h-48 mt-4">
                   <Line
                     data={weeklyDistribution}
                     options={{
@@ -1078,12 +1112,44 @@ export default function Dashboard() {
                         legend: {
                           display: false,
                         },
+                        tooltip: {
+                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          padding: 12,
+                          titleFont: {
+                            size: 14,
+                            weight: 'bold',
+                          },
+                          bodyFont: {
+                            size: 13,
+                          },
+                          cornerRadius: 8,
+                          displayColors: false,
+                        },
                       },
                       scales: {
+                        x: {
+                          grid: {
+                            display: false,
+                          },
+                          ticks: {
+                            font: {
+                              size: 11,
+                              weight: 500,
+                            },
+                            color: '#6B7280',
+                          },
+                        },
                         y: {
                           beginAtZero: true,
                           ticks: {
                             stepSize: 1,
+                            font: {
+                              size: 11,
+                            },
+                            color: '#6B7280',
+                          },
+                          grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
                           },
                         },
                       },

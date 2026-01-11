@@ -5,8 +5,9 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks } from "../drizzle/schema";
+import { tasks, studentExerciseAnswers } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
+import { getDb } from "./db";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
 import { sdk } from "./_core/sdk";
@@ -6795,6 +6796,181 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
       }))
       .mutation(async ({ ctx, input }) => {
         return db.respondDoubt(input.doubtId, input.answer, ctx.user.id);
+      }),
+  }),
+
+  // ==================== CADERNO DE EXERCÍCIOS ====================
+  notebook: router({
+    // Listar todas as questões respondidas (com filtros)
+    getQuestions: studentProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        isCorrect: z.boolean().optional(),
+        markedForReview: z.boolean().optional(),
+        masteryStatus: z.enum(['not_started', 'studying', 'practicing', 'mastered']).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const questions = await db.getStudentAnsweredQuestions(studentId, input);
+        return questions;
+      }),
+
+    // Obter estatísticas do caderno
+    getStats: studentProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const stats = await db.getStudentNotebookStats(studentId, input.subjectId);
+        return stats;
+      }),
+
+    // Marcar/desmarcar questão para revisão
+    toggleReview: studentProcedure
+      .input(z.object({
+        answerId: z.number(),
+        markedForReview: z.boolean(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.toggleQuestionForReview(input.answerId, input.markedForReview);
+        return result;
+      }),
+
+    // Atualizar status de domínio
+    updateMastery: studentProcedure
+      .input(z.object({
+        answerId: z.number(),
+        masteryStatus: z.enum(['not_started', 'studying', 'practicing', 'mastered']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.updateQuestionMasteryStatus(input.answerId, input.masteryStatus);
+        return result;
+      }),
+
+    // Incrementar contador de revisões
+    incrementReview: studentProcedure
+      .input(z.object({
+        answerId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.incrementQuestionReviewCount(input.answerId);
+        return result;
+      }),
+
+    // Gerar feedback e sugestões de estudo com IA
+    generateStudyMaterial: studentProcedure
+      .input(z.object({
+        answerId: z.number(),
+        questionText: z.string(),
+        studentAnswer: z.string(),
+        correctAnswer: z.string(),
+        questionType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Gerar materiais de estudo com IA
+        const prompt = `Você é um tutor educacional especializado. Analise esta questão respondida incorretamente pelo aluno e forneça materiais de estudo personalizados.
+
+Questão: ${input.questionText}
+Resposta do aluno: ${input.studentAnswer}
+Resposta correta: ${input.correctAnswer}
+Tipo: ${input.questionType}
+
+Forneça:
+1. Explicação detalhada do conceito
+2. Estratégia de como estudar este tópico
+3. Conceitos relacionados (lista)
+4. Recursos adicionais (links, vídeos, artigos)
+5. Exemplos práticos para praticar
+6. Erros comuns neste tipo de questão
+7. Tempo estimado para dominar (em minutos)
+8. Nível de dificuldade (1-5)`;
+
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: 'system', content: 'Você é um tutor educacional que cria materiais de estudo personalizados.' },
+              { role: 'user', content: prompt },
+            ],
+            response_format: {
+              type: 'json_schema',
+              json_schema: {
+                name: 'study_material',
+                strict: true,
+                schema: {
+                  type: 'object',
+                  properties: {
+                    detailedExplanation: { type: 'string' },
+                    studyStrategy: { type: 'string' },
+                    relatedConcepts: { 
+                      type: 'array',
+                      items: { type: 'string' }
+                    },
+                    additionalResources: { 
+                      type: 'array',
+                      items: { 
+                        type: 'object',
+                        properties: {
+                          title: { type: 'string' },
+                          url: { type: 'string' },
+                          type: { type: 'string' }
+                        },
+                        required: ['title', 'url', 'type'],
+                        additionalProperties: false
+                      }
+                    },
+                    practiceExamples: { 
+                      type: 'array',
+                      items: { type: 'string' }
+                    },
+                    commonMistakes: { type: 'string' },
+                    timeToMaster: { type: 'integer' },
+                    difficultyLevel: { type: 'integer' },
+                  },
+                  required: ['detailedExplanation', 'studyStrategy', 'relatedConcepts', 'additionalResources', 'practiceExamples', 'commonMistakes', 'timeToMaster', 'difficultyLevel'],
+                  additionalProperties: false,
+                },
+              },
+            },
+          });
+
+          const content = response.choices[0]?.message?.content;
+          if (!content || typeof content !== 'string') {
+            throw new Error('Resposta vazia da IA');
+          }
+
+          const material = JSON.parse(content);
+          
+          // Salvar no banco de dados
+          const db_instance = await getDb();
+          if (!db_instance) throw new Error("Database not available");
+          
+          await db_instance
+            .update(studentExerciseAnswers)
+            .set({
+              detailedExplanation: material.detailedExplanation,
+              studyStrategy: material.studyStrategy,
+              relatedConcepts: JSON.stringify(material.relatedConcepts),
+              additionalResources: JSON.stringify(material.additionalResources),
+              practiceExamples: JSON.stringify(material.practiceExamples),
+              commonMistakes: material.commonMistakes,
+              timeToMaster: material.timeToMaster,
+              difficultyLevel: material.difficultyLevel,
+            })
+            .where(eq(studentExerciseAnswers.id, input.answerId));
+          
+          return { success: true, material };
+        } catch (error) {
+          console.error('[Notebook] Error generating study material:', error);
+          throw new TRPCError({ 
+            code: 'INTERNAL_SERVER_ERROR', 
+            message: 'Erro ao gerar materiais de estudo' 
+          });
+        }
       }),
   }),
 });

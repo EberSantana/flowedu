@@ -136,6 +136,11 @@ const studentNavItems: NavItem[] = [
     href: "/student-dashboard",
   },
   {
+    label: "Caderno de Exercícios",
+    icon: <CheckCircle2 className="h-5 w-5" />,
+    href: "/student/notebook",
+  },
+  {
     label: "Avisos",
     icon: <Megaphone className="h-5 w-5" />,
     href: "/student/announcements",

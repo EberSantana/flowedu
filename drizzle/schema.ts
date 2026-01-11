@@ -1231,6 +1231,7 @@ export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
   masteryStatus: mysqlEnum("masteryStatus", ["not_started", "studying", "practicing", "mastered"]).default("not_started"), // Status de domínio do conceito
   lastReviewedAt: timestamp("lastReviewedAt"), // Última vez que o aluno revisou esta questão
   reviewCount: int("reviewCount").default(0).notNull(), // Quantas vezes o aluno revisou
+  markedForReview: boolean("markedForReview").default(false).notNull(), // Marcada pelo aluno para revisar depois
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

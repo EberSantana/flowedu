@@ -9856,3 +9856,249 @@ export async function getReviewItemDetails(queueItemId: number, studentId: numbe
 
   return queueItem;
 }
+
+// ==================== CADERNO DE EXERCÍCIOS ====================
+
+/**
+ * Obter todas as questões respondidas por um aluno (para caderno de exercícios)
+ */
+export async function getStudentAnsweredQuestions(
+  studentId: number,
+  filters?: {
+    subjectId?: number;
+    isCorrect?: boolean;
+    markedForReview?: boolean;
+    masteryStatus?: 'not_started' | 'studying' | 'practicing' | 'mastered';
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar todas as tentativas do aluno
+  let attemptsQuery = db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(eq(studentExerciseAttempts.studentId, studentId));
+  
+  const attempts = await attemptsQuery;
+  
+  if (attempts.length === 0) return [];
+  
+  const attemptIds = attempts.map(a => a.id);
+  
+  // Buscar todas as respostas dessas tentativas
+  let answersQuery = db
+    .select({
+      answer: studentExerciseAnswers,
+      exercise: studentExercises,
+      attempt: studentExerciseAttempts,
+    })
+    .from(studentExerciseAnswers)
+    .leftJoin(
+      studentExerciseAttempts,
+      eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+    )
+    .leftJoin(
+      studentExercises,
+      eq(studentExerciseAttempts.exerciseId, studentExercises.id)
+    )
+    .where(inArray(studentExerciseAnswers.attemptId, attemptIds));
+  
+  // Aplicar filtros
+  const conditions = [];
+  if (filters?.isCorrect !== undefined) {
+    conditions.push(eq(studentExerciseAnswers.isCorrect, filters.isCorrect));
+  }
+  if (filters?.markedForReview !== undefined) {
+    conditions.push(eq(studentExerciseAnswers.markedForReview, filters.markedForReview));
+  }
+  if (filters?.masteryStatus) {
+    conditions.push(eq(studentExerciseAnswers.masteryStatus, filters.masteryStatus));
+  }
+  
+  // Aplicar filtros adicionais se houver
+  // (os filtros já foram aplicados na query principal)
+  
+  const results = await answersQuery.orderBy(desc(studentExerciseAnswers.createdAt));
+  
+  // Filtrar por disciplina se necessário
+  let filteredResults = results;
+  if (filters?.subjectId) {
+    filteredResults = results.filter(r => r.exercise?.subjectId === filters.subjectId);
+  }
+  
+  // Enriquecer com dados da questão original
+  return filteredResults.map(result => {
+    const exerciseData = result.exercise?.exerciseData as any || { exercises: [] };
+    const originalQuestion = exerciseData.exercises?.[result.answer.questionNumber - 1] || {};
+    
+    return {
+      answerId: result.answer.id,
+      attemptId: result.answer.attemptId,
+      exerciseId: result.exercise?.id,
+      exerciseTitle: result.exercise?.title,
+      subjectId: result.exercise?.subjectId,
+      questionNumber: result.answer.questionNumber,
+      questionText: originalQuestion.text || originalQuestion.question || '',
+      questionType: result.answer.questionType,
+      options: originalQuestion.options || [],
+      studentAnswer: result.answer.studentAnswer,
+      correctAnswer: result.answer.correctAnswer,
+      isCorrect: result.answer.isCorrect,
+      pointsAwarded: result.answer.pointsAwarded,
+      
+      // Feedback e materiais de estudo
+      aiFeedback: result.answer.aiFeedback,
+      studyTips: result.answer.studyTips,
+      detailedExplanation: result.answer.detailedExplanation,
+      studyStrategy: result.answer.studyStrategy,
+      relatedConcepts: result.answer.relatedConcepts,
+      additionalResources: result.answer.additionalResources,
+      practiceExamples: result.answer.practiceExamples,
+      commonMistakes: result.answer.commonMistakes,
+      
+      // Status e progresso
+      masteryStatus: result.answer.masteryStatus,
+      difficultyLevel: result.answer.difficultyLevel,
+      timeToMaster: result.answer.timeToMaster,
+      reviewCount: result.answer.reviewCount,
+      lastReviewedAt: result.answer.lastReviewedAt,
+      markedForReview: result.answer.markedForReview,
+      
+      // Metadados
+      createdAt: result.answer.createdAt,
+      attemptDate: result.attempt?.completedAt || result.attempt?.startedAt,
+    };
+  });
+}
+
+/**
+ * Marcar/desmarcar questão para revisão
+ */
+export async function toggleQuestionForReview(answerId: number, markedForReview: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(studentExerciseAnswers)
+    .set({ markedForReview })
+    .where(eq(studentExerciseAnswers.id, answerId));
+  
+  return { success: true };
+}
+
+/**
+ * Atualizar status de domínio de uma questão
+ */
+export async function updateQuestionMasteryStatus(
+  answerId: number,
+  masteryStatus: 'not_started' | 'studying' | 'practicing' | 'mastered'
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(studentExerciseAnswers)
+    .set({ 
+      masteryStatus,
+      lastReviewedAt: new Date(),
+    })
+    .where(eq(studentExerciseAnswers.id, answerId));
+  
+  return { success: true };
+}
+
+/**
+ * Incrementar contador de revisões de uma questão
+ */
+export async function incrementQuestionReviewCount(answerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const answer = await db
+    .select()
+    .from(studentExerciseAnswers)
+    .where(eq(studentExerciseAnswers.id, answerId))
+    .limit(1);
+  
+  if (!answer[0]) throw new Error("Answer not found");
+  
+  await db
+    .update(studentExerciseAnswers)
+    .set({ 
+      reviewCount: (answer[0].reviewCount || 0) + 1,
+      lastReviewedAt: new Date(),
+    })
+    .where(eq(studentExerciseAnswers.id, answerId));
+  
+  return { success: true, newCount: (answer[0].reviewCount || 0) + 1 };
+}
+
+/**
+ * Obter estatísticas do caderno de exercícios
+ */
+export async function getStudentNotebookStats(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar todas as tentativas do aluno
+  let attemptsQuery = db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(eq(studentExerciseAttempts.studentId, studentId));
+  
+  const attempts = await attemptsQuery;
+  
+  if (attempts.length === 0) {
+    return {
+      totalQuestions: 0,
+      correctQuestions: 0,
+      incorrectQuestions: 0,
+      markedForReview: 0,
+      mastered: 0,
+      studying: 0,
+      practicing: 0,
+      notStarted: 0,
+    };
+  }
+  
+  const attemptIds = attempts.map(a => a.id);
+  
+  // Buscar todas as respostas
+  const answersQuery = db
+    .select({
+      answer: studentExerciseAnswers,
+      exercise: studentExercises,
+    })
+    .from(studentExerciseAnswers)
+    .leftJoin(
+      studentExerciseAttempts,
+      eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+    )
+    .leftJoin(
+      studentExercises,
+      eq(studentExerciseAttempts.exerciseId, studentExercises.id)
+    )
+    .where(inArray(studentExerciseAnswers.attemptId, attemptIds));
+  
+  const results = await answersQuery;
+  
+  // Filtrar por disciplina se necessário
+  let filteredResults = results;
+  if (subjectId) {
+    filteredResults = results.filter(r => r.exercise?.subjectId === subjectId);
+  }
+  
+  const answers = filteredResults.map(r => r.answer);
+  
+  return {
+    totalQuestions: answers.length,
+    correctQuestions: answers.filter(a => a.isCorrect === true).length,
+    incorrectQuestions: answers.filter(a => a.isCorrect === false).length,
+    markedForReview: answers.filter(a => a.markedForReview === true).length,
+    mastered: answers.filter(a => a.masteryStatus === 'mastered').length,
+    studying: answers.filter(a => a.masteryStatus === 'studying').length,
+    practicing: answers.filter(a => a.masteryStatus === 'practicing').length,
+    notStarted: answers.filter(a => a.masteryStatus === 'not_started').length,
+  };
+}
