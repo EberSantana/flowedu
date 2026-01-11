@@ -1,0 +1,1 @@
+ALTER TABLE `students` ADD `specialKimono` varchar(30) DEFAULT 'none';

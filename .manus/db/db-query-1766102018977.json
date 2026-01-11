@@ -1,0 +1,230 @@
+{
+  "query": "SELECT se.*, s.name as subjectName, lm.id as moduleId, lm.title as moduleTitle\nFROM subjectEnrollments se\nLEFT JOIN subjects s ON se.subjectId = s.id\nLEFT JOIN learning_modules lm ON lm.subjectId = se.subjectId AND lm.userId = se.userId\nWHERE se.subjectId = 120001 OR s.name LIKE '%Inform%'\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.*, s.name as subjectName, lm.id as moduleId, lm.title as moduleTitle\nFROM subjectEnrollments se\nLEFT JOIN subjects s ON se.subjectId = s.id\nLEFT JOIN learning_modules lm ON lm.subjectId = se.subjectId AND lm.userId = se.userId\nWHERE se.subjectId = 120001 OR s.name LIKE '%Inform%'\nLIMIT 20;",
+  "rows": [
+    {
+      "id": "120024",
+      "studentId": "60074",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120005",
+      "moduleTitle": "Módulo 5: Editor de Apresentação de Slides"
+    },
+    {
+      "id": "120024",
+      "studentId": "60074",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120004",
+      "moduleTitle": "Módulo 4: Editor de Planilhas - Cálculo e Análise de Dados"
+    },
+    {
+      "id": "120024",
+      "studentId": "60074",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120003",
+      "moduleTitle": "Módulo 3: Editor de Texto - Estrutura e Layout Avançado"
+    },
+    {
+      "id": "120024",
+      "studentId": "60074",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120002",
+      "moduleTitle": "Módulo 2: Editor de Texto - Fundamentos e Formatação"
+    },
+    {
+      "id": "120024",
+      "studentId": "60074",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120001",
+      "moduleTitle": "Módulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais"
+    },
+    {
+      "id": "120023",
+      "studentId": "60073",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120005",
+      "moduleTitle": "Módulo 5: Editor de Apresentação de Slides"
+    },
+    {
+      "id": "120023",
+      "studentId": "60073",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120004",
+      "moduleTitle": "Módulo 4: Editor de Planilhas - Cálculo e Análise de Dados"
+    },
+    {
+      "id": "120023",
+      "studentId": "60073",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120003",
+      "moduleTitle": "Módulo 3: Editor de Texto - Estrutura e Layout Avançado"
+    },
+    {
+      "id": "120023",
+      "studentId": "60073",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120002",
+      "moduleTitle": "Módulo 2: Editor de Texto - Fundamentos e Formatação"
+    },
+    {
+      "id": "120023",
+      "studentId": "60073",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120001",
+      "moduleTitle": "Módulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais"
+    },
+    {
+      "id": "120022",
+      "studentId": "60072",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120005",
+      "moduleTitle": "Módulo 5: Editor de Apresentação de Slides"
+    },
+    {
+      "id": "120022",
+      "studentId": "60072",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120004",
+      "moduleTitle": "Módulo 4: Editor de Planilhas - Cálculo e Análise de Dados"
+    },
+    {
+      "id": "120022",
+      "studentId": "60072",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120003",
+      "moduleTitle": "Módulo 3: Editor de Texto - Estrutura e Layout Avançado"
+    },
+    {
+      "id": "120022",
+      "studentId": "60072",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120002",
+      "moduleTitle": "Módulo 2: Editor de Texto - Fundamentos e Formatação"
+    },
+    {
+      "id": "120022",
+      "studentId": "60072",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120001",
+      "moduleTitle": "Módulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais"
+    },
+    {
+      "id": "120021",
+      "studentId": "60071",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120005",
+      "moduleTitle": "Módulo 5: Editor de Apresentação de Slides"
+    },
+    {
+      "id": "120021",
+      "studentId": "60071",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120004",
+      "moduleTitle": "Módulo 4: Editor de Planilhas - Cálculo e Análise de Dados"
+    },
+    {
+      "id": "120021",
+      "studentId": "60071",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120003",
+      "moduleTitle": "Módulo 3: Editor de Texto - Estrutura e Layout Avançado"
+    },
+    {
+      "id": "120021",
+      "studentId": "60071",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120002",
+      "moduleTitle": "Módulo 2: Editor de Texto - Fundamentos e Formatação"
+    },
+    {
+      "id": "120021",
+      "studentId": "60071",
+      "subjectId": "120001",
+      "enrolledAt": "2025-12-18 22:49:55",
+      "userId": "1",
+      "status": "active",
+      "subjectName": "Informática Básica",
+      "moduleId": "120001",
+      "moduleTitle": "Módulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tenrolledAt\tuserId\tstatus\tsubjectName\tmoduleId\tmoduleTitle\n120024\t60074\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120005\tMódulo 5: Editor de Apresentação de Slides\n120024\t60074\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120004\tMódulo 4: Editor de Planilhas - Cálculo e Análise de Dados\n120024\t60074\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120003\tMódulo 3: Editor de Texto - Estrutura e Layout Avançado\n120024\t60074\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120002\tMódulo 2: Editor de Texto - Fundamentos e Formatação\n120024\t60074\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120001\tMódulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais\n120023\t60073\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120005\tMódulo 5: Editor de Apresentação de Slides\n120023\t60073\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120004\tMódulo 4: Editor de Planilhas - Cálculo e Análise de Dados\n120023\t60073\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120003\tMódulo 3: Editor de Texto - Estrutura e Layout Avançado\n120023\t60073\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120002\tMódulo 2: Editor de Texto - Fundamentos e Formatação\n120023\t60073\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120001\tMódulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais\n120022\t60072\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120005\tMódulo 5: Editor de Apresentação de Slides\n120022\t60072\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120004\tMódulo 4: Editor de Planilhas - Cálculo e Análise de Dados\n120022\t60072\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120003\tMódulo 3: Editor de Texto - Estrutura e Layout Avançado\n120022\t60072\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120002\tMódulo 2: Editor de Texto - Fundamentos e Formatação\n120022\t60072\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120001\tMódulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais\n120021\t60071\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120005\tMódulo 5: Editor de Apresentação de Slides\n120021\t60071\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120004\tMódulo 4: Editor de Planilhas - Cálculo e Análise de Dados\n120021\t60071\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120003\tMódulo 3: Editor de Texto - Estrutura e Layout Avançado\n120021\t60071\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120002\tMódulo 2: Editor de Texto - Fundamentos e Formatação\n120021\t60071\t120001\t2025-12-18 22:49:55\t1\tactive\tInformática Básica\t120001\tMódulo 1: Fundamentos de Hardware, Software e Sistemas Operacionais\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

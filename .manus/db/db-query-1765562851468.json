@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS topic_class_links (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  topicId INT NOT NULL,\n  scheduledClassId INT NOT NULL,\n  userId INT NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS topic_class_links (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  topicId INT NOT NULL,\n  scheduledClassId INT NOT NULL,\n  userId INT NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 172
+}

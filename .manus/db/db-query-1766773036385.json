@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `student_subject_points` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `studentId` int NOT NULL,\n  `subjectId` int NOT NULL,\n  `totalPoints` int DEFAULT 0 NOT NULL,\n  `currentBelt` varchar(50) DEFAULT 'white' NOT NULL,\n  `streakDays` int DEFAULT 0 NOT NULL,\n  `lastActivityDate` date,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  UNIQUE KEY `unique_student_subject` (`studentId`, `subjectId`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `student_subject_points` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `studentId` int NOT NULL,\n  `subjectId` int NOT NULL,\n  `totalPoints` int DEFAULT 0 NOT NULL,\n  `currentBelt` varchar(50) DEFAULT 'white' NOT NULL,\n  `streakDays` int DEFAULT 0 NOT NULL,\n  `lastActivityDate` date,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  UNIQUE KEY `unique_student_subject` (`studentId`, `subjectId`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 338
+}

@@ -1,0 +1,97 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "active_methodologies"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "announcementReads"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "announcements"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "assignment_submissions"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "audit_logs"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "calendar_events"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "class_statuses"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "classes"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "invite_codes"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "learning_modules"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "learning_topics"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "notifications"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "scheduled_classes"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "shifts"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "student_attendance"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "student_class_enrollments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "student_enrollments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "student_topic_progress"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "students"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "subjectEnrollments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "subjects"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "tasks"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "time_slots"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "topic_assignments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "topic_class_links"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "topic_comments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "topic_materials"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6\n__drizzle_migrations\nactive_methodologies\nannouncementReads\nannouncements\nassignment_submissions\naudit_logs\ncalendar_events\nclass_statuses\nclasses\ninvite_codes\nlearning_modules\nlearning_topics\nnotifications\nscheduled_classes\nshifts\nstudent_attendance\nstudent_class_enrollments\nstudent_enrollments\nstudent_topic_progress\nstudents\nsubjectEnrollments\nsubjects\ntasks\ntime_slots\ntopic_assignments\ntopic_class_links\ntopic_comments\ntopic_materials\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

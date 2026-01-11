@@ -1,0 +1,19 @@
+{
+  "query": "SHOW TABLES LIKE '%enroll%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE '%enroll%';",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%enroll%)": "student_class_enrollments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%enroll%)": "student_enrollments"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%enroll%)": "subjectEnrollments"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%enroll%)\nstudent_class_enrollments\nstudent_enrollments\nsubjectEnrollments\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

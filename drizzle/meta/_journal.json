@@ -323,41 +323,6 @@
       "when": 1768081785163,
       "tag": "0045_gigantic_thunderball",
       "breakpoints": true
-    },
-    {
-      "idx": 46,
-      "version": "5",
-      "when": 1768083586186,
-      "tag": "0046_crazy_scorpion",
-      "breakpoints": true
-    },
-    {
-      "idx": 47,
-      "version": "5",
-      "when": 1768087117765,
-      "tag": "0047_new_black_knight",
-      "breakpoints": true
-    },
-    {
-      "idx": 48,
-      "version": "5",
-      "when": 1768090759746,
-      "tag": "0048_warm_sauron",
-      "breakpoints": true
-    },
-    {
-      "idx": 49,
-      "version": "5",
-      "when": 1768141638070,
-      "tag": "0049_redundant_lester",
-      "breakpoints": true
-    },
-    {
-      "idx": 50,
-      "version": "5",
-      "when": 1768142182441,
-      "tag": "0050_cool_bucky",
-      "breakpoints": true
     }
   ]
 }

@@ -1,53 +1,145 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import DashboardLayout from "./components/DashboardLayout";
-import Home from "./pages/Home";
-import Schedules from "./pages/Schedules";
-import Classes from "./pages/Classes";
+import { SidebarProvider } from "./contexts/SidebarContext";
+import Dashboard from "./pages/Dashboard";
 import Subjects from "./pages/Subjects";
-import Activities from "./pages/Activities";
-import ProfessionalBands from "./pages/ProfessionalBands";
+import SubjectCTStats from "./pages/SubjectCTStats";
+import Classes from "./pages/Classes";
+import Schedule from "./pages/Schedule";
+import Shifts from "./pages/Shifts";
+import TimeSlots from "./pages/TimeSlots";
+import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
+// ProfileSelection removido - perfil único tradicional
+import AdminUsers from "./pages/AdminUsers";
+import ActiveMethodologies from "./pages/ActiveMethodologies";
+import Tasks from "./pages/Tasks";
+import Reports from "./pages/Reports";
+import { LearningAnalytics } from "./pages/LearningAnalytics";
+import LearningPaths from "./pages/LearningPaths";
+import StudentDashboard from "./pages/StudentDashboard";
+import StudentSubjectView from "./pages/StudentSubjectView";
+import StudentSubjectDetails from "./pages/StudentSubjectDetails";
+import ManageEnrollments from "./pages/ManageEnrollments";
+import TopicMaterialsManager from "./pages/TopicMaterialsManager";
+import Students from "./pages/Students";
+import StudentProfile from "./pages/StudentProfile";
+import SubjectEnrollments from "./pages/SubjectEnrollments";
+import PortalChoice from "./pages/PortalChoice";
+import StudentLogin from "./pages/StudentLogin";
+import Register from "./pages/Register";
+import TeacherRegister from "./pages/TeacherRegister";
+import TeacherLogin from "./pages/TeacherLogin";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Announcements from "./pages/Announcements";
+import StudentAnnouncements from "./pages/StudentAnnouncements";
+import StudentSubjects from "./pages/StudentSubjects";
+import StudentLearningPaths from "./pages/StudentLearningPaths";
+import StudentLearningPathDetail from "./pages/StudentLearningPathDetail";
+import StudentProfilePage from "./pages/StudentProfilePage";
+import StudentExercises from "./pages/StudentExercises";
+import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
+import StudentExerciseResults from "./pages/StudentExerciseResults";
+import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
+
+import StudentReview from "./pages/StudentReview";
+import StudentSmartReview from "./pages/StudentSmartReview";
+import StudentSmartReviewItem from "./pages/StudentSmartReviewItem";
+import StudentStats from "./pages/StudentStats";
+import BibleFooter from "./components/BibleFooter";
+import { InstallPWA } from "./components/InstallPWA";
+import OfflineIndicator from "./components/OfflineIndicator";
+import { CommandPalette } from "./components/CommandPalette";
+import { TeacherAddActivity } from "./pages/TeacherAddActivity";
+import Questions from "./pages/Questions";
+import QuestionDetail from "./pages/QuestionDetail";
+import StudentSubmitQuestion from "./pages/StudentSubmitQuestion";
+import StudentMyQuestions from "./pages/StudentMyQuestions";
+import StudentLearningJournal from "./pages/StudentLearningJournal";
+import StudentDoubts from "./pages/StudentDoubts";
+import StudentStatistics from "./pages/StudentStatistics";
 
 function Router() {
   return (
-    <DashboardLayout>
+    <>
       <Switch>
-        <Route path={"/"} component={Home} />
-        <Route path={"/schedules"} component={Schedules} />
-        <Route path={"/classes"} component={Classes} />
+        <Route path={"/"} component={PortalChoice} />
+        <Route path={"/student-login"} component={StudentLogin} />
+        <Route path={"/register"} component={Register} />
+        <Route path={"/cadastro-professor"} component={TeacherRegister} />
+        <Route path={"/login-professor"} component={TeacherLogin} />
+        <Route path={"/esqueci-senha"} component={ForgotPassword} />
+        <Route path={"/redefinir-senha"} component={ResetPassword} />
+        <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
-        <Route path={"/activities"} component={Activities} />
-        <Route path={"/professional-bands"} component={ProfessionalBands} />
+        <Route path={"/subjects/:id/ct-stats"} component={SubjectCTStats} />
+        <Route path={"/classes"} component={Classes} />
+        <Route path={"/shifts"} component={Shifts} />
+        <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
+        <Route path={"/schedule"} component={Schedule} />
+        <Route path={"/calendar"} component={Calendar} />
+        <Route path={"/reports"} component={Reports} />
+        <Route path={"/learning-analytics"} component={LearningAnalytics} />
+        <Route path="/exercise-performance" component={ExercisePerformanceReport} />
+
+        <Route path={"/learning-paths"} component={LearningPaths} />
+        <Route path={"/active-methodologies"} component={ActiveMethodologies} />
+        <Route path={"/tasks"} component={Tasks} />
+        <Route path={"/announcements"} component={Announcements} />
         <Route path={"/profile"} component={Profile} />
+        {/* ProfileSelection removido - perfil único tradicional */}
+        <Route path={"/admin/users"} component={AdminUsers} />
+        <Route path={"/student-dashboard"} component={StudentDashboard} />
+        <Route path={"/student-subjects"} component={StudentSubjects} />
+        <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
+        <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />
+        <Route path={"/student-announcements"} component={StudentAnnouncements} />
+        <Route path={"/student-profile"} component={StudentProfilePage} />
+        <Route path={"/student-exercises"} component={StudentExercises} />
+        <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
+        <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
+        <Route path={"/student-review"} component={StudentReview} />
+        <Route path={"/student/smart-review"} component={StudentSmartReview} />
+        <Route path={"/student/smart-review/:id"} component={StudentSmartReviewItem} />
+        <Route path={"/student-stats"} component={StudentStats} />
+        <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
+        <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
+        <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
+        <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
+        <Route path={"/students"} component={Students} />
+        <Route path={"/students/:id"} component={StudentProfile} />
+        <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
+        <Route path={"/questions"} component={Questions} />
+        <Route path={"/questions/:id"} component={QuestionDetail} />
+        <Route path={"/student/submit-question"} component={StudentSubmitQuestion} />
+        <Route path={"/student/my-questions"} component={StudentMyQuestions} />
+        <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
+        <Route path={"/student/doubts"} component={StudentDoubts} />
+        <Route path={"/student/statistics"} component={StudentStatistics} />
         <Route path={"/404"} component={NotFound} />
-        {/* Final fallback route */}
         <Route component={NotFound} />
       </Switch>
-    </DashboardLayout>
+      <OfflineIndicator />
+      <BibleFooter />
+      <InstallPWA />
+      <CommandPalette />
+    </>
   );
 }
-
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+      <ThemeProvider defaultTheme="system" switchable={true}>
+        <SidebarProvider>
+          <TooltipProvider>
+            <Router />
+          </TooltipProvider>
+        </SidebarProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

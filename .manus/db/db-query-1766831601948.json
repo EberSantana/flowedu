@@ -1,0 +1,62 @@
+{
+  "query": "SELECT \n  se.id, \n  se.title, \n  se.subjectId,\n  sub.name as subject_name,\n  sub.code as subject_code,\n  se.availableFrom,\n  se.availableTo,\n  se.status,\n  se.totalQuestions,\n  se.totalPoints,\n  se.createdAt\nFROM student_exercises se\nJOIN subjects sub ON se.subjectId = sub.id\nORDER BY se.createdAt DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT \n  se.id, \n  se.title, \n  se.subjectId,\n  sub.name as subject_name,\n  sub.code as subject_code,\n  se.availableFrom,\n  se.availableTo,\n  se.status,\n  se.totalQuestions,\n  se.totalPoints,\n  se.createdAt\nFROM student_exercises se\nJOIN subjects sub ON se.subjectId = sub.id\nORDER BY se.createdAt DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "30002",
+      "title": "Modulo 1",
+      "subjectId": "5",
+      "subject_name": "Segurança da Informação",
+      "subject_code": "INFW31 - D1",
+      "availableFrom": "2025-12-27 10:12:00",
+      "availableTo": "2025-12-29 10:12:00",
+      "status": "published",
+      "totalQuestions": "15",
+      "totalPoints": "150",
+      "createdAt": "2025-12-27 10:12:26"
+    },
+    {
+      "id": "30001",
+      "title": "Exercícios 1",
+      "subjectId": "5",
+      "subject_name": "Segurança da Informação",
+      "subject_code": "INFW31 - D1",
+      "availableFrom": "2025-12-27 10:07:00",
+      "availableTo": "2025-12-29 10:07:00",
+      "status": "published",
+      "totalQuestions": "9",
+      "totalPoints": "90",
+      "createdAt": "2025-12-27 10:07:50"
+    },
+    {
+      "id": "2",
+      "title": "rrty",
+      "subjectId": "5",
+      "subject_name": "Segurança da Informação",
+      "subject_code": "INFW31 - D1",
+      "availableFrom": "2025-12-27 01:44:00",
+      "availableTo": "2025-12-30 01:44:00",
+      "status": "published",
+      "totalQuestions": "5",
+      "totalPoints": "50",
+      "createdAt": "2025-12-27 01:44:37"
+    },
+    {
+      "id": "1",
+      "title": "Modulo1 Fundamentos",
+      "subjectId": "5",
+      "subject_name": "Segurança da Informação",
+      "subject_code": "INFW31 - D1",
+      "availableFrom": "2025-12-27 01:40:00",
+      "availableTo": "2025-12-30 01:40:00",
+      "status": "published",
+      "totalQuestions": "10",
+      "totalPoints": "100",
+      "createdAt": "2025-12-27 01:40:56"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tsubjectId\tsubject_name\tsubject_code\tavailableFrom\tavailableTo\tstatus\ttotalQuestions\ttotalPoints\tcreatedAt\n30002\tModulo 1\t5\tSegurança da Informação\tINFW31 - D1\t2025-12-27 10:12:00\t2025-12-29 10:12:00\tpublished\t15\t150\t2025-12-27 10:12:26\n30001\tExercícios 1\t5\tSegurança da Informação\tINFW31 - D1\t2025-12-27 10:07:00\t2025-12-29 10:07:00\tpublished\t9\t90\t2025-12-27 10:07:50\n2\trrty\t5\tSegurança da Informação\tINFW31 - D1\t2025-12-27 01:44:00\t2025-12-30 01:44:00\tpublished\t5\t50\t2025-12-27 01:44:37\n1\tModulo1 Fundamentos\t5\tSegurança da Informação\tINFW31 - D1\t2025-12-27 01:40:00\t2025-12-30 01:40:00\tpublished\t10\t100\t2025-12-27 01:40:56\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

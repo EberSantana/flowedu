@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE students \nADD COLUMN avatarHairColor VARCHAR(20) DEFAULT 'black',\nADD COLUMN avatarKimonoStyle VARCHAR(20) DEFAULT 'traditional',\nADD COLUMN avatarHeadAccessory VARCHAR(20) DEFAULT 'none',\nADD COLUMN avatarExpression VARCHAR(20) DEFAULT 'neutral',\nADD COLUMN avatarPose VARCHAR(20) DEFAULT 'standing';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute ALTER TABLE students \nADD COLUMN avatarHairColor VARCHAR(20) DEFAULT 'black',\nADD COLUMN avatarKimonoStyle VARCHAR(20) DEFAULT 'traditional',\nADD COLUMN avatarHeadAccessory VARCHAR(20) DEFAULT 'none',\nADD COLUMN avatarExpression VARCHAR(20) DEFAULT 'neutral',\nADD COLUMN avatarPose VARCHAR(20) DEFAULT 'standing';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1756
+}

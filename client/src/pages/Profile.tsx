@@ -1,176 +1,206 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Award, Phone, Briefcase } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { trpc } from "@/lib/trpc";
+import { User, Mail, Calendar, Shield, LogOut, ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { useLocation, Link } from "wouter";
+import { getLoginUrl } from "@/const";
+import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function Profile() {
-  const { user } = useAuth();
-  const { data: teacher, isLoading: teacherLoading } = trpc.teachers.getCurrent.useQuery();
-  const { data: professionalBand } = trpc.professionalBands.getById.useQuery(
-    { id: teacher?.professionalBandId ?? 0 },
-    { enabled: !!teacher?.professionalBandId }
-  );
+  const { user, loading, logout } = useAuth();
+  const [, setLocation] = useLocation();
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+  });
+
+  const updateProfileMutation = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Perfil atualizado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error(`Erro ao atualizar perfil: ${error.message}`);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfileMutation.mutate(formData);
   };
 
-  return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Perfil</h1>
-        <p className="text-muted-foreground mt-2">
-          Gerencie suas informações pessoais e profissionais
-        </p>
+  const handleLogout = async () => {
+    await logout();
+    toast.success("Logout realizado com sucesso!");
+    setLocation("/");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
+    );
+  }
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Profile Card */}
-        <Card className="md:col-span-2">
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Informações Pessoais</CardTitle>
-            <CardDescription>
-              Seus dados cadastrados no sistema
-            </CardDescription>
+            <CardTitle>Acesso Restrito</CardTitle>
+            <CardDescription>Você precisa estar logado para acessar esta página</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarFallback className="text-2xl">
-                  {user?.name ? getInitials(user.name) : "?"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h3 className="text-2xl font-semibold">{user?.name || "Nome não disponível"}</h3>
-                <p className="text-sm text-muted-foreground">Professor</p>
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t">
-              <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{user?.email || "Não informado"}</p>
-                </div>
-              </div>
-
-              {teacherLoading ? (
-                <Skeleton className="h-16 w-full" />
-              ) : (
-                <>
-                  {teacher?.phone && (
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-5 w-5 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground">Telefone</p>
-                        <p className="font-medium">{teacher.phone}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {teacher?.specialization && (
-                    <div className="flex items-center gap-3">
-                      <Briefcase className="h-5 w-5 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground">Especialização</p>
-                        <p className="font-medium">{teacher.specialization}</p>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full mt-4"
-              onClick={() => toast.info("Funcionalidade em breve")}
-            >
-              Editar Perfil
+          <CardContent>
+            <Button onClick={() => window.location.href = getLoginUrl()} className="w-full">
+              Fazer Login
             </Button>
           </CardContent>
         </Card>
-
-        {/* Professional Band Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              Faixa Profissional
-            </CardTitle>
-            <CardDescription>
-              Sua carga horária semanal
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {teacherLoading ? (
-              <Skeleton className="h-32 w-full" />
-            ) : professionalBand ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: professionalBand.color || "#3b82f6" }}
-                  />
-                  <h3 className="text-xl font-semibold">{professionalBand.name}</h3>
-                </div>
-
-                <div className="space-y-3 pt-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Carga Total</span>
-                    <Badge variant="secondary">{professionalBand.weeklyHours}h/semana</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Aulas</span>
-                    <span className="font-medium">{professionalBand.classHours}h</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Planejamento</span>
-                    <span className="font-medium">{professionalBand.planningHours}h</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Outras Atividades</span>
-                    <span className="font-medium">{professionalBand.otherActivitiesHours}h</span>
-                  </div>
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full mt-4"
-                  onClick={() => toast.info("Funcionalidade em breve")}
-                >
-                  Alterar Faixa
-                </Button>
-              </>
-            ) : (
-              <div className="text-center py-6">
-                <Award className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground mb-4">
-                  Nenhuma faixa profissional definida
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => toast.info("Funcionalidade em breve")}
-                >
-                  Definir Faixa
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <>
+      <Sidebar />
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+        <div className="container max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">Meu Perfil</h1>
+            <p className="text-slate-600">Gerencie suas informações pessoais e configurações</p>
+          </div>
+
+        <div className="grid gap-6">
+          {/* Informações do Usuário */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Informações Pessoais
+              </CardTitle>
+              <CardDescription>Atualize seus dados cadastrais</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome Completo</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Seu nome completo"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="seu@email.com"
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={updateProfileMutation.isPending}
+                  className="w-full"
+                >
+                  {updateProfileMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Informações da Conta */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Informações da Conta
+              </CardTitle>
+              <CardDescription>Detalhes sobre sua conta no sistema</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-slate-500" />
+                  <div>
+                    <p className="font-medium text-sm">Método de Login</p>
+                    <p className="text-sm text-slate-600">{user.loginMethod || "Não especificado"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-slate-500" />
+                  <div>
+                    <p className="font-medium text-sm">Papel no Sistema</p>
+                    <p className="text-sm text-slate-600">
+                      {user.role === "admin" ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          Administrador
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Professor
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-slate-500" />
+                  <div>
+                    <p className="font-medium text-sm">Membro desde</p>
+                    <p className="text-sm text-slate-600">
+                      {new Date(user.createdAt).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Ações da Conta */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Ações da Conta</CardTitle>
+              <CardDescription>Gerencie sua sessão e acesso ao sistema</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={handleLogout}
+                variant="destructive"
+                className="w-full"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair do Sistema
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        </div>
+      </PageWrapper>
+    </>
   );
 }

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `challenge_submissions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `challengeId` int NOT NULL,\n  `studentId` int NOT NULL,\n  `score` int DEFAULT 0 NOT NULL,\n  `completionTime` int,\n  `submittedAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `challenge_submissions_id` PRIMARY KEY(`id`)\n);\n\nCREATE TABLE IF NOT EXISTS `challenge_rankings` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `challengeId` int NOT NULL,\n  `studentId` int NOT NULL,\n  `rank` int NOT NULL,\n  `totalScore` int NOT NULL,\n  `rewardCoins` int DEFAULT 0 NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `challenge_rankings_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `challenge_submissions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `challengeId` int NOT NULL,\n  `studentId` int NOT NULL,\n  `score` int DEFAULT 0 NOT NULL,\n  `completionTime` int,\n  `submittedAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `challenge_submissions_id` PRIMARY KEY(`id`)\n);\n\nCREATE TABLE IF NOT EXISTS `challenge_rankings` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `challengeId` int NOT NULL,\n  `studentId` int NOT NULL,\n  `rank` int NOT NULL,\n  `totalScore` int NOT NULL,\n  `rewardCoins` int DEFAULT 0 NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `challenge_rankings_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 314
+}

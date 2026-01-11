@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE student_skills (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  skillId INT NOT NULL,\n  unlockedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  isActive BOOLEAN NOT NULL DEFAULT TRUE,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE student_skills (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  skillId INT NOT NULL,\n  unlockedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  isActive BOOLEAN NOT NULL DEFAULT TRUE,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 310
+}

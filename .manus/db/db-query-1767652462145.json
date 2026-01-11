@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, title, createdAt FROM announcements ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, title, createdAt FROM announcements ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "150032",
+      "title": "dsdsd",
+      "createdAt": "2026-01-05 22:05:57"
+    },
+    {
+      "id": "150031",
+      "title": "sdsd",
+      "createdAt": "2026-01-05 22:05:52"
+    },
+    {
+      "id": "150030",
+      "title": "Aviso Urgente",
+      "createdAt": "2026-01-05 21:27:45"
+    },
+    {
+      "id": "150029",
+      "title": "Aviso 2",
+      "createdAt": "2026-01-05 21:27:44"
+    },
+    {
+      "id": "150028",
+      "title": "Aviso 1",
+      "createdAt": "2026-01-05 21:27:44"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tcreatedAt\n150032\tdsdsd\t2026-01-05 22:05:57\n150031\tsdsd\t2026-01-05 22:05:52\n150030\tAviso Urgente\t2026-01-05 21:27:45\n150029\tAviso 2\t2026-01-05 21:27:44\n150028\tAviso 1\t2026-01-05 21:27:44\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}
