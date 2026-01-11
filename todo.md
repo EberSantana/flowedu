@@ -5060,3 +5060,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar filtros por disciplina, data e status (correto/incorreto)
 - [x] Integrar salvamento automático ao finalizar exercícios (já implementado em submitExerciseAttempt)
 - [x] Adicionar link "Caderno de Respostas" no menu Sidebar do aluno
+- [x] Corrigir Caderno de Respostas que não está aparecendo (deve exibir questões certas/erradas, feedbacks de IA, dicas de estudo, explicações e sugestões)
