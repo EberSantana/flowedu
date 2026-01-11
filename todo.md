@@ -21,7 +21,7 @@
 - [x] BUG: Respostas corretas não estão sendo contabilizadas no contador de acertos do quiz (mostra 0 acertos mesmo quando a resposta está correta) - CORRIGIDO: lógica de extração de letra da resposta do aluno
 - [x] BUG CRÍTICO: Sistema marca respostas corretas como incorretas na interface de revisão, impedindo geração correta de relatórios (resposta do aluno = C, resposta correta = C, mas mostra como incorreta) - CORRIGIDO: normalizado salvamento de respostas para armazenar apenas letras (A, B, C, D) garantindo consistência
 
-- [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React)
+- [x] Corrigir erro crítico: "Invalid hook call" no TRPCProvider (conflito de versões React) - CORRIGIDO: invertida ordem dos providers no main.tsx
 - [x] Corrigir logout automático após 10 segundos no portal do aluno (CORRIGIDO: configurado QueryClient para evitar refetch excessivo)
 - [x] Corrigir erro TypeError na página /student-review (QuestionReviewCard tentando fazer .map() em undefined)
 
