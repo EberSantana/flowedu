@@ -24,7 +24,8 @@ import {
   Megaphone,
   KeyRound,
   Trophy,
-  Brain
+  Brain,
+  BookMarked
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -134,6 +135,11 @@ const studentNavItems: NavItem[] = [
     label: "Minhas Disciplinas",
     icon: <BookOpen className="h-5 w-5" />,
     href: "/student-dashboard",
+  },
+  {
+    label: "Caderno de Respostas",
+    icon: <BookMarked className="h-5 w-5" />,
+    href: "/student/answer-notebook",
   },
   {
     label: "Avisos",

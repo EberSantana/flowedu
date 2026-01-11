@@ -4766,6 +4766,59 @@ export async function getStudentExerciseHistory(studentId: number, subjectId?: n
 }
 
 /**
+ * Obter histórico completo de respostas do aluno (Caderno de Respostas)
+ */
+export async function getStudentAnswerHistory(
+  studentId: number, 
+  subjectId?: number, 
+  status?: "all" | "correct" | "incorrect",
+  limit: number = 50
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const conditions = [eq(studentExerciseAttempts.studentId, studentId)];
+  
+  if (subjectId) {
+    conditions.push(eq(studentExercises.subjectId, subjectId));
+  }
+  
+  // Adicionar filtro de status nas condições
+  if (status === "correct") {
+    conditions.push(eq(studentExerciseAnswers.isCorrect, true));
+  } else if (status === "incorrect") {
+    conditions.push(eq(studentExerciseAnswers.isCorrect, false));
+  }
+  
+  // Buscar respostas com detalhes do exercício
+  const results = await db
+    .select({
+      answer: studentExerciseAnswers,
+      attempt: studentExerciseAttempts,
+      exercise: studentExercises,
+      subject: subjects,
+    })
+    .from(studentExerciseAnswers)
+    .innerJoin(
+      studentExerciseAttempts,
+      eq(studentExerciseAnswers.attemptId, studentExerciseAttempts.id)
+    )
+    .innerJoin(
+      studentExercises,
+      eq(studentExerciseAttempts.exerciseId, studentExercises.id)
+    )
+    .innerJoin(
+      subjects,
+      eq(studentExercises.subjectId, subjects.id)
+    )
+    .where(and(...conditions))
+    .orderBy(desc(studentExerciseAttempts.completedAt))
+    .limit(limit);
+  
+  return results;
+}
+
+/**
  * Adicionar pontos de gamificação após completar exercício
  */
 export async function addExercisePoints(studentId: number, subjectId: number, points: number, description: string) {

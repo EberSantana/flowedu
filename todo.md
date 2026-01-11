@@ -5051,3 +5051,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🗑️ Remoção de Revisão Inteligente
 
 - [x] Remover funcionalidade de Revisão Inteligente do sistema
+
+## 📓 Caderno de Respostas do Aluno
+- [x] Criar tabela answer_history no banco de dados para armazenar histórico completo de respostas (usa tabela student_exercise_answers existente)
+- [x] Implementar procedure tRPC studentExercises.getAnswerHistory para recuperar histórico
+- [x] Criar página "Caderno de Respostas" no menu do aluno (/student/answer-notebook)
+- [x] Exibir questões certas e erradas com dicas de IA, feedbacks e sugestões
+- [x] Adicionar filtros por disciplina, data e status (correto/incorreto)
+- [x] Integrar salvamento automático ao finalizar exercícios (já implementado em submitExerciseAttempt)
+- [x] Adicionar link "Caderno de Respostas" no menu Sidebar do aluno

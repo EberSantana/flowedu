@@ -4622,13 +4622,28 @@ JSON (descrições MAX 15 chars):
       }),
 
     // Histórico de tentativas
-    getHistory: studentProcedure
-      .input(z.object({ subjectId: z.number().optional() }))
+    getAttemptHistory: studentProcedure
+      .input(z.object({ exerciseId: z.number() }))
       .query(async ({ ctx, input }) => {
         const studentId = ctx.studentSession.studentId;
         if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
         
-        const history = await db.getStudentExerciseHistory(studentId, input.subjectId);
+        const history = await db.getStudentExerciseHistory(studentId);
+        return history.filter(h => h.exercise.id === input.exerciseId);
+      }),
+
+    // Caderno de Respostas - Histórico completo de respostas do aluno
+    getAnswerHistory: studentProcedure
+      .input(z.object({ 
+        subjectId: z.number().optional(),
+        status: z.enum(["all", "correct", "incorrect"]).optional().default("all"),
+        limit: z.number().optional().default(50),
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const history = await db.getStudentAnswerHistory(studentId, input.subjectId, input.status, input.limit);
         return history;
       }),
   }),
