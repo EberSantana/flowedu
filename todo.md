@@ -35,5 +35,20 @@
 - [x] Validar todas as funcionalidades
 
 ## Entrega
-- [ ] Criar checkpoint final
-- [ ] Documentar funcionalidades implementadas
+- [x] Criar checkpoint final
+- [x] Documentar funcionalidades implementadas
+
+## Bugs
+- [x] Corrigir erro na query teachers.getCurrent que retorna undefined
+
+## Redesign UX/UI
+- [x] Implementar sistema de temas com múltiplas opções
+- [x] Redesenhar estilos globais e paleta de cores
+- [x] Atualizar DashboardLayout com seletor de temas
+- [x] Redesenhar página Home
+- [ ] Redesenhar página Schedules
+- [ ] Redesenhar página Classes
+- [ ] Redesenhar página Subjects
+- [ ] Redesenhar página Activities
+- [ ] Redesenhar página ProfessionalBands
+- [ ] Redesenhar página Profile
