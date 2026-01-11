@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `ct_exercises` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `dimension` varchar(50) NOT NULL,\n  `title` varchar(255) NOT NULL,\n  `description` text NOT NULL,\n  `difficulty` varchar(20) NOT NULL,\n  `expectedAnswer` text,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `ct_exercises` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `dimension` varchar(50) NOT NULL,\n  `title` varchar(255) NOT NULL,\n  `description` text NOT NULL,\n  `difficulty` varchar(20) NOT NULL,\n  `expectedAnswer` text,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 119
-}

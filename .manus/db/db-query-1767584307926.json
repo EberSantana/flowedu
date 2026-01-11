@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `learning_recommendations` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `studentId` int NOT NULL,\n  `topicId` int NOT NULL,\n  `reason` text NOT NULL,\n  `confidence` int NOT NULL,\n  `priority` enum('low','medium','high') NOT NULL DEFAULT 'medium',\n  `basedOn` json,\n  `status` enum('pending','accepted','rejected','completed') NOT NULL DEFAULT 'pending',\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `learning_recommendations_id` PRIMARY KEY(`id`)\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `learning_recommendations` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `studentId` int NOT NULL,\n  `topicId` int NOT NULL,\n  `reason` text NOT NULL,\n  `confidence` int NOT NULL,\n  `priority` enum('low','medium','high') NOT NULL DEFAULT 'medium',\n  `basedOn` json,\n  `status` enum('pending','accepted','rejected','completed') NOT NULL DEFAULT 'pending',\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `learning_recommendations_id` PRIMARY KEY(`id`)\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 261
-}

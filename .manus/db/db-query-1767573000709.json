@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `student_wallets` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`studentId` int NOT NULL,\n\t`techCoins` int NOT NULL DEFAULT 0,\n\t`totalEarned` int NOT NULL DEFAULT 0,\n\t`totalSpent` int NOT NULL DEFAULT 0,\n\t`lastTransactionAt` timestamp,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `student_wallets_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `student_wallets_studentId_unique` UNIQUE(`studentId`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `student_wallets` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`studentId` int NOT NULL,\n\t`techCoins` int NOT NULL DEFAULT 0,\n\t`totalEarned` int NOT NULL DEFAULT 0,\n\t`totalSpent` int NOT NULL DEFAULT 0,\n\t`lastTransactionAt` timestamp,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `student_wallets_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `student_wallets_studentId_unique` UNIQUE(`studentId`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 186
-}

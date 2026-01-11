@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `student_actions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `studentId` int NOT NULL,\n  `actionType` varchar(50) NOT NULL,\n  `actionData` json,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `student_actions_id` PRIMARY KEY(`id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `student_actions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `studentId` int NOT NULL,\n  `actionType` varchar(50) NOT NULL,\n  `actionData` json,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `student_actions_id` PRIMARY KEY(`id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 181
-}

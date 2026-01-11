@@ -1,8 +1,0 @@
-{
-  "query": "ALTER TABLE user MODIFY COLUMN profile ENUM('traditional') NOT NULL DEFAULT 'traditional';",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute ALTER TABLE user MODIFY COLUMN profile ENUM('traditional') NOT NULL DEFAULT 'traditional';",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1146 (42S02) at line 1: Table 'c6fhcpifofzeqqxntskeu6.user' doesn't exist"
-  ]
-}

@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE student_points \nADD COLUMN IF NOT EXISTS beltAnimationSeen BOOLEAN NOT NULL DEFAULT FALSE,\nADD COLUMN IF NOT EXISTS lastBeltUpgrade TIMESTAMP NULL,\nADD COLUMN IF NOT EXISTS pointsMultiplier DOUBLE NOT NULL DEFAULT 1.0,\nADD COLUMN IF NOT EXISTS consecutivePerfectScores INT NOT NULL DEFAULT 0,\nADD COLUMN IF NOT EXISTS totalExercisesCompleted INT NOT NULL DEFAULT 0,\nADD COLUMN IF NOT EXISTS totalPerfectScores INT NOT NULL DEFAULT 0;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute ALTER TABLE student_points \nADD COLUMN IF NOT EXISTS beltAnimationSeen BOOLEAN NOT NULL DEFAULT FALSE,\nADD COLUMN IF NOT EXISTS lastBeltUpgrade TIMESTAMP NULL,\nADD COLUMN IF NOT EXISTS pointsMultiplier DOUBLE NOT NULL DEFAULT 1.0,\nADD COLUMN IF NOT EXISTS consecutivePerfectScores INT NOT NULL DEFAULT 0,\nADD COLUMN IF NOT EXISTS totalExercisesCompleted INT NOT NULL DEFAULT 0,\nADD COLUMN IF NOT EXISTS totalPerfectScores INT NOT NULL DEFAULT 0;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 2213
-}

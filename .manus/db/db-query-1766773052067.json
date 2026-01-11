@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `student_subject_badges` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `studentId` int NOT NULL,\n  `subjectId` int NOT NULL,\n  `badgeId` int NOT NULL,\n  `earnedAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  UNIQUE KEY `unique_student_subject_badge` (`studentId`, `subjectId`, `badgeId`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `student_subject_badges` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `studentId` int NOT NULL,\n  `subjectId` int NOT NULL,\n  `badgeId` int NOT NULL,\n  `earnedAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  UNIQUE KEY `unique_student_subject_badge` (`studentId`, `subjectId`, `badgeId`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 180
-}

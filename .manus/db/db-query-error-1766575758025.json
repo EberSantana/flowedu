@@ -1,8 +1,0 @@
-{
-  "query": "INSERT INTO badges (code, name, description, icon) VALUES \n('first_exercise', 'Primeira Questão', 'Complete seu primeiro exercício', '🎯'),\n('exercise_master_10', 'Mestre dos Exercícios', 'Complete 10 exercícios', '📚'),\n('first_exam', 'Primeira Prova', 'Complete sua primeira prova', '📝'),\n('perfect_score', 'Nota Perfeita', 'Tire 10 em uma prova', '💯'),\n('fire_streak_7', 'Semana de Fogo', 'Mantenha 7 dias consecutivos', '🔥'),\n('fire_streak_30', 'Mês Incandescente', 'Mantenha 30 dias consecutivos', '🌟'),\n('top_3', 'Top 3', 'Fique entre os 3 primeiros', '🏆'),\n('champion', 'Campeão', 'Alcance o 1º lugar', '👑')",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO badges (code, name, description, icon) VALUES \n('first_exercise', 'Primeira Questão', 'Complete seu primeiro exercício', '🎯'),\n('exercise_master_10', 'Mestre dos Exercícios', 'Complete 10 exercícios', '📚'),\n('first_exam', 'Primeira Prova', 'Complete sua primeira prova', '📝'),\n('perfect_score', 'Nota Perfeita', 'Tire 10 em uma prova', '💯'),\n('fire_streak_7', 'Semana de Fogo', 'Mantenha 7 dias consecutivos', '🔥'),\n('fire_streak_30', 'Mês Incandescente', 'Mantenha 30 dias consecutivos', '🌟'),\n('top_3', 'Top 3', 'Fique entre os 3 primeiros', '🏆'),\n('champion', 'Campeão', 'Alcance o 1º lugar', '👑')",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1364 (HY000) at line 1: Field 'requirement' doesn't have a default value"
-  ]
-}
