@@ -63,6 +63,7 @@ import StudentLearningJournal from "./pages/StudentLearningJournal";
 import StudentDoubts from "./pages/StudentDoubts";
 import StudentStatistics from "./pages/StudentStatistics";
 import StudentNotebook from "./pages/StudentNotebook";
+import { StudentAnswerbook } from "./pages/StudentAnswerbook";
 import StudentAssessments from "./pages/StudentAssessments";
 import StudentAnswerSheet from "./pages/StudentAnswerSheet";
 import TeacherAssessments from "./pages/TeacherAssessments";
@@ -127,6 +128,7 @@ function Router() {
         <Route path={"/student/doubts"} component={StudentDoubts} />
         <Route path={"/student/statistics"} component={StudentStatistics} />
         <Route path={"/student/notebook"} component={StudentNotebook} />
+        <Route path={"/student/answerbook"} component={StudentAnswerbook} />
         <Route path={"/student-assessments"} component={StudentAssessments} />
         <Route path={"/student-answer-sheet/:assessmentId"} component={StudentAnswerSheet} />
         <Route path={"/assessments"} component={TeacherAssessments} />

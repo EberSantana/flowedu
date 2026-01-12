@@ -5140,3 +5140,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar sistema de validação de respostas
 - [x] Implementar geração de relatórios de correção
 
+
+## 📝 Caderno de Respostas Detalhado
+- [x] Mostrar perguntas completas dos exercícios respondidos
+- [x] Exibir respostas corretas de cada questão
+- [x] Exibir respostas marcadas pelo aluno (certas e erradas)
+- [x] Adicionar indicação visual de acertos e erros
+- [x] Criar interface de visualização do caderno de respostas

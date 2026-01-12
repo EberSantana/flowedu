@@ -146,6 +146,11 @@ const studentNavItems: NavItem[] = [
     href: "/student/notebook",
   },
   {
+    label: "Caderno de Respostas",
+    icon: <BookOpen className="h-5 w-5" />,
+    href: "/student/answerbook",
+  },
+  {
     label: "Avisos",
     icon: <Megaphone className="h-5 w-5" />,
     href: "/student/announcements",

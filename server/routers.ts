@@ -6874,6 +6874,52 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         return result;
       }),
 
+    // Obter caderno de respostas detalhado (perguntas + respostas corretas + respostas do aluno)
+    getDetailedAnswerbook: studentProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        exerciseId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        const questions = await db.getStudentAnsweredQuestions(studentId, { subjectId: input.subjectId });
+        
+        // Filtrar por exercício se especificado
+        const filteredQuestions = input.exerciseId 
+          ? questions.filter(q => q.exerciseId === input.exerciseId)
+          : questions;
+        
+        // Agrupar por exercício
+        const groupedByExercise = filteredQuestions.reduce((acc, question) => {
+          const exerciseId = question.exerciseId || 0;
+          if (!acc[exerciseId]) {
+            acc[exerciseId] = {
+              exerciseId,
+              exerciseTitle: question.exerciseTitle || 'Exercício sem título',
+              subjectId: question.subjectId,
+              questions: [],
+            };
+          }
+          acc[exerciseId].questions.push({
+            answerId: question.answerId,
+            questionNumber: question.questionNumber,
+            questionText: question.questionText,
+            questionType: question.questionType,
+            options: question.options,
+            studentAnswer: question.studentAnswer,
+            correctAnswer: question.correctAnswer || null,
+            isCorrect: question.isCorrect,
+            pointsAwarded: question.pointsAwarded,
+            attemptDate: question.attemptDate || question.createdAt,
+          });
+          return acc;
+        }, {} as Record<number, any>);
+        
+        return Object.values(groupedByExercise);
+      }),
+
     // Gerar feedback e sugestões de estudo com IA
     generateStudyMaterial: studentProcedure
       .input(z.object({
