@@ -1,0 +1,31 @@
+{
+  "query": "SELECT COUNT(*) as total FROM student_exercise_answers; SELECT * FROM student_exercise_answers LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total FROM student_exercise_answers; SELECT * FROM student_exercise_answers LIMIT 5;",
+  "rows": [
+    {
+      "total": "187"
+    },
+    {
+      "total": "id\tattemptId\tquestionNumber\tquestionType\tstudentAnswer\tcorrectAnswer\tisCorrect\tpointsAwarded\tteacherFeedback\tcreatedAt\taiFeedback\tstudyTips\taiScore\taiConfidence\taiAnalysis\tneedsReview\treviewedBy\treviewedAt\tfinalScore\tdetailedExplanation\tstudyStrategy\trelatedConcepts\tadditionalResources\tpracticeExamples\tcommonMistakes\tdifficultyLevel\ttimeToMaster\tmasteryStatus\tlastReviewedAt\treviewCount\tmarkedForReview"
+    },
+    {
+      "total": "1\t120009\t1\tobjective\tC\tC\t1\t10\tNULL\t2025-12-29 16:33:24\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0"
+    },
+    {
+      "total": "2\t120009\t2\tsubjective\tDemocracia é um sistema onde o povo governa\tDemocracia é um sistema de governo onde o poder é exercido pelo povo.\tNULL\t0\tNULL\t2025-12-29 16:33:24\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0"
+    },
+    {
+      "total": "30001\t150001\t1\tobjective\t5\t4\t0\t0\tNULL\t2025-12-29 20:27:00\tA resposta correta é 4, pois 2 + 2 = 4. Você respondeu 5, o que está incorreto.\tRevise operações básicas de adição. Pratique somas simples diariamente.\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0"
+    },
+    {
+      "total": "30002\t150002\t1\tobjective\t4\t4\t1\t10\tNULL\t2025-12-29 20:27:00\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0"
+    },
+    {
+      "total": "30003\t150003\t2\tobjective\tParis\tBrasília\t0\t0\tNULL\t2025-12-29 20:27:00\tParis é a capital da França, não do Brasil. A capital do Brasil é Brasília.\tEstude a geografia do Brasil. Memorize as capitais dos países da América do Sul.\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n187\nid\tattemptId\tquestionNumber\tquestionType\tstudentAnswer\tcorrectAnswer\tisCorrect\tpointsAwarded\tteacherFeedback\tcreatedAt\taiFeedback\tstudyTips\taiScore\taiConfidence\taiAnalysis\tneedsReview\treviewedBy\treviewedAt\tfinalScore\tdetailedExplanation\tstudyStrategy\trelatedConcepts\tadditionalResources\tpracticeExamples\tcommonMistakes\tdifficultyLevel\ttimeToMaster\tmasteryStatus\tlastReviewedAt\treviewCount\tmarkedForReview\n1\t120009\t1\tobjective\tC\tC\t1\t10\tNULL\t2025-12-29 16:33:24\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0\n2\t120009\t2\tsubjective\tDemocracia é um sistema onde o povo governa\tDemocracia é um sistema de governo onde o poder é exercido pelo povo.\tNULL\t0\tNULL\t2025-12-29 16:33:24\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0\n30001\t150001\t1\tobjective\t5\t4\t0\t0\tNULL\t2025-12-29 20:27:00\tA resposta correta é 4, pois 2 + 2 = 4. Você respondeu 5, o que está incorreto.\tRevise operações básicas de adição. Pratique somas simples diariamente.\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0\n30002\t150002\t1\tobjective\t4\t4\t1\t10\tNULL\t2025-12-29 20:27:00\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0\n30003\t150003\t2\tobjective\tParis\tBrasília\t0\t0\tNULL\t2025-12-29 20:27:00\tParis é a capital da França, não do Brasil. A capital do Brasil é Brasília.\tEstude a geografia do Brasil. Memorize as capitais dos países da América do Sul.\tNULL\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tnot_started\tNULL\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

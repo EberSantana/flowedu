@@ -1,0 +1,110 @@
+{
+  "query": "\nSELECT \n  sea.id as answer_id,\n  sea.attemptId,\n  sea.questionNumber,\n  sea.studentAnswer,\n  sea.isCorrect,\n  seat.studentId,\n  seat.exerciseId,\n  se.title as exercise_title\nFROM student_exercise_answers sea\nLEFT JOIN student_exercise_attempts seat ON sea.attemptId = seat.id\nLEFT JOIN student_exercises se ON seat.exerciseId = se.id\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \nSELECT \n  sea.id as answer_id,\n  sea.attemptId,\n  sea.questionNumber,\n  sea.studentAnswer,\n  sea.isCorrect,\n  seat.studentId,\n  seat.exerciseId,\n  se.title as exercise_title\nFROM student_exercise_answers sea\nLEFT JOIN student_exercise_attempts seat ON sea.attemptId = seat.id\nLEFT JOIN student_exercises se ON seat.exerciseId = se.id\nLIMIT 10;\n",
+  "rows": [
+    {
+      "answer_id": "1",
+      "attemptId": "120009",
+      "questionNumber": "1",
+      "studentAnswer": "C",
+      "isCorrect": "1",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "2",
+      "attemptId": "120009",
+      "questionNumber": "2",
+      "studentAnswer": "Democracia é um sistema onde o povo governa",
+      "isCorrect": "NULL",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "30001",
+      "attemptId": "150001",
+      "questionNumber": "1",
+      "studentAnswer": "5",
+      "isCorrect": "0",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "30002",
+      "attemptId": "150002",
+      "questionNumber": "1",
+      "studentAnswer": "4",
+      "isCorrect": "1",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "30003",
+      "attemptId": "150003",
+      "questionNumber": "2",
+      "studentAnswer": "Paris",
+      "isCorrect": "0",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "30004",
+      "attemptId": "150004",
+      "questionNumber": "1",
+      "studentAnswer": "5",
+      "isCorrect": "0",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "30005",
+      "attemptId": "150005",
+      "questionNumber": "1",
+      "studentAnswer": "4",
+      "isCorrect": "1",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "30006",
+      "attemptId": "150006",
+      "questionNumber": "2",
+      "studentAnswer": "Paris",
+      "isCorrect": "0",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "150002",
+      "attemptId": "270002",
+      "questionNumber": "1",
+      "studentAnswer": "C",
+      "isCorrect": "1",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    },
+    {
+      "answer_id": "150003",
+      "attemptId": "270003",
+      "questionNumber": "1",
+      "studentAnswer": "5",
+      "isCorrect": "0",
+      "studentId": "NULL",
+      "exerciseId": "NULL",
+      "exercise_title": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "answer_id\tattemptId\tquestionNumber\tstudentAnswer\tisCorrect\tstudentId\texerciseId\texercise_title\n1\t120009\t1\tC\t1\tNULL\tNULL\tNULL\n2\t120009\t2\tDemocracia é um sistema onde o povo governa\tNULL\tNULL\tNULL\tNULL\n30001\t150001\t1\t5\t0\tNULL\tNULL\tNULL\n30002\t150002\t1\t4\t1\tNULL\tNULL\tNULL\n30003\t150003\t2\tParis\t0\tNULL\tNULL\tNULL\n30004\t150004\t1\t5\t0\tNULL\tNULL\tNULL\n30005\t150005\t1\t4\t1\tNULL\tNULL\tNULL\n30006\t150006\t2\tParis\t0\tNULL\tNULL\tNULL\n150002\t270002\t1\tC\t1\tNULL\tNULL\tNULL\n150003\t270003\t1\t5\t0\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 89
+}

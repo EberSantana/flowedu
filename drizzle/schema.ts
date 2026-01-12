@@ -2322,3 +2322,169 @@ export const questionTypeInstructions = mysqlTable("question_type_instructions",
 
 export type QuestionTypeInstruction = typeof questionTypeInstructions.$inferSelect;
 export type InsertQuestionTypeInstruction = typeof questionTypeInstructions.$inferInsert;
+
+/**
+ * Caderno de Erros e Acertos com Análise Inteligente
+ * Sistema para alunos registrarem questões e receberem análises personalizadas
+ */
+
+/**
+ * Questões do Caderno de Erros e Acertos
+ */
+export const mistakeNotebookQuestions = mysqlTable("mistake_notebook_questions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  
+  // Informações da Questão
+  subject: varchar("subject", { length: 100 }).notNull(), // Matéria
+  topic: varchar("topic", { length: 255 }).notNull(), // Tópico específico
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
+  source: varchar("source", { length: 255 }), // Fonte da questão (livro, prova, etc)
+  
+  // Conteúdo
+  questionText: text("questionText").notNull(), // Enunciado da questão
+  questionImage: text("questionImage"), // URL da imagem da questão
+  correctAnswer: text("correctAnswer").notNull(), // Resposta correta
+  explanation: text("explanation"), // Explicação da resposta
+  
+  // Tags para organização
+  tags: text("tags"), // JSON array de tags
+  
+  // Controle
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MistakeNotebookQuestion = typeof mistakeNotebookQuestions.$inferSelect;
+export type InsertMistakeNotebookQuestion = typeof mistakeNotebookQuestions.$inferInsert;
+
+/**
+ * Tentativas de Resposta do Aluno
+ */
+export const mistakeNotebookAttempts = mysqlTable("mistake_notebook_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  questionId: int("questionId").notNull(), // FK para mistake_notebook_questions
+  studentId: int("studentId").notNull(), // FK para students
+  
+  // Resposta do Aluno
+  studentAnswer: text("studentAnswer").notNull(),
+  isCorrect: boolean("isCorrect").notNull(),
+  
+  // Análise do Erro
+  errorType: varchar("errorType", { length: 100 }), // Tipo de erro identificado
+  studentNotes: text("studentNotes"), // Anotações do aluno sobre o erro
+  
+  // Status de Revisão
+  reviewStatus: mysqlEnum("reviewStatus", ["pending", "reviewed", "mastered"]).default("pending").notNull(),
+  reviewedAt: timestamp("reviewedAt"),
+  
+  // Tempo gasto
+  timeSpent: int("timeSpent"), // Tempo em segundos
+  
+  // Controle
+  attemptedAt: timestamp("attemptedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MistakeNotebookAttempt = typeof mistakeNotebookAttempts.$inferSelect;
+export type InsertMistakeNotebookAttempt = typeof mistakeNotebookAttempts.$inferInsert;
+
+/**
+ * Tópicos de Estudo Identificados
+ */
+export const mistakeNotebookTopics = mysqlTable("mistake_notebook_topics", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  
+  // Informações do Tópico
+  subject: varchar("subject", { length: 100 }).notNull(),
+  topicName: varchar("topicName", { length: 255 }).notNull(),
+  
+  // Estatísticas
+  totalQuestions: int("totalQuestions").default(0).notNull(),
+  correctAnswers: int("correctAnswers").default(0).notNull(),
+  errorRate: float("errorRate").default(0).notNull(), // Taxa de erro (0-100)
+  
+  // Prioridade de Estudo
+  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  
+  // Controle
+  lastPracticed: timestamp("lastPracticed"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  uniqueTopic: unique().on(table.studentId, table.subject, table.topicName),
+}));
+
+export type MistakeNotebookTopic = typeof mistakeNotebookTopics.$inferSelect;
+export type InsertMistakeNotebookTopic = typeof mistakeNotebookTopics.$inferInsert;
+
+/**
+ * Insights Gerados pela IA
+ */
+export const mistakeNotebookInsights = mysqlTable("mistake_notebook_insights", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  
+  // Tipo de Insight
+  insightType: mysqlEnum("insightType", [
+    "pattern_analysis",      // Análise de padrões de erro
+    "study_suggestion",      // Sugestão de estudo
+    "question_recommendation", // Recomendação de questões
+    "progress_report"        // Relatório de progresso
+  ]).notNull(),
+  
+  // Conteúdo do Insight
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(), // Conteúdo em markdown
+  data: text("data"), // Dados estruturados em JSON
+  
+  // Relevância
+  relevanceScore: float("relevanceScore").default(0).notNull(), // 0-100
+  
+  // Status
+  isRead: boolean("isRead").default(false).notNull(),
+  isArchived: boolean("isArchived").default(false).notNull(),
+  
+  // Controle
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"), // Insights podem expirar
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MistakeNotebookInsight = typeof mistakeNotebookInsights.$inferSelect;
+export type InsertMistakeNotebookInsight = typeof mistakeNotebookInsights.$inferInsert;
+
+/**
+ * Planos de Estudo Gerados Automaticamente
+ */
+export const mistakeNotebookStudyPlans = mysqlTable("mistake_notebook_study_plans", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // FK para students
+  
+  // Informações do Plano
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  
+  // Período do Plano
+  startDate: date("startDate").notNull(),
+  endDate: date("endDate").notNull(),
+  
+  // Estrutura do Plano (JSON)
+  planData: text("planData").notNull(), // JSON com estrutura detalhada
+  
+  // Progresso
+  totalTasks: int("totalTasks").default(0).notNull(),
+  completedTasks: int("completedTasks").default(0).notNull(),
+  progressPercentage: float("progressPercentage").default(0).notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "completed", "abandoned"]).default("active").notNull(),
+  
+  // Controle
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MistakeNotebookStudyPlan = typeof mistakeNotebookStudyPlans.$inferSelect;
+export type InsertMistakeNotebookStudyPlan = typeof mistakeNotebookStudyPlans.$inferInsert;

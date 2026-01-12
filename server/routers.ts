@@ -7286,6 +7286,440 @@ Forneça:
         return responses;
       }),
   }),
+  
+  // Caderno de Erros e Acertos com IA
+  mistakeNotebook: router({
+    // Criar nova questão no caderno
+    createQuestion: studentProcedure
+      .input(z.object({
+        subject: z.string(),
+        topic: z.string(),
+        difficulty: z.enum(['easy', 'medium', 'hard']),
+        source: z.string().optional(),
+        questionText: z.string(),
+        questionImage: z.string().optional(),
+        correctAnswer: z.string(),
+        explanation: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const questionId = await db.createMistakeNotebookQuestion({
+          studentId: ctx.studentSession.studentId,
+          subject: input.subject,
+          topic: input.topic,
+          difficulty: input.difficulty,
+          source: input.source,
+          questionText: input.questionText,
+          questionImage: input.questionImage,
+          correctAnswer: input.correctAnswer,
+          explanation: input.explanation,
+          tags: input.tags ? JSON.stringify(input.tags) : null,
+        });
+        
+        return { questionId };
+      }),
+    
+    // Listar questões do caderno
+    listQuestions: studentProcedure
+      .input(z.object({
+        subject: z.string().optional(),
+        topic: z.string().optional(),
+        difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const questions = await db.getMistakeNotebookQuestions(
+          ctx.studentSession.studentId,
+          input
+        );
+        
+        return questions.map(q => ({
+          ...q,
+          tags: q.tags ? JSON.parse(q.tags) : [],
+        }));
+      }),
+    
+    // Obter questão por ID
+    getQuestion: studentProcedure
+      .input(z.object({ questionId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const question = await db.getMistakeNotebookQuestionById(
+          input.questionId,
+          ctx.studentSession.studentId
+        );
+        
+        if (!question) throw new TRPCError({ code: 'NOT_FOUND' });
+        
+        return {
+          ...question,
+          tags: question.tags ? JSON.parse(question.tags) : [],
+        };
+      }),
+    
+    // Registrar tentativa de resposta
+    createAttempt: studentProcedure
+      .input(z.object({
+        questionId: z.number(),
+        studentAnswer: z.string(),
+        isCorrect: z.boolean(),
+        errorType: z.string().optional(),
+        studentNotes: z.string().optional(),
+        timeSpent: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const attemptId = await db.createMistakeNotebookAttempt({
+          questionId: input.questionId,
+          studentId: ctx.studentSession.studentId,
+          studentAnswer: input.studentAnswer,
+          isCorrect: input.isCorrect,
+          errorType: input.errorType,
+          studentNotes: input.studentNotes,
+          timeSpent: input.timeSpent,
+        });
+        
+        return { attemptId };
+      }),
+    
+    // Listar tentativas de uma questão
+    listAttempts: studentProcedure
+      .input(z.object({ questionId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        return await db.getMistakeNotebookAttempts(
+          input.questionId,
+          ctx.studentSession.studentId
+        );
+      }),
+    
+    // Atualizar status de revisão
+    updateReviewStatus: studentProcedure
+      .input(z.object({
+        attemptId: z.number(),
+        status: z.enum(['pending', 'reviewed', 'mastered']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        await db.updateAttemptReviewStatus(input.attemptId, input.status);
+        return { success: true };
+      }),
+    
+    // Obter tópicos
+    listTopics: studentProcedure
+      .input(z.object({ subject: z.string().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        return await db.getMistakeNotebookTopics(
+          ctx.studentSession.studentId,
+          input.subject
+        );
+      }),
+    
+    // Obter estatísticas gerais
+    getStats: studentProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        return await db.getMistakeNotebookStats(ctx.studentSession.studentId);
+      }),
+    
+    // Analisar padrões com IA
+    analyzePatterns: studentProcedure
+      .input(z.object({ subject: z.string().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const topics = await db.getMistakeNotebookTopics(
+          ctx.studentSession.studentId,
+          input.subject
+        );
+        
+        if (topics.length === 0) {
+          return {
+            patterns: [],
+            summary: 'Ainda não há dados suficientes para análise.',
+          };
+        }
+        
+        // Gerar análise com IA
+        const prompt = `Analise os seguintes tópicos de estudo de um aluno e identifique padrões de erro:
+
+${topics.map(t => `- ${t.topicName} (${t.subject}): ${t.errorRate.toFixed(1)}% de erro, ${t.totalQuestions} questões`).join('\n')}
+
+Identifique:
+1. Padrões de dificuldade (quais tipos de tópicos têm mais erros)
+2. Áreas que precisam de mais atenção
+3. Possíveis lacunas de conhecimento
+
+Retorne uma análise clara e objetiva.`;
+        
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: 'system', content: 'Você é um tutor educacional especializado em identificar padrões de aprendizagem.' },
+              { role: 'user', content: prompt },
+            ],
+          });
+          
+          const analysis = typeof response.choices[0]?.message?.content === 'string'
+            ? response.choices[0].message.content
+            : 'Análise não disponível.';
+          
+          // Salvar insight
+          await db.createMistakeNotebookInsight({
+            studentId: ctx.studentSession.studentId,
+            insightType: 'pattern_analysis',
+            title: 'Análise de Padrões de Erro',
+            content: analysis,
+            data: JSON.stringify({ topics }),
+            relevanceScore: 85,
+          });
+          
+          return {
+            patterns: topics.filter(t => t.errorRate > 50),
+            summary: analysis,
+          };
+        } catch (error) {
+          console.error('Error analyzing patterns:', error);
+          return {
+            patterns: topics.filter(t => t.errorRate > 50),
+            summary: 'Erro ao gerar análise. Por favor, tente novamente.',
+          };
+        }
+      }),
+    
+    // Gerar sugestões personalizadas
+    generateSuggestions: studentProcedure
+      .mutation(async ({ ctx }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const stats = await db.getMistakeNotebookStats(ctx.studentSession.studentId);
+        const topics = await db.getMistakeNotebookTopics(ctx.studentSession.studentId);
+        
+        if (topics.length === 0) {
+          return {
+            suggestions: ['Comece registrando suas primeiras questões no caderno!'],
+          };
+        }
+        
+        const criticalTopics = topics.filter(t => t.priority === 'critical' || t.priority === 'high');
+        
+        const prompt = `Com base no desempenho do aluno:
+
+- Taxa de sucesso geral: ${stats.successRate.toFixed(1)}%
+- Total de questões: ${stats.totalQuestions}
+- Tópicos críticos: ${criticalTopics.map(t => t.topicName).join(', ')}
+
+Gere 5 sugestões práticas e específicas de estudo para melhorar o desempenho. Seja objetivo e motivador.`;
+        
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: 'system', content: 'Você é um tutor educacional que cria sugestões de estudo personalizadas.' },
+              { role: 'user', content: prompt },
+            ],
+          });
+          
+          const suggestionsText = typeof response.choices[0]?.message?.content === 'string' 
+            ? response.choices[0].message.content 
+            : '';
+          const suggestions = suggestionsText.split('\n').filter(s => s.trim().length > 0);
+          
+          // Salvar insight
+          await db.createMistakeNotebookInsight({
+            studentId: ctx.studentSession.studentId,
+            insightType: 'study_suggestion',
+            title: 'Sugestões Personalizadas de Estudo',
+            content: suggestionsText,
+            data: JSON.stringify({ stats, criticalTopics }),
+            relevanceScore: 90,
+          });
+          
+          return { suggestions };
+        } catch (error) {
+          console.error('Error generating suggestions:', error);
+          return {
+            suggestions: [
+              'Revise os tópicos com maior taxa de erro',
+              'Pratique mais questões dos temas difíceis',
+              'Faça revisões periódicas',
+            ],
+          };
+        }
+      }),
+    
+    // Criar plano de estudos
+    createStudyPlan: studentProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+        focusSubjects: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const topics = await db.getMistakeNotebookTopics(ctx.studentSession.studentId);
+        const priorityTopics = topics
+          .filter(t => t.priority === 'critical' || t.priority === 'high')
+          .sort((a, b) => b.errorRate - a.errorRate)
+          .slice(0, 10);
+        
+        if (priorityTopics.length === 0) {
+          throw new TRPCError({ 
+            code: 'BAD_REQUEST', 
+            message: 'Não há tópicos suficientes para criar um plano de estudos.' 
+          });
+        }
+        
+        const prompt = `Crie um plano de estudos detalhado de ${input.startDate} até ${input.endDate} focando nestes tópicos:
+
+${priorityTopics.map((t, i) => `${i + 1}. ${t.topicName} (${t.subject}) - ${t.errorRate.toFixed(1)}% de erro`).join('\n')}
+
+O plano deve:
+- Distribuir os tópicos ao longo do período
+- Incluir tempo para revisão
+- Ser realista e executável
+- Incluir tarefas específicas
+
+Retorne em formato JSON com estrutura:
+{
+  "tasks": [
+    { "date": "YYYY-MM-DD", "topic": "nome", "description": "o que fazer", "duration": "tempo em minutos" }
+  ]
+}`;
+        
+        try {
+          const response = await invokeLLM({
+            messages: [
+              { role: 'system', content: 'Você é um planejador educacional especializado.' },
+              { role: 'user', content: prompt },
+            ],
+            response_format: {
+              type: 'json_schema',
+              json_schema: {
+                name: 'study_plan',
+                strict: true,
+                schema: {
+                  type: 'object',
+                  properties: {
+                    tasks: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          date: { type: 'string' },
+                          topic: { type: 'string' },
+                          description: { type: 'string' },
+                          duration: { type: 'string' },
+                        },
+                        required: ['date', 'topic', 'description', 'duration'],
+                        additionalProperties: false,
+                      },
+                    },
+                  },
+                  required: ['tasks'],
+                  additionalProperties: false,
+                },
+              },
+            },
+          });
+          
+          const content = response.choices[0]?.message?.content;
+          if (!content || typeof content !== 'string') throw new Error('Empty response');
+          
+          const planData = JSON.parse(content);
+          
+          const planId = await db.createMistakeNotebookStudyPlan({
+            studentId: ctx.studentSession.studentId,
+            title: `Plano de Estudos - ${input.startDate} a ${input.endDate}`,
+            description: `Plano focado em ${priorityTopics.length} tópicos prioritários`,
+            startDate: new Date(input.startDate),
+            endDate: new Date(input.endDate),
+            planData: JSON.stringify(planData),
+            totalTasks: planData.tasks.length,
+            completedTasks: 0,
+            progressPercentage: 0,
+          });
+          
+          return { planId, plan: planData };
+        } catch (error) {
+          console.error('Error creating study plan:', error);
+          throw new TRPCError({ 
+            code: 'INTERNAL_SERVER_ERROR', 
+            message: 'Erro ao criar plano de estudos. Tente novamente.' 
+          });
+        }
+      }),
+    
+    // Listar planos de estudo
+    listStudyPlans: studentProcedure
+      .input(z.object({ status: z.enum(['active', 'completed', 'abandoned']).optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const plans = await db.getMistakeNotebookStudyPlans(
+          ctx.studentSession.studentId,
+          input.status
+        );
+        
+        return plans.map(p => ({
+          ...p,
+          planData: p.planData ? JSON.parse(p.planData) : null,
+        }));
+      }),
+    
+    // Atualizar progresso do plano
+    updatePlanProgress: studentProcedure
+      .input(z.object({
+        planId: z.number(),
+        completedTasks: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        await db.updateStudyPlanProgress(input.planId, input.completedTasks);
+        return { success: true };
+      }),
+    
+    // Listar insights
+    listInsights: studentProcedure
+      .input(z.object({
+        insightType: z.enum(['pattern_analysis', 'study_suggestion', 'question_recommendation', 'progress_report']).optional(),
+        onlyUnread: z.boolean().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const insights = await db.getMistakeNotebookInsights(
+          ctx.studentSession.studentId,
+          input
+        );
+        
+        return insights.map(i => ({
+          ...i,
+          data: i.data ? JSON.parse(i.data) : null,
+        }));
+      }),
+    
+    // Marcar insight como lido
+    markInsightRead: studentProcedure
+      .input(z.object({ insightId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        await db.markInsightAsRead(input.insightId);
+        return { success: true };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 

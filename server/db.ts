@@ -98,6 +98,16 @@ import {
   InsertTeacherPoints,
   InsertTeacherActivitiesHistory,
   InsertTeacherBeltHistory,
+  mistakeNotebookQuestions,
+  mistakeNotebookAttempts,
+  mistakeNotebookTopics,
+  mistakeNotebookInsights,
+  mistakeNotebookStudyPlans,
+  InsertMistakeNotebookQuestion,
+  InsertMistakeNotebookAttempt,
+  InsertMistakeNotebookTopic,
+  InsertMistakeNotebookInsight,
+  InsertMistakeNotebookStudyPlan,
   belts,
   Belt,
   InsertBelt,
@@ -10731,5 +10741,403 @@ export function getDefaultQuestionInstructions() {
 • Revise sua resposta antes de entregar.
 • Escreva de forma legível e respeite as margens.`
     }
+  };
+}
+
+
+/**
+ * ========================================
+ * CADERNO DE ERROS E ACERTOS COM IA
+ * ========================================
+ */
+
+/**
+ * Criar nova questão no caderno
+ */
+export async function createMistakeNotebookQuestion(data: InsertMistakeNotebookQuestion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(mistakeNotebookQuestions).values(data);
+  return result[0].insertId;
+}
+
+/**
+ * Listar questões do caderno do aluno
+ */
+export async function getMistakeNotebookQuestions(
+  studentId: number,
+  filters?: {
+    subject?: string;
+    topic?: string;
+    difficulty?: 'easy' | 'medium' | 'hard';
+  }
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(mistakeNotebookQuestions.studentId, studentId)];
+  
+  if (filters?.subject) {
+    conditions.push(eq(mistakeNotebookQuestions.subject, filters.subject));
+  }
+  
+  if (filters?.topic) {
+    conditions.push(eq(mistakeNotebookQuestions.topic, filters.topic));
+  }
+  
+  if (filters?.difficulty) {
+    conditions.push(eq(mistakeNotebookQuestions.difficulty, filters.difficulty));
+  }
+  
+  return await db
+    .select()
+    .from(mistakeNotebookQuestions)
+    .where(and(...conditions))
+    .orderBy(desc(mistakeNotebookQuestions.createdAt));
+}
+
+/**
+ * Obter questão por ID
+ */
+export async function getMistakeNotebookQuestionById(questionId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db
+    .select()
+    .from(mistakeNotebookQuestions)
+    .where(
+      and(
+        eq(mistakeNotebookQuestions.id, questionId),
+        eq(mistakeNotebookQuestions.studentId, studentId)
+      )
+    )
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Registrar tentativa de resposta
+ */
+export async function createMistakeNotebookAttempt(data: InsertMistakeNotebookAttempt) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(mistakeNotebookAttempts).values(data);
+  
+  // Atualizar estatísticas do tópico
+  const question = await getMistakeNotebookQuestionById(data.questionId, data.studentId);
+  if (question) {
+    await updateTopicStatistics(data.studentId, question.subject, question.topic);
+  }
+  
+  return result[0].insertId;
+}
+
+/**
+ * Listar tentativas de uma questão
+ */
+export async function getMistakeNotebookAttempts(questionId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(mistakeNotebookAttempts)
+    .where(
+      and(
+        eq(mistakeNotebookAttempts.questionId, questionId),
+        eq(mistakeNotebookAttempts.studentId, studentId)
+      )
+    )
+    .orderBy(desc(mistakeNotebookAttempts.attemptedAt));
+}
+
+/**
+ * Atualizar status de revisão de uma tentativa
+ */
+export async function updateAttemptReviewStatus(
+  attemptId: number,
+  status: 'pending' | 'reviewed' | 'mastered'
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(mistakeNotebookAttempts)
+    .set({ 
+      reviewStatus: status,
+      reviewedAt: status !== 'pending' ? new Date() : null
+    })
+    .where(eq(mistakeNotebookAttempts.id, attemptId));
+}
+
+/**
+ * Atualizar estatísticas de um tópico
+ */
+async function updateTopicStatistics(studentId: number, subject: string, topicName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar todas as questões deste tópico
+  const questions = await db
+    .select()
+    .from(mistakeNotebookQuestions)
+    .where(
+      and(
+        eq(mistakeNotebookQuestions.studentId, studentId),
+        eq(mistakeNotebookQuestions.subject, subject),
+        eq(mistakeNotebookQuestions.topic, topicName)
+      )
+    );
+  
+  if (questions.length === 0) return;
+  
+  // Buscar todas as tentativas dessas questões
+  const questionIds = questions.map(q => q.id);
+  const attempts = await db
+    .select()
+    .from(mistakeNotebookAttempts)
+    .where(
+      and(
+        eq(mistakeNotebookAttempts.studentId, studentId),
+        sql`${mistakeNotebookAttempts.questionId} IN (${sql.join(questionIds, sql`, `)})`
+      )
+    );
+  
+  const totalQuestions = questions.length;
+  const correctAnswers = attempts.filter(a => a.isCorrect).length;
+  const errorRate = totalQuestions > 0 ? ((totalQuestions - correctAnswers) / totalQuestions) * 100 : 0;
+  
+  // Determinar prioridade baseada na taxa de erro
+  let priority: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+  if (errorRate >= 75) priority = 'critical';
+  else if (errorRate >= 50) priority = 'high';
+  else if (errorRate >= 25) priority = 'medium';
+  else priority = 'low';
+  
+  // Verificar se o tópico já existe
+  const existingTopic = await db
+    .select()
+    .from(mistakeNotebookTopics)
+    .where(
+      and(
+        eq(mistakeNotebookTopics.studentId, studentId),
+        eq(mistakeNotebookTopics.subject, subject),
+        eq(mistakeNotebookTopics.topicName, topicName)
+      )
+    )
+    .limit(1);
+  
+  if (existingTopic.length > 0) {
+    // Atualizar
+    await db
+      .update(mistakeNotebookTopics)
+      .set({
+        totalQuestions,
+        correctAnswers,
+        errorRate,
+        priority,
+        lastPracticed: new Date(),
+      })
+      .where(eq(mistakeNotebookTopics.id, existingTopic[0].id));
+  } else {
+    // Criar
+    await db.insert(mistakeNotebookTopics).values({
+      studentId,
+      subject,
+      topicName,
+      totalQuestions,
+      correctAnswers,
+      errorRate,
+      priority,
+      lastPracticed: new Date(),
+    });
+  }
+}
+
+/**
+ * Obter tópicos do aluno
+ */
+export async function getMistakeNotebookTopics(studentId: number, subject?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(mistakeNotebookTopics.studentId, studentId)];
+  
+  if (subject) {
+    conditions.push(eq(mistakeNotebookTopics.subject, subject));
+  }
+  
+  return await db
+    .select()
+    .from(mistakeNotebookTopics)
+    .where(and(...conditions))
+    .orderBy(desc(mistakeNotebookTopics.errorRate));
+}
+
+/**
+ * Criar insight da IA
+ */
+export async function createMistakeNotebookInsight(data: InsertMistakeNotebookInsight) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(mistakeNotebookInsights).values(data);
+  return result[0].insertId;
+}
+
+/**
+ * Listar insights do aluno
+ */
+export async function getMistakeNotebookInsights(
+  studentId: number,
+  filters?: {
+    insightType?: 'pattern_analysis' | 'study_suggestion' | 'question_recommendation' | 'progress_report';
+    onlyUnread?: boolean;
+  }
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    eq(mistakeNotebookInsights.studentId, studentId),
+    eq(mistakeNotebookInsights.isArchived, false)
+  ];
+  
+  if (filters?.insightType) {
+    conditions.push(eq(mistakeNotebookInsights.insightType, filters.insightType));
+  }
+  
+  if (filters?.onlyUnread) {
+    conditions.push(eq(mistakeNotebookInsights.isRead, false));
+  }
+  
+  return await db
+    .select()
+    .from(mistakeNotebookInsights)
+    .where(and(...conditions))
+    .orderBy(desc(mistakeNotebookInsights.relevanceScore), desc(mistakeNotebookInsights.generatedAt));
+}
+
+/**
+ * Marcar insight como lido
+ */
+export async function markInsightAsRead(insightId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(mistakeNotebookInsights)
+    .set({ isRead: true })
+    .where(eq(mistakeNotebookInsights.id, insightId));
+}
+
+/**
+ * Criar plano de estudos
+ */
+export async function createMistakeNotebookStudyPlan(data: InsertMistakeNotebookStudyPlan) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(mistakeNotebookStudyPlans).values(data);
+  return result[0].insertId;
+}
+
+/**
+ * Obter planos de estudo do aluno
+ */
+export async function getMistakeNotebookStudyPlans(studentId: number, status?: 'active' | 'completed' | 'abandoned') {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(mistakeNotebookStudyPlans.studentId, studentId)];
+  
+  if (status) {
+    conditions.push(eq(mistakeNotebookStudyPlans.status, status));
+  }
+  
+  return await db
+    .select()
+    .from(mistakeNotebookStudyPlans)
+    .where(and(...conditions))
+    .orderBy(desc(mistakeNotebookStudyPlans.createdAt));
+}
+
+/**
+ * Atualizar progresso do plano de estudos
+ */
+export async function updateStudyPlanProgress(planId: number, completedTasks: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const plan = await db
+    .select()
+    .from(mistakeNotebookStudyPlans)
+    .where(eq(mistakeNotebookStudyPlans.id, planId))
+    .limit(1);
+  
+  if (plan.length === 0) return;
+  
+  const totalTasks = plan[0].totalTasks;
+  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const status = progressPercentage >= 100 ? 'completed' : 'active';
+  
+  await db
+    .update(mistakeNotebookStudyPlans)
+    .set({
+      completedTasks,
+      progressPercentage,
+      status,
+    })
+    .where(eq(mistakeNotebookStudyPlans.id, planId));
+}
+
+/**
+ * Obter estatísticas gerais do caderno
+ */
+export async function getMistakeNotebookStats(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Total de questões
+  const questions = await db
+    .select()
+    .from(mistakeNotebookQuestions)
+    .where(eq(mistakeNotebookQuestions.studentId, studentId));
+  
+  // Total de tentativas
+  const attempts = await db
+    .select()
+    .from(mistakeNotebookAttempts)
+    .where(eq(mistakeNotebookAttempts.studentId, studentId));
+  
+  const totalQuestions = questions.length;
+  const totalAttempts = attempts.length;
+  const correctAttempts = attempts.filter(a => a.isCorrect).length;
+  const successRate = totalAttempts > 0 ? (correctAttempts / totalAttempts) * 100 : 0;
+  
+  // Questões por matéria
+  const questionsBySubject = questions.reduce((acc, q) => {
+    acc[q.subject] = (acc[q.subject] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  // Tópicos prioritários
+  const topics = await getMistakeNotebookTopics(studentId);
+  const criticalTopics = topics.filter(t => t.priority === 'critical').length;
+  const highPriorityTopics = topics.filter(t => t.priority === 'high').length;
+  
+  return {
+    totalQuestions,
+    totalAttempts,
+    correctAttempts,
+    successRate,
+    questionsBySubject,
+    totalTopics: topics.length,
+    criticalTopics,
+    highPriorityTopics,
   };
 }

@@ -34,7 +34,8 @@
 - [x] Centralizar layout da página SubjectCTStats.tsx (aplicar container mx-auto com max-width)
 - [x] Corrigir erro: procedimento tRPC teacherExercises.getStatistics não encontrado
 - [x] Adicionar filtro por disciplina na página de Análise de Aprendizado com IA
-- [x] CRÍTICO: Caderno de exercícios não está visível no portal do aluno - CORRIGIDO: modificada detecção de tipo de usuário no Sidebar para usar sessão real (tRPC) ao invés de URL
+- [x- [x] CRÍTICO: Caderno de exercícios não está visível no portal do aluno - CORRIGIDO: modificada detecção de tipo de usuário no Sidebar para usar sessão real (tRPC) ao invés de URL
+- [ ] BUG: Caderno de Respostas não está exibindo nenhum conteúdo
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 
@@ -5147,3 +5148,56 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Exibir respostas marcadas pelo aluno (certas e erradas)
 - [x] Adicionar indicação visual de acertos e erros
 - [x] Criar interface de visualização do caderno de respostas
+
+
+## 🤖 Sistema de Análise Inteligente de Erros e Acertos (Caderno com IA)
+
+### Backend - Banco de Dados
+- [x] Criar tabela `mistake_notebook_questions` (questões do caderno)
+- [x] Criar tabela `mistake_notebook_attempts` (tentativas de resposta)
+- [x] Criar tabela `mistake_notebook_topics` (tópicos de estudo)
+- [x] Criar tabela `mistake_notebook_insights` (insights gerados pela IA)
+- [x] Criar tabela `mistake_notebook_study_plans` (planos de estudo)
+
+### Backend - tRPC Procedures
+- [x] Procedure para adicionar questão ao caderno
+- [x] Procedure para listar histórico de questões
+- [x] Procedure para obter estatísticas gerais do caderno
+- [x] Procedure para análise de padrões com IA
+- [x] Procedure para gerar sugestões personalizadas
+- [x] Procedure para recomendar questões similares
+- [x] Procedure para criar plano de estudos automático
+- [x] Procedure para obter insights por tópico
+- [x] Procedure para atualizar status de revisão
+
+### Frontend - Interface
+- [x] Página inicial do caderno com dashboard de estatísticas
+- [x] Formulário para registrar nova questão
+- [x] Lista de questões com filtros (acertos/erros/tópico/matéria)
+- [x] Página de análise de padrões com gráficos
+- [x] Seção de sugestões personalizadas da IA
+- [x] Seção de recomendações de questões
+- [x] Visualização do plano de estudos
+- [x] Página de insights por tópico
+- [x] Integração com menu do aluno
+
+### Frontend - Componentes
+- [x] Card de estatísticas gerais (total, acertos, erros, taxa)
+- [x] Gráfico de evolução temporal
+- [x] Gráfico de distribuição por tópico
+- [x] Gráfico de distribuição por matéria
+- [x] Card de insight da IA
+- [x] Lista de sugestões de estudo
+- [x] Timeline do plano de estudos
+- [x] Badge de dificuldade da questão
+
+### Testes
+- [x] Teste de criação de questão no caderno
+- [x] Teste de análise de padrões
+- [x] Teste de geração de sugestões
+- [x] Teste de criação de plano de estudos
+- [x] Teste de recomendação de questões
+
+### Entrega Final
+- [x] Criar checkpoint final do caderno inteligente
+- [x] Apresentar sistema ao usuário
