@@ -150,11 +150,6 @@ const studentNavItems: NavItem[] = [
     icon: <Megaphone className="h-5 w-5" />,
     href: "/student/announcements",
   },
-  {
-    label: "Perfil",
-    icon: <User className="h-5 w-5" />,
-    href: "/profile",
-  },
 ];
 
 export default function Sidebar() {
@@ -189,10 +184,26 @@ export default function Sidebar() {
       toast.error("Erro ao fazer logout: " + error.message);
     },
   });
+  
+  const exitStudentModeMutation = trpc.auth.exitStudentMode.useMutation({
+    onSuccess: () => {
+      toast.success("✅ Voltando ao modo Professor...");
+      window.location.href = "/dashboard";
+    },
+    onError: (error) => {
+      toast.error("Erro ao sair do modo aluno: " + error.message);
+    },
+  });
 
   const handleLogout = () => {
     if (confirm("Deseja realmente sair do sistema?")) {
       logoutMutation.mutate();
+    }
+  };
+  
+  const handleExitStudentMode = () => {
+    if (confirm("👨‍🏫 Deseja voltar ao modo Professor?")) {
+      exitStudentModeMutation.mutate();
     }
   };
 
@@ -421,44 +432,63 @@ export default function Sidebar() {
                   
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button
-                        onClick={() => {
-                          // Remover onboarding do perfil atual
-                          // Perfil único tradicional
-                          localStorage.removeItem('onboarding_completed_traditional');
-                          window.location.reload();
-                        }}
-                        className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
-                      >
-                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                          <HelpCircle className="h-4 w-4" />
-                        </span>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Refazer Tour</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  
-                  <div className="flex items-center justify-center">
-                    <ThemeToggle />
-                  </div>
-                  
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={handleLogout}
-                        className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
-                      >
-                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                          <LogOut className="h-4 w-4" />
-                        </span>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Sair</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <button
+                    onClick={() => {
+                      // Remover onboarding do perfil atual
+                      // Perfil único tradicional
+                      localStorage.removeItem('onboarding_completed_traditional');
+                      window.location.reload();
+                    }}
+                    className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                      <HelpCircle className="h-4 w-4" />
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Refazer Tour</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <div className="flex items-center justify-center">
+                <ThemeToggle />
+              </div>
+              
+              {/* Botão de sair do modo aluno (apenas para alunos) */}
+              {isStudent && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={handleExitStudentMode}
+                      className="p-2 rounded-xl text-blue-500 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-500/5 hover:shadow-md transition-all duration-200 group"
+                    >
+                      <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                        <KeyRound className="h-4 w-4" />
+                      </span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Voltar ao Modo Professor</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                      <LogOut className="h-4 w-4" />
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Sair</p>
+                </TooltipContent>
+              </Tooltip>
                 </div>
               </TooltipProvider>
             ) : (
@@ -504,6 +534,17 @@ export default function Sidebar() {
                     <ThemeToggle />
                     <span className="text-sm text-muted-foreground">Tema</span>
                   </div>
+                  
+                  {/* Botão de sair do modo aluno (apenas para alunos) */}
+                  {isStudent && (
+                    <button
+                      onClick={handleExitStudentMode}
+                      className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-blue-500 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-500/5 hover:shadow-md transition-all duration-200"
+                    >
+                      <KeyRound className="h-4 w-4" />
+                      <span className="text-sm">👨‍🏫 Voltar ao Modo Professor</span>
+                    </button>
+                  )}
                   
                   <button
                     onClick={handleLogout}

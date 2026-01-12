@@ -16,6 +16,8 @@
 
 ## 🐛 Bugs Críticos
 
+- [x] Corrigir navegação entre módulo Professor e módulo Aluno (bug reportado: não consegue sair do modo professor) - CORRIGIDO: adicionado botão "Voltar ao Modo Professor" no Sidebar e rota exitStudentMode
+
 - [x] Corrigir erro de consulta SQL na página /student-assessments (subject_enrollments) - CORRIGIDO: nome da tabela estava incorreto (subject_enrollments ao invés de subjectEnrollments)
 - [x] Corrigir validação de respostas no quiz - resposta correta sendo marcada como incorreta
 - [x] Corrigir exibição do enunciado das questões no quiz - enunciado não está aparecendo
