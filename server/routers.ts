@@ -6973,6 +6973,261 @@ Forneça:
         }
       }),
   }),
+
+  // ========================================
+  // SISTEMA DE CADERNO DE RESPOSTAS
+  // ========================================
+  answerSheet: router({
+    // === ROTAS DO PROFESSOR ===
+    
+    // Criar nova avaliação
+    createAssessment: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        classId: z.number().optional(),
+        title: z.string().min(1),
+        description: z.string().optional(),
+        assessmentType: z.enum(['prova', 'simulado', 'avaliacao_parcial', 'avaliacao_final', 'recuperacao', 'diagnostica']).optional(),
+        totalQuestions: z.number().min(1),
+        totalPoints: z.number().optional(),
+        passingScore: z.number().optional(),
+        duration: z.number().optional(),
+        generalInstructions: z.string().optional(),
+        applicationDate: z.date().optional(),
+        availableFrom: z.date().optional(),
+        availableTo: z.date().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        return await db.createAssessment({
+          teacherId: ctx.user.id,
+          ...input,
+        });
+      }),
+    
+    // Listar avaliações do professor
+    listAssessments: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        return await db.getAssessmentsByTeacher(ctx.user.id, input?.subjectId);
+      }),
+    
+    // Obter detalhes de uma avaliação
+    getAssessment: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        const assessment = await db.getAssessmentById(input.assessmentId, ctx.user.id);
+        if (!assessment) throw new TRPCError({ code: 'NOT_FOUND', message: 'Avaliação não encontrada' });
+        
+        const questions = await db.getAssessmentQuestions(input.assessmentId);
+        return { ...assessment, questions };
+      }),
+    
+    // Atualizar avaliação
+    updateAssessment: protectedProcedure
+      .input(z.object({
+        assessmentId: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        totalQuestions: z.number().optional(),
+        totalPoints: z.number().optional(),
+        passingScore: z.number().optional(),
+        duration: z.number().optional(),
+        generalInstructions: z.string().optional(),
+        applicationDate: z.date().optional(),
+        availableFrom: z.date().optional(),
+        availableTo: z.date().optional(),
+        status: z.enum(['draft', 'published', 'applied', 'corrected', 'archived']).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        const { assessmentId, ...data } = input;
+        await db.updateAssessment(assessmentId, ctx.user.id, data);
+        return { success: true };
+      }),
+    
+    // Adicionar questão
+    addQuestion: protectedProcedure
+      .input(z.object({
+        assessmentId: z.number(),
+        questionNumber: z.number(),
+        questionType: z.enum(['multiple_choice', 'true_false', 'matching', 'fill_blank', 'short_answer', 'essay']).optional(),
+        statement: z.string().min(1),
+        context: z.string().optional(),
+        optionA: z.string().optional(),
+        optionB: z.string().optional(),
+        optionC: z.string().optional(),
+        optionD: z.string().optional(),
+        optionE: z.string().optional(),
+        correctAnswer: z.string().min(1),
+        answerExplanation: z.string().optional(),
+        specificInstructions: z.string().optional(),
+        points: z.number().optional(),
+        partialCredit: z.boolean().optional(),
+        skill: z.string().optional(),
+        difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        return await db.addAssessmentQuestion(input);
+      }),
+    
+    // Atualizar questão
+    updateQuestion: protectedProcedure
+      .input(z.object({
+        questionId: z.number(),
+        statement: z.string().optional(),
+        context: z.string().optional(),
+        optionA: z.string().optional(),
+        optionB: z.string().optional(),
+        optionC: z.string().optional(),
+        optionD: z.string().optional(),
+        optionE: z.string().optional(),
+        correctAnswer: z.string().optional(),
+        answerExplanation: z.string().optional(),
+        specificInstructions: z.string().optional(),
+        points: z.number().optional(),
+        skill: z.string().optional(),
+        difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        const { questionId, ...data } = input;
+        await db.updateAssessmentQuestion(questionId, data);
+        return { success: true };
+      }),
+    
+    // Excluir questão
+    deleteQuestion: protectedProcedure
+      .input(z.object({ questionId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        await db.deleteAssessmentQuestion(input.questionId);
+        return { success: true };
+      }),
+    
+    // Listar cadernos de uma avaliação
+    listAnswerSheets: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        return await db.getAnswerSheetsByAssessment(input.assessmentId);
+      }),
+    
+    // Corrigir caderno
+    correctAnswerSheet: protectedProcedure
+      .input(z.object({ answerSheetId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        return await db.correctAnswerSheet(input.answerSheetId, ctx.user.id);
+      }),
+    
+    // Obter instruções por tipo de questão
+    getInstructions: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        const custom = await db.getQuestionTypeInstructions(ctx.user.id);
+        const defaults = db.getDefaultQuestionInstructions();
+        return { custom, defaults };
+      }),
+    
+    // Salvar instrução personalizada
+    saveInstruction: protectedProcedure
+      .input(z.object({
+        questionType: z.enum(['multiple_choice', 'true_false', 'matching', 'fill_blank', 'short_answer', 'essay']),
+        title: z.string().min(1),
+        instructions: z.string().min(1),
+        exampleImage: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        await db.saveQuestionTypeInstruction({
+          teacherId: ctx.user.id,
+          ...input,
+        });
+        return { success: true };
+      }),
+    
+    // === ROTAS DO ALUNO ===
+    
+    // Listar avaliações disponíveis
+    listAvailableAssessments: studentProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        return await db.getAvailableAssessmentsForStudent(ctx.studentSession.studentId);
+      }),
+    
+    // Obter caderno de respostas do aluno
+    getMyAnswerSheet: studentProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        let answerSheet = await db.getAnswerSheetByStudent(input.assessmentId, ctx.studentSession.studentId);
+        
+        // Se não existe, criar um novo caderno
+        if (!answerSheet) {
+          const { sheetCode } = await db.createAnswerSheet({
+            assessmentId: input.assessmentId,
+            studentId: ctx.studentSession.studentId,
+          });
+          answerSheet = await db.getAnswerSheetByStudent(input.assessmentId, ctx.studentSession.studentId);
+        }
+        
+        const questions = await db.getAssessmentQuestions(input.assessmentId);
+        const responses = answerSheet?.id ? await db.getAnswerSheetResponses(answerSheet.id) : [];
+        const instructions = db.getDefaultQuestionInstructions();
+        
+        return { answerSheet, questions, responses, instructions };
+      }),
+    
+    // Iniciar preenchimento do caderno
+    startAnswerSheet: studentProcedure
+      .input(z.object({ answerSheetId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        await db.startAnswerSheet(input.answerSheetId);
+        return { success: true };
+      }),
+    
+    // Salvar resposta
+    saveResponse: studentProcedure
+      .input(z.object({
+        answerSheetId: z.number(),
+        questionId: z.number(),
+        studentAnswer: z.string().optional(),
+        isBlank: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        await db.saveAnswerSheetResponse(input);
+        return { success: true };
+      }),
+    
+    // Submeter caderno
+    submitAnswerSheet: studentProcedure
+      .input(z.object({ answerSheetId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        await db.submitAnswerSheet(input.answerSheetId);
+        return { success: true };
+      }),
+    
+    // Ver resultado (após correção)
+    getMyResults: studentProcedure
+      .input(z.object({ answerSheetId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.studentSession?.studentId) throw new TRPCError({ code: 'UNAUTHORIZED' });
+        
+        const responses = await db.getAnswerSheetResponses(input.answerSheetId);
+        return responses;
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 

@@ -10102,3 +10102,634 @@ export async function getStudentNotebookStats(studentId: number, subjectId?: num
     notStarted: answers.filter(a => a.masteryStatus === 'not_started').length,
   };
 }
+
+
+// ========================================
+// SISTEMA DE CADERNO DE RESPOSTAS
+// ========================================
+
+/**
+ * Criar uma nova avaliação
+ */
+export async function createAssessment(data: {
+  teacherId: number;
+  subjectId: number;
+  classId?: number;
+  title: string;
+  description?: string;
+  assessmentType?: 'prova' | 'simulado' | 'avaliacao_parcial' | 'avaliacao_final' | 'recuperacao' | 'diagnostica';
+  totalQuestions: number;
+  totalPoints?: number;
+  passingScore?: number;
+  duration?: number;
+  generalInstructions?: string;
+  applicationDate?: Date;
+  availableFrom?: Date;
+  availableTo?: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    INSERT INTO assessments (
+      teacherId, subjectId, classId, title, description, assessmentType,
+      totalQuestions, totalPoints, passingScore, duration, generalInstructions,
+      applicationDate, availableFrom, availableTo, status
+    ) VALUES (
+      ${data.teacherId}, ${data.subjectId}, ${data.classId || null}, ${data.title}, 
+      ${data.description || null}, ${data.assessmentType || 'prova'},
+      ${data.totalQuestions}, ${data.totalPoints || 100}, ${data.passingScore || 60},
+      ${data.duration || null}, ${data.generalInstructions || null},
+      ${data.applicationDate || null}, ${data.availableFrom || null}, ${data.availableTo || null}, 'draft'
+    )
+  `);
+  
+  return result;
+}
+
+/**
+ * Listar avaliações de um professor
+ */
+export async function getAssessmentsByTeacher(teacherId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  if (subjectId) {
+    const result = await db.execute(sql`
+      SELECT a.*, s.name as subjectName, c.name as className
+      FROM assessments a
+      LEFT JOIN subjects s ON a.subjectId = s.id
+      LEFT JOIN classes c ON a.classId = c.id
+      WHERE a.teacherId = ${teacherId} AND a.subjectId = ${subjectId}
+      ORDER BY a.createdAt DESC
+    `);
+    return (result[0] as unknown) as any[];
+  }
+  
+  const result = await db.execute(sql`
+    SELECT a.*, s.name as subjectName, c.name as className
+    FROM assessments a
+    LEFT JOIN subjects s ON a.subjectId = s.id
+    LEFT JOIN classes c ON a.classId = c.id
+    WHERE a.teacherId = ${teacherId}
+    ORDER BY a.createdAt DESC
+  `);
+  return (result[0] as unknown) as any[];
+}
+
+/**
+ * Obter detalhes de uma avaliação
+ */
+export async function getAssessmentById(assessmentId: number, teacherId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT a.*, s.name as subjectName, c.name as className
+    FROM assessments a
+    LEFT JOIN subjects s ON a.subjectId = s.id
+    LEFT JOIN classes c ON a.classId = c.id
+    WHERE a.id = ${assessmentId} AND a.teacherId = ${teacherId}
+  `);
+  
+  return ((result[0] as unknown) as any[])[0];
+}
+
+/**
+ * Atualizar avaliação
+ */
+export async function updateAssessment(assessmentId: number, teacherId: number, data: {
+  title?: string;
+  description?: string;
+  totalQuestions?: number;
+  totalPoints?: number;
+  passingScore?: number;
+  duration?: number;
+  generalInstructions?: string;
+  applicationDate?: Date;
+  availableFrom?: Date;
+  availableTo?: Date;
+  status?: 'draft' | 'published' | 'applied' | 'corrected' | 'archived';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Usar update com todos os campos (mantendo valores atuais se não fornecidos)
+  await db.execute(sql`
+    UPDATE assessments SET
+      title = COALESCE(${data.title ?? null}, title),
+      description = COALESCE(${data.description ?? null}, description),
+      totalQuestions = COALESCE(${data.totalQuestions ?? null}, totalQuestions),
+      totalPoints = COALESCE(${data.totalPoints ?? null}, totalPoints),
+      passingScore = COALESCE(${data.passingScore ?? null}, passingScore),
+      duration = COALESCE(${data.duration ?? null}, duration),
+      generalInstructions = COALESCE(${data.generalInstructions ?? null}, generalInstructions),
+      applicationDate = COALESCE(${data.applicationDate ?? null}, applicationDate),
+      availableFrom = COALESCE(${data.availableFrom ?? null}, availableFrom),
+      availableTo = COALESCE(${data.availableTo ?? null}, availableTo),
+      status = COALESCE(${data.status ?? null}, status)
+    WHERE id = ${assessmentId} AND teacherId = ${teacherId}
+  `);
+}
+
+/**
+ * Adicionar questão à avaliação
+ */
+export async function addAssessmentQuestion(data: {
+  assessmentId: number;
+  questionNumber: number;
+  questionType?: 'multiple_choice' | 'true_false' | 'matching' | 'fill_blank' | 'short_answer' | 'essay';
+  statement: string;
+  context?: string;
+  optionA?: string;
+  optionB?: string;
+  optionC?: string;
+  optionD?: string;
+  optionE?: string;
+  correctAnswer: string;
+  answerExplanation?: string;
+  specificInstructions?: string;
+  points?: number;
+  partialCredit?: boolean;
+  skill?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    INSERT INTO assessment_questions (
+      assessmentId, questionNumber, questionType, statement, context,
+      optionA, optionB, optionC, optionD, optionE,
+      correctAnswer, answerExplanation, specificInstructions,
+      points, partialCredit, skill, difficulty
+    ) VALUES (
+      ${data.assessmentId}, ${data.questionNumber}, ${data.questionType || 'multiple_choice'},
+      ${data.statement}, ${data.context || null},
+      ${data.optionA || null}, ${data.optionB || null}, ${data.optionC || null},
+      ${data.optionD || null}, ${data.optionE || null},
+      ${data.correctAnswer}, ${data.answerExplanation || null}, ${data.specificInstructions || null},
+      ${data.points || 10}, ${data.partialCredit || false}, ${data.skill || null}, ${data.difficulty || 'medium'}
+    )
+  `);
+  
+  return result;
+}
+
+/**
+ * Listar questões de uma avaliação
+ */
+export async function getAssessmentQuestions(assessmentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT * FROM assessment_questions
+    WHERE assessmentId = ${assessmentId}
+    ORDER BY questionNumber ASC
+  `);
+  
+  return (result[0] as unknown) as any[];
+}
+
+/**
+ * Atualizar questão
+ */
+export async function updateAssessmentQuestion(questionId: number, data: {
+  statement?: string;
+  context?: string;
+  optionA?: string;
+  optionB?: string;
+  optionC?: string;
+  optionD?: string;
+  optionE?: string;
+  correctAnswer?: string;
+  answerExplanation?: string;
+  specificInstructions?: string;
+  points?: number;
+  skill?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.execute(sql`
+    UPDATE assessment_questions SET
+      statement = COALESCE(${data.statement ?? null}, statement),
+      context = COALESCE(${data.context ?? null}, context),
+      optionA = COALESCE(${data.optionA ?? null}, optionA),
+      optionB = COALESCE(${data.optionB ?? null}, optionB),
+      optionC = COALESCE(${data.optionC ?? null}, optionC),
+      optionD = COALESCE(${data.optionD ?? null}, optionD),
+      optionE = COALESCE(${data.optionE ?? null}, optionE),
+      correctAnswer = COALESCE(${data.correctAnswer ?? null}, correctAnswer),
+      answerExplanation = COALESCE(${data.answerExplanation ?? null}, answerExplanation),
+      specificInstructions = COALESCE(${data.specificInstructions ?? null}, specificInstructions),
+      points = COALESCE(${data.points ?? null}, points),
+      skill = COALESCE(${data.skill ?? null}, skill),
+      difficulty = COALESCE(${data.difficulty ?? null}, difficulty)
+    WHERE id = ${questionId}
+  `);
+}
+
+/**
+ * Excluir questão
+ */
+export async function deleteAssessmentQuestion(questionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.execute(sql`DELETE FROM assessment_questions WHERE id = ${questionId}`);
+}
+
+/**
+ * Criar caderno de respostas para um aluno
+ */
+export async function createAnswerSheet(data: {
+  assessmentId: number;
+  studentId: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Gerar código único para o caderno
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  const sheetCode = `CR-${timestamp}-${random}`.toUpperCase();
+  
+  const result = await db.execute(sql`
+    INSERT INTO answer_sheets (assessmentId, studentId, sheetCode, status)
+    VALUES (${data.assessmentId}, ${data.studentId}, ${sheetCode}, 'pending')
+  `);
+  
+  return { sheetCode, result };
+}
+
+/**
+ * Obter caderno de respostas do aluno
+ */
+export async function getAnswerSheetByStudent(assessmentId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT ash.*, a.title as assessmentTitle, a.totalQuestions, a.totalPoints,
+           a.duration, a.generalInstructions, a.passingScore,
+           s.name as subjectName
+    FROM answer_sheets ash
+    JOIN assessments a ON ash.assessmentId = a.id
+    LEFT JOIN subjects s ON a.subjectId = s.id
+    WHERE ash.assessmentId = ${assessmentId} AND ash.studentId = ${studentId}
+  `);
+  
+  return ((result[0] as unknown) as any[])[0];
+}
+
+/**
+ * Obter caderno de respostas por código
+ */
+export async function getAnswerSheetByCode(sheetCode: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT ash.*, a.title as assessmentTitle, a.totalQuestions, a.totalPoints,
+           a.duration, a.generalInstructions, a.passingScore,
+           s.name as subjectName, st.fullName as studentName
+    FROM answer_sheets ash
+    JOIN assessments a ON ash.assessmentId = a.id
+    LEFT JOIN subjects s ON a.subjectId = s.id
+    LEFT JOIN students st ON ash.studentId = st.id
+    WHERE ash.sheetCode = ${sheetCode}
+  `);
+  
+  return ((result[0] as unknown) as any[])[0];
+}
+
+/**
+ * Iniciar preenchimento do caderno de respostas
+ */
+export async function startAnswerSheet(answerSheetId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.execute(sql`
+    UPDATE answer_sheets
+    SET status = 'in_progress', startedAt = NOW()
+    WHERE id = ${answerSheetId} AND status = 'pending'
+  `);
+}
+
+/**
+ * Salvar resposta individual
+ */
+export async function saveAnswerSheetResponse(data: {
+  answerSheetId: number;
+  questionId: number;
+  studentAnswer?: string;
+  isBlank?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se já existe resposta para esta questão
+  const existing = await db.execute(sql`
+    SELECT id FROM answer_sheet_responses
+    WHERE answerSheetId = ${data.answerSheetId} AND questionId = ${data.questionId}
+  `);
+  
+  if (((existing[0] as unknown) as any[]).length > 0) {
+    // Atualizar resposta existente
+    await db.execute(sql`
+      UPDATE answer_sheet_responses
+      SET studentAnswer = ${data.studentAnswer || null},
+          isBlank = ${data.isBlank || false},
+          answeredAt = NOW()
+      WHERE answerSheetId = ${data.answerSheetId} AND questionId = ${data.questionId}
+    `);
+  } else {
+    // Inserir nova resposta
+    await db.execute(sql`
+      INSERT INTO answer_sheet_responses (answerSheetId, questionId, studentAnswer, isBlank, answeredAt)
+      VALUES (${data.answerSheetId}, ${data.questionId}, ${data.studentAnswer || null}, ${data.isBlank || false}, NOW())
+    `);
+  }
+}
+
+/**
+ * Submeter caderno de respostas
+ */
+export async function submitAnswerSheet(answerSheetId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.execute(sql`
+    UPDATE answer_sheets
+    SET status = 'submitted', submittedAt = NOW()
+    WHERE id = ${answerSheetId} AND status = 'in_progress'
+  `);
+}
+
+/**
+ * Corrigir caderno de respostas automaticamente
+ */
+export async function correctAnswerSheet(answerSheetId: number, correctedBy: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar todas as respostas do caderno
+  const responsesResult = await db.execute(sql`
+    SELECT r.*, q.correctAnswer, q.points, q.questionType
+    FROM answer_sheet_responses r
+    JOIN assessment_questions q ON r.questionId = q.id
+    WHERE r.answerSheetId = ${answerSheetId}
+  `);
+  
+  const responses = (responsesResult[0] as unknown) as any[];
+  
+  let totalScore = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let blankCount = 0;
+  
+  for (const response of responses) {
+    if (response.isBlank) {
+      blankCount++;
+      await db.execute(sql`
+        UPDATE answer_sheet_responses
+        SET isCorrect = false, pointsAwarded = 0, correctedAt = NOW()
+        WHERE id = ${response.id}
+      `);
+    } else if (response.questionType === 'multiple_choice' || response.questionType === 'true_false') {
+      // Correção automática para questões objetivas
+      const isCorrect = response.studentAnswer?.toUpperCase().trim() === response.correctAnswer?.toUpperCase().trim();
+      const pointsAwarded = isCorrect ? response.points : 0;
+      
+      if (isCorrect) {
+        correctCount++;
+        totalScore += pointsAwarded;
+      } else {
+        wrongCount++;
+      }
+      
+      await db.execute(sql`
+        UPDATE answer_sheet_responses
+        SET isCorrect = ${isCorrect}, pointsAwarded = ${pointsAwarded}, correctedAt = NOW()
+        WHERE id = ${response.id}
+      `);
+    } else {
+      // Questões abertas precisam de correção manual
+      await db.execute(sql`
+        UPDATE answer_sheet_responses
+        SET needsManualReview = true
+        WHERE id = ${response.id}
+      `);
+    }
+  }
+  
+  // Buscar total de pontos da avaliação
+  const assessmentResult = await db.execute(sql`
+    SELECT a.totalPoints FROM answer_sheets ash
+    JOIN assessments a ON ash.assessmentId = a.id
+    WHERE ash.id = ${answerSheetId}
+  `);
+  const totalPoints = ((assessmentResult[0] as unknown) as any[])[0]?.totalPoints || 100;
+  
+  const percentageScore = (totalScore / totalPoints) * 100;
+  
+  // Atualizar caderno com resultados
+  await db.execute(sql`
+    UPDATE answer_sheets
+    SET status = 'corrected',
+        totalScore = ${totalScore},
+        percentageScore = ${percentageScore},
+        correctAnswers = ${correctCount},
+        wrongAnswers = ${wrongCount},
+        blankAnswers = ${blankCount},
+        correctedAt = NOW(),
+        correctedBy = ${correctedBy}
+    WHERE id = ${answerSheetId}
+  `);
+  
+  return {
+    totalScore,
+    percentageScore,
+    correctCount,
+    wrongCount,
+    blankCount
+  };
+}
+
+/**
+ * Obter respostas do caderno
+ */
+export async function getAnswerSheetResponses(answerSheetId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT r.*, q.questionNumber, q.questionType, q.statement, q.context,
+           q.optionA, q.optionB, q.optionC, q.optionD, q.optionE,
+           q.correctAnswer, q.answerExplanation, q.points, q.skill
+    FROM answer_sheet_responses r
+    JOIN assessment_questions q ON r.questionId = q.id
+    WHERE r.answerSheetId = ${answerSheetId}
+    ORDER BY q.questionNumber ASC
+  `);
+  
+  return (result[0] as unknown) as any[];
+}
+
+/**
+ * Listar cadernos de uma avaliação (para professor)
+ */
+export async function getAnswerSheetsByAssessment(assessmentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT ash.*, st.fullName as studentName, st.registrationNumber
+    FROM answer_sheets ash
+    JOIN students st ON ash.studentId = st.id
+    WHERE ash.assessmentId = ${assessmentId}
+    ORDER BY st.fullName ASC
+  `);
+  
+  return (result[0] as unknown) as any[];
+}
+
+/**
+ * Listar avaliações disponíveis para um aluno
+ */
+export async function getAvailableAssessmentsForStudent(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar disciplinas em que o aluno está matriculado
+  const enrollmentsResult = await db.execute(sql`
+    SELECT subjectId FROM subject_enrollments WHERE studentId = ${studentId}
+  `);
+  const enrollments = (enrollmentsResult[0] as unknown) as any[];
+  
+  if (enrollments.length === 0) return [];
+  
+  const subjectIds = enrollments.map(e => e.subjectId);
+  
+  const result = await db.execute(sql`
+    SELECT a.*, s.name as subjectName,
+           ash.id as answerSheetId, ash.status as answerSheetStatus, ash.totalScore
+    FROM assessments a
+    LEFT JOIN subjects s ON a.subjectId = s.id
+    LEFT JOIN answer_sheets ash ON ash.assessmentId = a.id AND ash.studentId = ${studentId}
+    WHERE a.subjectId IN (${sql.raw(subjectIds.join(','))})
+      AND a.status = 'published'
+      AND (a.availableFrom IS NULL OR a.availableFrom <= NOW())
+      AND (a.availableTo IS NULL OR a.availableTo >= NOW())
+    ORDER BY a.applicationDate DESC, a.createdAt DESC
+  `);
+  
+  return (result[0] as unknown) as any[];
+}
+
+/**
+ * Obter instruções por tipo de questão
+ */
+export async function getQuestionTypeInstructions(teacherId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.execute(sql`
+    SELECT * FROM question_type_instructions
+    WHERE teacherId = ${teacherId} OR isDefault = true
+    ORDER BY isDefault DESC, questionType ASC
+  `);
+  
+  return (result[0] as unknown) as any[];
+}
+
+/**
+ * Criar/atualizar instrução por tipo de questão
+ */
+export async function saveQuestionTypeInstruction(data: {
+  teacherId: number;
+  questionType: 'multiple_choice' | 'true_false' | 'matching' | 'fill_blank' | 'short_answer' | 'essay';
+  title: string;
+  instructions: string;
+  exampleImage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se já existe
+  const existing = await db.execute(sql`
+    SELECT id FROM question_type_instructions
+    WHERE teacherId = ${data.teacherId} AND questionType = ${data.questionType}
+  `);
+  
+  if (((existing[0] as unknown) as any[]).length > 0) {
+    await db.execute(sql`
+      UPDATE question_type_instructions
+      SET title = ${data.title}, instructions = ${data.instructions}, exampleImage = ${data.exampleImage || null}
+      WHERE teacherId = ${data.teacherId} AND questionType = ${data.questionType}
+    `);
+  } else {
+    await db.execute(sql`
+      INSERT INTO question_type_instructions (teacherId, questionType, title, instructions, exampleImage)
+      VALUES (${data.teacherId}, ${data.questionType}, ${data.title}, ${data.instructions}, ${data.exampleImage || null})
+    `);
+  }
+}
+
+/**
+ * Obter instruções padrão do sistema
+ */
+export function getDefaultQuestionInstructions() {
+  return {
+    multiple_choice: {
+      title: "Questões de Múltipla Escolha",
+      instructions: `• Leia atentamente cada questão antes de marcar sua resposta.
+• Cada questão possui apenas UMA alternativa correta.
+• Marque a resposta preenchendo completamente o círculo correspondente à letra escolhida (A, B, C, D ou E).
+• Use caneta esferográfica azul ou preta.
+• Não faça rasuras. Caso erre, solicite um novo caderno de respostas.
+• Não deixe questões em branco.`
+    },
+    true_false: {
+      title: "Questões de Verdadeiro ou Falso",
+      instructions: `• Analise cada afirmação cuidadosamente.
+• Marque (V) para afirmações VERDADEIRAS e (F) para afirmações FALSAS.
+• Preencha completamente o círculo correspondente.
+• Não há alternativa "parcialmente verdadeira" - a afirmação deve ser totalmente correta para ser marcada como verdadeira.`
+    },
+    matching: {
+      title: "Questões de Associação de Colunas",
+      instructions: `• Relacione os itens da coluna da esquerda com os da coluna da direita.
+• Cada item da coluna da esquerda corresponde a apenas um item da coluna da direita.
+• Escreva a letra correspondente no espaço indicado.
+• Verifique todas as associações antes de finalizar.`
+    },
+    fill_blank: {
+      title: "Questões de Preenchimento de Lacunas",
+      instructions: `• Complete as lacunas com a palavra ou expressão adequada.
+• Escreva de forma legível, usando letra de forma se necessário.
+• Respeite a concordância gramatical com o restante da frase.
+• Não use abreviações, exceto quando indicado.`
+    },
+    short_answer: {
+      title: "Questões de Resposta Curta",
+      instructions: `• Responda de forma objetiva e direta.
+• Limite sua resposta ao espaço disponível.
+• Seja claro e conciso em sua explicação.
+• Evite informações desnecessárias.`
+    },
+    essay: {
+      title: "Questões Dissertativas",
+      instructions: `• Leia atentamente o enunciado e identifique o que está sendo solicitado.
+• Organize suas ideias antes de começar a escrever.
+• Desenvolva sua resposta com introdução, desenvolvimento e conclusão.
+• Utilize argumentos consistentes e exemplos quando pertinente.
+• Revise sua resposta antes de entregar.
+• Escreva de forma legível e respeite as margens.`
+    }
+  };
+}

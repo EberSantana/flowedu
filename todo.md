@@ -5096,3 +5096,44 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar testes para edição de aulas agendadas
 - [x] Criar testes para exclusão de aulas agendadas
 - [x] Testar cenários de sobreposição de horários
+
+
+## 📝 Caderno de Respostas - Portal do Aluno
+
+### Estrutura e Design
+- [x] Criar página CadernoRespostas.tsx no portal do aluno
+- [x] Implementar layout compatível com leitura óptica
+- [x] Criar cabeçalho com identificação do aluno e avaliação
+- [x] Implementar grid de marcação de respostas (bolhas A, B, C, D, E)
+- [x] Adicionar área de instruções gerais no topo
+
+### Instruções do Caderno
+- [x] Criar seção de instruções gerais claras
+- [x] Implementar instruções específicas por tipo de questão
+- [x] Adicionar orientações de preenchimento para leitura óptica
+- [x] Incluir avisos sobre rasuras e correções
+
+### Sistema de Questões
+- [x] Exibir um único problema bem formulado por item
+- [x] Apresentar alternativas claras sem ambiguidades
+- [x] Implementar numeração sequencial das questões
+- [x] Adicionar indicador de tipo de questão (múltipla escolha, V/F, etc.)
+
+### Gabarito e Correção
+- [x] Criar sistema de gabarito objetivo e inequívoco
+- [x] Implementar correção automática para questões objetivas
+- [x] Criar relatório de acertos/erros por questão
+- [x] Adicionar visualização do gabarito oficial após submissão
+
+### Formato e Exportação
+- [x] Garantir formato compatível com leitura óptica
+- [x] Implementar versão para impressão (PDF)
+- [x] Criar versão para correção manual
+- [x] Adicionar código de barras/QR code para identificação
+
+### Backend
+- [x] Criar tabela answer_sheets no banco de dados
+- [x] Implementar procedures tRPC para caderno de respostas
+- [x] Criar sistema de validação de respostas
+- [x] Implementar geração de relatórios de correção
+

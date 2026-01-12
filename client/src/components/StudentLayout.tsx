@@ -13,7 +13,8 @@ import {
   FileText, 
   Map,
   Menu,
-  X
+  X,
+  ClipboardList
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -60,7 +61,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects", color: "text-green-600" },
     { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths", color: "text-purple-600" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "text-orange-600" },
-
+    { icon: ClipboardList, label: "Caderno de Respostas", path: "/student-assessments", color: "text-teal-600" },
     { icon: Bell, label: "Avisos", path: "/student-announcements", color: "text-red-600" },
   ];
 

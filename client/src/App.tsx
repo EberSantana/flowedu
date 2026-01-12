@@ -63,6 +63,11 @@ import StudentLearningJournal from "./pages/StudentLearningJournal";
 import StudentDoubts from "./pages/StudentDoubts";
 import StudentStatistics from "./pages/StudentStatistics";
 import StudentNotebook from "./pages/StudentNotebook";
+import StudentAssessments from "./pages/StudentAssessments";
+import StudentAnswerSheet from "./pages/StudentAnswerSheet";
+import TeacherAssessments from "./pages/TeacherAssessments";
+import AssessmentQuestions from "./pages/AssessmentQuestions";
+import AssessmentResults from "./pages/AssessmentResults";
 
 function Router() {
   return (
@@ -122,6 +127,11 @@ function Router() {
         <Route path={"/student/doubts"} component={StudentDoubts} />
         <Route path={"/student/statistics"} component={StudentStatistics} />
         <Route path={"/student/notebook"} component={StudentNotebook} />
+        <Route path={"/student-assessments"} component={StudentAssessments} />
+        <Route path={"/student-answer-sheet/:assessmentId"} component={StudentAnswerSheet} />
+        <Route path={"/assessments"} component={TeacherAssessments} />
+        <Route path={"/assessments/:assessmentId/questions"} component={AssessmentQuestions} />
+        <Route path={"/assessments/:assessmentId/results"} component={AssessmentResults} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

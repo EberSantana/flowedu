@@ -24,7 +24,8 @@ import {
   Megaphone,
   KeyRound,
   Trophy,
-  Brain
+  Brain,
+  ClipboardList
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -119,7 +120,11 @@ const teacherNavItems: NavItem[] = [
     icon: <Megaphone className="h-5 w-5" />,
     href: "/announcements",
   },
-  
+  {
+    label: "Avaliações",
+    icon: <ClipboardList className="h-5 w-5" />,
+    href: "/assessments",
+  },
   {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,

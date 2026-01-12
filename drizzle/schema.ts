@@ -2097,3 +2097,228 @@ export const reviewNotifications = mysqlTable("review_notifications", {
 
 export type ReviewNotification = typeof reviewNotifications.$inferSelect;
 export type InsertReviewNotification = typeof reviewNotifications.$inferInsert;
+
+
+/**
+ * ========================================
+ * SISTEMA DE CADERNO DE RESPOSTAS
+ * ========================================
+ * Caderno de respostas para avaliações formais
+ * Compatível com leitura óptica e correção manual
+ */
+
+/**
+ * Avaliações/Provas criadas pelo professor
+ */
+export const assessments = mysqlTable("assessments", {
+  id: int("id").autoincrement().primaryKey(),
+  teacherId: int("teacherId").notNull(), // FK para users (professor)
+  subjectId: int("subjectId").notNull(), // FK para subjects
+  classId: int("classId"), // FK para classes (opcional)
+  
+  // Informações da Avaliação
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  assessmentType: mysqlEnum("assessmentType", [
+    "prova",           // Prova tradicional
+    "simulado",        // Simulado
+    "avaliacao_parcial", // Avaliação parcial
+    "avaliacao_final", // Avaliação final
+    "recuperacao",     // Recuperação
+    "diagnostica"      // Avaliação diagnóstica
+  ]).default("prova").notNull(),
+  
+  // Configurações
+  totalQuestions: int("totalQuestions").notNull(),
+  totalPoints: int("totalPoints").default(100).notNull(),
+  passingScore: int("passingScore").default(60).notNull(), // Nota mínima para aprovação
+  duration: int("duration"), // Duração em minutos
+  
+  // Instruções
+  generalInstructions: text("generalInstructions"), // Instruções gerais do caderno
+  
+  // Datas
+  applicationDate: timestamp("applicationDate"), // Data de aplicação
+  availableFrom: timestamp("availableFrom"),
+  availableTo: timestamp("availableTo"),
+  
+  // Status
+  status: mysqlEnum("status", ["draft", "published", "applied", "corrected", "archived"]).default("draft").notNull(),
+  
+  // Controle
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Assessment = typeof assessments.$inferSelect;
+export type InsertAssessment = typeof assessments.$inferInsert;
+
+/**
+ * Questões da Avaliação
+ */
+export const assessmentQuestions = mysqlTable("assessment_questions", {
+  id: int("id").autoincrement().primaryKey(),
+  assessmentId: int("assessmentId").notNull(), // FK para assessments
+  
+  // Numeração
+  questionNumber: int("questionNumber").notNull(), // Número da questão (1, 2, 3...)
+  
+  // Tipo de Questão
+  questionType: mysqlEnum("questionType", [
+    "multiple_choice",    // Múltipla escolha (A, B, C, D, E)
+    "true_false",         // Verdadeiro ou Falso
+    "matching",           // Associação de colunas
+    "fill_blank",         // Preencher lacunas
+    "short_answer",       // Resposta curta
+    "essay"               // Dissertativa
+  ]).default("multiple_choice").notNull(),
+  
+  // Conteúdo da Questão
+  statement: text("statement").notNull(), // Enunciado da questão
+  context: text("context"), // Contexto adicional (texto de apoio, imagem, etc.)
+  
+  // Alternativas (para múltipla escolha)
+  optionA: text("optionA"),
+  optionB: text("optionB"),
+  optionC: text("optionC"),
+  optionD: text("optionD"),
+  optionE: text("optionE"),
+  
+  // Gabarito
+  correctAnswer: varchar("correctAnswer", { length: 500 }).notNull(), // A, B, C, D, E ou texto para outras
+  answerExplanation: text("answerExplanation"), // Explicação da resposta correta
+  
+  // Instruções específicas
+  specificInstructions: text("specificInstructions"), // Instruções específicas para este tipo de questão
+  
+  // Pontuação
+  points: int("points").default(10).notNull(), // Pontos da questão
+  partialCredit: boolean("partialCredit").default(false).notNull(), // Permite pontuação parcial
+  
+  // Habilidade/Competência avaliada
+  skill: varchar("skill", { length: 255 }), // Habilidade avaliada (ex: "Interpretação de texto")
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).default("medium").notNull(),
+  
+  // Controle
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AssessmentQuestion = typeof assessmentQuestions.$inferSelect;
+export type InsertAssessmentQuestion = typeof assessmentQuestions.$inferInsert;
+
+/**
+ * Caderno de Respostas do Aluno
+ * Registro das respostas do aluno em uma avaliação
+ */
+export const answerSheets = mysqlTable("answer_sheets", {
+  id: int("id").autoincrement().primaryKey(),
+  assessmentId: int("assessmentId").notNull(), // FK para assessments
+  studentId: int("studentId").notNull(), // FK para students
+  
+  // Identificação única para leitura óptica
+  sheetCode: varchar("sheetCode", { length: 50 }).notNull().unique(), // Código único do caderno (ex: "2024-PROVA01-ALU001")
+  qrCode: varchar("qrCode", { length: 255 }), // QR Code para identificação rápida
+  
+  // Status do Caderno
+  status: mysqlEnum("status", [
+    "pending",      // Aguardando preenchimento
+    "in_progress",  // Em andamento
+    "submitted",    // Submetido pelo aluno
+    "correcting",   // Em correção
+    "corrected",    // Corrigido
+    "reviewed"      // Revisado pelo professor
+  ]).default("pending").notNull(),
+  
+  // Pontuação
+  totalScore: int("totalScore"), // Pontuação total obtida
+  percentageScore: float("percentageScore"), // Percentual de acerto
+  correctAnswers: int("correctAnswers"), // Número de respostas corretas
+  wrongAnswers: int("wrongAnswers"), // Número de respostas erradas
+  blankAnswers: int("blankAnswers"), // Número de respostas em branco
+  
+  // Controle de Tempo
+  startedAt: timestamp("startedAt"),
+  submittedAt: timestamp("submittedAt"),
+  correctedAt: timestamp("correctedAt"),
+  correctedBy: int("correctedBy"), // ID do professor que corrigiu
+  
+  // Observações
+  teacherNotes: text("teacherNotes"), // Observações do professor
+  studentNotes: text("studentNotes"), // Observações do aluno
+  
+  // Controle
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnswerSheet = typeof answerSheets.$inferSelect;
+export type InsertAnswerSheet = typeof answerSheets.$inferInsert;
+
+/**
+ * Respostas Individuais do Caderno
+ * Cada resposta marcada pelo aluno
+ */
+export const answerSheetResponses = mysqlTable("answer_sheet_responses", {
+  id: int("id").autoincrement().primaryKey(),
+  answerSheetId: int("answerSheetId").notNull(), // FK para answer_sheets
+  questionId: int("questionId").notNull(), // FK para assessment_questions
+  
+  // Resposta do Aluno
+  studentAnswer: text("studentAnswer"), // A, B, C, D, E ou texto
+  isBlank: boolean("isBlank").default(false).notNull(), // Questão deixada em branco
+  
+  // Correção
+  isCorrect: boolean("isCorrect"), // null = não corrigido, true/false = corrigido
+  pointsAwarded: int("pointsAwarded"), // Pontos atribuídos
+  
+  // Para questões dissertativas/abertas
+  manualScore: int("manualScore"), // Nota manual do professor
+  feedback: text("feedback"), // Feedback do professor
+  
+  // Controle de leitura óptica
+  opticalReadConfidence: int("opticalReadConfidence"), // Confiança da leitura óptica (0-100)
+  needsManualReview: boolean("needsManualReview").default(false).notNull(), // Precisa revisão manual
+  
+  // Controle
+  answeredAt: timestamp("answeredAt"),
+  correctedAt: timestamp("correctedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AnswerSheetResponse = typeof answerSheetResponses.$inferSelect;
+export type InsertAnswerSheetResponse = typeof answerSheetResponses.$inferInsert;
+
+/**
+ * Instruções por Tipo de Questão
+ * Instruções padrão para cada tipo de questão
+ */
+export const questionTypeInstructions = mysqlTable("question_type_instructions", {
+  id: int("id").autoincrement().primaryKey(),
+  teacherId: int("teacherId").notNull(), // FK para users (professor)
+  
+  questionType: mysqlEnum("questionType", [
+    "multiple_choice",
+    "true_false",
+    "matching",
+    "fill_blank",
+    "short_answer",
+    "essay"
+  ]).notNull(),
+  
+  // Instruções
+  title: varchar("title", { length: 255 }).notNull(), // Ex: "Questões de Múltipla Escolha"
+  instructions: text("instructions").notNull(), // Instruções detalhadas
+  
+  // Exemplo visual
+  exampleImage: text("exampleImage"), // URL de imagem de exemplo de preenchimento
+  
+  // Controle
+  isDefault: boolean("isDefault").default(false).notNull(), // Se é a instrução padrão do sistema
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type QuestionTypeInstruction = typeof questionTypeInstructions.$inferSelect;
+export type InsertQuestionTypeInstruction = typeof questionTypeInstructions.$inferInsert;
