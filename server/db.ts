@@ -10607,7 +10607,7 @@ export async function getAvailableAssessmentsForStudent(studentId: number) {
   
   // Buscar disciplinas em que o aluno está matriculado
   const enrollmentsResult = await db.execute(sql`
-    SELECT subjectId FROM subject_enrollments WHERE studentId = ${studentId}
+    SELECT subjectId FROM subjectEnrollments WHERE studentId = ${studentId}
   `);
   const enrollments = (enrollmentsResult[0] as unknown) as any[];
   

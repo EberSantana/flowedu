@@ -16,6 +16,7 @@
 
 ## 🐛 Bugs Críticos
 
+- [x] Corrigir erro de consulta SQL na página /student-assessments (subject_enrollments) - CORRIGIDO: nome da tabela estava incorreto (subject_enrollments ao invés de subjectEnrollments)
 - [x] Corrigir validação de respostas no quiz - resposta correta sendo marcada como incorreta
 - [x] Corrigir exibição do enunciado das questões no quiz - enunciado não está aparecendo
 - [x] BUG: Respostas corretas não estão sendo contabilizadas no contador de acertos do quiz (mostra 0 acertos mesmo quando a resposta está correta) - CORRIGIDO: lógica de extração de letra da resposta do aluno
