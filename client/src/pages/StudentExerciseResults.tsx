@@ -24,7 +24,7 @@ export default function StudentExerciseResults() {
   const [, setLocation] = useLocation();
 
   // Buscar resultados da tentativa
-  const { data: results, isLoading } = (trpc.studentExercises as any).getResults.useQuery(
+  const { data: results, isLoading } = trpc.studentExercises.getResults.useQuery(
     { attemptId: parseInt(attemptId!) },
     { enabled: !!attemptId }
   );

@@ -23,16 +23,16 @@ export default function StudentExerciseAttempt() {
   const [attemptId, setAttemptId] = useState<number | null>(null);
 
   // Buscar detalhes do exercício
-  const { data: exercise, isLoading, error } = (trpc.studentExercises as any).getDetails.useQuery(
+  const { data: exercise, isLoading, error } = trpc.studentExercises.getDetails.useQuery(
     { exerciseId: parseInt(id!) },
     { enabled: !!id }
   );
 
   // Iniciar tentativa
-  const startAttemptMutation = (trpc.studentExercises as any).startAttempt.useMutation();
+  const startAttemptMutation = trpc.studentExercises.startAttempt.useMutation();
 
   // Submeter tentativa
-  const submitAttemptMutation = (trpc.studentExercises as any).submitAttempt.useMutation({
+  const submitAttemptMutation = trpc.studentExercises.submitAttempt.useMutation({
     onSuccess: (result: any) => {
       showToast.success(
         "Exercício enviado!",

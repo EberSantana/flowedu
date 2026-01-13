@@ -92,7 +92,7 @@ export default function ExerciseGeneratorModal({
     },
   });
 
-  const publishExercisesMutation = (trpc.teacherExercises as any).publish.useMutation({
+  const publishExercisesMutation = trpc.teacherExercises.publish.useMutation({
     onSuccess: () => {
       toast.success("Exercícios publicados com sucesso!");
       setShowPublishDialog(false);

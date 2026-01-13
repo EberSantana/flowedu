@@ -5235,3 +5235,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir tipagem em StudentExerciseAttempt.tsx (3 ocorrências)
 - [x] Corrigir tipagem em StudentExerciseResults.tsx (1 ocorrência)
 - [x] Corrigir tipagem em server/db.ts (2 ocorrências)
+
+## 🔧 Melhoria de Tipagem tRPC
+
+- [x] Criar tipos explícitos para rotas teacherExercises no backend
+- [x] Criar tipos explícitos para rotas studentExercises no backend
+- [x] Atualizar frontend para usar tipos corretos (remover as any)
+- [x] Exportar tipos do backend para o frontend
+- [x] Testar autocomplete e validação de tipos

@@ -49,13 +49,13 @@ export default function ExercisePerformanceReport() {
   const { data: subjects } = trpc.subjects.list.useQuery();
 
   // Buscar exercícios da disciplina selecionada
-  const { data: exercises, refetch: refetchExercises } = (trpc.teacherExercises as any).listBySubject.useQuery(
+  const { data: exercises, refetch: refetchExercises } = trpc.teacherExercises.listBySubject.useQuery(
     { subjectId: selectedSubject! },
     { enabled: !!selectedSubject }
   );
 
   // Mutation para deletar exercício
-  const deleteExerciseMutation = (trpc.teacherExercises as any).delete.useMutation({
+  const deleteExerciseMutation = trpc.teacherExercises.delete.useMutation({
     onSuccess: () => {
       toast.success("Exercício deletado com sucesso!");
       refetchExercises();
@@ -66,7 +66,7 @@ export default function ExercisePerformanceReport() {
   });
 
   // Buscar estatísticas gerais
-  const { data: stats, isLoading } = (trpc.teacherExercises as any).getStatistics.useQuery(
+  const { data: stats, isLoading } = trpc.teacherExercises.getStatistics.useQuery(
     {
       subjectId: selectedSubject!,
       exerciseId: selectedExercise,
