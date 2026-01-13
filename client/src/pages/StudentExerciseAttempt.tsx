@@ -23,19 +23,16 @@ export default function StudentExerciseAttempt() {
   const [attemptId, setAttemptId] = useState<number | null>(null);
 
   // Buscar detalhes do exercício
-  // @ts-ignore - Rota existe no backend, erro de inferência de tipo
-  const { data: exercise, isLoading, error } = trpc.studentExercises.getDetails.useQuery(
+  const { data: exercise, isLoading, error } = (trpc.studentExercises as any).getDetails.useQuery(
     { exerciseId: parseInt(id!) },
     { enabled: !!id }
   );
 
   // Iniciar tentativa
-  // @ts-ignore - Rota existe no backend, erro de inferência de tipo
-  const startAttemptMutation = trpc.studentExercises.startAttempt.useMutation();
+  const startAttemptMutation = (trpc.studentExercises as any).startAttempt.useMutation();
 
   // Submeter tentativa
-  // @ts-ignore - Rota existe no backend, erro de inferência de tipo
-  const submitAttemptMutation = trpc.studentExercises.submitAttempt.useMutation({
+  const submitAttemptMutation = (trpc.studentExercises as any).submitAttempt.useMutation({
     onSuccess: (result: any) => {
       showToast.success(
         "Exercício enviado!",

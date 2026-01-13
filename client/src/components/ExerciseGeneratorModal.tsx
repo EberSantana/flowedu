@@ -92,8 +92,7 @@ export default function ExerciseGeneratorModal({
     },
   });
 
-  // @ts-ignore - Rota existe no backend
-  const publishExercisesMutation = trpc.teacherExercises.publish.useMutation({
+  const publishExercisesMutation = (trpc.teacherExercises as any).publish.useMutation({
     onSuccess: () => {
       toast.success("Exercícios publicados com sucesso!");
       setShowPublishDialog(false);

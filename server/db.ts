@@ -465,8 +465,7 @@ export async function checkTimeSlotOverlap(
   ];
   
   if (excludeId) {
-    // @ts-ignore
-    conditions.push(ne(timeSlots.id, excludeId));
+    conditions.push(ne(timeSlots.id, excludeId) as any);
   }
   
   const existingSlots = await db.select().from(timeSlots).where(
@@ -568,8 +567,7 @@ export async function checkScheduleConflict(
   ];
   
   if (excludeId) {
-    // @ts-ignore
-    conditions.push(ne(scheduledClasses.id, excludeId));
+    conditions.push(ne(scheduledClasses.id, excludeId) as any);
   }
   
   const result = await db.select().from(scheduledClasses).where(

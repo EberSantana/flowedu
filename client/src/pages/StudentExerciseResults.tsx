@@ -24,8 +24,7 @@ export default function StudentExerciseResults() {
   const [, setLocation] = useLocation();
 
   // Buscar resultados da tentativa
-  // @ts-ignore - Rota existe no backend, erro de inferência de tipo
-  const { data: results, isLoading } = trpc.studentExercises.getResults.useQuery(
+  const { data: results, isLoading } = (trpc.studentExercises as any).getResults.useQuery(
     { attemptId: parseInt(attemptId!) },
     { enabled: !!attemptId }
   );
