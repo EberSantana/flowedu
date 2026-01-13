@@ -35,7 +35,8 @@
 - [x] Corrigir erro: procedimento tRPC teacherExercises.getStatistics não encontrado
 - [x] Adicionar filtro por disciplina na página de Análise de Aprendizado com IA
 - [x- [x] CRÍTICO: Caderno de exercícios não está visível no portal do aluno - CORRIGIDO: modificada detecção de tipo de usuário no Sidebar para usar sessão real (tRPC) ao invés de URL
-- [ ] BUG: Caderno de Respostas não está exibindo nenhum conteúdo
+- [x] BUG: Caderno de Respostas não está exibindo nenhum conteúdo
+- [x] Remover funcionalidade "Caderno de Respostas" do portal do aluno (Frontend, Backend, Banco de Dados)
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 

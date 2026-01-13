@@ -145,11 +145,7 @@ const studentNavItems: NavItem[] = [
     icon: <CheckCircle2 className="h-5 w-5" />,
     href: "/student/notebook",
   },
-  {
-    label: "Caderno de Respostas",
-    icon: <BookOpen className="h-5 w-5" />,
-    href: "/student/answerbook",
-  },
+
   {
     label: "Caderno Inteligente IA",
     icon: <Brain className="h-5 w-5" />,
