@@ -2320,34 +2320,54 @@ Título: ${module.title}
 Descrição: ${module.description || 'Não informada'}
 Tópicos: ${topicsList}
 
-=== DIRETRIZES GERAIS ===
-- SEMPRE inclua "correctAnswer" com a resposta correta
-- SEMPRE inclua "explanation" com justificativa pedagógica detalhada
-- Use linguagem clara, profissional e contextualizada
-- Evite questões triviais ou puramente memorísticas
+⚠️ REGRAS OBRIGATÓRIAS PARA ESTUDOS DE CASO E PBL:
 
-=== PARA ESTUDOS DE CASO (PBL) ===
-Siga rigorosamente o modelo Problem-Based Learning:
+1. NUNCA crie perguntas genéricas como "Responda às perguntas do Estudo de Caso X" ou "Análise de Estoque"
+2. SEMPRE inclua o contexto COMPLETO no campo "caseContext" com pelo menos 3 parágrafos
+3. SEMPRE inclua dados CONCRETOS: números, nomes, datas, valores, percentuais
+4. A pergunta no campo "question" deve ser ESPECÍFICA e diretamente relacionada ao contexto
+5. Se usar "caseQuestions", cada sub-pergunta deve ser DETALHADA e CLARA
 
-1. **Problema Autêntico**: Crie um cenário REALISTA e COMPLEXO baseado em situações profissionais reais
-2. **Contexto Rico**: Inclua dados, personagens, conflitos, restrições e desafios múltiplos
-3. **Questões Abertas**: Formule perguntas que exijam ANÁLISE, SÍNTESE e TOMADA DE DECISÃO
-4. **Multidimensionalidade**: Aborde aspectos técnicos, éticos, econômicos e sociais
-5. **Sem Resposta Única**: Permita múltiplas soluções válidas com justificativas sólidas
+📝 EXEMPLO DE ESTUDO DE CASO BEM FEITO:
 
-Exemplo de estrutura PBL:
-- Contexto: 2-3 parágrafos descrevendo situação complexa com dados concretos
-- Questões: 3-5 perguntas progressivas (identificar problema → analisar causas → propor soluções → avaliar impactos)
+{
+  "type": "case_study",
+  "caseContext": "A empresa TechSolutions, com 150 funcionários, enfrenta uma crise de produtividade. Nos últimos 6 meses, o tempo médio de entrega de projetos aumentou de 45 para 78 dias, causando a perda de 3 clientes importantes (representação de 22% da receita anual). A equipe de desenvolvimento reclama de reuniões excessivas (média de 4h/dia), enquanto a gerência alega falta de comunicação entre departamentos. O CEO Maria Silva precisa decidir entre: (a) contratar um consultor externo por R$ 80.000, (b) implementar nova metodologia ágil internamente, ou (c) reestruturar as equipes. O orçamento disponível é de R$ 120.000 e a decisão deve ser tomada em 30 dias.",
+  "question": "Baseado no cenário apresentado, qual estratégia você recomendaria para Maria Silva e por quê? Justifique sua resposta considerando custos, prazos e impacto organizacional.",
+  "correctAnswer": "Resposta esperada: Análise comparativa das 3 opções considerando: (1) Custo-benefício, (2) Tempo de implementação, (3) Sustentabilidade da solução, (4) Impacto na cultura organizacional. Qualquer opção é válida se bem justificada.",
+  "explanation": "Este caso exige análise de trade-offs. Opção A oferece expertise rápida mas dependência externa. Opção B desenvolve capacidade interna mas requer tempo. Opção C pode resolver comunicação mas gera resistência. Avalia-se: pensamento estratégico, análise de dados, consideração de múltiplas variáveis."
+}
 
-=== PARA QUESTÕES OBJETIVAS ===
-- Distratores plausíveis (erros comuns de raciocínio)
-- Evite "todas as anteriores" ou "nenhuma das anteriores"
-- Teste compreensão, não memorialização
+❌ EXEMPLO DE PERGUNTA RUIM (NUNCA FAÇA ISSO):
+{
+  "type": "case_study",
+  "question": "Análise de Estoque",
+  "caseContext": "",  // ERRO: Sem contexto!
+  "correctAnswer": "Resposta sobre estoque"  // ERRO: Genérico!
+}
 
-=== PARA QUESTÕES SUBJETIVAS ===
-- Estimule reflexão crítica e argumentação
-- Peça análise, comparação, avaliação (não apenas descrição)
-- Inclua critérios de avaliação na explicação
+=== DIRETRIZES POR TIPO ===
+
+**QUESTÕES OBJETIVAS:**
+- Contextualize a pergunta (evite questões soltas)
+- 4 alternativas com distratores plausíveis
+- Teste compreensão conceitual, não decoração
+- correctAnswer: "A) [texto completo da alternativa correta]"
+
+**QUESTÕES SUBJETIVAS:**
+- Exija análise, comparação, avaliação ou síntese
+- Evite perguntas que começam com "O que é..."
+- Prefira: "Analise...", "Compare...", "Avalie...", "Justifique..."
+- correctAnswer: Resposta modelo com estrutura esperada
+- explanation: Critérios de avaliação claros
+
+**ESTUDOS DE CASO / PBL:**
+- caseContext: MÍNIMO 200 palavras com dados concretos
+- Inclua: personagens, números, dilemas, restrições
+- question: Pergunta específica que exige decisão/análise
+- Se usar caseQuestions: 3-5 perguntas progressivas
+- correctAnswer: Múltiplas soluções válidas com critérios
+- explanation: Aspectos a avaliar na resposta do aluno
 
 Retorne um JSON com a estrutura:
 {

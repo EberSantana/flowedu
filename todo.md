@@ -5211,3 +5211,18 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar templates de exercícios PBL com cenários realistas
 - [x] Criar estrutura de problemas complexos e contextualizados
 - [x] Melhorar prompts de IA para gerar exercícios mais desafiadores e contextualizados
+
+## 🐛 Bug: Contagem de Tentativas de Exercícios
+
+- [ ] BUG: Portal do aluno mostra apenas 2 tentativas quando foram feitas 3 tentativas de exercícios
+- [ ] Investigar query de busca de tentativas no backend
+- [ ] Verificar lógica de exibição de tentativas no frontend
+- [ ] Testar correção com múltiplas tentativas
+
+## 🔧 Correção Urgente: Qualidade das Perguntas PBL/Estudos de Caso
+
+- [x] BUG CRÍTICO: Perguntas de estudo de caso e PBL estão sendo geradas sem contexto, dados ou fundamento
+- [x] Melhorar prompt de IA com exemplos concretos e estrutura obrigatória
+- [x] Adicionar validação de qualidade (contexto mínimo, dados específicos)
+- [x] Incluir exemplos de boas perguntas no prompt do sistema
+- [ ] Testar geração com diferentes módulos para garantir qualidade
