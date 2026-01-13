@@ -5202,3 +5202,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ### Entrega Final
 - [x] Criar checkpoint final do caderno inteligente
 - [x] Apresentar sistema ao usuário
+
+## 🎓 Melhorias em Exercícios e Modelo PBL
+
+- [x] Analisar sistema atual de criação de exercícios nas trilhas de aprendizado
+- [x] Melhorar geração de perguntas e respostas para estudos de caso
+- [x] Implementar modelo PBL (Problem-Based Learning - Aprendizagem Baseada em Problemas)
+- [x] Adicionar templates de exercícios PBL com cenários realistas
+- [x] Criar estrutura de problemas complexos e contextualizados
+- [x] Melhorar prompts de IA para gerar exercícios mais desafiadores e contextualizados

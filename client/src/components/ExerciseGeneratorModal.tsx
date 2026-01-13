@@ -41,7 +41,7 @@ interface ExerciseGeneratorModalProps {
   subjectId: number;
 }
 
-type ExerciseType = "objective" | "subjective" | "case_study" | "mixed";
+type ExerciseType = "objective" | "subjective" | "case_study" | "pbl" | "mixed";
 
 interface GeneratedExercises {
   moduleTitle: string;
@@ -454,8 +454,9 @@ export default function ExerciseGeneratorModal({
 
   const exerciseTypeOptions = [
     { value: "objective", label: "Objetivas", icon: CheckSquare, description: "Múltipla escolha" },
-    { value: "subjective", label: "Subjetivas", icon: MessageSquare, description: "Dissertativas" },
+    { value: "subjective", label: "Subjetivas", icon: MessageSquare, description: "Dissertativas reflexivas" },
     { value: "case_study", label: "Estudos de Caso", icon: Briefcase, description: "Casos práticos" },
+    { value: "pbl", label: "PBL", icon: Lightbulb, description: "Aprendizagem Baseada em Problemas" },
     { value: "mixed", label: "Mista", icon: Shuffle, description: "Todos os tipos" },
   ];
 
@@ -563,7 +564,8 @@ export default function ExerciseGeneratorModal({
                       </div>
                       <span className="text-sm bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
                         {exercise.type === "objective" ? "Objetiva" : 
-                         exercise.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
+                         exercise.type === "subjective" ? "Subjetiva" :
+                         exercise.type === "pbl" ? "PBL" : "Estudo de Caso"}
                       </span>
                     </div>
                     

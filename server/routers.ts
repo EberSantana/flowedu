@@ -2281,7 +2281,7 @@ Retorne um JSON com a estrutura:
     generateModuleExercises: protectedProcedure
       .input(z.object({
         moduleId: z.number(),
-        exerciseType: z.enum(['objective', 'subjective', 'case_study', 'mixed']),
+        exerciseType: z.enum(['objective', 'subjective', 'case_study', 'pbl', 'mixed']),
         questionCount: z.number().min(1).max(20).default(5),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -2297,16 +2297,20 @@ Retorne um JSON com a estrutura:
         
         const exerciseTypeLabels = {
           objective: 'questões objetivas (múltipla escolha com 4 alternativas)',
-          subjective: 'questões dissertativas',
-          case_study: 'estudos de caso práticos',
-          mixed: 'misto (objetivas, subjetivas e estudos de caso)'
+          subjective: 'questões dissertativas reflexivas',
+          case_study: 'estudos de caso práticos contextualizados',
+          pbl: 'problemas complexos no modelo PBL (Problem-Based Learning - Aprendizagem Baseada em Problemas)',
+          mixed: 'misto (objetivas, subjetivas reflexivas, estudos de caso e PBL)'
         };
         
         const response = await invokeLLM({
           messages: [
             {
               role: 'system',
-              content: `Você é um professor especialista em criar exercícios didáticos. Gere exercícios em português brasileiro. Retorne APENAS um JSON válido.`
+              content: `Você é um professor especialista em pedagogia ativa e metodologias inovadoras (PBL, ABP, Aprendizagem Baseada em Problemas). 
+Crie exercícios desafiadores, contextualizados e que estimulem o pensamento crítico.
+Para estudos de caso, use o modelo PBL com problemas complexos, autênticos e multidimensionais.
+Gere exercícios em português brasileiro. Retorne APENAS um JSON válido.`
             },
             {
               role: 'user',
@@ -2316,9 +2320,34 @@ Título: ${module.title}
 Descrição: ${module.description || 'Não informada'}
 Tópicos: ${topicsList}
 
-IMPORTANTE:
-- SEMPRE inclua "correctAnswer" com a resposta correta (para objetivas: a letra da alternativa; para subjetivas/casos: a resposta esperada completa)
-- SEMPRE inclua "explanation" com uma justificativa detalhada explicando por que essa é a resposta correta
+=== DIRETRIZES GERAIS ===
+- SEMPRE inclua "correctAnswer" com a resposta correta
+- SEMPRE inclua "explanation" com justificativa pedagógica detalhada
+- Use linguagem clara, profissional e contextualizada
+- Evite questões triviais ou puramente memorísticas
+
+=== PARA ESTUDOS DE CASO (PBL) ===
+Siga rigorosamente o modelo Problem-Based Learning:
+
+1. **Problema Autêntico**: Crie um cenário REALISTA e COMPLEXO baseado em situações profissionais reais
+2. **Contexto Rico**: Inclua dados, personagens, conflitos, restrições e desafios múltiplos
+3. **Questões Abertas**: Formule perguntas que exijam ANÁLISE, SÍNTESE e TOMADA DE DECISÃO
+4. **Multidimensionalidade**: Aborde aspectos técnicos, éticos, econômicos e sociais
+5. **Sem Resposta Única**: Permita múltiplas soluções válidas com justificativas sólidas
+
+Exemplo de estrutura PBL:
+- Contexto: 2-3 parágrafos descrevendo situação complexa com dados concretos
+- Questões: 3-5 perguntas progressivas (identificar problema → analisar causas → propor soluções → avaliar impactos)
+
+=== PARA QUESTÕES OBJETIVAS ===
+- Distratores plausíveis (erros comuns de raciocínio)
+- Evite "todas as anteriores" ou "nenhuma das anteriores"
+- Teste compreensão, não memorialização
+
+=== PARA QUESTÕES SUBJETIVAS ===
+- Estimule reflexão crítica e argumentação
+- Peça análise, comparação, avaliação (não apenas descrição)
+- Inclua critérios de avaliação na explicação
 
 Retorne um JSON com a estrutura:
 {
