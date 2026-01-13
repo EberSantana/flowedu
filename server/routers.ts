@@ -2291,9 +2291,15 @@ Retorne um JSON com a estrutura:
         const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
         if (!module) throw new Error('Módulo não encontrado');
         
-        // Buscar tópicos do módulo
+        // Buscar tópicos do módulo com descrições completas
         const topics = await db.getLearningTopicsByModule(input.moduleId, ctx.user.id);
         const topicsList = topics?.map((t: any) => t.title).join(', ') || 'Não informados';
+        
+        // Criar contexto detalhado com descrições dos tópicos para a IA
+        const topicsDetailed = topics?.map((t: any) => {
+          const desc = t.description ? `: ${t.description}` : '';
+          return `- ${t.title}${desc}`;
+        }).join('\n') || 'Não informados';
         
         const exerciseTypeLabels = {
           objective: 'questões objetivas (múltipla escolha com 4 alternativas)',
@@ -2318,7 +2324,11 @@ Gere exercícios em português brasileiro. Retorne APENAS um JSON válido.`
 
 Título: ${module.title}
 Descrição: ${module.description || 'Não informada'}
-Tópicos: ${topicsList}
+
+TÓPICOS DO MÓDULO (use este conteúdo como base para criar perguntas contextualizadas):
+${topicsDetailed}
+
+📌 IMPORTANTE: Use o conteúdo dos tópicos acima para criar perguntas ESPECÍFICAS sobre o conteúdo real do módulo.
 
 ⚠️ REGRAS OBRIGATÓRIAS PARA ESTUDOS DE CASO E PBL:
 
@@ -2426,7 +2436,41 @@ Retorne um JSON com a estrutura:
         const content = typeof response.choices[0].message.content === 'string' 
           ? response.choices[0].message.content 
           : JSON.stringify(response.choices[0].message.content);
-        return JSON.parse(content || '{}');
+        
+        const result = JSON.parse(content || '{}');
+        
+        // VALIDAÇÃO: Rejeitar perguntas sem contexto adequado
+        if (result.exercises) {
+          for (const exercise of result.exercises) {
+            // Para estudos de caso e PBL, validar contexto mínimo
+            if (exercise.type === 'case_study' || exercise.type === 'pbl') {
+              if (!exercise.caseContext || exercise.caseContext.length < 100) {
+                throw new Error(
+                  `Pergunta ${exercise.number} foi rejeitada: Estudos de caso devem ter pelo menos 100 caracteres de contexto. ` +
+                  `Recebido: "${exercise.question}". Por favor, gere novamente com um cenário completo e dados concretos.`
+                );
+              }
+              
+              // Validar que a pergunta não é genérica
+              const genericPatterns = [
+                /^responda.*estudo de caso \d+/i,
+                /^análise de \w+$/i,
+                /^planejamento de \w+$/i,
+                /^estudo de caso \d+$/i
+              ];
+              
+              const isGeneric = genericPatterns.some(pattern => pattern.test(exercise.question));
+              if (isGeneric) {
+                throw new Error(
+                  `Pergunta ${exercise.number} foi rejeitada: "${exercise.question}" é muito genérica. ` +
+                  `Crie uma pergunta específica baseada no contexto do caso.`
+                );
+              }
+            }
+          }
+        }
+        
+        return result;
       }),
 
     // Gerar mapa mental dos módulos

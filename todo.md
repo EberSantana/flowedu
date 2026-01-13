@@ -5256,3 +5256,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar botão de atualização manual
 - [x] Adicionar barra de progresso visual de tentativas
 - [x] Mostrar tentativas restantes claramente
+
+## 🚨 PROBLEMA CRÍTICO: Perguntas Sem Fundamento (PERSISTENTE)
+
+- [x] CRÍTICO: Perguntas continuam sendo geradas sem contexto real mesmo após correção anterior
+- [x] Adicionar validação no backend: rejeitar perguntas com menos de 100 caracteres de contexto
+- [x] Passar conteúdo COMPLETO do módulo (títulos + descrições dos tópicos) para o prompt da IA
+- [x] Adicionar validação de padrões genéricos ("Análise de X", "Estudo de Caso N")
+- [ ] Implementar botão "Regenerar Pergunta" para questões ruins
+- [ ] Criar banco de templates de casos reais por área (matemática, português, etc.)
+- [ ] Adicionar preview das perguntas antes de salvar o exercício
+- [ ] Implementar sistema de aprovação/rejeição de perguntas pelo professor
