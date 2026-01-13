@@ -32,8 +32,14 @@ export default function StudentExerciseAttempt() {
   const startAttemptMutation = trpc.studentExercises.startAttempt.useMutation();
 
   // Submeter tentativa
+  const utils = trpc.useUtils();
+  
   const submitAttemptMutation = trpc.studentExercises.submitAttempt.useMutation({
     onSuccess: (result: any) => {
+      // Invalidar cache para atualizar lista de exercícios
+      utils.studentExercises.listAvailable.invalidate();
+      utils.studentExercises.getDetails.invalidate({ exerciseId: parseInt(id!) });
+      
       showToast.success(
         "Exercício enviado!",
         { description: `Você acertou ${result.correctCount} de ${result.totalQuestions} questões (${result.score.toFixed(1)}%)` }

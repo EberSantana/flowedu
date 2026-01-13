@@ -16,7 +16,8 @@ import {
   Search,
   Filter,
   Award,
-  FileText
+  FileText,
+  RefreshCw
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,10 +29,17 @@ export default function StudentExercises() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Buscar exercícios disponíveis
-  const { data: exercises = [], isLoading } = trpc.studentExercises.listAvailable.useQuery(
+  const { data: exercises = [], isLoading, refetch, isFetching } = trpc.studentExercises.listAvailable.useQuery(
     { subjectId: selectedSubject },
-    { refetchOnWindowFocus: false }
+    { 
+      refetchOnWindowFocus: true,  // Atualizar ao voltar para a página
+      refetchOnMount: true,         // Atualizar ao montar o componente
+    }
   );
+  
+  const handleRefresh = () => {
+    refetch();
+  };
 
   // Buscar disciplinas do aluno
   const { data: enrollments = [] } = trpc.student.getEnrolledSubjects.useQuery();
@@ -124,12 +132,21 @@ export default function StudentExercises() {
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
                 <FileText className="h-8 w-8" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
                 <p className="text-orange-100 mt-1">
                   Pratique e aprimore seus conhecimentos
                 </p>
               </div>
+              <Button
+                onClick={handleRefresh}
+                disabled={isFetching}
+                variant="secondary"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+                {isFetching ? 'Atualizando...' : 'Atualizar'}
+              </Button>
             </div>
           </div>
         </div>
@@ -281,14 +298,29 @@ export default function StudentExercises() {
                     </div>
 
                     {/* Tentativas */}
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-purple-600" />
-                        <span className="text-sm font-medium text-gray-700">Tentativas:</span>
+                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Award className="w-5 h-5 text-purple-600" />
+                          <span className="text-sm font-semibold text-gray-900">Tentativas</span>
+                        </div>
+                        <span className="text-sm font-bold text-purple-700">
+                          {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
+                        </span>
                       </div>
-                      <span className="text-sm font-bold text-gray-900">
-                        {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
-                      </span>
+                      {exercise.maxAttempts > 0 && (
+                        <div className="w-full bg-purple-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${(exercise.attempts / exercise.maxAttempts) * 100}%` }}
+                          />
+                        </div>
+                      )}
+                      {exercise.canAttempt && exercise.maxAttempts > 0 && (
+                        <p className="text-xs text-purple-700 mt-2 font-medium">
+                          {exercise.maxAttempts - exercise.attempts} tentativa(s) restante(s)
+                        </p>
+                      )}
                     </div>
 
                     {/* Data de Disponibilidade */}

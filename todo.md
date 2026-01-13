@@ -5243,3 +5243,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar frontend para usar tipos corretos (remover as any)
 - [x] Exportar tipos do backend para o frontend
 - [x] Testar autocomplete e validação de tipos
+
+## 🐛 BUG CRÍTICO: Atualização de Exercícios
+
+- [x] BUG: Contador de tentativas não atualiza após nova tentativa (mostra 1/3 quando deveria ser 2/3)
+- [x] BUG: Status do exercício não atualiza (continua "Reprovado 7%" após segunda tentativa)
+- [x] Investigar query que busca tentativas do aluno
+- [x] Verificar se a tentativa está sendo salva corretamente no banco
+- [x] Corrigir invalidação de cache do tRPC após submissão
+- [x] Adicionar refresh automático da lista de exercícios após tentativa
+- [x] Melhorar feedback visual de atualização de status
+- [x] Adicionar botão de atualização manual
+- [x] Adicionar barra de progresso visual de tentativas
+- [x] Mostrar tentativas restantes claramente
