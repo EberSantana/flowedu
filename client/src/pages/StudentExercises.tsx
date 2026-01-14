@@ -58,7 +58,7 @@ export default function StudentExercises() {
       const score = exercise.lastAttempt.score;
       if (score >= exercise.passingScore) {
         return (
-          <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-green-600 hover:bg-green-700">
+          <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-success hover:bg-success/90">
             <CheckCircle2 className="w-4 h-4" />
             Aprovado ({score}%)
           </Badge>
@@ -75,7 +75,7 @@ export default function StudentExercises() {
 
     if (exercise.lastAttempt?.status === "in_progress") {
       return (
-        <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm font-semibold border-blue-300 text-blue-700">
+        <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm font-semibold border-primary/50 text-primary">
           <Clock className="w-4 h-4" />
           Em Andamento
         </Badge>
@@ -83,7 +83,7 @@ export default function StudentExercises() {
     }
 
     return (
-      <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700">
+      <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-primary hover:bg-primary/90">
         <BookOpen className="w-4 h-4" />
         Disponível
       </Badge>
@@ -126,7 +126,7 @@ export default function StudentExercises() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
@@ -162,7 +162,7 @@ export default function StudentExercises() {
               placeholder="Buscar exercícios..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              className="pl-12 h-12 text-base border-border focus:border-primary focus:ring-primary"
             />
             </div>
 
@@ -211,7 +211,7 @@ export default function StudentExercises() {
           {filteredExercises && filteredExercises.length === 0 ? (
           <Card className="border-2 border-dashed border-gray-300">
             <CardContent className="py-20 text-center">
-              <div className="mx-auto w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-8 shadow-inner">
+              <div className="mx-auto w-28 h-28 bg-gradient-to-br from-muted to-muted/50 rounded-full flex items-center justify-center mb-8 shadow-inner">
                 <BookOpen className="w-14 h-14 text-gray-400" />
               </div>
               <h3 className="text-3xl font-bold mb-4 text-gray-900">
@@ -244,7 +244,7 @@ export default function StudentExercises() {
               {filteredExercises.map((exercise: any) => (
               <Card 
                 key={exercise.id} 
-                className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-blue-300 flex flex-col group"
+                className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 flex flex-col group"
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between gap-3 mb-3">
@@ -262,9 +262,9 @@ export default function StudentExercises() {
                   <div className="space-y-4 flex-1">
                     {/* Grid de Informações */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-3 text-sm bg-blue-50 p-4 rounded-xl border border-blue-100">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-5 h-5 text-blue-600" />
+                      <div className="flex items-center gap-3 text-sm bg-primary/10 p-4 rounded-xl border border-primary/20">
+                        <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <BookOpen className="w-5 h-5 text-primary" />
                         </div>
                         <div>
                           <p className="font-bold text-gray-900 text-lg">{exercise.totalQuestions}</p>
@@ -286,9 +286,9 @@ export default function StudentExercises() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-3 text-sm bg-green-50 p-4 rounded-xl border border-green-100 col-span-2">
-                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Target className="w-5 h-5 text-green-600" />
+                      <div className="flex items-center gap-3 text-sm bg-success/10 p-4 rounded-xl border border-success/20 col-span-2">
+                        <div className="w-10 h-10 bg-success/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Target className="w-5 h-5 text-success" />
                         </div>
                         <div>
                           <p className="font-bold text-gray-900 text-lg">{exercise.passingScore}%</p>
@@ -339,7 +339,7 @@ export default function StudentExercises() {
                     <Button
                       onClick={() => handleStartExercise(exercise.id)}
                       disabled={!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts}
-                      className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg group-hover:shadow-xl transition-all"
+                      className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg group-hover:shadow-xl transition-all"
                     >
                       {exercise.lastAttempt?.status === "in_progress" 
                         ? "Continuar Exercício" 

@@ -116,7 +116,7 @@ export function Announcements() {
             <div className="mb-6 flex justify-end">
               <Button
                 onClick={() => setIsCreating(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Aviso
@@ -126,7 +126,7 @@ export function Announcements() {
 
           {/* Form */}
           {isCreating && (
-            <div className="bg-green-50 border-green-200 p-6 rounded-lg border shadow-sm mb-6">
+            <div className="bg-success/10 border-success/30 p-6 rounded-lg border shadow-sm mb-6">
               <h2 className="text-lg font-semibold mb-4">
                 {editingId ? "Editar Aviso" : "Criar Novo Aviso"}
               </h2>
@@ -200,7 +200,7 @@ export function Announcements() {
                   <Button
                     type="submit"
                     disabled={createMutation.isPending || updateMutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-primary hover:bg-primary/90"
                   >
                     {editingId ? "Atualizar" : "Criar"} Aviso
                   </Button>
@@ -246,7 +246,7 @@ export function Announcements() {
                       </p>
                       
                       <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="font-medium text-blue-600">
+                        <span className="font-medium text-primary">
                           {announcement.subjectName}
                         </span>
                         <span>

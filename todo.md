@@ -5332,3 +5332,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Corrigir página de Metodologias Ativas - nome em preto seguindo padrões
 - [x] Corrigir página de Gerenciar Tarefas - aplicar cores do tema corretamente
+
+- [x] Padronizar páginas do portal do aluno (exercícios e trilhas) com variáveis do tema
+- [x] Revisar e padronizar página de Avisos com variáveis do tema

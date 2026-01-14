@@ -32,7 +32,7 @@ export default function StudentLearningPaths() {
       <StudentLayout>
         <div className="container mx-auto py-8 px-4">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-gray-600">Carregando trilhas de aprendizagem...</p>
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function StudentLearningPaths() {
 
   const getDifficultyColor = (difficulty?: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-700 border-green-300';
+      case 'easy': return 'bg-success/20 text-success border-success/50';
       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
       case 'hard': return 'bg-red-100 text-red-700 border-red-300';
       default: return 'bg-gray-100 text-gray-700 border-gray-300';
@@ -62,7 +62,7 @@ export default function StudentLearningPaths() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
@@ -70,7 +70,7 @@ export default function StudentLearningPaths() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold">Trilhas de Aprendizagem</h1>
-                <p className="text-blue-100 mt-1">
+                <p className="text-primary-foreground/80 mt-1">
                   Acompanhe seu progresso e domine cada disciplina passo a passo
                 </p>
               </div>
@@ -81,13 +81,13 @@ export default function StudentLearningPaths() {
         <div className="container mx-auto py-8 px-4 max-w-7xl">
           {/* Cards de Estatísticas Globais */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50 to-white">
+          <Card className="border-l-4 border-l-primary hover:shadow-lg transition-shadow bg-gradient-to-br from-primary/10 to-background">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold text-gray-700">
                   Disciplinas Ativas
                 </CardTitle>
-                <BookOpen className="w-5 h-5 text-blue-600" />
+                <BookOpen className="w-5 h-5 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
@@ -96,13 +96,13 @@ export default function StudentLearningPaths() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow bg-gradient-to-br from-green-50 to-white">
+          <Card className="border-l-4 border-l-success hover:shadow-lg transition-shadow bg-gradient-to-br from-success/10 to-background">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold text-gray-700">
                   Tópicos Concluídos
                 </CardTitle>
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <CheckCircle2 className="w-5 h-5 text-success" />
               </div>
             </CardHeader>
             <CardContent>
@@ -111,7 +111,7 @@ export default function StudentLearningPaths() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow bg-gradient-to-br from-purple-50 to-white">
+          <Card className="border-l-4 border-l-accent hover:shadow-lg transition-shadow bg-gradient-to-br from-accent/10 to-background">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold text-gray-700">
@@ -126,7 +126,7 @@ export default function StudentLearningPaths() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow bg-gradient-to-br from-orange-50 to-white">
+          <Card className="border-l-4 border-l-warning hover:shadow-lg transition-shadow bg-gradient-to-br from-warning/10 to-background">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold text-gray-700">
@@ -146,7 +146,7 @@ export default function StudentLearningPaths() {
           <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Target className="w-6 h-6 text-blue-600" />
+              <Target className="w-6 h-6 text-primary" />
               Suas Trilhas de Aprendizagem
             </h2>
             </div>
@@ -180,7 +180,7 @@ export default function StudentLearningPaths() {
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">
                             {subject.name}
                           </CardTitle>
                           <CardDescription className="text-sm text-gray-600 mt-1">
@@ -188,7 +188,7 @@ export default function StudentLearningPaths() {
                           </CardDescription>
                         </div>
                         {hasLearningPath && (
-                          <Badge className="bg-green-100 text-green-700 border-green-300">
+                          <Badge className="bg-success/20 text-success border-success/50">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
                             Trilha Ativa
                           </Badge>
@@ -212,13 +212,13 @@ export default function StudentLearningPaths() {
                           <div className="grid grid-cols-3 gap-2 pt-2 border-t">
                             <div className="text-center">
                               <div className="text-xs text-gray-500 mb-1">Em Progresso</div>
-                              <div className="text-lg font-bold text-blue-600">
+                              <div className="text-lg font-bold text-primary">
                                 {stats?.inProgressTopics || 0}
                               </div>
                             </div>
                             <div className="text-center border-l border-r">
                               <div className="text-xs text-gray-500 mb-1">Concluídos</div>
-                              <div className="text-lg font-bold text-green-600">
+                              <div className="text-lg font-bold text-success">
                                 {stats?.completedTopics || 0}
                               </div>
                             </div>
@@ -237,7 +237,7 @@ export default function StudentLearningPaths() {
                               className="flex-1"
                             >
                               <Button 
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md"
+                                className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-md"
                                 size="sm"
                               >
                                 <Map className="w-4 h-4 mr-2" />
@@ -247,7 +247,7 @@ export default function StudentLearningPaths() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                              className="border-primary/50 text-primary hover:bg-primary/10"
                             >
                               <BarChart3 className="w-4 h-4" />
                             </Button>
@@ -271,9 +271,9 @@ export default function StudentLearningPaths() {
 
           {/* Recursos Adicionais */}
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-200 hover:shadow-lg transition-shadow">
+          <Card className="bg-gradient-to-br from-primary/10 to-background border-primary/30 hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-900">
+              <CardTitle className="flex items-center gap-2 text-foreground">
                 <BookMarked className="w-5 h-5" />
                 Diário de Aprendizagem
               </CardTitle>
@@ -291,7 +291,7 @@ export default function StudentLearningPaths() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-white border-purple-200 hover:shadow-lg transition-shadow">
+          <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30 hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-purple-900">
                 <MessageCircle className="w-5 h-5" />
@@ -311,9 +311,9 @@ export default function StudentLearningPaths() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-white border-green-200 hover:shadow-lg transition-shadow">
+          <Card className="bg-gradient-to-br from-success/10 to-background border-success/30 hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-900">
+              <CardTitle className="flex items-center gap-2 text-foreground">
                 <TrendingUp className="w-5 h-5" />
                 Estatísticas
               </CardTitle>
@@ -323,7 +323,7 @@ export default function StudentLearningPaths() {
                 Acompanhe seu desempenho e evolução em todas as disciplinas.
               </p>
               <Link href="/student/statistics">
-                <Button variant="outline" size="sm" className="w-full border-green-300 text-green-600 hover:bg-green-50">
+                <Button variant="outline" size="sm" className="w-full border-success/50 text-success hover:bg-success/10">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Ver Estatísticas
                 </Button>
