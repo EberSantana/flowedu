@@ -270,7 +270,7 @@ export default function StudentExerciseReview() {
                         
                         return (
                           <div
-                            key={optIdx}
+                            key={`${response.id}-option-${optIdx}`}
                             className={`p-3 rounded-lg border-2 ${
                               isCorrectAnswer
                                 ? 'border-green-500 bg-green-50'

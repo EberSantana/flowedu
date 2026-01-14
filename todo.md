@@ -5278,3 +5278,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Destacar questões que o aluno errou vs acertou
 - [x] Criar rota backend getExerciseHistory para buscar histórico completo
 - [x] Adicionar rota /student-exercises/:id/review no frontend
+
+## 🐛 Bug: Key Prop Faltando
+
+- [x] Corrigir erro "Each child in a list should have a unique key prop" em StudentExerciseReview
+
+## 🌐 Site do Guia VPS
+
+- [ ] Ler conteúdo do guia_deploy_vps_professores.md.docx
+- [ ] Criar novo projeto web para o site do guia
+- [ ] Implementar design responsivo e navegação
+- [ ] Adicionar conteúdo do guia formatado
