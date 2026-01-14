@@ -5341,3 +5341,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aplicar variáveis de cores do tema nas outras páginas do aluno (StudentStats, StudentSubjects)
 
 - [x] Padronizar gradientes e backgrounds em todas as páginas (mantendo cores semânticas)
+
+
+## Sistema de Autenticação Standalone (VPS)
+
+- [x] Analisar sistema de autenticação atual e identificar dependências do OAuth Manus
+- [x] Implementar cadastro por convite com e-mail e senha (sem OAuth)
+- [x] Implementar login com e-mail e senha (bcrypt + JWT)
+- [x] Implementar recuperação de senha por e-mail (token temporário)
+- [x] Atualizar páginas de login/cadastro para usar novo sistema
+- [x] Remover/desabilitar dependência do OAuth Manus (flag USE_STANDALONE_AUTH)
+- [x] Documentar configuração de SMTP para envio de e-mails
+- [x] Testar fluxo completo de autenticação

@@ -11,8 +11,10 @@ import { getDb } from "./db";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
 import { sdk } from "./_core/sdk";
+import { createSessionToken as createStandaloneSession } from "./_core/auth-standalone";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
+import { sendPasswordResetEmail } from "./_core/email";
 
 export const appRouter = router({
   system: systemRouter,
@@ -147,9 +149,8 @@ export const appRouter = router({
           throw new Error("Erro ao criar sessão. Tente fazer login.");
         }
 
-        // Criar sessão JWT usando o mesmo formato do OAuth
-        const token = await sdk.createSessionToken(user.openId, {
-          name: user.name || '',
+        // Criar sessão JWT standalone (sem dependência do OAuth Manus)
+        const token = await createStandaloneSession(user, {
           expiresInMs: 7 * 24 * 60 * 60 * 1000, // 7 dias
         });
 
@@ -205,9 +206,8 @@ export const appRouter = router({
           lastSignedIn: new Date(),
         });
 
-        // Criar sessão JWT usando o mesmo formato do OAuth
-        const token = await sdk.createSessionToken(user.openId, {
-          name: user.name || '',
+        // Criar sessão JWT standalone (sem dependência do OAuth Manus)
+        const token = await createStandaloneSession(user, {
           expiresInMs: 7 * 24 * 60 * 60 * 1000, // 7 dias
         });
 
@@ -249,9 +249,10 @@ export const appRouter = router({
         // Salvar token no banco
         await db.createPasswordResetToken(user.id, token, expiresAt);
 
-        // TODO: Enviar e-mail com link de recuperação
-        // const resetLink = `${process.env.FRONTEND_URL}/redefinir-senha?token=${token}`;
-        // await sendPasswordResetEmail(user.email, resetLink);
+        // Enviar e-mail com link de recuperação
+        if (user.email) {
+          await sendPasswordResetEmail(user.email, token, user.name || undefined);
+        }
 
         return { success: true, message: "Se o e-mail existir, você receberá um link de recuperação." };
       }),

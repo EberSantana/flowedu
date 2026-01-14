@@ -1,6 +1,7 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
+import { authenticateRequest as authenticateStandalone } from "./auth-standalone";
 import jwt from "jsonwebtoken";
 import { ENV } from "./env";
 import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../../shared/const";
@@ -24,6 +25,9 @@ export type TrpcContext = {
   studentSession: StudentSession | null;
   userType: 'teacher' | 'student' | null;
 };
+
+// Flag para usar autenticação standalone (VPS) ou OAuth Manus
+const USE_STANDALONE_AUTH = process.env.USE_STANDALONE_AUTH === 'true' || !ENV.oAuthServerUrl;
 
 export async function createContext(
   opts: CreateExpressContextOptions
@@ -63,7 +67,13 @@ export async function createContext(
   // Se não é aluno, tentar autenticação de professor
   if (!studentSession) {
     try {
-      user = await sdk.authenticateRequest(opts.req);
+      // Usar autenticação standalone se configurado ou se OAuth não está disponível
+      if (USE_STANDALONE_AUTH) {
+        user = await authenticateStandalone(opts.req);
+      } else {
+        user = await sdk.authenticateRequest(opts.req);
+      }
+      
       if (user) {
         userType = 'teacher';
       }
