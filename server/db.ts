@@ -4705,12 +4705,14 @@ export async function getExerciseResults(attemptId: number) {
   const exerciseData = exercise[0]?.exerciseData as any || { exercises: [] };
   
   // Combinar respostas com questões originais
-  const questionsWithAnswers = answers.map((answer) => {
+  const questionsWithAnswers = answers.map((answer, idx) => {
     // Buscar questão original pelo número (index + 1)
     const originalQuestion = exerciseData.exercises?.[answer.questionNumber - 1] || 
                             exerciseData.exercises?.find((q: any) => q.number === answer.questionNumber) || 
                             {};
     return {
+      // ID único para React key
+      id: answer.id || `question-${attemptId}-${idx}`,
       // Dados da questão original
       question: originalQuestion.question || answer.questionType, // Mantido para compatibilidade
       text: originalQuestion.text || originalQuestion.question || answer.questionType, // Enunciado completo

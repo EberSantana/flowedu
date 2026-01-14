@@ -37,6 +37,7 @@
 - [x- [x] CRÍTICO: Caderno de exercícios não está visível no portal do aluno - CORRIGIDO: modificada detecção de tipo de usuário no Sidebar para usar sessão real (tRPC) ao invés de URL
 - [x] BUG: Caderno de Respostas não está exibindo nenhum conteúdo
 - [x] Remover funcionalidade "Caderno de Respostas" do portal do aluno (Frontend, Backend, Banco de Dados)
+- [x] Corrigir erro de "key" prop no componente StudentExerciseReview - CORRIGIDO: adicionado id único às questões retornadas por getExerciseResults e fallback no key do componente
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 

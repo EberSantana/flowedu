@@ -218,7 +218,7 @@ export default function StudentExerciseReview() {
             
             return (
               <Card 
-                key={response.id}
+                key={response.id || `response-${index}`}
                 className={`border-2 ${
                   isCorrect 
                     ? 'border-green-200 bg-green-50/30' 
@@ -270,7 +270,7 @@ export default function StudentExerciseReview() {
                         
                         return (
                           <div
-                            key={`${response.id}-option-${optIdx}`}
+                            key={`${response.id || index}-option-${optIdx}`}
                             className={`p-3 rounded-lg border-2 ${
                               isCorrectAnswer
                                 ? 'border-green-500 bg-green-50'
