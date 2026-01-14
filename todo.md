@@ -41,6 +41,7 @@
 - [x] Melhorar interface da página de revisão (StudentExerciseReview) com indicadores visuais claros para respostas certas e erradas
 - [x] Corrigir erro "Invalid hook call" no TRPCProvider (múltiplas cópias do React) - RESOLVIDO: reiniciar o servidor limpou o cache do Vite
 - [x] Analisar e otimizar configuração do Vite para evitar problemas de cache - CONCLUÍDO: adicionados scripts de limpeza, configurações de dedupe, optimizeDeps e documentação
+- [x] Implementar sistema de temas pré-definidos (6-8 paletas profissionais com preview visual) - CONCLUÍDO: 8 temas (Padrão, Oceano, Floresta, Pôr do Sol, Lavanda, Rosa, Ardósia, Turquesa) + modo claro/escuro/sistema
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 

@@ -37,6 +37,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Search, Command as CommandIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeSelectorCompact } from "@/components/ThemeSelector";
 import {
   Tooltip,
   TooltipContent,
@@ -458,7 +459,7 @@ export default function Sidebar() {
               </Tooltip>
               
               <div className="flex items-center justify-center">
-                <ThemeToggle />
+                <ThemeSelectorCompact />
               </div>
               
               {/* Botão de sair do modo aluno (apenas para alunos) */}
@@ -537,7 +538,7 @@ export default function Sidebar() {
                   </button>
                   
                   <div className="flex items-center gap-3 px-4 py-2">
-                    <ThemeToggle />
+                    <ThemeSelectorCompact />
                     <span className="text-sm text-muted-foreground">Tema</span>
                   </div>
                   

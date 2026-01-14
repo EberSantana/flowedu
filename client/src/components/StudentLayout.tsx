@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
+import { ThemeSelector } from "@/components/ThemeSelector";
+import { Palette } from "lucide-react";
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const { student, loading, logout, isAuthenticated } = useStudentAuth();
@@ -123,6 +125,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
           {/* Bottom Actions */}
           <div className="p-4 border-t border-gray-200 bg-gray-50 space-y-2">
+            <ThemeSelector
+              trigger={
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-3 h-11 border-gray-300 hover:bg-gray-100"
+                >
+                  <Palette className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-medium">Personalizar Tema</span>
+                </Button>
+              }
+            />
             <Link href="/student-profile">
               <Button
                 variant="outline"
@@ -221,6 +234,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
           {/* Bottom Actions */}
           <div className="p-4 border-t border-gray-200 bg-gray-50 space-y-2">
+            <ThemeSelector
+              trigger={
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-3 h-11 border-gray-300 hover:bg-gray-100"
+                >
+                  <Palette className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-medium">Personalizar Tema</span>
+                </Button>
+              }
+            />
             <Link href="/student-profile">
               <Button
                 onClick={() => setSidebarOpen(false)}
