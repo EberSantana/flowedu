@@ -175,14 +175,50 @@ export const appRouter = router({
     loginTeacher: publicProcedure
       .input(z.object({
         email: z.string().email("E-mail inválido"),
-        password: z.string().min(1, "Senha é obrigatória"),
+        password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Sanitizar e normalizar e-mail
+        const normalizedEmail = input.email.trim().toLowerCase();
+        
+        // Rate limiting baseado em IP (em memória - para produção usar Redis)
+        const clientIP = ctx.req.headers['x-forwarded-for'] || ctx.req.socket.remoteAddress || 'unknown';
+        const ipKey = `login_attempts_${clientIP}`;
+        const emailKey = `login_attempts_email_${normalizedEmail}`;
+        
+        // Verificar tentativas por IP (global)
+        const ipAttempts = (global as any)[ipKey] || { count: 0, lastAttempt: 0 };
+        const now = Date.now();
+        
+        // Reset após 15 minutos de inatividade
+        if (now - ipAttempts.lastAttempt > 15 * 60 * 1000) {
+          ipAttempts.count = 0;
+        }
+        
+        // Bloquear após 10 tentativas por IP
+        if (ipAttempts.count >= 10) {
+          const timeRemaining = Math.ceil((15 * 60 * 1000 - (now - ipAttempts.lastAttempt)) / 1000 / 60);
+          throw new TRPCError({
+            code: 'TOO_MANY_REQUESTS',
+            message: `Muitas tentativas de login. Aguarde ${timeRemaining} minutos.`,
+          });
+        }
+        
         // Buscar usuário pelo e-mail
-        const user = await db.getUserByEmail(input.email);
+        const user = await db.getUserByEmail(normalizedEmail);
+        
+        // Mensagem genérica para evitar enumeração de usuários
+        const genericError = "Credenciais inválidas. Verifique seu e-mail e senha.";
         
         if (!user) {
-          throw new Error("E-mail não encontrado. Verifique ou cadastre-se.");
+          // Incrementar tentativas mesmo para usuário inexistente
+          ipAttempts.count++;
+          ipAttempts.lastAttempt = now;
+          (global as any)[ipKey] = ipAttempts;
+          
+          // Delay artificial para prevenir timing attacks
+          await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
+          throw new Error(genericError);
         }
 
         // Verificar se usuário está ativo
@@ -192,13 +228,24 @@ export const appRouter = router({
 
         // Verificar senha
         if (!user.passwordHash) {
-          throw new Error("Esta conta usa login com Google/GitHub. Use o botão 'Entrar como Professor'.");
+          throw new Error("Esta conta usa login social. Use o botão 'Entrar com Google'.");
         }
 
         const validPassword = await bcrypt.compare(input.password, user.passwordHash);
         if (!validPassword) {
-          throw new Error("Senha incorreta. Tente novamente.");
+          // Incrementar tentativas
+          ipAttempts.count++;
+          ipAttempts.lastAttempt = now;
+          (global as any)[ipKey] = ipAttempts;
+          
+          // Delay artificial para prevenir timing attacks
+          await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
+          throw new Error(genericError);
         }
+        
+        // Login bem-sucedido - resetar contadores
+        (global as any)[ipKey] = { count: 0, lastAttempt: 0 };
+        (global as any)[emailKey] = { count: 0, lastAttempt: 0 };
 
         // Atualizar último login
         await db.upsertUser({

@@ -5393,3 +5393,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir cor do texto "Analisar com IA" no botão para ficar mais legível (text-primary-foreground)
 
 - [x] Alterar cor do texto do botão "Analisar com IA" para preto fixo
+
+## Aprimoramento do Login do Professor
+
+- [x] Redesenhar página de login com design profissional (layout split-screen)
+- [x] Adicionar validação de força de senha (mínimo 6 caracteres)
+- [x] Implementar proteção contra brute force (rate limiting por IP)
+- [x] Adicionar indicadores visuais de segurança (SSL badge, shield icon)
+- [x] Melhorar feedback de erros de autenticação (mensagens genéricas anti-enumeração)
+- [x] Adicionar opção "Lembrar-me" com checkbox
