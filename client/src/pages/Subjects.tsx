@@ -322,12 +322,12 @@ export default function Subjects() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-4 sm:py-6 lg:py-8">
           <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-                <BookOpen className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-600" />
+                <BookOpen className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary" />
                 Gerenciar Disciplinas
               </h1>
             </div>
@@ -337,7 +337,7 @@ export default function Subjects() {
                   <Button 
                     onClick={() => setIsBulkEnrollOpen(true)} 
                     size="lg"
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Matricular em {selectedSubjects.length} Disciplina{selectedSubjects.length > 1 ? 's' : ''}
@@ -356,7 +356,7 @@ export default function Subjects() {
                     onClick={() => setIsQuickEnrollOpen(true)} 
                     size="lg"
                     variant="outline"
-                    className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 w-full sm:w-auto min-h-[44px]"
+                    className="bg-success/10 hover:bg-success/20 border-success/30 text-success hover:text-success w-full sm:w-auto min-h-[44px]"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Matricular Alunos
@@ -424,9 +424,9 @@ export default function Subjects() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <CardTitle className="text-lg truncate">{subject.name}</CardTitle>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 rounded-full border border-blue-200 flex-shrink-0">
-                          <Users className="h-3.5 w-3.5 text-blue-600" />
-                          <span className="text-xs font-semibold text-blue-700">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 rounded-full border border-primary/30 flex-shrink-0">
+                          <Users className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-xs font-semibold text-primary">
                             {enrollmentCounts[subject.id] || 0}
                           </span>
                         </div>
@@ -445,14 +445,14 @@ export default function Subjects() {
                   {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (
                     <button
                       onClick={() => setViewingCoursePlan(subject)}
-                      className="mb-4 w-full p-3 bg-blue-50 rounded-lg border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer"
+                      className="mb-4 w-full p-3 bg-primary/10 rounded-lg border border-primary/30 hover:bg-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
                     >
-                      <div className="flex items-center justify-between text-blue-700 text-sm font-semibold">
+                      <div className="flex items-center justify-between text-primary text-sm font-semibold">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          <span>Plano de Curso cadastrado</span>
+                          Ver Plano de Curso
                         </div>
-                        <span className="text-xs text-blue-600">Clique para visualizar</span>
+                        <span className="text-xs text-primary/80">Clique para visualizar</span>
                       </div>
                     </button>
                   )}
@@ -506,7 +506,7 @@ export default function Subjects() {
                           href={subject.googleDriveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 p-2 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200 hover:border-blue-300 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-800"
+                          className="flex-1 p-2 bg-gradient-to-r from-primary/10 to-success/10 rounded-lg border border-primary/30 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-primary hover:text-primary/90"
                         >
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>
@@ -519,7 +519,7 @@ export default function Subjects() {
                           href={subject.googleClassroomUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 p-2 bg-gradient-to-r from-green-50 to-yellow-50 rounded-lg border border-green-200 hover:border-green-300 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-green-700 hover:text-green-800"
+                          className="flex-1 p-2 bg-gradient-to-r from-success/10 to-warning/10 rounded-lg border border-success/30 hover:border-success/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-success hover:text-success/90"
                         >
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
@@ -539,7 +539,7 @@ export default function Subjects() {
                           <Button
                             variant="default"
                             size="sm"
-                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                            className="w-full bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70"
                           >
                             <Users className="mr-2 h-3 w-3" />
                             {enrollmentCounts[subject.id] || 0} Aluno(s) - Ver Detalhes
@@ -553,7 +553,7 @@ export default function Subjects() {
                           setSelectedSubjectForEnroll(subject.id);
                           setIsQuickEnrollOpen(true);
                         }}
-                        className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                        className="bg-gradient-to-r from-info to-info/80 hover:from-info/90 hover:to-info/70"
                         title="Matricular aluno rapidamente"
                       >
                         <UserPlus className="h-3 w-3" />
@@ -563,7 +563,7 @@ export default function Subjects() {
                       <Button
                         variant="default"
                         size="sm"
-                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                        className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70"
                       >
                         <Route className="mr-2 h-3 w-3" />
                         Trilhas de Aprendizagem
@@ -727,7 +727,7 @@ export default function Subjects() {
                 <TabsContent value="coursePlan" className="py-4">
                   <ScrollArea className="h-[500px] pr-4">
                     <div className="space-y-4 pb-4">
-                      <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                      <div className="bg-primary/10 p-3 rounded-lg border-l-4 border-primary">
                         <div className="space-y-2">
                         <Label htmlFor="ementa">Ementa</Label>
                         <Textarea
@@ -739,7 +739,7 @@ export default function Subjects() {
                         />
                         </div>
                       </div>
-                      <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
+                      <div className="bg-success/10 p-3 rounded-lg border-l-4 border-success">
                         <div className="space-y-2">
                         <Label htmlFor="generalObjective">Objetivo Geral</Label>
                         <Textarea
@@ -822,16 +822,16 @@ export default function Subjects() {
                     </div>
                     
                     {/* Google Drive */}
-                    <div className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border-2 border-blue-200">
+                    <div className="bg-gradient-to-r from-primary/10 to-success/10 p-4 rounded-lg border-2 border-primary/30">
                       <div className="flex items-start gap-3 mb-3">
-                        <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-primary flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>
                         </svg>
                         <div className="flex-1">
-                          <h4 className="font-semibold text-blue-800 mb-1">Google Drive</h4>
-                          <p className="text-sm text-blue-700 mb-3">Armazene e compartilhe materiais didáticos, apostilas, apresentações e recursos da disciplina</p>
+                          <h4 className="font-semibold text-primary mb-1">Google Drive</h4>
+                          <p className="text-sm text-primary/80 mb-3">Armazene e compartilhe materiais didáticos, apostilas, apresentações e recursos da disciplina</p>
                           <div className="space-y-2">
-                            <Label htmlFor="googleDriveUrl" className="text-blue-900">Link da Pasta do Drive</Label>
+                            <Label htmlFor="googleDriveUrl" className="text-primary">Link da Pasta do Drive</Label>
                             <Input
                               id="googleDriveUrl"
                               value={formData.googleDriveUrl}
@@ -840,23 +840,23 @@ export default function Subjects() {
                               type="url"
                               className="bg-white"
                             />
-                            <p className="text-xs text-blue-600">💡 Dica: Crie uma pasta específica para a disciplina e cole o link aqui</p>
+                            <p className="text-xs text-primary/70">💡 Dica: Crie uma pasta específica para a disciplina e cole o link aqui</p>
                           </div>
                         </div>
                       </div>
                     </div>
                     
                     {/* Google Classroom */}
-                    <div className="bg-gradient-to-r from-green-50 to-yellow-50 p-4 rounded-lg border-2 border-green-200">
+                    <div className="bg-gradient-to-r from-success/10 to-warning/10 p-4 rounded-lg border-2 border-success/30">
                       <div className="flex items-start gap-3 mb-3">
-                        <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-success flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
                         </svg>
                         <div className="flex-1">
-                          <h4 className="font-semibold text-green-800 mb-1">Google Classroom</h4>
-                          <p className="text-sm text-green-700 mb-3">Gerencie turmas virtuais, publique atividades, avaliações e interaja com alunos</p>
+                          <h4 className="font-semibold text-success mb-1">Google Classroom</h4>
+                          <p className="text-sm text-success/80 mb-3">Gerencie turmas virtuais, publique atividades, avaliações e interaja com alunos</p>
                           <div className="space-y-2">
-                            <Label htmlFor="googleClassroomUrl" className="text-green-900">Link da Turma Virtual</Label>
+                            <Label htmlFor="googleClassroomUrl" className="text-success">Link da Turma Virtual</Label>
                             <Input
                               id="googleClassroomUrl"
                               value={formData.googleClassroomUrl}
@@ -865,7 +865,7 @@ export default function Subjects() {
                               type="url"
                               className="bg-white"
                             />
-                            <p className="text-xs text-green-600">💡 Dica: Acesse o Classroom, abra a turma e copie o link da barra de endereços</p>
+                            <p className="text-xs text-success/70">💡 Dica: Acesse o Classroom, abra a turma e copie o link da barra de endereços</p>
                           </div>
                         </div>
                       </div>
@@ -896,7 +896,7 @@ export default function Subjects() {
         <Dialog open={!!viewingCoursePlan} onOpenChange={() => setViewingCoursePlan(null)}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+              <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
                 <FileText className="h-6 w-6" />
                 Plano de Curso - {viewingCoursePlan?.name}
               </DialogTitle>
@@ -909,14 +909,14 @@ export default function Subjects() {
               <ScrollArea className="h-[60vh] pr-4">
                 <div className="space-y-6 py-4">
                 {viewingCoursePlan.ementa && (
-                  <div className="border-l-4 border-blue-500 pl-4">
+                  <div className="border-l-4 border-primary pl-4">
                     <h3 className="text-lg font-semibold text-slate-700 mb-2">Ementa</h3>
                     <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.ementa}</p>
                   </div>
                 )}
 
                 {viewingCoursePlan.generalObjective && (
-                  <div className="border-l-4 border-green-500 pl-4">
+                  <div className="border-l-4 border-success pl-4">
                     <h3 className="text-lg font-semibold text-slate-700 mb-2">Objetivo Geral</h3>
                     <p className="text-slate-600 whitespace-pre-wrap">{viewingCoursePlan.generalObjective}</p>
                   </div>
@@ -1029,7 +1029,7 @@ export default function Subjects() {
               </Button>
               <Button 
                 onClick={handleBulkEnroll}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Matricular em Todas

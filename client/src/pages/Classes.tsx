@@ -93,12 +93,12 @@ export default function Classes() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-4 sm:py-6 lg:py-8">
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-                <Users className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-green-600" />
+                <Users className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary" />
                 Gerenciar Turmas
               </h1>
             </div>

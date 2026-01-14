@@ -5316,3 +5316,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Padronizar cores do Dashboard para usar variáveis do tema ativo (cards, botões, badges, gráficos)
 
 - [x] Remover botão Compactar do menu desktop (manter apenas para mobile)
+
+- [x] Aplicar variáveis de cores do tema na página de Disciplinas
+- [x] Aplicar variáveis de cores do tema na página de Turmas
+- [x] Aplicar variáveis de cores do tema na página de Relatórios

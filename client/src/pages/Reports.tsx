@@ -260,8 +260,8 @@ export default function Reports() {
           {/* Header com animação fade-in */}
           <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <BarChart3 className="h-8 w-8 text-blue-600" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <BarChart3 className="h-8 w-8 text-primary" />
               </div>
               Relatórios de Aulas
             </h1>
@@ -271,10 +271,10 @@ export default function Reports() {
           </div>
           
           {/* Filtros com animação */}
-          <Card className="mb-6 border-l-4 border-l-blue-500 shadow-md animate-in fade-in slide-in-from-top-4 duration-500 delay-100">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-white">
+          <Card className="mb-6 border-l-4 border-l-primary shadow-md animate-in fade-in slide-in-from-top-4 duration-500 delay-100">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-background">
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-600" />
+                <Calendar className="h-5 w-5 text-primary" />
                 Filtros
               </CardTitle>
               <CardDescription>Selecione o período e disciplina para visualizar</CardDescription>
@@ -322,7 +322,7 @@ export default function Reports() {
                 <div className="flex items-end">
                   <Button 
                     onClick={exportToPDF}
-                    className="w-full bg-blue-600 hover:bg-blue-700 transition-all hover:scale-105"
+                    className="w-full bg-primary hover:bg-primary/90 transition-all hover:scale-105"
                     disabled={isLoading || !stats}
                   >
                     <FileDown className="h-4 w-4 mr-2" />
@@ -352,7 +352,7 @@ export default function Reports() {
                     <CardTitle className="text-sm font-medium text-gray-600">Aulas Dadas</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-3xl font-bold text-green-600">{stats.given}</p>
+                    <p className="text-3xl font-bold text-success">{stats.given}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       {stats.total > 0 ? `${((stats.given / stats.total) * 100).toFixed(1)}%` : '0%'}
                     </p>
@@ -401,7 +401,7 @@ export default function Reports() {
                 {/* Gráfico de Pizza */}
                 {pieChartData && (
                   <Card className="shadow-md hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-left-4 duration-500 delay-[600ms]">
-                    <CardHeader className="bg-gradient-to-r from-purple-50 to-white border-b">
+                    <CardHeader className="bg-gradient-to-r from-accent/5 to-background border-b">
                       <CardTitle className="flex items-center gap-2">
                         <div className="p-1.5 bg-purple-100 rounded-lg">
                           <PieChart className="h-5 w-5 text-purple-600" />
@@ -421,10 +421,10 @@ export default function Reports() {
                 {/* Gráfico de Barras */}
                 {barChartData && stats.bySubject.length > 0 && (
                   <Card className="shadow-md hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-right-4 duration-500 delay-[600ms]">
-                    <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b">
+                    <CardHeader className="bg-gradient-to-r from-success/5 to-background border-b">
                       <CardTitle className="flex items-center gap-2">
-                        <div className="p-1.5 bg-green-100 rounded-lg">
-                          <BarChart3 className="h-5 w-5 text-green-600" />
+                        <div className="p-1.5 bg-success/10 rounded-lg">
+                          <BarChart3 className="h-5 w-5 text-success" />
                         </div>
                         Por Disciplina
                       </CardTitle>
@@ -451,7 +451,7 @@ export default function Reports() {
               {/* Tabela Detalhada por Disciplina com animação */}
               {stats.bySubject && stats.bySubject.length > 0 && (
                 <Card className="shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[700ms]">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-white border-b">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-background border-b">
                     <CardTitle>Detalhamento por Disciplina</CardTitle>
                     <CardDescription>Estatísticas completas de cada disciplina</CardDescription>
                   </CardHeader>
@@ -486,12 +486,12 @@ export default function Reports() {
                                 </div>
                               </td>
                               <td className="text-center py-3 px-4 font-medium">{subject.total}</td>
-                              <td className="text-center py-3 px-4 text-green-600 font-semibold">{subject.given}</td>
+                              <td className="text-center py-3 px-4 text-success font-semibold">{subject.given}</td>
                               <td className="text-center py-3 px-4 text-yellow-600 font-semibold">{subject.notGiven}</td>
                               <td className="text-center py-3 px-4 text-red-600 font-semibold">{subject.cancelled}</td>
                               <td className="text-center py-3 px-4 text-gray-600 font-medium">{subject.pending}</td>
                               <td className="text-center py-3 px-4">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shadow-sm">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary shadow-sm">
                                   {subject.total > 0 ? `${((subject.given / subject.total) * 100).toFixed(1)}%` : '0%'}
                                 </span>
                               </td>
@@ -527,7 +527,7 @@ export default function Reports() {
           {isLoading && (
             <div className="flex items-center justify-center py-12 animate-in fade-in duration-300">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                 <p className="text-gray-600">Carregando relatórios...</p>
               </div>
             </div>
