@@ -515,27 +515,8 @@ export default function Sidebar() {
             )}
           </div>
           
-          {/* Toggle Button */}
-          <div className={`border-b border-border/50 ${
-            isCompact ? 'p-2' : 'p-4'
-          }`}>
-            <button
-              onClick={() => setIsCompact(!isCompact)}
-              className={`hidden lg:flex items-center justify-center w-full py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-sm transition-all duration-200 ${
-                isCompact ? 'px-0' : 'px-4 gap-2'
-              }`}
-              title={isCompact ? 'Expandir menu' : 'Compactar menu'}
-            >
-              {isCompact ? (
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              ) : (
-                <>
-                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">Compactar</span>
-                </>
-              )}
-            </button>
-          </div>
+          {/* Separador - botão compactar removido para desktop */}
+          <div className="border-b border-border/50 p-2" />
 
           {/* Navigation */}
           <TooltipProvider delayDuration={300}>

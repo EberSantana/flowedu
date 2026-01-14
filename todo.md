@@ -5312,3 +5312,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover botão "Avaliações" do menu lateral (redundante)
 
 - [x] Implementar submenu hover com delay (200ms) no modo compacto do menu lateral
+
+- [ ] Padronizar cores do Dashboard para usar variáveis do tema ativo (cards, botões, badges, gráficos)
+
+- [x] Remover botão Compactar do menu desktop (manter apenas para mobile)
