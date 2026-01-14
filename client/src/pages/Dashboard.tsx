@@ -1062,9 +1062,9 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Gráfico de Distribuição Semanal */}
+          {/* Gráfico de Distribuição Semanal - Design Moderno com Barras */}
           {widgetVisibility.weeklyChart && scheduledClasses && scheduledClasses.length > 0 && (
-            <Card className="border-l-4 border-l-primary">
+            <Card className="border-l-4 border-l-primary overflow-hidden">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -1072,91 +1072,72 @@ export default function Dashboard() {
                       <BarChart3 className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-semibold text-gray-900">Distribuição Semanal</CardTitle>
-                      <CardDescription className="text-sm text-gray-500 mt-0.5">Carga horária por dia da semana</CardDescription>
+                      <CardTitle className="text-lg font-semibold text-foreground">Distribuição Semanal</CardTitle>
+                      <CardDescription className="text-sm text-muted-foreground mt-0.5">Carga horária por dia da semana</CardDescription>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-primary">{totalScheduledClasses}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">aulas/semana</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">aulas/semana</div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-2">
-                {/* Barra de estatísticas resumidas */}
-                <div className="grid grid-cols-5 gap-2 mb-6">
+                {/* Gráfico de Barras Verticais Moderno */}
+                <div className="flex items-end justify-between gap-3 h-48 px-2">
                   {DAYS_OF_WEEK.map((day, index) => {
                     const count = scheduledClasses?.filter(c => c.dayOfWeek === index).length || 0;
-                    const percentage = totalScheduledClasses > 0 ? (count / totalScheduledClasses) * 100 : 0;
+                    const maxCount = Math.max(...DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0), 1);
+                    const heightPercent = (count / maxCount) * 100;
+                    const colors = [
+                      'from-blue-500 to-blue-600',
+                      'from-emerald-500 to-emerald-600', 
+                      'from-violet-500 to-violet-600',
+                      'from-amber-500 to-amber-600',
+                      'from-rose-500 to-rose-600'
+                    ];
                     return (
-                      <div key={day} className="text-center">
-                        <div className="text-xs font-medium text-gray-500 mb-1">{day.substring(0, 3)}</div>
-                        <div className="text-lg font-bold text-gray-900">{count}</div>
-                        <div className="h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                      <div key={day} className="flex-1 flex flex-col items-center gap-2">
+                        {/* Número de aulas */}
+                        <span className={`text-sm font-bold ${count > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {count}
+                        </span>
+                        {/* Barra vertical */}
+                        <div className="w-full h-32 bg-muted/30 rounded-xl relative overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500"
-                            style={{ width: `${percentage}%` }}
-                          />
+                            className={`absolute bottom-0 left-0 right-0 rounded-xl bg-gradient-to-t ${colors[index]} transition-all duration-700 ease-out shadow-lg`}
+                            style={{ height: count > 0 ? `${Math.max(heightPercent, 8)}%` : '0%' }}
+                          >
+                            {/* Efeito de brilho */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent" />
+                          </div>
                         </div>
+                        {/* Dia da semana */}
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {day.substring(0, 3)}
+                        </span>
                       </div>
                     );
                   })}
                 </div>
                 
-                {/* Gráfico de linha */}
-                <div className="h-48 mt-4">
-                  <Line
-                    data={weeklyDistribution}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: {
-                        legend: {
-                          display: false,
-                        },
-                        tooltip: {
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                          padding: 12,
-                          titleFont: {
-                            size: 14,
-                            weight: 'bold',
-                          },
-                          bodyFont: {
-                            size: 13,
-                          },
-                          cornerRadius: 8,
-                          displayColors: false,
-                        },
-                      },
-                      scales: {
-                        x: {
-                          grid: {
-                            display: false,
-                          },
-                          ticks: {
-                            font: {
-                              size: 11,
-                              weight: 500,
-                            },
-                            color: '#6B7280',
-                          },
-                        },
-                        y: {
-                          beginAtZero: true,
-                          ticks: {
-                            stepSize: 1,
-                            font: {
-                              size: 11,
-                            },
-                            color: '#6B7280',
-                          },
-                          grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                          },
-                        },
-                      },
-                    }}
-                  />
+                {/* Legenda/Resumo */}
+                <div className="mt-6 pt-4 border-t border-border/50">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600" />
+                        <span className="text-muted-foreground">Dia mais cheio:</span>
+                        <span className="font-semibold text-foreground">
+                          {DAYS_OF_WEEK[DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0).indexOf(Math.max(...DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0)))]}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <span>Média:</span>
+                      <span className="font-semibold text-foreground">{(totalScheduledClasses / 5).toFixed(1)} aulas/dia</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

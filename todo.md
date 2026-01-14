@@ -5359,3 +5359,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover tour duplicado - deixar apenas OnboardingTour (Shepherd.js)
 
 - [x] Corrigir botão Tema - padronizar visual e fazer clique funcionar em toda a área
+
+- [x] Redesenhar gráfico de Distribuição Semanal com design mais profissional (barras coloridas)
