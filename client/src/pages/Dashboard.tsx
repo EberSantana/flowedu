@@ -689,15 +689,17 @@ export default function Dashboard() {
                 {/* Botão Próxima Aula em Destaque com Dropdown */}
                 <div className="mb-4">
                   <div
-                    className={`group relative overflow-hidden rounded-xl bg-gradient-to-br p-4 shadow-lg transition-all duration-300 ${
+                    className={`group relative overflow-hidden rounded-xl p-4 shadow-lg transition-all duration-300 ${
                       upcomingClasses && upcomingClasses.length > 0
-                        ? 'from-info to-info/80 hover:shadow-xl'
-                        : 'from-muted to-muted/80 opacity-60'
+                        ? 'bg-gradient-to-br from-primary to-primary/90 hover:shadow-xl'
+                        : 'bg-muted/50 border border-border'
                     }`}
                   >
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
                     <div className="relative z-10">
-                      <div className="flex items-center gap-3 text-white mb-2">
+                      <div className={`flex items-center gap-3 mb-2 ${
+                        upcomingClasses && upcomingClasses.length > 0 ? 'text-primary-foreground' : 'text-muted-foreground'
+                      }`}>
                         <ExternalLink className="h-6 w-6 flex-shrink-0" />
                         <div className="flex-1">
                           <span className="text-sm font-bold block">Ir para Próxima Aula</span>
@@ -724,8 +726,8 @@ export default function Dashboard() {
                             disabled={!upcomingClasses[0].googleClassroomUrl}
                             className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
                               upcomingClasses[0].googleClassroomUrl
-                                ? 'bg-white/20 hover:bg-white/30 text-white cursor-pointer'
-                                : 'bg-white/10 text-white/50 cursor-not-allowed'
+                                ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground cursor-pointer'
+                                : 'bg-primary-foreground/10 text-primary-foreground/50 cursor-not-allowed'
                             }`}
                             title={upcomingClasses[0].googleClassroomUrl ? 'Abrir Google Classroom' : 'Link não cadastrado'}
                           >
@@ -746,8 +748,8 @@ export default function Dashboard() {
                             disabled={!upcomingClasses[0].googleDriveUrl}
                             className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
                               upcomingClasses[0].googleDriveUrl
-                                ? 'bg-white/20 hover:bg-white/30 text-white cursor-pointer'
-                                : 'bg-white/10 text-white/50 cursor-not-allowed'
+                                ? 'bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground cursor-pointer'
+                                : 'bg-primary-foreground/10 text-primary-foreground/50 cursor-not-allowed'
                             }`}
                             title={upcomingClasses[0].googleDriveUrl ? 'Abrir Google Drive' : 'Link não cadastrado'}
                           >

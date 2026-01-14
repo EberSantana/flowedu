@@ -5361,3 +5361,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir botão Tema - padronizar visual e fazer clique funcionar em toda a área
 
 - [x] Redesenhar gráfico de Distribuição Semanal com design mais profissional (barras coloridas)
+
+- [x] Corrigir cor do texto na caixa "Ir para Próxima Aula" - texto agora visível com cores do tema
