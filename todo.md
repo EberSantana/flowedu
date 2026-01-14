@@ -5375,3 +5375,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar fluxo completo de redefinição
 
 - [x] Corrigir cores das Ações Rápidas para seguir a paleta de cores do tema (OKLCH)
+
+- [x] Padronizar TODAS as Ações Rápidas com a mesma cor escura do botão Nova Disciplina
