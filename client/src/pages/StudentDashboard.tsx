@@ -28,11 +28,11 @@ export default function StudentDashboard() {
 
   // Ações rápidas profissionais
   const quickActions = [
-    { icon: BookOpen, label: "Disciplinas", path: "/student-subjects", color: "bg-blue-600", description: "Acesse suas disciplinas" },
+    { icon: BookOpen, label: "Disciplinas", path: "/student-subjects", color: "bg-primary", description: "Acesse suas disciplinas" },
     { icon: Map, label: "Trilhas", path: "/student-learning-paths", color: "bg-purple-600", description: "Trilhas de aprendizagem" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "bg-orange-600", description: "Pratique e aprenda" },
-    { icon: Lightbulb, label: "Revisão", path: "/student-review", color: "bg-indigo-600", description: "Revisão inteligente" },
-    { icon: BarChart3, label: "Estatísticas", path: "/student-stats", color: "bg-green-600", description: "Seu desempenho" },
+    { icon: Lightbulb, label: "Revisão", path: "/student-review", color: "bg-accent", description: "Revisão inteligente" },
+    { icon: BarChart3, label: "Estatísticas", path: "/student-stats", color: "bg-success", description: "Seu desempenho" },
   ];
 
   return (
@@ -40,7 +40,7 @@ export default function StudentDashboard() {
       <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header de Boas-vindas */}
         <div className="mb-8">
-          <Card className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-primary to-accent text-primary-foreground border-0 shadow-xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
@@ -50,7 +50,7 @@ export default function StudentDashboard() {
                   <h1 className="text-2xl font-bold">
                     Olá, {student?.fullName?.split(' ')[0] || 'Aluno'}!
                   </h1>
-                  <p className="text-blue-100 mt-1">
+                  <p className="text-primary-foreground/80 mt-1">
                     Bem-vindo ao seu portal de estudos
                   </p>
                 </div>
@@ -65,7 +65,7 @@ export default function StudentDashboard() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {quickActions.map((action) => (
               <Link key={action.path} href={action.path}>
-                <Card className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-blue-300">
+                <Card className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-primary/50">
                   <CardContent className="p-4 text-center">
                     <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
                       <action.icon className="w-6 h-6 text-white" />
@@ -82,8 +82,8 @@ export default function StudentDashboard() {
         {isLoading ? (
           <div className="text-center py-20">
             <div className="relative w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-blue-200"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-primary/30"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
             </div>
             <p className="text-gray-600 font-medium">Carregando...</p>
           </div>
@@ -93,7 +93,7 @@ export default function StudentDashboard() {
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-600 rounded-xl">
+                  <div className="p-2 bg-primary rounded-xl">
                     <BookOpen className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -132,7 +132,7 @@ export default function StudentDashboard() {
                   {activeSubjects.slice(0, 6).map((enrollment: any) => (
                     <Card 
                       key={enrollment.id} 
-                      className="hover:shadow-lg transition-all border hover:border-blue-300"
+                      className="hover:shadow-lg transition-all border hover:border-primary/50"
                     >
                       <div 
                         className="h-1" 
@@ -149,7 +149,7 @@ export default function StudentDashboard() {
                               {enrollment.subject?.code || ''}
                             </p>
                           </div>
-                          <Badge className="bg-green-100 text-green-700 border-green-200">
+                          <Badge className="bg-success/20 text-success border-success/30">
                             Ativa
                           </Badge>
                         </div>
@@ -158,7 +158,7 @@ export default function StudentDashboard() {
                       <CardContent>
                         <div className="space-y-3">
                           <div className="flex items-center text-gray-600 text-sm">
-                            <GraduationCap className="w-4 h-4 mr-2 text-blue-600" />
+                            <GraduationCap className="w-4 h-4 mr-2 text-primary" />
                             Prof: {enrollment.professor?.name || 'N/A'}
                           </div>
                           
@@ -174,7 +174,7 @@ export default function StudentDashboard() {
                           </div>
 
                           <Link href={`/student/subject-details/${enrollment.subjectId}/${enrollment.userId}`}>
-                            <Button className="w-full mt-2 bg-blue-600 hover:bg-blue-700">
+                            <Button className="w-full mt-2 bg-primary hover:bg-primary/90">
                               Ver Detalhes
                               <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
@@ -190,16 +190,16 @@ export default function StudentDashboard() {
             {/* Resumo de Progresso */}
             {completedSubjects.length > 0 && (
               <div className="mb-10">
-                <Card className="bg-green-50 border-green-200">
+                <Card className="bg-success/10 border-success/30">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-green-100 rounded-xl">
-                        <GraduationCap className="w-6 h-6 text-green-600" />
+                      <div className="p-3 bg-success/20 rounded-xl">
+                        <GraduationCap className="w-6 h-6 text-success" />
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">Disciplinas Concluídas</h3>
                         <p className="text-gray-600">
-                          Você completou <span className="font-bold text-green-600">{completedSubjects.length}</span> disciplina{completedSubjects.length !== 1 ? 's' : ''}
+                          Você completou <span className="font-bold text-success">{completedSubjects.length}</span> disciplina{completedSubjects.length !== 1 ? 's' : ''}
                         </p>
                       </div>
                     </div>

@@ -101,7 +101,7 @@ export default function StudentStats() {
             </Button>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
+            <div className="p-3 bg-gradient-to-br from-primary to-accent rounded-xl shadow-lg">
               <BarChart3 className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -114,8 +114,8 @@ export default function StudentStats() {
         {isLoading ? (
           <div className="text-center py-20">
             <div className="relative w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-green-200"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-green-600 border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-primary/30"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
             </div>
             <p className="text-gray-600 font-medium">Carregando estatísticas...</p>
           </div>
@@ -126,8 +126,8 @@ export default function StudentStats() {
               <Card className="border-l-4 border-l-blue-500">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <BookOpen className="w-5 h-5 text-blue-600" />
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <BookOpen className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Exercícios</p>
@@ -141,8 +141,8 @@ export default function StudentStats() {
               <Card className="border-l-4 border-l-green-500">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <Target className="w-5 h-5 text-green-600" />
+                    <div className="p-2 bg-success/20 rounded-lg">
+                      <Target className="w-5 h-5 text-success" />
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Média Geral</p>
@@ -188,7 +188,7 @@ export default function StudentStats() {
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <TrendingUp className="w-5 h-5 text-success" />
                   Taxa de Acerto Geral
                 </CardTitle>
               </CardHeader>
@@ -196,7 +196,7 @@ export default function StudentStats() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Progresso</span>
-                    <span className="text-lg font-bold text-green-600">{accuracyRate}%</span>
+                    <span className="text-lg font-bold text-success">{accuracyRate}%</span>
                   </div>
                   <Progress value={accuracyRate} className="h-3" />
                   <div className="flex justify-between text-xs text-gray-500">
@@ -221,12 +221,12 @@ export default function StudentStats() {
                     <div className="text-3xl font-bold text-yellow-600">{stats.perfectScores}</div>
                     <p className="text-sm text-gray-600 mt-1">Notas 100%</p>
                   </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <div className="text-3xl font-bold text-blue-600">{stats.completedExercises}</div>
+                  <div className="text-center p-4 bg-primary/10 rounded-xl border border-primary/30">
+                    <div className="text-3xl font-bold text-primary">{stats.completedExercises}</div>
                     <p className="text-sm text-gray-600 mt-1">Exercícios Feitos</p>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200">
-                    <div className="text-3xl font-bold text-green-600">{stats.totalCorrect}</div>
+                  <div className="text-center p-4 bg-success/10 rounded-xl border border-success/30">
+                    <div className="text-3xl font-bold text-success">{stats.totalCorrect}</div>
                     <p className="text-sm text-gray-600 mt-1">Respostas Corretas</p>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-xl border border-purple-200">
@@ -243,7 +243,7 @@ export default function StudentStats() {
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  <BookOpen className="w-5 h-5 text-primary" />
                   Desempenho por Disciplina
                 </CardTitle>
               </CardHeader>
@@ -287,7 +287,7 @@ export default function StudentStats() {
                             </div>
                             <div>
                               <p className="text-gray-500">Taxa</p>
-                              <p className="font-semibold text-green-600">{accuracy}%</p>
+                              <p className="font-semibold text-success">{accuracy}%</p>
                             </div>
                           </div>
                           <Progress value={accuracy} className="h-2 mt-3" />
@@ -303,7 +303,7 @@ export default function StudentStats() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-indigo-600" />
+                  <Calendar className="w-5 h-5 text-accent" />
                   Histórico Recente
                 </CardTitle>
               </CardHeader>
@@ -322,10 +322,10 @@ export default function StudentStats() {
                       >
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-lg ${
-                            attempt.score >= 70 ? 'bg-green-100' : 'bg-orange-100'
+                            attempt.score >= 70 ? 'bg-success/20' : 'bg-warning/20'
                           }`}>
                             {attempt.score >= 70 ? (
-                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                              <CheckCircle2 className="w-4 h-4 text-success" />
                             ) : (
                               <Target className="w-4 h-4 text-orange-600" />
                             )}

@@ -16,9 +16,9 @@ export default function StudentSubjects() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-700 border-green-200">Ativa</Badge>;
+        return <Badge className="bg-success/20 text-success border-success/30">Ativa</Badge>;
       case 'completed':
-        return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Concluída</Badge>;
+        return <Badge className="bg-primary/20 text-primary border-primary/30">Concluída</Badge>;
       case 'dropped':
         return <Badge className="bg-red-100 text-red-700 border-red-200">Cancelada</Badge>;
       default:
@@ -30,7 +30,7 @@ export default function StudentSubjects() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
@@ -38,7 +38,7 @@ export default function StudentSubjects() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold">Minhas Disciplinas</h1>
-                <p className="text-green-100 mt-1">
+                <p className="text-primary-foreground/80 mt-1">
                   Acompanhe todas as suas disciplinas matriculadas
                 </p>
               </div>
@@ -49,7 +49,7 @@ export default function StudentSubjects() {
         <div className="container mx-auto py-8 px-4">
           {isLoading ? (
             <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">Carregando suas disciplinas...</p>
             </div>
           ) : (
@@ -58,7 +58,7 @@ export default function StudentSubjects() {
             <Card className="bg-white mb-6">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-green-600" />
+                <BookOpen className="w-5 h-5 text-primary" />
                 <CardTitle className="text-xl">Disciplinas Ativas ({activeSubjects.length})</CardTitle>
               </div>
               <CardDescription>
@@ -109,7 +109,7 @@ export default function StudentSubjects() {
                                 href={enrollment.subject.googleClassroomUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800"
+                                className="inline-flex items-center text-xs text-primary hover:text-primary/80"
                               >
                                 <ExternalLink className="w-3 h-3 mr-1" />
                                 Classroom
@@ -120,7 +120,7 @@ export default function StudentSubjects() {
                                 href={enrollment.subject.googleDriveUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center text-xs text-green-600 hover:text-green-800"
+                                className="inline-flex items-center text-xs text-success hover:text-success/80"
                               >
                                 <FolderOpen className="w-3 h-3 mr-1" />
                                 Drive
@@ -152,7 +152,7 @@ export default function StudentSubjects() {
             <Card className="bg-white mb-6">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-blue-600" />
+                  <GraduationCap className="w-5 h-5 text-primary" />
                   <CardTitle className="text-xl">Disciplinas Concluídas ({completedSubjects.length})</CardTitle>
                 </div>
                 <CardDescription>

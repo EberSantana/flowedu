@@ -5335,3 +5335,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Padronizar páginas do portal do aluno (exercícios e trilhas) com variáveis do tema
 - [x] Revisar e padronizar página de Avisos com variáveis do tema
+
+- [x] Aplicar variáveis de cores do tema no StudentDashboard
+- [x] Aplicar variáveis de cores do tema no StudentProfile
+- [x] Aplicar variáveis de cores do tema nas outras páginas do aluno (StudentStats, StudentSubjects)

@@ -54,7 +54,7 @@ export default function StudentProfile() {
       <DashboardLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-gray-600">Carregando perfil do aluno...</p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function StudentProfile() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'present':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'absent':
         return <XCircle className="h-4 w-4 text-red-600" />;
       case 'justified':
@@ -114,7 +114,7 @@ export default function StudentProfile() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'present':
-        return 'text-green-600 bg-green-50';
+        return 'text-success bg-success/10';
       case 'absent':
         return 'text-red-600 bg-red-50';
       case 'justified':
@@ -145,16 +145,16 @@ export default function StudentProfile() {
         </div>
 
         {/* Dados do Aluno */}
-        <Card className="mb-6 border-blue-200 bg-white shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+        <Card className="mb-6 border-primary/30 bg-card shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-600 rounded-full">
+              <div className="p-3 bg-primary rounded-full">
                 <User className="h-6 w-6 text-white" />
               </div>
               <div>
                 <CardTitle className="text-2xl">{student.fullName}</CardTitle>
                 <CardDescription className="text-base">
-                  Matrícula: <span className="font-semibold text-blue-600">{student.registrationNumber}</span>
+                  Matrícula: <span className="font-semibold text-primary">{student.registrationNumber}</span>
                 </CardDescription>
               </div>
             </div>
@@ -168,18 +168,18 @@ export default function StudentProfile() {
                   <p className="font-semibold">{new Date(student.createdAt).toLocaleDateString('pt-BR')}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-3 p-4 bg-success/10 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-success" />
                 <div>
                   <p className="text-sm text-gray-600">Taxa de Frequência</p>
-                  <p className="font-semibold text-green-600">{statistics?.attendanceRate.toFixed(1)}%</p>
+                  <p className="font-semibold text-success">{statistics?.attendanceRate.toFixed(1)}%</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
-                <BookOpen className="h-5 w-5 text-blue-600" />
+              <div className="flex items-center gap-3 p-4 bg-primary/10 rounded-lg">
+                <BookOpen className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-gray-600">Turmas Matriculadas</p>
-                  <p className="font-semibold text-blue-600">{enrollments.length}</p>
+                  <p className="font-semibold text-primary">{enrollments.length}</p>
                 </div>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function StudentProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Estatísticas */}
           <Card className="border-purple-200 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+            <CardHeader className="bg-gradient-to-r from-accent/10 to-accent/5">
               <div className="flex items-center gap-3">
                 <TrendingUp className="h-5 w-5 text-purple-600" />
                 <CardTitle>Estatísticas de Frequência</CardTitle>
@@ -202,9 +202,9 @@ export default function StudentProfile() {
                     <span className="text-gray-700">Total de Aulas</span>
                     <span className="font-bold text-lg">{statistics.totalClasses}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-success/10 rounded-lg">
                     <span className="text-gray-700">Presenças</span>
-                    <span className="font-bold text-lg text-green-600">{statistics.present}</span>
+                    <span className="font-bold text-lg text-success">{statistics.present}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
                     <span className="text-gray-700">Faltas</span>
@@ -220,10 +220,10 @@ export default function StudentProfile() {
           </Card>
 
           {/* Turmas Matriculadas */}
-          <Card className="border-green-200 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+          <Card className="border-success/30 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-success/10 to-success/5">
               <div className="flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-green-600" />
+                <BookOpen className="h-5 w-5 text-success" />
                 <CardTitle>Turmas Matriculadas</CardTitle>
               </div>
             </CardHeader>
@@ -238,7 +238,7 @@ export default function StudentProfile() {
                   {enrollments.map((enrollment) => (
                     <div
                       key={enrollment.enrollmentId}
-                      className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200"
+                      className="p-4 bg-gradient-to-r from-success/10 to-success/5 rounded-lg border border-success/30"
                     >
                       <div className="flex justify-between items-start">
                         <div>
@@ -260,9 +260,9 @@ export default function StudentProfile() {
         {/* Gráfico de Evolução */}
         {attendance && attendance.length > 0 && (
           <Card className="mb-6 border-indigo-200 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50">
+            <CardHeader className="bg-gradient-to-r from-accent/10 to-accent/5">
               <div className="flex items-center gap-3">
-                <TrendingUp className="h-5 w-5 text-indigo-600" />
+                <TrendingUp className="h-5 w-5 text-accent" />
                 <CardTitle>Evolução de Frequência</CardTitle>
               </div>
               <CardDescription>Visualização da taxa de presença ao longo do tempo</CardDescription>
@@ -319,7 +319,7 @@ export default function StudentProfile() {
 
         {/* Histórico de Frequência */}
         <Card className="border-orange-200 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50">
+          <CardHeader className="bg-gradient-to-r from-warning/10 to-warning/5">
             <div className="flex items-center gap-3">
               <Calendar className="h-5 w-5 text-orange-600" />
               <CardTitle>Histórico de Frequência</CardTitle>
