@@ -41,6 +41,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { Search, Command as CommandIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemeSelectorCompact } from "@/components/ThemeSelector";
+import { HoverSubmenu } from "@/components/HoverSubmenu";
 import {
   Tooltip,
   TooltipContent,
@@ -395,37 +396,13 @@ export default function Sidebar() {
     }
     
     if (isCompact) {
-      // No modo compacto, mostrar apenas os itens ativos ou primeiro item
-      const activeItem = category.items.find(item => location === item.href) || category.items[0];
+      // No modo compacto, usar HoverSubmenu com delay
       return (
         <div key={category.id} className="mb-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href={activeItem.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`
-                  flex items-center justify-center p-3 rounded-xl relative group
-                  transition-all duration-200
-                  ${
-                    hasActiveItem
-                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
-                      : "text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md"
-                  }
-                `}
-              >
-                <span className="transition-transform duration-200 group-hover:scale-110">
-                  {category.icon}
-                </span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <p className="font-medium">{category.label}</p>
-              <div className="text-xs text-muted-foreground mt-1">
-                {category.items.map(item => item.label).join(', ')}
-              </div>
-            </TooltipContent>
-          </Tooltip>
+          <HoverSubmenu 
+            category={category} 
+            onNavigate={() => setIsMobileMenuOpen(false)}
+          />
         </div>
       );
     }

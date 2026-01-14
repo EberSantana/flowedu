@@ -5310,3 +5310,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Implementar menu com categorias expansíveis para professor (Gestão Acadêmica, Planejamento, Análise e Relatórios, Recursos Pedagógicos, Comunicação, Administração)
 - [x] Remover botão "Avaliações" do menu lateral (redundante)
+
+- [x] Implementar submenu hover com delay (200ms) no modo compacto do menu lateral
