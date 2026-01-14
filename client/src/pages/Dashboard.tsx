@@ -762,7 +762,7 @@ export default function Dashboard() {
                       )}
                       
                       {(!upcomingClasses || upcomingClasses.length === 0) && (
-                        <p className="text-xs text-white/70 text-center">Nenhuma aula agendada para hoje</p>
+                        <p className="text-xs text-muted-foreground text-center mt-2">Nenhuma aula agendada para hoje</p>
                       )}
                     </div>
                   </div>
