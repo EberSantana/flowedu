@@ -39,6 +39,19 @@ export function ThemeProvider({
 
   const effectiveTheme = theme === "system" ? getSystemTheme() : theme;
 
+  // Desabilitar transições durante carregamento inicial
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add("no-transitions");
+    
+    // Remover classe após um pequeno delay para permitir renderização inicial
+    const timeout = setTimeout(() => {
+      root.classList.remove("no-transitions");
+    }, 100);
+    
+    return () => clearTimeout(timeout);
+  }, []);
+
   useEffect(() => {
     const root = document.documentElement;
     if (effectiveTheme === "dark") {

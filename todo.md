@@ -5327,3 +5327,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aplicar variáveis de cores do tema na página de Análise de Aprendizagem
 - [x] Aplicar variáveis de cores do tema na página de Gerenciar Tarefas
 - [x] Aplicar variáveis de cores do tema na página de Usuários
+
+- [x] Implementar animação de transição suave (fade) ao trocar de tema

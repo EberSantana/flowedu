@@ -45,6 +45,22 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Transição suave para mudança de tema */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Desabilitar transição durante carregamento inicial */
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+  transition: none !important;
+}
+
 :root {
   /* Primary - Cinza azulado neutro e discreto */
   --primary: oklch(0.45 0.03 240);
