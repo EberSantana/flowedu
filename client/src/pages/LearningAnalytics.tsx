@@ -131,7 +131,7 @@ export function LearningAnalytics() {
   const selectedStudentData = students?.find(s => s.id === selectedStudent);
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
       <PageWrapper className="flex-1">
         <div className="max-w-7xl mx-auto py-8 px-6 space-y-8">

@@ -5381,3 +5381,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Fazer Ações Rápidas usarem variáveis CSS do tema (bg-sidebar-primary) para mudar dinamicamente com o tema
 
 - [x] Redesenhar Distribuição Semanal com Cards de Resumo por Dia (5 cards lado a lado)
+
+## Correção de Cores de Fundo do Tema
+
+- [x] Corrigir cores de fundo do Calendário para seguir o tema
+- [x] Corrigir cores de fundo da Análise de Aprendizado com IA
+- [x] Corrigir cores de fundo do Relatório de Desempenho
+- [x] Corrigir cores de fundo das Trilhas de Aprendizagem
+- [x] Corrigir cores de fundo dos Avisos

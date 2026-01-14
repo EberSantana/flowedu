@@ -103,7 +103,7 @@ export function Announcements() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gray-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
           <div className="mb-8">

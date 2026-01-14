@@ -253,7 +253,7 @@ export default function Reports() {
   };
   
   return (
-    <PageWrapper>
+    <PageWrapper className="bg-background">
       <Sidebar />
       <div className="flex-1 overflow-auto">
         <div className="container mx-auto py-8 px-4 max-w-7xl">

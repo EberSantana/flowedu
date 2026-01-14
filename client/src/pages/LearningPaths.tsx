@@ -465,7 +465,7 @@ export default function LearningPaths() {
     return (
       <>
         <Sidebar />
-        <PageWrapper className="min-h-screen bg-gray-50">
+        <PageWrapper className="min-h-screen bg-background">
           <div className="container mx-auto py-8 px-4">
             <div className="flex items-center justify-center h-64">
               <p className="text-muted-foreground">Carregando disciplinas...</p>
@@ -479,7 +479,7 @@ export default function LearningPaths() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gray-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Trilhas de Aprendizagem</h1>

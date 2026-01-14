@@ -347,7 +347,7 @@ export default function Calendar() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4">
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
