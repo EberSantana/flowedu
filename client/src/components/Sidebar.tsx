@@ -15,6 +15,7 @@ import {
   Lightbulb,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   CheckSquare,
   CheckCircle2,
   BarChart3,
@@ -23,15 +24,17 @@ import {
   HelpCircle,
   Megaphone,
   KeyRound,
-  Trophy,
   Brain,
-  ClipboardList
+  GraduationCap,
+  MessageSquare,
+  Settings,
+  FolderOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import NotificationBell from "@/components/NotificationBell";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -44,92 +47,153 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface NavItem {
   label: string;
   icon: React.ReactNode;
   href: string;
   adminOnly?: boolean;
-  // profileRestriction removido - perfil único tradicional
 }
 
-// Menu para professores (completo)
-const teacherNavItems: NavItem[] = [
+interface NavCategory {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  items: NavItem[];
+  adminOnly?: boolean;
+}
+
+// Menu para professores organizado por categorias
+const teacherNavCategories: NavCategory[] = [
   {
-    label: "Dashboard",
+    id: "main",
+    label: "Principal",
     icon: <LayoutDashboard className="h-5 w-5" />,
-    href: "/dashboard",
+    items: [
+      {
+        label: "Dashboard",
+        icon: <LayoutDashboard className="h-5 w-5" />,
+        href: "/dashboard",
+      },
+    ],
   },
   {
-    label: "Disciplinas",
-    icon: <BookOpen className="h-5 w-5" />,
-    href: "/subjects",
+    id: "academic",
+    label: "Gestão Acadêmica",
+    icon: <GraduationCap className="h-5 w-5" />,
+    items: [
+      {
+        label: "Disciplinas",
+        icon: <BookOpen className="h-5 w-5" />,
+        href: "/subjects",
+      },
+      {
+        label: "Turmas",
+        icon: <Users className="h-5 w-5" />,
+        href: "/classes",
+      },
+      {
+        label: "Turnos",
+        icon: <Clock className="h-5 w-5" />,
+        href: "/shifts",
+      },
+    ],
   },
   {
-    label: "Turmas",
-    icon: <Users className="h-5 w-5" />,
-    href: "/classes",
-  },
-  {
-    label: "Turnos",
-    icon: <Clock className="h-5 w-5" />,
-    href: "/shifts",
-  },
-  {
-    label: "Grade Semanal",
+    id: "planning",
+    label: "Planejamento",
     icon: <Calendar className="h-5 w-5" />,
-    href: "/schedule",
+    items: [
+      {
+        label: "Grade Semanal",
+        icon: <Calendar className="h-5 w-5" />,
+        href: "/schedule",
+      },
+      {
+        label: "Calendário",
+        icon: <CalendarDays className="h-5 w-5" />,
+        href: "/calendar",
+      },
+    ],
   },
   {
-    label: "Calendário",
-    icon: <CalendarDays className="h-5 w-5" />,
-    href: "/calendar",
-  },
-  {
-    label: "Relatórios",
+    id: "analytics",
+    label: "Análise e Relatórios",
     icon: <BarChart3 className="h-5 w-5" />,
-    href: "/reports",
+    items: [
+      {
+        label: "Relatórios",
+        icon: <BarChart3 className="h-5 w-5" />,
+        href: "/reports",
+      },
+      {
+        label: "Análise de Aprendizado",
+        icon: <Brain className="h-5 w-5" />,
+        href: "/learning-analytics",
+      },
+      {
+        label: "Desempenho em Exercícios",
+        icon: <Target className="h-5 w-5" />,
+        href: "/exercise-performance",
+      },
+    ],
   },
   {
-    label: "Análise de Aprendizado",
-    icon: <Brain className="h-5 w-5" />,
-    href: "/learning-analytics",
+    id: "resources",
+    label: "Recursos Pedagógicos",
+    icon: <FolderOpen className="h-5 w-5" />,
+    items: [
+      {
+        label: "Trilhas de Aprendizagem",
+        icon: <Route className="h-5 w-5" />,
+        href: "/learning-paths",
+      },
+      {
+        label: "Metodologias",
+        icon: <Lightbulb className="h-5 w-5" />,
+        href: "/active-methodologies",
+      },
+    ],
   },
   {
-    label: "Desempenho em Exercícios",
-    icon: <Target className="h-5 w-5" />,
-    href: "/exercise-performance",
-  },
-  
-  {
-    label: "Trilhas de Aprendizagem",
-    icon: <Route className="h-5 w-5" />,
-    href: "/learning-paths",
-  },
-  {
-    label: "Metodologias",
-    icon: <Lightbulb className="h-5 w-5" />,
-    href: "/active-methodologies",
-  },
-  {
-    label: "Tarefas",
-    icon: <CheckSquare className="h-5 w-5" />,
-    href: "/tasks",
+    id: "communication",
+    label: "Comunicação",
+    icon: <MessageSquare className="h-5 w-5" />,
+    items: [
+      {
+        label: "Tarefas",
+        icon: <CheckSquare className="h-5 w-5" />,
+        href: "/tasks",
+      },
+      {
+        label: "Avisos",
+        icon: <Megaphone className="h-5 w-5" />,
+        href: "/announcements",
+      },
+    ],
   },
   {
-    label: "Avisos",
-    icon: <Megaphone className="h-5 w-5" />,
-    href: "/announcements",
-  },
-  {
-    label: "Usuários",
-    icon: <Shield className="h-5 w-5" />,
-    href: "/admin/users",
+    id: "admin",
+    label: "Administração",
+    icon: <Settings className="h-5 w-5" />,
     adminOnly: true,
+    items: [
+      {
+        label: "Usuários",
+        icon: <Shield className="h-5 w-5" />,
+        href: "/admin/users",
+        adminOnly: true,
+      },
+    ],
   },
 ];
 
-// Menu para alunos (simplificado)
+// Menu para alunos (simplificado - sem categorias)
 const studentNavItems: NavItem[] = [
   {
     label: "Minhas Disciplinas",
@@ -141,7 +205,6 @@ const studentNavItems: NavItem[] = [
     icon: <CheckCircle2 className="h-5 w-5" />,
     href: "/student/notebook",
   },
-
   {
     label: "Caderno Inteligente IA",
     icon: <Brain className="h-5 w-5" />,
@@ -161,6 +224,35 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
   
+  // Estado para categorias expandidas
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
+    // Inicializar com categorias que contêm a página atual
+    const saved = localStorage.getItem('sidebar_expanded_categories');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return ['main'];
+      }
+    }
+    return ['main'];
+  });
+  
+  // Salvar estado das categorias no localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebar_expanded_categories', JSON.stringify(expandedCategories));
+  }, [expandedCategories]);
+  
+  // Expandir automaticamente a categoria que contém a página atual
+  useEffect(() => {
+    const currentCategory = teacherNavCategories.find(cat => 
+      cat.items.some(item => item.href === location)
+    );
+    if (currentCategory && !expandedCategories.includes(currentCategory.id)) {
+      setExpandedCategories(prev => [...prev, currentCategory.id]);
+    }
+  }, [location]);
+  
   // Detectar tipo de usuário baseado na sessão real (não apenas na URL)
   const { data: studentSession } = trpc.auth.studentSession.useQuery();
   const isStudent = !!studentSession;
@@ -168,16 +260,15 @@ export default function Sidebar() {
   // Query para eventos próximos (badge de notificação) - apenas para professores
   const { data: upcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery(undefined, {
     refetchInterval: 60000,
-    enabled: !isStudent, // Desabilita para alunos
+    enabled: !isStudent,
   });
   
   // Query para avisos não lidos (badge de notificação) - apenas para alunos
   const { data: unreadAnnouncementsCount } = trpc.announcements.getUnreadCount.useQuery(undefined, {
-    refetchInterval: 30000, // Atualiza a cada 30 segundos
-    enabled: isStudent, // Habilita apenas para alunos
+    refetchInterval: 30000,
+    enabled: isStudent,
   });
 
-  
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       window.location.href = "/";
@@ -208,19 +299,169 @@ export default function Sidebar() {
       exitStudentModeMutation.mutate();
     }
   };
-
-  // Selecionar menu baseado no tipo de usuário
-  const navItems = isStudent ? studentNavItems : teacherNavItems;
   
-  // Filtrar itens baseado em permissões e perfil
-  const filteredNavItems = navItems.filter((item) => {
-    // Filtro de admin
-    if (item.adminOnly && user?.role !== "admin") return false;
-    
-    // Filtro de perfil removido - perfil único tradicional
-    
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+  
+  // Filtrar categorias baseado em permissões
+  const filteredCategories = teacherNavCategories.filter(cat => {
+    if (cat.adminOnly && user?.role !== "admin") return false;
     return true;
   });
+
+  // Renderizar item de navegação
+  const renderNavItem = (item: NavItem, inCategory: boolean = false) => {
+    const isActive = location === item.href;
+    const isCalendar = item.href === '/calendar';
+    const isAnnouncementsMenu = item.label === 'Avisos';
+    
+    let notificationCount = 0;
+    if (isCalendar && upcomingEvents) {
+      notificationCount = upcomingEvents.length;
+    } else if (isAnnouncementsMenu && unreadAnnouncementsCount !== undefined) {
+      notificationCount = unreadAnnouncementsCount;
+    }
+    
+    const linkContent = (
+      <Link
+        href={item.href}
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={`
+          flex items-center rounded-xl relative
+          transition-all duration-200
+          ${
+            isActive
+              ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+              : "text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md"
+          }
+          ${
+            isCompact 
+              ? 'justify-center p-3 group' 
+              : inCategory ? 'gap-3 px-4 py-2.5 ml-4' : 'gap-3 px-4 py-3'
+          }
+        `}
+      >
+        <span className={isCompact ? 'transition-transform duration-200 group-hover:scale-110' : ''}>
+          {item.icon}
+        </span>
+        {!isCompact && <span className={inCategory ? "text-sm font-medium" : "font-medium"}>{item.label}</span>}
+        {(isCalendar || isAnnouncementsMenu) && notificationCount > 0 && (
+          <span className={`
+            flex items-center justify-center
+            bg-red-500 text-white text-[10px] font-bold rounded-full
+            ${isCompact ? 'absolute w-4 h-4 -top-1 -right-1' : 'w-5 h-5 ml-auto'}
+          `}>
+            {notificationCount}
+          </span>
+        )}
+      </Link>
+    );
+    
+    return (
+      <li key={item.href}>
+        {isCompact ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {linkContent}
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{item.label}</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          linkContent
+        )}
+      </li>
+    );
+  };
+
+  // Renderizar categoria
+  const renderCategory = (category: NavCategory) => {
+    const isExpanded = expandedCategories.includes(category.id);
+    const hasActiveItem = category.items.some(item => location === item.href);
+    
+    // Para categoria "Principal" com apenas Dashboard, renderizar direto
+    if (category.id === 'main') {
+      return (
+        <div key={category.id} className="mb-1">
+          {category.items.map(item => renderNavItem(item, false))}
+        </div>
+      );
+    }
+    
+    if (isCompact) {
+      // No modo compacto, mostrar apenas os itens ativos ou primeiro item
+      const activeItem = category.items.find(item => location === item.href) || category.items[0];
+      return (
+        <div key={category.id} className="mb-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href={activeItem.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`
+                  flex items-center justify-center p-3 rounded-xl relative group
+                  transition-all duration-200
+                  ${
+                    hasActiveItem
+                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+                      : "text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md"
+                  }
+                `}
+              >
+                <span className="transition-transform duration-200 group-hover:scale-110">
+                  {category.icon}
+                </span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p className="font-medium">{category.label}</p>
+              <div className="text-xs text-muted-foreground mt-1">
+                {category.items.map(item => item.label).join(', ')}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      );
+    }
+    
+    return (
+      <Collapsible
+        key={category.id}
+        open={isExpanded}
+        onOpenChange={() => toggleCategory(category.id)}
+        className="mb-1"
+      >
+        <CollapsibleTrigger asChild>
+          <button
+            className={`
+              w-full flex items-center gap-3 px-4 py-3 rounded-xl
+              transition-all duration-200
+              ${
+                hasActiveItem
+                  ? "bg-primary/10 text-primary"
+                  : "text-foreground hover:bg-accent/50"
+              }
+            `}
+          >
+            {category.icon}
+            <span className="font-medium flex-1 text-left">{category.label}</span>
+            <ChevronDown 
+              className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+            />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-1 space-y-1">
+          {category.items.map(item => renderNavItem(item, true))}
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  };
 
   return (
     <>
@@ -324,73 +565,17 @@ export default function Sidebar() {
             <nav className={`flex-1 overflow-y-auto transition-all duration-300 ${
               isCompact ? 'p-2' : 'p-4'
             }`}>
-              <ul className="space-y-1">
-                {filteredNavItems.map((item) => {
-                  const isActive = location === item.href;
-                  const isCalendar = item.href === '/calendar';
-                  const isAnnouncementsMenu = item.label === 'Avisos'; // Usar label ao invés de href
-                  
-                  // Contador de notificações
-                  let notificationCount = 0;
-                  if (isCalendar && upcomingEvents) {
-                    notificationCount = upcomingEvents.length;
-                  } else if (isAnnouncementsMenu && unreadAnnouncementsCount !== undefined) {
-                    notificationCount = unreadAnnouncementsCount;
-                  }
-                  
-                  const linkContent = (
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`
-                        flex items-center rounded-xl relative
-                        transition-all duration-200
-                        ${
-                          isActive
-                            ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
-                            : "text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md"
-                        }
-                        ${
-                          isCompact 
-                            ? 'justify-center p-3 group' 
-                            : 'gap-3 px-4 py-3'
-                        }
-                      `}
-                    >
-                      <span className={isCompact ? 'transition-transform duration-200 group-hover:scale-110' : ''}>
-                        {item.icon}
-                      </span>
-                      {!isCompact && <span className="font-medium">{item.label}</span>}
-                      {(isCalendar || isAnnouncementsMenu) && notificationCount > 0 && (
-                        <span className={`
-                          flex items-center justify-center
-                          bg-red-500 text-white text-[10px] font-bold rounded-full
-                          ${isCompact ? 'absolute w-4 h-4 -top-1 -right-1' : 'w-5 h-5 ml-auto'}
-                        `}>
-                          {notificationCount}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                  
-                  return (
-                    <li key={item.href}>
-                      {isCompact ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            {linkContent}
-                          </TooltipTrigger>
-                          <TooltipContent side="right">
-                            <p>{item.label}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        linkContent
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+              {isStudent ? (
+                // Menu simples para alunos
+                <ul className="space-y-1">
+                  {studentNavItems.map(item => renderNavItem(item, false))}
+                </ul>
+              ) : (
+                // Menu com categorias para professores
+                <div className="space-y-1">
+                  {filteredCategories.map(category => renderCategory(category))}
+                </div>
+              )}
             </nav>
           </TooltipProvider>
 
@@ -434,63 +619,60 @@ export default function Sidebar() {
                   
                   <Tooltip>
                     <TooltipTrigger asChild>
-                  <button
-                    onClick={() => {
-                      // Remover onboarding do perfil atual
-                      // Perfil único tradicional
-                      localStorage.removeItem('onboarding_completed_traditional');
-                      window.location.reload();
-                    }}
-                    className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
-                  >
-                    <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                      <HelpCircle className="h-4 w-4" />
-                    </span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Refazer Tour</p>
-                </TooltipContent>
-              </Tooltip>
+                      <button
+                        onClick={() => {
+                          localStorage.removeItem('onboarding_completed_traditional');
+                          window.location.reload();
+                        }}
+                        className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
+                      >
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                          <HelpCircle className="h-4 w-4" />
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Refazer Tour</p>
+                    </TooltipContent>
+                  </Tooltip>
               
-              <div className="flex items-center justify-center">
-                <ThemeSelectorCompact />
-              </div>
+                  <div className="flex items-center justify-center">
+                    <ThemeSelectorCompact />
+                  </div>
               
-              {/* Botão de sair do modo aluno (apenas para alunos) */}
-              {isStudent && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={handleExitStudentMode}
-                      className="p-2 rounded-xl text-blue-500 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-500/5 hover:shadow-md transition-all duration-200 group"
-                    >
-                      <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                        <KeyRound className="h-4 w-4" />
-                      </span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Voltar ao Modo Professor</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
+                  {isStudent && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={handleExitStudentMode}
+                          className="p-2 rounded-xl text-blue-500 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-500/5 hover:shadow-md transition-all duration-200 group"
+                        >
+                          <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                            <KeyRound className="h-4 w-4" />
+                          </span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p>Voltar ao Modo Professor</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
               
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={handleLogout}
-                    className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
-                  >
-                    <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                      <LogOut className="h-4 w-4" />
-                    </span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Sair</p>
-                </TooltipContent>
-              </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={handleLogout}
+                        className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
+                      >
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                          <LogOut className="h-4 w-4" />
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Sair</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </TooltipProvider>
             ) : (
@@ -521,8 +703,6 @@ export default function Sidebar() {
                   
                   <button
                     onClick={() => {
-                      // Remover onboarding do perfil atual
-// Perfil único tradicional
                       localStorage.removeItem('onboarding_completed_traditional');
                       window.location.reload();
                     }}
@@ -537,7 +717,6 @@ export default function Sidebar() {
                     <span className="text-sm text-muted-foreground">Tema</span>
                   </div>
                   
-                  {/* Botão de sair do modo aluno (apenas para alunos) */}
                   {isStudent && (
                     <button
                       onClick={handleExitStudentMode}
