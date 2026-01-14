@@ -22,7 +22,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailParams): P
   try {
     // Usar domínio padrão do Resend (onboarding@resend.dev) para evitar erros de domínio não verificado
     // O domínio personalizado requer verificação no painel do Resend: https://resend.com/domains
-    const defaultFrom = 'Sistema de Gestão Educacional <onboarding@resend.dev>';
+    const defaultFrom = 'FlowEdu <onboarding@resend.dev>';
     const emailFrom = from || defaultFrom;
     
     const result = await resend.emails.send({
@@ -56,7 +56,7 @@ export function getInviteEmailTemplate(inviteLink: string, inviterName: string, 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Convite para o Sistema de Gestão</title>
+  <title>Convite para o FlowEdu</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
@@ -67,7 +67,7 @@ export function getInviteEmailTemplate(inviteLink: string, inviterName: string, 
           <tr>
             <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 40px 30px; border-radius: 8px 8px 0 0; text-align: center;">
               <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">
-                🎓 Sistema de Gestão de Tempo para Professores
+                🎓 FlowEdu
               </h1>
             </td>
           </tr>
@@ -84,7 +84,7 @@ export function getInviteEmailTemplate(inviteLink: string, inviterName: string, 
               </p>
               
               <p style="margin: 0 0 16px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                <strong>${inviterName}</strong> convidou você para se juntar ao <strong>Sistema de Gestão de Tempo para Professores</strong> como <strong>${roleText}</strong>.
+                <strong>${inviterName}</strong> convidou você para se juntar ao <strong>FlowEdu</strong> como <strong>${roleText}</strong>.
               </p>
               
               <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
@@ -121,7 +121,7 @@ export function getInviteEmailTemplate(inviteLink: string, inviterName: string, 
           <tr>
             <td style="background-color: #f7fafc; padding: 24px 40px; border-radius: 0 0 8px 8px; text-align: center;">
               <p style="margin: 0; color: #a0aec0; font-size: 13px;">
-                © ${new Date().getFullYear()} Sistema de Gestão de Tempo para Professores
+                © ${new Date().getFullYear()} FlowEdu
               </p>
             </td>
           </tr>
@@ -168,7 +168,7 @@ export function getPasswordResetEmailTemplate(resetLink: string, userName?: stri
               </p>
               
               <p style="margin: 0 0 16px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                Recebemos uma solicitação para redefinir a senha da sua conta no Sistema de Gestão de Professores.
+                Recebemos uma solicitação para redefinir a senha da sua conta no FlowEdu.
               </p>
               
               <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
@@ -207,7 +207,7 @@ export function getPasswordResetEmailTemplate(resetLink: string, userName?: stri
           <tr>
             <td style="background-color: #f7fafc; padding: 24px 40px; border-radius: 0 0 8px 8px; text-align: center;">
               <p style="margin: 0; color: #a0aec0; font-size: 13px;">
-                © ${new Date().getFullYear()} Sistema de Gestão de Tempo para Professores
+                © ${new Date().getFullYear()} FlowEdu
               </p>
             </td>
           </tr>
@@ -235,7 +235,7 @@ export async function sendPasswordResetEmail(
   
   return sendEmail({
     to: email,
-    subject: '🔐 Recuperação de Senha - Sistema de Gestão de Professores',
+    subject: '🔐 Recuperação de Senha - FlowEdu',
     html,
   });
 }
@@ -294,7 +294,7 @@ export function getWelcomeEmailTemplate(userName: string, role: 'admin' | 'user'
           <tr>
             <td style="background-color: #f7fafc; padding: 24px 40px; border-radius: 0 0 8px 8px; text-align: center;">
               <p style="margin: 0; color: #a0aec0; font-size: 13px;">
-                © ${new Date().getFullYear()} Sistema de Gestão de Tempo para Professores
+                © ${new Date().getFullYear()} FlowEdu
               </p>
             </td>
           </tr>
@@ -321,7 +321,7 @@ export function getManualRegistrationEmailTemplate(userName: string, role: 'admi
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conta Criada - Sistema de Gestão</title>
+  <title>Conta Criada - FlowEdu</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
@@ -345,7 +345,7 @@ export function getManualRegistrationEmailTemplate(userName: string, role: 'admi
               </h2>
               
               <p style="margin: 0 0 16px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                Uma conta foi criada para você no <strong>Sistema de Gestão de Tempo para Professores</strong> com o papel de <strong>${roleText}</strong>.
+                Uma conta foi criada para você no <strong>FlowEdu</strong> com o papel de <strong>${roleText}</strong>.
               </p>
               
               <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
@@ -388,7 +388,7 @@ export function getManualRegistrationEmailTemplate(userName: string, role: 'admi
           <tr>
             <td style="background-color: #f7fafc; padding: 24px 40px; border-radius: 0 0 8px 8px; text-align: center;">
               <p style="margin: 0; color: #a0aec0; font-size: 13px;">
-                © ${new Date().getFullYear()} Sistema de Gestão de Tempo para Professores
+                © ${new Date().getFullYear()} FlowEdu
               </p>
             </td>
           </tr>

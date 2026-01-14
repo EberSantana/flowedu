@@ -15,7 +15,7 @@ interface OnboardingStep {
 const ONBOARDING_STEPS: Record<string, OnboardingStep[]> = {
   traditional: [
     {
-      title: "Bem-vindo ao Sistema de Gestão",
+      title: "Bem-vindo ao FlowEdu",
       description: "Este sistema foi projetado para ajudá-lo a organizar sua carga horária e calendário de forma simples e eficiente.",
       icon: <BookOpen className="h-12 w-12 text-blue-600" />,
     },

@@ -52,8 +52,8 @@ export function useAdaptiveDashboard(): DashboardConfig {
       quickActionsOrder: ['schedule', 'subjects', 'classes', 'calendar'],
       
       // Mensagens
-      welcomeMessage: 'Bem-vindo ao seu sistema de gestão',
-      dashboardDescription: 'Visão geral da sua carga horária e calendário',
+      welcomeMessage: 'Bem-vindo ao FlowEdu',
+      dashboardDescription: 'Onde a educação flui - Visão geral da sua carga horária e calendário',
     };
   }, []);
   

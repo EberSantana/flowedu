@@ -1,7 +1,7 @@
 {
-  "name": "Sistema de Gestão para Professores",
-  "short_name": "Gestão Professores",
-  "description": "Sistema completo de gestão de tempo, disciplinas, trilhas de aprendizagem e acompanhamento de alunos para professores",
+  "name": "FlowEdu - Onde a educação flui",
+  "short_name": "FlowEdu",
+  "description": "FlowEdu - Sistema de gestão educacional onde a educação flui. Gerencie tempo, disciplinas, trilhas de aprendizagem e acompanhe seus alunos.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

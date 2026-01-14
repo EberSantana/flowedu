@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de Backup - Sistema de Gestão de Tempo para Professores
+# Script de Backup - FlowEdu
 # Exporta todos os dados em formato CSV usando mysqldump
 
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)

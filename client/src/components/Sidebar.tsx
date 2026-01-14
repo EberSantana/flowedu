@@ -488,12 +488,12 @@ export default function Sidebar() {
                     <div className="p-2 rounded-lg bg-primary/10">
                       <Sun className="h-5 w-5 text-primary" />
                     </div>
-                    Gestão Educacional
+                    FlowEdu
                   </h1>
                   <NotificationBell />
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Professor & Aluno
+                  Onde a educação flui
                 </p>
                 <button
                   onClick={() => {

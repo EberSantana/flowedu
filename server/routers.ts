@@ -1313,7 +1313,7 @@ Regras:
         
         const emailResult = await sendEmail({
           to: input.email,
-          subject: 'Bem-vindo ao Sistema de Gestão de Tempo para Professores',
+          subject: 'Bem-vindo ao FlowEdu',
           html: emailHtml,
         });
 

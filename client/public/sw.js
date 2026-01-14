@@ -1,4 +1,4 @@
-// Service Worker para PWA - Sistema de Gestão para Professores
+// Service Worker para PWA - FlowEdu
 // Versão do cache - incrementar quando houver mudanças importantes
 const CACHE_VERSION = 'v1.1.0';
 const CACHE_NAME = `teacher-schedule-${CACHE_VERSION}`;
@@ -189,7 +189,7 @@ function createOfflineResponse() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Offline - Sistema de Gestão</title>
+      <title>Offline - FlowEdu</title>
       <style>
         * {
           margin: 0;

@@ -46,10 +46,10 @@ export default function PortalChoice() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Sistema de Gestão Educacional Professor & Aluno
+            FlowEdu
           </h1>
           <p className="text-lg text-gray-600">
-            Escolha como deseja acessar o sistema
+            Onde a educação flui - Escolha como deseja acessar
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export default function PortalChoice() {
 
         {/* Footer */}
         <div className="text-center mt-12 text-gray-500 text-sm">
-          <p>© 2025 Sistema de Gestão Educacional Professor & Aluno</p>
+          <p>© 2026 FlowEdu - Onde a educação flui</p>
         </div>
       </div>
     </div>

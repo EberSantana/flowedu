@@ -37,7 +37,10 @@ export function useOnboardingTour() {
       id: 'dashboard',
       text: `
         <div class="shepherd-content-custom">
-          <h3 class="text-xl font-bold mb-2">📊 Dashboard</h3>
+          <h3 class="text-xl font-bold mb-2">👋 Bem-vindo ao FlowEdu!</h3>
+          <p class="text-gray-700 mb-2">
+            <strong>Onde a educação flui.</strong>
+          </p>
           <p class="text-gray-700">
             Aqui você tem uma visão geral do sistema: disciplinas, turmas, aulas agendadas e estatísticas de aulas dadas.
           </p>

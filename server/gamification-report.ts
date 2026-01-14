@@ -176,7 +176,7 @@ export function generateGamificationReport(data: ReportData) {
 
   // Rodapé
   doc.fontSize(8).font('Helvetica').text(
-    'Sistema de Gestão Educacional - Relatório gerado automaticamente',
+    'FlowEdu - Relatório gerado automaticamente',
     50,
     doc.page.height - 50,
     { align: 'center' }

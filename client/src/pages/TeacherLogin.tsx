@@ -217,8 +217,8 @@ export default function TeacherLogin() {
               <GraduationCap className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Gestão Educacional</h1>
-              <p className="text-white/70 text-sm">Sistema de Gestão para Professores</p>
+              <h1 className="text-2xl font-bold text-white">FlowEdu</h1>
+              <p className="text-white/70 text-sm">Onde a educação flui</p>
             </div>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function TeacherLogin() {
         </div>
         
         <div className="text-white/60 text-sm">
-          © 2026 Gestão Educacional. Todos os direitos reservados.
+          © 2026 FlowEdu. Todos os direitos reservados.
         </div>
       </div>
 

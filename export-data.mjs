@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script de Exportação de Dados - Sistema de Gestão de Tempo para Professores
+ * Script de Exportação de Dados - FlowEdu
  * 
  * Este script exporta todos os dados importantes do sistema em formato CSV para backup.
  * Gera arquivos separados para: disciplinas, turmas, turnos, horários, aulas agendadas e eventos.
@@ -182,7 +182,7 @@ Para restaurar os dados, importe os arquivos CSV na ordem:
 5. aulas_agendadas.csv
 6. eventos_calendario.csv
 
-Sistema: ${process.env.VITE_APP_TITLE || 'Sistema de Gestão de Tempo para Professores'}
+Sistema: ${process.env.VITE_APP_TITLE || 'FlowEdu'}
 `;
   
   await writeFile(readmePath, readmeContent);

@@ -1,4 +1,4 @@
-# Sistema de Gestão de Tempo para Professores - TODO
+# FlowEdu - TODO
 
 ## 🛠️ Remoção de Gamificação
 
@@ -5402,3 +5402,33 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar indicadores visuais de segurança (SSL badge, shield icon)
 - [x] Melhorar feedback de erros de autenticação (mensagens genéricas anti-enumeração)
 - [x] Adicionar opção "Lembrar-me" com checkbox
+
+## Rebranding para FlowEdu
+
+- [ ] Atualizar título da aplicação no index.html
+- [ ] Atualizar variável VITE_APP_TITLE
+- [ ] Atualizar nome no Sidebar (Gestão Educacional → FlowEdu)
+- [ ] Atualizar slogan no Sidebar (Professor & Aluno → Onde a educação flui)
+- [ ] Atualizar página de login do professor
+- [ ] Atualizar página de cadastro do professor
+- [ ] Atualizar página de login do aluno
+- [ ] Atualizar textos de boas-vindas no Dashboard
+- [ ] Atualizar manifest.json para PWA
+
+## 🎨 Renomeação para FlowEdu
+
+- [x] Atualizar nome da aplicação para "FlowEdu" com slogan "Onde a educação flui"
+- [x] Atualizar index.html com novo título e meta tags
+- [x] Atualizar manifest.json do PWA
+- [x] Atualizar Sidebar com novo nome e slogan
+- [x] Atualizar página de login do professor (TeacherLogin.tsx)
+- [x] Atualizar página de escolha de portal (PortalChoice.tsx)
+- [x] Atualizar BibleFooter.tsx
+- [x] Atualizar GuidedTour.tsx
+- [x] Atualizar InfographicModal.tsx
+- [x] Atualizar ProfileOnboarding.tsx
+- [x] Atualizar StudentLayout.tsx
+- [x] Atualizar OnboardingTour.tsx (Shepherd.js)
+- [x] Atualizar templates de e-mail (email.ts)
+- [x] Atualizar routers.ts (subject de e-mail de boas-vindas)
+- [x] Atualizar gamification-report.ts (rodapé do PDF)

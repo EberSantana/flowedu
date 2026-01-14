@@ -254,7 +254,7 @@ export default function InfographicModal({
     ctx.fillStyle = "#94a3b8";
     ctx.font = "16px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("Gerado automaticamente pelo Sistema de Gestão Educacional", canvas.width / 2, yPos);
+    ctx.fillText("Gerado automaticamente pelo FlowEdu", canvas.width / 2, yPos);
   };
 
   const handleDownload = () => {

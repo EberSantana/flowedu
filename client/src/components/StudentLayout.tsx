@@ -79,7 +79,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             </div>
             <div>
               <h1 className="font-bold text-white text-xl">Portal do Aluno</h1>
-              <p className="text-xs text-blue-100">Gestão Educacional</p>
+              <p className="text-xs text-blue-100">FlowEdu</p>
             </div>
           </div>
 
@@ -180,7 +180,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               </div>
               <div>
                 <h1 className="font-bold text-white text-xl">Portal do Aluno</h1>
-                <p className="text-xs text-blue-100">Gestão Educacional</p>
+                <p className="text-xs text-blue-100">FlowEdu</p>
               </div>
             </div>
             <button

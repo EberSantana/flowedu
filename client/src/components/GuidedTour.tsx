@@ -21,7 +21,7 @@ export function GuidedTour({ run = false, onComplete }: GuidedTourProps) {
       target: "body",
       content: (
         <div>
-          <h3 className="text-lg font-bold mb-2">Bem-vindo ao Sistema de Gestão Educacional!</h3>
+          <h3 className="text-lg font-bold mb-2">Bem-vindo ao FlowEdu!</h3>
           <p>Vamos fazer um tour rápido pelas principais funcionalidades do sistema.</p>
         </div>
       ),
