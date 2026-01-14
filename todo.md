@@ -5303,3 +5303,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Investigar rota getExerciseHistory e dados retornados
 - [x] Corrigir exibição no frontend
 - [x] Adicionar exibição de Feedback da IA e Dicas de Estudo
+
+- [x] Remover botão "Avaliações" do menu lateral (redundante)

@@ -122,11 +122,6 @@ const teacherNavItems: NavItem[] = [
     href: "/announcements",
   },
   {
-    label: "Avaliações",
-    icon: <ClipboardList className="h-5 w-5" />,
-    href: "/assessments",
-  },
-  {
     label: "Usuários",
     icon: <Shield className="h-5 w-5" />,
     href: "/admin/users",
