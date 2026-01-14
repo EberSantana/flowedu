@@ -129,10 +129,10 @@ export default function ActiveMethodologies() {
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      "Quiz e Avaliação": "from-blue-500 to-blue-600",
-      "Colaboração": "from-green-500 to-green-600",
-      "Apresentação": "from-purple-500 to-purple-600",
-      "Gamificação": "from-orange-500 to-orange-600",
+      "Quiz e Avaliação": "from-primary to-primary/80",
+      "Colaboração": "from-success to-success/80",
+      "Apresentação": "from-accent to-accent/80",
+      "Gamificação": "from-warning to-warning/80",
       "Formulários": "from-pink-500 to-pink-600",
       "Quadro Branco": "from-teal-500 to-teal-600",
       "Vídeo e Áudio": "from-red-500 to-red-600",
@@ -149,14 +149,14 @@ export default function ActiveMethodologies() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-foreground">
             Metodologias Ativas
           </h1>
           <p className="text-muted-foreground mt-1">
             Biblioteca de ferramentas pedagógicas para suas aulas
           </p>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+        <Button onClick={() => setIsCreateOpen(true)} className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
           <Plus className="h-4 w-4 mr-2" />
           Nova Ferramenta
         </Button>
@@ -242,8 +242,8 @@ export default function ActiveMethodologies() {
 
                 {/* Tips */}
                 {methodology.tips && (
-                  <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
-                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                  <div className="bg-info/10 p-3 rounded-lg">
+                    <p className="text-xs text-info">
                       💡 {methodology.tips}
                     </p>
                   </div>
@@ -253,7 +253,7 @@ export default function ActiveMethodologies() {
                 <div className="flex items-center gap-2 pt-2">
                   <Button
                     size="sm"
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                     onClick={() => window.open(methodology.url, "_blank")}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />

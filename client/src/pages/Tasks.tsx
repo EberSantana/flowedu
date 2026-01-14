@@ -206,9 +206,9 @@ export default function Tasks() {
   const getPriorityColor = (priority: Priority) => {
     switch (priority) {
       case "high":
-        return "text-red-600 bg-red-50 border-red-200";
+        return "text-destructive bg-destructive/10 border-destructive/20";
       case "medium":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+        return "text-warning bg-warning/10 border-warning/20";
       case "low":
         return "text-success bg-success/10 border-success/30";
     }
@@ -244,7 +244,7 @@ export default function Tasks() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8">
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
@@ -521,8 +521,8 @@ export default function Tasks() {
                               <span
                                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
                                   isOverdue(task.dueDate) && !task.completed
-                                    ? "bg-red-50 text-red-700 border border-red-200"
-                                    : "bg-gray-50 text-gray-700 border border-gray-200"
+                                    ? "bg-destructive/10 text-destructive border border-destructive/20"
+                                    : "bg-muted text-muted-foreground border border-border"
                                 }`}
                               >
                                 <Calendar className="h-3 w-3" />
@@ -547,9 +547,9 @@ export default function Tasks() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDelete(task.id, task.title)}
-                            className="h-8 w-8 p-0 hover:bg-red-50"
+                            className="h-8 w-8 p-0 hover:bg-destructive/10"
                           >
-                            <Trash2 className="h-4 w-4 text-red-600" />
+                            <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>
                       </div>
