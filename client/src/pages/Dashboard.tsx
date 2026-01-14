@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as LucideIcons from "lucide-react";
-import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User, UserCog } from "lucide-react";
+import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, CalendarDays, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
@@ -1070,81 +1070,127 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Gráfico de Distribuição Semanal - Design Moderno com Barras */}
+          {/* Distribuição Semanal - Cards de Resumo por Dia */}
           {widgetVisibility.weeklyChart && scheduledClasses && scheduledClasses.length > 0 && (
-            <Card className="border-l-4 border-l-primary overflow-hidden">
-              <CardHeader className="pb-3">
+            <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card via-card to-muted/20">
+              <CardHeader className="pb-4 border-b border-border/50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-primary/10">
-                      <BarChart3 className="h-5 w-5 text-primary" />
+                    <div className="p-3 rounded-2xl bg-sidebar-primary shadow-lg">
+                      <CalendarDays className="h-6 w-6 text-sidebar-primary-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-semibold text-foreground">Distribuição Semanal</CardTitle>
-                      <CardDescription className="text-sm text-muted-foreground mt-0.5">Carga horária por dia da semana</CardDescription>
+                      <CardTitle className="text-xl font-bold text-foreground">Distribuição Semanal</CardTitle>
+                      <CardDescription className="text-sm text-muted-foreground mt-1">Visão geral da sua carga horária</CardDescription>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{totalScheduledClasses}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">aulas/semana</div>
+                  <div className="text-right bg-sidebar-primary/10 px-4 py-2 rounded-xl">
+                    <div className="text-3xl font-extrabold text-sidebar-primary">{totalScheduledClasses}</div>
+                    <div className="text-xs font-medium text-muted-foreground">aulas/semana</div>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-2">
-                {/* Gráfico de Barras Verticais Moderno */}
-                <div className="flex items-end justify-between gap-3 h-48 px-2">
+              <CardContent className="p-6">
+                {/* Grid de 5 Cards - Um por dia */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {DAYS_OF_WEEK.map((day, index) => {
-                    const count = scheduledClasses?.filter(c => c.dayOfWeek === index).length || 0;
+                    const dayClasses = scheduledClasses?.filter(c => c.dayOfWeek === index) || [];
+                    const count = dayClasses.length;
                     const maxCount = Math.max(...DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0), 1);
-                    const heightPercent = (count / maxCount) * 100;
-                    const colors = [
-                      'from-blue-500 to-blue-600',
-                      'from-emerald-500 to-emerald-600', 
-                      'from-violet-500 to-violet-600',
-                      'from-amber-500 to-amber-600',
-                      'from-rose-500 to-rose-600'
+                    const isMaxDay = count === maxCount && count > 0;
+                    // Simplificado - sem acesso a subjectName diretamente
+                    
+                    // Cores do tema para cada dia
+                    const dayStyles = [
+                      { accent: 'border-blue-400', bg: 'from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20', icon: 'text-blue-600 dark:text-blue-400' },
+                      { accent: 'border-emerald-400', bg: 'from-emerald-50 to-emerald-100 dark:from-emerald-950/30 dark:to-emerald-900/20', icon: 'text-emerald-600 dark:text-emerald-400' },
+                      { accent: 'border-violet-400', bg: 'from-violet-50 to-violet-100 dark:from-violet-950/30 dark:to-violet-900/20', icon: 'text-violet-600 dark:text-violet-400' },
+                      { accent: 'border-amber-400', bg: 'from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/20', icon: 'text-amber-600 dark:text-amber-400' },
+                      { accent: 'border-rose-400', bg: 'from-rose-50 to-rose-100 dark:from-rose-950/30 dark:to-rose-900/20', icon: 'text-rose-600 dark:text-rose-400' },
                     ];
+                    const style = dayStyles[index];
+                    
                     return (
-                      <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                        {/* Número de aulas */}
-                        <span className={`text-sm font-bold ${count > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          {count}
-                        </span>
-                        {/* Barra vertical */}
-                        <div className="w-full h-32 bg-muted/30 rounded-xl relative overflow-hidden">
-                          <div 
-                            className={`absolute bottom-0 left-0 right-0 rounded-xl bg-gradient-to-t ${colors[index]} transition-all duration-700 ease-out shadow-lg`}
-                            style={{ height: count > 0 ? `${Math.max(heightPercent, 8)}%` : '0%' }}
-                          >
-                            {/* Efeito de brilho */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent" />
+                      <div 
+                        key={day} 
+                        className={`relative group rounded-2xl border-2 ${style.accent} bg-gradient-to-br ${style.bg} p-4 transition-all duration-300 hover:shadow-xl hover:scale-105 ${isMaxDay ? 'ring-2 ring-sidebar-primary ring-offset-2' : ''}`}
+                      >
+                        {/* Badge de dia mais cheio */}
+                        {isMaxDay && (
+                          <div className="absolute -top-2 -right-2 bg-sidebar-primary text-sidebar-primary-foreground text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
+                            ★ Mais cheio
+                          </div>
+                        )}
+                        
+                        {/* Cabeçalho do Card */}
+                        <div className="text-center mb-3">
+                          <div className={`text-xs font-bold uppercase tracking-wider ${style.icon} mb-1`}>
+                            {day.substring(0, 3)}
+                          </div>
+                          <div className="text-2xl font-black text-foreground">
+                            {day}
                           </div>
                         </div>
-                        {/* Dia da semana */}
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {day.substring(0, 3)}
-                        </span>
+                        
+                        {/* Número de Aulas */}
+                        <div className="text-center py-3 border-y border-border/30">
+                          <div className={`text-4xl font-extrabold ${count > 0 ? 'text-sidebar-primary' : 'text-muted-foreground/50'}`}>
+                            {count}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {count === 1 ? 'aula' : 'aulas'}
+                          </div>
+                        </div>
+                        
+                        {/* Status do dia */}
+                        <div className="mt-3">
+                          {count > 0 ? (
+                            <div className="flex items-center justify-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              <span className="font-medium">Dia ativo</span>
+                            </div>
+                          ) : (
+                            <div className="text-xs text-muted-foreground/50 text-center italic">
+                              Dia livre
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Indicador de carga */}
+                        {count > 0 && (
+                          <div className="mt-3 pt-2 border-t border-border/30">
+                            <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              <span>{count} {count === 1 ? 'aula programada' : 'aulas programadas'}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                 </div>
                 
-                {/* Legenda/Resumo */}
+                {/* Resumo Inferior */}
                 <div className="mt-6 pt-4 border-t border-border/50">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
+                    <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600" />
-                        <span className="text-muted-foreground">Dia mais cheio:</span>
-                        <span className="font-semibold text-foreground">
-                          {DAYS_OF_WEEK[DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0).indexOf(Math.max(...DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0)))]}
-                        </span>
+                        <div className="w-3 h-3 rounded-full bg-sidebar-primary" />
+                        <span className="text-muted-foreground">Média:</span>
+                        <span className="font-bold text-foreground">{(totalScheduledClasses / 5).toFixed(1)} aulas/dia</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-emerald-500" />
+                        <span className="text-muted-foreground">Dias ativos:</span>
+                        <span className="font-bold text-foreground">{DAYS_OF_WEEK.filter((_, i) => (scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0) > 0).length}/5</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <span>Média:</span>
-                      <span className="font-semibold text-foreground">{(totalScheduledClasses / 5).toFixed(1)} aulas/dia</span>
-                    </div>
+                    <Link href="/schedule">
+                      <Button variant="outline" size="sm" className="gap-2 hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors">
+                        Ver Grade Completa
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>

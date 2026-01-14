@@ -5379,3 +5379,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Padronizar TODAS as Ações Rápidas com a mesma cor escura do botão Nova Disciplina
 
 - [x] Fazer Ações Rápidas usarem variáveis CSS do tema (bg-sidebar-primary) para mudar dinamicamente com o tema
+
+- [x] Redesenhar Distribuição Semanal com Cards de Resumo por Dia (5 cards lado a lado)
