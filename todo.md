@@ -39,6 +39,8 @@
 - [x] Remover funcionalidade "Caderno de Respostas" do portal do aluno (Frontend, Backend, Banco de Dados)
 - [x] Corrigir erro de "key" prop no componente StudentExerciseReview - CORRIGIDO: adicionado id único às questões retornadas por getExerciseResults e fallback no key do componente
 - [x] Melhorar interface da página de revisão (StudentExerciseReview) com indicadores visuais claros para respostas certas e erradas
+- [x] Corrigir erro "Invalid hook call" no TRPCProvider (múltiplas cópias do React) - RESOLVIDO: reiniciar o servidor limpou o cache do Vite
+- [x] Analisar e otimizar configuração do Vite para evitar problemas de cache - CONCLUÍDO: adicionados scripts de limpeza, configurações de dedupe, optimizeDeps e documentação
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 

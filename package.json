@@ -12,7 +12,11 @@
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "clean": "rm -rf node_modules/.vite dist",
-    "clean:restart": "pnpm clean && pnpm dev"
+    "clean:cache": "rm -rf node_modules/.vite",
+    "clean:all": "rm -rf node_modules/.vite dist node_modules/.cache",
+    "clean:restart": "pnpm clean:cache && pnpm dev",
+    "dev:fresh": "pnpm clean:cache && pnpm dev",
+    "prebuild": "pnpm clean:cache"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
