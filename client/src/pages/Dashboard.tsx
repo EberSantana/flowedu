@@ -27,7 +27,7 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useOnboardingTour } from "@/components/OnboardingTour";
-import { GuidedTour } from "@/components/GuidedTour";
+// GuidedTour removido - usando apenas OnboardingTour (Shepherd.js)
 import { useAdaptiveDashboard } from "@/hooks/useAdaptiveDashboard";
 import { QuickActionsCustomizer, QuickAction } from "@/components/QuickActionsCustomizer";
 // ProfileOnboarding removido - perfil único tradicional
@@ -95,16 +95,7 @@ export default function Dashboard() {
   // Tour interativo para novos usuários
   useOnboardingTour();
   
-  // Estado para controlar o tour guiado
-  const [showGuidedTour, setShowGuidedTour] = useState(() => {
-    const hasSeenTour = localStorage.getItem('guided_tour_completed');
-    return !hasSeenTour;
-  });
-  
-  const handleTourComplete = () => {
-    localStorage.setItem('guided_tour_completed', 'true');
-    setShowGuidedTour(false);
-  };
+  // GuidedTour removido - usando apenas OnboardingTour (Shepherd.js)
   
   // Configuração adaptativa baseada no perfil do professor
   const dashboardConfig = useAdaptiveDashboard();
@@ -1247,8 +1238,7 @@ export default function Dashboard() {
         onSave={(actions) => setQuickActions(actions)}
       />
       
-      {/* Tour Guiado */}
-      <GuidedTour run={showGuidedTour} onComplete={handleTourComplete} />
+      {/* Tour Guiado removido - usando apenas OnboardingTour (Shepherd.js) */}
     </>
   );
 }

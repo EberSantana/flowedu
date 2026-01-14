@@ -5355,3 +5355,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar fluxo completo de autenticação
 
 - [x] Padronizar botão "Tema" no menu lateral para ficar consistente com outros itens
+
+- [x] Remover tour duplicado - deixar apenas OnboardingTour (Shepherd.js)
