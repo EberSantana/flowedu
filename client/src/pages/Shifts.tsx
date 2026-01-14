@@ -94,12 +94,12 @@ export default function Shifts() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <Clock className="h-8 w-8 text-orange-600" />
+                <Clock className="h-8 w-8 text-primary" />
                 Configurar Turnos
               </h1>
               <p className="text-gray-600 mt-2">

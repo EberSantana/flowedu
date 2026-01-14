@@ -5320,3 +5320,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aplicar variáveis de cores do tema na página de Disciplinas
 - [x] Aplicar variáveis de cores do tema na página de Turmas
 - [x] Aplicar variáveis de cores do tema na página de Relatórios
+
+- [x] Aplicar variáveis de cores do tema na página de Turnos
+- [x] Aplicar variáveis de cores do tema na página de Grade de Horários
+- [x] Aplicar variáveis de cores do tema na página de Calendário
+- [x] Aplicar variáveis de cores do tema na página de Análise de Aprendizagem
+- [x] Aplicar variáveis de cores do tema na página de Gerenciar Tarefas
+- [x] Aplicar variáveis de cores do tema na página de Usuários

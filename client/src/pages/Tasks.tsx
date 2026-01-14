@@ -210,7 +210,7 @@ export default function Tasks() {
       case "medium":
         return "text-yellow-600 bg-yellow-50 border-yellow-200";
       case "low":
-        return "text-green-600 bg-green-50 border-green-200";
+        return "text-success bg-success/10 border-success/30";
     }
   };
 
@@ -474,7 +474,7 @@ export default function Tasks() {
                           className="mt-1 flex-shrink-0 transition-transform hover:scale-110"
                         >
                           {task.completed ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            <CheckCircle2 className="h-5 w-5 text-success" />
                           ) : (
                             <Circle className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                           )}
@@ -510,7 +510,7 @@ export default function Tasks() {
 
                             {/* Categoria */}
                             {task.category && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/30">
                                 <Tag className="h-3 w-3" />
                                 {task.category}
                               </span>

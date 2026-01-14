@@ -200,7 +200,7 @@ export default function AdminUsers() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 p-6">
         <div className="container max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -233,7 +233,7 @@ export default function AdminUsers() {
 
             <Button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              className="bg-success hover:bg-success/90 text-white"
             >
               <Users className="w-4 h-4 mr-2" />
               {showCreateForm ? "Cancelar" : "Novo Usuário"}
@@ -243,9 +243,9 @@ export default function AdminUsers() {
         
         {/* Formulário de Cadastro */}
         {showCreateForm && (
-          <Card className="mb-8 border-green-200 bg-green-50">
+          <Card className="mb-8 border-success/30 bg-success/10">
             <CardHeader>
-              <CardTitle className="text-green-800">Cadastrar Novo Usuário</CardTitle>
+              <CardTitle className="text-success">Cadastrar Novo Usuário</CardTitle>
               <CardDescription>Preencha os dados para criar um novo professor ou administrador</CardDescription>
             </CardHeader>
             <CardContent>
@@ -318,7 +318,7 @@ export default function AdminUsers() {
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-success hover:bg-success/90"
                     disabled={createUserMutation.isPending}
                   >
                     {createUserMutation.isPending ? "Criando..." : "Criar Usuário"}
@@ -336,7 +336,7 @@ export default function AdminUsers() {
               <CardTitle className="text-sm font-medium text-slate-600">Usuários Ativos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">{activeUsers?.length || 0}</div>
+              <div className="text-3xl font-bold text-success">{activeUsers?.length || 0}</div>
             </CardContent>
           </Card>
 
@@ -365,7 +365,7 @@ export default function AdminUsers() {
               <CardTitle className="text-sm font-medium text-slate-600">Professores</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600">
+              <div className="text-3xl font-bold text-primary">
                 {activeUsers?.filter((u) => u.role === "user").length || 0}
               </div>
             </CardContent>
@@ -426,7 +426,7 @@ export default function AdminUsers() {
                   <TableRow key={u.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm">
                           {u.name?.charAt(0).toUpperCase() || "?"}
                         </div>
                         {u.name || "Sem nome"}
@@ -485,7 +485,7 @@ export default function AdminUsers() {
                                   }
                                 }}
                                 disabled={reactivateUserMutation.isPending}
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                className="text-success hover:text-success/90 hover:bg-success/10"
                               >
                                 <RefreshCw className="w-4 h-4 mr-1" />
                                 Reativar

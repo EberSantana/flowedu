@@ -456,7 +456,7 @@ export default function Schedule() {
     return (
       <>
         <Sidebar />
-        <PageWrapper className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+        <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
           <div className="container mx-auto py-8">
             <div className="mb-6">
               <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
@@ -473,7 +473,7 @@ export default function Schedule() {
 
   if (!fullSchedule || fullSchedule.shifts.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-8">
           <Link href="/">
             <Button variant="ghost" size="sm" className="mb-4">
@@ -495,7 +495,7 @@ export default function Schedule() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-8">
           <div className="mb-6">
             <div className="flex items-center justify-between">
@@ -514,7 +514,7 @@ export default function Schedule() {
                 </Button>
                 <Button
                   onClick={exportToExcel}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-success hover:bg-success/90 text-white"
                   size="lg"
                 >
                   <FileSpreadsheet className="mr-2 h-5 w-5" />
@@ -522,7 +522,7 @@ export default function Schedule() {
                 </Button>
                 <Button
                   onClick={exportToCalendar}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                   size="lg"
                 >
                   <Download className="mr-2 h-5 w-5" />
@@ -595,8 +595,8 @@ export default function Schedule() {
               </div>
             </div>
             {hasActiveFilters && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-md">
-                <p className="text-sm text-blue-800">
+              <div className="mt-4 p-3 bg-primary/10 rounded-md">
+                <p className="text-sm text-primary">
                   <strong>Filtros ativos:</strong>
                   {filterSubjectId && filterSubjectId !== "all" && (
                     <span className="ml-2">
@@ -701,7 +701,7 @@ export default function Schedule() {
                                   ) : (
                                     <button
                                       onClick={() => handleOpenDialog(slot.id, day.id)}
-                                      className="w-full h-full min-h-[60px] flex items-center justify-center text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded transition-colors"
+                                      className="w-full h-full min-h-[60px] flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary rounded transition-colors"
                                     >
                                       <Plus className="h-4 w-4" />
                                     </button>

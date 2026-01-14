@@ -113,7 +113,7 @@ export function LearningAnalytics() {
       case "critical": return "bg-red-500";
       case "urgent": return "bg-orange-500";
       case "warning": return "bg-yellow-500";
-      case "info": return "bg-blue-500";
+      case "info": return "bg-info";
       default: return "bg-gray-500";
     }
   };
@@ -122,7 +122,7 @@ export function LearningAnalytics() {
     switch (priority) {
       case "critical": return <AlertCircle className="h-4 w-4 text-red-500" />;
       case "high": return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-      case "medium": return <Info className="h-4 w-4 text-blue-500" />;
+      case "medium": return <Info className="h-4 w-4 text-info" />;
       case "low": return <Info className="h-4 w-4 text-gray-500" />;
       default: return <Info className="h-4 w-4 text-gray-500" />;
     }
@@ -138,7 +138,7 @@ export function LearningAnalytics() {
           {/* Header Centralizado */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-accent to-accent/80 flex items-center justify-center shadow-lg">
                 <Brain className="h-10 w-10 text-white" />
               </div>
             </div>
@@ -150,9 +150,9 @@ export function LearningAnalytics() {
                 Monitore comportamento, padrões e evolução dos seus alunos com inteligência artificial
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-3 rounded-full border border-indigo-200 shadow-sm">
-              <Sparkles className="h-5 w-5 text-indigo-600" />
-              <span className="text-indigo-700 font-semibold">Powered by AI</span>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 px-6 py-3 rounded-full border border-primary/30 shadow-sm">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <span className="text-primary font-semibold">Powered by AI</span>
             </div>
           </div>
 
@@ -161,8 +161,8 @@ export function LearningAnalytics() {
             <Card className="border-t-4 border-t-blue-500 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Users className="h-8 w-8 text-blue-600" />
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users className="h-8 w-8 text-primary" />
                   </div>
                   <div>
                     <p className="text-slate-600 text-sm font-medium mb-1">Total de Alunos</p>
@@ -220,7 +220,7 @@ export function LearningAnalytics() {
             <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-md">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-md">
                     <Activity className="h-6 w-6 text-white" />
                   </div>
                   <div>
@@ -293,7 +293,7 @@ export function LearningAnalytics() {
                 <Button
                   onClick={handleAnalyzeStudent}
                   disabled={!selectedStudent || isAnalyzing}
-                  className="h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md"
+                  className="h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-md"
                   size="lg"
                 >
                   {isAnalyzing ? (
@@ -311,9 +311,9 @@ export function LearningAnalytics() {
               </div>
 
               {selectedStudentData && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border border-primary/30">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg shadow-md">
                       {selectedStudentData.fullName.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -392,12 +392,12 @@ export function LearningAnalytics() {
                                 <h4 className="font-semibold text-slate-900 mb-2 text-lg">{insight.title}</h4>
                                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">{insight.description}</p>
                                 {insight.recommendation && (
-                                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-3">
+                                  <div className="bg-gradient-to-r from-info/10 to-primary/10 border border-info/30 rounded-lg p-4 mb-3">
                                     <div className="flex items-start gap-2">
-                                      <ArrowRight className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                      <ArrowRight className="h-4 w-4 text-info mt-0.5 flex-shrink-0" />
                                       <div>
-                                        <p className="text-xs font-semibold text-blue-900 mb-1">Recomendação:</p>
-                                        <p className="text-sm text-blue-700 leading-relaxed">{insight.recommendation}</p>
+                                        <p className="text-xs font-semibold text-info mb-1">Recomendação:</p>
+                                        <p className="text-sm text-info/80 leading-relaxed">{insight.recommendation}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -448,8 +448,8 @@ export function LearningAnalytics() {
                     <ScrollArea className="h-[500px] pr-4">
                       {!studentAlerts || studentAlerts.length === 0 ? (
                         <div className="text-center py-16">
-                          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                            <CheckCircle className="h-10 w-10 text-green-500" />
+                          <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="h-10 w-10 text-success" />
                           </div>
                           <p className="text-slate-500 text-lg font-medium">Nenhum alerta ativo</p>
                           <p className="text-sm text-slate-400 mt-2">Este aluno está com bom desempenho</p>
@@ -486,7 +486,7 @@ export function LearningAnalytics() {
                                     <Button
                                       size="sm"
                                       onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
-                                      className="text-xs bg-green-600 hover:bg-green-700"
+                                      className="text-xs bg-success hover:bg-success/90"
                                     >
                                       <CheckCircle className="h-3 w-3 mr-1" />
                                       Resolver
@@ -506,10 +506,10 @@ export function LearningAnalytics() {
               {/* Tab: Padrões */}
               <TabsContent value="patterns" className="mt-6">
                 <Card className="shadow-lg">
-                  <CardHeader className="border-b bg-gradient-to-r from-purple-50 to-pink-50">
+                  <CardHeader className="border-b bg-gradient-to-r from-accent/10 to-accent/5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center">
                           <TrendingUp className="h-5 w-5 text-white" />
                         </div>
                         <div>
@@ -559,7 +559,7 @@ export function LearningAnalytics() {
                                   </div>
                                 )}
                                 {pattern.impact && (
-                                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+                                  <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/30 rounded-lg p-4">
                                     <p className="text-xs font-semibold text-purple-900 mb-1">Impacto:</p>
                                     <p className="text-sm text-purple-700 leading-relaxed">{pattern.impact}</p>
                                   </div>
@@ -640,7 +640,7 @@ export function LearningAnalytics() {
                                 <Button
                                   size="sm"
                                   onClick={() => resolveAlertMutation.mutate({ alertId: alert.id })}
-                                  className="text-xs bg-green-600 hover:bg-green-700"
+                                  className="text-xs bg-success hover:bg-success/90"
                                 >
                                   <CheckCircle className="h-3 w-3 mr-1" />
                                   Resolver

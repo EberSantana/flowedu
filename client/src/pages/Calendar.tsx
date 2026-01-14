@@ -353,7 +353,7 @@ export default function Calendar() {
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <CalendarDays className="w-8 h-8 text-blue-600" />
+                <CalendarDays className="w-8 h-8 text-primary" />
                 Calendário
               </h1>
               <p className="text-gray-600 mt-1">
@@ -363,14 +363,14 @@ export default function Calendar() {
             <div className="flex gap-3">
               <Button
                 onClick={() => setIsUpdateDialogOpen(true)}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
                 <Clock className="w-4 h-4 mr-2" />
                 Atualizar Calendário Anual
               </Button>
               <Button
                 onClick={() => setIsImportDialogOpen(true)}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Importar Calendário PDF
@@ -382,7 +382,7 @@ export default function Calendar() {
             {/* Calendário Principal */}
             <div className="lg:col-span-2">
               <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-t-lg">
+                <CardHeader className="bg-gradient-to-r from-primary to-accent text-white rounded-t-lg">
                   <div className="flex items-center justify-between">
                     <Button
                       variant="ghost"
@@ -432,14 +432,14 @@ export default function Calendar() {
                           className={`
                             aspect-square p-2 rounded-lg border-2 transition-all
                             ${!date ? 'invisible' : ''}
-                            ${isToday(date) ? 'border-blue-500 bg-blue-50 font-bold' : 'border-gray-200'}
-                            ${date && !isToday(date) ? 'hover:border-blue-300 hover:bg-blue-50' : ''}
-                            ${hasEvents ? 'bg-gradient-to-br from-white to-blue-50' : 'bg-white'}
+                            ${isToday(date) ? 'border-primary bg-primary/10 font-bold' : 'border-gray-200'}
+                            ${date && !isToday(date) ? 'hover:border-primary/50 hover:bg-primary/5' : ''}
+                            ${hasEvents ? 'bg-gradient-to-br from-white to-primary/5' : 'bg-white'}
                           `}
                         >
                           {date && (
                             <div className="flex flex-col items-center justify-center h-full">
-                              <span className={`text-sm ${isToday(date) ? 'text-blue-600' : 'text-gray-700'}`}>
+                              <span className={`text-sm ${isToday(date) ? 'text-primary' : 'text-gray-700'}`}>
                                 {date.getDate()}
                               </span>
                               {hasEvents && (
@@ -482,7 +482,7 @@ export default function Calendar() {
             {/* Painel Lateral - Lista de Eventos */}
             <div className="lg:col-span-1">
               <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-t-lg">
+                <CardHeader className="bg-gradient-to-r from-accent to-accent/80 text-white rounded-t-lg">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-bold">Eventos do Mês</CardTitle>
                     <Button
@@ -562,7 +562,7 @@ export default function Calendar() {
                                   onClick={() => handleEdit(event)}
                                   className="h-7 w-7"
                                 >
-                                  <Pencil className="w-3.5 h-3.5 text-blue-600" />
+                                  <Pencil className="w-3.5 h-3.5 text-primary" />
                                 </Button>
                                 <Button
                                   size="icon"
@@ -657,7 +657,7 @@ export default function Calendar() {
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-green-600" />
+                <FileText className="w-5 h-5 text-success" />
                 Importar Calendário Escolar (PDF)
               </DialogTitle>
               <DialogDescription>
@@ -667,7 +667,7 @@ export default function Calendar() {
             
             {extractedEvents.length === 0 ? (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-500 transition-colors">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-success transition-colors">
                   <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                   <Label htmlFor="pdf-upload" className="cursor-pointer">
                     <span className="text-lg font-medium text-gray-700">Clique para selecionar o PDF</span>
@@ -685,7 +685,7 @@ export default function Calendar() {
                 
                 {isProcessing && (
                   <div className="text-center py-8">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-success mb-4"></div>
                     <p className="text-gray-600">Processando PDF e extraindo eventos...</p>
                     <p className="text-sm text-gray-500 mt-2">Isso pode levar alguns segundos</p>
                   </div>
@@ -693,10 +693,10 @@ export default function Calendar() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center justify-between bg-green-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between bg-success/10 p-4 rounded-lg">
                   <div>
-                    <p className="font-medium text-green-900">{extractedEvents.length} eventos extraídos</p>
-                    <p className="text-sm text-green-700">{selectedEvents.size} selecionados para importar</p>
+                    <p className="font-medium text-success">{extractedEvents.length} eventos extraídos</p>
+                    <p className="text-sm text-success/80">{selectedEvents.size} selecionados para importar</p>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -724,7 +724,7 @@ export default function Calendar() {
                       key={index}
                       className={`p-4 border rounded-lg cursor-pointer transition-all ${
                         selectedEvents.has(index)
-                          ? 'border-green-500 bg-green-50'
+                          ? 'border-success bg-success/10'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                       onClick={() => toggleEventSelection(index)}
@@ -732,7 +732,7 @@ export default function Calendar() {
                       <div className="flex items-start gap-3">
                         <div className="mt-1">
                           {selectedEvents.has(index) ? (
-                            <Check className="w-5 h-5 text-green-600" />
+                            <Check className="w-5 h-5 text-success" />
                           ) : (
                             <div className="w-5 h-5 border-2 border-gray-300 rounded"></div>
                           )}
@@ -771,7 +771,7 @@ export default function Calendar() {
                   <Button
                     onClick={handleConfirmImport}
                     disabled={selectedEvents.size === 0 || bulkCreateMutation.isPending}
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                    className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70"
                   >
                     {bulkCreateMutation.isPending ? 'Importando...' : `Importar ${selectedEvents.size} Eventos`}
                   </Button>
@@ -838,13 +838,13 @@ export default function Calendar() {
                       <p className="text-xs text-red-600 mt-1">Feriados, datas comemorativas e eventos escolares de {updateYear}</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-green-200 bg-green-50">
+                  <Card className="border-success/30 bg-success/10">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm text-green-700">Eventos a Adicionar</CardTitle>
+                      <CardTitle className="text-sm text-success">Eventos a Adicionar</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-2xl font-bold text-green-600">{newYearEvents.length}</p>
-                      <p className="text-xs text-green-600 mt-1">Novos eventos do calendário escolar</p>
+                      <p className="text-2xl font-bold text-success">{newYearEvents.length}</p>
+                      <p className="text-xs text-success/80 mt-1">Novos eventos do calendário escolar</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -879,7 +879,7 @@ export default function Calendar() {
               <Button
                 onClick={handleConfirmUpdate}
                 disabled={newYearEvents.length === 0 || updateAnnualMutation.isPending}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
                 {updateAnnualMutation.isPending ? 'Aplicando...' : 'Aplicar Atualização'}
               </Button>
