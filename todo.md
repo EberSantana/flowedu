@@ -5353,3 +5353,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover/desabilitar dependência do OAuth Manus (flag USE_STANDALONE_AUTH)
 - [x] Documentar configuração de SMTP para envio de e-mails
 - [x] Testar fluxo completo de autenticação
+
+- [x] Padronizar botão "Tema" no menu lateral para ficar consistente com outros itens

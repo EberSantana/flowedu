@@ -670,9 +670,9 @@ export default function Sidebar() {
                     <span className="text-sm">Refazer Tour</span>
                   </button>
                   
-                  <div className="flex items-center gap-3 px-4 py-2">
+                  <div className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200 cursor-pointer">
                     <ThemeSelectorCompact />
-                    <span className="text-sm text-muted-foreground">Tema</span>
+                    <span className="text-sm">Tema</span>
                   </div>
                   
                   {isStudent && (
