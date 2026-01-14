@@ -5267,3 +5267,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Criar banco de templates de casos reais por área (matemática, português, etc.)
 - [ ] Adicionar preview das perguntas antes de salvar o exercício
 - [ ] Implementar sistema de aprovação/rejeição de perguntas pelo professor
+
+## 📝 Botão de Revisão de Questões
+
+- [x] Adicionar botão "Revisar Questões" no card do exercício (ao lado de "Tentar Novamente")
+- [x] Criar página mostrando todas as tentativas anteriores
+- [x] Exibir questões, respostas do aluno e respostas corretas lado a lado
+- [x] Mostrar pontuação de cada tentativa
+- [x] Adicionar navegação entre tentativas (se houver múltiplas)
+- [x] Destacar questões que o aluno errou vs acertou
+- [x] Criar rota backend getExerciseHistory para buscar histórico completo
+- [x] Adicionar rota /student-exercises/:id/review no frontend

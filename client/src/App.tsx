@@ -44,6 +44,7 @@ import StudentProfilePage from "./pages/StudentProfilePage";
 import StudentExercises from "./pages/StudentExercises";
 import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
 import StudentExerciseResults from "./pages/StudentExerciseResults";
+import StudentExerciseReview from "./pages/StudentExerciseReview";
 import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
 
 import StudentReview from "./pages/StudentReview";
@@ -109,6 +110,7 @@ function Router() {
         <Route path={"/student-exercises"} component={StudentExercises} />
         <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
         <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
+        <Route path={"/student-exercises/:id/review"} component={StudentExerciseReview} />
         <Route path={"/student-review"} component={StudentReview} />
         <Route path={"/student/smart-review"} component={StudentSmartReview} />
         <Route path={"/student/smart-review/:id"} component={StudentSmartReviewItem} />

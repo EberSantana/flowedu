@@ -4737,6 +4737,63 @@ JSON (descrições MAX 15 chars):
         const history = await db.getStudentExerciseHistory(studentId, input.subjectId);
         return history;
       }),
+
+    // Histórico de tentativas de um exercício específico
+    getExerciseHistory: studentProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const studentId = ctx.studentSession.studentId;
+        if (!studentId) throw new TRPCError({ code: "UNAUTHORIZED", message: "Student ID not found" });
+        
+        // Buscar informações do exercício
+        const exercise = await db.getExerciseDetails(input.exerciseId, studentId);
+        if (!exercise) throw new TRPCError({ code: "NOT_FOUND", message: "Exercise not found" });
+        
+        // Buscar todas as tentativas do aluno neste exercício
+        const { studentExerciseAttempts } = await import('../drizzle/schema');
+        const { db: drizzleDb } = await import('./db');
+        const { eq, and, desc } = await import('drizzle-orm');
+        
+        const attempts = await drizzleDb
+          .select()
+          .from(studentExerciseAttempts)
+          .where(
+            and(
+              eq(studentExerciseAttempts.exerciseId, input.exerciseId),
+              eq(studentExerciseAttempts.studentId, studentId),
+              eq(studentExerciseAttempts.status, 'completed')
+            )
+          )
+          .orderBy(desc(studentExerciseAttempts.completedAt));
+        
+        // Para cada tentativa, buscar as respostas detalhadas
+        const attemptsWithResponses = await Promise.all(
+          attempts.map(async (attempt: any) => {
+            const results = await db.getExerciseResults(attempt.id);
+            return {
+              id: attempt.id,
+              attemptNumber: attempt.attemptNumber,
+              score: attempt.score,
+              correctAnswers: attempt.correctAnswers,
+              totalQuestions: attempt.totalQuestions,
+              submittedAt: attempt.completedAt || attempt.startedAt,
+              status: attempt.status,
+              responses: results?.questions || []
+            };
+          })
+        );
+        
+        return {
+          exercise: {
+            id: exercise.id,
+            title: exercise.title,
+            description: exercise.description,
+            passingScore: exercise.passingScore,
+            totalQuestions: exercise.totalQuestions
+          },
+          attempts: attemptsWithResponses
+        };
+      }),
   }),
 
   // Rotas do professor para gerenciar exercícios

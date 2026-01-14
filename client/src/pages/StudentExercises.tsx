@@ -334,8 +334,8 @@ export default function StudentExercises() {
                     )}
                   </div>
 
-                  {/* Botão de Ação */}
-                  <div className="mt-6 pt-4 border-t border-gray-200">
+                  {/* Botões de Ação */}
+                  <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
                     <Button
                       onClick={() => handleStartExercise(exercise.id)}
                       disabled={!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts}
@@ -347,6 +347,18 @@ export default function StudentExercises() {
                         ? "Tentar Novamente"
                         : "Iniciar Exercício"}
                     </Button>
+                    
+                    {/* Botão de Revisão - só aparece se houver tentativas */}
+                    {exercise.attempts > 0 && (
+                      <Button
+                        onClick={() => setLocation(`/student-exercises/${exercise.id}/review`)}
+                        variant="outline"
+                        className="w-full h-11 text-sm font-medium border-2 border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Revisar Questões
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
