@@ -1,0 +1,17 @@
+{
+  "query": "SELECT * FROM dashboard_preferences LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM dashboard_preferences LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "1",
+      "quickActionsConfig": "[{\"id\":\"new-subject\",\"label\":\"Nova Disciplina\",\"icon\":\"Plus\",\"href\":\"/subjects\",\"color\":\"from-blue-500 to-blue-600\",\"enabled\":true},{\"id\":\"schedule\",\"label\":\"Grade Completa\",\"icon\":\"Calendar\",\"href\":\"/schedule\",\"color\":\"from-purple-500 to-purple-600\",\"enabled\":true},{\"id\":\"reports\",\"label\":\"Relatórios\",\"icon\":\"BarChart3\",\"href\":\"/reports\",\"color\":\"from-green-500 to-green-600\",\"enabled\":true},{\"id\":\"tasks\",\"label\":\"Tarefas\",\"icon\":\"CheckSquare\",\"href\":\"/tasks\",\"color\":\"from-teal-500 to-teal-600\",\"enabled\":true},{\"id\":\"announcements\",\"label\":\"Avisos\",\"icon\":\"Bell\",\"href\":\"/announcements\",\"color\":\"from-red-500 to-red-600\",\"enabled\":true},{\"id\":\"classes\",\"label\":\"Turmas\",\"icon\":\"Users\",\"href\":\"/classes\",\"color\":\"from-orange-500 to-orange-600\",\"enabled\":true},{\"id\":\"calendar\",\"label\":\"Calendário\",\"icon\":\"CalendarDays\",\"href\":\"/calendar\",\"color\":\"from-pink-500 to-pink-600\",\"enabled\":true},{\"id\":\"methodologies\",\"label\":\"Metodologias\",\"icon\":\"Lightbulb\",\"href\":\"/active-methodologies\",\"color\":\"from-amber-500 to-amber-600\",\"enabled\":true},{\"id\":\"learning-paths\",\"label\":\"Trilhas\",\"icon\":\"TrendingUp\",\"href\":\"/learning-paths\",\"color\":\"from-indigo-500 to-indigo-600\",\"enabled\":true}]",
+      "createdAt": "2026-01-05 19:57:08",
+      "updatedAt": "2026-01-05 19:57:08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tquickActionsConfig\tcreatedAt\tupdatedAt\n1\t1\t[{\"id\":\"new-subject\",\"label\":\"Nova Disciplina\",\"icon\":\"Plus\",\"href\":\"/subjects\",\"color\":\"from-blue-500 to-blue-600\",\"enabled\":true},{\"id\":\"schedule\",\"label\":\"Grade Completa\",\"icon\":\"Calendar\",\"href\":\"/schedule\",\"color\":\"from-purple-500 to-purple-600\",\"enabled\":true},{\"id\":\"reports\",\"label\":\"Relatórios\",\"icon\":\"BarChart3\",\"href\":\"/reports\",\"color\":\"from-green-500 to-green-600\",\"enabled\":true},{\"id\":\"tasks\",\"label\":\"Tarefas\",\"icon\":\"CheckSquare\",\"href\":\"/tasks\",\"color\":\"from-teal-500 to-teal-600\",\"enabled\":true},{\"id\":\"announcements\",\"label\":\"Avisos\",\"icon\":\"Bell\",\"href\":\"/announcements\",\"color\":\"from-red-500 to-red-600\",\"enabled\":true},{\"id\":\"classes\",\"label\":\"Turmas\",\"icon\":\"Users\",\"href\":\"/classes\",\"color\":\"from-orange-500 to-orange-600\",\"enabled\":true},{\"id\":\"calendar\",\"label\":\"Calendário\",\"icon\":\"CalendarDays\",\"href\":\"/calendar\",\"color\":\"from-pink-500 to-pink-600\",\"enabled\":true},{\"id\":\"methodologies\",\"label\":\"Metodologias\",\"icon\":\"Lightbulb\",\"href\":\"/active-methodologies\",\"color\":\"from-amber-500 to-amber-600\",\"enabled\":true},{\"id\":\"learning-paths\",\"label\":\"Trilhas\",\"icon\":\"TrendingUp\",\"href\":\"/learning-paths\",\"color\":\"from-indigo-500 to-indigo-600\",\"enabled\":true}]\t2026-01-05 19:57:08\t2026-01-05 19:57:08\n",
+  "stderr": "",
+  "execution_time_ms": 98
+}

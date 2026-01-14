@@ -5373,3 +5373,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Conectar com endpoint de redefinição de senha
 - [x] Registrar rota /redefinir-senha no App.tsx
 - [x] Testar fluxo completo de redefinição
+
+- [x] Corrigir cores das Ações Rápidas para seguir a paleta de cores do tema (OKLCH)

@@ -185,13 +185,17 @@ export default function Dashboard() {
     if (preferences?.actions) {
       setQuickActions(preferences.actions);
     } else {
-      // Ações padrão se não houver preferências salvas - usando variáveis do tema
+      // Ações padrão se não houver preferências salvas - usando cores do tema
       setQuickActions([
-        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-primary to-primary/80", enabled: true },
-        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-accent to-accent/80", enabled: true },
-        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-success to-success/80", enabled: true },
-        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-info to-info/80", enabled: true },
-        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-destructive to-destructive/80", enabled: true },
+        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-[oklch(0.45_0.03_240)] to-[oklch(0.40_0.03_240)]", enabled: true },
+        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-[oklch(0.50_0.04_240)] to-[oklch(0.45_0.04_240)]", enabled: true },
+        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-[oklch(0.55_0.06_150)] to-[oklch(0.50_0.06_150)]", enabled: true },
+        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-[oklch(0.52_0.05_235)] to-[oklch(0.47_0.05_235)]", enabled: true },
+        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-[oklch(0.50_0.12_20)] to-[oklch(0.45_0.12_20)]", enabled: true },
+        { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "from-[oklch(0.55_0.05_200)] to-[oklch(0.50_0.05_200)]", enabled: true },
+        { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "from-[oklch(0.52_0.05_280)] to-[oklch(0.47_0.05_280)]", enabled: true },
+        { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/methodologies", color: "from-[oklch(0.65_0.08_80)] to-[oklch(0.60_0.08_80)]", enabled: true },
+        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/trails", color: "from-[oklch(0.54_0.04_320)] to-[oklch(0.49_0.04_320)]", enabled: true },
       ]);
     }
   }, [preferences]);
