@@ -5357,3 +5357,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Padronizar botão "Tema" no menu lateral para ficar consistente com outros itens
 
 - [x] Remover tour duplicado - deixar apenas OnboardingTour (Shepherd.js)
+
+- [x] Corrigir botão Tema - padronizar visual e fazer clique funcionar em toda a área

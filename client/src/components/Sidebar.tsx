@@ -40,7 +40,8 @@ import NotificationBell from "@/components/NotificationBell";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Search, Command as CommandIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ThemeSelectorCompact } from "@/components/ThemeSelector";
+import { ThemeSelector, ThemeSelectorCompact } from "@/components/ThemeSelector";
+import { Palette } from "lucide-react";
 import { HoverSubmenu } from "@/components/HoverSubmenu";
 import {
   Tooltip,
@@ -670,10 +671,14 @@ export default function Sidebar() {
                     <span className="text-sm">Refazer Tour</span>
                   </button>
                   
-                  <div className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200 cursor-pointer">
-                    <ThemeSelectorCompact />
-                    <span className="text-sm">Tema</span>
-                  </div>
+                  <ThemeSelector
+                    trigger={
+                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200">
+                        <Palette className="h-4 w-4" />
+                        <span className="text-sm">Tema</span>
+                      </button>
+                    }
+                  />
                   
                   {isStudent && (
                     <button
