@@ -13,11 +13,17 @@ import {
   ChevronRight,
   FileText,
   Award,
-  Target
+  Target,
+  TrendingUp,
+  AlertCircle,
+  Lightbulb,
+  BookOpen,
+  Sparkles
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import StudentLayout from "@/components/StudentLayout";
 import { useLocation } from "wouter";
+import { Progress } from "@/components/ui/progress";
 
 export default function StudentExerciseReview() {
   const params = useParams();
@@ -62,6 +68,7 @@ export default function StudentExerciseReview() {
 
   const currentAttempt = history.attempts[selectedAttemptIndex];
   const exercise = history.exercise;
+  const correctPercentage = (currentAttempt.correctAnswers / currentAttempt.totalQuestions) * 100;
 
   return (
     <StudentLayout>
@@ -126,92 +133,113 @@ export default function StudentExerciseReview() {
           </Card>
         )}
 
-        {/* Informações da Tentativa */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="border-2">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Award className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-gray-900">{currentAttempt.score}%</p>
-                  <p className="text-sm text-gray-600">Nota obtida</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Target className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {currentAttempt.correctAnswers}/{currentAttempt.totalQuestions}
-                  </p>
-                  <p className="text-sm text-gray-600">Acertos</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-900">
-                    {new Date(currentAttempt.submittedAt).toLocaleDateString('pt-BR')}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {new Date(currentAttempt.submittedAt).toLocaleTimeString('pt-BR', { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Status da Tentativa */}
-        <Card className="mb-8">
+        {/* Resumo Visual de Desempenho */}
+        <Card className="mb-8 overflow-hidden">
+          <div className={`h-2 ${currentAttempt.score >= exercise.passingScore ? 'bg-green-500' : 'bg-red-500'}`} />
           <CardContent className="py-6">
-            <div className="flex items-center justify-center gap-4">
-              {currentAttempt.score >= exercise.passingScore ? (
-                <>
-                  <CheckCircle2 className="w-12 h-12 text-green-600" />
-                  <div>
-                    <p className="text-2xl font-bold text-green-700">Aprovado!</p>
-                    <p className="text-gray-600">
-                      Você atingiu a nota mínima de {exercise.passingScore}%
-                    </p>
+            <div className="grid md:grid-cols-4 gap-6">
+              {/* Nota */}
+              <div className="text-center">
+                <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white text-2xl font-bold ${
+                  currentAttempt.score >= 80 ? 'bg-green-500' :
+                  currentAttempt.score >= 60 ? 'bg-yellow-500' :
+                  currentAttempt.score >= 40 ? 'bg-orange-500' : 'bg-red-500'
+                }`}>
+                  {currentAttempt.score}%
+                </div>
+                <p className="mt-2 text-sm font-medium text-gray-600">Nota Obtida</p>
+              </div>
+
+              {/* Acertos */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                    <span className="text-2xl font-bold text-green-600">{currentAttempt.correctAnswers}</span>
                   </div>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-12 h-12 text-red-600" />
-                  <div>
-                    <p className="text-2xl font-bold text-red-700">Reprovado</p>
-                    <p className="text-gray-600">
-                      Nota mínima necessária: {exercise.passingScore}%
-                    </p>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-2xl font-bold text-gray-600">{currentAttempt.totalQuestions}</span>
+                </div>
+                <Progress 
+                  value={correctPercentage} 
+                  className="h-2 w-32 mx-auto"
+                />
+                <p className="mt-2 text-sm font-medium text-gray-600">Questões Corretas</p>
+              </div>
+
+              {/* Data */}
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                  <Calendar className="w-8 h-8 text-blue-600" />
+                </div>
+                <p className="text-sm font-bold text-gray-900">
+                  {new Date(currentAttempt.submittedAt).toLocaleDateString('pt-BR')}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {new Date(currentAttempt.submittedAt).toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </p>
+              </div>
+
+              {/* Status */}
+              <div className="text-center">
+                {currentAttempt.score >= exercise.passingScore ? (
+                  <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
+                    <Award className="w-8 h-8 text-green-600" />
                   </div>
-                </>
-              )}
+                ) : (
+                  <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-2">
+                    <AlertCircle className="w-8 h-8 text-red-600" />
+                  </div>
+                )}
+                <p className={`text-sm font-bold ${currentAttempt.score >= exercise.passingScore ? 'text-green-600' : 'text-red-600'}`}>
+                  {currentAttempt.score >= exercise.passingScore ? 'APROVADO' : 'REPROVADO'}
+                </p>
+                <p className="text-xs text-gray-600">
+                  Mínimo: {exercise.passingScore}%
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Legenda Visual */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Legenda:</h3>
+          <div className="flex flex-wrap gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-green-500" />
+              <span className="text-sm text-gray-600">Resposta Correta</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-red-500" />
+              <span className="text-sm text-gray-600">Resposta Incorreta</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded border-2 border-green-500 bg-green-50" />
+              <span className="text-sm text-gray-600">Alternativa Correta</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded border-2 border-red-500 bg-red-50" />
+              <span className="text-sm text-gray-600">Sua Resposta (Errada)</span>
+            </div>
+          </div>
+        </div>
+
         {/* Questões e Respostas */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Revisão das Questões</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Revisão das Questões</h2>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <span>{currentAttempt.correctAnswers} certas</span>
+              <span className="mx-2">|</span>
+              <XCircle className="w-4 h-4 text-red-500" />
+              <span>{currentAttempt.totalQuestions - currentAttempt.correctAnswers} erradas</span>
+            </div>
+          </div>
           
           {currentAttempt.responses.map((response: any, index: number) => {
             const isCorrect = response.isCorrect;
@@ -219,41 +247,80 @@ export default function StudentExerciseReview() {
             return (
               <Card 
                 key={response.id || `response-${index}`}
-                className={`border-2 ${
+                className={`relative overflow-hidden transition-all duration-200 hover:shadow-lg ${
                   isCorrect 
-                    ? 'border-green-200 bg-green-50/30' 
-                    : 'border-red-200 bg-red-50/30'
+                    ? 'border-l-4 border-l-green-500 bg-gradient-to-r from-green-50/50 to-white' 
+                    : 'border-l-4 border-l-red-500 bg-gradient-to-r from-red-50/50 to-white'
                 }`}
               >
-                <CardHeader>
+                {/* Indicador Visual Grande */}
+                <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full opacity-10 ${
+                  isCorrect ? 'bg-green-500' : 'bg-red-500'
+                }`} />
+                
+                <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Badge variant="outline" className="text-sm">
-                          Questão {index + 1}
-                        </Badge>
+                      <div className="flex items-center gap-3 mb-3">
+                        {/* Número da Questão com Indicador */}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                          isCorrect ? 'bg-green-500' : 'bg-red-500'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        
+                        {/* Badge de Status */}
                         {isCorrect ? (
-                          <Badge className="bg-green-600">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                            Correta
-                          </Badge>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-700 rounded-full">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span className="text-sm font-semibold">Resposta Correta</span>
+                          </div>
                         ) : (
-                          <Badge variant="destructive">
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Incorreta
-                          </Badge>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-red-100 text-red-700 rounded-full">
+                            <XCircle className="w-4 h-4" />
+                            <span className="text-sm font-semibold">Resposta Incorreta</span>
+                          </div>
                         )}
+                        
+                        {/* Tipo de Questão */}
+                        <Badge variant="outline" className="text-xs">
+                          {response.type === 'objective' || response.questionType === 'objective' 
+                            ? 'Objetiva' 
+                            : response.type === 'subjective' || response.questionType === 'subjective'
+                            ? 'Subjetiva'
+                            : response.type === 'case_study' || response.questionType === 'case_study'
+                            ? 'Estudo de Caso'
+                            : 'PBL'}
+                        </Badge>
                       </div>
-                      <CardTitle className="text-xl">{response.text || response.question}</CardTitle>
+                      
+                      {/* Enunciado da Questão */}
+                      <CardTitle className="text-lg font-medium text-gray-800 leading-relaxed">
+                        {response.text || response.question}
+                      </CardTitle>
+                    </div>
+                    
+                    {/* Ícone Grande de Status */}
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
+                      isCorrect ? 'bg-green-100' : 'bg-red-100'
+                    }`}>
+                      {isCorrect ? (
+                        <CheckCircle2 className="w-7 h-7 text-green-600" />
+                      ) : (
+                        <XCircle className="w-7 h-7 text-red-600" />
+                      )}
                     </div>
                   </div>
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-0">
                   {/* Contexto do Caso (se houver) */}
                   {response.caseContext && (
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm font-semibold text-blue-900 mb-2">Contexto do Caso:</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookOpen className="w-4 h-4 text-blue-600" />
+                        <p className="text-sm font-semibold text-blue-900">Contexto do Caso:</p>
+                      </div>
                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
                         {response.caseContext}
                       </p>
@@ -263,34 +330,73 @@ export default function StudentExerciseReview() {
                   {/* Opções (para questões objetivas) */}
                   {(response.type === 'objective' || response.questionType === 'objective') && response.options && response.options.length > 0 && (
                     <div className="space-y-2">
-                      <p className="font-semibold text-sm text-gray-700">Alternativas:</p>
+                      <p className="font-semibold text-sm text-gray-700 mb-3">Alternativas:</p>
                       {response.options.map((option: string, optIdx: number) => {
-                        const isStudentAnswer = response.studentAnswer === option;
-                        const isCorrectAnswer = response.correctAnswer === option;
+                        const optionLetter = String.fromCharCode(65 + optIdx); // A, B, C, D...
+                        const isStudentAnswer = response.studentAnswer === option || 
+                                               response.studentAnswer === optionLetter ||
+                                               response.studentAnswer?.includes(option);
+                        const isCorrectAnswer = response.correctAnswer === option ||
+                                               response.correctAnswer === optionLetter ||
+                                               response.correctAnswer?.includes(option);
+                        
+                        let bgClass = 'bg-gray-50 border-gray-200 hover:bg-gray-100';
+                        let textClass = 'text-gray-700';
+                        let iconElement = null;
+                        
+                        if (isCorrectAnswer) {
+                          bgClass = 'bg-green-50 border-green-400 border-2';
+                          textClass = 'text-green-800 font-semibold';
+                          iconElement = <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />;
+                        } else if (isStudentAnswer) {
+                          bgClass = 'bg-red-50 border-red-400 border-2';
+                          textClass = 'text-red-800 font-semibold';
+                          iconElement = <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />;
+                        }
                         
                         return (
                           <div
                             key={`${response.id || index}-option-${optIdx}`}
-                            className={`p-3 rounded-lg border-2 ${
-                              isCorrectAnswer
-                                ? 'border-green-500 bg-green-50'
-                                : isStudentAnswer
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-gray-200 bg-white'
-                            }`}
+                            className={`p-3 rounded-lg border transition-colors ${bgClass}`}
                           >
-                            <div className="flex items-center gap-2">
-                              {isCorrectAnswer && (
-                                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                              )}
-                              {isStudentAnswer && !isCorrectAnswer && (
-                                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                              )}
-                              <span className={`text-sm ${
-                                isCorrectAnswer || isStudentAnswer ? 'font-semibold' : ''
+                            <div className="flex items-center gap-3">
+                              {/* Letra da Alternativa */}
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                isCorrectAnswer 
+                                  ? 'bg-green-500 text-white' 
+                                  : isStudentAnswer 
+                                  ? 'bg-red-500 text-white'
+                                  : 'bg-gray-200 text-gray-600'
                               }`}>
+                                {optionLetter}
+                              </div>
+                              
+                              {/* Texto da Alternativa */}
+                              <span className={`flex-1 text-sm ${textClass}`}>
                                 {option}
                               </span>
+                              
+                              {/* Ícone de Status */}
+                              {iconElement}
+                              
+                              {/* Labels */}
+                              <div className="flex gap-2">
+                                {isCorrectAnswer && (
+                                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                    Correta
+                                  </span>
+                                )}
+                                {isStudentAnswer && !isCorrectAnswer && (
+                                  <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                                    Sua resposta
+                                  </span>
+                                )}
+                                {isStudentAnswer && isCorrectAnswer && (
+                                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                    Sua resposta ✓
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
@@ -303,15 +409,31 @@ export default function StudentExerciseReview() {
                     response.type === 'case_study' || response.questionType === 'case_study' ||
                     response.type === 'pbl' || response.questionType === 'pbl') && (
                     <div className="space-y-3">
-                      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                        <p className="text-sm font-semibold text-gray-700 mb-2">Sua Resposta:</p>
+                      <div className={`p-4 rounded-lg border-2 ${
+                        isCorrect 
+                          ? 'bg-green-50 border-green-300' 
+                          : 'bg-red-50 border-red-300'
+                      }`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          {isCorrect ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-600" />
+                          )}
+                          <p className={`text-sm font-semibold ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                            Sua Resposta:
+                          </p>
+                        </div>
                         <p className="text-sm text-gray-800 whitespace-pre-wrap">
                           {response.studentAnswer || "Não respondida"}
                         </p>
                       </div>
 
-                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm font-semibold text-green-900 mb-2">Resposta Esperada:</p>
+                      <div className="p-4 bg-green-50 border-2 border-green-300 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          <p className="text-sm font-semibold text-green-800">Resposta Esperada:</p>
+                        </div>
                         <p className="text-sm text-gray-800 whitespace-pre-wrap">
                           {response.correctAnswer}
                         </p>
@@ -322,7 +444,10 @@ export default function StudentExerciseReview() {
                   {/* Explicação */}
                   {response.explanation && (
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm font-semibold text-blue-900 mb-2">Explicação:</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Lightbulb className="w-4 h-4 text-blue-600" />
+                        <p className="text-sm font-semibold text-blue-900">Explicação:</p>
+                      </div>
                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
                         {response.explanation}
                       </p>
@@ -332,7 +457,10 @@ export default function StudentExerciseReview() {
                   {/* Feedback da IA */}
                   {response.aiFeedback && (
                     <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                      <p className="text-sm font-semibold text-purple-900 mb-2">Feedback da IA:</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-4 h-4 text-purple-600" />
+                        <p className="text-sm font-semibold text-purple-900">Feedback da IA:</p>
+                      </div>
                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
                         {response.aiFeedback}
                       </p>
@@ -342,7 +470,10 @@ export default function StudentExerciseReview() {
                   {/* Dicas de Estudo */}
                   {response.studyTips && (
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                      <p className="text-sm font-semibold text-amber-900 mb-2">Dicas de Estudo:</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-amber-600" />
+                        <p className="text-sm font-semibold text-amber-900">Dicas de Estudo:</p>
+                      </div>
                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
                         {response.studyTips}
                       </p>
@@ -353,6 +484,50 @@ export default function StudentExerciseReview() {
             );
           })}
         </div>
+
+        {/* Resumo Final */}
+        <Card className="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 border-2">
+          <CardContent className="py-6">
+            <div className="text-center">
+              <h3 className="text-xl font-bold mb-4">Resumo do Desempenho</h3>
+              <div className="flex justify-center gap-8">
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-2xl font-bold text-green-600">{currentAttempt.correctAnswers}</p>
+                    <p className="text-xs text-gray-600">Acertos</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <XCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-2xl font-bold text-red-600">{currentAttempt.totalQuestions - currentAttempt.correctAnswers}</p>
+                    <p className="text-xs text-gray-600">Erros</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    currentAttempt.score >= exercise.passingScore ? 'bg-green-100' : 'bg-red-100'
+                  }`}>
+                    <Award className={`w-6 h-6 ${
+                      currentAttempt.score >= exercise.passingScore ? 'text-green-600' : 'text-red-600'
+                    }`} />
+                  </div>
+                  <div className="text-left">
+                    <p className={`text-2xl font-bold ${
+                      currentAttempt.score >= exercise.passingScore ? 'text-green-600' : 'text-red-600'
+                    }`}>{currentAttempt.score}%</p>
+                    <p className="text-xs text-gray-600">Nota Final</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Botão de Voltar */}
         <div className="mt-8 text-center">

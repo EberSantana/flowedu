@@ -38,6 +38,7 @@
 - [x] BUG: Caderno de Respostas não está exibindo nenhum conteúdo
 - [x] Remover funcionalidade "Caderno de Respostas" do portal do aluno (Frontend, Backend, Banco de Dados)
 - [x] Corrigir erro de "key" prop no componente StudentExerciseReview - CORRIGIDO: adicionado id único às questões retornadas por getExerciseResults e fallback no key do componente
+- [x] Melhorar interface da página de revisão (StudentExerciseReview) com indicadores visuais claros para respostas certas e erradas
 
 ## 🤖 Sistema de Validação Inteligente de Respostas Abertas
 
