@@ -16,16 +16,17 @@ export interface QuickAction {
   enabled: boolean;
 }
 
+// Cores baseadas nas variáveis do tema para consistência visual
 const DEFAULT_ACTIONS: QuickAction[] = [
-  { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-blue-500 to-blue-600", enabled: true },
-  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-purple-500 to-purple-600", enabled: true },
-  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-green-500 to-green-600", enabled: true },
-  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-teal-500 to-teal-600", enabled: true },
-  { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-red-500 to-red-600", enabled: true },
-  { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "from-orange-500 to-orange-600", enabled: false },
-  { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "from-pink-500 to-pink-600", enabled: false },
-  { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/active-methodologies", color: "from-amber-500 to-amber-600", enabled: false },
-  { id: "learning-paths", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: "from-indigo-500 to-indigo-600", enabled: false },
+  { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-primary to-primary/80", enabled: true },
+  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-accent to-accent/80", enabled: true },
+  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-success to-success/80", enabled: true },
+  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-info to-info/80", enabled: true },
+  { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-destructive to-destructive/80", enabled: true },
+  { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "from-warning to-warning/80", enabled: false },
+  { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "from-chart-1 to-chart-1/80", enabled: false },
+  { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/active-methodologies", color: "from-chart-2 to-chart-2/80", enabled: false },
+  { id: "learning-paths", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: "from-chart-3 to-chart-3/80", enabled: false },
 ];
 
 interface QuickActionsCustomizerProps {

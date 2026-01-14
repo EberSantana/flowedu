@@ -194,13 +194,13 @@ export default function Dashboard() {
     if (preferences?.actions) {
       setQuickActions(preferences.actions);
     } else {
-      // Ações padrão se não houver preferências salvas
+      // Ações padrão se não houver preferências salvas - usando variáveis do tema
       setQuickActions([
-        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-blue-500 to-blue-600", enabled: true },
-        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-purple-500 to-purple-600", enabled: true },
-        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-green-500 to-green-600", enabled: true },
-        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-teal-500 to-teal-600", enabled: true },
-        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-red-500 to-red-600", enabled: true },
+        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-primary to-primary/80", enabled: true },
+        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-accent to-accent/80", enabled: true },
+        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-success to-success/80", enabled: true },
+        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-info to-info/80", enabled: true },
+        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-destructive to-destructive/80", enabled: true },
       ]);
     }
   }, [preferences]);
@@ -341,7 +341,18 @@ export default function Dashboard() {
     return diffDays >= 0 && diffDays <= 7 && (event.eventType === 'school_event' || event.eventType === 'holiday');
   }).slice(0, 5) || [];
 
-  // Dados para gráfico de distribuição semanal
+  // Obter cor do tema via CSS custom property
+  const getThemeColor = (opacity: number = 1) => {
+    if (typeof window === 'undefined') return `rgba(59, 130, 246, ${opacity})`;
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
+    const primaryColor = style.getPropertyValue('--primary').trim();
+    // Converter OKLCH para RGB aproximado ou usar fallback
+    // Por simplicidade, usamos cores que se adaptam ao tema
+    return `oklch(from ${primaryColor || 'oklch(0.55 0.12 230)'} l c h / ${opacity})`;
+  };
+
+  // Dados para gráfico de distribuição semanal - cores adaptativas ao tema
   const weeklyDistribution = {
     labels: DAYS_OF_WEEK,
     datasets: [{
@@ -353,8 +364,8 @@ export default function Dashboard() {
         scheduledClasses?.filter(c => c.dayOfWeek === 3).length || 0,
         scheduledClasses?.filter(c => c.dayOfWeek === 4).length || 0,
       ],
-      borderColor: 'rgb(59, 130, 246)',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+      borderColor: 'var(--chart-1, rgb(59, 130, 246))',
+      backgroundColor: 'color-mix(in oklch, var(--chart-1, rgb(59, 130, 246)) 15%, transparent)',
       fill: true,
       tension: 0.4,
     }]
@@ -581,7 +592,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
-                <Card className="border-l-4 border-l-blue-500">
+                <Card className="border-l-4 border-l-primary">
                   <CardHeader className="pb-3">
                     <Skeleton className="h-4 w-24" />
                   </CardHeader>
@@ -666,7 +677,7 @@ export default function Dashboard() {
           {/* Ações Rápidas */}
           {widgetVisibility.quickActions && (
           <Card className="overflow-hidden" data-tour="quick-actions">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl font-bold text-gray-900">Ações Rápidas</CardTitle>
@@ -689,8 +700,8 @@ export default function Dashboard() {
                   <div
                     className={`group relative overflow-hidden rounded-xl bg-gradient-to-br p-4 shadow-lg transition-all duration-300 ${
                       upcomingClasses && upcomingClasses.length > 0
-                        ? 'from-teal-500 to-teal-600 hover:shadow-xl'
-                        : 'from-gray-400 to-gray-500 opacity-60'
+                        ? 'from-info to-info/80 hover:shadow-xl'
+                        : 'from-muted to-muted/80 opacity-60'
                     }`}
                   >
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -788,7 +799,7 @@ export default function Dashboard() {
             {/* Aulas de Hoje */}
             {widgetVisibility.todayClasses && (
             <Card className="overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
+              <CardHeader className="bg-gradient-to-r from-success/5 to-info/5 border-b">
                 <CardTitle className="text-xl font-bold text-gray-900">Aulas de Hoje</CardTitle>
                 <CardDescription className="text-gray-600">Sua programação de aulas para hoje</CardDescription>
               </CardHeader>
@@ -815,8 +826,8 @@ export default function Dashboard() {
                             {/* Indicador de Data e Dia - Compacto */}
                             <div className={`flex flex-col items-center justify-center rounded-lg px-2.5 py-2 min-w-[70px] shadow-sm transition-transform duration-300 group-hover:scale-105 ${
                               cls.isHoliday
-                                ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700'
-                                : 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
+                                ? 'bg-gradient-to-br from-destructive via-destructive/90 to-destructive/80'
+                                : 'bg-gradient-to-br from-primary via-primary/90 to-primary/80'
                             }`}>
                               <span className="text-[10px] font-bold text-white uppercase tracking-wide">
                                 {cls.dayOfWeek.substring(0, 3)}
@@ -966,8 +977,8 @@ export default function Dashboard() {
 
           {/* Widget: Eventos Próximos do Calendário (3 dias) */}
           {widgetVisibility.upcomingEvents && calendarUpcomingEvents && calendarUpcomingEvents.length > 0 && (
-            <Card className="mb-8 overflow-hidden border-2 border-amber-200 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 border-b-2 border-amber-200">
+            <Card className="mb-8 overflow-hidden border-2 border-warning/30 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-warning/5 via-warning/10 to-destructive/5 border-b-2 border-warning/30">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -977,7 +988,7 @@ export default function Dashboard() {
                     <CardDescription className="text-gray-600">Eventos nos próximos 3 dias</CardDescription>
                   </div>
                   <Link href="/calendar">
-                    <Button variant="outline" size="sm" className="border-amber-300 hover:bg-amber-50">
+                    <Button variant="outline" size="sm" className="border-warning/50 hover:bg-warning/5">
                       Ver Calendário <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
@@ -1062,12 +1073,12 @@ export default function Dashboard() {
 
           {/* Gráfico de Distribuição Semanal */}
           {widgetVisibility.weeklyChart && scheduledClasses && scheduledClasses.length > 0 && (
-            <Card className="border-l-4 border-l-blue-500">
+            <Card className="border-l-4 border-l-primary">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-blue-50">
-                      <BarChart3 className="h-5 w-5 text-blue-600" />
+                    <div className="p-2.5 rounded-xl bg-primary/10">
+                      <BarChart3 className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <CardTitle className="text-lg font-semibold text-gray-900">Distribuição Semanal</CardTitle>
@@ -1075,7 +1086,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-blue-600">{totalScheduledClasses}</div>
+                    <div className="text-2xl font-bold text-primary">{totalScheduledClasses}</div>
                     <div className="text-xs text-gray-500 mt-0.5">aulas/semana</div>
                   </div>
                 </div>
@@ -1092,7 +1103,7 @@ export default function Dashboard() {
                         <div className="text-lg font-bold text-gray-900">{count}</div>
                         <div className="h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                            className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
