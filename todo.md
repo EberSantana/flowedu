@@ -5365,3 +5365,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir cor do texto na caixa "Ir para Próxima Aula" - texto agora visível com cores do tema
 
 - [x] Corrigir legibilidade da frase "Nenhuma aula agendada para hoje" na caixa Ir para Próxima Aula
+
+## Página de Redefinição de Senha
+
+- [x] Criar componente ResetPassword.tsx com design consistente
+- [x] Implementar validação de força da senha (barra de progresso + checklist)
+- [x] Conectar com endpoint de redefinição de senha
+- [x] Registrar rota /redefinir-senha no App.tsx
+- [x] Testar fluxo completo de redefinição

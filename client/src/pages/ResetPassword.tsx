@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Lock, ArrowLeft, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Lock, ArrowLeft, Loader2, CheckCircle, AlertCircle, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { Progress } from "@/components/ui/progress";
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();
@@ -14,6 +15,37 @@ export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Calcular força da senha
+  const passwordStrength = useMemo(() => {
+    if (!newPassword) return { score: 0, label: "", color: "" };
+    
+    let score = 0;
+    const checks = {
+      length: newPassword.length >= 8,
+      lowercase: /[a-z]/.test(newPassword),
+      uppercase: /[A-Z]/.test(newPassword),
+      number: /[0-9]/.test(newPassword),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(newPassword),
+    };
+    
+    if (checks.length) score += 20;
+    if (checks.lowercase) score += 20;
+    if (checks.uppercase) score += 20;
+    if (checks.number) score += 20;
+    if (checks.special) score += 20;
+    
+    if (score <= 20) return { score, label: "Muito fraca", color: "bg-red-500", textColor: "text-red-600" };
+    if (score <= 40) return { score, label: "Fraca", color: "bg-orange-500", textColor: "text-orange-600" };
+    if (score <= 60) return { score, label: "Média", color: "bg-yellow-500", textColor: "text-yellow-600" };
+    if (score <= 80) return { score, label: "Forte", color: "bg-green-500", textColor: "text-green-600" };
+    return { score, label: "Muito forte", color: "bg-emerald-500", textColor: "text-emerald-600" };
+  }, [newPassword]);
+
+  // Verificar se as senhas coincidem
+  const passwordsMatch = newPassword && confirmPassword && newPassword === confirmPassword;
 
   // Extrair token da URL
   useEffect(() => {
@@ -170,35 +202,94 @@ export default function ResetPassword() {
               <div className="space-y-2">
                 <Label htmlFor="newPassword">Nova Senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="newPassword"
-                    type="password"
-                    placeholder="Mínimo 6 caracteres"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mínimo 8 caracteres"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     disabled={resetPassword.isPending}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
+                
+                {/* Indicador de força da senha */}
+                {newPassword && (
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Força da senha:</span>
+                      <span className={`font-medium ${passwordStrength.textColor}`}>
+                        {passwordStrength.label}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${passwordStrength.color} transition-all duration-300`}
+                        style={{ width: `${passwordStrength.score}%` }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-1 text-xs text-muted-foreground">
+                      <div className={`flex items-center gap-1 ${newPassword.length >= 8 ? 'text-green-600' : ''}`}>
+                        {newPassword.length >= 8 ? <CheckCircle className="h-3 w-3" /> : <span className="w-3 h-3 rounded-full border border-muted-foreground/50" />}
+                        8+ caracteres
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[A-Z]/.test(newPassword) ? 'text-green-600' : ''}`}>
+                        {/[A-Z]/.test(newPassword) ? <CheckCircle className="h-3 w-3" /> : <span className="w-3 h-3 rounded-full border border-muted-foreground/50" />}
+                        Maiúscula
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[0-9]/.test(newPassword) ? 'text-green-600' : ''}`}>
+                        {/[0-9]/.test(newPassword) ? <CheckCircle className="h-3 w-3" /> : <span className="w-3 h-3 rounded-full border border-muted-foreground/50" />}
+                        Número
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : ''}`}>
+                        {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? <CheckCircle className="h-3 w-3" /> : <span className="w-3 h-3 rounded-full border border-muted-foreground/50" />}
+                        Especial
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Digite a senha novamente"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10"
+                    className={`pl-10 pr-10 ${confirmPassword && (passwordsMatch ? 'border-green-500 focus-visible:ring-green-500' : 'border-red-500 focus-visible:ring-red-500')}`}
                     disabled={resetPassword.isPending}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
+                {confirmPassword && (
+                  <p className={`text-xs flex items-center gap-1 ${passwordsMatch ? 'text-green-600' : 'text-red-600'}`}>
+                    {passwordsMatch ? (
+                      <><CheckCircle className="h-3 w-3" /> As senhas coincidem</>
+                    ) : (
+                      <><AlertCircle className="h-3 w-3" /> As senhas não coincidem</>
+                    )}
+                  </p>
+                )}
               </div>
 
               <Button 
