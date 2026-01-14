@@ -5289,3 +5289,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Criar novo projeto web para o site do guia
 - [ ] Implementar design responsivo e navegação
 - [ ] Adicionar conteúdo do guia formatado
+
+## 🐛 BUG: Revisão de Exercícios Incompleta
+
+- [x] Perguntas não aparecem na página de revisão
+- [x] Respostas do aluno não aparecem
+- [x] Feedbacks da IA não aparecem
+- [x] Investigar rota getExerciseHistory e dados retornados
+- [x] Corrigir exibição no frontend
+- [x] Adicionar exibição de Feedback da IA e Dicas de Estudo

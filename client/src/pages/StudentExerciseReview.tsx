@@ -244,29 +244,29 @@ export default function StudentExerciseReview() {
                           </Badge>
                         )}
                       </div>
-                      <CardTitle className="text-xl">{response.question.question}</CardTitle>
+                      <CardTitle className="text-xl">{response.text || response.question}</CardTitle>
                     </div>
                   </div>
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
                   {/* Contexto do Caso (se houver) */}
-                  {response.question.caseContext && (
+                  {response.caseContext && (
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm font-semibold text-blue-900 mb-2">Contexto do Caso:</p>
                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                        {response.question.caseContext}
+                        {response.caseContext}
                       </p>
                     </div>
                   )}
 
                   {/* Opções (para questões objetivas) */}
-                  {response.question.type === 'objective' && response.question.options && (
+                  {(response.type === 'objective' || response.questionType === 'objective') && response.options && response.options.length > 0 && (
                     <div className="space-y-2">
                       <p className="font-semibold text-sm text-gray-700">Alternativas:</p>
-                      {response.question.options.map((option: string, optIdx: number) => {
+                      {response.options.map((option: string, optIdx: number) => {
                         const isStudentAnswer = response.studentAnswer === option;
-                        const isCorrectAnswer = response.question.correctAnswer === option;
+                        const isCorrectAnswer = response.correctAnswer === option;
                         
                         return (
                           <div
@@ -299,9 +299,9 @@ export default function StudentExerciseReview() {
                   )}
 
                   {/* Resposta do Aluno (para questões subjetivas) */}
-                  {(response.question.type === 'subjective' || 
-                    response.question.type === 'case_study' || 
-                    response.question.type === 'pbl') && (
+                  {(response.type === 'subjective' || response.questionType === 'subjective' ||
+                    response.type === 'case_study' || response.questionType === 'case_study' ||
+                    response.type === 'pbl' || response.questionType === 'pbl') && (
                     <div className="space-y-3">
                       <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                         <p className="text-sm font-semibold text-gray-700 mb-2">Sua Resposta:</p>
@@ -313,18 +313,38 @@ export default function StudentExerciseReview() {
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                         <p className="text-sm font-semibold text-green-900 mb-2">Resposta Esperada:</p>
                         <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                          {response.question.correctAnswer}
+                          {response.correctAnswer}
                         </p>
                       </div>
                     </div>
                   )}
 
                   {/* Explicação */}
-                  {response.question.explanation && (
+                  {response.explanation && (
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm font-semibold text-blue-900 mb-2">Explicação:</p>
                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                        {response.question.explanation}
+                        {response.explanation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Feedback da IA */}
+                  {response.aiFeedback && (
+                    <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                      <p className="text-sm font-semibold text-purple-900 mb-2">Feedback da IA:</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {response.aiFeedback}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Dicas de Estudo */}
+                  {response.studyTips && (
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-sm font-semibold text-amber-900 mb-2">Dicas de Estudo:</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {response.studyTips}
                       </p>
                     </div>
                   )}
