@@ -118,7 +118,7 @@ export default function StudentLearningPathDetail() {
       case 'completed':
         return <CheckCircle2 className="w-5 h-5 text-green-600" />;
       case 'in_progress':
-        return <Play className="w-5 h-5 text-blue-600" />;
+        return <Play className="w-5 h-5 text-primary" />;
       default:
         return <Circle className="w-5 h-5 text-gray-400" />;
     }
@@ -205,7 +205,7 @@ export default function StudentLearningPathDetail() {
               </p>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold text-blue-600">{progressPercentage}%</div>
+              <div className="text-4xl font-bold text-primary">{progressPercentage}%</div>
               <div className="text-sm text-gray-600">Progresso Geral</div>
             </div>
           </div>
@@ -220,11 +220,11 @@ export default function StudentLearningPathDetail() {
             const moduleProgress = module.topics?.length ? Math.round((moduleCompletedTopics / module.topics.length) * 100) : 0;
 
             return (
-              <Card key={module.id} className="bg-white shadow-lg border-l-4 border-l-blue-500">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+              <Card key={module.id} className="bg-white shadow-lg border-l-4 border-l-primary">
+                <CardHeader className="bg-gradient-to-r from-accent/10 to-primary/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                         {moduleIndex + 1}
                       </div>
                       <div>
@@ -234,7 +234,7 @@ export default function StudentLearningPathDetail() {
                         )}
                       </div>
                     </div>
-                    <Badge className="bg-blue-100 text-blue-700">
+                    <Badge className="bg-primary/20 text-primary">
                       {moduleCompletedTopics}/{module.topics?.length || 0} tópicos
                     </Badge>
                   </div>
@@ -341,7 +341,7 @@ export default function StudentLearningPathDetail() {
         {selectedTopic && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+              <CardHeader className="bg-gradient-to-r from-accent/10 to-primary/10">
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-2xl">{selectedTopic.title}</CardTitle>
@@ -364,7 +364,7 @@ export default function StudentLearningPathDetail() {
                 {selectedTopic.materials && selectedTopic.materials.length > 0 && (
                   <div>
                     <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <BookOpen className="w-5 h-5 text-blue-600" />
+                      <BookOpen className="w-5 h-5 text-primary" />
                       Materiais de Estudo
                     </h3>
                     <div className="space-y-2">
@@ -373,7 +373,7 @@ export default function StudentLearningPathDetail() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {material.type === 'video' && <Video className="w-4 h-4 text-red-600" />}
-                              {material.type === 'pdf' && <FileText className="w-4 h-4 text-blue-600" />}
+                              {material.type === 'pdf' && <FileText className="w-4 h-4 text-primary" />}
                               {material.type === 'link' && <Zap className="w-4 h-4 text-purple-600" />}
                               <span className="text-sm font-medium">{material.title}</span>
                             </div>

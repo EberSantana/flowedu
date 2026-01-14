@@ -67,11 +67,11 @@ export default function ResetPassword() {
   // Loading state
   if (validatingToken) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-12 h-12 text-purple-600 animate-spin" />
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
               <p className="text-gray-600">Validando link de recuperação...</p>
             </div>
           </CardContent>
@@ -83,7 +83,7 @@ export default function ResetPassword() {
   // Invalid or expired token
   if (!token || (tokenValidation && !tokenValidation.valid)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -101,7 +101,7 @@ export default function ResetPassword() {
             
             <div className="flex gap-2">
               <Link href="/esqueci-senha" className="flex-1">
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                <Button className="w-full bg-primary hover:bg-primary/90">
                   Solicitar Novo Link
                 </Button>
               </Link>
@@ -120,7 +120,7 @@ export default function ResetPassword() {
   // Success state
   if (resetSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -133,7 +133,7 @@ export default function ResetPassword() {
           </CardHeader>
           <CardContent>
             <Link href="/login-professor">
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button className="w-full bg-primary hover:bg-primary/90">
                 Ir para Login
               </Button>
             </Link>
@@ -145,7 +145,7 @@ export default function ResetPassword() {
 
   // Reset password form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Botão Voltar */}
         <Link href="/login-professor">
@@ -157,8 +157,8 @@ export default function ResetPassword() {
 
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-              <Lock className="w-8 h-8 text-purple-600" />
+            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+              <Lock className="w-8 h-8 text-primary" />
             </div>
             <CardTitle className="text-2xl">Redefinir Senha</CardTitle>
             <CardDescription>
@@ -203,7 +203,7 @@ export default function ResetPassword() {
 
               <Button 
                 type="submit" 
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-primary hover:bg-primary/90"
                 disabled={resetPassword.isPending}
               >
                 {resetPassword.isPending ? (

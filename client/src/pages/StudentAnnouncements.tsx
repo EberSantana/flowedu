@@ -34,7 +34,7 @@ export function StudentAnnouncements() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">

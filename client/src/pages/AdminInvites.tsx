@@ -173,7 +173,7 @@ export default function AdminInvites() {
             {/* Aba: Códigos de Convite */}
             <TabsContent value="invites" className="space-y-4">
               <Card className="border-0 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
+                <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-accent/10 to-primary/10 rounded-t-lg">
                   <div>
                     <CardTitle className="text-xl text-gray-800">Códigos de Convite</CardTitle>
                     <CardDescription className="text-gray-600">

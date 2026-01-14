@@ -79,7 +79,7 @@ export default function StudentLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Botão Voltar */}
         <div className="mb-6">
@@ -97,7 +97,7 @@ export default function StudentLogin() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <GraduationCap className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -145,7 +145,7 @@ export default function StudentLogin() {
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-primary hover:bg-primary/90"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -160,12 +160,12 @@ export default function StudentLogin() {
           </form>
 
           {/* Informações Adicionais */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-800">
+          <div className="mt-6 p-4 bg-accent/10 rounded-lg border border-accent/30">
+            <p className="text-sm text-foreground">
               <strong>Primeira vez acessando?</strong><br />
               Use sua matrícula como usuário e senha. Exemplo: se sua matrícula é "2024001", use:
             </p>
-            <ul className="text-sm text-blue-700 mt-2 space-y-1">
+            <ul className="text-sm text-muted-foreground mt-2 space-y-1">
               <li>• <strong>Matrícula:</strong> 2024001</li>
               <li>• <strong>Senha:</strong> 2024001</li>
             </ul>

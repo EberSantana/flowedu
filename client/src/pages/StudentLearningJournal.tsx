@@ -94,7 +94,7 @@ export default function StudentLearningJournal() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function StudentLearningJournal() {
                 </div>
                 <div>
                   <h1 className="text-4xl font-bold">Diário de Aprendizagem</h1>
-                  <p className="text-blue-100 mt-1">
+                  <p className="text-primary-foreground/80 mt-1">
                     Registre suas reflexões, anotações e insights sobre cada tópico estudado
                   </p>
                 </div>
@@ -111,7 +111,7 @@ export default function StudentLearningJournal() {
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-white text-blue-600 hover:bg-blue-50">
+                  <Button className="bg-white text-primary hover:bg-primary/10">
                     <Plus className="w-4 h-4 mr-2" />
                     Nova Entrada
                   </Button>
@@ -208,7 +208,7 @@ export default function StudentLearningJournal() {
         <div className="container mx-auto py-8 px-4 max-w-4xl">
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
               <p className="mt-4 text-gray-600">Carregando diário...</p>
             </div>
           ) : entries && entries.length > 0 ? (

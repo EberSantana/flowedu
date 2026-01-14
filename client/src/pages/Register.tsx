@@ -72,7 +72,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-accent/10 via-primary/10 to-accent/20 flex items-center justify-center p-4">
       <div className="max-w-lg w-full">
         {/* Botão Voltar */}
         <div className="mb-6">
@@ -88,7 +88,7 @@ export default function Register() {
 
         <Card className="shadow-xl">
           <CardHeader className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <UserPlus className="w-8 h-8 text-white" />
             </div>
             <CardTitle className="text-2xl">Cadastro de Professor</CardTitle>
@@ -204,7 +204,7 @@ export default function Register() {
                 Já tem uma conta?{" "}
                 <a
                   href={getLoginUrl()}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-primary hover:text-primary/80 font-medium"
                 >
                   Fazer login
                 </a>

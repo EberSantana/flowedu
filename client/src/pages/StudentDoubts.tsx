@@ -114,7 +114,7 @@ export default function StudentDoubts() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -123,7 +123,7 @@ export default function StudentDoubts() {
                 </div>
                 <div>
                   <h1 className="text-4xl font-bold">Minhas Dúvidas</h1>
-                  <p className="text-purple-100 mt-1">
+                  <p className="text-primary-foreground/80 mt-1">
                     Envie suas dúvidas aos professores e acompanhe as respostas
                   </p>
                 </div>
@@ -131,7 +131,7 @@ export default function StudentDoubts() {
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-white text-purple-600 hover:bg-purple-50">
+                  <Button className="bg-white text-primary hover:bg-primary/10">
                     <Plus className="w-4 h-4 mr-2" />
                     Nova Dúvida
                   </Button>
@@ -226,10 +226,10 @@ export default function StudentDoubts() {
         <div className="container mx-auto py-8 px-4 max-w-5xl">
           {/* Cards de Estatísticas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="border-l-4 border-l-purple-500">
+            <Card className="border-l-4 border-l-primary">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4 text-purple-500" />
+                  <MessageCircle className="h-4 w-4 text-primary" />
                   Total de Dúvidas
                 </CardTitle>
               </CardHeader>
@@ -269,7 +269,7 @@ export default function StudentDoubts() {
           {/* Lista de Dúvidas */}
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
               <p className="mt-4 text-gray-600">Carregando dúvidas...</p>
             </div>
           ) : doubts && doubts.length > 0 ? (

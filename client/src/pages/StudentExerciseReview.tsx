@@ -90,7 +90,7 @@ export default function StudentExerciseReview() {
 
         {/* Seletor de Tentativas */}
         {history.attempts.length > 1 && (
-          <Card className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
+          <Card className="mb-6 bg-gradient-to-r from-accent/10 to-primary/10 border-2 border-accent/30">
             <CardContent className="py-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -111,7 +111,7 @@ export default function StudentExerciseReview() {
                   </Button>
                   
                   <div className="text-center min-w-[120px]">
-                    <p className="text-2xl font-bold text-purple-700">
+                    <p className="text-2xl font-bold text-primary">
                       Tentativa {selectedAttemptIndex + 1}
                     </p>
                     <p className="text-xs text-gray-600">

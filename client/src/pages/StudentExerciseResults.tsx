@@ -92,7 +92,7 @@ export default function StudentExerciseResults() {
       <div className="container mx-auto py-8 px-4 max-w-5xl">
         {/* Header com resultado geral */}
         <Card className="mb-8 border-t-4 border-t-blue-500 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+          <CardHeader className="bg-gradient-to-r from-accent/10 to-primary/10">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <CardTitle className="text-3xl mb-2 flex items-center gap-3">
