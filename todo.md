@@ -5391,3 +5391,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir cores de fundo dos Avisos
 
 - [x] Corrigir cor do texto "Analisar com IA" no botão para ficar mais legível (text-primary-foreground)
+
+- [x] Alterar cor do texto do botão "Analisar com IA" para preto fixo
