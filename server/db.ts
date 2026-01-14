@@ -10852,3 +10852,22 @@ export async function getMistakeNotebookStats(studentId: number) {
     highPriorityTopics,
   };
 }
+
+export async function getExerciseAttemptsByStudent(exerciseId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const attempts = await db
+    .select()
+    .from(studentExerciseAttempts)
+    .where(
+      and(
+        eq(studentExerciseAttempts.exerciseId, exerciseId),
+        eq(studentExerciseAttempts.studentId, studentId),
+        eq(studentExerciseAttempts.status, 'completed')
+      )
+    )
+    .orderBy(desc(studentExerciseAttempts.completedAt));
+
+  return attempts;
+}

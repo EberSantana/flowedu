@@ -4749,22 +4749,8 @@ JSON (descrições MAX 15 chars):
         const exercise = await db.getExerciseDetails(input.exerciseId, studentId);
         if (!exercise) throw new TRPCError({ code: "NOT_FOUND", message: "Exercise not found" });
         
-        // Buscar todas as tentativas do aluno neste exercício
-        const { studentExerciseAttempts } = await import('../drizzle/schema');
-        const { db: drizzleDb } = await import('./db');
-        const { eq, and, desc } = await import('drizzle-orm');
-        
-        const attempts = await drizzleDb
-          .select()
-          .from(studentExerciseAttempts)
-          .where(
-            and(
-              eq(studentExerciseAttempts.exerciseId, input.exerciseId),
-              eq(studentExerciseAttempts.studentId, studentId),
-              eq(studentExerciseAttempts.status, 'completed')
-            )
-          )
-          .orderBy(desc(studentExerciseAttempts.completedAt));
+        // Buscar tentativas completas do aluno neste exercício
+        const attempts = await db.getExerciseAttemptsByStudent(input.exerciseId, studentId);
         
         // Para cada tentativa, buscar as respostas detalhadas
         const attemptsWithResponses = await Promise.all(
