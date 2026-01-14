@@ -185,18 +185,19 @@ export default function Dashboard() {
     if (preferences?.actions) {
       setQuickActions(preferences.actions);
     } else {
-      // Ações padrão se não houver preferências salvas - usando cor escura do tema (igual Nova Disciplina)
-      const darkColor = "from-[oklch(0.35_0.05_160)] to-[oklch(0.30_0.05_160)]";
+      // Ações padrão se não houver preferências salvas - usando variável CSS do tema
+      // A cor "theme" indica que deve usar a cor do tema dinâmico
+      const themeColor = "theme";
       setQuickActions([
-        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: darkColor, enabled: true },
-        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: darkColor, enabled: true },
-        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: darkColor, enabled: true },
-        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: darkColor, enabled: true },
-        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: darkColor, enabled: true },
-        { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: darkColor, enabled: true },
-        { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: darkColor, enabled: true },
-        { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/methodologies", color: darkColor, enabled: true },
-        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/trails", color: darkColor, enabled: true },
+        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: themeColor, enabled: true },
+        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: themeColor, enabled: true },
+        { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: themeColor, enabled: true },
+        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: themeColor, enabled: true },
+        { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: themeColor, enabled: true },
+        { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: themeColor, enabled: true },
+        { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: themeColor, enabled: true },
+        { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/methodologies", color: themeColor, enabled: true },
+        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/trails", color: themeColor, enabled: true },
       ]);
     }
   }, [preferences]);
@@ -779,9 +780,9 @@ export default function Dashboard() {
                     const IconComponent = (LucideIcons as any)[action.icon] || LucideIcons.HelpCircle;
                     return (
                       <Link key={action.id} href={action.href}>
-                        <div className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${action.color} p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32`}>
+                        <div className={`group relative overflow-hidden rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32 ${action.color === 'theme' ? 'bg-sidebar-primary' : `bg-gradient-to-br ${action.color}`}`}>
                           <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                          <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                          <div className={`relative z-10 flex flex-col items-center justify-center h-full ${action.color === 'theme' ? 'text-sidebar-primary-foreground' : 'text-white'}`}>
                             <IconComponent className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
                             <span className="text-sm font-semibold text-center">{action.label}</span>
                           </div>
