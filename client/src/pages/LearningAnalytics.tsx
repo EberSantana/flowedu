@@ -293,7 +293,7 @@ export function LearningAnalytics() {
                 <Button
                   onClick={handleAnalyzeStudent}
                   disabled={!selectedStudent || isAnalyzing}
-                  className="h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-md"
+                  className="h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-md text-primary-foreground"
                   size="lg"
                 >
                   {isAnalyzing ? (

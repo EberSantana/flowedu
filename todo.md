@@ -5389,3 +5389,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir cores de fundo do Relatório de Desempenho
 - [x] Corrigir cores de fundo das Trilhas de Aprendizagem
 - [x] Corrigir cores de fundo dos Avisos
+
+- [x] Corrigir cor do texto "Analisar com IA" no botão para ficar mais legível (text-primary-foreground)
