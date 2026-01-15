@@ -1,0 +1,40 @@
+{
+  "query": "SELECT m.id, m.title, m.orderIndex, COUNT(t.id) as topicCount FROM learning_modules m LEFT JOIN learning_topics t ON t.moduleId = m.id WHERE m.subjectId = 870001 GROUP BY m.id ORDER BY m.orderIndex;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT m.id, m.title, m.orderIndex, COUNT(t.id) as topicCount FROM learning_modules m LEFT JOIN learning_topics t ON t.moduleId = m.id WHERE m.subjectId = 870001 GROUP BY m.id ORDER BY m.orderIndex;",
+  "rows": [
+    {
+      "id": "540001",
+      "title": "Módulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação",
+      "orderIndex": "0",
+      "topicCount": "4"
+    },
+    {
+      "id": "540002",
+      "title": "Módulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos",
+      "orderIndex": "1",
+      "topicCount": "3"
+    },
+    {
+      "id": "540003",
+      "title": "Módulo 3: Governança, Gestão e Padrões de Segurança",
+      "orderIndex": "2",
+      "topicCount": "3"
+    },
+    {
+      "id": "540004",
+      "title": "Módulo 4: Segurança no Desenvolvimento e Garantia da Aplicação",
+      "orderIndex": "3",
+      "topicCount": "3"
+    },
+    {
+      "id": "540005",
+      "title": "Módulo 5: Auditoria de Sistemas de Informação",
+      "orderIndex": "4",
+      "topicCount": "4"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\torderIndex\ttopicCount\n540001\tMódulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação\t0\t4\n540002\tMódulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos\t1\t3\n540003\tMódulo 3: Governança, Gestão e Padrões de Segurança\t2\t3\n540004\tMódulo 4: Segurança no Desenvolvimento e Garantia da Aplicação\t3\t3\n540005\tMódulo 5: Auditoria de Sistemas de Informação\t4\t4\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

@@ -5731,3 +5731,44 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 | Trilhas | btn-learning-path | Roxo (purple-600) |
 | Exercícios | btn-exercise | Laranja (orange-600) |
 | Estatísticas | btn-stats | Índigo (indigo-600) |
+
+
+## 📚 Trilha de Aprendizagem - Segurança da Informação (15/01/2026)
+
+- [ ] Identificar ID da disciplina no banco de dados
+- [ ] Criar módulos da trilha de aprendizagem
+- [ ] Criar tópicos para cada módulo
+- [ ] Verificar se trilha aparece no portal do aluno
+
+## 🔍 Varredura Completa de Botões com Transparência (15/01/2026)
+
+- [ ] Verificar todas as páginas do portal do professor
+- [ ] Verificar todas as páginas do portal do aluno
+- [ ] Identificar padrões de cores com transparência
+- [ ] Corrigir botões identificados
+
+
+## 📚 Trilha de Aprendizagem - Segurança da Informação (15/01/2026)
+
+- [x] Verificar disciplina Segurança da Informação no banco
+- [x] Confirmar que trilha já existe (5 módulos, 17 tópicos)
+
+**Módulos existentes:**
+1. Fundamentos de Segurança da Informação
+2. Criptografia e Proteção de Dados
+3. Segurança de Redes
+4. Segurança em Aplicações Web
+5. Resposta a Incidentes e Forense Digital
+
+## 🔍 Varredura Completa de Botões com Transparência (15/01/2026)
+
+- [x] Buscar todos os padrões de cores com transparência
+- [x] Identificar botões variant="outline" e variant="ghost"
+- [x] Corrigir componentes base para garantir visibilidade
+- [x] Testar em todas as páginas
+
+**Correções aplicadas no componente Button base:**
+- `outline`: Adicionado `bg-background text-foreground` para garantir visibilidade
+- `ghost`: Adicionado `text-foreground` para garantir cor de texto visível
+
+**Resultado:** Todos os 162 botões outline e 51 botões ghost agora têm cores de texto visíveis automaticamente

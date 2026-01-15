@@ -1,0 +1,78 @@
+{
+  "query": "SELECT m.title as modulo, t.title as topico FROM learning_modules m JOIN learning_topics t ON t.moduleId = m.id WHERE m.subjectId = 870001 ORDER BY m.orderIndex, t.orderIndex LIMIT 25;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT m.title as modulo, t.title as topico FROM learning_modules m JOIN learning_topics t ON t.moduleId = m.id WHERE m.subjectId = 870001 ORDER BY m.orderIndex, t.orderIndex LIMIT 25;",
+  "rows": [
+    {
+      "modulo": "Módulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação",
+      "topico": "Conceitos Fundamentais de Segurança da Informação"
+    },
+    {
+      "modulo": "Módulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação",
+      "topico": "O Ciclo de Vida da Informação e a Segurança"
+    },
+    {
+      "modulo": "Módulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação",
+      "topico": "Classificação e Pilares da Segurança (CIA)"
+    },
+    {
+      "modulo": "Módulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação",
+      "topico": "Aspectos Humanos e Sociais da Segurança"
+    },
+    {
+      "modulo": "Módulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos",
+      "topico": "Segurança do Ambiente Físico"
+    },
+    {
+      "modulo": "Módulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos",
+      "topico": "Segurança do Ambiente Lógico"
+    },
+    {
+      "modulo": "Módulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos",
+      "topico": "Controle de Acesso (Access Control)"
+    },
+    {
+      "modulo": "Módulo 3: Governança, Gestão e Padrões de Segurança",
+      "topico": "Organização e Gestão Corporativa da Segurança"
+    },
+    {
+      "modulo": "Módulo 3: Governança, Gestão e Padrões de Segurança",
+      "topico": "Segurança no Contexto da Governança de TI (COBIT e ITIL)"
+    },
+    {
+      "modulo": "Módulo 3: Governança, Gestão e Padrões de Segurança",
+      "topico": "Padrões Internacionais e Estratégias de Segurança"
+    },
+    {
+      "modulo": "Módulo 4: Segurança no Desenvolvimento e Garantia da Aplicação",
+      "topico": "Segurança no Desenvolvimento de Software (DevSecOps)"
+    },
+    {
+      "modulo": "Módulo 4: Segurança no Desenvolvimento e Garantia da Aplicação",
+      "topico": "Testes de Segurança e Avaliação de Vulnerabilidade"
+    },
+    {
+      "modulo": "Módulo 4: Segurança no Desenvolvimento e Garantia da Aplicação",
+      "topico": "Documentação e Suporte ao Ciclo de Vida"
+    },
+    {
+      "modulo": "Módulo 5: Auditoria de Sistemas de Informação",
+      "topico": "Fundamentos e Tipos de Auditoria em SI"
+    },
+    {
+      "modulo": "Módulo 5: Auditoria de Sistemas de Informação",
+      "topico": "Metodologias e Ferramentas de Auditoria"
+    },
+    {
+      "modulo": "Módulo 5: Auditoria de Sistemas de Informação",
+      "topico": "Técnicas de Auditoria: Testes e Rastreamento"
+    },
+    {
+      "modulo": "Módulo 5: Auditoria de Sistemas de Informação",
+      "topico": "Melhores Práticas e Padrões (ISACA)"
+    }
+  ],
+  "messages": [],
+  "stdout": "modulo\ttopico\nMódulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação\tConceitos Fundamentais de Segurança da Informação\nMódulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação\tO Ciclo de Vida da Informação e a Segurança\nMódulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação\tClassificação e Pilares da Segurança (CIA)\nMódulo 1: Fundamentos e Conceitos Essenciais de Segurança da Informação\tAspectos Humanos e Sociais da Segurança\nMódulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos\tSegurança do Ambiente Físico\nMódulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos\tSegurança do Ambiente Lógico\nMódulo 2: Segurança Aplicada: Ambientes Físicos e Lógicos\tControle de Acesso (Access Control)\nMódulo 3: Governança, Gestão e Padrões de Segurança\tOrganização e Gestão Corporativa da Segurança\nMódulo 3: Governança, Gestão e Padrões de Segurança\tSegurança no Contexto da Governança de TI (COBIT e ITIL)\nMódulo 3: Governança, Gestão e Padrões de Segurança\tPadrões Internacionais e Estratégias de Segurança\nMódulo 4: Segurança no Desenvolvimento e Garantia da Aplicação\tSegurança no Desenvolvimento de Software (DevSecOps)\nMódulo 4: Segurança no Desenvolvimento e Garantia da Aplicação\tTestes de Segurança e Avaliação de Vulnerabilidade\nMódulo 4: Segurança no Desenvolvimento e Garantia da Aplicação\tDocumentação e Suporte ao Ciclo de Vida\nMódulo 5: Auditoria de Sistemas de Informação\tFundamentos e Tipos de Auditoria em SI\nMódulo 5: Auditoria de Sistemas de Informação\tMetodologias e Ferramentas de Auditoria\nMódulo 5: Auditoria de Sistemas de Informação\tTécnicas de Auditoria: Testes e Rastreamento\nMódulo 5: Auditoria de Sistemas de Informação\tMelhores Práticas e Padrões (ISACA)\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}
