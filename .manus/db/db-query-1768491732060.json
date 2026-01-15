@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, code FROM subjects WHERE name LIKE '%QA%' OR name LIKE '%Matemática%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code FROM subjects WHERE name LIKE '%QA%' OR name LIKE '%Matemática%' LIMIT 10;",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "Matemática Teste",
+      "code": "MAT1766800399052"
+    },
+    {
+      "id": "300002",
+      "name": "Matemática Teste",
+      "code": "MAT1766800417394"
+    },
+    {
+      "id": "360001",
+      "name": "Matemática Teste",
+      "code": "MAT001"
+    },
+    {
+      "id": "540001",
+      "name": "Matemática",
+      "code": "MAT-1767578329585"
+    },
+    {
+      "id": "570001",
+      "name": "Matemática",
+      "code": "MAT-1767581814952"
+    },
+    {
+      "id": "600022",
+      "name": "Matemática",
+      "code": "MAT-1767639157258"
+    },
+    {
+      "id": "600038",
+      "name": "Matemática",
+      "code": "MAT-1767640501748"
+    },
+    {
+      "id": "600054",
+      "name": "Matemática",
+      "code": "MAT-1767640641545"
+    },
+    {
+      "id": "600072",
+      "name": "Matemática",
+      "code": "MAT-1767640967048"
+    },
+    {
+      "id": "600091",
+      "name": "Matemática",
+      "code": "MAT-1767641126431"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\n300001\tMatemática Teste\tMAT1766800399052\n300002\tMatemática Teste\tMAT1766800417394\n360001\tMatemática Teste\tMAT001\n540001\tMatemática\tMAT-1767578329585\n570001\tMatemática\tMAT-1767581814952\n600022\tMatemática\tMAT-1767639157258\n600038\tMatemática\tMAT-1767640501748\n600054\tMatemática\tMAT-1767640641545\n600072\tMatemática\tMAT-1767640967048\n600091\tMatemática\tMAT-1767641126431\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

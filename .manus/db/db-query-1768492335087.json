@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO announcements (title, message, isImportant, subjectId, userId, createdAt, updatedAt) VALUES ('Bem-vindo à Disciplina!', 'Olá alunos! Bem-vindos à disciplina de Matemática Básica QA. Fiquem atentos aos materiais e exercícios.', 1, 840001, 2700001, NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO announcements (title, message, isImportant, subjectId, userId, createdAt, updatedAt) VALUES ('Bem-vindo à Disciplina!', 'Olá alunos! Bem-vindos à disciplina de Matemática Básica QA. Fiquem atentos aos materiais e exercícios.', 1, 840001, 2700001, NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 61
+}

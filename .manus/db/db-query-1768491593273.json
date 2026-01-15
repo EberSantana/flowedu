@@ -1,0 +1,100 @@
+{
+  "query": "SELECT se.id, se.studentId, se.subjectId, se.professorId, se.status, st.fullName as student_name, sub.name as subject_name FROM student_enrollments se LEFT JOIN students st ON se.studentId = st.id LEFT JOIN subjects sub ON se.subjectId = sub.id LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.id, se.studentId, se.subjectId, se.professorId, se.status, st.fullName as student_name, sub.name as subject_name FROM student_enrollments se LEFT JOIN students st ON se.studentId = st.id LEFT JOIN subjects sub ON se.subjectId = sub.id LIMIT 10;",
+  "rows": [
+    {
+      "id": "300001",
+      "studentId": "480014",
+      "subjectId": "510009",
+      "professorId": "2010017",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300002",
+      "studentId": "480015",
+      "subjectId": "510010",
+      "professorId": "2010018",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300003",
+      "studentId": "480016",
+      "subjectId": "510011",
+      "professorId": "2010019",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300004",
+      "studentId": "480017",
+      "subjectId": "510012",
+      "professorId": "2010020",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300005",
+      "studentId": "480018",
+      "subjectId": "510013",
+      "professorId": "2010021",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300006",
+      "studentId": "480019",
+      "subjectId": "510014",
+      "professorId": "2010022",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300007",
+      "studentId": "480020",
+      "subjectId": "510015",
+      "professorId": "2010023",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300008",
+      "studentId": "480021",
+      "subjectId": "510016",
+      "professorId": "2010024",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300009",
+      "studentId": "480022",
+      "subjectId": "510017",
+      "professorId": "2010025",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    },
+    {
+      "id": "300010",
+      "studentId": "480023",
+      "subjectId": "510018",
+      "professorId": "2010026",
+      "status": "active",
+      "student_name": "Aluno Teste",
+      "subject_name": "Disciplina Teste"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tprofessorId\tstatus\tstudent_name\tsubject_name\n300001\t480014\t510009\t2010017\tactive\tAluno Teste\tDisciplina Teste\n300002\t480015\t510010\t2010018\tactive\tAluno Teste\tDisciplina Teste\n300003\t480016\t510011\t2010019\tactive\tAluno Teste\tDisciplina Teste\n300004\t480017\t510012\t2010020\tactive\tAluno Teste\tDisciplina Teste\n300005\t480018\t510013\t2010021\tactive\tAluno Teste\tDisciplina Teste\n300006\t480019\t510014\t2010022\tactive\tAluno Teste\tDisciplina Teste\n300007\t480020\t510015\t2010023\tactive\tAluno Teste\tDisciplina Teste\n300008\t480021\t510016\t2010024\tactive\tAluno Teste\tDisciplina Teste\n300009\t480022\t510017\t2010025\tactive\tAluno Teste\tDisciplina Teste\n300010\t480023\t510018\t2010026\tactive\tAluno Teste\tDisciplina Teste\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

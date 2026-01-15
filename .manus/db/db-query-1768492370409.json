@@ -1,0 +1,25 @@
+{
+  "query": "SELECT se.*, st.fullName, st.registrationNumber FROM student_enrollments se JOIN students st ON se.studentId = st.id WHERE st.registrationNumber = '2024001' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.*, st.fullName, st.registrationNumber FROM student_enrollments se JOIN students st ON se.studentId = st.id WHERE st.registrationNumber = '2024001' LIMIT 5;",
+  "rows": [
+    {
+      "id": "450002",
+      "studentId": "1",
+      "subjectId": "840001",
+      "classId": "NULL",
+      "professorId": "2700001",
+      "status": "active",
+      "enrolledAt": "2026-01-15 09:38:58",
+      "completedAt": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-01-15 09:38:58",
+      "updatedAt": "2026-01-15 09:38:58",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "2024001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tclassId\tprofessorId\tstatus\tenrolledAt\tcompletedAt\tnotes\tcreatedAt\tupdatedAt\tfullName\tregistrationNumber\n450002\t1\t840001\tNULL\t2700001\tactive\t2026-01-15 09:38:58\tNULL\tNULL\t2026-01-15 09:38:58\t2026-01-15 09:38:58\tAluno Teste\t2024001\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

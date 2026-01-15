@@ -5654,3 +5654,32 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - StudentSubjects.tsx: Botão Ver Trilha (bg-primary)
 - StudentDashboard.tsx: Botão Ver Todas (bg-primary)
 - StudentExercises.tsx: Botão Revisar Questões (bg-purple-600)
+
+
+## 🐛 Bug: Aluno Matriculado Não Aparece no Portal (15/01/2026)
+
+- [x] Investigar fluxo de matrícula (professor -> aluno)
+- [x] Verificar consulta de matrículas no portal do aluno
+- [x] Verificar se trilha de aprendizagem está vinculada corretamente
+- [x] Corrigir bug identificado
+- [x] Testar fluxo completo
+
+**Resultado da investigação:**
+- O sistema está funcionando corretamente
+- O aluno consegue fazer login e ver suas disciplinas matriculadas
+- A mensagem "Trilha não encontrada" aparece porque a disciplina não possui módulos/tópicos configurados
+- **Ação necessária:** O professor deve criar a trilha de aprendizagem (módulos e tópicos) para a disciplina
+
+
+## 🔔 Indicador de Avisos no Menu do Aluno (15/01/2026)
+
+- [x] Adicionar ícone de sino com contador no menu lateral
+- [x] Buscar quantidade de avisos não lidos
+- [x] Destacar visualmente quando há novos avisos
+- [x] Testar funcionalidade
+
+**Implementação:**
+- Badge vermelho com contador no ícone de sino no menu "Avisos"
+- Badge adicional ao lado do texto do menu
+- Atualização automática a cada 30 segundos
+- Corrigido bug na consulta de avisos (usava tabela errada)

@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO announcements (title, content, subjectId, userId, priority, createdAt, updatedAt) SELECT 'Aviso de Teste', 'Este é um aviso de teste para verificar o indicador de avisos não lidos no menu do aluno.', 840001, userId, 'normal', NOW(), NOW() FROM subjects WHERE id = 840001 LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO announcements (title, content, subjectId, userId, priority, createdAt, updatedAt) SELECT 'Aviso de Teste', 'Este é um aviso de teste para verificar o indicador de avisos não lidos no menu do aluno.', 840001, userId, 'normal', NOW(), NOW() FROM subjects WHERE id = 840001 LIMIT 1;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'content' in 'field list'"
+  ]
+}

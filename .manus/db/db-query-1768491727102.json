@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, subjectId, title FROM learning_modules LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, subjectId, title FROM learning_modules LIMIT 20;",
+  "rows": [
+    {
+      "id": "60007",
+      "subjectId": "7",
+      "title": "Módulo 2: Navegação, Comunicação e Nuvem"
+    },
+    {
+      "id": "60008",
+      "subjectId": "7",
+      "title": "Módulo 3: Produtividade com Editor de Texto (Word/Writer)"
+    },
+    {
+      "id": "60009",
+      "subjectId": "7",
+      "title": "Módulo 4: Análise e Cálculo com Editor de Planilhas (Excel/Calc)"
+    },
+    {
+      "id": "60010",
+      "subjectId": "7",
+      "title": "Módulo 5: Criação de Apresentações Profissionais (PowerPoint/Impress)"
+    },
+    {
+      "id": "60012",
+      "subjectId": "8",
+      "title": "Módulo 2: Internet, Comunicação Digital e Nuvem"
+    },
+    {
+      "id": "60013",
+      "subjectId": "8",
+      "title": "Módulo 3: Produtividade com Editor de Texto (Word Processing)"
+    },
+    {
+      "id": "60014",
+      "subjectId": "8",
+      "title": "Módulo 4: Análise e Cálculo com Editor de Planilhas (Spreadsheets)"
+    },
+    {
+      "id": "60015",
+      "subjectId": "8",
+      "title": "Módulo 5: Criação de Apresentações Profissionais (Slides)"
+    },
+    {
+      "id": "60017",
+      "subjectId": "5",
+      "title": "Módulo 2: Segurança em Aplicações e Ambientes"
+    },
+    {
+      "id": "60018",
+      "subjectId": "5",
+      "title": "Módulo 3: Governança, Padrões e Estratégias de Segurança"
+    },
+    {
+      "id": "60019",
+      "subjectId": "5",
+      "title": "Módulo 4: Segurança no Ciclo de Desenvolvimento de Software (SDLC)"
+    },
+    {
+      "id": "60020",
+      "subjectId": "5",
+      "title": "Módulo 5: Auditoria em Sistemas de Informação"
+    },
+    {
+      "id": "90001",
+      "subjectId": "9",
+      "title": "Módulo Teste"
+    },
+    {
+      "id": "120002",
+      "subjectId": "120001",
+      "title": "Módulo 2: Editor de Texto - Fundamentos e Formatação"
+    },
+    {
+      "id": "120003",
+      "subjectId": "120001",
+      "title": "Módulo 3: Editor de Texto - Estrutura e Layout Avançado"
+    },
+    {
+      "id": "120004",
+      "subjectId": "120001",
+      "title": "Módulo 4: Editor de Planilhas - Cálculo e Análise de Dados"
+    },
+    {
+      "id": "120005",
+      "subjectId": "120001",
+      "title": "Módulo 5: Editor de Apresentação de Slides"
+    },
+    {
+      "id": "120006",
+      "subjectId": "6",
+      "title": "Módulo Teste"
+    },
+    {
+      "id": "120009",
+      "subjectId": "240003",
+      "title": "Módulo Teste"
+    },
+    {
+      "id": "150001",
+      "subjectId": "240006",
+      "title": "Módulo Teste"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsubjectId\ttitle\n60007\t7\tMódulo 2: Navegação, Comunicação e Nuvem\n60008\t7\tMódulo 3: Produtividade com Editor de Texto (Word/Writer)\n60009\t7\tMódulo 4: Análise e Cálculo com Editor de Planilhas (Excel/Calc)\n60010\t7\tMódulo 5: Criação de Apresentações Profissionais (PowerPoint/Impress)\n60012\t8\tMódulo 2: Internet, Comunicação Digital e Nuvem\n60013\t8\tMódulo 3: Produtividade com Editor de Texto (Word Processing)\n60014\t8\tMódulo 4: Análise e Cálculo com Editor de Planilhas (Spreadsheets)\n60015\t8\tMódulo 5: Criação de Apresentações Profissionais (Slides)\n60017\t5\tMódulo 2: Segurança em Aplicações e Ambientes\n60018\t5\tMódulo 3: Governança, Padrões e Estratégias de Segurança\n60019\t5\tMódulo 4: Segurança no Ciclo de Desenvolvimento de Software (SDLC)\n60020\t5\tMódulo 5: Auditoria em Sistemas de Informação\n90001\t9\tMódulo Teste\n120002\t120001\tMódulo 2: Editor de Texto - Fundamentos e Formatação\n120003\t120001\tMódulo 3: Editor de Texto - Estrutura e Layout Avançado\n120004\t120001\tMódulo 4: Editor de Planilhas - Cálculo e Análise de Dados\n120005\t120001\tMódulo 5: Editor de Apresentação de Slides\n120006\t6\tMódulo Teste\n120009\t240003\tMódulo Teste\n150001\t240006\tMódulo Teste\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

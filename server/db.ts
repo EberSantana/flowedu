@@ -2111,7 +2111,8 @@ export async function getAnnouncementsForStudent(studentId: number, subjectId?: 
   if (!db) throw new Error("Database not available");
   
   // Buscar avisos das disciplinas em que o aluno está matriculado
-  const conditions = [eq(subjectEnrollments.studentId, studentId)];
+  // Usar studentEnrollments (tabela correta com dados) em vez de subjectEnrollments
+  const conditions = [eq(studentEnrollments.studentId, studentId)];
   
   // Se subjectId for fornecido, adicionar filtro por disciplina
   if (subjectId !== undefined && subjectId !== null) {
@@ -2130,7 +2131,7 @@ export async function getAnnouncementsForStudent(studentId: number, subjectId?: 
   })
     .from(announcements)
     .innerJoin(subjects, eq(announcements.subjectId, subjects.id))
-    .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, announcements.subjectId))
+    .innerJoin(studentEnrollments, eq(studentEnrollments.subjectId, announcements.subjectId))
     .leftJoin(announcementReads, and(
       eq(announcementReads.announcementId, announcements.id),
       eq(announcementReads.studentId, studentId)
@@ -2145,17 +2146,18 @@ export async function getUnreadAnnouncementsCount(studentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Usar studentEnrollments (tabela correta com dados) em vez de subjectEnrollments
   const result = await db.select({
     count: sql<number>`COUNT(DISTINCT ${announcements.id})`,
   })
     .from(announcements)
-    .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, announcements.subjectId))
+    .innerJoin(studentEnrollments, eq(studentEnrollments.subjectId, announcements.subjectId))
     .leftJoin(announcementReads, and(
       eq(announcementReads.announcementId, announcements.id),
       eq(announcementReads.studentId, studentId)
     ))
     .where(and(
-      eq(subjectEnrollments.studentId, studentId),
+      eq(studentEnrollments.studentId, studentId),
       sql`${announcementReads.id} IS NULL`
     ));
   

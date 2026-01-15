@@ -1,0 +1,162 @@
+{
+  "query": "DESCRIBE students;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute DESCRIBE students;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "userId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "registrationNumber",
+      "Type": "varchar(50)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "fullName",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "avatarSkinTone",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "light",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarKimonoColor",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "white",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarHairStyle",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "short",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarAccessories",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarHairColor",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "black",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarKimonoStyle",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "traditional",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarHeadAccessory",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "none",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarExpression",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "neutral",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarPose",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "standing",
+      "Extra": ""
+    },
+    {
+      "Field": "specialKimono",
+      "Type": "varchar(30)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "none",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarGender",
+      "Type": "enum('male','female')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "male",
+      "Extra": ""
+    },
+    {
+      "Field": "hd2dCharacterId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "hd2dUnlockedCharacters",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nuserId\tint(11)\tNO\tMUL\tNULL\t\nregistrationNumber\tvarchar(50)\tNO\t\tNULL\t\nfullName\tvarchar(255)\tNO\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\navatarSkinTone\tvarchar(20)\tYES\t\tlight\t\navatarKimonoColor\tvarchar(20)\tYES\t\twhite\t\navatarHairStyle\tvarchar(20)\tYES\t\tshort\t\navatarAccessories\ttext\tYES\t\tNULL\t\navatarHairColor\tvarchar(20)\tYES\t\tblack\t\navatarKimonoStyle\tvarchar(20)\tYES\t\ttraditional\t\navatarHeadAccessory\tvarchar(20)\tYES\t\tnone\t\navatarExpression\tvarchar(20)\tYES\t\tneutral\t\navatarPose\tvarchar(20)\tYES\t\tstanding\t\nspecialKimono\tvarchar(30)\tYES\t\tnone\t\navatarGender\tenum('male','female')\tNO\t\tmale\t\nhd2dCharacterId\tint(11)\tNO\t\t1\t\nhd2dUnlockedCharacters\ttext\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

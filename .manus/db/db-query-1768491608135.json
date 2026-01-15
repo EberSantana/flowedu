@@ -1,0 +1,40 @@
+{
+  "query": "SELECT st.id, st.fullName, st.registrationNumber, st.userId FROM students st LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT st.id, st.fullName, st.registrationNumber, st.userId FROM students st LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "2024001",
+      "userId": "300008"
+    },
+    {
+      "id": "60051",
+      "fullName": "ANGELA SABRINA COSTA DA SILVA",
+      "registrationNumber": "2023327800",
+      "userId": "1"
+    },
+    {
+      "id": "60052",
+      "fullName": "DARLESSON COELHO PAULO",
+      "registrationNumber": "2023308313",
+      "userId": "1"
+    },
+    {
+      "id": "60053",
+      "fullName": "DOUGLAS DA SILVA SOUZA",
+      "registrationNumber": "2023312281",
+      "userId": "1"
+    },
+    {
+      "id": "60054",
+      "fullName": "DOUGLAS DANIEL APARICIO",
+      "registrationNumber": "2023317958",
+      "userId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\tregistrationNumber\tuserId\n1\tAluno Teste\t2024001\t300008\n60051\tANGELA SABRINA COSTA DA SILVA\t2023327800\t1\n60052\tDARLESSON COELHO PAULO\t2023308313\t1\n60053\tDOUGLAS DA SILVA SOUZA\t2023312281\t1\n60054\tDOUGLAS DANIEL APARICIO\t2023317958\t1\n",
+  "stderr": "",
+  "execution_time_ms": 47
+}

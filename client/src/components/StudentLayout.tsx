@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { 
   GraduationCap, 
   LogOut, 
@@ -21,11 +22,21 @@ import StudentNotifications from "@/components/StudentNotifications";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { Palette } from "lucide-react";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
+import { trpc } from "@/lib/trpc";
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const { student, loading, logout, isAuthenticated } = useStudentAuth();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Buscar contagem de avisos não lidos - DEVE ficar antes dos early returns
+  const { data: unreadAnnouncementsCount } = trpc.announcements.getUnreadCount.useQuery(
+    undefined,
+    { 
+      refetchInterval: 30000, // Atualiza a cada 30 segundos
+      enabled: isAuthenticated 
+    }
+  );
 
   if (loading) {
     return (
@@ -60,11 +71,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   }
 
   const menuItems = [
-    { icon: Home, label: "Início", path: "/student-dashboard" },
-    { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects" },
-    { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths" },
-    { icon: FileText, label: "Exercícios", path: "/student-exercises" },
-    { icon: Bell, label: "Avisos", path: "/student-announcements" },
+    { icon: Home, label: "Início", path: "/student-dashboard", badge: 0 },
+    { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects", badge: 0 },
+    { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths", badge: 0 },
+    { icon: FileText, label: "Exercícios", path: "/student-exercises", badge: 0 },
+    { icon: Bell, label: "Avisos", path: "/student-announcements", badge: unreadAnnouncementsCount || 0 },
   ];
 
   return (
@@ -113,8 +124,26 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm">{item.label}</span>
+                    <div className="relative">
+                      <item.icon className="w-5 h-5" />
+                      {item.badge > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px] font-bold"
+                        >
+                          {item.badge > 9 ? "9+" : item.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="text-sm flex-1 text-left">{item.label}</span>
+                    {item.badge > 0 && (
+                      <Badge 
+                        variant={isActive ? "secondary" : "destructive"}
+                        className="h-5 min-w-5 flex items-center justify-center text-xs"
+                      >
+                        {item.badge > 99 ? "99+" : item.badge}
+                      </Badge>
+                    )}
                   </button>
                 </Link>
               );
@@ -219,8 +248,26 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm">{item.label}</span>
+                    <div className="relative">
+                      <item.icon className="w-5 h-5" />
+                      {item.badge > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px] font-bold"
+                        >
+                          {item.badge > 9 ? "9+" : item.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="text-sm flex-1 text-left">{item.label}</span>
+                    {item.badge > 0 && (
+                      <Badge 
+                        variant={isActive ? "secondary" : "destructive"}
+                        className="h-5 min-w-5 flex items-center justify-center text-xs"
+                      >
+                        {item.badge > 99 ? "99+" : item.badge}
+                      </Badge>
+                    )}
                   </button>
                 </Link>
               );
