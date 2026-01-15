@@ -7454,6 +7454,31 @@ export async function getStudentDoubts(studentId: number, topicId?: number) {
 }
 
 /**
+ * Deletar dúvida do aluno
+ */
+export async function deleteStudentDoubt(doubtId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se a dúvida pertence ao aluno
+  const [doubt] = await db.select().from(studentTopicDoubts)
+    .where(and(
+      eq(studentTopicDoubts.id, doubtId),
+      eq(studentTopicDoubts.studentId, studentId)
+    ));
+  
+  if (!doubt) {
+    throw new Error("Dúvida não encontrada ou sem permissão");
+  }
+  
+  // Deletar a dúvida
+  await db.delete(studentTopicDoubts)
+    .where(eq(studentTopicDoubts.id, doubtId));
+  
+  return { success: true };
+}
+
+/**
  * Buscar dúvidas pendentes para o professor
  */
 export async function getPendingDoubts(professorId: number, subjectId?: number) {
@@ -7594,12 +7619,9 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
       inArray(studentLearningJournal.topicId, topicIds)
     ));
   
-  // Buscar dúvidas
+  // Buscar dúvidas - buscar todas as dúvidas do aluno (independente do tópico)
   const doubts = await db.select().from(studentTopicDoubts)
-    .where(and(
-      eq(studentTopicDoubts.studentId, studentId),
-      inArray(studentTopicDoubts.topicId, topicIds)
-    ));
+    .where(eq(studentTopicDoubts.studentId, studentId));
   
   const completedTopics = progress.filter(p => p.status === 'completed').length;
   const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;

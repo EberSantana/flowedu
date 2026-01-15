@@ -7010,6 +7010,15 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         return db.getStudentDoubts(ctx.studentSession.studentId, input.topicId);
       }),
 
+    // Deletar dúvida
+    deleteDoubt: studentProcedure
+      .input(z.object({
+        doubtId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteStudentDoubt(input.doubtId, ctx.studentSession.studentId);
+      }),
+
     // Buscar dúvidas pendentes (professor)
     getPendingDoubts: protectedProcedure
       .input(z.object({

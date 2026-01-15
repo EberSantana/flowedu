@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import StudentLayout from "@/components/StudentLayout";
-import { MessageCircle, Plus, Clock, CheckCircle2, AlertCircle, Send, Sparkles, Loader2 } from "lucide-react";
+import { MessageCircle, Plus, Clock, CheckCircle2, AlertCircle, Send, Sparkles, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -141,6 +141,17 @@ export default function StudentDoubts() {
     },
     onError: (error) => {
       toast.error(`❌ Erro ao enviar dúvida: ${error.message}`);
+    },
+  });
+
+  // Mutation para deletar dúvida
+  const deleteDoubtMutation = trpc.studentDoubts.deleteDoubt.useMutation({
+    onSuccess: () => {
+      toast.success("🗑️ Dúvida excluída com sucesso!");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`❌ Erro ao excluir dúvida: ${error.message}`);
     },
   });
 
@@ -369,6 +380,20 @@ export default function StudentDoubts() {
                             Enviada em {formatDate(doubt.createdAt)}
                           </CardDescription>
                         </div>
+                        {/* Botão de deletar dúvida */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            if (confirm("Tem certeza que deseja excluir esta dúvida?")) {
+                              deleteDoubtMutation.mutate({ doubtId: doubt.id });
+                            }
+                          }}
+                          disabled={deleteDoubtMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">

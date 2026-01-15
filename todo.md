@@ -5851,3 +5851,19 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Bordas coloridas e ícones em backgrounds arredondados
 - Botão "Pedir Dicas da IA" adicionado nas dúvidas pendentes
 - IA gera dicas e sugestões para ajudar o aluno a resolver a dúvida por conta própria
+
+
+## 🐛 Correções Solicitadas - Dúvidas e Diário (15/01/2026)
+
+- [x] Remover Diário de Aprendizagem da página de Trilhas
+- [x] Adicionar botão de deletar dúvida para o aluno ter controle
+- [x] Corrigir contador de dúvidas que estava mostrando 0
+
+**Alterações realizadas:**
+- Removido card "Diário de Aprendizagem" da seção Recursos Adicionais
+- Atualizado card de estatísticas do topo para mostrar apenas "Minhas Dúvidas" (sem Diário)
+- Grid de recursos alterado de 3 para 2 colunas
+- Adicionado botão de lixeira (Trash2) em cada card de dúvida
+- Criada mutation deleteDoubt no frontend e backend
+- Criada função deleteStudentDoubt no db.ts
+- Corrigido contador de dúvidas: agora busca todas as dúvidas do aluno (independente do tópico)

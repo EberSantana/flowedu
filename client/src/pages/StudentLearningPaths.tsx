@@ -130,14 +130,14 @@ export default function StudentLearningPaths() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold text-gray-700">
-                  Diário & Dúvidas
+                  Minhas Dúvidas
                 </CardTitle>
                 <MessageCircle className="w-5 h-5 text-orange-600" />
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-gray-900">{stats?.journalEntries || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">{stats?.pendingDoubts || 0} dúvidas pendentes</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.pendingDoubts || 0}</p>
+              <p className="text-sm text-gray-600 mt-1">dúvidas pendentes</p>
             </CardContent>
           </Card>
           </div>
@@ -263,29 +263,7 @@ export default function StudentLearningPaths() {
           </div>
 
           {/* Recursos Adicionais */}
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            <Card className="bg-white border-2 border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-gray-900">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <BookMarked className="w-5 h-5 text-blue-600" />
-                  </div>
-                  Diário de Aprendizagem
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  Registre suas reflexões, anotações e insights sobre cada tópico estudado.
-                </p>
-                <Link href="/student/learning-journal">
-                  <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Acessar Diário
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
             <Card className="bg-white border-2 border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-gray-900">
