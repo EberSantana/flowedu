@@ -490,16 +490,15 @@ export default function Sidebar() {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-center mb-2">
                   <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                     <img src="/logo.png" alt="FlowEdu" className="h-8 w-8" />
                     FlowEdu
                   </h1>
+                </div>
+                <div className="flex justify-end mb-2">
                   <NotificationBell />
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Onde a educação flui
-                </p>
                 <button
                   onClick={() => {
                     const event = new KeyboardEvent('keydown', {

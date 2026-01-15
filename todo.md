@@ -5551,3 +5551,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - idx_attempts_exercise_student (student_exercise_attempts: exerciseId, studentId)
 - idx_students_user_registration (students: userId, registrationNumber)
 - idx_enrollments_student_status (student_enrollments: studentId, status)
+
+
+## 🎨 Ajuste Visual da Sidebar (15/01/2026)
+
+- [x] Remover slogan "Onde a educação flui" do cabeçalho
+- [x] Centralizar a marca FlowEdu
