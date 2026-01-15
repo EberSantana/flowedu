@@ -5909,3 +5909,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Redesenhar página PortalChoice com visual mais profissional e impactante
 - [x] Igualar altura e estrutura das caixas do Portal do Aluno e Portal do Professor
 - [x] Remover Pensamento Computacional e Estatísticas de PC da caixa de disciplinas
+
+## Correção de Cálculos
+- [x] Corrigir cálculo de Exercícios Concluídos e Tentativas nas tabelas de desempenho dos alunos

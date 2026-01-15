@@ -5157,16 +5157,27 @@ JSON (descrições MAX 15 chars):
           .sort((a, b) => a.date.localeCompare(b.date));
         
         // Desempenho de todos os alunos
+        // Calcular exercícios únicos concluídos por aluno (não tentativas)
+        const studentCompletedExercises = new Map<number, Set<number>>();
+        completedAttempts.forEach(attempt => {
+          if (!studentCompletedExercises.has(attempt.studentId)) {
+            studentCompletedExercises.set(attempt.studentId, new Set());
+          }
+          studentCompletedExercises.get(attempt.studentId)!.add(attempt.exerciseId);
+        });
+        
         const allStudentsPerformance = [];
         for (const [studentId, perf] of Array.from(studentPerformance.entries())) {
           const avgScore = perf.scores.reduce((sum: number, s: number) => sum + s, 0) / perf.scores.length;
           const studentInfo = studentsData.find(s => s.id === studentId);
+          const uniqueExercisesCompleted = studentCompletedExercises.get(studentId)?.size || 0;
           allStudentsPerformance.push({
             studentId,
             studentName: studentInfo?.fullName || 'Desconhecido',
             registrationNumber: studentInfo?.registrationNumber || 'N/A',
             averageScore: Math.round(avgScore * 10) / 10,
-            completedExercises: perf.attempts,
+            completedExercises: uniqueExercisesCompleted,
+            totalAttempts: perf.attempts,
           });
         }
         

@@ -581,6 +581,7 @@ export default function ExercisePerformanceReport() {
                               </td>
                               <td className="py-3 px-4 text-center">
                                 {student.completedExercises} / {stats.totalExercises}
+                                <span className="text-xs text-gray-500 block">({student.totalAttempts || student.completedExercises} tentativa{(student.totalAttempts || student.completedExercises) !== 1 ? 's' : ''})</span>
                               </td>
                               <td className="py-3 px-4 text-center">
                                 <Badge
