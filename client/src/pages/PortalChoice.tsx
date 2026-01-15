@@ -1,45 +1,9 @@
-// Version: 2025-12-18-v4 - Login direto com e-mail/senha para professores
-import { Link, useLocation } from "wouter";
-import { GraduationCap, Users, Loader2, UserPlus, Mail, LogIn } from "lucide-react";
+// Version: 2025-12-18-v6 - Versão simplificada sem query de autenticação
+import { Link } from "wouter";
+import { GraduationCap, Users, Mail, LogIn } from "lucide-react";
 import { getLoginUrl } from "@/const";
-import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
 
 export default function PortalChoice() {
-  const { user, isLoading } = useAuth();
-  const [, setLocation] = useLocation();
-
-  // Redirecionar automaticamente se o usuário já está autenticado
-  useEffect(() => {
-    if (!isLoading && user) {
-      setLocation("/dashboard");
-    }
-  }, [user, isLoading, setLocation]);
-
-  // Mostrar loading enquanto verifica autenticação
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-accent/10 via-primary/10 to-accent/20 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin" />
-          <p className="text-gray-600">Verificando autenticação...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Se usuário está autenticado, não mostrar nada (vai redirecionar)
-  if (user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-accent/10 via-primary/10 to-accent/20 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin" />
-          <p className="text-gray-600">Redirecionando para o Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent/10 via-primary/10 to-accent/20 flex items-center justify-center p-4">
       <div className="max-w-5xl w-full">

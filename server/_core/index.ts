@@ -9,6 +9,8 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import uploadMaterialRouter from "../upload-material";
 import extractPdfRouter from "../extract-pdf";
+import { getSessionCookieOptions } from "./cookies";
+import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../../shared/const";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -43,7 +45,9 @@ async function startServer() {
   app.use("/api", extractPdfRouter);
   // Rota de logout via GET (para links diretos)
   app.get("/api/logout", (req, res) => {
-    res.clearCookie("session");
+    const cookieOptions = getSessionCookieOptions(req);
+    res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+    res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
     res.redirect("/");
   });
   

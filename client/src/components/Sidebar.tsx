@@ -259,16 +259,16 @@ export default function Sidebar() {
   const { data: studentSession } = trpc.auth.studentSession.useQuery();
   const isStudent = !!studentSession;
   
-  // Query para eventos próximos (badge de notificação) - apenas para professores
+  // Query para eventos próximos (badge de notificação) - apenas para professores autenticados
   const { data: upcomingEvents } = trpc.calendar.getUpcomingEvents.useQuery(undefined, {
     refetchInterval: 60000,
-    enabled: !isStudent,
+    enabled: !isStudent && !!user, // Só executa se for professor autenticado
   });
   
-  // Query para avisos não lidos (badge de notificação) - apenas para alunos
+  // Query para avisos não lidos (badge de notificação) - apenas para alunos autenticados
   const { data: unreadAnnouncementsCount } = trpc.announcements.getUnreadCount.useQuery(undefined, {
     refetchInterval: 30000,
-    enabled: isStudent,
+    enabled: isStudent && !!studentSession, // Só executa se for aluno autenticado
   });
 
   const logoutMutation = trpc.auth.logout.useMutation({

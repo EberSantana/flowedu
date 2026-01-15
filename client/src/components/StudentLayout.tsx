@@ -143,14 +143,13 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <span className="text-sm font-medium">Meu Perfil</span>
               </Button>
             </Link>
-            <Button
-              onClick={logout}
-              variant="outline"
-              className="w-full justify-start gap-3 h-11 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+            <a
+              href="/api/logout"
+              className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-md"
             >
               <LogOut className="w-5 h-5" />
               <span className="text-sm font-medium">Sair</span>
-            </Button>
+            </a>
           </div>
         </div>
       </aside>
@@ -251,14 +250,13 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <span className="text-sm font-medium">Meu Perfil</span>
               </Button>
             </Link>
-            <Button
-              onClick={logout}
-              variant="outline"
-              className="w-full justify-start gap-3 h-11 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+            <a
+              href="/api/logout"
+              className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-md"
             >
               <LogOut className="w-5 h-5" />
               <span className="text-sm font-medium">Sair</span>
-            </Button>
+            </a>
           </div>
         </div>
       </aside>
