@@ -124,17 +124,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
-                    <div className="relative">
-                      <item.icon className="w-5 h-5" />
-                      {item.badge > 0 && (
-                        <Badge 
-                          variant="destructive" 
-                          className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px] font-bold"
-                        >
-                          {item.badge > 9 ? "9+" : item.badge}
-                        </Badge>
-                      )}
-                    </div>
+                    <item.icon className="w-5 h-5" />
                     <span className="text-sm flex-1 text-left">{item.label}</span>
                     {item.badge > 0 && (
                       <Badge 
@@ -248,17 +238,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
-                    <div className="relative">
-                      <item.icon className="w-5 h-5" />
-                      {item.badge > 0 && (
-                        <Badge 
-                          variant="destructive" 
-                          className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px] font-bold"
-                        >
-                          {item.badge > 9 ? "9+" : item.badge}
-                        </Badge>
-                      )}
-                    </div>
+                    <item.icon className="w-5 h-5" />
                     <span className="text-sm flex-1 text-left">{item.label}</span>
                     {item.badge > 0 && (
                       <Badge 
