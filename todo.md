@@ -5818,3 +5818,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Gráfico de barras: layout horizontal com gradiente e labels legíveis
 - Tooltips estilizados com sombra e bordas arredondadas
 - Cards com shadow-lg para destaque visual
+
+
+## 🐛 Bug: Avisos da Disciplina Segurança Não Aparecem para Alunos (15/01/2026)
+
+- [x] Verificar avisos existentes no banco de dados para a disciplina
+- [x] Verificar consulta de avisos para alunos matriculados
+- [x] Corrigir bug identificado
+- [x] Testar exibição de avisos no portal do aluno
+
+**Causa raiz:** As funções `getAnnouncementsForStudent` e `getUnreadAnnouncementsCount` buscavam apenas da tabela `studentEnrollments`, mas os alunos da disciplina Segurança estão matriculados na tabela `subjectEnrollments`.
+
+**Solução:** Modificadas ambas as funções para buscar de AMBAS as tabelas de matrícula e combinar os resultados, removendo duplicatas.

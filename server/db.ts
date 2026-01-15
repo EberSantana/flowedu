@@ -2135,15 +2135,15 @@ export async function getAnnouncementsForStudent(studentId: number, subjectId?: 
   if (!db) throw new Error("Database not available");
   
   // Buscar avisos das disciplinas em que o aluno está matriculado
-  // Usar studentEnrollments (tabela correta com dados) em vez de subjectEnrollments
-  const conditions = [eq(studentEnrollments.studentId, studentId)];
+  // Buscar de AMBAS as tabelas de matrícula (studentEnrollments e subjectEnrollments)
   
-  // Se subjectId for fornecido, adicionar filtro por disciplina
+  // Primeiro, buscar de studentEnrollments
+  const conditions1 = [eq(studentEnrollments.studentId, studentId)];
   if (subjectId !== undefined && subjectId !== null) {
-    conditions.push(eq(announcements.subjectId, subjectId));
+    conditions1.push(eq(announcements.subjectId, subjectId));
   }
   
-  const result = await db.select({
+  const result1 = await db.select({
     id: announcements.id,
     title: announcements.title,
     message: announcements.message,
@@ -2160,19 +2160,59 @@ export async function getAnnouncementsForStudent(studentId: number, subjectId?: 
       eq(announcementReads.announcementId, announcements.id),
       eq(announcementReads.studentId, studentId)
     ))
-    .where(and(...conditions))
-    .orderBy(desc(announcements.isImportant), desc(announcements.createdAt));
+    .where(and(...conditions1));
   
-  return result;
+  // Segundo, buscar de subjectEnrollments
+  const conditions2 = [eq(subjectEnrollments.studentId, studentId)];
+  if (subjectId !== undefined && subjectId !== null) {
+    conditions2.push(eq(announcements.subjectId, subjectId));
+  }
+  
+  const result2 = await db.select({
+    id: announcements.id,
+    title: announcements.title,
+    message: announcements.message,
+    isImportant: announcements.isImportant,
+    subjectId: announcements.subjectId,
+    subjectName: subjects.name,
+    createdAt: announcements.createdAt,
+    isRead: announcementReads.readAt,
+  })
+    .from(announcements)
+    .innerJoin(subjects, eq(announcements.subjectId, subjects.id))
+    .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, announcements.subjectId))
+    .leftJoin(announcementReads, and(
+      eq(announcementReads.announcementId, announcements.id),
+      eq(announcementReads.studentId, studentId)
+    ))
+    .where(and(...conditions2));
+  
+  // Combinar resultados e remover duplicatas por ID
+  const combined = [...result1, ...result2];
+  const uniqueMap = new Map();
+  combined.forEach(item => uniqueMap.set(item.id, item));
+  const uniqueResults = Array.from(uniqueMap.values());
+  
+  // Ordenar por importância e data
+  uniqueResults.sort((a, b) => {
+    if (a.isImportant !== b.isImportant) {
+      return a.isImportant ? -1 : 1;
+    }
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+  
+  return uniqueResults;
 }
 
 export async function getUnreadAnnouncementsCount(studentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Usar studentEnrollments (tabela correta com dados) em vez de subjectEnrollments
-  const result = await db.select({
-    count: sql<number>`COUNT(DISTINCT ${announcements.id})`,
+  // Buscar de AMBAS as tabelas de matrícula (studentEnrollments e subjectEnrollments)
+  
+  // Primeiro, buscar de studentEnrollments
+  const result1 = await db.select({
+    id: announcements.id,
   })
     .from(announcements)
     .innerJoin(studentEnrollments, eq(studentEnrollments.subjectId, announcements.subjectId))
@@ -2185,7 +2225,26 @@ export async function getUnreadAnnouncementsCount(studentId: number) {
       sql`${announcementReads.id} IS NULL`
     ));
   
-  return result[0]?.count || 0;
+  // Segundo, buscar de subjectEnrollments
+  const result2 = await db.select({
+    id: announcements.id,
+  })
+    .from(announcements)
+    .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, announcements.subjectId))
+    .leftJoin(announcementReads, and(
+      eq(announcementReads.announcementId, announcements.id),
+      eq(announcementReads.studentId, studentId)
+    ))
+    .where(and(
+      eq(subjectEnrollments.studentId, studentId),
+      sql`${announcementReads.id} IS NULL`
+    ));
+  
+  // Combinar e contar IDs únicos
+  const combined = [...result1, ...result2];
+  const uniqueIds = new Set(combined.map(item => item.id));
+  
+  return uniqueIds.size;
 }
 
 export async function markAnnouncementAsRead(announcementId: number, studentId: number) {

@@ -1,0 +1,110 @@
+{
+  "query": "SELECT * FROM announcements LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM announcements LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "PROVA",
+      "message": "DATA DA PROVA 04/12/2025",
+      "isImportant": "1",
+      "subjectId": "7",
+      "userId": "1",
+      "createdAt": "2025-12-17 02:04:16",
+      "updatedAt": "2025-12-17 02:04:16"
+    },
+    {
+      "id": "30001",
+      "title": "Prova",
+      "message": "Prova",
+      "isImportant": "1",
+      "subjectId": "8",
+      "userId": "1",
+      "createdAt": "2025-12-18 01:12:09",
+      "updatedAt": "2025-12-18 01:12:09"
+    },
+    {
+      "id": "90001",
+      "title": "PROVA",
+      "message": "PROVA",
+      "isImportant": "1",
+      "subjectId": "5",
+      "userId": "1",
+      "createdAt": "2025-12-30 01:11:47",
+      "updatedAt": "2025-12-30 01:11:47"
+    },
+    {
+      "id": "120001",
+      "title": "Aviso Importante",
+      "message": "Mensagem de teste",
+      "isImportant": "1",
+      "subjectId": "510023",
+      "userId": "2010031",
+      "createdAt": "2026-01-04 23:24:33",
+      "updatedAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "120002",
+      "title": "Aviso 1",
+      "message": "Mensagem 1",
+      "isImportant": "1",
+      "subjectId": "510024",
+      "userId": "2010032",
+      "createdAt": "2026-01-04 23:24:33",
+      "updatedAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "120003",
+      "title": "Aviso 2",
+      "message": "Mensagem 2",
+      "isImportant": "1",
+      "subjectId": "510024",
+      "userId": "2010032",
+      "createdAt": "2026-01-04 23:24:33",
+      "updatedAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "120004",
+      "title": "Aviso Urgente",
+      "message": "Mensagem urgente",
+      "isImportant": "1",
+      "subjectId": "510029",
+      "userId": "2010037",
+      "createdAt": "2026-01-04 23:24:33",
+      "updatedAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "150001",
+      "title": "teste",
+      "message": "tese",
+      "isImportant": "1",
+      "subjectId": "5",
+      "userId": "1",
+      "createdAt": "2026-01-05 17:46:20",
+      "updatedAt": "2026-01-05 17:46:20"
+    },
+    {
+      "id": "150002",
+      "title": "Aviso Importante",
+      "message": "Mensagem de teste",
+      "isImportant": "1",
+      "subjectId": "600010",
+      "userId": "2100025",
+      "createdAt": "2026-01-05 18:52:30",
+      "updatedAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "150003",
+      "title": "Aviso 1",
+      "message": "Mensagem 1",
+      "isImportant": "1",
+      "subjectId": "600011",
+      "userId": "2100027",
+      "createdAt": "2026-01-05 18:52:30",
+      "updatedAt": "2026-01-05 18:52:30"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tmessage\tisImportant\tsubjectId\tuserId\tcreatedAt\tupdatedAt\n1\tPROVA\tDATA DA PROVA 04/12/2025\t1\t7\t1\t2025-12-17 02:04:16\t2025-12-17 02:04:16\n30001\tProva\tProva\t1\t8\t1\t2025-12-18 01:12:09\t2025-12-18 01:12:09\n90001\tPROVA\tPROVA\t1\t5\t1\t2025-12-30 01:11:47\t2025-12-30 01:11:47\n120001\tAviso Importante\tMensagem de teste\t1\t510023\t2010031\t2026-01-04 23:24:33\t2026-01-04 23:24:33\n120002\tAviso 1\tMensagem 1\t1\t510024\t2010032\t2026-01-04 23:24:33\t2026-01-04 23:24:33\n120003\tAviso 2\tMensagem 2\t1\t510024\t2010032\t2026-01-04 23:24:33\t2026-01-04 23:24:33\n120004\tAviso Urgente\tMensagem urgente\t1\t510029\t2010037\t2026-01-04 23:24:33\t2026-01-04 23:24:33\n150001\tteste\ttese\t1\t5\t1\t2026-01-05 17:46:20\t2026-01-05 17:46:20\n150002\tAviso Importante\tMensagem de teste\t1\t600010\t2100025\t2026-01-05 18:52:30\t2026-01-05 18:52:30\n150003\tAviso 1\tMensagem 1\t1\t600011\t2100027\t2026-01-05 18:52:30\t2026-01-05 18:52:30\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

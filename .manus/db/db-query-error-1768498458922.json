@@ -1,0 +1,8 @@
+{
+  "query": "SELECT a.*, s.name as subject_name FROM announcements a LEFT JOIN subjects s ON a.subject_id = s.id WHERE s.name LIKE '%Segurança%' OR s.code = 'SEC01' ORDER BY a.created_at DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT a.*, s.name as subject_name FROM announcements a LEFT JOIN subjects s ON a.subject_id = s.id WHERE s.name LIKE '%Segurança%' OR s.code = 'SEC01' ORDER BY a.created_at DESC;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'a.subject_id' in 'on clause'"
+  ]
+}

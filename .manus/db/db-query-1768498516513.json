@@ -1,0 +1,226 @@
+{
+  "query": "SELECT se.*, s.name as subject_name FROM subjectEnrollments se JOIN subjects s ON se.subjectId = s.id WHERE s.name LIKE '%Segurança%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.*, s.name as subject_name FROM subjectEnrollments se JOIN subjects s ON se.subjectId = s.id WHERE s.name LIKE '%Segurança%';",
+  "rows": [
+    {
+      "id": "510024",
+      "studentId": "60074",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510023",
+      "studentId": "60073",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510022",
+      "studentId": "60072",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510021",
+      "studentId": "60071",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510020",
+      "studentId": "60070",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510019",
+      "studentId": "60069",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510018",
+      "studentId": "60068",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510017",
+      "studentId": "60067",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510016",
+      "studentId": "60066",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510015",
+      "studentId": "60065",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:33",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510014",
+      "studentId": "60064",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510013",
+      "studentId": "60063",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510012",
+      "studentId": "60062",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510011",
+      "studentId": "60061",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510010",
+      "studentId": "60060",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510009",
+      "studentId": "60059",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510008",
+      "studentId": "60058",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510007",
+      "studentId": "60057",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510006",
+      "studentId": "60056",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510005",
+      "studentId": "60055",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510004",
+      "studentId": "60054",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510003",
+      "studentId": "60053",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510002",
+      "studentId": "60052",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    },
+    {
+      "id": "510001",
+      "studentId": "60051",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "subject_name": "Segurança da Informação"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tenrolledAt\tuserId\tstatus\tsubject_name\n510024\t60074\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510023\t60073\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510022\t60072\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510021\t60071\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510020\t60070\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510019\t60069\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510018\t60068\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510017\t60067\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510016\t60066\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510015\t60065\t870001\t2026-01-15 15:20:33\t1\tactive\tSegurança da Informação\n510014\t60064\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510013\t60063\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510012\t60062\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510011\t60061\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510010\t60060\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510009\t60059\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510008\t60058\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510007\t60057\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510006\t60056\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510005\t60055\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510004\t60054\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510003\t60053\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510002\t60052\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n510001\t60051\t870001\t2026-01-15 15:20:32\t1\tactive\tSegurança da Informação\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}
