@@ -11,17 +11,23 @@ import {
   Settings,
   BarChart3,
   FileText,
-  GraduationCap,
   ClipboardList,
   UserCircle,
   Shield,
-  BookMarked,
-  Trophy,
-  Target,
-  MessageSquare,
   X,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+
+// Rotas públicas onde o CommandPalette não deve ser renderizado
+const PUBLIC_ROUTES = [
+  '/',
+  '/cadastro-professor',
+  '/login-professor',
+  '/esqueci-senha',
+  '/redefinir-senha',
+  '/student-login',
+  '/register',
+];
 
 interface CommandItem {
   id: string;
@@ -33,7 +39,8 @@ interface CommandItem {
   category: string;
 }
 
-export function CommandPalette() {
+// Componente interno que usa useAuth
+function CommandPaletteInner() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [, setLocation] = useLocation();
@@ -80,7 +87,7 @@ export function CommandPalette() {
       label: "Dashboard",
       description: "Página inicial",
       icon: <Home className="w-4 h-4" />,
-      action: () => navigate("/"),
+      action: () => navigate("/dashboard"),
       keywords: ["dashboard", "início", "home", "principal"],
       category: "Navegação",
     },
@@ -120,7 +127,7 @@ export function CommandPalette() {
       label: "Agendar Aula",
       description: "Criar novo agendamento",
       icon: <Clock className="w-4 h-4" />,
-      action: () => navigate("/schedule-class"),
+      action: () => navigate("/schedule"),
       keywords: ["agendar", "nova aula", "schedule", "criar"],
       category: "Horários",
     },
@@ -130,7 +137,7 @@ export function CommandPalette() {
       label: "Calendário Anual",
       description: "Eventos e datas importantes",
       icon: <Calendar className="w-4 h-4" />,
-      action: () => navigate("/annual-calendar"),
+      action: () => navigate("/calendar"),
       keywords: ["calendário", "anual", "eventos", "feriados", "datas"],
       category: "Planejamento",
     },
@@ -140,7 +147,7 @@ export function CommandPalette() {
       label: "Configurar Turnos",
       description: "Gerenciar turnos e horários",
       icon: <Settings className="w-4 h-4" />,
-      action: () => navigate("/shifts-config"),
+      action: () => navigate("/shifts"),
       keywords: ["turnos", "configurar", "horários", "períodos"],
       category: "Configurações",
     },
@@ -150,7 +157,7 @@ export function CommandPalette() {
       label: "Relatório de Desempenho",
       description: "Estatísticas e análises",
       icon: <BarChart3 className="w-4 h-4" />,
-      action: () => navigate("/performance-report"),
+      action: () => navigate("/reports"),
       keywords: ["relatório", "desempenho", "estatísticas", "análise"],
       category: "Relatórios",
     },
@@ -160,7 +167,7 @@ export function CommandPalette() {
       label: "Banco de Exercícios",
       description: "Gerenciar exercícios",
       icon: <ClipboardList className="w-4 h-4" />,
-      action: () => navigate("/exercises"),
+      action: () => navigate("/questions"),
       keywords: ["exercícios", "questões", "provas", "atividades"],
       category: "Conteúdo",
     },
@@ -170,7 +177,7 @@ export function CommandPalette() {
       label: "Revisão de Respostas",
       description: "Revisar respostas abertas",
       icon: <FileText className="w-4 h-4" />,
-      action: () => navigate("/review-answers"),
+      action: () => navigate("/questions"),
       keywords: ["revisão", "respostas", "correção", "avaliar"],
       category: "Avaliação",
     },
@@ -196,15 +203,6 @@ export function CommandPalette() {
         icon: <Shield className="w-4 h-4" />,
         action: () => navigate("/admin/users"),
         keywords: ["admin", "usuários", "gerenciar", "administração"],
-        category: "Administração",
-      },
-      {
-        id: "admin-dashboard",
-        label: "Dashboard Admin",
-        description: "Painel administrativo",
-        icon: <Shield className="w-4 h-4" />,
-        action: () => navigate("/admin/dashboard"),
-        keywords: ["admin", "dashboard", "painel", "administração"],
         category: "Administração",
       }
     );
@@ -311,4 +309,20 @@ export function CommandPalette() {
       </div>
     </div>
   );
+}
+
+// Componente wrapper que verifica a rota ANTES de renderizar o componente interno
+export function CommandPalette() {
+  const [location] = useLocation();
+  
+  // Verificar se estamos em uma rota pública ANTES de renderizar o componente interno
+  const isPublicRoute = PUBLIC_ROUTES.some(route => location === route || location.startsWith(route + '/'));
+  
+  // Se estamos em uma rota pública, não renderizar nada (e não chamar useAuth)
+  if (isPublicRoute) {
+    return null;
+  }
+  
+  // Só renderizar o componente interno (que usa useAuth) em rotas protegidas
+  return <CommandPaletteInner />;
 }

@@ -15,17 +15,12 @@ export default function TeacherRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
-  const utils = trpc.useUtils();
-
   const registerMutation = trpc.auth.registerTeacher.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       toast.success("Conta criada com sucesso!");
       setIsRegistered(true);
       
-      // Invalidar cache e redirecionar após pequeno delay
-      await utils.auth.me.invalidate();
-      
-      // Redirecionar após 1.5 segundos
+      // Redirecionar após 1.5 segundos (não usar invalidate para evitar query auth.me)
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1500);
@@ -37,7 +32,6 @@ export default function TeacherRegister() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
 

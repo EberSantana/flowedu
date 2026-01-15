@@ -5432,3 +5432,55 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar templates de e-mail (email.ts)
 - [x] Atualizar routers.ts (subject de e-mail de boas-vindas)
 - [x] Atualizar gamification-report.ts (rodapé do PDF)
+
+
+## 🧪 Teste Completo da Aplicação - QA Final (Entrega ao Cliente)
+
+### Portal do Professor - Autenticação
+- [ ] Teste de cadastro de novo professor
+- [ ] Teste de login com credenciais válidas
+- [ ] Teste de login com credenciais inválidas
+- [ ] Teste de recuperação de senha
+- [ ] Teste de logout
+
+### Portal do Professor - Dashboard
+- [ ] Verificar carregamento do dashboard
+- [ ] Verificar exibição de estatísticas
+- [ ] Verificar navegação do sidebar
+- [ ] Verificar responsividade mobile
+
+### Portal do Professor - Gestão de Turmas
+- [ ] Criar nova turma
+- [ ] Editar turma existente
+- [ ] Excluir turma
+- [ ] Listar turmas
+
+### Portal do Professor - Gestão de Alunos
+- [ ] Adicionar aluno à turma
+- [ ] Editar dados do aluno
+- [ ] Remover aluno da turma
+- [ ] Visualizar perfil do aluno
+
+### Portal do Professor - Horários e Agenda
+- [ ] Criar novo horário
+- [ ] Editar horário existente
+- [ ] Excluir horário
+- [ ] Visualizar agenda semanal
+
+### Portal do Aluno - Autenticação
+- [ ] Teste de login com código de acesso
+- [ ] Teste de login com credenciais inválidas
+- [ ] Teste de logout
+
+### Portal do Aluno - Dashboard
+- [ ] Verificar carregamento do dashboard
+- [ ] Verificar exibição de faixa/rank
+- [ ] Verificar navegação
+- [ ] Verificar responsividade mobile
+
+### Portal do Aluno - Funcionalidades
+- [ ] Visualizar exercícios
+- [ ] Visualizar trilha de aprendizado
+- [ ] Visualizar avisos
+- [ ] Verificar perfil do aluno
+

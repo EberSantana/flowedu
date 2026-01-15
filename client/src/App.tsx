@@ -1,6 +1,6 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { SidebarProvider } from "./contexts/SidebarContext";
@@ -68,9 +68,6 @@ import StudentNotebook from "./pages/StudentNotebook";
 import { MistakeNotebook } from "./pages/MistakeNotebook";
 
 
-
-
-
 function Router() {
   return (
     <>
@@ -131,7 +128,6 @@ function Router() {
         <Route path={"/student/statistics"} component={StudentStatistics} />
         <Route path={"/student/notebook"} component={StudentNotebook} />
         <Route path={"/student/mistake-notebook"} component={MistakeNotebook} />
-
 
 
 
