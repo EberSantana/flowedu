@@ -6792,8 +6792,25 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         subjectId: z.number().optional(),
       }))
       .query(async ({ ctx, input }) => {
-        // Buscar todos os alunos
-        const students = await db.getStudentsByUser(ctx.user.id);
+        // Buscar alunos - se tiver disciplina selecionada, buscar apenas alunos matriculados nela
+        let students;
+        if (input.subjectId) {
+          // Buscar alunos matriculados na disciplina específica
+          const enrollments = await db.getEnrollmentsBySubject(input.subjectId, ctx.user.id);
+          const studentIds = enrollments.map(e => e.studentId);
+          const allStudents = await db.getStudentsByUser(ctx.user.id);
+          students = allStudents.filter(s => studentIds.includes(s.id));
+        } else {
+          // Buscar todos os alunos únicos do professor (sem duplicatas)
+          const allStudents = await db.getStudentsByUser(ctx.user.id);
+          // Remover duplicatas por ID
+          const uniqueStudentIds = new Set<number>();
+          students = allStudents.filter(s => {
+            if (uniqueStudentIds.has(s.id)) return false;
+            uniqueStudentIds.add(s.id);
+            return true;
+          });
+        }
         
         // Buscar alertas críticos
         const allAlerts = await db.getPendingAlerts(ctx.user.id);

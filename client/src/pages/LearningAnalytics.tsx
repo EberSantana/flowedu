@@ -534,39 +534,74 @@ export function LearningAnalytics() {
                         </div>
                       ) : (
                         <div className="grid gap-4">
-                          {learningPatterns.map((pattern: any) => (
-                            <Card key={pattern.id} className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-shadow">
-                              <CardContent className="pt-4">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="flex items-center gap-2">
-                                    <TrendingUp className="h-4 w-4 text-purple-600" />
-                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                                      {pattern.patternType}
-                                    </Badge>
-                                  </div>
-                                  <span className="text-xs text-slate-500">
-                                    {new Date(pattern.identifiedAt).toLocaleDateString('pt-BR')}
-                                  </span>
-                                </div>
-                                <h4 className="font-semibold text-slate-900 mb-2 text-lg">{pattern.title}</h4>
-                                <p className="text-sm text-slate-600 mb-4 leading-relaxed">{pattern.description}</p>
-                                {pattern.frequency && (
-                                  <div className="flex items-center gap-2 mb-3 text-sm">
-                                    <Clock className="h-4 w-4 text-slate-400" />
-                                    <span className="text-slate-600">
-                                      Frequência: <strong className="text-slate-900">{pattern.frequency}</strong>
+                          {learningPatterns.map((pattern: any) => {
+                            // Traduzir tipos de padrão para português
+                            const patternTypeLabels: Record<string, string> = {
+                              'learning_pace': 'Ritmo de Aprendizado',
+                              'preferred_time': 'Horário Preferido',
+                              'difficulty_areas': 'Áreas de Dificuldade',
+                              'strength_areas': 'Áreas de Força',
+                              'engagement_pattern': 'Padrão de Engajamento',
+                              'submission_pattern': 'Padrão de Submissão',
+                              'improvement_trend': 'Tendência de Melhoria',
+                              'struggle_pattern': 'Padrão de Dificuldade',
+                              'consistency': 'Consistência',
+                              'collaboration': 'Colaboração'
+                            };
+                            const patternLabel = patternTypeLabels[pattern.patternType] || pattern.patternType;
+                            
+                            // Formatar data corretamente
+                            const formatDate = (dateValue: any) => {
+                              if (!dateValue) return 'Data não disponível';
+                              try {
+                                const date = new Date(dateValue);
+                                if (isNaN(date.getTime())) return 'Data não disponível';
+                                return date.toLocaleDateString('pt-BR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                });
+                              } catch {
+                                return 'Data não disponível';
+                              }
+                            };
+                            
+                            return (
+                              <Card key={pattern.id} className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-shadow">
+                                <CardContent className="pt-4">
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                      <TrendingUp className="h-4 w-4 text-purple-600" />
+                                      <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                        {patternLabel}
+                                      </Badge>
+                                      {pattern.confidence && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          {Math.round(pattern.confidence * 100)}% confiança
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <span className="text-xs text-slate-500">
+                                      {formatDate(pattern.detectedAt || pattern.lastUpdated)}
                                     </span>
                                   </div>
-                                )}
-                                {pattern.impact && (
-                                  <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/30 rounded-lg p-4">
-                                    <p className="text-xs font-semibold text-purple-900 mb-1">Impacto:</p>
-                                    <p className="text-sm text-purple-700 leading-relaxed">{pattern.impact}</p>
-                                  </div>
-                                )}
-                              </CardContent>
-                            </Card>
-                          ))}
+                                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                                    {pattern.patternDescription || 'Padrão identificado pela análise de IA'}
+                                  </p>
+                                  {pattern.evidence && typeof pattern.evidence === 'object' && (
+                                    <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/30 rounded-lg p-4">
+                                      <p className="text-xs font-semibold text-purple-900 mb-1">Evidências:</p>
+                                      <p className="text-sm text-purple-700 leading-relaxed">
+                                        {typeof pattern.evidence === 'string' 
+                                          ? pattern.evidence 
+                                          : JSON.stringify(pattern.evidence, null, 2)}
+                                      </p>
+                                    </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
                         </div>
                       )}
                     </ScrollArea>
