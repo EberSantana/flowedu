@@ -5803,3 +5803,18 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Ajustar botão "Ver Trilha" para ocupar largura total
 
 **Resultado:** Botão de estatísticas removido. Botão "Ver Trilha" agora ocupa 100% da largura do card.
+
+
+## 🐛 Correção Relatório de Desempenho (15/01/2026)
+
+- [x] Corrigir filtro "Todos os exercícios" que não funciona
+- [x] Redesenhar gráfico de pizza (Distribuição de Notas) - mais profissional
+- [x] Redesenhar gráfico de barras (Desempenho por Exercício) - mais legível
+- [x] Melhorar layout geral dos gráficos
+
+**Melhorias aplicadas:**
+- Filtro "Todos os exercícios" agora funciona corretamente (value="all" -> undefined)
+- Gráfico de pizza: donut chart com legenda lateral detalhada
+- Gráfico de barras: layout horizontal com gradiente e labels legíveis
+- Tooltips estilizados com sombra e bordas arredondadas
+- Cards com shadow-lg para destaque visual

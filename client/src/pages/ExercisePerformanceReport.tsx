@@ -154,8 +154,8 @@ export default function ExercisePerformanceReport() {
                     Exercício (opcional)
                   </label>
                   <Select
-                    value={selectedExercise?.toString()}
-                    onValueChange={(value) => setSelectedExercise(parseInt(value))}
+                    value={selectedExercise?.toString() || "all"}
+                    onValueChange={(value) => setSelectedExercise(value === "all" ? undefined : parseInt(value))}
                     disabled={!selectedSubject}
                   >
                     <SelectTrigger>
@@ -304,49 +304,117 @@ export default function ExercisePerformanceReport() {
               {/* Gráficos */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Distribuição de Notas */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Distribuição de Notas</CardTitle>
+                <Card className="shadow-lg">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-semibold text-gray-800">Distribuição de Notas</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={stats.scoreDistribution}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }: any) =>
-                            `${name}: ${(percent * 100).toFixed(0)}%`
-                          }
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="count"
-                        >
-                          {stats.scoreDistribution.map((_: any, index: number) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
+                  <CardContent className="pt-0">
+                    <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+                      <div className="w-full lg:w-1/2">
+                        <ResponsiveContainer width="100%" height={280}>
+                          <PieChart>
+                            <Pie
+                              data={stats.scoreDistribution}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={100}
+                              paddingAngle={3}
+                              dataKey="count"
+                            >
+                              {stats.scoreDistribution.map((_: any, index: number) => (
+                                <Cell 
+                                  key={`cell-${index}`} 
+                                  fill={COLORS[index % COLORS.length]}
+                                  stroke="#fff"
+                                  strokeWidth={2}
+                                />
+                              ))}
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#fff', 
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                              }}
+                              formatter={(value: any, name: any) => [`${value} alunos`, name]}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="w-full lg:w-1/2 space-y-3">
+                        {stats.scoreDistribution.map((item: any, index: number) => (
+                          <div key={item.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-4 h-4 rounded-full" 
+                                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                              />
+                              <span className="font-medium text-gray-700">{item.name}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="font-bold text-gray-900">{item.count}</span>
+                              <span className="text-gray-500 text-sm ml-1">alunos</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
 
                 {/* Desempenho por Exercício */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Desempenho por Exercício</CardTitle>
+                <Card className="shadow-lg">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-semibold text-gray-800">Desempenho por Exercício</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={stats.exercisePerformance}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="exerciseTitle" angle={-45} textAnchor="end" height={100} />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="averageScore" fill="#3B82F6" name="Média (%)" />
+                  <CardContent className="pt-0">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <BarChart 
+                        data={stats.exercisePerformance} 
+                        layout="vertical"
+                        margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e5e7eb" />
+                        <XAxis 
+                          type="number" 
+                          domain={[0, 100]} 
+                          tickFormatter={(value) => `${value}%`}
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#6b7280', fontSize: 12 }}
+                        />
+                        <YAxis 
+                          type="category" 
+                          dataKey="exerciseTitle" 
+                          width={120}
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#374151', fontSize: 12 }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#fff', 
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                          }}
+                          formatter={(value: any) => [`${value.toFixed(1)}%`, 'Média']}
+                          labelStyle={{ fontWeight: 'bold', color: '#374151' }}
+                        />
+                        <Bar 
+                          dataKey="averageScore" 
+                          fill="url(#colorGradient)" 
+                          radius={[0, 6, 6, 0]}
+                          barSize={24}
+                        />
+                        <defs>
+                          <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#3B82F6" />
+                            <stop offset="100%" stopColor="#8B5CF6" />
+                          </linearGradient>
+                        </defs>
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
