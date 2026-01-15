@@ -5908,3 +5908,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Redesign Profissional da Página de Entrada
 - [x] Redesenhar página PortalChoice com visual mais profissional e impactante
 - [x] Igualar altura e estrutura das caixas do Portal do Aluno e Portal do Professor
+- [x] Remover Pensamento Computacional e Estatísticas de PC da caixa de disciplinas

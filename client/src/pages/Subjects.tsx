@@ -13,7 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Brain, Search, X } from "lucide-react";
+import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, Route, UserPlus, Eye, EyeOff, Search, X } from "lucide-react";
 import { AdvancedPagination, usePagination } from "@/components/ui/advanced-pagination";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
@@ -38,7 +38,7 @@ export default function Subjects() {
     complementaryBibliography: "",
     googleDriveUrl: "",
     googleClassroomUrl: "",
-    computationalThinkingEnabled: false,
+
   });
   const [showCoursePlan, setShowCoursePlan] = useState(false);
   const [viewingCoursePlan, setViewingCoursePlan] = useState<any>(null);
@@ -191,14 +191,7 @@ export default function Subjects() {
     },
   });
   
-  const toggleCT = trpc.subjects.toggleCT.useMutation({
-    onSuccess: () => {
-      utils.subjects.list.invalidate();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Erro ao atualizar Pensamento Computacional");
-    },
-  });
+
 
   const bulkEnrollMutation = (trpc as any).students.bulkEnrollInMultipleSubjects.useMutation({
     onSuccess: (result: { studentCreated: boolean; enrolled: string[]; errors: string[] }) => {
@@ -232,7 +225,7 @@ export default function Subjects() {
       name: "", 
       code: "", 
       description: "",
-      computationalThinkingEnabled: false, 
+   
       color: "#3b82f6",
       ementa: "",
       generalObjective: "",
@@ -265,7 +258,7 @@ export default function Subjects() {
       complementaryBibliography: formData.complementaryBibliography || undefined,
       googleDriveUrl: formData.googleDriveUrl || undefined,
       googleClassroomUrl: formData.googleClassroomUrl || undefined,
-      computationalThinkingEnabled: formData.computationalThinkingEnabled,
+
     };
     
     if (editingSubject) {
@@ -308,7 +301,6 @@ export default function Subjects() {
       complementaryBibliography: subject.complementaryBibliography || "",
       googleDriveUrl: subject.googleDriveUrl || "",
       googleClassroomUrl: subject.googleClassroomUrl || "",
-      computationalThinkingEnabled: subject.computationalThinkingEnabled || false,
     });
     setIsDialogOpen(true);
   };
@@ -457,46 +449,7 @@ export default function Subjects() {
                     </button>
                   )}
                   
-                  {/* Toggle Pensamento Computacional */}
-                  <div className="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Brain className="h-4 w-4 text-indigo-600" />
-                        <span className="text-sm font-medium text-indigo-900">Pensamento Computacional</span>
-                      </div>
-                      <button
-                        onClick={async () => {
-                          try {
-                            await toggleCT.mutateAsync({
-                              id: subject.id,
-                              enabled: !subject.computationalThinkingEnabled,
-                            });
-                            toast.success(
-                              subject.computationalThinkingEnabled
-                                ? "Pensamento Computacional desabilitado"
-                                : "Pensamento Computacional habilitado"
-                            );
-                          } catch (error) {
-                            toast.error("Erro ao atualizar configuração");
-                          }
-                        }}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          subject.computationalThinkingEnabled ? "bg-indigo-600" : "bg-gray-300"
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                            subject.computationalThinkingEnabled ? "translate-x-6" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
-                    </div>
-                    {subject.computationalThinkingEnabled && (
-                      <p className="text-xs text-indigo-600 mt-2">
-                        Alunos poderão visualizar e desenvolver habilidades de PC nesta disciplina
-                      </p>
-                    )}
-                  </div>
+
                   
                   {/* Botões de Integração Google */}
                   {(subject.googleDriveUrl || subject.googleClassroomUrl) && (
@@ -569,18 +522,7 @@ export default function Subjects() {
                         Trilhas de Aprendizagem
                       </Button>
                     </Link>
-                    {subject.computationalThinkingEnabled && (
-                      <Link href={`/subjects/${subject.id}/ct-stats`}>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                        >
-                          <Brain className="mr-2 h-3 w-3" />
-                          Estatísticas de PC
-                        </Button>
-                      </Link>
-                    )}
+
                     <div className="flex gap-2">
                       <Button
                         variant="default"
@@ -704,24 +646,7 @@ export default function Subjects() {
                   </div>
                 </div>
                 
-                {/* Toggle de Pensamento Computacional */}
-                <div className="flex items-center space-x-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                  <Checkbox
-                    id="computationalThinking"
-                    checked={formData.computationalThinkingEnabled}
-                    onCheckedChange={(checked) => 
-                      setFormData({ ...formData, computationalThinkingEnabled: checked as boolean })
-                    }
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="computationalThinking" className="text-sm font-medium cursor-pointer">
-                      Habilitar Pensamento Computacional
-                    </Label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Ative para permitir exercícios de PC nesta disciplina (Decomposição, Padrões, Abstração, Algoritmos)
-                    </p>
-                  </div>
-                </div>
+
                 </TabsContent>
                 
                 <TabsContent value="coursePlan" className="py-4">
