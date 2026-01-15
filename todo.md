@@ -5624,3 +5624,19 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Reports.tsx: Corrigido badges de taxa de conclusão (bg-primary/10 → bg-blue-600)
 - Tasks.tsx: Corrigido cores de prioridade e categorias
 - LearningAnalytics.tsx: Corrigido backgrounds e bordas de baixo contraste
+
+
+## 🎨 Favicon Personalizado com Logo FlowEdu (15/01/2026)
+
+- [x] Verificar logo existente do FlowEdu
+- [x] Criar favicon.ico em múltiplos tamanhos (16x16, 32x32, 48x48)
+- [x] Criar apple-touch-icon (180x180)
+- [x] Atualizar index.html com referências ao favicon
+- [x] Atualizar manifest.json com ícones
+- [x] Testar favicon em diferentes navegadores
+
+**Arquivos gerados:**
+- favicon.ico (16x16, 32x32, 48x48)
+- favicon-16.png, favicon-32.png, favicon-48.png
+- apple-touch-icon.png (180x180)
+- icon-192.png, icon-512.png (PWA)
