@@ -5604,3 +5604,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Botão Alunos: bg-blue-600 (azul) com texto branco
 - Botão Matricular Aluno: bg-indigo-600 (índigo) com texto branco
 - QuickActions: cores mais visíveis com melhor contraste
+
+
+## 🎨 Ajuste do Botão Alunos (15/01/2026)
+
+- [x] Ajustar badge de contagem de alunos para ficar verde (emerald-600) com texto branco, igual ao botão "Trilha de Aprendizagem"

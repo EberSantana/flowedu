@@ -424,9 +424,9 @@ export default function Subjects() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <CardTitle className="text-lg truncate">{subject.name}</CardTitle>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 rounded-full border border-primary/30 flex-shrink-0">
-                          <Users className="h-3.5 w-3.5 text-primary" />
-                          <span className="text-xs font-semibold text-primary">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-600 rounded-full flex-shrink-0">
+                          <Users className="h-3.5 w-3.5 text-white" />
+                          <span className="text-xs font-semibold text-white">
                             {enrollmentCounts[subject.id] || 0}
                           </span>
                         </div>
