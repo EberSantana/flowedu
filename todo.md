@@ -5795,3 +5795,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Botões de sentimento agora usam grid responsivo (2 colunas em mobile, 5 em desktop)
 - Adicionado overflow-y-auto e max-height no DialogContent
 - Texto dos botões com truncate para evitar quebra
+
+
+## 🧹 Remoção Botão Estatísticas nas Trilhas (15/01/2026)
+
+- [x] Remover botão de estatísticas (ícone gráfico) do card de trilha
+- [x] Ajustar botão "Ver Trilha" para ocupar largura total
+
+**Resultado:** Botão de estatísticas removido. Botão "Ver Trilha" agora ocupa 100% da largura do card.

@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { 
   BookOpen, Map, ChevronRight, AlertCircle, CheckCircle2, Clock, Circle, 
   Lock, Unlock, TrendingUp, Calendar, MessageCircle, BookMarked, Target,
-  Award, Flame, BarChart3, FileText, Lightbulb, Video, FileQuestion,
+  Award, Flame, FileText, Lightbulb, Video, FileQuestion,
   Zap, Brain
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
@@ -230,11 +230,11 @@ export default function StudentLearningPaths() {
                             </div>
                           </div>
 
-                          {/* Botões de Ação */}
-                          <div className="flex gap-2 pt-2">
+                          {/* Botão Ver Trilha */}
+                          <div className="pt-2">
                             <Link 
                               href={`/student/learning-path/${subject.id}/${enrollment.userId}`}
-                              className="flex-1"
+                              className="block"
                             >
                               <Button 
                                 className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-md"
@@ -244,13 +244,6 @@ export default function StudentLearningPaths() {
                                 Ver Trilha
                               </Button>
                             </Link>
-                            <Button 
-                              variant="default" 
-                              size="sm"
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <BarChart3 className="w-4 h-4" />
-                            </Button>
                           </div>
                         </>
                       ) : (
@@ -324,7 +317,7 @@ export default function StudentLearningPaths() {
               </p>
               <Link href="/student/statistics">
                 <Button variant="default" size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                  <BarChart3 className="w-4 h-4 mr-2" />
+                  <TrendingUp className="w-4 h-4 mr-2" />
                   Ver Estatísticas
                 </Button>
               </Link>
