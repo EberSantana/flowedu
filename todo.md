@@ -5697,3 +5697,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - `subjectEnrollments` (usada para matrículas diretas em disciplinas)
 
 **Solução:** Modificada a função `getStudentEnrollments` para buscar de AMBAS as tabelas e combinar os resultados, removendo duplicatas.
+
+
+## 🎨 Correção Definitiva Botão Trilhas de Aprendizagem (15/01/2026)
+
+- [x] Corrigir botão "Trilhas de Aprendizagem" para usar cor sólida
+- [x] Garantir visibilidade em todos os temas
+
+**Correções aplicadas:**
+- Botão "Trilhas de Aprendizagem": bg-purple-600 (cor sólida roxa)
+- Botão "Matricular em Disciplinas": bg-purple-600 (cor sólida roxa)
+- Removidos todos os gradientes com primary/opacity que causavam transparência

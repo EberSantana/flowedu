@@ -337,7 +337,7 @@ export default function Subjects() {
                   <Button 
                     onClick={() => setIsBulkEnrollOpen(true)} 
                     size="lg"
-                    className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Matricular em {selectedSubjects.length} Disciplina{selectedSubjects.length > 1 ? 's' : ''}
@@ -563,7 +563,7 @@ export default function Subjects() {
                       <Button
                         variant="default"
                         size="sm"
-                        className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white"
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                       >
                         <Route className="mr-2 h-3 w-3" />
                         Trilhas de Aprendizagem
@@ -1029,7 +1029,7 @@ export default function Subjects() {
               </Button>
               <Button 
                 onClick={handleBulkEnroll}
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Matricular em Todas
