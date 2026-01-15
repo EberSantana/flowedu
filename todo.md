@@ -5557,3 +5557,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Remover slogan "Onde a educação flui" do cabeçalho
 - [x] Centralizar a marca FlowEdu
+
+
+## 🎨 Visibilidade da Logo no Portal do Aluno (15/01/2026)
+
+- [x] Analisar cores do cabeçalho do portal do aluno
+- [x] Ajustar logo para ficar visível no fundo azul/roxo (fundo branco arredondado)
+- [x] Testar alteração

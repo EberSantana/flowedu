@@ -74,7 +74,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 shadow-xl">
           {/* Logo */}
           <div className="flex items-center gap-3 px-6 py-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
-            <img src="/logo.png" alt="FlowEdu" className="h-12 w-12" />
+            <div className="bg-white rounded-xl p-2 shadow-md">
+              <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
+            </div>
             <div>
               <h1 className="font-bold text-white text-xl">Portal do Aluno</h1>
               <p className="text-xs text-blue-100">FlowEdu</p>
@@ -172,7 +174,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           {/* Logo + Close */}
           <div className="flex items-center justify-between px-6 py-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="FlowEdu" className="h-12 w-12" />
+              <div className="bg-white rounded-xl p-2 shadow-md">
+                <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
+              </div>
               <div>
                 <h1 className="font-bold text-white text-xl">Portal do Aluno</h1>
                 <p className="text-xs text-blue-100">FlowEdu</p>
