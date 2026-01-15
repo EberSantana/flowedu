@@ -1,4 +1,4 @@
-// Version: 2026-01-15-v2 - Redesign profissional com gradiente elegante e hover effects
+// Version: 2026-01-15-v3 - Cards com altura igual
 import { Link } from "wouter";
 import { GraduationCap, Users, Mail, LogIn, Shield, BookOpen, Award, TrendingUp } from "lucide-react";
 import { getLoginUrl } from "@/const";
@@ -106,11 +106,11 @@ export default function PortalChoice() {
             </p>
           </div>
 
-          {/* Cards de Escolha com design premium */}
+          {/* Cards de Escolha com design premium - ALTURA IGUAL */}
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Portal do Aluno */}
             <Link href="/student-login">
-              <div className="group relative">
+              <div className="group relative h-full">
                 {/* Glow effect no hover */}
                 <div 
                   className="absolute rounded-3xl opacity-0 group-hover:opacity-40 transition-all duration-500"
@@ -122,14 +122,12 @@ export default function PortalChoice() {
                 />
                 
                 <div 
-                  className="relative rounded-3xl p-8 lg:p-10 cursor-pointer transition-all duration-500 group-hover:translate-y-[-8px] overflow-hidden"
+                  className="relative rounded-3xl p-8 lg:p-10 cursor-pointer transition-all duration-500 group-hover:translate-y-[-8px] overflow-hidden h-full"
                   style={{
                     background: 'rgba(255, 255, 255, 0.08)',
                     backdropFilter: 'blur(24px)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    minHeight: '480px',
-                    display: 'flex',
-                    alignItems: 'center'
+                    minHeight: '520px'
                   }}
                 >
                   {/* Decoração interna */}
@@ -146,9 +144,9 @@ export default function PortalChoice() {
                     }}
                   />
                   
-                  <div className="flex flex-col items-center text-center space-y-8 w-full relative z-10">
+                  <div className="flex flex-col items-center text-center h-full relative z-10">
                     {/* Ícone com animação */}
-                    <div className="relative">
+                    <div className="relative mb-8">
                       <div 
                         className="absolute inset-0 rounded-full group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
                         style={{
@@ -168,7 +166,7 @@ export default function PortalChoice() {
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-3 mb-6">
                       <h2 className="text-3xl font-bold text-white group-hover:text-cyan-100 transition-colors">
                         Portal do Aluno
                       </h2>
@@ -178,7 +176,7 @@ export default function PortalChoice() {
                     </div>
 
                     {/* Features badges */}
-                    <div className="flex flex-wrap justify-center gap-2 pt-2">
+                    <div className="flex flex-wrap justify-center gap-2 mb-6">
                       <span 
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
                         style={{
@@ -214,8 +212,11 @@ export default function PortalChoice() {
                       </span>
                     </div>
 
+                    {/* Área de botões - flex-grow para empurrar para baixo */}
+                    <div className="flex-grow" />
+
                     {/* Botão principal */}
-                    <div className="pt-4 w-full max-w-xs">
+                    <div className="w-full max-w-xs mb-4">
                       <div className="relative">
                         <div 
                           className="absolute rounded-xl"
@@ -248,7 +249,7 @@ export default function PortalChoice() {
             </Link>
 
             {/* Portal do Professor */}
-            <div className="group relative">
+            <div className="group relative h-full">
               {/* Glow effect no hover */}
               <div 
                 className="absolute rounded-3xl opacity-0 group-hover:opacity-40 transition-all duration-500"
@@ -260,14 +261,12 @@ export default function PortalChoice() {
               />
               
               <div 
-                className="relative rounded-3xl p-8 lg:p-10 transition-all duration-500 group-hover:translate-y-[-8px] overflow-hidden"
+                className="relative rounded-3xl p-8 lg:p-10 transition-all duration-500 group-hover:translate-y-[-8px] overflow-hidden h-full"
                 style={{
                   background: 'rgba(255, 255, 255, 0.08)',
                   backdropFilter: 'blur(24px)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                  minHeight: '480px',
-                  display: 'flex',
-                  alignItems: 'center'
+                  minHeight: '520px'
                 }}
               >
                 {/* Decoração interna */}
@@ -284,9 +283,9 @@ export default function PortalChoice() {
                   }}
                 />
                 
-                <div className="flex flex-col items-center text-center space-y-8 w-full relative z-10">
+                <div className="flex flex-col items-center text-center h-full relative z-10">
                   {/* Ícone com animação */}
-                  <div className="relative">
+                  <div className="relative mb-8">
                     <div 
                       className="absolute inset-0 rounded-full group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
                       style={{
@@ -306,7 +305,7 @@ export default function PortalChoice() {
                     </div>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-3 mb-6">
                     <h2 className="text-3xl font-bold text-white group-hover:text-purple-100 transition-colors">
                       Portal do Professor
                     </h2>
@@ -316,7 +315,7 @@ export default function PortalChoice() {
                   </div>
 
                   {/* Features badges */}
-                  <div className="flex flex-wrap justify-center gap-2 pt-2">
+                  <div className="flex flex-wrap justify-center gap-2 mb-6">
                     <span 
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
                       style={{
@@ -352,8 +351,11 @@ export default function PortalChoice() {
                     </span>
                   </div>
 
+                  {/* Área de botões - flex-grow para empurrar para baixo */}
+                  <div className="flex-grow" />
+
                   {/* Botões de Login */}
-                  <div className="pt-4 space-y-3 w-full max-w-xs">
+                  <div className="space-y-3 w-full max-w-xs mb-4">
                     <Link href="/login-professor" className="block">
                       <div className="relative">
                         <div 
