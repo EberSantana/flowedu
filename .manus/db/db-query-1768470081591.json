@@ -1,0 +1,40 @@
+{
+  "query": "SELECT se.subjectId, se.professorId, \n       (SELECT id FROM subjects WHERE id = se.subjectId LIMIT 1) as subject_exists,\n       (SELECT userId FROM subjects WHERE id = se.subjectId LIMIT 1) as subject_owner\nFROM student_enrollments se \nWHERE se.studentId = 1\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.subjectId, se.professorId, \n       (SELECT id FROM subjects WHERE id = se.subjectId LIMIT 1) as subject_exists,\n       (SELECT userId FROM subjects WHERE id = se.subjectId LIMIT 1) as subject_owner\nFROM student_enrollments se \nWHERE se.studentId = 1\nLIMIT 5;",
+  "rows": [
+    {
+      "subjectId": "7",
+      "professorId": "1",
+      "subject_exists": "NULL",
+      "subject_owner": "NULL"
+    },
+    {
+      "subjectId": "8",
+      "professorId": "1",
+      "subject_exists": "NULL",
+      "subject_owner": "NULL"
+    },
+    {
+      "subjectId": "9",
+      "professorId": "1",
+      "subject_exists": "NULL",
+      "subject_owner": "NULL"
+    },
+    {
+      "subjectId": "120001",
+      "professorId": "1",
+      "subject_exists": "NULL",
+      "subject_owner": "NULL"
+    },
+    {
+      "subjectId": "6",
+      "professorId": "1",
+      "subject_exists": "NULL",
+      "subject_owner": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tprofessorId\tsubject_exists\tsubject_owner\n7\t1\tNULL\tNULL\n8\t1\tNULL\tNULL\n9\t1\tNULL\tNULL\n120001\t1\tNULL\tNULL\n6\t1\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

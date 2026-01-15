@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO subjects (name, code, description, color, userId, createdAt, updatedAt)\nSELECT 'Matemática Básica QA', 'MAT-QA-001', 'Disciplina de teste para QA do sistema FlowEdu', '#3b82f6', id, NOW(), NOW()\nFROM users WHERE email = 'professor.qa@flowedu.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO subjects (name, code, description, color, userId, createdAt, updatedAt)\nSELECT 'Matemática Básica QA', 'MAT-QA-001', 'Disciplina de teste para QA do sistema FlowEdu', '#3b82f6', id, NOW(), NOW()\nFROM users WHERE email = 'professor.qa@flowedu.com';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 69
+}

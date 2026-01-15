@@ -5484,3 +5484,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Visualizar avisos
 - [ ] Verificar perfil do aluno
 
+
+
+## 🔧 Correções QA Portal do Aluno (15/01/2026)
+
+- [x] Corrigir função getStudentEnrollments para usar tabela correta (student_enrollments)
+- [x] Limpar matrículas órfãs que referenciavam disciplinas inexistentes
+- [x] Criar endpoint student.getSubjectDetails para aluno visualizar detalhes de disciplinas matriculadas
+- [x] Atualizar StudentSubjectDetails.tsx para usar novo endpoint
+- [x] Testar dashboard do aluno com disciplinas válidas
+- [x] Testar página de detalhes da disciplina
+- [x] Testar trilhas de aprendizagem
+- [x] Testar página de exercícios

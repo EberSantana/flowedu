@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, email, name, loginMethod, passwordHash IS NOT NULL as hasPassword FROM users WHERE email = 'professor.qa@flowedu.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, loginMethod, passwordHash IS NOT NULL as hasPassword FROM users WHERE email = 'professor.qa@flowedu.com';",
+  "rows": [
+    {
+      "id": "2700001",
+      "email": "professor.qa@flowedu.com",
+      "name": "Professor Teste QA",
+      "loginMethod": "email",
+      "hasPassword": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\thasPassword\n2700001\tprofessor.qa@flowedu.com\tProfessor Teste QA\temail\t1\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

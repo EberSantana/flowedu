@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, registrationNumber FROM students LIMIT 1; SELECT id, name FROM subjects LIMIT 1; SELECT id FROM users WHERE role = 'admin' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, registrationNumber FROM students LIMIT 1; SELECT id, name FROM subjects LIMIT 1; SELECT id FROM users WHERE role = 'admin' LIMIT 1;",
+  "rows": [
+    {
+      "id": "60064",
+      "registrationNumber": "2022341860"
+    },
+    {
+      "id": "id",
+      "registrationNumber": "name"
+    },
+    {
+      "id": "10",
+      "registrationNumber": "Test Subject Regular"
+    }
+  ],
+  "messages": [
+    "id",
+    "1"
+  ],
+  "stdout": "id\tregistrationNumber\n60064\t2022341860\nid\tname\n10\tTest Subject Regular\nid\n1\n",
+  "stderr": "",
+  "execution_time_ms": 77
+}

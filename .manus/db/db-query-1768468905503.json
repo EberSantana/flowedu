@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, name, email FROM users WHERE passwordHash IS NOT NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, email FROM users WHERE passwordHash IS NOT NULL LIMIT 5;",
+  "rows": [
+    {
+      "id": "1140011",
+      "name": "Professor Teste",
+      "email": "teste.professor@email.com"
+    },
+    {
+      "id": "1170001",
+      "name": "Juliane Fagundes",
+      "email": "fagundesjuliane91@gmail.com"
+    },
+    {
+      "id": "1710001",
+      "name": "Professor Teste",
+      "email": "teacher-1766890621333@test.com"
+    },
+    {
+      "id": "2610001",
+      "name": "Julia Pinto de Noronha",
+      "email": "jps@gmail.com"
+    },
+    {
+      "id": "2610003",
+      "name": "Professor Teste",
+      "email": "professor.teste@escola.edu.br"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\n1140011\tProfessor Teste\tteste.professor@email.com\n1170001\tJuliane Fagundes\tfagundesjuliane91@gmail.com\n1710001\tProfessor Teste\tteacher-1766890621333@test.com\n2610001\tJulia Pinto de Noronha\tjps@gmail.com\n2610003\tProfessor Teste\tprofessor.teste@escola.edu.br\n",
+  "stderr": "",
+  "execution_time_ms": 224
+}

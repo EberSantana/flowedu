@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO student_enrollments (studentId, subjectId, professorId, status, enrolledAt, createdAt, updatedAt)\nSELECT 1, s.id, s.userId, 'active', NOW(), NOW(), NOW()\nFROM subjects s WHERE s.code = 'MAT-QA-001';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO student_enrollments (studentId, subjectId, professorId, status, enrolledAt, createdAt, updatedAt)\nSELECT 1, s.id, s.userId, 'active', NOW(), NOW(), NOW()\nFROM subjects s WHERE s.code = 'MAT-QA-001';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 58
+}

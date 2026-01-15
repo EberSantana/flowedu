@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, userId FROM subjects LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, userId FROM subjects LIMIT 10;",
+  "rows": [
+    {
+      "id": "10",
+      "name": "Test Subject Regular",
+      "userId": "150600"
+    },
+    {
+      "id": "11",
+      "name": "Test Subject Admin",
+      "userId": "150598"
+    },
+    {
+      "id": "14",
+      "name": "Test Subject Regular",
+      "userId": "150600"
+    },
+    {
+      "id": "15",
+      "name": "Test Subject Admin",
+      "userId": "150598"
+    },
+    {
+      "id": "17",
+      "name": "Test Subject Regular",
+      "userId": "150815"
+    },
+    {
+      "id": "18",
+      "name": "Test Subject Admin",
+      "userId": "150813"
+    },
+    {
+      "id": "30001",
+      "name": "Test Subject Regular",
+      "userId": "180006"
+    },
+    {
+      "id": "30002",
+      "name": "Test Subject Admin",
+      "userId": "180001"
+    },
+    {
+      "id": "30004",
+      "name": "Test Subject Regular",
+      "userId": "180021"
+    },
+    {
+      "id": "30005",
+      "name": "Test Subject Admin",
+      "userId": "180017"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tuserId\n10\tTest Subject Regular\t150600\n11\tTest Subject Admin\t150598\n14\tTest Subject Regular\t150600\n15\tTest Subject Admin\t150598\n17\tTest Subject Regular\t150815\n18\tTest Subject Admin\t150813\n30001\tTest Subject Regular\t180006\n30002\tTest Subject Admin\t180001\n30004\tTest Subject Regular\t180021\n30005\tTest Subject Admin\t180017\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

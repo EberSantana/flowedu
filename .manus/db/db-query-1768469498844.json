@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, code FROM subjects WHERE userId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code FROM subjects WHERE userId = 1;",
+  "rows": [
+    {
+      "id": "810002",
+      "name": "Test Subject 1768428856856",
+      "code": "TS1768428856856"
+    },
+    {
+      "id": "810021",
+      "name": "Test Subject 1768428873547",
+      "code": "TS1768428873550"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\n810002\tTest Subject 1768428856856\tTS1768428856856\n810021\tTest Subject 1768428873547\tTS1768428873550\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

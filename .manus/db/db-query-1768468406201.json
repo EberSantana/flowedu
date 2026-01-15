@@ -1,0 +1,55 @@
+{
+  "query": "SELECT * FROM classes LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM classes LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "IMSI31 - D1",
+      "code": "IMSI31 - D1",
+      "description": "Sala 07 Projeto Integrador II ",
+      "userId": "1",
+      "createdAt": "2025-12-11 00:43:21",
+      "updatedAt": "2025-12-11 01:12:34"
+    },
+    {
+      "id": "2",
+      "name": "INFW11 - D1",
+      "code": "INFW11 - D1",
+      "description": "Sala 10 Informática Básica",
+      "userId": "1",
+      "createdAt": "2025-12-11 00:45:05",
+      "updatedAt": "2025-12-11 00:45:05"
+    },
+    {
+      "id": "3",
+      "name": "IAGRO11",
+      "code": "IAGRO11",
+      "description": "Sala 09 Informática Básica",
+      "userId": "1",
+      "createdAt": "2025-12-11 00:45:56",
+      "updatedAt": "2025-12-11 00:45:56"
+    },
+    {
+      "id": "4",
+      "name": "IMSI11",
+      "code": "IMSI11",
+      "description": "Sala 10 Informática Básica",
+      "userId": "1",
+      "createdAt": "2025-12-11 00:46:56",
+      "updatedAt": "2025-12-11 00:46:56"
+    },
+    {
+      "id": "5",
+      "name": "IMSI31 - D2",
+      "code": "IMSI31 - D2",
+      "description": "Sala 07 Segurança da Informação",
+      "userId": "1",
+      "createdAt": "2025-12-11 00:48:49",
+      "updatedAt": "2025-12-11 00:48:49"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tdescription\tuserId\tcreatedAt\tupdatedAt\n1\tIMSI31 - D1\tIMSI31 - D1\tSala 07 Projeto Integrador II \t1\t2025-12-11 00:43:21\t2025-12-11 01:12:34\n2\tINFW11 - D1\tINFW11 - D1\tSala 10 Informática Básica\t1\t2025-12-11 00:45:05\t2025-12-11 00:45:05\n3\tIAGRO11\tIAGRO11\tSala 09 Informática Básica\t1\t2025-12-11 00:45:56\t2025-12-11 00:45:56\n4\tIMSI11\tIMSI11\tSala 10 Informática Básica\t1\t2025-12-11 00:46:56\t2025-12-11 00:46:56\n5\tIMSI31 - D2\tIMSI31 - D2\tSala 07 Segurança da Informação\t1\t2025-12-11 00:48:49\t2025-12-11 00:48:49\n",
+  "stderr": "",
+  "execution_time_ms": 78
+}

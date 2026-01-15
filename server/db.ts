@@ -1251,9 +1251,16 @@ export async function getStudentEnrollments(studentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Buscar matrículas na tabela subjectEnrollments
-  return await db.select().from(subjectEnrollments)
-    .where(eq(subjectEnrollments.studentId, studentId));
+  // Buscar matrículas na tabela student_enrollments (tabela correta com dados)
+  // Retorna com campo 'userId' mapeado de 'professorId' para compatibilidade com o router
+  const enrollments = await db.select().from(studentEnrollments)
+    .where(eq(studentEnrollments.studentId, studentId));
+  
+  // Mapear professorId para userId para compatibilidade com o código existente
+  return enrollments.map(enrollment => ({
+    ...enrollment,
+    userId: enrollment.professorId, // Mapear para compatibilidade
+  }));
 }
 
 export async function getEnrollmentsBySubject(subjectId: number, professorId: number) {

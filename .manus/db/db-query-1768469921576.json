@@ -1,0 +1,14 @@
+{
+  "query": "SELECT s.id as subjectId, s.userId as professorId FROM subjects s WHERE s.code = 'MAT-QA-001';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id as subjectId, s.userId as professorId FROM subjects s WHERE s.code = 'MAT-QA-001';",
+  "rows": [
+    {
+      "subjectId": "840001",
+      "professorId": "2700001"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tprofessorId\n840001\t2700001\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

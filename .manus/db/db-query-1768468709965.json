@@ -1,0 +1,29 @@
+{
+  "query": "SHOW CREATE TABLE subjectEnrollments;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE subjectEnrollments;",
+  "rows": [
+    {
+      "Table": "subjectEnrollments",
+      "Create Table": "CREATE TABLE `subjectEnrollments` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `studentId` int(11) NOT NULL,",
+    "  `subjectId` int(11) NOT NULL,",
+    "  `enrolledAt` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `userId` int(11) NOT NULL,",
+    "  `status` enum('active','completed','dropped') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `unique_enrollment` (`studentId`,`subjectId`,`userId`),",
+    "  KEY `fk_2` (`subjectId`),",
+    "  KEY `fk_3` (`userId`),",
+    "  CONSTRAINT `fk_1` FOREIGN KEY (`studentId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`students` (`id`) ON DELETE CASCADE,",
+    "  CONSTRAINT `fk_2` FOREIGN KEY (`subjectId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`subjects` (`id`) ON DELETE CASCADE,",
+    "  CONSTRAINT `fk_3` FOREIGN KEY (`userId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`users` (`id`) ON DELETE CASCADE",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=480001"
+  ],
+  "stdout": "Table\tCreate Table\nsubjectEnrollments\tCREATE TABLE `subjectEnrollments` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `studentId` int(11) NOT NULL,\n  `subjectId` int(11) NOT NULL,\n  `enrolledAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `userId` int(11) NOT NULL,\n  `status` enum('active','completed','dropped') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `unique_enrollment` (`studentId`,`subjectId`,`userId`),\n  KEY `fk_2` (`subjectId`),\n  KEY `fk_3` (`userId`),\n  CONSTRAINT `fk_1` FOREIGN KEY (`studentId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`students` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `fk_2` FOREIGN KEY (`subjectId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`subjects` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `fk_3` FOREIGN KEY (`userId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`users` (`id`) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=480001\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

@@ -1,0 +1,80 @@
+{
+  "query": "SELECT se.id, se.subjectId, se.professorId, s.name as subjectName, s.code as subjectCode\nFROM student_enrollments se \nLEFT JOIN subjects s ON se.subjectId = s.id AND se.professorId = s.userId\nWHERE se.studentId = 1 \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.id, se.subjectId, se.professorId, s.name as subjectName, s.code as subjectCode\nFROM student_enrollments se \nLEFT JOIN subjects s ON se.subjectId = s.id AND se.professorId = s.userId\nWHERE se.studentId = 1 \nLIMIT 10;",
+  "rows": [
+    {
+      "id": "120001",
+      "subjectId": "7",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "150001",
+      "subjectId": "8",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "180001",
+      "subjectId": "9",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "210001",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "210002",
+      "subjectId": "6",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "210003",
+      "subjectId": "240003",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "240001",
+      "subjectId": "240006",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "240002",
+      "subjectId": "240009",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "270001",
+      "subjectId": "1",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    },
+    {
+      "id": "330001",
+      "subjectId": "480008",
+      "professorId": "1",
+      "subjectName": "NULL",
+      "subjectCode": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsubjectId\tprofessorId\tsubjectName\tsubjectCode\n120001\t7\t1\tNULL\tNULL\n150001\t8\t1\tNULL\tNULL\n180001\t9\t1\tNULL\tNULL\n210001\t120001\t1\tNULL\tNULL\n210002\t6\t1\tNULL\tNULL\n210003\t240003\t1\tNULL\tNULL\n240001\t240006\t1\tNULL\tNULL\n240002\t240009\t1\tNULL\tNULL\n270001\t1\t1\tNULL\tNULL\n330001\t480008\t1\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 101
+}

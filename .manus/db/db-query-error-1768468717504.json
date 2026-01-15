@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO subjectEnrollments (studentId, subjectId, userId, status) VALUES (1, 1, 1, 'active');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO subjectEnrollments (studentId, subjectId, userId, status) VALUES (1, 1, 1, 'active');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1452 (23000) at line 1: Cannot add or update a child row: a foreign key constraint fails (`c6fhcpifofzeqqxntskeu6`.`subjectenrollments`, CONSTRAINT `fk_2` FOREIGN KEY (`subjectId`) REFERENCES `subjects` (`id`) ON DELETE CASCADE)"
+  ]
+}

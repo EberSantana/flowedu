@@ -1,0 +1,60 @@
+{
+  "query": "SELECT se.subjectId, se.professorId, \n       CASE WHEN EXISTS (SELECT 1 FROM subjects s WHERE s.id = se.subjectId) THEN 'YES' ELSE 'NO' END as subject_exists\nFROM student_enrollments se \nWHERE se.studentId = 1\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.subjectId, se.professorId, \n       CASE WHEN EXISTS (SELECT 1 FROM subjects s WHERE s.id = se.subjectId) THEN 'YES' ELSE 'NO' END as subject_exists\nFROM student_enrollments se \nWHERE se.studentId = 1\nLIMIT 10;",
+  "rows": [
+    {
+      "subjectId": "7",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "8",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "9",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "120001",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "6",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "240003",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "240006",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "240009",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "1",
+      "professorId": "1",
+      "subject_exists": "NO"
+    },
+    {
+      "subjectId": "480008",
+      "professorId": "1",
+      "subject_exists": "NO"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tprofessorId\tsubject_exists\n7\t1\tNO\n8\t1\tNO\n9\t1\tNO\n120001\t1\tNO\n6\t1\tNO\n240003\t1\tNO\n240006\t1\tNO\n240009\t1\tNO\n1\t1\tNO\n480008\t1\tNO\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

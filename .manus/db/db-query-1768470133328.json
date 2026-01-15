@@ -1,0 +1,22 @@
+{
+  "query": "SELECT se.id, se.subjectId, se.professorId, s.name as subject_name\nFROM student_enrollments se \nJOIN subjects s ON se.subjectId = s.id\nWHERE se.studentId = 1\nORDER BY se.id DESC\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.id, se.subjectId, se.professorId, s.name as subject_name\nFROM student_enrollments se \nJOIN subjects s ON se.subjectId = s.id\nWHERE se.studentId = 1\nORDER BY se.id DESC\nLIMIT 5;",
+  "rows": [
+    {
+      "id": "450002",
+      "subjectId": "840001",
+      "professorId": "2700001",
+      "subject_name": "Matemática Básica QA"
+    },
+    {
+      "id": "420009",
+      "subjectId": "810002",
+      "professorId": "1",
+      "subject_name": "Test Subject 1768428856856"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsubjectId\tprofessorId\tsubject_name\n450002\t840001\t2700001\tMatemática Básica QA\n420009\t810002\t1\tTest Subject 1768428856856\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks, studentExerciseAnswers } from "../drizzle/schema";
+import { tasks, studentExerciseAnswers, subjects } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
@@ -2898,6 +2898,41 @@ JSON (descrições MAX 15 chars):
       ctx.res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true };
     }),
+    
+    // Obter detalhes de uma disciplina específica para o aluno
+    getSubjectDetails: studentProcedure
+      .input(z.object({ subjectId: z.number(), professorId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        // Verificar se o aluno está matriculado nesta disciplina
+        const enrollments = await db.getStudentEnrollments(ctx.studentSession.studentId);
+        const enrollment = enrollments.find(e => e.subjectId === input.subjectId);
+        
+        if (!enrollment) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Você não está matriculado nesta disciplina' });
+        }
+        
+        // Buscar disciplina sem verificar userId (aluno pode ver qualquer disciplina em que está matriculado)
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error("Database not available");
+        
+        const subjectResult = await dbInstance.select().from(subjects).where(
+          eq(subjects.id, input.subjectId)
+        ).limit(1);
+        
+        const subject = subjectResult.length > 0 ? subjectResult[0] : null;
+        
+        if (!subject) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Disciplina não encontrada' });
+        }
+        
+        const professor = await db.getUserById(input.professorId);
+        
+        return {
+          ...subject,
+          professor,
+          enrollment,
+        };
+      }),
     
     getEnrolledSubjects: studentProcedure
       .query(async ({ ctx }) => {

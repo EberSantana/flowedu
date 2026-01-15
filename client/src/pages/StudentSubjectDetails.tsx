@@ -31,11 +31,14 @@ export default function StudentSubjectDetails() {
   const professorId = params?.professorId ? parseInt(params.professorId) : 0;
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Query para buscar informações da disciplina
-  const { data: subject, isLoading: subjectLoading } = trpc.subjects.getById.useQuery(
-    { id: subjectId },
-    { enabled: !!subjectId }
+  // Query para buscar informações da disciplina (usando endpoint do aluno)
+  const { data: subjectData, isLoading: subjectLoading } = trpc.student.getSubjectDetails.useQuery(
+    { subjectId, professorId },
+    { enabled: !!subjectId && !!professorId }
   );
+  
+  // Extrair subject do resultado
+  const subject = subjectData;
 
   // Query para buscar trilha de aprendizagem
   const { data: learningPath, isLoading: pathLoading } = trpc.student.getSubjectLearningPath.useQuery(

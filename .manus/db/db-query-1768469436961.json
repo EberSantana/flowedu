@@ -1,0 +1,125 @@
+{
+  "query": "SELECT DISTINCT se.subjectId, se.professorId, \n       (SELECT s.name FROM subjects s WHERE s.id = se.subjectId AND s.userId = se.professorId) as subjectName\nFROM student_enrollments se \nWHERE se.studentId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT DISTINCT se.subjectId, se.professorId, \n       (SELECT s.name FROM subjects s WHERE s.id = se.subjectId AND s.userId = se.professorId) as subjectName\nFROM student_enrollments se \nWHERE se.studentId = 1;",
+  "rows": [
+    {
+      "subjectId": "1",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "780004",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "120001",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "6",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "600114",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "600040",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "240003",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "5",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "600076",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "240009",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "600110",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "810002",
+      "professorId": "1",
+      "subjectName": "Test Subject 1768428856856"
+    },
+    {
+      "subjectId": "240006",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "2",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "9",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "480008",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "600058",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "7",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "780063",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "4",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "600099",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "780026",
+      "professorId": "1",
+      "subjectName": "NULL"
+    },
+    {
+      "subjectId": "8",
+      "professorId": "1",
+      "subjectName": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tprofessorId\tsubjectName\n1\t1\tNULL\n780004\t1\tNULL\n120001\t1\tNULL\n6\t1\tNULL\n600114\t1\tNULL\n600040\t1\tNULL\n240003\t1\tNULL\n5\t1\tNULL\n600076\t1\tNULL\n240009\t1\tNULL\n600110\t1\tNULL\n810002\t1\tTest Subject 1768428856856\n240006\t1\tNULL\n2\t1\tNULL\n9\t1\tNULL\n480008\t1\tNULL\n600058\t1\tNULL\n7\t1\tNULL\n780063\t1\tNULL\n4\t1\tNULL\n600099\t1\tNULL\n780026\t1\tNULL\n8\t1\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

@@ -1,0 +1,30 @@
+{
+  "query": "SELECT DISTINCT se.subjectId, se.professorId FROM student_enrollments se WHERE se.studentId = 1 LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT DISTINCT se.subjectId, se.professorId FROM student_enrollments se WHERE se.studentId = 1 LIMIT 5;",
+  "rows": [
+    {
+      "subjectId": "810002",
+      "professorId": "1"
+    },
+    {
+      "subjectId": "840001",
+      "professorId": "2700001"
+    },
+    {
+      "subjectId": "600114",
+      "professorId": "1"
+    },
+    {
+      "subjectId": "6",
+      "professorId": "1"
+    },
+    {
+      "subjectId": "480008",
+      "professorId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "subjectId\tprofessorId\n810002\t1\n840001\t2700001\n600114\t1\n6\t1\n480008\t1\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

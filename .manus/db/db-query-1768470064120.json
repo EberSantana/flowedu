@@ -1,0 +1,55 @@
+{
+  "query": "SELECT se.id, se.studentId, se.subjectId, se.professorId, s.id as subject_id_check, s.name as subject_name, s.userId as subject_userId\nFROM student_enrollments se \nLEFT JOIN subjects s ON se.subjectId = s.id AND se.professorId = s.userId\nWHERE se.studentId = 1\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.id, se.studentId, se.subjectId, se.professorId, s.id as subject_id_check, s.name as subject_name, s.userId as subject_userId\nFROM student_enrollments se \nLEFT JOIN subjects s ON se.subjectId = s.id AND se.professorId = s.userId\nWHERE se.studentId = 1\nLIMIT 5;",
+  "rows": [
+    {
+      "id": "120001",
+      "studentId": "1",
+      "subjectId": "7",
+      "professorId": "1",
+      "subject_id_check": "NULL",
+      "subject_name": "NULL",
+      "subject_userId": "NULL"
+    },
+    {
+      "id": "150001",
+      "studentId": "1",
+      "subjectId": "8",
+      "professorId": "1",
+      "subject_id_check": "NULL",
+      "subject_name": "NULL",
+      "subject_userId": "NULL"
+    },
+    {
+      "id": "180001",
+      "studentId": "1",
+      "subjectId": "9",
+      "professorId": "1",
+      "subject_id_check": "NULL",
+      "subject_name": "NULL",
+      "subject_userId": "NULL"
+    },
+    {
+      "id": "210001",
+      "studentId": "1",
+      "subjectId": "120001",
+      "professorId": "1",
+      "subject_id_check": "NULL",
+      "subject_name": "NULL",
+      "subject_userId": "NULL"
+    },
+    {
+      "id": "210002",
+      "studentId": "1",
+      "subjectId": "6",
+      "professorId": "1",
+      "subject_id_check": "NULL",
+      "subject_name": "NULL",
+      "subject_userId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tprofessorId\tsubject_id_check\tsubject_name\tsubject_userId\n120001\t1\t7\t1\tNULL\tNULL\tNULL\n150001\t1\t8\t1\tNULL\tNULL\tNULL\n180001\t1\t9\t1\tNULL\tNULL\tNULL\n210001\t1\t120001\t1\tNULL\tNULL\tNULL\n210002\t1\t6\t1\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}
