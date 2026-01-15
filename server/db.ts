@@ -11077,3 +11077,22 @@ export async function getExerciseAttemptsByStudent(exerciseId: number, studentId
 
   return attempts;
 }
+
+
+// Buscar alunos matriculados nas disciplinas do professor
+export async function getEnrolledStudentsByProfessor(professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Buscar todas as matrículas de alunos nas disciplinas do professor
+  const enrollments = await db.select({
+    studentId: subjectEnrollments.studentId,
+    subjectId: subjectEnrollments.subjectId,
+    enrolledAt: subjectEnrollments.enrolledAt,
+    status: subjectEnrollments.status,
+  })
+    .from(subjectEnrollments)
+    .where(eq(subjectEnrollments.userId, professorId));
+
+  return enrollments;
+}

@@ -6792,25 +6792,19 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         subjectId: z.number().optional(),
       }))
       .query(async ({ ctx, input }) => {
-        // Buscar alunos - se tiver disciplina selecionada, buscar apenas alunos matriculados nela
-        let students;
-        if (input.subjectId) {
-          // Buscar alunos matriculados na disciplina específica
-          const enrollments = await db.getEnrollmentsBySubject(input.subjectId, ctx.user.id);
-          const studentIds = enrollments.map(e => e.studentId);
-          const allStudents = await db.getStudentsByUser(ctx.user.id);
-          students = allStudents.filter(s => studentIds.includes(s.id));
-        } else {
-          // Buscar todos os alunos únicos do professor (sem duplicatas)
-          const allStudents = await db.getStudentsByUser(ctx.user.id);
-          // Remover duplicatas por ID
-          const uniqueStudentIds = new Set<number>();
-          students = allStudents.filter(s => {
-            if (uniqueStudentIds.has(s.id)) return false;
-            uniqueStudentIds.add(s.id);
-            return true;
-          });
-        }
+        // Buscar alunos MATRICULADOS nas disciplinas do professor (via subjectEnrollments)
+        // Isso conta apenas alunos que estão realmente matriculados, não todos os cadastrados
+        const enrolledStudents = await db.getEnrolledStudentsByProfessor(ctx.user.id);
+        
+        // Contar alunos únicos por studentId (evita duplicatas se o aluno estiver em várias disciplinas)
+        const uniqueStudentIds = new Set<number>();
+        const uniqueEnrollments = enrolledStudents.filter(e => {
+          if (uniqueStudentIds.has(e.studentId)) {
+            return false;
+          }
+          uniqueStudentIds.add(e.studentId);
+          return true;
+        });
         
         // Buscar alertas críticos
         const allAlerts = await db.getPendingAlerts(ctx.user.id);
@@ -6818,13 +6812,13 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         
         // Buscar insights recentes
         const recentInsights = [];
-        for (const student of students.slice(0, 10)) {
-          const insights = await db.getStudentInsights(student.id, ctx.user.id, false);
+        for (const enrollment of uniqueEnrollments.slice(0, 10)) {
+          const insights = await db.getStudentInsights(enrollment.studentId, ctx.user.id, false);
           recentInsights.push(...insights.slice(0, 2));
         }
         
         return {
-          totalStudents: students.length,
+          totalStudents: uniqueEnrollments.length,
           criticalAlerts: criticalAlerts.length,
           recentInsights: recentInsights.slice(0, 10),
           studentsNeedingAttention: criticalAlerts.map(a => a.studentId).filter((v, i, a) => a.indexOf(v) === i).length,
