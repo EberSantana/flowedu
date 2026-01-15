@@ -5898,3 +5898,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Adicionado card com número de módulos e carga horária real
 - Cards superiores agora mostram total de tópicos corretamente
 - Corrigido getStudyStatistics para buscar matrículas em ambas as tabelas (student_enrollments e subject_enrollments)
+
+## Página de Estatísticas - Tema Dinâmico
+- [ ] Atualizar página de Estatísticas de Desempenho para usar variáveis CSS do tema escolhido pelo aluno
+
+## Padronização de Temas
+- [x] Atualizar página de Estatísticas de Desempenho para usar variáveis CSS do tema escolhido pelo aluno
