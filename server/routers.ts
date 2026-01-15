@@ -7028,6 +7028,67 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
       .mutation(async ({ ctx, input }) => {
         return db.respondDoubt(input.doubtId, input.answer, ctx.user.id);
       }),
+
+    // Obter dicas da IA para resolver a dúvida
+    getAIHints: studentProcedure
+      .input(z.object({
+        doubtId: z.number(),
+        question: z.string(),
+        context: z.string().optional(),
+        subjectName: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const response = await invokeLLM({
+            messages: [
+              {
+                role: "system",
+                content: `Você é um tutor educacional amigável e paciente. Seu papel é ajudar o aluno a entender o conceito por trás da dúvida, NÃO dar a resposta direta.
+
+Regras:
+1. Forneça DICAS e SUGESTÕES para guiar o raciocínio do aluno
+2. Use analogias e exemplos do dia a dia quando possível
+3. Divida o problema em passos menores
+4. Incentive o aluno a pensar criticamente
+5. Seja encorajador e positivo
+6. Responda em português brasileiro
+7. Limite sua resposta a 3-4 dicas principais
+8. Se a dúvida for sobre um tópico específico, contextualize com a disciplina
+
+Formato da resposta:
+- Use emojis para tornar mais amigável
+- Estruture em tópicos claros
+- Termine com uma pergunta reflexiva para o aluno`
+              },
+              {
+                role: "user",
+                content: `Disciplina: ${input.subjectName || "Não especificada"}
+
+Dúvida do aluno: ${input.question}
+
+${input.context ? `Contexto adicional: ${input.context}` : ""}
+
+Por favor, forneça dicas e sugestões para ajudar o aluno a resolver essa dúvida por conta própria.`
+              }
+            ],
+          });
+
+          const hints = response.choices[0]?.message?.content || "Desculpe, não consegui gerar dicas no momento. Tente novamente.";
+          
+          return {
+            success: true,
+            hints,
+            doubtId: input.doubtId,
+          };
+        } catch (error) {
+          console.error("Erro ao gerar dicas da IA:", error);
+          return {
+            success: false,
+            hints: "Desculpe, ocorreu um erro ao gerar as dicas. Por favor, tente novamente mais tarde ou aguarde a resposta do professor.",
+            doubtId: input.doubtId,
+          };
+        }
+      }),
   }),
 
   // ==================== CADERNO DE EXERCÍCIOS ====================

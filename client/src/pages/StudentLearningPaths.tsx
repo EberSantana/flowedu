@@ -264,65 +264,71 @@ export default function StudentLearningPaths() {
 
           {/* Recursos Adicionais */}
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Card className="bg-gradient-to-br from-blue-100 to-background border-blue-400 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <BookMarked className="w-5 h-5" />
-                Diário de Aprendizagem
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Registre suas reflexões, anotações e insights sobre cada tópico estudado.
-              </p>
-              <Link href="/student/learning-journal">
-                <Button variant="default" size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Acessar Diário
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+            <Card className="bg-white border-2 border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <BookMarked className="w-5 h-5 text-blue-600" />
+                  </div>
+                  Diário de Aprendizagem
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Registre suas reflexões, anotações e insights sobre cada tópico estudado.
+                </p>
+                <Link href="/student/learning-journal">
+                  <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Acessar Diário
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-br from-accent/10 to-background border-accent/30 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-900">
-                <MessageCircle className="w-5 h-5" />
-                Minhas Dúvidas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Envie suas dúvidas aos professores e acompanhe as respostas.
-              </p>
-              <Link href="/student/doubts">
-                <Button variant="default" size="sm" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                  <Lightbulb className="w-4 h-4 mr-2" />
-                  Ver Dúvidas ({stats?.pendingDoubts || 0})
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+            <Card className="bg-white border-2 border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <MessageCircle className="w-5 h-5 text-purple-600" />
+                  </div>
+                  Minhas Dúvidas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Envie suas dúvidas aos professores e acompanhe as respostas.
+                </p>
+                <Link href="/student/doubts">
+                  <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Ver Dúvidas ({stats?.pendingDoubts || 0})
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-gradient-to-br from-success/10 to-background border-success/30 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <TrendingUp className="w-5 h-5" />
-                Estatísticas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Acompanhe seu desempenho e evolução em todas as disciplinas.
-              </p>
-              <Link href="/student/statistics">
-                <Button variant="default" size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Ver Estatísticas
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+            <Card className="bg-white border-2 border-emerald-200 hover:shadow-lg hover:border-emerald-400 transition-all">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <div className="p-2 bg-emerald-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  Estatísticas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Acompanhe seu desempenho e evolução em todas as disciplinas.
+                </p>
+                <Link href="/student/statistics">
+                  <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Ver Estatísticas
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

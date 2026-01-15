@@ -5830,3 +5830,24 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 **Causa raiz:** As funções `getAnnouncementsForStudent` e `getUnreadAnnouncementsCount` buscavam apenas da tabela `studentEnrollments`, mas os alunos da disciplina Segurança estão matriculados na tabela `subjectEnrollments`.
 
 **Solução:** Modificadas ambas as funções para buscar de AMBAS as tabelas de matrícula e combinar os resultados, removendo duplicatas.
+
+
+## 🐛 Correções Portal do Aluno - Dúvidas e Estatísticas (15/01/2026)
+
+- [ ] Corrigir contador de dúvidas no card "Minhas Dúvidas"
+- [ ] Corrigir card de "Estatísticas" que está com quadrado branco fora do padrão
+- [ ] Implementar IA para dar dicas e sugestões nas dúvidas do aluno
+
+
+## 🐛 Correções Portal do Aluno - Dúvidas e Estatísticas (15/01/2026)
+
+- [x] Corrigir contador de dúvidas no card "Minhas Dúvidas"
+- [x] Corrigir card de "Estatísticas" com quadrado branco fora do padrão
+- [x] Implementar IA para dar dicas nas dúvidas do aluno
+- [x] Testar funcionalidades
+
+**Melhorias aplicadas:**
+- Cards de recursos (Diário, Dúvidas, Estatísticas) redesenhados com visual consistente
+- Bordas coloridas e ícones em backgrounds arredondados
+- Botão "Pedir Dicas da IA" adicionado nas dúvidas pendentes
+- IA gera dicas e sugestões para ajudar o aluno a resolver a dúvida por conta própria
