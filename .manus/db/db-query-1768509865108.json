@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, studentId, status FROM student_topic_doubts LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, studentId, status FROM student_topic_doubts LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "studentId": "1",
+      "status": "pending"
+    },
+    {
+      "id": "2",
+      "studentId": "1",
+      "status": "answered"
+    },
+    {
+      "id": "30001",
+      "studentId": "60060",
+      "status": "pending"
+    },
+    {
+      "id": "30002",
+      "studentId": "1",
+      "status": "pending"
+    },
+    {
+      "id": "30003",
+      "studentId": "1",
+      "status": "answered"
+    },
+    {
+      "id": "30004",
+      "studentId": "1",
+      "status": "pending"
+    },
+    {
+      "id": "30005",
+      "studentId": "1",
+      "status": "answered"
+    },
+    {
+      "id": "30006",
+      "studentId": "1",
+      "status": "pending"
+    },
+    {
+      "id": "30007",
+      "studentId": "1",
+      "status": "answered"
+    },
+    {
+      "id": "30008",
+      "studentId": "1",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tstatus\n1\t1\tpending\n2\t1\tanswered\n30001\t60060\tpending\n30002\t1\tpending\n30003\t1\tanswered\n30004\t1\tpending\n30005\t1\tanswered\n30006\t1\tpending\n30007\t1\tanswered\n30008\t1\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

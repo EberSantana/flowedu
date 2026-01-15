@@ -389,51 +389,24 @@ export default function StudentLearningPathDetail() {
                   </div>
                 )}
 
-                {/* Diário de Aprendizagem */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <BookMarked className="w-5 h-5 text-purple-600" />
-                    Adicionar ao Diário
-                  </h3>
-                  <Textarea 
-                    placeholder="Registre suas anotações, reflexões ou insights sobre este tópico..."
-                    value={journalContent}
-                    onChange={(e) => setJournalContent(e.target.value)}
-                    rows={4}
-                    className="mb-2"
-                  />
-                  <Button 
-                    onClick={handleAddJournalEntry}
-                    disabled={addJournal.isPending}
-                    className="w-full"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Salvar no Diário
-                  </Button>
-                </div>
-
-                {/* Sistema de Dúvidas */}
+                {/* Minhas Dúvidas */}
                 <div>
                   <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
                     <MessageCircle className="w-5 h-5 text-orange-600" />
-                    Enviar Dúvida ao Professor
+                    Minhas Dúvidas
                   </h3>
-                  <Textarea 
-                    placeholder="Descreva sua dúvida sobre este tópico..."
-                    value={doubtQuestion}
-                    onChange={(e) => setDoubtQuestion(e.target.value)}
-                    rows={3}
-                    className="mb-2"
-                  />
-                  <Button 
-                    onClick={handleSubmitDoubt}
-                    disabled={submitDoubt.isPending}
-                    className="w-full"
-                    variant="outline"
-                  >
-                    <HelpCircle className="w-4 h-4 mr-2" />
-                    Enviar Dúvida
-                  </Button>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Envie suas dúvidas aos professores e acompanhe as respostas.
+                  </p>
+                  <Link href="/student/doubts">
+                    <Button 
+                      className="w-full"
+                      variant="outline"
+                    >
+                      <HelpCircle className="w-4 h-4 mr-2" />
+                      Ver Minhas Dúvidas
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

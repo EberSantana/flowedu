@@ -5867,3 +5867,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Criada mutation deleteDoubt no frontend e backend
 - Criada função deleteStudentDoubt no db.ts
 - Corrigido contador de dúvidas: agora busca todas as dúvidas do aluno (independente do tópico)
+
+
+## 🐛 Correções Modal de Tópico (15/01/2026)
+
+- [x] Remover seção "Adicionar ao Diário" do modal de tópico
+- [x] Renomear "Enviar Dúvida ao Professor" para "Minhas Dúvidas" e redirecionar para página de dúvidas
+- [x] Corrigir indicador (0) no botão "Ver Dúvidas" que não conta corretamente
+
+**Alterações realizadas:**
+- Removida seção "Adicionar ao Diário" do modal de tópico (StudentLearningPathDetail.tsx)
+- Renomeado "Enviar Dúvida ao Professor" para "Minhas Dúvidas"
+- Botão agora é "Ver Minhas Dúvidas" e redireciona para a página de dúvidas na trilha
+- Contador de dúvidas corrigido: busca todas as dúvidas do aluno independente do tópico (getStudyStatistics)

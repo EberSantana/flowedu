@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, registrationNumber, fullName FROM students WHERE id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, registrationNumber, fullName FROM students WHERE id = 1;",
+  "rows": [
+    {
+      "id": "1",
+      "registrationNumber": "2024001",
+      "fullName": "Aluno Teste"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregistrationNumber\tfullName\n1\t2024001\tAluno Teste\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

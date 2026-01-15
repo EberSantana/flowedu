@@ -7566,6 +7566,13 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
   
   const subjectIds = enrollments.map(e => e.subjectId);
   
+  // Buscar dúvidas - buscar todas as dúvidas do aluno (independente do tópico/matrícula)
+  const allDoubts = await db.select().from(studentTopicDoubts)
+    .where(eq(studentTopicDoubts.studentId, studentId));
+  
+  const pendingDoubtsCount = allDoubts.filter(d => d.status === 'pending').length;
+  const answeredDoubtsCount = allDoubts.filter(d => d.status === 'answered').length;
+  
   if (subjectIds.length === 0) {
     return {
       totalTopics: 0,
@@ -7574,8 +7581,8 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
       notStartedTopics: 0,
       totalHoursEstimated: 0,
       journalEntries: 0,
-      pendingDoubts: 0,
-      answeredDoubts: 0
+      pendingDoubts: pendingDoubtsCount,
+      answeredDoubts: answeredDoubtsCount
     };
   }
   
@@ -7619,10 +7626,6 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
       inArray(studentLearningJournal.topicId, topicIds)
     ));
   
-  // Buscar dúvidas - buscar todas as dúvidas do aluno (independente do tópico)
-  const doubts = await db.select().from(studentTopicDoubts)
-    .where(eq(studentTopicDoubts.studentId, studentId));
-  
   const completedTopics = progress.filter(p => p.status === 'completed').length;
   const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
   const notStartedTopics = topics.length - completedTopics - inProgressTopics;
@@ -7635,8 +7638,8 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
     notStartedTopics,
     totalHoursEstimated,
     journalEntries: journalCount[0]?.count || 0,
-    pendingDoubts: doubts.filter(d => d.status === 'pending').length,
-    answeredDoubts: doubts.filter(d => d.status === 'answered').length
+    pendingDoubts: pendingDoubtsCount,
+    answeredDoubts: answeredDoubtsCount
   };
 }
 

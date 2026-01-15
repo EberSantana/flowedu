@@ -1,0 +1,8 @@
+{
+  "query": "SELECT lp.id, lp.subject_id, s.name as subject_name FROM learning_paths lp JOIN subjects s ON lp.subject_id = s.id LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT lp.id, lp.subject_id, s.name as subject_name FROM learning_paths lp JOIN subjects s ON lp.subject_id = s.id LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'c6fhcpifofzeqqxntskeu6.learning_paths' doesn't exist"
+  ]
+}
