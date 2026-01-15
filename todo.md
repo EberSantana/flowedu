@@ -5578,3 +5578,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Aplicado fundo neutro (bg-muted) consistente com o professor
 - Unificado cores de menu ativo, avatar e botões
 - Removidas cores hardcoded (text-blue-600, etc.) por variáveis do tema
+
+
+## 🖼️ Ajuste do Tamanho da Logo (15/01/2026)
+
+- [x] Aumentar tamanho da logo na sidebar do portal do aluno (h-10 w-10 → h-14 w-14)

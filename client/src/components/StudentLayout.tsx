@@ -74,7 +74,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         <div className="flex flex-col flex-grow bg-card border-r border-border shadow-xl">
           {/* Logo */}
           <div className="flex items-center gap-3 px-6 py-6 border-b border-border bg-muted">
-            <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
+            <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
             <div>
               <h1 className="font-bold text-foreground text-xl">Portal do Aluno</h1>
               <p className="text-xs text-muted-foreground">FlowEdu</p>
@@ -172,7 +172,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           {/* Logo + Close */}
           <div className="flex items-center justify-between px-6 py-6 border-b border-border bg-muted">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
+              <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
               <div>
                 <h1 className="font-bold text-foreground text-xl">Portal do Aluno</h1>
                 <p className="text-xs text-muted-foreground">FlowEdu</p>
@@ -273,7 +273,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Menu className="w-6 h-6 text-foreground" />
             </button>
             <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="FlowEdu" className="h-8 w-8" />
+              <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
               <span className="font-bold text-foreground">Portal do Aluno</span>
             </div>
             <StudentNotifications />
