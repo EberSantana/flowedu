@@ -5708,3 +5708,26 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Botão "Trilhas de Aprendizagem": bg-purple-600 (cor sólida roxa)
 - Botão "Matricular em Disciplinas": bg-purple-600 (cor sólida roxa)
 - Removidos todos os gradientes com primary/opacity que causavam transparência
+
+
+## 🎨 Padronização Central de Cores dos Botões (15/01/2026)
+
+- [x] Criar arquivo de configuração central de cores
+- [x] Definir classes utilitárias para cada tipo de botão
+- [x] Documentar padrões de uso
+
+**Arquivos criados:**
+- `client/src/lib/button-styles.ts` - Constantes TypeScript para cores de botões
+- `client/src/index.css` - Classes CSS utilitárias (.btn-primary, .btn-success, etc.)
+
+**Paleta de cores definida:**
+| Tipo | Classe | Cor |
+|------|--------|-----|
+| Primário | btn-primary | Roxo (purple-600) |
+| Sucesso | btn-success | Verde (emerald-600) |
+| Perigo | btn-danger | Vermelho (red-600) |
+| Neutro | btn-neutral | Cinza (slate-600) |
+| Info | btn-info | Azul claro (sky-600) |
+| Trilhas | btn-learning-path | Roxo (purple-600) |
+| Exercícios | btn-exercise | Laranja (orange-600) |
+| Estatísticas | btn-stats | Índigo (indigo-600) |

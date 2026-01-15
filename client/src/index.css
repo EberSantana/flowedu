@@ -565,3 +565,100 @@
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
+
+
+/* =====================================================
+ * FLOWEDU - CLASSES UTILITÁRIAS DE BOTÕES
+ * =====================================================
+ * 
+ * Classes CSS padronizadas para botões do sistema.
+ * Use em conjunto com o arquivo button-styles.ts
+ * 
+ * IMPORTANTE: Todas as cores são SÓLIDAS (sem transparência)
+ * para garantir visibilidade em qualquer tema.
+ */
+
+@layer components {
+  /* === BOTÕES PRIMÁRIOS === */
+  
+  /* Botão primário - Roxo (cor principal FlowEdu) */
+  .btn-primary {
+    @apply bg-purple-600 hover:bg-purple-700 text-white transition-colors;
+  }
+  
+  /* Botão primário alternativo - Azul */
+  .btn-primary-alt {
+    @apply bg-blue-600 hover:bg-blue-700 text-white transition-colors;
+  }
+  
+  /* === BOTÕES DE AÇÃO === */
+  
+  /* Botão de sucesso - Verde */
+  .btn-success {
+    @apply bg-emerald-600 hover:bg-emerald-700 text-white transition-colors;
+  }
+  
+  /* Botão de perigo - Vermelho */
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white transition-colors;
+  }
+  
+  /* Botão de aviso - Âmbar */
+  .btn-warning {
+    @apply bg-amber-600 hover:bg-amber-700 text-white transition-colors;
+  }
+  
+  /* Botão de informação - Azul claro */
+  .btn-info {
+    @apply bg-sky-600 hover:bg-sky-700 text-white transition-colors;
+  }
+  
+  /* === BOTÕES NEUTROS === */
+  
+  /* Botão neutro - Cinza */
+  .btn-neutral {
+    @apply bg-slate-600 hover:bg-slate-700 text-white transition-colors;
+  }
+  
+  /* Botão de cancelar - Cinza claro */
+  .btn-cancel {
+    @apply bg-gray-500 hover:bg-gray-600 text-white transition-colors;
+  }
+  
+  /* === BOTÕES TEMÁTICOS === */
+  
+  /* Trilhas de aprendizagem - Roxo */
+  .btn-learning-path {
+    @apply bg-purple-600 hover:bg-purple-700 text-white transition-colors;
+  }
+  
+  /* Exercícios - Laranja */
+  .btn-exercise {
+    @apply bg-orange-600 hover:bg-orange-700 text-white transition-colors;
+  }
+  
+  /* Estatísticas - Índigo */
+  .btn-stats {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white transition-colors;
+  }
+  
+  /* Suporte/Dúvidas - Rosa */
+  .btn-support {
+    @apply bg-pink-600 hover:bg-pink-700 text-white transition-colors;
+  }
+  
+  /* Diário - Azul */
+  .btn-diary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white transition-colors;
+  }
+  
+  /* Alunos/Matrícula - Verde */
+  .btn-students {
+    @apply bg-emerald-600 hover:bg-emerald-700 text-white transition-colors;
+  }
+  
+  /* Avisos - Âmbar */
+  .btn-announcements {
+    @apply bg-amber-600 hover:bg-amber-700 text-white transition-colors;
+  }
+}
