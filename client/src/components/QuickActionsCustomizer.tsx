@@ -19,9 +19,9 @@ export interface QuickAction {
 // Cores baseadas nas variáveis do tema para consistência visual
 const DEFAULT_ACTIONS: QuickAction[] = [
   { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-primary to-primary/80", enabled: true },
-  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-accent to-accent/80", enabled: true },
-  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-success to-success/80", enabled: true },
-  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-info to-info/80", enabled: true },
+  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-slate-600 to-slate-500", enabled: true },
+  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-emerald-600 to-emerald-500", enabled: true },
+  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-blue-600 to-blue-500", enabled: true },
   { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-destructive to-destructive/80", enabled: true },
   { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "from-warning to-warning/80", enabled: false },
   { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "from-chart-1 to-chart-1/80", enabled: false },

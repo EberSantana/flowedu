@@ -539,7 +539,7 @@ export default function Subjects() {
                           <Button
                             variant="default"
                             size="sm"
-                            className="w-full bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70"
+                            className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white"
                           >
                             <Users className="mr-2 h-3 w-3" />
                             {enrollmentCounts[subject.id] || 0} Aluno(s) - Ver Detalhes
@@ -553,7 +553,7 @@ export default function Subjects() {
                           setSelectedSubjectForEnroll(subject.id);
                           setIsQuickEnrollOpen(true);
                         }}
-                        className="bg-gradient-to-r from-info to-info/80 hover:from-info/90 hover:to-info/70"
+                        className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white"
                         title="Matricular aluno rapidamente"
                       >
                         <UserPlus className="h-3 w-3" />
@@ -563,7 +563,7 @@ export default function Subjects() {
                       <Button
                         variant="default"
                         size="sm"
-                        className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70"
+                        className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white"
                       >
                         <Route className="mr-2 h-3 w-3" />
                         Trilhas de Aprendizagem

@@ -1,0 +1,40 @@
+{
+  "query": "SELECT u.id, u.name, u.email, COUNT(s.id) as subjects_count \nFROM users u \nLEFT JOIN subjects s ON s.userId = u.id \nGROUP BY u.id \nHAVING subjects_count > 0 \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT u.id, u.name, u.email, COUNT(s.id) as subjects_count \nFROM users u \nLEFT JOIN subjects s ON s.userId = u.id \nGROUP BY u.id \nHAVING subjects_count > 0 \nLIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Eber Santana",
+      "email": "eberss@gmail.com",
+      "subjects_count": "1"
+    },
+    {
+      "id": "1680001",
+      "name": "Professor Rankings Test",
+      "email": "rankings-test-1766867721294@test.com",
+      "subjects_count": "1"
+    },
+    {
+      "id": "1680002",
+      "name": "Professor Rankings Test",
+      "email": "rankings-test-1766867745889@test.com",
+      "subjects_count": "1"
+    },
+    {
+      "id": "1680003",
+      "name": "Professor Rankings Test",
+      "email": "rankings-test-1766867799503@test.com",
+      "subjects_count": "1"
+    },
+    {
+      "id": "1710001",
+      "name": "Professor Teste",
+      "email": "teacher-1766890621333@test.com",
+      "subjects_count": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tsubjects_count\n1\tEber Santana\teberss@gmail.com\t1\n1680001\tProfessor Rankings Test\trankings-test-1766867721294@test.com\t1\n1680002\tProfessor Rankings Test\trankings-test-1766867745889@test.com\t1\n1680003\tProfessor Rankings Test\trankings-test-1766867799503@test.com\t1\n1710001\tProfessor Teste\tteacher-1766890621333@test.com\t1\n",
+  "stderr": "",
+  "execution_time_ms": 96
+}

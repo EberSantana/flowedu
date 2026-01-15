@@ -5583,3 +5583,24 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🖼️ Ajuste do Tamanho da Logo (15/01/2026)
 
 - [x] Aumentar tamanho da logo na sidebar do portal do aluno (h-10 w-10 → h-14 w-14)
+
+
+## 🎨 Melhoria de Visibilidade dos Botões (15/01/2026)
+
+- [ ] Identificar botões com baixo contraste (Trilha de Aprendizagem, Alunos, etc.)
+- [ ] Ajustar estilos para melhor visibilidade
+- [ ] Testar em todas as páginas afetadas
+
+
+## 🎨 Melhoria de Visibilidade dos Botões - CONCLUÍDO (15/01/2026)
+
+- [x] Identificar botões com baixo contraste na página de disciplinas
+- [x] Ajustar cores dos botões de Trilha de Aprendizagem e Alunos
+- [x] Verificar outras partes do sistema com o mesmo problema
+- [x] Testar alterações
+
+**Alterações realizadas:**
+- Botão Trilha de Aprendizagem: bg-emerald-600 (verde escuro) com texto branco
+- Botão Alunos: bg-blue-600 (azul) com texto branco
+- Botão Matricular Aluno: bg-indigo-600 (índigo) com texto branco
+- QuickActions: cores mais visíveis com melhor contraste
