@@ -5534,3 +5534,20 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - idx_exercise_attempts_studentId (student_exercise_attempts.studentId)
 - idx_calendar_events_userId (calendar_events.userId)
 - idx_calendar_events_eventDate (calendar_events.eventDate)
+
+
+## 📊 Índices Compostos para Performance (15/01/2026)
+
+- [x] Identificar combinações frequentes de campos em consultas
+- [x] Criar índices compostos nas tabelas principais
+- [x] Verificar índices criados
+
+**Índices compostos criados (8 novos):**
+- idx_stp_student_status (student_topic_progress: studentId, status)
+- idx_notifications_user_read (notifications: userId, isRead)
+- idx_modules_subject_user (learning_modules: subjectId, userId)
+- idx_topics_module_user (learning_topics: moduleId, userId)
+- idx_tasks_user_completed (tasks: userId, completed)
+- idx_attempts_exercise_student (student_exercise_attempts: exerciseId, studentId)
+- idx_students_user_registration (students: userId, registrationNumber)
+- idx_enrollments_student_status (student_enrollments: studentId, status)
