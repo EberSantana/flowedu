@@ -1,0 +1,37 @@
+{
+  "query": "SHOW CREATE TABLE students;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE students;",
+  "rows": [
+    {
+      "Table": "students",
+      "Create Table": "CREATE TABLE `students` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `userId` int(11) NOT NULL,",
+    "  `registrationNumber` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `fullName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `avatarSkinTone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'light',",
+    "  `avatarKimonoColor` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'white',",
+    "  `avatarHairStyle` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'short',",
+    "  `avatarAccessories` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `avatarHairColor` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'black',",
+    "  `avatarKimonoStyle` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'traditional',",
+    "  `avatarHeadAccessory` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'none',",
+    "  `avatarExpression` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'neutral',",
+    "  `avatarPose` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'standing',",
+    "  `specialKimono` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT 'none',",
+    "  `avatarGender` enum('male','female') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'male',",
+    "  `hd2dCharacterId` int(11) NOT NULL DEFAULT '1',",
+    "  `hd2dUnlockedCharacters` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `unique_registration_per_user` (`userId`,`registrationNumber`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=750001"
+  ],
+  "stdout": "Table\tCreate Table\nstudents\tCREATE TABLE `students` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `userId` int(11) NOT NULL,\n  `registrationNumber` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `fullName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `avatarSkinTone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'light',\n  `avatarKimonoColor` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'white',\n  `avatarHairStyle` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'short',\n  `avatarAccessories` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `avatarHairColor` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'black',\n  `avatarKimonoStyle` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'traditional',\n  `avatarHeadAccessory` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'none',\n  `avatarExpression` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'neutral',\n  `avatarPose` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'standing',\n  `specialKimono` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT 'none',\n  `avatarGender` enum('male','female') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'male',\n  `hd2dCharacterId` int(11) NOT NULL DEFAULT '1',\n  `hd2dUnlockedCharacters` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `unique_registration_per_user` (`userId`,`registrationNumber`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=750001\n",
+  "stderr": "",
+  "execution_time_ms": 90
+}

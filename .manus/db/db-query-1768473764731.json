@@ -1,0 +1,32 @@
+{
+  "query": "SHOW CREATE TABLE student_exercise_attempts;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE student_exercise_attempts;",
+  "rows": [
+    {
+      "Table": "student_exercise_attempts",
+      "Create Table": "CREATE TABLE `student_exercise_attempts` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `exerciseId` int(11) NOT NULL,",
+    "  `studentId` int(11) NOT NULL,",
+    "  `attemptNumber` int(11) NOT NULL,",
+    "  `answers` json NOT NULL,",
+    "  `score` int(11) NOT NULL,",
+    "  `correctAnswers` int(11) NOT NULL,",
+    "  `totalQuestions` int(11) NOT NULL,",
+    "  `pointsEarned` int(11) NOT NULL,",
+    "  `timeSpent` int(11) DEFAULT NULL,",
+    "  `status` enum('in_progress','completed','abandoned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'in_progress',",
+    "  `startedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `completedAt` timestamp NULL DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=630001"
+  ],
+  "stdout": "Table\tCreate Table\nstudent_exercise_attempts\tCREATE TABLE `student_exercise_attempts` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `exerciseId` int(11) NOT NULL,\n  `studentId` int(11) NOT NULL,\n  `attemptNumber` int(11) NOT NULL,\n  `answers` json NOT NULL,\n  `score` int(11) NOT NULL,\n  `correctAnswers` int(11) NOT NULL,\n  `totalQuestions` int(11) NOT NULL,\n  `pointsEarned` int(11) NOT NULL,\n  `timeSpent` int(11) DEFAULT NULL,\n  `status` enum('in_progress','completed','abandoned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'in_progress',\n  `startedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `completedAt` timestamp NULL DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=630001\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

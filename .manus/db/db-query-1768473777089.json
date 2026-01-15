@@ -1,0 +1,27 @@
+{
+  "query": "SHOW CREATE TABLE calendar_events;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE calendar_events;",
+  "rows": [
+    {
+      "Table": "calendar_events",
+      "Create Table": "CREATE TABLE `calendar_events` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `userId` int(11) NOT NULL,",
+    "  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `eventDate` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `eventType` enum('holiday','commemorative','school_event','personal') COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `isRecurring` int(11) NOT NULL,",
+    "  `color` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#3b82f6',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=480001"
+  ],
+  "stdout": "Table\tCreate Table\ncalendar_events\tCREATE TABLE `calendar_events` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `userId` int(11) NOT NULL,\n  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `eventDate` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `eventType` enum('holiday','commemorative','school_event','personal') COLLATE utf8mb4_unicode_ci NOT NULL,\n  `isRecurring` int(11) NOT NULL,\n  `color` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#3b82f6',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=480001\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

@@ -1,0 +1,145 @@
+{
+  "query": "SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND INDEX_NAME LIKE 'idx_%' ORDER BY TABLE_NAME, INDEX_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND INDEX_NAME LIKE 'idx_%' ORDER BY TABLE_NAME, INDEX_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "calendar_events",
+      "INDEX_NAME": "idx_calendar_events_eventDate",
+      "COLUMN_NAME": "eventDate"
+    },
+    {
+      "TABLE_NAME": "calendar_events",
+      "INDEX_NAME": "idx_calendar_events_userId",
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "TABLE_NAME": "classes",
+      "INDEX_NAME": "idx_classes_userId",
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "TABLE_NAME": "notifications",
+      "INDEX_NAME": "idx_created",
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "TABLE_NAME": "notifications",
+      "INDEX_NAME": "idx_user_read",
+      "COLUMN_NAME": "isRead"
+    },
+    {
+      "TABLE_NAME": "notifications",
+      "INDEX_NAME": "idx_user_read",
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "TABLE_NAME": "student_attendance",
+      "INDEX_NAME": "idx_class_date",
+      "COLUMN_NAME": "classId"
+    },
+    {
+      "TABLE_NAME": "student_attendance",
+      "INDEX_NAME": "idx_class_date",
+      "COLUMN_NAME": "date"
+    },
+    {
+      "TABLE_NAME": "student_attendance",
+      "INDEX_NAME": "idx_student_date",
+      "COLUMN_NAME": "studentId"
+    },
+    {
+      "TABLE_NAME": "student_attendance",
+      "INDEX_NAME": "idx_student_date",
+      "COLUMN_NAME": "date"
+    },
+    {
+      "TABLE_NAME": "student_attendance",
+      "INDEX_NAME": "idx_user",
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "TABLE_NAME": "student_class_enrollments",
+      "INDEX_NAME": "idx_class",
+      "COLUMN_NAME": "classId"
+    },
+    {
+      "TABLE_NAME": "student_class_enrollments",
+      "INDEX_NAME": "idx_student",
+      "COLUMN_NAME": "studentId"
+    },
+    {
+      "TABLE_NAME": "student_class_enrollments",
+      "INDEX_NAME": "idx_user",
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "TABLE_NAME": "student_exercise_attempts",
+      "INDEX_NAME": "idx_exercise_attempts_exerciseId",
+      "COLUMN_NAME": "exerciseId"
+    },
+    {
+      "TABLE_NAME": "student_exercise_attempts",
+      "INDEX_NAME": "idx_exercise_attempts_studentId",
+      "COLUMN_NAME": "studentId"
+    },
+    {
+      "TABLE_NAME": "student_learning_journal",
+      "INDEX_NAME": "idx_entry_date",
+      "COLUMN_NAME": "entryDate"
+    },
+    {
+      "TABLE_NAME": "student_learning_journal",
+      "INDEX_NAME": "idx_student_topic",
+      "COLUMN_NAME": "topicId"
+    },
+    {
+      "TABLE_NAME": "student_learning_journal",
+      "INDEX_NAME": "idx_student_topic",
+      "COLUMN_NAME": "studentId"
+    },
+    {
+      "TABLE_NAME": "student_topic_doubts",
+      "INDEX_NAME": "idx_professor",
+      "COLUMN_NAME": "professorId"
+    },
+    {
+      "TABLE_NAME": "student_topic_doubts",
+      "INDEX_NAME": "idx_status",
+      "COLUMN_NAME": "status"
+    },
+    {
+      "TABLE_NAME": "student_topic_doubts",
+      "INDEX_NAME": "idx_student",
+      "COLUMN_NAME": "studentId"
+    },
+    {
+      "TABLE_NAME": "student_topic_doubts",
+      "INDEX_NAME": "idx_topic",
+      "COLUMN_NAME": "topicId"
+    },
+    {
+      "TABLE_NAME": "student_topic_progress",
+      "INDEX_NAME": "idx_student_topic_progress_topicId",
+      "COLUMN_NAME": "topicId"
+    },
+    {
+      "TABLE_NAME": "subject_points_history",
+      "INDEX_NAME": "idx_student_subject",
+      "COLUMN_NAME": "subjectId"
+    },
+    {
+      "TABLE_NAME": "subject_points_history",
+      "INDEX_NAME": "idx_student_subject",
+      "COLUMN_NAME": "studentId"
+    },
+    {
+      "TABLE_NAME": "subjects",
+      "INDEX_NAME": "idx_subjects_userId",
+      "COLUMN_NAME": "userId"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\tINDEX_NAME\tCOLUMN_NAME\ncalendar_events\tidx_calendar_events_eventDate\teventDate\ncalendar_events\tidx_calendar_events_userId\tuserId\nclasses\tidx_classes_userId\tuserId\nnotifications\tidx_created\tcreatedAt\nnotifications\tidx_user_read\tisRead\nnotifications\tidx_user_read\tuserId\nstudent_attendance\tidx_class_date\tclassId\nstudent_attendance\tidx_class_date\tdate\nstudent_attendance\tidx_student_date\tstudentId\nstudent_attendance\tidx_student_date\tdate\nstudent_attendance\tidx_user\tuserId\nstudent_class_enrollments\tidx_class\tclassId\nstudent_class_enrollments\tidx_student\tstudentId\nstudent_class_enrollments\tidx_user\tuserId\nstudent_exercise_attempts\tidx_exercise_attempts_exerciseId\texerciseId\nstudent_exercise_attempts\tidx_exercise_attempts_studentId\tstudentId\nstudent_learning_journal\tidx_entry_date\tentryDate\nstudent_learning_journal\tidx_student_topic\ttopicId\nstudent_learning_journal\tidx_student_topic\tstudentId\nstudent_topic_doubts\tidx_professor\tprofessorId\nstudent_topic_doubts\tidx_status\tstatus\nstudent_topic_doubts\tidx_student\tstudentId\nstudent_topic_doubts\tidx_topic\ttopicId\nstudent_topic_progress\tidx_student_topic_progress_topicId\ttopicId\nsubject_points_history\tidx_student_subject\tsubjectId\nsubject_points_history\tidx_student_subject\tstudentId\nsubjects\tidx_subjects_userId\tuserId\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

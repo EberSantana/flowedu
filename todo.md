@@ -5507,3 +5507,30 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar foreign key de student_enrollments.classId para classes.id
 - [x] Aplicar migração no banco de dados (via SQL direto)
 - [x] Testar integridade referencial
+
+
+## 🖼️ Otimização da Logo (15/01/2026)
+
+- [ ] Localizar a logo atual no projeto
+- [ ] Analisar tamanho e dimensões
+- [ ] Redimensionar para tamanho adequado para web
+- [ ] Comprimir a imagem mantendo qualidade
+- [ ] Substituir no projeto
+- [ ] Testar carregamento da página
+
+
+## 📊 Criação de Índices para Performance (15/01/2026)
+
+- [x] Analisar índices existentes nas tabelas principais
+- [x] Identificar campos FK que precisam de índices
+- [x] Criar índices nas tabelas de matrícula e relacionadas
+- [x] Verificar índices criados
+
+**Índices criados:**
+- idx_subjects_userId (subjects.userId)
+- idx_classes_userId (classes.userId)
+- idx_student_topic_progress_topicId (student_topic_progress.topicId)
+- idx_exercise_attempts_exerciseId (student_exercise_attempts.exerciseId)
+- idx_exercise_attempts_studentId (student_exercise_attempts.studentId)
+- idx_calendar_events_userId (calendar_events.userId)
+- idx_calendar_events_eventDate (calendar_events.eventDate)

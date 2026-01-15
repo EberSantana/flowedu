@@ -1,0 +1,41 @@
+{
+  "query": "SHOW CREATE TABLE subjects;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE subjects;",
+  "rows": [
+    {
+      "Table": "subjects",
+      "Create Table": "CREATE TABLE `subjects` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `color` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#3b82f6',",
+    "  `userId` int(11) NOT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `courseObjectives` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `courseContent` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `methodology` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `evaluation` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `bibliography` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `coursePlanPdfUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `ementa` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `generalObjective` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `specificObjectives` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `programContent` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `basicBibliography` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `complementaryBibliography` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `googleDriveUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `googleClassroomUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `workload` int(11) DEFAULT '60',",
+    "  `computationalThinkingEnabled` tinyint(1) NOT NULL DEFAULT '0',",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=870001"
+  ],
+  "stdout": "Table\tCreate Table\nsubjects\tCREATE TABLE `subjects` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `color` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#3b82f6',\n  `userId` int(11) NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `courseObjectives` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `courseContent` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `methodology` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `evaluation` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `bibliography` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `coursePlanPdfUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `ementa` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `generalObjective` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `specificObjectives` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `programContent` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `basicBibliography` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `complementaryBibliography` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `googleDriveUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `googleClassroomUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `workload` int(11) DEFAULT '60',\n  `computationalThinkingEnabled` tinyint(1) NOT NULL DEFAULT '0',\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=870001\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

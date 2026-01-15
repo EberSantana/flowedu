@@ -1,0 +1,28 @@
+{
+  "query": "SHOW INDEX FROM subjects;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW INDEX FROM subjects;",
+  "rows": [
+    {
+      "Table": "subjects",
+      "Non_unique": "0",
+      "Key_name": "PRIMARY",
+      "Seq_in_index": "1",
+      "Column_name": "id",
+      "Collation": "A",
+      "Cardinality": "0",
+      "Sub_part": "NULL",
+      "Packed": "NULL",
+      "Null": "",
+      "Index_type": "BTREE",
+      "Comment": "",
+      "Index_comment": "",
+      "Visible": "YES",
+      "Expression": "NULL",
+      "Clustered": "YES"
+    }
+  ],
+  "messages": [],
+  "stdout": "Table\tNon_unique\tKey_name\tSeq_in_index\tColumn_name\tCollation\tCardinality\tSub_part\tPacked\tNull\tIndex_type\tComment\tIndex_comment\tVisible\tExpression\tClustered\nsubjects\t0\tPRIMARY\t1\tid\tA\t0\tNULL\tNULL\t\tBTREE\t\t\tYES\tNULL\tYES\n",
+  "stderr": "",
+  "execution_time_ms": 168
+}

@@ -1,0 +1,27 @@
+{
+  "query": "SHOW CREATE TABLE student_topic_progress;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE student_topic_progress;",
+  "rows": [
+    {
+      "Table": "student_topic_progress",
+      "Create Table": "CREATE TABLE `student_topic_progress` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `studentId` int(11) NOT NULL,",
+    "  `topicId` int(11) NOT NULL,",
+    "  `status` enum('not_started','in_progress','completed') COLLATE utf8mb4_unicode_ci DEFAULT 'not_started',",
+    "  `selfAssessment` enum('understood','have_doubts','need_help') COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `completedAt` timestamp NULL DEFAULT NULL,",
+    "  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `unique_student_topic` (`studentId`,`topicId`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=510001"
+  ],
+  "stdout": "Table\tCreate Table\nstudent_topic_progress\tCREATE TABLE `student_topic_progress` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `studentId` int(11) NOT NULL,\n  `topicId` int(11) NOT NULL,\n  `status` enum('not_started','in_progress','completed') COLLATE utf8mb4_unicode_ci DEFAULT 'not_started',\n  `selfAssessment` enum('understood','have_doubts','need_help') COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `completedAt` timestamp NULL DEFAULT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `unique_student_topic` (`studentId`,`topicId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=510001\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
