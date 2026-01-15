@@ -5772,3 +5772,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - `ghost`: Adicionado `text-foreground` para garantir cor de texto visível
 
 **Resultado:** Todos os 162 botões outline e 51 botões ghost agora têm cores de texto visíveis automaticamente
+
+
+## 🧹 Remoção de Redundância no Menu do Aluno (15/01/2026)
+
+- [x] Analisar itens "Minhas Disciplinas" e "Trilhas de Aprendizagem"
+- [x] Decidir qual item remover (Trilhas parece redundante)
+- [x] Remover item do menu StudentLayout
+- [x] Testar navegação
+
+**Resultado:** Removido "Trilhas de Aprendizagem" do menu principal. O acesso às trilhas continua disponível através de "Minhas Disciplinas" > "Ver Trilha".
