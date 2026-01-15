@@ -6796,9 +6796,15 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         // Isso conta apenas alunos que estão realmente matriculados, não todos os cadastrados
         const enrolledStudents = await db.getEnrolledStudentsByProfessor(ctx.user.id);
         
+        // Filtrar por disciplina se selecionada
+        let filteredEnrollments = enrolledStudents;
+        if (input.subjectId) {
+          filteredEnrollments = enrolledStudents.filter(e => e.subjectId === input.subjectId);
+        }
+        
         // Contar alunos únicos por studentId (evita duplicatas se o aluno estiver em várias disciplinas)
         const uniqueStudentIds = new Set<number>();
-        const uniqueEnrollments = enrolledStudents.filter(e => {
+        const uniqueEnrollments = filteredEnrollments.filter(e => {
           if (uniqueStudentIds.has(e.studentId)) {
             return false;
           }
@@ -6806,9 +6812,15 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
           return true;
         });
         
-        // Buscar alertas críticos
+        // Buscar alertas críticos (filtrar por disciplina se selecionada)
         const allAlerts = await db.getPendingAlerts(ctx.user.id);
-        const criticalAlerts = allAlerts.filter(a => a.severity === 'critical' || a.severity === 'urgent');
+        let filteredAlerts = allAlerts;
+        if (input.subjectId) {
+          // Filtrar alertas apenas dos alunos matriculados na disciplina selecionada
+          const studentIdsInSubject = new Set(filteredEnrollments.map(e => e.studentId));
+          filteredAlerts = allAlerts.filter(a => studentIdsInSubject.has(a.studentId));
+        }
+        const criticalAlerts = filteredAlerts.filter(a => a.severity === 'critical' || a.severity === 'urgent');
         
         // Buscar insights recentes
         const recentInsights = [];

@@ -5916,3 +5916,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Melhorar exibição de Padrões de Aprendizado (engagement_pattern e Invalid Date)
 
 - [x] Corrigir definitivamente contagem de Total de Alunos (usar subjectEnrollments ao invés de students)
+- [x] Adicionar seletor de disciplina na página de Análise com IA para filtrar estatísticas
