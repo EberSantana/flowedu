@@ -42,7 +42,7 @@ export default function StudentLearningPaths() {
 
   const getDifficultyColor = (difficulty?: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-success/20 text-success border-success/50';
+      case 'easy': return 'bg-emerald-600 text-white';
       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
       case 'hard': return 'bg-red-100 text-red-700 border-red-300';
       default: return 'bg-gray-100 text-gray-700 border-gray-300';
@@ -188,7 +188,7 @@ export default function StudentLearningPaths() {
                           </CardDescription>
                         </div>
                         {hasLearningPath && (
-                          <Badge className="bg-success/20 text-success border-success/50">
+                          <Badge className="bg-emerald-600 text-white">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
                             Trilha Ativa
                           </Badge>
@@ -247,7 +247,7 @@ export default function StudentLearningPaths() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="border-primary/50 text-primary hover:bg-primary/10"
+                              className="border-blue-500 text-blue-700 hover:bg-blue-100"
                             >
                               <BarChart3 className="w-4 h-4" />
                             </Button>
@@ -271,7 +271,7 @@ export default function StudentLearningPaths() {
 
           {/* Recursos Adicionais */}
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Card className="bg-gradient-to-br from-primary/10 to-background border-primary/30 hover:shadow-lg transition-shadow">
+          <Card className="bg-gradient-to-br from-blue-100 to-background border-blue-400 hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <BookMarked className="w-5 h-5" />
@@ -323,7 +323,7 @@ export default function StudentLearningPaths() {
                 Acompanhe seu desempenho e evolução em todas as disciplinas.
               </p>
               <Link href="/student/statistics">
-                <Button variant="outline" size="sm" className="w-full border-success/50 text-success hover:bg-success/10">
+                <Button variant="outline" size="sm" className="w-full border-emerald-500 text-emerald-700 hover:bg-emerald-100">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Ver Estatísticas
                 </Button>

@@ -5609,3 +5609,18 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🎨 Ajuste do Botão Alunos (15/01/2026)
 
 - [x] Ajustar badge de contagem de alunos para ficar verde (emerald-600) com texto branco, igual ao botão "Trilha de Aprendizagem"
+
+
+## 🔍 Varredura de Elementos com Baixo Contraste (15/01/2026)
+
+- [x] Buscar padrões de cores com baixo contraste no código
+- [x] Corrigir elementos identificados
+- [x] Testar alterações
+
+**Arquivos corrigidos:**
+- Subjects.tsx: Corrigido bg-primary/10 → bg-emerald-100, bg-blue-100
+- StudentSubjects.tsx: Corrigido badges de status (bg-success/20 → bg-emerald-600)
+- StudentLearningPaths.tsx: Corrigido badges e botões com cores sólidas
+- Reports.tsx: Corrigido badges de taxa de conclusão (bg-primary/10 → bg-blue-600)
+- Tasks.tsx: Corrigido cores de prioridade e categorias
+- LearningAnalytics.tsx: Corrigido backgrounds e bordas de baixo contraste

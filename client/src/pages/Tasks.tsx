@@ -206,11 +206,11 @@ export default function Tasks() {
   const getPriorityColor = (priority: Priority) => {
     switch (priority) {
       case "high":
-        return "text-destructive bg-destructive/10 border-destructive/20";
+        return "text-red-700 bg-red-100 border-red-400";
       case "medium":
-        return "text-warning bg-warning/10 border-warning/20";
+        return "text-amber-700 bg-amber-100 border-amber-400";
       case "low":
-        return "text-success bg-success/10 border-success/30";
+        return "text-emerald-700 bg-emerald-100 border-emerald-400";
     }
   };
 
@@ -510,7 +510,7 @@ export default function Tasks() {
 
                             {/* Categoria */}
                             {task.category && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/30">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-400">
                                 <Tag className="h-3 w-3" />
                                 {task.category}
                               </span>

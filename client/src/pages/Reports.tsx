@@ -260,7 +260,7 @@ export default function Reports() {
           {/* Header com animação fade-in */}
           <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-lg">
                 <BarChart3 className="h-8 w-8 text-primary" />
               </div>
               Relatórios de Aulas
@@ -423,7 +423,7 @@ export default function Reports() {
                   <Card className="shadow-md hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-right-4 duration-500 delay-[600ms]">
                     <CardHeader className="bg-gradient-to-r from-success/5 to-background border-b">
                       <CardTitle className="flex items-center gap-2">
-                        <div className="p-1.5 bg-success/10 rounded-lg">
+                        <div className="p-1.5 bg-emerald-100 rounded-lg">
                           <BarChart3 className="h-5 w-5 text-success" />
                         </div>
                         Por Disciplina
@@ -491,7 +491,7 @@ export default function Reports() {
                               <td className="text-center py-3 px-4 text-red-600 font-semibold">{subject.cancelled}</td>
                               <td className="text-center py-3 px-4 text-gray-600 font-medium">{subject.pending}</td>
                               <td className="text-center py-3 px-4">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary shadow-sm">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white shadow-sm">
                                   {subject.total > 0 ? `${((subject.given / subject.total) * 100).toFixed(1)}%` : '0%'}
                                 </span>
                               </td>

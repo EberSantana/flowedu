@@ -150,7 +150,7 @@ export function LearningAnalytics() {
                 Monitore comportamento, padrões e evolução dos seus alunos com inteligência artificial
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 px-6 py-3 rounded-full border border-primary/30 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-100 to-purple-100 px-6 py-3 rounded-full border border-blue-400 shadow-sm">
               <Sparkles className="h-5 w-5 text-primary" />
               <span className="text-primary font-semibold">Powered by AI</span>
             </div>
@@ -161,7 +161,7 @@ export function LearningAnalytics() {
             <Card className="border-t-4 border-t-blue-500 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
                     <Users className="h-8 w-8 text-primary" />
                   </div>
                   <div>
@@ -311,7 +311,7 @@ export function LearningAnalytics() {
               </div>
 
               {selectedStudentData && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border border-primary/30">
+                <div className="mt-6 p-4 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg border border-blue-400">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg shadow-md">
                       {selectedStudentData.fullName.charAt(0).toUpperCase()}
@@ -392,7 +392,7 @@ export function LearningAnalytics() {
                                 <h4 className="font-semibold text-slate-900 mb-2 text-lg">{insight.title}</h4>
                                 <p className="text-sm text-slate-600 mb-4 leading-relaxed">{insight.description}</p>
                                 {insight.recommendation && (
-                                  <div className="bg-gradient-to-r from-info/10 to-primary/10 border border-info/30 rounded-lg p-4 mb-3">
+                                  <div className="bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-400 rounded-lg p-4 mb-3">
                                     <div className="flex items-start gap-2">
                                       <ArrowRight className="h-4 w-4 text-info mt-0.5 flex-shrink-0" />
                                       <div>
@@ -448,7 +448,7 @@ export function LearningAnalytics() {
                     <ScrollArea className="h-[500px] pr-4">
                       {!studentAlerts || studentAlerts.length === 0 ? (
                         <div className="text-center py-16">
-                          <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+                          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
                             <CheckCircle className="h-10 w-10 text-success" />
                           </div>
                           <p className="text-slate-500 text-lg font-medium">Nenhum alerta ativo</p>

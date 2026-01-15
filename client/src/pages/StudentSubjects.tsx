@@ -16,9 +16,9 @@ export default function StudentSubjects() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-success/20 text-success border-success/30">Ativa</Badge>;
+        return <Badge className="bg-emerald-600 text-white">Ativa</Badge>;
       case 'completed':
-        return <Badge className="bg-primary/20 text-primary border-primary/30">Concluída</Badge>;
+        return <Badge className="bg-blue-600 text-white">Concluída</Badge>;
       case 'dropped':
         return <Badge className="bg-red-100 text-red-700 border-red-200">Cancelada</Badge>;
       default:

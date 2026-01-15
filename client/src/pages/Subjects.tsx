@@ -445,7 +445,7 @@ export default function Subjects() {
                   {(subject.ementa || subject.generalObjective || subject.specificObjectives || subject.programContent || subject.basicBibliography || subject.complementaryBibliography) && (
                     <button
                       onClick={() => setViewingCoursePlan(subject)}
-                      className="mb-4 w-full p-3 bg-primary/10 rounded-lg border border-primary/30 hover:bg-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
+                      className="mb-4 w-full p-3 bg-emerald-100 rounded-lg border border-emerald-400 hover:bg-emerald-200 hover:border-emerald-500 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center justify-between text-primary text-sm font-semibold">
                         <div className="flex items-center gap-2">
@@ -506,7 +506,7 @@ export default function Subjects() {
                           href={subject.googleDriveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 p-2 bg-gradient-to-r from-primary/10 to-success/10 rounded-lg border border-primary/30 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-primary hover:text-primary/90"
+                          className="flex-1 p-2 bg-gradient-to-r from-emerald-100 to-green-100 rounded-lg border border-emerald-400 hover:border-emerald-500 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-800"
                         >
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>
@@ -727,7 +727,7 @@ export default function Subjects() {
                 <TabsContent value="coursePlan" className="py-4">
                   <ScrollArea className="h-[500px] pr-4">
                     <div className="space-y-4 pb-4">
-                      <div className="bg-primary/10 p-3 rounded-lg border-l-4 border-primary">
+                      <div className="bg-blue-100 p-3 rounded-lg border-l-4 border-blue-600">
                         <div className="space-y-2">
                         <Label htmlFor="ementa">Ementa</Label>
                         <Textarea
@@ -822,7 +822,7 @@ export default function Subjects() {
                     </div>
                     
                     {/* Google Drive */}
-                    <div className="bg-gradient-to-r from-primary/10 to-success/10 p-4 rounded-lg border-2 border-primary/30">
+                    <div className="bg-gradient-to-r from-blue-100 to-green-100 p-4 rounded-lg border-2 border-blue-400">
                       <div className="flex items-start gap-3 mb-3">
                         <svg className="w-6 h-6 text-primary flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>
@@ -840,7 +840,7 @@ export default function Subjects() {
                               type="url"
                               className="bg-white"
                             />
-                            <p className="text-xs text-primary/70">💡 Dica: Crie uma pasta específica para a disciplina e cole o link aqui</p>
+                            <p className="text-xs text-blue-700">💡 Dica: Crie uma pasta específica para a disciplina e cole o link aqui</p>
                           </div>
                         </div>
                       </div>
