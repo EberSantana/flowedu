@@ -245,9 +245,9 @@ export default function StudentLearningPaths() {
                               </Button>
                             </Link>
                             <Button 
-                              variant="outline" 
+                              variant="default" 
                               size="sm"
-                              className="border-blue-500 text-blue-700 hover:bg-blue-100"
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
                               <BarChart3 className="w-4 h-4" />
                             </Button>
@@ -283,7 +283,7 @@ export default function StudentLearningPaths() {
                 Registre suas reflexões, anotações e insights sobre cada tópico estudado.
               </p>
               <Link href="/student/learning-journal">
-                <Button variant="outline" size="sm" className="w-full border-blue-300 text-blue-600 hover:bg-blue-50">
+                <Button variant="default" size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                   <FileText className="w-4 h-4 mr-2" />
                   Acessar Diário
                 </Button>
@@ -303,7 +303,7 @@ export default function StudentLearningPaths() {
                 Envie suas dúvidas aos professores e acompanhe as respostas.
               </p>
               <Link href="/student/doubts">
-                <Button variant="outline" size="sm" className="w-full border-purple-300 text-purple-600 hover:bg-purple-50">
+                <Button variant="default" size="sm" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
                   <Lightbulb className="w-4 h-4 mr-2" />
                   Ver Dúvidas ({stats?.pendingDoubts || 0})
                 </Button>
@@ -323,7 +323,7 @@ export default function StudentLearningPaths() {
                 Acompanhe seu desempenho e evolução em todas as disciplinas.
               </p>
               <Link href="/student/statistics">
-                <Button variant="outline" size="sm" className="w-full border-emerald-500 text-emerald-700 hover:bg-emerald-100">
+                <Button variant="default" size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Ver Estatísticas
                 </Button>

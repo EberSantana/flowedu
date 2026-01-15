@@ -5640,3 +5640,17 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - favicon-16.png, favicon-32.png, favicon-48.png
 - apple-touch-icon.png (180x180)
 - icon-192.png, icon-512.png (PWA)
+
+
+## 🎨 Correção de Botões Transparentes (15/01/2026)
+
+- [x] Identificar botões "Alunos" e "Ver Detalhes" com transparência
+- [x] Substituir por cores sólidas da paleta do tema
+- [x] Testar visibilidade em todas as páginas afetadas
+
+**Arquivos corrigidos:**
+- Subjects.tsx: Botão Matricular Alunos (bg-emerald-600), Editar (bg-slate-600), Excluir (bg-red-600)
+- StudentLearningPaths.tsx: Botões Acessar Diário (bg-blue-600), Ver Dúvidas (bg-purple-600), Ver Estatísticas (bg-emerald-600)
+- StudentSubjects.tsx: Botão Ver Trilha (bg-primary)
+- StudentDashboard.tsx: Botão Ver Todas (bg-primary)
+- StudentExercises.tsx: Botão Revisar Questões (bg-purple-600)

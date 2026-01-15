@@ -352,8 +352,8 @@ export default function StudentExercises() {
                     {exercise.attempts > 0 && (
                       <Button
                         onClick={() => setLocation(`/student-exercises/${exercise.id}/review`)}
-                        variant="outline"
-                        className="w-full h-11 text-sm font-medium border-2 border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all"
+                        variant="default"
+                        className="w-full h-11 text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white transition-all"
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         Revisar Questões

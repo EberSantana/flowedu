@@ -105,7 +105,7 @@ export default function StudentDashboard() {
                 </div>
                 {activeSubjects.length > 0 && (
                   <Link href="/student-subjects">
-                    <Button variant="outline" className="gap-2">
+                    <Button variant="default" className="gap-2 bg-primary hover:bg-primary/90 text-white">
                       Ver Todas
                       <ArrowRight className="w-4 h-4" />
                     </Button>

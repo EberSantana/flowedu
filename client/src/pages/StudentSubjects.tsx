@@ -134,7 +134,7 @@ export default function StudentSubjects() {
                             Matriculado em: {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR') : 'N/A'}
                           </p>
                           <Link href={`/student/subject/${enrollment.subjectId}/${enrollment.userId}`}>
-                            <Button size="sm" variant="outline" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button size="sm" variant="default" className="bg-primary hover:bg-primary/90 text-white opacity-0 group-hover:opacity-100 transition-opacity">
                               Ver Trilha
                             </Button>
                           </Link>

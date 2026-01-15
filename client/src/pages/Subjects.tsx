@@ -355,8 +355,8 @@ export default function Subjects() {
                   <Button 
                     onClick={() => setIsQuickEnrollOpen(true)} 
                     size="lg"
-                    variant="outline"
-                    className="bg-success/10 hover:bg-success/20 border-success/30 text-success hover:text-success w-full sm:w-auto min-h-[44px]"
+                    variant="default"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto min-h-[44px]"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Matricular Alunos
@@ -583,19 +583,19 @@ export default function Subjects() {
                     )}
                     <div className="flex gap-2">
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={() => handleEdit(subject)}
-                        className="flex-1"
+                        className="flex-1 bg-slate-600 hover:bg-slate-700 text-white"
                       >
                         <Pencil className="mr-2 h-3 w-3" />
                         Editar
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={() => handleDelete(subject.id)}
-                        className="text-red-600 hover:text-red-700"
+                        className="bg-red-600 hover:bg-red-700 text-white"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
