@@ -1,0 +1,75 @@
+{
+  "query": "SELECT * FROM student_enrollments LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM student_enrollments LIMIT 5;",
+  "rows": [
+    {
+      "id": "300001",
+      "studentId": "480014",
+      "subjectId": "510009",
+      "classId": "NULL",
+      "professorId": "2010017",
+      "status": "active",
+      "enrolledAt": "2026-01-04 23:23:52",
+      "completedAt": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-01-04 23:23:52",
+      "updatedAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "300002",
+      "studentId": "480015",
+      "subjectId": "510010",
+      "classId": "NULL",
+      "professorId": "2010018",
+      "status": "active",
+      "enrolledAt": "2026-01-04 23:23:52",
+      "completedAt": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-01-04 23:23:52",
+      "updatedAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "300003",
+      "studentId": "480016",
+      "subjectId": "510011",
+      "classId": "NULL",
+      "professorId": "2010019",
+      "status": "active",
+      "enrolledAt": "2026-01-04 23:23:52",
+      "completedAt": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-01-04 23:23:52",
+      "updatedAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "300004",
+      "studentId": "480017",
+      "subjectId": "510012",
+      "classId": "NULL",
+      "professorId": "2010020",
+      "status": "active",
+      "enrolledAt": "2026-01-04 23:23:52",
+      "completedAt": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-01-04 23:23:52",
+      "updatedAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "300005",
+      "studentId": "480018",
+      "subjectId": "510013",
+      "classId": "NULL",
+      "professorId": "2010021",
+      "status": "active",
+      "enrolledAt": "2026-01-04 23:23:52",
+      "completedAt": "NULL",
+      "notes": "NULL",
+      "createdAt": "2026-01-04 23:23:52",
+      "updatedAt": "2026-01-04 23:23:52"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tclassId\tprofessorId\tstatus\tenrolledAt\tcompletedAt\tnotes\tcreatedAt\tupdatedAt\n300001\t480014\t510009\tNULL\t2010017\tactive\t2026-01-04 23:23:52\tNULL\tNULL\t2026-01-04 23:23:52\t2026-01-04 23:23:52\n300002\t480015\t510010\tNULL\t2010018\tactive\t2026-01-04 23:23:52\tNULL\tNULL\t2026-01-04 23:23:52\t2026-01-04 23:23:52\n300003\t480016\t510011\tNULL\t2010019\tactive\t2026-01-04 23:23:52\tNULL\tNULL\t2026-01-04 23:23:52\t2026-01-04 23:23:52\n300004\t480017\t510012\tNULL\t2010020\tactive\t2026-01-04 23:23:52\tNULL\tNULL\t2026-01-04 23:23:52\t2026-01-04 23:23:52\n300005\t480018\t510013\tNULL\t2010021\tactive\t2026-01-04 23:23:52\tNULL\tNULL\t2026-01-04 23:23:52\t2026-01-04 23:23:52\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

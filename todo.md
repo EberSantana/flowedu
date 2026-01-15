@@ -5880,3 +5880,21 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Renomeado "Enviar Dúvida ao Professor" para "Minhas Dúvidas"
 - Botão agora é "Ver Minhas Dúvidas" e redireciona para a página de dúvidas na trilha
 - Contador de dúvidas corrigido: busca todas as dúvidas do aluno independente do tópico (getStudyStatistics)
+
+
+## 🐛 Correções Estatísticas de Desempenho (15/01/2026)
+
+- [x] Corrigir cálculos de tópicos concluídos/total (disciplina tem 5 módulos com 17 assuntos)
+- [x] Aplicar paleta de cores consistente com o tema do sistema (roxo/purple)
+- [x] Remover "Entradas no Diário" (Diário foi removido)
+- [x] Corrigir horas estimadas (agora mostra carga horária real da disciplina)
+- [x] Sincronizar dados entre cards superiores e card da disciplina
+
+**Alterações realizadas:**
+- Criada função getSubjectStatistics para buscar estatísticas reais por disciplina
+- Removido uso de Math.random() - agora usa dados reais do banco
+- Aplicada paleta de cores roxa consistente em toda a página
+- Removida seção "Entradas no Diário"
+- Adicionado card com número de módulos e carga horária real
+- Cards superiores agora mostram total de tópicos corretamente
+- Corrigido getStudyStatistics para buscar matrículas em ambas as tabelas (student_enrollments e subject_enrollments)

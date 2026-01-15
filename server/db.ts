@@ -7556,15 +7556,26 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Buscar matrículas do aluno
+  // Buscar matrículas do aluno em ambas as tabelas
   let enrollments = await db.select().from(studentEnrollments)
     .where(eq(studentEnrollments.studentId, studentId));
   
+  // Também buscar na tabela subject_enrollments (matrículas feitas pelo professor)
+  const subjectEnrollmentsData = await db.select().from(subjectEnrollments)
+    .where(eq(subjectEnrollments.studentId, studentId));
+  
+  // Combinar os IDs de disciplinas de ambas as tabelas
+  let subjectIdsFromStudentEnrollments = enrollments.map(e => e.subjectId);
+  let subjectIdsFromSubjectEnrollments = subjectEnrollmentsData.map(e => e.subjectId);
+  
+  // Unir e remover duplicatas
+  let allSubjectIds = Array.from(new Set([...subjectIdsFromStudentEnrollments, ...subjectIdsFromSubjectEnrollments]));
+  
   if (subjectId) {
-    enrollments = enrollments.filter(e => e.subjectId === subjectId);
+    allSubjectIds = allSubjectIds.filter(id => id === subjectId);
   }
   
-  const subjectIds = enrollments.map(e => e.subjectId);
+  const subjectIds = allSubjectIds;
   
   // Buscar dúvidas - buscar todas as dúvidas do aluno (independente do tópico/matrícula)
   const allDoubts = await db.select().from(studentTopicDoubts)
@@ -7643,6 +7654,82 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
   };
 }
 
+
+/**
+ * Buscar estatísticas detalhadas de uma disciplina específica para o aluno
+ */
+export async function getSubjectStatistics(studentId: number, subjectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar a disciplina
+  const [subject] = await db.select().from(subjects)
+    .where(eq(subjects.id, subjectId));
+  
+  if (!subject) {
+    return null;
+  }
+  
+  // Buscar todos os módulos da disciplina
+  const modules = await db.select().from(learningModules)
+    .where(eq(learningModules.subjectId, subjectId))
+    .orderBy(learningModules.orderIndex);
+  
+  const moduleIds = modules.map(m => m.id);
+  
+  if (moduleIds.length === 0) {
+    return {
+      subjectId,
+      subjectName: subject.name,
+      subjectCode: subject.code,
+      workload: subject.workload || 0,
+      totalModules: 0,
+      totalTopics: 0,
+      completedTopics: 0,
+      inProgressTopics: 0,
+      notStartedTopics: 0,
+      progressPercentage: 0,
+      totalHoursEstimated: 0
+    };
+  }
+  
+  // Buscar todos os tópicos dos módulos
+  const topics = await db.select().from(learningTopics)
+    .where(inArray(learningTopics.moduleId, moduleIds));
+  
+  const topicIds = topics.map(t => t.id);
+  
+  // Buscar progresso do aluno
+  const progress = topicIds.length > 0 
+    ? await db.select().from(studentTopicProgress)
+        .where(and(
+          eq(studentTopicProgress.studentId, studentId),
+          inArray(studentTopicProgress.topicId, topicIds)
+        ))
+    : [];
+  
+  const completedTopics = progress.filter(p => p.status === 'completed').length;
+  const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
+  const notStartedTopics = topics.length - completedTopics - inProgressTopics;
+  const totalHoursEstimated = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+  const progressPercentage = topics.length > 0 
+    ? Math.round((completedTopics / topics.length) * 100) 
+    : 0;
+  
+  return {
+    subjectId,
+    subjectName: subject.name,
+    subjectCode: subject.code,
+    workload: subject.workload || 0,
+    totalModules: modules.length,
+    totalTopics: topics.length,
+    completedTopics,
+    inProgressTopics,
+    notStartedTopics,
+    progressPercentage,
+    totalHoursEstimated
+  };
+}
 
 // ==================== GAMIFICAÇÃO AVANÇADA ====================
 
