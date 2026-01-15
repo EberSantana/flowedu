@@ -213,9 +213,7 @@ export default function TeacherLogin() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-12 flex-col justify-between">
         <div>
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <GraduationCap className="h-7 w-7 text-white" />
-            </div>
+            <img src="/logo.png" alt="FlowEdu" className="h-12 w-12" />
             <div>
               <h1 className="text-2xl font-bold text-white">FlowEdu</h1>
               <p className="text-white/70 text-sm">Onde a educação flui</p>

@@ -45,9 +45,12 @@ export default function PortalChoice() {
       <div className="max-w-5xl w-full">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            FlowEdu
-          </h1>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
+            <h1 className="text-4xl font-bold text-gray-900">
+              FlowEdu
+            </h1>
+          </div>
           <p className="text-lg text-gray-600">
             Onde a educação flui - Escolha como deseja acessar
           </p>

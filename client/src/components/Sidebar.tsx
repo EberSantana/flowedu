@@ -476,18 +476,14 @@ export default function Sidebar() {
           }`}>
             {isCompact ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Sun className="h-6 w-6 text-primary" />
-                </div>
+                <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
                 <NotificationBell />
               </div>
             ) : (
               <>
                 <div className="flex items-center justify-between mb-2">
                   <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Sun className="h-5 w-5 text-primary" />
-                    </div>
+                    <img src="/logo.png" alt="FlowEdu" className="h-8 w-8" />
                     FlowEdu
                   </h1>
                   <NotificationBell />
