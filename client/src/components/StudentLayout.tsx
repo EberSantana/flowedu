@@ -12,6 +12,7 @@ import {
   Home, 
   User, 
   FileText, 
+  Map,
   Menu,
   X,
   ClipboardList
@@ -72,6 +73,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const menuItems = [
     { icon: Home, label: "Início", path: "/student-dashboard", badge: 0 },
     { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects", badge: 0 },
+    { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths", badge: 0 },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", badge: 0 },
     { icon: Bell, label: "Avisos", path: "/student-announcements", badge: unreadAnnouncementsCount || 0 },
   ];

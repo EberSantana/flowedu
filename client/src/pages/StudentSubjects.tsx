@@ -1,10 +1,8 @@
 import { trpc } from "../lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { BookOpen, GraduationCap, AlertCircle, ExternalLink, FolderOpen, Users } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
-import { Link } from "wouter";
 
 export default function StudentSubjects() {
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
@@ -129,15 +127,10 @@ export default function StudentSubjects() {
                           </div>
                         </div>
                         
-                        <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                        <div className="mt-4 pt-4 border-t">
                           <p className="text-xs text-gray-500">
                             Matriculado em: {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR') : 'N/A'}
                           </p>
-                          <Link href={`/student/subject/${enrollment.subjectId}/${enrollment.userId}`}>
-                            <Button size="sm" variant="default" className="bg-primary hover:bg-primary/90 text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                              Ver Trilha
-                            </Button>
-                          </Link>
                         </div>
                       </CardContent>
                     </Card>

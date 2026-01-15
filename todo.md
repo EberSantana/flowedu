@@ -5777,8 +5777,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🧹 Remoção de Redundância no Menu do Aluno (15/01/2026)
 
 - [x] Analisar itens "Minhas Disciplinas" e "Trilhas de Aprendizagem"
-- [x] Decidir qual item remover (Trilhas parece redundante)
-- [x] Remover item do menu StudentLayout
+- [x] Decidir qual item remover (botão "Ver Trilha" em Minhas Disciplinas)
+- [x] Remover botão "Ver Trilha" da página StudentSubjects
+- [x] Manter "Trilhas de Aprendizagem" no menu lateral
 - [x] Testar navegação
 
-**Resultado:** Removido "Trilhas de Aprendizagem" do menu principal. O acesso às trilhas continua disponível através de "Minhas Disciplinas" > "Ver Trilha".
+**Resultado:** Removido botão "Ver Trilha" dos cards de disciplinas em "Minhas Disciplinas". O acesso às trilhas continua disponível através do menu lateral "Trilhas de Aprendizagem".
