@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import StudentLayout from "@/components/StudentLayout";
-import { MessageCircle, Plus, Clock, CheckCircle2, AlertCircle, Send } from "lucide-react";
+import { MessageCircle, Plus, Clock, CheckCircle2, AlertCircle, Send, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +42,76 @@ const statusConfig = {
     color: "bg-blue-100 text-blue-700 border-blue-300",
   },
 };
+
+// Componente para exibir dicas da IA
+function AIHintsSection({ doubt }: { doubt: any }) {
+  const [showHints, setShowHints] = useState(false);
+  const [hints, setHints] = useState<string | null>(null);
+  
+  const getHintsMutation = trpc.studentDoubts.getAIHints.useMutation({
+    onSuccess: (data) => {
+      if (data.success && typeof data.hints === 'string') {
+        setHints(data.hints);
+        setShowHints(true);
+      }
+    },
+  });
+
+  const handleGetHints = () => {
+    if (hints) {
+      setShowHints(!showHints);
+      return;
+    }
+    
+    getHintsMutation.mutate({
+      doubtId: doubt.id,
+      question: doubt.question,
+      context: doubt.context || undefined,
+      subjectName: doubt.subject?.name || undefined,
+    });
+  };
+
+  return (
+    <div className="mt-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleGetHints}
+        disabled={getHintsMutation.isPending}
+        className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-0 hover:from-purple-600 hover:to-indigo-600"
+      >
+        {getHintsMutation.isPending ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Gerando dicas...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-4 h-4 mr-2" />
+            {hints ? (showHints ? "Ocultar Dicas" : "Ver Dicas da IA") : "Pedir Dicas da IA"}
+          </>
+        )}
+      </Button>
+
+      {showHints && hints && (
+        <div className="mt-4 bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 p-4 rounded-lg">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-5 h-5 text-purple-600" />
+            <p className="text-sm font-semibold text-purple-800">
+              Dicas do Tutor IA
+            </p>
+          </div>
+          <div className="text-gray-800 whitespace-pre-wrap text-sm leading-relaxed">
+            {hints}
+          </div>
+          <p className="text-xs text-purple-600 mt-3 italic">
+            💡 Essas dicas são para te ajudar a pensar. A resposta oficial virá do professor!
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function StudentDoubts() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -329,6 +399,11 @@ export default function StudentDoubts() {
                             </p>
                           )}
                         </div>
+                      )}
+
+                      {/* Botão de Dicas da IA - apenas para dúvidas pendentes */}
+                      {doubt.status === "pending" && (
+                        <AIHintsSection doubt={doubt} />
                       )}
                     </CardContent>
                   </Card>
