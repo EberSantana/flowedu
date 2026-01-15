@@ -5783,3 +5783,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar navegação
 
 **Resultado:** Removido botão "Ver Trilha" dos cards de disciplinas em "Minhas Disciplinas". O acesso às trilhas continua disponível através do menu lateral "Trilhas de Aprendizagem".
+
+
+## 🐛 Correção do Modal do Diário de Aprendizagem (15/01/2026)
+
+- [x] Corrigir layout dos botões de sentimento no modal
+- [x] Garantir que todos os elementos fiquem dentro da caixa do modal
+- [x] Testar responsividade do modal
+
+**Correções aplicadas:**
+- Botões de sentimento agora usam grid responsivo (2 colunas em mobile, 5 em desktop)
+- Adicionado overflow-y-auto e max-height no DialogContent
+- Texto dos botões com truncate para evitar quebra

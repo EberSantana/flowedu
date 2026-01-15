@@ -116,7 +116,7 @@ export default function StudentLearningJournal() {
                     Nova Entrada
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Adicionar Entrada no Diário</DialogTitle>
                     <DialogDescription>
@@ -146,7 +146,7 @@ export default function StudentLearningJournal() {
 
                     <div>
                       <Label>Como você se sentiu estudando este tópico?</Label>
-                      <div className="flex gap-2 mt-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-2">
                         {Object.entries(moodIcons).map(([key, { icon: Icon, label, color }]) => (
                           <Button
                             key={key}
@@ -154,10 +154,10 @@ export default function StudentLearningJournal() {
                             variant={mood === key ? "default" : "outline"}
                             size="sm"
                             onClick={() => setMood(key as any)}
-                            className="flex-1"
+                            className="w-full"
                           >
                             <Icon className={`w-4 h-4 mr-1 ${mood === key ? "" : color}`} />
-                            {label}
+                            <span className="truncate">{label}</span>
                           </Button>
                         ))}
                       </div>
