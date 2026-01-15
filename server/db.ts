@@ -1251,16 +1251,40 @@ export async function getStudentEnrollments(studentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Buscar matrículas na tabela student_enrollments (tabela correta com dados)
-  // Retorna com campo 'userId' mapeado de 'professorId' para compatibilidade com o router
-  const enrollments = await db.select().from(studentEnrollments)
+  // Buscar matrículas de AMBAS as tabelas para garantir compatibilidade
+  // Tabela 1: student_enrollments (usada pelo portal do professor para matrículas em turmas)
+  const enrollmentsFromStudentEnrollments = await db.select().from(studentEnrollments)
     .where(eq(studentEnrollments.studentId, studentId));
   
-  // Mapear professorId para userId para compatibilidade com o código existente
-  return enrollments.map(enrollment => ({
-    ...enrollment,
-    userId: enrollment.professorId, // Mapear para compatibilidade
-  }));
+  // Tabela 2: subjectEnrollments (usada pelo portal do professor para matrículas diretas em disciplinas)
+  const enrollmentsFromSubjectEnrollments = await db.select().from(subjectEnrollments)
+    .where(eq(subjectEnrollments.studentId, studentId));
+  
+  // Combinar resultados de ambas as tabelas
+  const combinedEnrollments = [
+    // Matrículas de student_enrollments (mapeando professorId para userId)
+    ...enrollmentsFromStudentEnrollments.map(enrollment => ({
+      ...enrollment,
+      userId: enrollment.professorId,
+      source: 'student_enrollments' as const,
+    })),
+    // Matrículas de subjectEnrollments (já tem userId)
+    ...enrollmentsFromSubjectEnrollments.map(enrollment => ({
+      ...enrollment,
+      source: 'subjectEnrollments' as const,
+    })),
+  ];
+  
+  // Remover duplicatas (mesmo studentId + subjectId)
+  const uniqueEnrollments = combinedEnrollments.reduce((acc, enrollment) => {
+    const key = `${enrollment.studentId}-${enrollment.subjectId}`;
+    if (!acc.has(key)) {
+      acc.set(key, enrollment);
+    }
+    return acc;
+  }, new Map());
+  
+  return Array.from(uniqueEnrollments.values());
 }
 
 export async function getEnrollmentsBySubject(subjectId: number, professorId: number) {

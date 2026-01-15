@@ -5683,3 +5683,17 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - Badge adicional ao lado do texto do menu
 - Atualização automática a cada 30 segundos
 - Corrigido bug na consulta de avisos (usava tabela errada)
+
+
+## 🐛 Bug: Aluno 2023306650 Matriculado mas Não Aparece no Portal (15/01/2026)
+
+- [x] Verificar dados de matrícula no banco de dados
+- [x] Verificar se a matrícula está na tabela correta (student_enrollments)
+- [x] Corrigir inconsistência se houver
+- [x] Testar fluxo completo
+
+**Causa raiz:** O sistema tinha duas tabelas de matrícula:
+- `student_enrollments` (usada para matrículas em turmas)
+- `subjectEnrollments` (usada para matrículas diretas em disciplinas)
+
+**Solução:** Modificada a função `getStudentEnrollments` para buscar de AMBAS as tabelas e combinar os resultados, removendo duplicatas.

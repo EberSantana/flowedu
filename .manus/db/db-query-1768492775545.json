@@ -1,0 +1,9 @@
+{
+  "query": "SELECT se.*, s.fullName, s.registrationNumber, sub.name as subjectName FROM student_enrollments se JOIN students s ON se.studentId = s.id LEFT JOIN subjects sub ON se.subjectId = sub.id WHERE s.registrationNumber = '2023306650';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.*, s.fullName, s.registrationNumber, sub.name as subjectName FROM student_enrollments se JOIN students s ON se.studentId = s.id LEFT JOIN subjects sub ON se.subjectId = sub.id WHERE s.registrationNumber = '2023306650';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 56
+}

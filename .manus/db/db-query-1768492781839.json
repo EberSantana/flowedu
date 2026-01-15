@@ -1,0 +1,21 @@
+{
+  "query": "SELECT se.*, s.fullName, s.registrationNumber, sub.name as subjectName FROM subjectEnrollments se JOIN students s ON se.studentId = s.id LEFT JOIN subjects sub ON se.subjectId = sub.id WHERE s.registrationNumber = '2023306650';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT se.*, s.fullName, s.registrationNumber, sub.name as subjectName FROM subjectEnrollments se JOIN students s ON se.studentId = s.id LEFT JOIN subjects sub ON se.subjectId = sub.id WHERE s.registrationNumber = '2023306650';",
+  "rows": [
+    {
+      "id": "510013",
+      "studentId": "60063",
+      "subjectId": "870001",
+      "enrolledAt": "2026-01-15 15:20:32",
+      "userId": "1",
+      "status": "active",
+      "fullName": "KALIANDRA ANSELMO DOS SANTOS",
+      "registrationNumber": "2023306650",
+      "subjectName": "Segurança da Informação"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstudentId\tsubjectId\tenrolledAt\tuserId\tstatus\tfullName\tregistrationNumber\tsubjectName\n510013\t60063\t870001\t2026-01-15 15:20:32\t1\tactive\tKALIANDRA ANSELMO DOS SANTOS\t2023306650\tSegurança da Informação\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}
