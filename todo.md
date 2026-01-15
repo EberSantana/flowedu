@@ -5496,3 +5496,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar página de detalhes da disciplina
 - [x] Testar trilhas de aprendizagem
 - [x] Testar página de exercícios
+
+
+## 🔐 Integridade Referencial - Foreign Keys (15/01/2026)
+
+- [x] Analisar estrutura atual das tabelas de matrícula
+- [x] Adicionar foreign key de student_enrollments.subjectId para subjects.id
+- [x] Adicionar foreign key de student_enrollments.studentId para students.id
+- [x] Adicionar foreign key de student_enrollments.professorId para users.id
+- [x] Adicionar foreign key de student_enrollments.classId para classes.id
+- [x] Aplicar migração no banco de dados (via SQL direto)
+- [x] Testar integridade referencial

@@ -1,0 +1,36 @@
+{
+  "query": "SHOW CREATE TABLE student_enrollments;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE student_enrollments;",
+  "rows": [
+    {
+      "Table": "student_enrollments",
+      "Create Table": "CREATE TABLE `student_enrollments` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `studentId` int(11) NOT NULL,",
+    "  `subjectId` int(11) NOT NULL,",
+    "  `classId` int(11) DEFAULT NULL,",
+    "  `professorId` int(11) NOT NULL,",
+    "  `status` enum('active','completed','dropped') COLLATE utf8mb4_unicode_ci DEFAULT 'active',",
+    "  `enrolledAt` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `completedAt` timestamp NULL DEFAULT NULL,",
+    "  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `fk_enrollment_student` (`studentId`),",
+    "  KEY `fk_enrollment_subject` (`subjectId`),",
+    "  KEY `fk_enrollment_class` (`classId`),",
+    "  KEY `fk_enrollment_professor` (`professorId`),",
+    "  CONSTRAINT `fk_enrollment_student` FOREIGN KEY (`studentId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`students` (`id`) ON DELETE CASCADE,",
+    "  CONSTRAINT `fk_enrollment_subject` FOREIGN KEY (`subjectId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`subjects` (`id`) ON DELETE CASCADE,",
+    "  CONSTRAINT `fk_enrollment_class` FOREIGN KEY (`classId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`classes` (`id`) ON DELETE SET NULL,",
+    "  CONSTRAINT `fk_enrollment_professor` FOREIGN KEY (`professorId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`users` (`id`) ON DELETE CASCADE",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=480001"
+  ],
+  "stdout": "Table\tCreate Table\nstudent_enrollments\tCREATE TABLE `student_enrollments` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `studentId` int(11) NOT NULL,\n  `subjectId` int(11) NOT NULL,\n  `classId` int(11) DEFAULT NULL,\n  `professorId` int(11) NOT NULL,\n  `status` enum('active','completed','dropped') COLLATE utf8mb4_unicode_ci DEFAULT 'active',\n  `enrolledAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `completedAt` timestamp NULL DEFAULT NULL,\n  `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `fk_enrollment_student` (`studentId`),\n  KEY `fk_enrollment_subject` (`subjectId`),\n  KEY `fk_enrollment_class` (`classId`),\n  KEY `fk_enrollment_professor` (`professorId`),\n  CONSTRAINT `fk_enrollment_student` FOREIGN KEY (`studentId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`students` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `fk_enrollment_subject` FOREIGN KEY (`subjectId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`subjects` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `fk_enrollment_class` FOREIGN KEY (`classId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`classes` (`id`) ON DELETE SET NULL,\n  CONSTRAINT `fk_enrollment_professor` FOREIGN KEY (`professorId`) REFERENCES `c6FhCpifoFzEQqXNtsKEU6`.`users` (`id`) ON DELETE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=480001\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

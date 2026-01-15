@@ -401,10 +401,10 @@ export type InsertTopicClassLink = typeof topicClassLinks.$inferInsert;
  */
 export const studentEnrollments = mysqlTable("student_enrollments", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(), // ID do usuário com role 'user' (aluno)
-  subjectId: int("subjectId").notNull(),
-  classId: int("classId"), // Turma específica (opcional)
-  professorId: int("professorId").notNull(), // Professor responsável
+  studentId: int("studentId").notNull().references(() => students.id, { onDelete: "cascade" }), // ID do aluno na tabela students
+  subjectId: int("subjectId").notNull().references(() => subjects.id, { onDelete: "cascade" }), // ID da disciplina
+  classId: int("classId").references(() => classes.id, { onDelete: "set null" }), // Turma específica (opcional)
+  professorId: int("professorId").notNull().references(() => users.id, { onDelete: "cascade" }), // Professor responsável
   enrolledAt: timestamp("enrolledAt").defaultNow().notNull(),
   status: mysqlEnum("status", ["active", "completed", "dropped"]).default("active").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
