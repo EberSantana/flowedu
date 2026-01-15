@@ -5904,3 +5904,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Padronização de Temas
 - [x] Atualizar página de Estatísticas de Desempenho para usar variáveis CSS do tema escolhido pelo aluno
+
+## Redesign Profissional da Página de Entrada
+- [x] Redesenhar página PortalChoice com visual mais profissional e impactante
