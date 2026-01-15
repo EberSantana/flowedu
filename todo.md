@@ -5564,3 +5564,17 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Analisar cores do cabeçalho do portal do aluno
 - [x] Ajustar logo para ficar visível no fundo azul/roxo (fundo branco arredondado)
 - [x] Testar alteração
+
+
+## 🎨 Padronização de Cores - Portal do Aluno (15/01/2026)
+
+- [x] Analisar paleta de cores do portal do professor
+- [x] Aplicar mesmas cores no cabeçalho da sidebar do aluno
+- [x] Padronizar gradientes e botões
+- [x] Testar alterações
+
+**Alterações realizadas:**
+- Removido gradiente azul/roxo do cabeçalho
+- Aplicado fundo neutro (bg-muted) consistente com o professor
+- Unificado cores de menu ativo, avatar e botões
+- Removidas cores hardcoded (text-blue-600, etc.) por variáveis do tema
