@@ -60,32 +60,14 @@ const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
 // Componente de botão de logout
 function LogoutButton() {
-  const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
-      window.location.href = "/";
-    },
-    onError: (error) => {
-      toast.error("Erro ao fazer logout: " + error.message);
-    },
-  });
-
-  const handleLogout = () => {
-    if (confirm("Deseja realmente sair do sistema?")) {
-      logoutMutation.mutate();
-    }
-  };
-
   return (
-    <Button
-      onClick={handleLogout}
-      variant="outline"
-      size="sm"
-      className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-      disabled={logoutMutation.isPending}
+    <a
+      href="/api/logout"
+      className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background h-9 rounded-md px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
     >
       <LogOut className="h-4 w-4" />
-      {logoutMutation.isPending ? 'Saindo...' : 'Sair'}
-    </Button>
+      Sair
+    </a>
   );
 }
 

@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, email, name, role, passwordHash IS NOT NULL as hasPassword FROM users WHERE passwordHash IS NOT NULL LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, role, passwordHash IS NOT NULL as hasPassword FROM users WHERE passwordHash IS NOT NULL LIMIT 10;",
+  "rows": [
+    {
+      "id": "1140011",
+      "email": "teste.professor@email.com",
+      "name": "Professor Teste",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "1170001",
+      "email": "fagundesjuliane91@gmail.com",
+      "name": "Juliane Fagundes",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "1710001",
+      "email": "teacher-1766890621333@test.com",
+      "name": "Professor Teste",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2610001",
+      "email": "jps@gmail.com",
+      "name": "Julia Pinto de Noronha",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2610003",
+      "email": "professor.teste@escola.edu.br",
+      "name": "Professor Teste",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2610004",
+      "email": "maria.silva@teste.com",
+      "name": "Maria Silva",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2610005",
+      "email": "ana.costa@escola.com",
+      "name": "Ana Costa",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2640001",
+      "email": "teste.novo@email.com",
+      "name": "Teste Professor",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2640002",
+      "email": "teste.api3@email.com",
+      "name": "Teste API3",
+      "role": "user",
+      "hasPassword": "1"
+    },
+    {
+      "id": "2640003",
+      "email": "teste.novo.professor@email.com",
+      "name": "Teste Novo",
+      "role": "user",
+      "hasPassword": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\thasPassword\n1140011\tteste.professor@email.com\tProfessor Teste\tuser\t1\n1170001\tfagundesjuliane91@gmail.com\tJuliane Fagundes\tuser\t1\n1710001\tteacher-1766890621333@test.com\tProfessor Teste\tuser\t1\n2610001\tjps@gmail.com\tJulia Pinto de Noronha\tuser\t1\n2610003\tprofessor.teste@escola.edu.br\tProfessor Teste\tuser\t1\n2610004\tmaria.silva@teste.com\tMaria Silva\tuser\t1\n2610005\tana.costa@escola.com\tAna Costa\tuser\t1\n2640001\tteste.novo@email.com\tTeste Professor\tuser\t1\n2640002\tteste.api3@email.com\tTeste API3\tuser\t1\n2640003\tteste.novo.professor@email.com\tTeste Novo\tuser\t1\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

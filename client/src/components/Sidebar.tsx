@@ -290,9 +290,18 @@ export default function Sidebar() {
     },
   });
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (confirm("Deseja realmente sair do sistema?")) {
-      logoutMutation.mutate();
+      try {
+        await fetch('/api/trpc/auth.logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        window.location.href = '/';
+      } catch (error) {
+        toast.error("Erro ao sair do sistema");
+      }
     }
   };
   
@@ -613,21 +622,15 @@ export default function Sidebar() {
                     </Tooltip>
                   )}
               
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={handleLogout}
-                        className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group"
-                      >
-                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                          <LogOut className="h-4 w-4" />
-                        </span>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Sair</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <a
+                    href="/api/logout"
+                    className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group inline-block"
+                    title="Sair"
+                  >
+                    <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                      <LogOut className="h-4 w-4" />
+                    </span>
+                  </a>
                 </div>
               </TooltipProvider>
             ) : (
@@ -686,13 +689,13 @@ export default function Sidebar() {
                     </button>
                   )}
                   
-                  <button
-                    onClick={handleLogout}
+                  <a
+                    href="/api/logout"
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200"
                   >
                     <LogOut className="h-4 w-4" />
                     <span className="text-sm">Sair</span>
-                  </button>
+                  </a>
                 </div>
               </>
             )}

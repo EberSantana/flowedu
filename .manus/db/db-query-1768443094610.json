@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, email, name, role FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, role FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "180009",
+      "email": "temp-reactivate@test.com",
+      "name": "Temp Reactivate User",
+      "role": "user"
+    },
+    {
+      "id": "180022",
+      "email": "temp-deactivate@test.com",
+      "name": "Temp Deactivate User",
+      "role": "user"
+    },
+    {
+      "id": "180023",
+      "email": "temp-reactivate@test.com",
+      "name": "Temp Reactivate User",
+      "role": "user"
+    },
+    {
+      "id": "180024",
+      "email": "preserve@test.com",
+      "name": "Preserve Data User",
+      "role": "user"
+    },
+    {
+      "id": "180036",
+      "email": "temp-deactivate@test.com",
+      "name": "Temp Deactivate User",
+      "role": "user"
+    },
+    {
+      "id": "180037",
+      "email": "temp-reactivate@test.com",
+      "name": "Temp Reactivate User",
+      "role": "user"
+    },
+    {
+      "id": "180038",
+      "email": "preserve@test.com",
+      "name": "Preserve Data User",
+      "role": "user"
+    },
+    {
+      "id": "210001",
+      "email": "anderson.goncalves@ifam.edu.br",
+      "name": "Anderson Carlos de Melo Gonçalves",
+      "role": "user"
+    },
+    {
+      "id": "240001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\n1\teberss@gmail.com\tEber Santana\tadmin\n180009\ttemp-reactivate@test.com\tTemp Reactivate User\tuser\n180022\ttemp-deactivate@test.com\tTemp Deactivate User\tuser\n180023\ttemp-reactivate@test.com\tTemp Reactivate User\tuser\n180024\tpreserve@test.com\tPreserve Data User\tuser\n180036\ttemp-deactivate@test.com\tTemp Deactivate User\tuser\n180037\ttemp-reactivate@test.com\tTemp Reactivate User\tuser\n180038\tpreserve@test.com\tPreserve Data User\tuser\n210001\tanderson.goncalves@ifam.edu.br\tAnderson Carlos de Melo Gonçalves\tuser\n240001\teberss@gmail.com\tEber Santana\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

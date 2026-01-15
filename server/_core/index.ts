@@ -41,6 +41,12 @@ async function startServer() {
   app.use("/api", uploadMaterialRouter);
   // Extract PDF text endpoint
   app.use("/api", extractPdfRouter);
+  // Rota de logout via GET (para links diretos)
+  app.get("/api/logout", (req, res) => {
+    res.clearCookie("session");
+    res.redirect("/");
+  });
+  
   // tRPC API
   app.use(
     "/api/trpc",
