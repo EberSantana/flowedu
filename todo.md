@@ -6014,3 +6014,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Progressão de Tópicos em Dois Passos (16/01/2026)
 - [x] Alterar lógica: primeiro clique marca como "em progresso", segundo clique marca como "concluído" (já estava implementado, limpeza de dados órfãos realizada)
+
+## Bug - Progresso não atualiza ao clicar Concluir/Iniciar (16/01/2026)
+- [x] Verificado: função de atualização de progresso está funcionando corretamente (50% após concluir tópico)
