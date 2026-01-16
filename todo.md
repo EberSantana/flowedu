@@ -5920,3 +5920,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Ajustar badge de notificação de Avisos para mostrar número ao lado do ícone, não em cima
 - [x] Corrigir cálculo da carga horária na página de Estatísticas (mostrando 60h ao invés de 50h) - Atualizado no banco de dados
 - [x] Remover botão 'Voltar para Trilhas' duplicado da página de Trilha de Aprendizagem
+- [x] Aumentar e centralizar logo no sidebar do professor
+- [x] Remover opção 'Voltar ao Modo Professor' do sidebar

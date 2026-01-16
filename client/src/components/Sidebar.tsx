@@ -490,13 +490,11 @@ export default function Sidebar() {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-center mb-2">
-                  <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                    <img src="/logo.png" alt="FlowEdu" className="h-8 w-8" />
-                    FlowEdu
-                  </h1>
+                <div className="flex flex-col items-center justify-center mb-4">
+                  <img src="/logo.png" alt="FlowEdu" className="h-16 w-16 mb-2" />
+                  <h1 className="text-2xl font-bold text-foreground">FlowEdu</h1>
                 </div>
-                <div className="flex justify-end mb-2">
+                <div className="flex justify-center mb-2">
                   <NotificationBell />
                 </div>
                 <button
@@ -603,24 +601,6 @@ export default function Sidebar() {
                     <ThemeSelectorCompact />
                   </div>
               
-                  {isStudent && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={handleExitStudentMode}
-                          className="p-2 rounded-xl text-blue-500 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-500/5 hover:shadow-md transition-all duration-200 group"
-                        >
-                          <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                            <KeyRound className="h-4 w-4" />
-                          </span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <p>Voltar ao Modo Professor</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-              
                   <a
                     href="/api/logout"
                     className="p-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200 group inline-block"
@@ -677,16 +657,6 @@ export default function Sidebar() {
                       </button>
                     }
                   />
-                  
-                  {isStudent && (
-                    <button
-                      onClick={handleExitStudentMode}
-                      className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-blue-500 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-500/5 hover:shadow-md transition-all duration-200"
-                    >
-                      <KeyRound className="h-4 w-4" />
-                      <span className="text-sm">👨‍🏫 Voltar ao Modo Professor</span>
-                    </button>
-                  )}
                   
                   <a
                     href="/api/logout"
