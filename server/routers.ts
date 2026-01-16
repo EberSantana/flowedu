@@ -1279,11 +1279,12 @@ Regras:
       return db.getInactiveUsers();
     }),
 
-    // Cadastro manual de usuários (com link para definir senha)
+    // Cadastro manual de usuários (com senha definida pelo admin)
     createUser: protectedProcedure
       .input(z.object({
         name: z.string().min(1, 'Nome é obrigatório'),
         email: z.string().email('E-mail inválido'),
+        password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
         role: z.enum(['admin', 'user']).default('user'),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -1301,7 +1302,11 @@ Regras:
         const crypto = await import('crypto');
         const tempOpenId = `manual-${crypto.randomBytes(16).toString('hex')}`;
         
-        // Criar usuário (sem senha - será definida pelo link)
+        // Hash da senha
+        const bcrypt = await import('bcryptjs');
+        const passwordHash = await bcrypt.hash(input.password, 10);
+        
+        // Criar usuário com senha já definida
         await db.upsertUser({
           openId: tempOpenId,
           name: input.name,
@@ -1319,19 +1324,8 @@ Regras:
           throw new Error('Erro ao criar usuário');
         }
 
-        // Gerar token para definição de senha (24 horas de validade)
-        const token = `${Date.now()}-${crypto.randomBytes(16).toString('hex')}`;
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
-        await db.createPasswordResetToken(newUser.id, token, expiresAt);
-
-        // Enviar e-mail com link para definir senha
-        const { sendSetPasswordEmail } = await import('./_core/email');
-        const emailResult = await sendSetPasswordEmail(
-          input.email,
-          token,
-          input.name,
-          input.role
-        );
+        // Atualizar senha do usuário
+        await db.updateUserPassword(newUser.id, passwordHash);
 
         // Registrar log de auditoria
         await db.createAuditLog({
@@ -1346,69 +1340,7 @@ Regras:
 
         return { 
           success: true, 
-          user: newUser,
-          emailSent: emailResult.success,
-          emailError: emailResult.error 
-        };
-      }),
-
-    // Reenviar email de convite para usuário que não ativou conta
-    resendInvite: protectedProcedure
-      .input(z.object({
-        userId: z.number(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new Error('Acesso negado: apenas administradores');
-        }
-
-        // Buscar usuário
-        const users = await db.getAllUsers();
-        const user = users.find(u => u.id === input.userId);
-
-        if (!user) {
-          throw new Error('Usuário não encontrado');
-        }
-
-        if (!user.email) {
-          throw new Error('Usuário não possui e-mail cadastrado');
-        }
-
-        // Verificar se usuário já tem senha definida
-        if (user.passwordHash) {
-          throw new Error('Este usuário já ativou sua conta');
-        }
-
-        // Gerar novo token para definição de senha (24 horas de validade)
-        const crypto = await import('crypto');
-        const token = `${Date.now()}-${crypto.randomBytes(16).toString('hex')}`;
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
-        await db.createPasswordResetToken(user.id, token, expiresAt);
-
-        // Enviar e-mail com link para definir senha
-        const { sendSetPasswordEmail } = await import('./_core/email');
-        const emailResult = await sendSetPasswordEmail(
-          user.email,
-          token,
-          user.name || 'Professor',
-          user.role || 'user'
-        );
-
-        // Registrar log de auditoria
-        await db.createAuditLog({
-          adminId: ctx.user.id,
-          adminName: ctx.user.name || 'Administrador',
-          action: 'RESEND_INVITE',
-          targetUserId: user.id,
-          targetUserName: user.name || '',
-          newData: JSON.stringify({ email: user.email }),
-          ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for'] as string || 'unknown',
-        });
-
-        return { 
-          success: true, 
-          emailSent: emailResult.success,
-          emailError: emailResult.error 
+          user: newUser
         };
       }),
 

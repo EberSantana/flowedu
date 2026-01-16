@@ -40,6 +40,8 @@ export default function AdminUsers() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [newUserRole, setNewUserRole] = useState<"admin" | "user">("user");
   
   const { data: activeUsers, isLoading: activeLoading, refetch: refetchActive } = trpc.admin.listActiveUsers.useQuery();
@@ -114,19 +116,13 @@ export default function AdminUsers() {
     },
   });
 
-
-
   const createUserMutation = trpc.admin.createUser.useMutation({
     onSuccess: (data) => {
       toast.success(`Usuário ${data.user.name} criado com sucesso!`);
-      if (data.emailSent) {
-        toast.success("E-mail de boas-vindas enviado!");
-      } else if (data.emailError) {
-        toast.warning(`E-mail não enviado: ${data.emailError}`);
-      }
       // Limpar formulário
       setNewUserName("");
       setNewUserEmail("");
+      setNewUserPassword("");
       setNewUserRole("user");
       setShowCreateForm(false);
       refetch();
@@ -146,18 +142,17 @@ export default function AdminUsers() {
     },
   });
 
-  const resendInviteMutation = trpc.admin.resendInvite.useMutation({
-    onSuccess: (data) => {
-      if (data.emailSent) {
-        toast.success("E-mail de convite reenviado com sucesso!");
-      } else {
-        toast.warning(`E-mail não enviado: ${data.emailError}`);
-      }
-    },
-    onError: (error: any) => {
-      toast.error(`Erro: ${error.message}`);
-    },
-  });
+  // Função para gerar senha aleatória
+  const generateRandomPassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setNewUserPassword(password);
+    setShowPassword(true);
+    toast.info("Senha gerada! Anote para informar ao usuário.");
+  };
 
   if (isLoading || usersLoading) {
     return (
@@ -259,25 +254,30 @@ export default function AdminUsers() {
           <Card className="mb-8 border-success/30 bg-success/10">
             <CardHeader>
               <CardTitle className="text-success">Cadastrar Novo Usuário</CardTitle>
-              <CardDescription>Preencha os dados para criar um novo professor ou administrador</CardDescription>
+              <CardDescription>Preencha os dados para criar um novo professor ou administrador. A senha será definida por você e deve ser informada ao usuário.</CardDescription>
             </CardHeader>
             <CardContent>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (!newUserName || !newUserEmail) {
+                  if (!newUserName || !newUserEmail || !newUserPassword) {
                     toast.error("Preencha todos os campos obrigatórios");
+                    return;
+                  }
+                  if (newUserPassword.length < 6) {
+                    toast.error("A senha deve ter pelo menos 6 caracteres");
                     return;
                   }
                   createUserMutation.mutate({
                     name: newUserName,
                     email: newUserEmail,
+                    password: newUserPassword,
                     role: newUserRole,
                   });
                 }}
                 className="space-y-4"
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Nome Completo *</label>
                     <input
@@ -300,6 +300,41 @@ export default function AdminUsers() {
                       className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       required
                     />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Senha Inicial *</label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={newUserPassword}
+                          onChange={(e) => setNewUserPassword(e.target.value)}
+                          placeholder="Mínimo 6 caracteres"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pr-10"
+                          required
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={generateRandomPassword}
+                        className="whitespace-nowrap"
+                      >
+                        Gerar Senha
+                      </Button>
+                    </div>
+                    <p className="text-xs text-slate-500">Anote a senha para informar ao usuário. Ele poderá alterá-la depois.</p>
                   </div>
                   
                   <div className="space-y-2">
@@ -324,6 +359,7 @@ export default function AdminUsers() {
                       setShowCreateForm(false);
                       setNewUserName("");
                       setNewUserEmail("");
+                      setNewUserPassword("");
                       setNewUserRole("user");
                     }}
                   >
@@ -525,39 +561,20 @@ export default function AdminUsers() {
                               </Button>
                             </>
                           ) : (
-                            <>
-                              {/* Botão Reenviar Convite - apenas para usuários sem senha */}
-                              {!u.passwordHash && (
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => {
-                                    if (confirm(`Reenviar e-mail de convite para ${u.name}?`)) {
-                                      resendInviteMutation.mutate({ userId: u.id });
-                                    }
-                                  }}
-                                  disabled={resendInviteMutation.isPending}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                >
-                                  <Mail className="w-4 h-4 mr-1" />
-                                  Reenviar Convite
-                                </Button>
-                              )}
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => {
-                                  if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
-                                    deleteUserMutation.mutate({ userId: u.id });
-                                  }
-                                }}
-                                disabled={deleteUserMutation.isPending}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Desativar
-                              </Button>
-                            </>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
+                                  deleteUserMutation.mutate({ userId: u.id });
+                                }
+                              }}
+                              disabled={deleteUserMutation.isPending}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Desativar
+                            </Button>
                           )}
                         </div>
                       )}

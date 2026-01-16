@@ -6040,3 +6040,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar rota backend admin.resendInvite para reenviar email de convite
 - [x] Adicionar botão "Reenviar Convite" na página de gerenciamento de usuários
 - [x] Mostrar botão apenas para usuários sem senha definida (passwordHash = null)
+
+## Simplificar Cadastro de Professores (16/01/2026)
+- [x] Remover sistema de convite por email (rota resendInvite, página SetPassword, template de email)
+- [x] Atualizar rota admin.createUser para aceitar senha inicial
+- [x] Atualizar formulário de cadastro para incluir campo de senha
+- [x] Remover botão "Reenviar Convite" da página de usuários
