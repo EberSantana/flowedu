@@ -30,7 +30,7 @@ import { toast } from "sonner";
 export function LearningAnalytics() {
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
-  const [filterSubjectId, setFilterSubjectId] = useState<number | null>(null);
+  
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Queries
@@ -39,9 +39,7 @@ export function LearningAnalytics() {
     { subjectId: selectedSubject! },
     { enabled: !!selectedSubject }
   );
-  const { data: classAnalytics } = trpc.analytics.getClassAnalytics.useQuery(
-    { subjectId: filterSubjectId || undefined }
-  );
+  const { data: classAnalytics } = trpc.analytics.getClassAnalytics.useQuery({});
   const { data: alerts } = trpc.analytics.getAlerts.useQuery();
   const { data: alertStats } = trpc.analytics.getAlertStatistics.useQuery();
   
@@ -159,41 +157,6 @@ export function LearningAnalytics() {
             </div>
           </div>
 
-          {/* Filtro por Disciplina */}
-          <div className="flex justify-center">
-            <div className="bg-white rounded-xl shadow-md p-4 flex items-center gap-4 border border-slate-200">
-              <div className="flex items-center gap-2 text-slate-600">
-                <BarChart3 className="h-5 w-5" />
-                <span className="font-medium">Filtrar por Disciplina:</span>
-              </div>
-              <Select
-                value={filterSubjectId?.toString() || "all"}
-                onValueChange={(value) => setFilterSubjectId(value === "all" ? null : parseInt(value))}
-              >
-                <SelectTrigger className="w-[280px] bg-slate-50 border-slate-300">
-                  <SelectValue placeholder="Todas as Disciplinas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as Disciplinas</SelectItem>
-                  {subjects?.map((subject) => (
-                    <SelectItem key={subject.id} value={subject.id.toString()}>
-                      {subject.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {filterSubjectId && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setFilterSubjectId(null)}
-                  className="text-slate-500 hover:text-slate-700"
-                >
-                  Limpar filtro
-                </Button>
-              )}
-            </div>
-          </div>
 
           {/* Estatísticas em Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

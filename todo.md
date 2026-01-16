@@ -5975,3 +5975,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar backend para suportar código de convite opcional
 - [x] Atualizar frontend com campo de código de convite e tela de pendente
 - [x] Testar fluxo completo (TypeScript sem erros)
+
+## 🗑️ Remoção de Filtro
+
+- [x] Remover filtro "Filtrar por Disciplina" da página de Análise de Aprendizado com IA
