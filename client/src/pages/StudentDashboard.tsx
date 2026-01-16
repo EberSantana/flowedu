@@ -26,12 +26,11 @@ export default function StudentDashboard() {
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
 
-  // Ações rápidas profissionais
+  // Ações rápidas profissionais (Revisão removida conforme solicitado)
   const quickActions = [
     { icon: BookOpen, label: "Disciplinas", path: "/student-subjects", color: "bg-primary", description: "Acesse suas disciplinas" },
     { icon: Map, label: "Trilhas", path: "/student-learning-paths", color: "bg-purple-600", description: "Trilhas de aprendizagem" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "bg-orange-600", description: "Pratique e aprenda" },
-    { icon: Lightbulb, label: "Revisão", path: "/student-review", color: "bg-accent", description: "Revisão inteligente" },
     { icon: BarChart3, label: "Estatísticas", path: "/student-stats", color: "bg-success", description: "Seu desempenho" },
   ];
 
@@ -62,7 +61,7 @@ export default function StudentDashboard() {
         {/* Ações Rápidas */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Acesso Rápido</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:grid-cols-4">
             {quickActions.map((action) => (
               <Link key={action.path} href={action.path}>
                 <Card className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-primary/50">
@@ -125,7 +124,7 @@ export default function StudentDashboard() {
                   {activeSubjects.slice(0, 6).map((enrollment: any) => (
                     <Card 
                       key={enrollment.id} 
-                      className="hover:shadow-lg transition-all border hover:border-primary/50"
+                      className="transition-all border"
                     >
                       <div 
                         className="h-1" 

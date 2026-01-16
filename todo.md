@@ -5943,3 +5943,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Corrigir fundo preto do modal de materiais - melhorar cores e visual (backdrop-blur + bg-slate-900/60)
 - [x] Remover seção "Minhas Dúvidas" do modal de tópicos
+
+## 🔧 Correções Solicitadas (15/01/2026)
+
+- [x] Corrigir progresso zerado na trilha de aprendizagem (agora busca estatísticas por disciplina)
+- [x] Remover card "Revisão" do Acesso Rápido no portal do aluno
+- [x] Remover clique do card de disciplinas (manter apenas botão Ver Detalhes)

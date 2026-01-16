@@ -11,21 +11,33 @@ import {
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
 import { Link } from "wouter";
-import { useState } from "react";
+
 
 export default function StudentLearningPaths() {
-  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
-  
   // Buscar disciplinas matriculadas
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
   
-  // Buscar estatísticas de estudo
-  const { data: stats } = trpc.student.getStudyStatistics.useQuery(
-    { subjectId: selectedSubjectId || undefined },
-    { enabled: true }
-  );
+  // Buscar estatísticas globais de estudo
+  const { data: globalStats } = trpc.student.getStudyStatistics.useQuery({});
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
+  
+  // Buscar estatísticas por disciplina (para cada disciplina ativa)
+  const subjectStatsQueries = activeSubjects.map(enrollment => {
+    return trpc.student.getSubjectStatistics.useQuery(
+      { subjectId: enrollment.subjectId },
+      { enabled: !!enrollment.subjectId }
+    );
+  });
+  
+  // Criar mapa de estatísticas por subjectId
+  const subjectStatsMap: Record<number, any> = {};
+  activeSubjects.forEach((enrollment, index) => {
+    const query = subjectStatsQueries[index];
+    if (query?.data) {
+      subjectStatsMap[enrollment.subjectId] = query.data;
+    }
+  });
 
   if (isLoading) {
     return (
@@ -106,8 +118,8 @@ export default function StudentLearningPaths() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-gray-900">{stats?.completedTopics || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">de {stats?.totalTopics || 0} tópicos</p>
+              <p className="text-3xl font-bold text-gray-900">{globalStats?.completedTopics || 0}</p>
+              <p className="text-sm text-gray-600 mt-1">de {globalStats?.totalTopics || 0} tópicos</p>
             </CardContent>
           </Card>
 
@@ -121,7 +133,7 @@ export default function StudentLearningPaths() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-gray-900">{stats?.totalHoursEstimated || 0}h</p>
+              <p className="text-3xl font-bold text-gray-900">{globalStats?.totalHoursEstimated || 0}h</p>
               <p className="text-sm text-gray-600 mt-1">de estudo planejado</p>
             </CardContent>
           </Card>
@@ -130,14 +142,14 @@ export default function StudentLearningPaths() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold text-gray-700">
-                  Minhas Dúvidas
+                  Em Progresso
                 </CardTitle>
-                <MessageCircle className="w-5 h-5 text-orange-600" />
+                <TrendingUp className="w-5 h-5 text-orange-600" />
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-gray-900">{stats?.pendingDoubts || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">dúvidas pendentes</p>
+              <p className="text-3xl font-bold text-gray-900">{globalStats?.inProgressTopics || 0}</p>
+              <p className="text-sm text-gray-600 mt-1">tópicos em andamento</p>
             </CardContent>
           </Card>
           </div>
@@ -169,8 +181,14 @@ export default function StudentLearningPaths() {
                 const subject = enrollment.subject;
                 if (!subject) return null;
 
-                const progress = 0; // TODO: calcular progresso real
-                const hasLearningPath = true; // Assumir que todas as disciplinas têm trilha
+                // Buscar estatísticas específicas desta disciplina
+                const subjectStats = subjectStatsMap[enrollment.subjectId];
+                const progress = subjectStats?.progressPercentage || 0;
+                const completedTopics = subjectStats?.completedTopics || 0;
+                const inProgressTopics = subjectStats?.inProgressTopics || 0;
+                const notStartedTopics = subjectStats?.notStartedTopics || 0;
+                const totalTopics = subjectStats?.totalTopics || 0;
+                const hasLearningPath = totalTopics > 0;
 
                 return (
                   <Card 
@@ -213,19 +231,19 @@ export default function StudentLearningPaths() {
                             <div className="text-center">
                               <div className="text-xs text-gray-500 mb-1">Em Progresso</div>
                               <div className="text-lg font-bold text-primary">
-                                {stats?.inProgressTopics || 0}
+                                {inProgressTopics}
                               </div>
                             </div>
                             <div className="text-center border-l border-r">
                               <div className="text-xs text-gray-500 mb-1">Concluídos</div>
                               <div className="text-lg font-bold text-success">
-                                {stats?.completedTopics || 0}
+                                {completedTopics}
                               </div>
                             </div>
                             <div className="text-center">
                               <div className="text-xs text-gray-500 mb-1">Pendentes</div>
                               <div className="text-lg font-bold text-gray-600">
-                                {stats?.notStartedTopics || 0}
+                                {notStartedTopics}
                               </div>
                             </div>
                           </div>
@@ -280,7 +298,7 @@ export default function StudentLearningPaths() {
                 <Link href="/student/doubts">
                   <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
                     <Lightbulb className="w-4 h-4 mr-2" />
-                    Ver Dúvidas ({stats?.pendingDoubts || 0})
+                    Ver Dúvidas ({globalStats?.pendingDoubts || 0})
                   </Button>
                 </Link>
               </CardContent>
