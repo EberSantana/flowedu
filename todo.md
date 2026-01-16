@@ -5979,3 +5979,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🗑️ Remoção de Filtro
 
 - [x] Remover filtro "Filtrar por Disciplina" da página de Análise de Aprendizado com IA
+
+## 🔑 Recuperação de Senha (Esqueci minha senha)
+
+- [x] Criar tabela de tokens de recuperação de senha no banco de dados (já existia)
+- [x] Implementar rota para solicitar recuperação de senha (enviar email) (já existia)
+- [x] Implementar rota para validar token e redefinir senha (já existia)
+- [x] Criar página de solicitação de recuperação de senha (/esqueci-senha)
+- [x] Criar página de redefinição de senha (/redefinir-senha)
+- [x] Adicionar link "Esqueci minha senha" na página de login
