@@ -5992,3 +5992,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Portal do Aluno - Card de Disciplina
 - [x] Remover botão "Ver Detalhes" do card de disciplina
 - [x] Adicionar barra de progressão da disciplina no card
+
+## Correção Card de Disciplinas - Portal do Aluno (16/01/2026)
+- [x] Remover clique/navegação do card de disciplinas (deixar apenas visual)
+- [x] Corrigir cálculo de progressão da disciplina para mostrar progresso real (já estava funcionando - 4 de 16 tópicos = 25%)

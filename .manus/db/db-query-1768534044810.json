@@ -1,0 +1,16 @@
+{
+  "query": "SELECT s.id, s.name, COUNT(DISTINCT lm.id) as totalModules, COUNT(DISTINCT lt.id) as totalTopics FROM subjects s LEFT JOIN learning_modules lm ON lm.subjectId = s.id LEFT JOIN learning_topics lt ON lt.moduleId = lm.id WHERE s.name LIKE '%Segurança%' GROUP BY s.id, s.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id, s.name, COUNT(DISTINCT lm.id) as totalModules, COUNT(DISTINCT lt.id) as totalTopics FROM subjects s LEFT JOIN learning_modules lm ON lm.subjectId = s.id LEFT JOIN learning_topics lt ON lt.moduleId = lm.id WHERE s.name LIKE '%Segurança%' GROUP BY s.id, s.name;",
+  "rows": [
+    {
+      "id": "930001",
+      "name": "Segurança",
+      "totalModules": "5",
+      "totalTopics": "16"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttotalModules\ttotalTopics\n930001\tSegurança\t5\t16\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

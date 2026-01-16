@@ -126,11 +126,7 @@ export default function StudentDashboard() {
                     const totalTopics = enrollment.progress?.totalTopics || 0;
                     
                     return (
-                      <Link 
-                        key={enrollment.id} 
-                        href={`/student/subject-details/${enrollment.subjectId}/${enrollment.userId}`}
-                      >
-                        <Card className="transition-all border hover:shadow-lg hover:border-primary/50 cursor-pointer group">
+                        <Card key={enrollment.id} className="transition-all border">
                           <div 
                             className="h-1" 
                             style={{ backgroundColor: enrollment.subject?.color || '#3B82F6' }}
@@ -139,7 +135,7 @@ export default function StudentDashboard() {
                           <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+                                <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">
                                   {enrollment.subject?.name || 'Disciplina'}
                                 </CardTitle>
                                 <p className="text-sm text-gray-500 font-mono">
@@ -194,7 +190,6 @@ export default function StudentDashboard() {
                             </div>
                           </CardContent>
                         </Card>
-                      </Link>
                     );
                   })}
                 </div>
