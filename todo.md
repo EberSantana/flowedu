@@ -5924,3 +5924,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover opção 'Voltar ao Modo Professor' do sidebar
 - [x] Colocar logo (F) ao lado do nome FlowEdu no sidebar
 - [x] Remover sino de alerta do sidebar do professor
+- [x] Aumentar logo e centralizar melhor com nome FlowEdu ao lado no sidebar
