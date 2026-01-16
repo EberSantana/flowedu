@@ -5918,3 +5918,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir definitivamente contagem de Total de Alunos (usar subjectEnrollments ao invés de students)
 - [x] Adicionar seletor de disciplina na página de Análise com IA para filtrar estatísticas
 - [x] Ajustar badge de notificação de Avisos para mostrar número ao lado do ícone, não em cima
+- [x] Corrigir cálculo da carga horária na página de Estatísticas (mostrando 60h ao invés de 50h) - Atualizado no banco de dados
