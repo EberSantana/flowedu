@@ -6017,3 +6017,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug - Progresso não atualiza ao clicar Concluir/Iniciar (16/01/2026)
 - [x] Verificado: função de atualização de progresso está funcionando corretamente (50% após concluir tópico)
+
+## Bug - Sincronização de Progressão entre Páginas (16/01/2026)
+- [x] Verificado: todas as páginas estão sincronizadas mostrando 63% (10 de 16 tópicos concluídos)
+
+## UI - Padronizar Card de Trilhas de Aprendizagem (16/01/2026)
+- [x] Alterar layout do card de Trilhas para ficar igual ao de Estatísticas (Concluídos, Total, Módulos, Carga)
