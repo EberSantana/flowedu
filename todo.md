@@ -5999,3 +5999,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Botão Estatísticas - Portal do Aluno (16/01/2026)
 - [x] Alterar link do botão "Estatísticas" para redirecionar para página de Estatísticas de Desempenho (/student/statistics)
+
+## Bug - StudentLearningPaths Hooks Error (16/01/2026)
+- [x] Corrigir erro "Rendered more hooks than during the previous render" no StudentLearningPaths (criada rota getAllSubjectsStatistics para evitar hooks em loop)

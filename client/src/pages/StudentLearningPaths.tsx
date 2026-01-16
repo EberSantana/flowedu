@@ -20,24 +20,27 @@ export default function StudentLearningPaths() {
   // Buscar estatísticas globais de estudo
   const { data: globalStats } = trpc.student.getStudyStatistics.useQuery({});
 
+  // Filtrar disciplinas ativas (sem usar hooks condicionais)
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   
-  // Buscar estatísticas por disciplina (para cada disciplina ativa)
-  const subjectStatsQueries = activeSubjects.map(enrollment => {
-    return trpc.student.getSubjectStatistics.useQuery(
-      { subjectId: enrollment.subjectId },
-      { enabled: !!enrollment.subjectId }
-    );
-  });
+  // Extrair IDs das disciplinas ativas para buscar estatísticas em uma única query
+  const subjectIds = activeSubjects.map(e => e.subjectId);
+  
+  // Buscar estatísticas de todas as disciplinas de uma vez (evita hooks em loop)
+  const { data: allSubjectStats } = trpc.student.getAllSubjectsStatistics.useQuery(
+    { subjectIds },
+    { enabled: subjectIds.length > 0 }
+  );
   
   // Criar mapa de estatísticas por subjectId
   const subjectStatsMap: Record<number, any> = {};
-  activeSubjects.forEach((enrollment, index) => {
-    const query = subjectStatsQueries[index];
-    if (query?.data) {
-      subjectStatsMap[enrollment.subjectId] = query.data;
-    }
-  });
+  if (allSubjectStats) {
+    allSubjectStats.forEach((stats: any) => {
+      if (stats) {
+        subjectStatsMap[stats.subjectId] = stats;
+      }
+    });
+  }
 
   if (isLoading) {
     return (
@@ -252,7 +255,6 @@ export default function StudentLearningPaths() {
                           <div className="pt-2">
                             <Link 
                               href={`/student/learning-path/${subject.id}/${enrollment.userId}`}
-                              className="block"
                             >
                               <Button 
                                 className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-md"

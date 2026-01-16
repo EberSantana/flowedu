@@ -3182,6 +3182,18 @@ JSON (descrições MAX 15 chars):
           input.subjectId
         );
       }),
+
+    // Estatísticas de todas as disciplinas de uma vez (evita hooks em loop)
+    getAllSubjectsStatistics: studentProcedure
+      .input(z.object({ subjectIds: z.array(z.number()) }))
+      .query(async ({ ctx, input }) => {
+        const results = await Promise.all(
+          input.subjectIds.map(subjectId => 
+            db.getSubjectStatistics(ctx.studentSession.studentId, subjectId)
+          )
+        );
+        return results.filter(Boolean);
+      }),
   }),
 
   // Professor Materials Management
