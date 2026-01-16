@@ -2616,13 +2616,44 @@ export async function createTeacherWithPassword(data: {
   name: string;
   email: string;
   passwordHash: string;
-}): Promise<{ id: number; openId: string } | null> {
+  inviteCode?: string; // Código de convite opcional
+}): Promise<{ id: number; openId: string; approvalStatus: string } | null> {
   const db = await getDb();
   if (!db) return null;
 
   try {
+    // Verificar código de convite se fornecido
+    let hasValidInvite = false;
+    if (data.inviteCode) {
+      const invite = await db.select().from(inviteCodes)
+        .where(and(
+          eq(inviteCodes.code, data.inviteCode),
+          eq(inviteCodes.isActive, true)
+        ))
+        .limit(1);
+      
+      if (invite[0]) {
+        // Verificar se não expirou
+        const notExpired = !invite[0].expiresAt || new Date(invite[0].expiresAt) > new Date();
+        // Verificar se não atingiu limite de usos
+        const hasUses = invite[0].currentUses < invite[0].maxUses;
+        
+        if (notExpired && hasUses) {
+          hasValidInvite = true;
+          // Incrementar uso do código
+          await db.update(inviteCodes)
+            .set({ currentUses: invite[0].currentUses + 1 })
+            .where(eq(inviteCodes.id, invite[0].id));
+        }
+      }
+    }
+
     // Gerar openId único para o professor
     const openId = `teacher-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    
+    // Se tem código de convite válido: aprovado automaticamente
+    // Se não tem código: pendente de aprovação
+    const approvalStatus = hasValidInvite ? 'approved' : 'pending';
     
     await db.insert(users).values({
       openId,
@@ -2632,7 +2663,8 @@ export async function createTeacherWithPassword(data: {
       loginMethod: 'email',
       role: 'user',
       active: true,
-      approvalStatus: 'approved', // Aprovado automaticamente
+      approvalStatus: approvalStatus,
+      inviteCode: data.inviteCode || null,
     });
 
     // Buscar o usuário criado para retornar o ID
@@ -2641,7 +2673,7 @@ export async function createTeacherWithPassword(data: {
       .limit(1);
     
     if (created[0]) {
-      return { id: created[0].id, openId: created[0].openId };
+      return { id: created[0].id, openId: created[0].openId, approvalStatus: approvalStatus };
     }
     return null;
   } catch (error) {

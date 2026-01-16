@@ -1,0 +1,1330 @@
+{
+  "query": "SELECT id, email, name, role FROM users WHERE email = 'eberss@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, role FROM users WHERE email = 'eberss@gmail.com';",
+  "rows": [
+    {
+      "id": "1",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "240001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "240002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "240003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "240004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "240005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "240006",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300006",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300010",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300011",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300012",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300013",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "300014",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "300015",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300016",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "300017",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "300018",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "300019",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "330001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "330002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "330003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "330004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "330005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "330006",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "330007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "330008",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "360001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "360002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "360003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "360004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "360005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "390001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390006",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390008",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390009",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390010",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390011",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390012",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390013",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390014",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390015",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "390016",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "420001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "420002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "450001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "480001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "480002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "510001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "510002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "510003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "510004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "540001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "570001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "570002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "570003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "570004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "600001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "600002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "630001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "630002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "660001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "690001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "690002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "690004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "720001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "720002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "720003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "750001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "750002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "780001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "810001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "840001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "870001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "870002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "870003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "900001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "900002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "930016",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "930017",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "930018",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "960001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "960002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "960003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "990001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "990002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "990003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1020001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1080001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1140001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1140004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1140005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1140007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1140008",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1140009",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1140010",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1170002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1170003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1200001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1230001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1290007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290037",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290038",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290039",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1290040",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1290042",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1320002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1320003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1350001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1380001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1410001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1470002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1500001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1530001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1560001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1560002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1560003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1590001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1590002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1620001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1620002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1650001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1650002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1740001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1770001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1770002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1770003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1800005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1860001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1860002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1890001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1890002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1920001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "1950001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1950013",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "1950017",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2010001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2010002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2010038",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2040001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2040002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2070001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2070002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "2070013",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "2100001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "2100010",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2100011",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2100012",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2100226",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2100271",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2100292",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2100293",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "2130001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "2130002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2130003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2160001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "user"
+    },
+    {
+      "id": "2190001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2190003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2220001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2250007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2310049",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2310147",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2310148",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2310149",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2310150",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2340001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2370001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2400001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2430001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2460001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2460002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2490001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2490002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2490003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2520001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2520002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2520003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2550001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2550002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2580001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2640046",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730006",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730007",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730008",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730011",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730012",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730013",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730014",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730015",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730016",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730017",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2730018",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2760001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2790001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2790002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2790003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2790004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2790005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2820001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2820002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2820003",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2820004",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2820005",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2850001",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    },
+    {
+      "id": "2850002",
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\n1\teberss@gmail.com\tEber Santana\tadmin\n240001\teberss@gmail.com\tEber Santana\tadmin\n240002\teberss@gmail.com\tEber Santana\tadmin\n240003\teberss@gmail.com\tEber Santana\tadmin\n240004\teberss@gmail.com\tEber Santana\tadmin\n240005\teberss@gmail.com\tEber Santana\tadmin\n240006\teberss@gmail.com\tEber Santana\tuser\n300001\teberss@gmail.com\tEber Santana\tuser\n300003\teberss@gmail.com\tEber Santana\tuser\n300006\teberss@gmail.com\tEber Santana\tuser\n300007\teberss@gmail.com\tEber Santana\tuser\n300010\teberss@gmail.com\tEber Santana\tuser\n300011\teberss@gmail.com\tEber Santana\tuser\n300012\teberss@gmail.com\tEber Santana\tuser\n300013\teberss@gmail.com\tEber Santana\tadmin\n300014\teberss@gmail.com\tEber Santana\tadmin\n300015\teberss@gmail.com\tEber Santana\tuser\n300016\teberss@gmail.com\tEber Santana\tuser\n300017\teberss@gmail.com\tEber Santana\tadmin\n300018\teberss@gmail.com\tEber Santana\tadmin\n300019\teberss@gmail.com\tEber Santana\tadmin\n330001\teberss@gmail.com\tEber Santana\tuser\n330002\teberss@gmail.com\tEber Santana\tuser\n330003\teberss@gmail.com\tEber Santana\tadmin\n330004\teberss@gmail.com\tEber Santana\tadmin\n330005\teberss@gmail.com\tEber Santana\tadmin\n330006\teberss@gmail.com\tEber Santana\tuser\n330007\teberss@gmail.com\tEber Santana\tuser\n330008\teberss@gmail.com\tEber Santana\tuser\n360001\teberss@gmail.com\tEber Santana\tadmin\n360002\teberss@gmail.com\tEber Santana\tuser\n360003\teberss@gmail.com\tEber Santana\tuser\n360004\teberss@gmail.com\tEber Santana\tuser\n360005\teberss@gmail.com\tEber Santana\tadmin\n390001\teberss@gmail.com\tEber Santana\tuser\n390002\teberss@gmail.com\tEber Santana\tuser\n390003\teberss@gmail.com\tEber Santana\tuser\n390004\teberss@gmail.com\tEber Santana\tuser\n390005\teberss@gmail.com\tEber Santana\tuser\n390006\teberss@gmail.com\tEber Santana\tuser\n390007\teberss@gmail.com\tEber Santana\tuser\n390008\teberss@gmail.com\tEber Santana\tuser\n390009\teberss@gmail.com\tEber Santana\tuser\n390010\teberss@gmail.com\tEber Santana\tuser\n390011\teberss@gmail.com\tEber Santana\tuser\n390012\teberss@gmail.com\tEber Santana\tuser\n390013\teberss@gmail.com\tEber Santana\tuser\n390014\teberss@gmail.com\tEber Santana\tuser\n390015\teberss@gmail.com\tEber Santana\tuser\n390016\teberss@gmail.com\tEber Santana\tuser\n420001\teberss@gmail.com\tEber Santana\tuser\n420002\teberss@gmail.com\tEber Santana\tuser\n450001\teberss@gmail.com\tEber Santana\tadmin\n480001\teberss@gmail.com\tEber Santana\tuser\n480002\teberss@gmail.com\tEber Santana\tuser\n510001\teberss@gmail.com\tEber Santana\tuser\n510002\teberss@gmail.com\tEber Santana\tuser\n510003\teberss@gmail.com\tEber Santana\tuser\n510004\teberss@gmail.com\tEber Santana\tuser\n540001\teberss@gmail.com\tEber Santana\tuser\n570001\teberss@gmail.com\tEber Santana\tuser\n570002\teberss@gmail.com\tEber Santana\tuser\n570003\teberss@gmail.com\tEber Santana\tuser\n570004\teberss@gmail.com\tEber Santana\tuser\n600001\teberss@gmail.com\tEber Santana\tuser\n600002\teberss@gmail.com\tEber Santana\tuser\n630001\teberss@gmail.com\tEber Santana\tadmin\n630002\teberss@gmail.com\tEber Santana\tadmin\n660001\teberss@gmail.com\tEber Santana\tadmin\n690001\teberss@gmail.com\tEber Santana\tuser\n690002\teberss@gmail.com\tEber Santana\tuser\n690004\teberss@gmail.com\tEber Santana\tuser\n720001\teberss@gmail.com\tEber Santana\tuser\n720002\teberss@gmail.com\tEber Santana\tuser\n720003\teberss@gmail.com\tEber Santana\tuser\n750001\teberss@gmail.com\tEber Santana\tuser\n750002\teberss@gmail.com\tEber Santana\tuser\n780001\teberss@gmail.com\tEber Santana\tuser\n810001\teberss@gmail.com\tEber Santana\tuser\n840001\teberss@gmail.com\tEber Santana\tuser\n870001\teberss@gmail.com\tEber Santana\tuser\n870002\teberss@gmail.com\tEber Santana\tuser\n870003\teberss@gmail.com\tEber Santana\tuser\n900001\teberss@gmail.com\tEber Santana\tuser\n900002\teberss@gmail.com\tEber Santana\tuser\n930016\teberss@gmail.com\tEber Santana\tuser\n930017\teberss@gmail.com\tEber Santana\tuser\n930018\teberss@gmail.com\tEber Santana\tuser\n960001\teberss@gmail.com\tEber Santana\tuser\n960002\teberss@gmail.com\tEber Santana\tuser\n960003\teberss@gmail.com\tEber Santana\tuser\n990001\teberss@gmail.com\tEber Santana\tuser\n990002\teberss@gmail.com\tEber Santana\tuser\n990003\teberss@gmail.com\tEber Santana\tuser\n1020001\teberss@gmail.com\tEber Santana\tuser\n1080001\teberss@gmail.com\tEber Santana\tuser\n1140001\teberss@gmail.com\tEber Santana\tadmin\n1140004\teberss@gmail.com\tEber Santana\tadmin\n1140005\teberss@gmail.com\tEber Santana\tadmin\n1140007\teberss@gmail.com\tEber Santana\tadmin\n1140008\teberss@gmail.com\tEber Santana\tadmin\n1140009\teberss@gmail.com\tEber Santana\tadmin\n1140010\teberss@gmail.com\tEber Santana\tadmin\n1170002\teberss@gmail.com\tEber Santana\tadmin\n1170003\teberss@gmail.com\tEber Santana\tadmin\n1200001\teberss@gmail.com\tEber Santana\tadmin\n1230001\teberss@gmail.com\tEber Santana\tuser\n1290001\teberss@gmail.com\tEber Santana\tuser\n1290003\teberss@gmail.com\tEber Santana\tuser\n1290005\teberss@gmail.com\tEber Santana\tadmin\n1290007\teberss@gmail.com\tEber Santana\tuser\n1290037\teberss@gmail.com\tEber Santana\tuser\n1290038\teberss@gmail.com\tEber Santana\tuser\n1290039\teberss@gmail.com\tEber Santana\tuser\n1290040\teberss@gmail.com\tEber Santana\tadmin\n1290042\teberss@gmail.com\tEber Santana\tadmin\n1320002\teberss@gmail.com\tEber Santana\tadmin\n1320003\teberss@gmail.com\tEber Santana\tadmin\n1350001\teberss@gmail.com\tEber Santana\tadmin\n1380001\teberss@gmail.com\tEber Santana\tadmin\n1410001\teberss@gmail.com\tEber Santana\tadmin\n1470002\teberss@gmail.com\tEber Santana\tuser\n1500001\teberss@gmail.com\tEber Santana\tadmin\n1530001\teberss@gmail.com\tEber Santana\tuser\n1560001\teberss@gmail.com\tEber Santana\tuser\n1560002\teberss@gmail.com\tEber Santana\tadmin\n1560003\teberss@gmail.com\tEber Santana\tadmin\n1590001\teberss@gmail.com\tEber Santana\tuser\n1590002\teberss@gmail.com\tEber Santana\tadmin\n1620001\teberss@gmail.com\tEber Santana\tadmin\n1620002\teberss@gmail.com\tEber Santana\tuser\n1650001\teberss@gmail.com\tEber Santana\tuser\n1650002\teberss@gmail.com\tEber Santana\tuser\n1740001\teberss@gmail.com\tEber Santana\tuser\n1770001\teberss@gmail.com\tEber Santana\tadmin\n1770002\teberss@gmail.com\tEber Santana\tadmin\n1770003\teberss@gmail.com\tEber Santana\tuser\n1800005\teberss@gmail.com\tEber Santana\tadmin\n1860001\teberss@gmail.com\tEber Santana\tadmin\n1860002\teberss@gmail.com\tEber Santana\tadmin\n1890001\teberss@gmail.com\tEber Santana\tadmin\n1890002\teberss@gmail.com\tEber Santana\tadmin\n1920001\teberss@gmail.com\tEber Santana\tadmin\n1950001\teberss@gmail.com\tEber Santana\tuser\n1950013\teberss@gmail.com\tEber Santana\tuser\n1950017\teberss@gmail.com\tEber Santana\tadmin\n2010001\teberss@gmail.com\tEber Santana\tadmin\n2010002\teberss@gmail.com\tEber Santana\tadmin\n2010038\teberss@gmail.com\tEber Santana\tadmin\n2040001\teberss@gmail.com\tEber Santana\tadmin\n2040002\teberss@gmail.com\tEber Santana\tadmin\n2070001\teberss@gmail.com\tEber Santana\tadmin\n2070002\teberss@gmail.com\tEber Santana\tuser\n2070013\teberss@gmail.com\tEber Santana\tuser\n2100001\teberss@gmail.com\tEber Santana\tuser\n2100010\teberss@gmail.com\tEber Santana\tadmin\n2100011\teberss@gmail.com\tEber Santana\tadmin\n2100012\teberss@gmail.com\tEber Santana\tadmin\n2100226\teberss@gmail.com\tEber Santana\tadmin\n2100271\teberss@gmail.com\tEber Santana\tadmin\n2100292\teberss@gmail.com\tEber Santana\tadmin\n2100293\teberss@gmail.com\tEber Santana\tuser\n2130001\teberss@gmail.com\tEber Santana\tuser\n2130002\teberss@gmail.com\tEber Santana\tadmin\n2130003\teberss@gmail.com\tEber Santana\tadmin\n2160001\teberss@gmail.com\tEber Santana\tuser\n2190001\teberss@gmail.com\tEber Santana\tadmin\n2190003\teberss@gmail.com\tEber Santana\tadmin\n2220001\teberss@gmail.com\tEber Santana\tadmin\n2250007\teberss@gmail.com\tEber Santana\tadmin\n2310049\teberss@gmail.com\tEber Santana\tadmin\n2310147\teberss@gmail.com\tEber Santana\tadmin\n2310148\teberss@gmail.com\tEber Santana\tadmin\n2310149\teberss@gmail.com\tEber Santana\tadmin\n2310150\teberss@gmail.com\tEber Santana\tadmin\n2340001\teberss@gmail.com\tEber Santana\tadmin\n2370001\teberss@gmail.com\tEber Santana\tadmin\n2400001\teberss@gmail.com\tEber Santana\tadmin\n2430001\teberss@gmail.com\tEber Santana\tadmin\n2460001\teberss@gmail.com\tEber Santana\tadmin\n2460002\teberss@gmail.com\tEber Santana\tadmin\n2490001\teberss@gmail.com\tEber Santana\tadmin\n2490002\teberss@gmail.com\tEber Santana\tadmin\n2490003\teberss@gmail.com\tEber Santana\tadmin\n2520001\teberss@gmail.com\tEber Santana\tadmin\n2520002\teberss@gmail.com\tEber Santana\tadmin\n2520003\teberss@gmail.com\tEber Santana\tadmin\n2550001\teberss@gmail.com\tEber Santana\tadmin\n2550002\teberss@gmail.com\tEber Santana\tadmin\n2580001\teberss@gmail.com\tEber Santana\tadmin\n2640046\teberss@gmail.com\tEber Santana\tadmin\n2730001\teberss@gmail.com\tEber Santana\tadmin\n2730002\teberss@gmail.com\tEber Santana\tadmin\n2730003\teberss@gmail.com\tEber Santana\tadmin\n2730004\teberss@gmail.com\tEber Santana\tadmin\n2730005\teberss@gmail.com\tEber Santana\tadmin\n2730006\teberss@gmail.com\tEber Santana\tadmin\n2730007\teberss@gmail.com\tEber Santana\tadmin\n2730008\teberss@gmail.com\tEber Santana\tadmin\n2730011\teberss@gmail.com\tEber Santana\tadmin\n2730012\teberss@gmail.com\tEber Santana\tadmin\n2730013\teberss@gmail.com\tEber Santana\tadmin\n2730014\teberss@gmail.com\tEber Santana\tadmin\n2730015\teberss@gmail.com\tEber Santana\tadmin\n2730016\teberss@gmail.com\tEber Santana\tadmin\n2730017\teberss@gmail.com\tEber Santana\tadmin\n2730018\teberss@gmail.com\tEber Santana\tadmin\n2760001\teberss@gmail.com\tEber Santana\tadmin\n2790001\teberss@gmail.com\tEber Santana\tadmin\n2790002\teberss@gmail.com\tEber Santana\tadmin\n2790003\teberss@gmail.com\tEber Santana\tadmin\n2790004\teberss@gmail.com\tEber Santana\tadmin\n2790005\teberss@gmail.com\tEber Santana\tadmin\n2820001\teberss@gmail.com\tEber Santana\tadmin\n2820002\teberss@gmail.com\tEber Santana\tadmin\n2820003\teberss@gmail.com\tEber Santana\tadmin\n2820004\teberss@gmail.com\tEber Santana\tadmin\n2820005\teberss@gmail.com\tEber Santana\tadmin\n2850001\teberss@gmail.com\tEber Santana\tadmin\n2850002\teberss@gmail.com\tEber Santana\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

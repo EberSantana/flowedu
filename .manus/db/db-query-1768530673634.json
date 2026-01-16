@@ -1,0 +1,676 @@
+{
+  "query": "SELECT COUNT(*) as total FROM users; SELECT id, email, name FROM users WHERE email = 'eberss@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total FROM users; SELECT id, email, name FROM users WHERE email = 'eberss@gmail.com';",
+  "rows": [
+    {
+      "total": "832"
+    },
+    {
+      "total": "id\temail\tname"
+    },
+    {
+      "total": "1\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "240001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "240002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "240003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "240004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "240005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "240006\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300006\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300010\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300011\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300012\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300013\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300014\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300015\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300016\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300017\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300018\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "300019\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330006\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "330008\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "360001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "360002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "360003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "360004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "360005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390006\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390008\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390009\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390010\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390011\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390012\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390013\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390014\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390015\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "390016\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "420001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "420002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "450001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "480001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "480002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "510001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "510002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "510003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "510004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "540001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "570001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "570002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "570003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "570004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "600001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "600002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "630001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "630002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "660001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "690001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "690002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "690004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "720001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "720002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "720003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "750001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "750002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "780001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "810001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "840001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "870001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "870002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "870003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "900001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "900002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "930016\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "930017\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "930018\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "960001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "960002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "960003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "990001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "990002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "990003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1020001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1080001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140008\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140009\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1140010\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1170002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1170003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1200001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1230001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290037\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290038\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290039\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290040\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1290042\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1320002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1320003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1350001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1380001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1410001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1470002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1500001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1530001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1560001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1560002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1560003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1590001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1590002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1620001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1620002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1650001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1650002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1740001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1770001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1770002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1770003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1800005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1860001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1860002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1890001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1890002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1920001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1950001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1950013\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "1950017\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2010001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2010002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2010038\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2040001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2040002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2070001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2070002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2070013\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100010\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100011\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100012\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100226\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100271\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100292\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2100293\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2130001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2130002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2130003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2160001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2190001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2190003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2220001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2250007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2310049\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2310147\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2310148\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2310149\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2310150\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2340001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2370001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2400001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2430001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2460001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2460002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2490001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2490002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2490003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2520001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2520002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2520003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2550001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2550002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2580001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2640046\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730006\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730007\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730008\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730011\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730012\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730013\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730014\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730015\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730016\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730017\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2730018\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2760001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2790001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2790002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2790003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2790004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2790005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2820001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2820002\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2820003\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2820004\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2820005\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2850001\teberss@gmail.com\tEber Santana"
+    },
+    {
+      "total": "2850002\teberss@gmail.com\tEber Santana"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n832\nid\temail\tname\n1\teberss@gmail.com\tEber Santana\n240001\teberss@gmail.com\tEber Santana\n240002\teberss@gmail.com\tEber Santana\n240003\teberss@gmail.com\tEber Santana\n240004\teberss@gmail.com\tEber Santana\n240005\teberss@gmail.com\tEber Santana\n240006\teberss@gmail.com\tEber Santana\n300001\teberss@gmail.com\tEber Santana\n300003\teberss@gmail.com\tEber Santana\n300006\teberss@gmail.com\tEber Santana\n300007\teberss@gmail.com\tEber Santana\n300010\teberss@gmail.com\tEber Santana\n300011\teberss@gmail.com\tEber Santana\n300012\teberss@gmail.com\tEber Santana\n300013\teberss@gmail.com\tEber Santana\n300014\teberss@gmail.com\tEber Santana\n300015\teberss@gmail.com\tEber Santana\n300016\teberss@gmail.com\tEber Santana\n300017\teberss@gmail.com\tEber Santana\n300018\teberss@gmail.com\tEber Santana\n300019\teberss@gmail.com\tEber Santana\n330001\teberss@gmail.com\tEber Santana\n330002\teberss@gmail.com\tEber Santana\n330003\teberss@gmail.com\tEber Santana\n330004\teberss@gmail.com\tEber Santana\n330005\teberss@gmail.com\tEber Santana\n330006\teberss@gmail.com\tEber Santana\n330007\teberss@gmail.com\tEber Santana\n330008\teberss@gmail.com\tEber Santana\n360001\teberss@gmail.com\tEber Santana\n360002\teberss@gmail.com\tEber Santana\n360003\teberss@gmail.com\tEber Santana\n360004\teberss@gmail.com\tEber Santana\n360005\teberss@gmail.com\tEber Santana\n390001\teberss@gmail.com\tEber Santana\n390002\teberss@gmail.com\tEber Santana\n390003\teberss@gmail.com\tEber Santana\n390004\teberss@gmail.com\tEber Santana\n390005\teberss@gmail.com\tEber Santana\n390006\teberss@gmail.com\tEber Santana\n390007\teberss@gmail.com\tEber Santana\n390008\teberss@gmail.com\tEber Santana\n390009\teberss@gmail.com\tEber Santana\n390010\teberss@gmail.com\tEber Santana\n390011\teberss@gmail.com\tEber Santana\n390012\teberss@gmail.com\tEber Santana\n390013\teberss@gmail.com\tEber Santana\n390014\teberss@gmail.com\tEber Santana\n390015\teberss@gmail.com\tEber Santana\n390016\teberss@gmail.com\tEber Santana\n420001\teberss@gmail.com\tEber Santana\n420002\teberss@gmail.com\tEber Santana\n450001\teberss@gmail.com\tEber Santana\n480001\teberss@gmail.com\tEber Santana\n480002\teberss@gmail.com\tEber Santana\n510001\teberss@gmail.com\tEber Santana\n510002\teberss@gmail.com\tEber Santana\n510003\teberss@gmail.com\tEber Santana\n510004\teberss@gmail.com\tEber Santana\n540001\teberss@gmail.com\tEber Santana\n570001\teberss@gmail.com\tEber Santana\n570002\teberss@gmail.com\tEber Santana\n570003\teberss@gmail.com\tEber Santana\n570004\teberss@gmail.com\tEber Santana\n600001\teberss@gmail.com\tEber Santana\n600002\teberss@gmail.com\tEber Santana\n630001\teberss@gmail.com\tEber Santana\n630002\teberss@gmail.com\tEber Santana\n660001\teberss@gmail.com\tEber Santana\n690001\teberss@gmail.com\tEber Santana\n690002\teberss@gmail.com\tEber Santana\n690004\teberss@gmail.com\tEber Santana\n720001\teberss@gmail.com\tEber Santana\n720002\teberss@gmail.com\tEber Santana\n720003\teberss@gmail.com\tEber Santana\n750001\teberss@gmail.com\tEber Santana\n750002\teberss@gmail.com\tEber Santana\n780001\teberss@gmail.com\tEber Santana\n810001\teberss@gmail.com\tEber Santana\n840001\teberss@gmail.com\tEber Santana\n870001\teberss@gmail.com\tEber Santana\n870002\teberss@gmail.com\tEber Santana\n870003\teberss@gmail.com\tEber Santana\n900001\teberss@gmail.com\tEber Santana\n900002\teberss@gmail.com\tEber Santana\n930016\teberss@gmail.com\tEber Santana\n930017\teberss@gmail.com\tEber Santana\n930018\teberss@gmail.com\tEber Santana\n960001\teberss@gmail.com\tEber Santana\n960002\teberss@gmail.com\tEber Santana\n960003\teberss@gmail.com\tEber Santana\n990001\teberss@gmail.com\tEber Santana\n990002\teberss@gmail.com\tEber Santana\n990003\teberss@gmail.com\tEber Santana\n1020001\teberss@gmail.com\tEber Santana\n1080001\teberss@gmail.com\tEber Santana\n1140001\teberss@gmail.com\tEber Santana\n1140004\teberss@gmail.com\tEber Santana\n1140005\teberss@gmail.com\tEber Santana\n1140007\teberss@gmail.com\tEber Santana\n1140008\teberss@gmail.com\tEber Santana\n1140009\teberss@gmail.com\tEber Santana\n1140010\teberss@gmail.com\tEber Santana\n1170002\teberss@gmail.com\tEber Santana\n1170003\teberss@gmail.com\tEber Santana\n1200001\teberss@gmail.com\tEber Santana\n1230001\teberss@gmail.com\tEber Santana\n1290001\teberss@gmail.com\tEber Santana\n1290003\teberss@gmail.com\tEber Santana\n1290005\teberss@gmail.com\tEber Santana\n1290007\teberss@gmail.com\tEber Santana\n1290037\teberss@gmail.com\tEber Santana\n1290038\teberss@gmail.com\tEber Santana\n1290039\teberss@gmail.com\tEber Santana\n1290040\teberss@gmail.com\tEber Santana\n1290042\teberss@gmail.com\tEber Santana\n1320002\teberss@gmail.com\tEber Santana\n1320003\teberss@gmail.com\tEber Santana\n1350001\teberss@gmail.com\tEber Santana\n1380001\teberss@gmail.com\tEber Santana\n1410001\teberss@gmail.com\tEber Santana\n1470002\teberss@gmail.com\tEber Santana\n1500001\teberss@gmail.com\tEber Santana\n1530001\teberss@gmail.com\tEber Santana\n1560001\teberss@gmail.com\tEber Santana\n1560002\teberss@gmail.com\tEber Santana\n1560003\teberss@gmail.com\tEber Santana\n1590001\teberss@gmail.com\tEber Santana\n1590002\teberss@gmail.com\tEber Santana\n1620001\teberss@gmail.com\tEber Santana\n1620002\teberss@gmail.com\tEber Santana\n1650001\teberss@gmail.com\tEber Santana\n1650002\teberss@gmail.com\tEber Santana\n1740001\teberss@gmail.com\tEber Santana\n1770001\teberss@gmail.com\tEber Santana\n1770002\teberss@gmail.com\tEber Santana\n1770003\teberss@gmail.com\tEber Santana\n1800005\teberss@gmail.com\tEber Santana\n1860001\teberss@gmail.com\tEber Santana\n1860002\teberss@gmail.com\tEber Santana\n1890001\teberss@gmail.com\tEber Santana\n1890002\teberss@gmail.com\tEber Santana\n1920001\teberss@gmail.com\tEber Santana\n1950001\teberss@gmail.com\tEber Santana\n1950013\teberss@gmail.com\tEber Santana\n1950017\teberss@gmail.com\tEber Santana\n2010001\teberss@gmail.com\tEber Santana\n2010002\teberss@gmail.com\tEber Santana\n2010038\teberss@gmail.com\tEber Santana\n2040001\teberss@gmail.com\tEber Santana\n2040002\teberss@gmail.com\tEber Santana\n2070001\teberss@gmail.com\tEber Santana\n2070002\teberss@gmail.com\tEber Santana\n2070013\teberss@gmail.com\tEber Santana\n2100001\teberss@gmail.com\tEber Santana\n2100010\teberss@gmail.com\tEber Santana\n2100011\teberss@gmail.com\tEber Santana\n2100012\teberss@gmail.com\tEber Santana\n2100226\teberss@gmail.com\tEber Santana\n2100271\teberss@gmail.com\tEber Santana\n2100292\teberss@gmail.com\tEber Santana\n2100293\teberss@gmail.com\tEber Santana\n2130001\teberss@gmail.com\tEber Santana\n2130002\teberss@gmail.com\tEber Santana\n2130003\teberss@gmail.com\tEber Santana\n2160001\teberss@gmail.com\tEber Santana\n2190001\teberss@gmail.com\tEber Santana\n2190003\teberss@gmail.com\tEber Santana\n2220001\teberss@gmail.com\tEber Santana\n2250007\teberss@gmail.com\tEber Santana\n2310049\teberss@gmail.com\tEber Santana\n2310147\teberss@gmail.com\tEber Santana\n2310148\teberss@gmail.com\tEber Santana\n2310149\teberss@gmail.com\tEber Santana\n2310150\teberss@gmail.com\tEber Santana\n2340001\teberss@gmail.com\tEber Santana\n2370001\teberss@gmail.com\tEber Santana\n2400001\teberss@gmail.com\tEber Santana\n2430001\teberss@gmail.com\tEber Santana\n2460001\teberss@gmail.com\tEber Santana\n2460002\teberss@gmail.com\tEber Santana\n2490001\teberss@gmail.com\tEber Santana\n2490002\teberss@gmail.com\tEber Santana\n2490003\teberss@gmail.com\tEber Santana\n2520001\teberss@gmail.com\tEber Santana\n2520002\teberss@gmail.com\tEber Santana\n2520003\teberss@gmail.com\tEber Santana\n2550001\teberss@gmail.com\tEber Santana\n2550002\teberss@gmail.com\tEber Santana\n2580001\teberss@gmail.com\tEber Santana\n2640046\teberss@gmail.com\tEber Santana\n2730001\teberss@gmail.com\tEber Santana\n2730002\teberss@gmail.com\tEber Santana\n2730003\teberss@gmail.com\tEber Santana\n2730004\teberss@gmail.com\tEber Santana\n2730005\teberss@gmail.com\tEber Santana\n2730006\teberss@gmail.com\tEber Santana\n2730007\teberss@gmail.com\tEber Santana\n2730008\teberss@gmail.com\tEber Santana\n2730011\teberss@gmail.com\tEber Santana\n2730012\teberss@gmail.com\tEber Santana\n2730013\teberss@gmail.com\tEber Santana\n2730014\teberss@gmail.com\tEber Santana\n2730015\teberss@gmail.com\tEber Santana\n2730016\teberss@gmail.com\tEber Santana\n2730017\teberss@gmail.com\tEber Santana\n2730018\teberss@gmail.com\tEber Santana\n2760001\teberss@gmail.com\tEber Santana\n2790001\teberss@gmail.com\tEber Santana\n2790002\teberss@gmail.com\tEber Santana\n2790003\teberss@gmail.com\tEber Santana\n2790004\teberss@gmail.com\tEber Santana\n2790005\teberss@gmail.com\tEber Santana\n2820001\teberss@gmail.com\tEber Santana\n2820002\teberss@gmail.com\tEber Santana\n2820003\teberss@gmail.com\tEber Santana\n2820004\teberss@gmail.com\tEber Santana\n2820005\teberss@gmail.com\tEber Santana\n2850001\teberss@gmail.com\tEber Santana\n2850002\teberss@gmail.com\tEber Santana\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

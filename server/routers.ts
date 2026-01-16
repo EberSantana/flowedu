@@ -121,6 +121,7 @@ export const appRouter = router({
         name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
         email: z.string().email("E-mail inválido"),
         password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+        inviteCode: z.string().optional(), // Código de convite opcional
       }))
       .mutation(async ({ ctx, input }) => {
         // Verificar se e-mail já existe
@@ -132,15 +133,25 @@ export const appRouter = router({
         // Hash da senha
         const passwordHash = await bcrypt.hash(input.password, 10);
 
-        // Criar professor
+        // Criar professor (com ou sem código de convite)
         const result = await db.createTeacherWithPassword({
           name: input.name,
           email: input.email,
           passwordHash,
+          inviteCode: input.inviteCode,
         });
 
         if (!result) {
           throw new Error("Erro ao criar conta. Tente novamente.");
+        }
+
+        // Se o cadastro ficou pendente, não criar sessão
+        if (result.approvalStatus === 'pending') {
+          return {
+            success: true,
+            pending: true,
+            message: "Sua solicitação de cadastro foi enviada e está aguardando aprovação do administrador.",
+          };
         }
 
         // Buscar usuário criado para criar sessão
@@ -163,6 +174,7 @@ export const appRouter = router({
 
         return {
           success: true,
+          pending: false,
           user: {
             id: user.id,
             name: user.name,

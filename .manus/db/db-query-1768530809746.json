@@ -1,0 +1,13 @@
+{
+  "query": "SET FOREIGN_KEY_CHECKS = 0; DELETE FROM users WHERE email != 'eberss@gmail.com' OR email IS NULL; SET FOREIGN_KEY_CHECKS = 1; SELECT COUNT(*) as remaining FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SET FOREIGN_KEY_CHECKS = 0; DELETE FROM users WHERE email != 'eberss@gmail.com' OR email IS NULL; SET FOREIGN_KEY_CHECKS = 1; SELECT COUNT(*) as remaining FROM users;",
+  "rows": [
+    {
+      "remaining": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "remaining\n1\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

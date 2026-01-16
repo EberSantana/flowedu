@@ -1,0 +1,475 @@
+{
+  "query": "SELECT COUNT(*) as total FROM users; SELECT id, email, name, role FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total FROM users; SELECT id, email, name, role FROM users;",
+  "rows": [
+    {
+      "total": "153"
+    },
+    {
+      "total": "id\temail\tname\trole"
+    },
+    {
+      "total": "1\teberss@gmail.com\tEber Santana\tadmin"
+    },
+    {
+      "total": "1140012\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1260001\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1290002\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1290004\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1290006\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1290036\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1290041\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1320001\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440001\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "1440002\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "1440003\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "1440004\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440005\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440006\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440007\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440008\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440009\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440010\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440011\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440012\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440013\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440014\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440015\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440016\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440017\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440018\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440019\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440020\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440021\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440022\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440023\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440024\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440025\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440026\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440027\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440028\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440029\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1440030\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "1470001\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "2100013\tNULL\tTest Quiz Student\tuser"
+    },
+    {
+      "total": "2100270\tNULL\tTest Quiz Student\tuser"
+    },
+    {
+      "total": "2130004\tNULL\tTest Quiz Student\tuser"
+    },
+    {
+      "total": "2280001\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2280002\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2280003\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2280004\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2280005\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2280006\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2280007\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310050\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310051\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310052\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310053\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310054\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310055\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310056\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310057\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310058\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310059\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310060\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310061\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310062\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310063\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310064\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310065\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310066\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310067\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310068\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310069\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310070\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310071\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310072\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310073\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310074\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310075\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310076\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310077\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310078\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310079\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310080\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310081\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310082\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310083\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310084\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310085\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310086\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310087\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310088\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310089\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310090\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310091\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310092\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310093\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310094\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310095\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310096\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310097\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310098\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310099\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310100\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310101\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310102\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310103\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310104\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310105\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310106\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310107\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310108\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310109\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310110\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310111\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310112\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310113\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310114\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310115\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310116\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310117\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310118\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310119\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310120\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310121\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310122\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310123\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310124\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310125\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310126\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310127\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310128\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310129\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310130\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310131\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310132\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310133\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310134\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310135\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310136\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310137\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310138\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310139\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310140\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310141\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310142\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310143\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310144\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310145\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2310146\tNULL\tNULL\tadmin"
+    },
+    {
+      "total": "2610002\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "2640045\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "2700002\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "2700003\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "2730010\tNULL\tNULL\tuser"
+    },
+    {
+      "total": "2820006\tNULL\tTest Quiz Student\tuser"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n153\nid\temail\tname\trole\n1\teberss@gmail.com\tEber Santana\tadmin\n1140012\tNULL\tNULL\tuser\n1260001\tNULL\tNULL\tuser\n1290002\tNULL\tNULL\tuser\n1290004\tNULL\tNULL\tuser\n1290006\tNULL\tNULL\tuser\n1290036\tNULL\tNULL\tuser\n1290041\tNULL\tNULL\tuser\n1320001\tNULL\tNULL\tuser\n1440001\tNULL\tNULL\tadmin\n1440002\tNULL\tNULL\tadmin\n1440003\tNULL\tNULL\tadmin\n1440004\tNULL\tNULL\tuser\n1440005\tNULL\tNULL\tuser\n1440006\tNULL\tNULL\tuser\n1440007\tNULL\tNULL\tuser\n1440008\tNULL\tNULL\tuser\n1440009\tNULL\tNULL\tuser\n1440010\tNULL\tNULL\tuser\n1440011\tNULL\tNULL\tuser\n1440012\tNULL\tNULL\tuser\n1440013\tNULL\tNULL\tuser\n1440014\tNULL\tNULL\tuser\n1440015\tNULL\tNULL\tuser\n1440016\tNULL\tNULL\tuser\n1440017\tNULL\tNULL\tuser\n1440018\tNULL\tNULL\tuser\n1440019\tNULL\tNULL\tuser\n1440020\tNULL\tNULL\tuser\n1440021\tNULL\tNULL\tuser\n1440022\tNULL\tNULL\tuser\n1440023\tNULL\tNULL\tuser\n1440024\tNULL\tNULL\tuser\n1440025\tNULL\tNULL\tuser\n1440026\tNULL\tNULL\tuser\n1440027\tNULL\tNULL\tuser\n1440028\tNULL\tNULL\tuser\n1440029\tNULL\tNULL\tuser\n1440030\tNULL\tNULL\tuser\n1470001\tNULL\tNULL\tuser\n2100013\tNULL\tTest Quiz Student\tuser\n2100270\tNULL\tTest Quiz Student\tuser\n2130004\tNULL\tTest Quiz Student\tuser\n2280001\tNULL\tNULL\tadmin\n2280002\tNULL\tNULL\tadmin\n2280003\tNULL\tNULL\tadmin\n2280004\tNULL\tNULL\tadmin\n2280005\tNULL\tNULL\tadmin\n2280006\tNULL\tNULL\tadmin\n2280007\tNULL\tNULL\tadmin\n2310050\tNULL\tNULL\tadmin\n2310051\tNULL\tNULL\tadmin\n2310052\tNULL\tNULL\tadmin\n2310053\tNULL\tNULL\tadmin\n2310054\tNULL\tNULL\tadmin\n2310055\tNULL\tNULL\tadmin\n2310056\tNULL\tNULL\tadmin\n2310057\tNULL\tNULL\tadmin\n2310058\tNULL\tNULL\tadmin\n2310059\tNULL\tNULL\tadmin\n2310060\tNULL\tNULL\tadmin\n2310061\tNULL\tNULL\tadmin\n2310062\tNULL\tNULL\tadmin\n2310063\tNULL\tNULL\tadmin\n2310064\tNULL\tNULL\tadmin\n2310065\tNULL\tNULL\tadmin\n2310066\tNULL\tNULL\tadmin\n2310067\tNULL\tNULL\tadmin\n2310068\tNULL\tNULL\tadmin\n2310069\tNULL\tNULL\tadmin\n2310070\tNULL\tNULL\tadmin\n2310071\tNULL\tNULL\tadmin\n2310072\tNULL\tNULL\tadmin\n2310073\tNULL\tNULL\tadmin\n2310074\tNULL\tNULL\tadmin\n2310075\tNULL\tNULL\tadmin\n2310076\tNULL\tNULL\tadmin\n2310077\tNULL\tNULL\tadmin\n2310078\tNULL\tNULL\tadmin\n2310079\tNULL\tNULL\tadmin\n2310080\tNULL\tNULL\tadmin\n2310081\tNULL\tNULL\tadmin\n2310082\tNULL\tNULL\tadmin\n2310083\tNULL\tNULL\tadmin\n2310084\tNULL\tNULL\tadmin\n2310085\tNULL\tNULL\tadmin\n2310086\tNULL\tNULL\tadmin\n2310087\tNULL\tNULL\tadmin\n2310088\tNULL\tNULL\tadmin\n2310089\tNULL\tNULL\tadmin\n2310090\tNULL\tNULL\tadmin\n2310091\tNULL\tNULL\tadmin\n2310092\tNULL\tNULL\tadmin\n2310093\tNULL\tNULL\tadmin\n2310094\tNULL\tNULL\tadmin\n2310095\tNULL\tNULL\tadmin\n2310096\tNULL\tNULL\tadmin\n2310097\tNULL\tNULL\tadmin\n2310098\tNULL\tNULL\tadmin\n2310099\tNULL\tNULL\tadmin\n2310100\tNULL\tNULL\tadmin\n2310101\tNULL\tNULL\tadmin\n2310102\tNULL\tNULL\tadmin\n2310103\tNULL\tNULL\tadmin\n2310104\tNULL\tNULL\tadmin\n2310105\tNULL\tNULL\tadmin\n2310106\tNULL\tNULL\tadmin\n2310107\tNULL\tNULL\tadmin\n2310108\tNULL\tNULL\tadmin\n2310109\tNULL\tNULL\tadmin\n2310110\tNULL\tNULL\tadmin\n2310111\tNULL\tNULL\tadmin\n2310112\tNULL\tNULL\tadmin\n2310113\tNULL\tNULL\tadmin\n2310114\tNULL\tNULL\tadmin\n2310115\tNULL\tNULL\tadmin\n2310116\tNULL\tNULL\tadmin\n2310117\tNULL\tNULL\tadmin\n2310118\tNULL\tNULL\tadmin\n2310119\tNULL\tNULL\tadmin\n2310120\tNULL\tNULL\tadmin\n2310121\tNULL\tNULL\tadmin\n2310122\tNULL\tNULL\tadmin\n2310123\tNULL\tNULL\tadmin\n2310124\tNULL\tNULL\tadmin\n2310125\tNULL\tNULL\tadmin\n2310126\tNULL\tNULL\tadmin\n2310127\tNULL\tNULL\tadmin\n2310128\tNULL\tNULL\tadmin\n2310129\tNULL\tNULL\tadmin\n2310130\tNULL\tNULL\tadmin\n2310131\tNULL\tNULL\tadmin\n2310132\tNULL\tNULL\tadmin\n2310133\tNULL\tNULL\tadmin\n2310134\tNULL\tNULL\tadmin\n2310135\tNULL\tNULL\tadmin\n2310136\tNULL\tNULL\tadmin\n2310137\tNULL\tNULL\tadmin\n2310138\tNULL\tNULL\tadmin\n2310139\tNULL\tNULL\tadmin\n2310140\tNULL\tNULL\tadmin\n2310141\tNULL\tNULL\tadmin\n2310142\tNULL\tNULL\tadmin\n2310143\tNULL\tNULL\tadmin\n2310144\tNULL\tNULL\tadmin\n2310145\tNULL\tNULL\tadmin\n2310146\tNULL\tNULL\tadmin\n2610002\tNULL\tNULL\tuser\n2640045\tNULL\tNULL\tuser\n2700002\tNULL\tNULL\tuser\n2700003\tNULL\tNULL\tuser\n2730010\tNULL\tNULL\tuser\n2820006\tNULL\tTest Quiz Student\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

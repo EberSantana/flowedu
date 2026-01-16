@@ -5953,3 +5953,25 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🎨 Correção Layout Modal Adicionar Material Didático
 
 - [x] Corrigir layout desconfigurado do modal de adicionar material didático (ajustado espaçamento, largura e truncate no nome do arquivo)
+
+## 🗑️ Limpeza de Usuários
+
+- [x] Remover todos os usuários ativos exceto eberss@gmail.com (restou apenas 1 usuário)
+
+## 🔐 Sistema Combinado de Cadastro de Professores
+
+- [ ] Verificar sistema de códigos de convite existente
+- [ ] Implementar/ajustar cadastro com aprovação manual (sem código de convite)
+- [ ] Criar página de cadastro público para professores
+- [ ] Adicionar notificação ao admin quando novo professor solicitar cadastro
+- [ ] Garantir que professores com código de convite sejam aprovados automaticamente
+- [ ] Testar fluxo completo de ambos os métodos
+
+## 🔐 Sistema Combinado de Cadastro de Professores (VPS)
+
+- [x] Verificar sistema de códigos de convite existente
+- [x] Implementar cadastro com aprovação manual (sem código de convite)
+- [x] Integrar os dois métodos de cadastro na mesma página
+- [x] Atualizar backend para suportar código de convite opcional
+- [x] Atualizar frontend com campo de código de convite e tela de pendente
+- [x] Testar fluxo completo (TypeScript sem erros)

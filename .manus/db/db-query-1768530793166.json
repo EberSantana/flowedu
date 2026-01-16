@@ -1,0 +1,22 @@
+{
+  "query": "SELECT DISTINCT email, name FROM users LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT DISTINCT email, name FROM users LIMIT 50;",
+  "rows": [
+    {
+      "email": "NULL",
+      "name": "NULL"
+    },
+    {
+      "email": "NULL",
+      "name": "Test Quiz Student"
+    },
+    {
+      "email": "eberss@gmail.com",
+      "name": "Eber Santana"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\tname\nNULL\tNULL\nNULL\tTest Quiz Student\neberss@gmail.com\tEber Santana\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

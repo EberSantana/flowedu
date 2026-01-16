@@ -1,0 +1,18 @@
+{
+  "query": "SELECT email, COUNT(*) as count FROM users GROUP BY email ORDER BY count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT email, COUNT(*) as count FROM users GROUP BY email ORDER BY count DESC;",
+  "rows": [
+    {
+      "email": "NULL",
+      "count": "152"
+    },
+    {
+      "email": "eberss@gmail.com",
+      "count": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\tcount\nNULL\t152\neberss@gmail.com\t1\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
