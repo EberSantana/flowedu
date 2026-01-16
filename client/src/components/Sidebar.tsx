@@ -486,16 +486,12 @@ export default function Sidebar() {
             {isCompact ? (
               <div className="flex flex-col items-center gap-3">
                 <img src="/logo.png" alt="FlowEdu" className="h-10 w-10" />
-                <NotificationBell />
               </div>
             ) : (
               <>
-                <div className="flex flex-col items-center justify-center mb-4">
-                  <img src="/logo.png" alt="FlowEdu" className="h-16 w-16 mb-2" />
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <img src="/logo.png" alt="FlowEdu" className="h-12 w-12" />
                   <h1 className="text-2xl font-bold text-foreground">FlowEdu</h1>
-                </div>
-                <div className="flex justify-center mb-2">
-                  <NotificationBell />
                 </div>
                 <button
                   onClick={() => {

@@ -5922,3 +5922,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover botão 'Voltar para Trilhas' duplicado da página de Trilha de Aprendizagem
 - [x] Aumentar e centralizar logo no sidebar do professor
 - [x] Remover opção 'Voltar ao Modo Professor' do sidebar
+- [x] Colocar logo (F) ao lado do nome FlowEdu no sidebar
+- [x] Remover sino de alerta do sidebar do professor
