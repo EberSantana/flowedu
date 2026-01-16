@@ -1352,6 +1352,66 @@ Regras:
         };
       }),
 
+    // Reenviar email de convite para usuário que não ativou conta
+    resendInvite: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+
+        // Buscar usuário
+        const users = await db.getAllUsers();
+        const user = users.find(u => u.id === input.userId);
+
+        if (!user) {
+          throw new Error('Usuário não encontrado');
+        }
+
+        if (!user.email) {
+          throw new Error('Usuário não possui e-mail cadastrado');
+        }
+
+        // Verificar se usuário já tem senha definida
+        if (user.passwordHash) {
+          throw new Error('Este usuário já ativou sua conta');
+        }
+
+        // Gerar novo token para definição de senha (24 horas de validade)
+        const crypto = await import('crypto');
+        const token = `${Date.now()}-${crypto.randomBytes(16).toString('hex')}`;
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
+        await db.createPasswordResetToken(user.id, token, expiresAt);
+
+        // Enviar e-mail com link para definir senha
+        const { sendSetPasswordEmail } = await import('./_core/email');
+        const emailResult = await sendSetPasswordEmail(
+          user.email,
+          token,
+          user.name || 'Professor',
+          user.role || 'user'
+        );
+
+        // Registrar log de auditoria
+        await db.createAuditLog({
+          adminId: ctx.user.id,
+          adminName: ctx.user.name || 'Administrador',
+          action: 'RESEND_INVITE',
+          targetUserId: user.id,
+          targetUserName: user.name || '',
+          newData: JSON.stringify({ email: user.email }),
+          ipAddress: ctx.req.ip || ctx.req.headers['x-forwarded-for'] as string || 'unknown',
+        });
+
+        return { 
+          success: true, 
+          emailSent: emailResult.success,
+          emailError: emailResult.error 
+        };
+      }),
+
     // ==================== CÓDIGOS DE CONVITE ====================
     
     // Criar código de convite

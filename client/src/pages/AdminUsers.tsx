@@ -146,6 +146,19 @@ export default function AdminUsers() {
     },
   });
 
+  const resendInviteMutation = trpc.admin.resendInvite.useMutation({
+    onSuccess: (data) => {
+      if (data.emailSent) {
+        toast.success("E-mail de convite reenviado com sucesso!");
+      } else {
+        toast.warning(`E-mail não enviado: ${data.emailError}`);
+      }
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+
   if (isLoading || usersLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -512,20 +525,39 @@ export default function AdminUsers() {
                               </Button>
                             </>
                           ) : (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
-                                  deleteUserMutation.mutate({ userId: u.id });
-                                }
-                              }}
-                              disabled={deleteUserMutation.isPending}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Desativar
-                            </Button>
+                            <>
+                              {/* Botão Reenviar Convite - apenas para usuários sem senha */}
+                              {!u.passwordHash && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => {
+                                    if (confirm(`Reenviar e-mail de convite para ${u.name}?`)) {
+                                      resendInviteMutation.mutate({ userId: u.id });
+                                    }
+                                  }}
+                                  disabled={resendInviteMutation.isPending}
+                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                >
+                                  <Mail className="w-4 h-4 mr-1" />
+                                  Reenviar Convite
+                                </Button>
+                              )}
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm(`Tem certeza que deseja desativar o usuário ${u.name}? O usuário não poderá mais fazer login, mas seus dados serão preservados.`)) {
+                                    deleteUserMutation.mutate({ userId: u.id });
+                                  }
+                                }}
+                                disabled={deleteUserMutation.isPending}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Desativar
+                              </Button>
+                            </>
                           )}
                         </div>
                       )}

@@ -6035,3 +6035,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar página SetPassword para professor definir senha inicial
 - [x] Atualizar rota admin.createUser para enviar email com link de definição de senha
 - [x] Criar template de email sendSetPasswordEmail
+
+## Reenviar Email de Convite (16/01/2026)
+- [x] Criar rota backend admin.resendInvite para reenviar email de convite
+- [x] Adicionar botão "Reenviar Convite" na página de gerenciamento de usuários
+- [x] Mostrar botão apenas para usuários sem senha definida (passwordHash = null)
