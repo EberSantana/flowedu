@@ -5996,3 +5996,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Correção Card de Disciplinas - Portal do Aluno (16/01/2026)
 - [x] Remover clique/navegação do card de disciplinas (deixar apenas visual)
 - [x] Corrigir cálculo de progressão da disciplina para mostrar progresso real (já estava funcionando - 4 de 16 tópicos = 25%)
+
+## Botão Estatísticas - Portal do Aluno (16/01/2026)
+- [x] Alterar link do botão "Estatísticas" para redirecionar para página de Estatísticas de Desempenho (/student/statistics)

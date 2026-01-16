@@ -30,7 +30,7 @@ export default function StudentDashboard() {
     { icon: BookOpen, label: "Disciplinas", path: "/student-subjects", color: "bg-primary", description: "Acesse suas disciplinas" },
     { icon: Map, label: "Trilhas", path: "/student-learning-paths", color: "bg-purple-600", description: "Trilhas de aprendizagem" },
     { icon: FileText, label: "Exercícios", path: "/student-exercises", color: "bg-orange-600", description: "Pratique e aprenda" },
-    { icon: BarChart3, label: "Estatísticas", path: "/student-stats", color: "bg-success", description: "Seu desempenho" },
+    { icon: BarChart3, label: "Estatísticas", path: "/student/statistics", color: "bg-success", description: "Seu desempenho" },
   ];
 
   return (
