@@ -5927,3 +5927,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aumentar logo e centralizar melhor com nome FlowEdu ao lado no sidebar
 - [x] Remover botão 'Ver Todas' da seção Minhas Disciplinas do aluno
 - [x] Remover aba 'PC' (Pensamento Computacional) da página de detalhes da disciplina do aluno
+
+## 🔧 Correção de Upload de Vídeo (39.9 MB travando em 95%)
+
+- [x] Adicionar limite de tamanho de arquivo com aviso ao usuário (máx 75MB)
+- [x] Melhorar feedback de progresso real durante upload
+- [x] Adicionar timeout adequado para uploads grandes (5 minutos)
+- [x] Implementar tratamento de erro mais robusto
+- [x] Aumentar limite do Express de 50MB para 100MB (para acomodar base64)
+- [x] Adicionar validação de tamanho no frontend antes do upload
+- [x] Adicionar mensagens de erro claras para o usuário
+- [ ] Adicionar retry automático em caso de falha (futuro)

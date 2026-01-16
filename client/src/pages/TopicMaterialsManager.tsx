@@ -1,35 +1,50 @@
 import { useState, useRef } from "react";
-import { useRoute, Link } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import {
+  ArrowLeft,
+  Plus,
+  Trash2,
   FileText,
   Video,
-  Link as LinkIcon,
-  Upload,
-  Trash2,
-  Plus,
-  ArrowLeft,
+  LinkIcon,
   Download,
   File,
-  CheckCircle2,
-  AlertCircle,
+  Upload,
   Loader2,
   GripVertical,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
 type MaterialType = 'pdf' | 'video' | 'link' | 'document' | 'presentation' | 'other';
+
+// Limite máximo de arquivo em bytes (75MB - deixando margem para base64)
+const MAX_FILE_SIZE = 75 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 75;
 
 export default function TopicMaterialsManager() {
   const [, params] = useRoute("/learning-paths/:subjectId/topic/:topicId/materials");
@@ -39,6 +54,8 @@ export default function TopicMaterialsManager() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<string>("");
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -59,7 +76,7 @@ export default function TopicMaterialsManager() {
     { enabled: !!subjectId }
   );
 
-  const { data: materials, isLoading } = trpc.materials.getByTopic.useQuery(
+  const { data: materials, isLoading: loadingMaterials } = trpc.materials.getByTopic.useQuery(
     { topicId },
     { enabled: !!topicId }
   );
@@ -113,14 +130,35 @@ export default function TopicMaterialsManager() {
       isRequired: false,
     });
     setSelectedFile(null);
+    setUploadProgress(0);
+    setUploadStatus("");
+    setUploadError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setUploadError(null);
+    
     if (file) {
+      // Validar tamanho do arquivo
+      if (file.size > MAX_FILE_SIZE) {
+        setUploadError(`O arquivo é muito grande (${formatFileSize(file.size)}). O limite máximo é ${MAX_FILE_SIZE_MB}MB.`);
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        return;
+      }
+      
       setSelectedFile(file);
       
       // Auto-detect type based on file extension
@@ -146,61 +184,117 @@ export default function TopicMaterialsManager() {
       return;
     }
 
+    // Validação adicional de tamanho
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      toast.error(`O arquivo excede o limite de ${MAX_FILE_SIZE_MB}MB`);
+      return;
+    }
+
     setIsUploading(true);
     setUploadProgress(0);
+    setUploadStatus("Lendo arquivo...");
+    setUploadError(null);
 
     try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => Math.min(prev + 10, 90));
-      }, 200);
-
       // Convert file to base64 for upload
       const reader = new FileReader();
+      
+      reader.onerror = () => {
+        setUploadError("Erro ao ler o arquivo. Tente novamente.");
+        setIsUploading(false);
+        setUploadStatus("");
+      };
+      
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 30);
+          setUploadProgress(progress);
+          setUploadStatus(`Lendo arquivo... ${progress}%`);
+        }
+      };
+      
       reader.onload = async (e) => {
-        clearInterval(progressInterval);
-        setUploadProgress(95);
+        setUploadProgress(35);
+        setUploadStatus("Preparando upload...");
 
         const base64Data = e.target?.result as string;
-        const fileKey = `materials/${Date.now()}-${selectedFile.name}`;
+        const fileKey = `materials/${Date.now()}-${selectedFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
 
-        // Upload to S3 via tRPC
-        const response = await fetch('/api/upload-material', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fileKey,
-            fileData: base64Data,
-            contentType: selectedFile.type,
-          }),
-        });
+        try {
+          setUploadProgress(40);
+          setUploadStatus("Enviando para o servidor...");
+          
+          // Upload to S3 via API with timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutos de timeout
+          
+          const response = await fetch('/api/upload-material', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileKey,
+              fileData: base64Data,
+              contentType: selectedFile.type,
+            }),
+            signal: controller.signal,
+          });
+          
+          clearTimeout(timeoutId);
 
-        if (!response.ok) {
-          throw new Error('Erro no upload');
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+            throw new Error(errorData.message || errorData.error || `Erro no upload (${response.status})`);
+          }
+
+          setUploadProgress(90);
+          setUploadStatus("Finalizando...");
+
+          const { url } = await response.json();
+          setUploadProgress(95);
+          setUploadStatus("Salvando material...");
+
+          // Create material with uploaded URL
+          await createMaterialMutation.mutateAsync({
+            topicId,
+            title: formData.title,
+            description: formData.description,
+            type: formData.type,
+            url,
+            fileSize: selectedFile.size,
+            isRequired: formData.isRequired,
+          });
+
+          setUploadProgress(100);
+          setUploadStatus("Concluído!");
+          setIsUploading(false);
+          
+        } catch (uploadError: any) {
+          console.error('Upload error:', uploadError);
+          
+          let errorMessage = "Erro ao fazer upload do arquivo.";
+          
+          if (uploadError.name === 'AbortError') {
+            errorMessage = "O upload excedeu o tempo limite. Tente com um arquivo menor ou verifique sua conexão.";
+          } else if (uploadError.message.includes('413') || uploadError.message.includes('too large')) {
+            errorMessage = `O arquivo é muito grande. O limite máximo é ${MAX_FILE_SIZE_MB}MB.`;
+          } else if (uploadError.message) {
+            errorMessage = uploadError.message;
+          }
+          
+          setUploadError(errorMessage);
+          toast.error(errorMessage);
+          setIsUploading(false);
+          setUploadStatus("");
         }
-
-        const { url } = await response.json();
-        setUploadProgress(100);
-
-        // Create material with uploaded URL
-        await createMaterialMutation.mutateAsync({
-          topicId,
-          title: formData.title,
-          description: formData.description,
-          type: formData.type,
-          url,
-          fileSize: selectedFile.size,
-          isRequired: formData.isRequired,
-        });
-
-        setIsUploading(false);
       };
 
       reader.readAsDataURL(selectedFile);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
+      setUploadError("Erro inesperado ao processar o arquivo.");
       toast.error("Erro ao fazer upload do arquivo");
       setIsUploading(false);
+      setUploadStatus("");
     }
   };
 
@@ -250,57 +344,33 @@ export default function TopicMaterialsManager() {
     }
   };
 
-  const formatFileSize = (bytes?: number) => {
-    if (!bytes) return '';
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
-
-  if (isLoading) {
-    return (
-      <>
-        <Sidebar />
-        <PageWrapper>
-          <div className="container mx-auto py-8">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-4 text-muted-foreground">Carregando materiais...</p>
-              </div>
-            </div>
-          </div>
-        </PageWrapper>
-      </>
-    );
-  }
+  const [, setLocation] = useLocation();
 
   return (
-    <>
+    <PageWrapper className="bg-background">
       <Sidebar />
-      <PageWrapper>
-        <div className="container mx-auto py-8">
-          {/* Breadcrumb */}
-          <div className="mb-6">
-            <Link href="/learning-paths">
-              <Button variant="ghost" size="sm" className="mb-2">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para Trilhas
-              </Button>
-            </Link>
-            <div className="text-sm text-gray-600 mb-2">
-              {currentSubject?.name} → {currentTopic?.title}
-            </div>
-          </div>
-
+      <div className="flex-1 overflow-auto">
+        <div className="container mx-auto py-8 px-4 max-w-5xl">
           {/* Header */}
           <div className="mb-8">
+            <Button
+              variant="ghost"
+              onClick={() => setLocation(`/learning-paths/${subjectId}`)}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar para Trilha
+            </Button>
+
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Materiais Didáticos
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Materiais do Tópico
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mt-1">
+                  {currentTopic?.title || "Carregando..."} • {currentSubject?.name}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
                   Gerencie os materiais de estudo deste tópico
                 </p>
               </div>
@@ -322,8 +392,8 @@ export default function TopicMaterialsManager() {
             <CardContent>
               {!materials || materials.length === 0 ? (
                 <div className="text-center py-12">
-                  <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
                     Nenhum material cadastrado
                   </h3>
                   <p className="text-gray-600 mb-4">
@@ -353,44 +423,40 @@ export default function TopicMaterialsManager() {
                             )}
                             <div className="flex items-center gap-3 mt-2">
                               <Badge variant="secondary" className="text-xs">
-                                {material.type}
+                                {material.type === 'pdf' ? 'PDF' :
+                                 material.type === 'video' ? 'Vídeo' :
+                                 material.type === 'link' ? 'Link' :
+                                 material.type === 'document' ? 'Documento' :
+                                 material.type === 'presentation' ? 'Apresentação' :
+                                 'Outro'}
                               </Badge>
                               {material.fileSize && (
                                 <span className="text-xs text-gray-500">
                                   {formatFileSize(material.fileSize)}
                                 </span>
                               )}
-                              <a
-                                href={material.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs text-blue-600 hover:underline"
-                              >
-                                Abrir →
-                              </a>
+                              {material.isRequired && (
+                                <Badge variant="destructive" className="text-xs">
+                                  Obrigatório
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-2">
-                              <Label htmlFor={`required-${material.id}`} className="text-xs cursor-pointer">
-                                {material.isRequired ? (
-                                  <Badge variant="default" className="text-xs">Obrigatório</Badge>
-                                ) : (
-                                  <Badge variant="outline" className="text-xs">Opcional</Badge>
-                                )}
-                              </Label>
-                              <Switch
-                                id={`required-${material.id}`}
-                                checked={material.isRequired}
-                                onCheckedChange={() => toggleRequired(material.id, material.isRequired)}
-                              />
-                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleRequired(material.id, material.isRequired || false)}
+                            >
+                              {material.isRequired ? 'Tornar Opcional' : 'Tornar Obrigatório'}
+                            </Button>
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
                               onClick={() => handleDelete(material.id, material.title)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-600" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -403,7 +469,10 @@ export default function TopicMaterialsManager() {
           </Card>
 
           {/* Add Material Dialog */}
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+            if (!open) resetForm();
+            setIsAddDialogOpen(open);
+          }}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Adicionar Material Didático</DialogTitle>
@@ -467,38 +536,55 @@ export default function TopicMaterialsManager() {
                         variant="outline"
                         onClick={() => fileInputRef.current?.click()}
                         className="w-full"
+                        disabled={isUploading}
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        {selectedFile ? selectedFile.name : 'Selecionar Arquivo'}
+                        {selectedFile ? selectedFile.name : "Selecionar Arquivo"}
                       </Button>
+                      
+                      {/* Informação de tamanho */}
                       {selectedFile && (
                         <p className="text-xs text-gray-600 mt-2">
                           Tamanho: {formatFileSize(selectedFile.size)}
                         </p>
                       )}
+                      
+                      {/* Erro de upload */}
+                      {uploadError && (
+                        <div className="flex items-center gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                          <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                          <p className="text-sm text-red-700">{uploadError}</p>
+                        </div>
+                      )}
+                      
+                      {/* Progresso de upload */}
+                      {isUploading && (
+                        <div className="mt-3 space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">{uploadStatus}</span>
+                            <span className="font-medium">{uploadProgress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${uploadProgress}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      <p className="text-xs text-gray-500 mt-2">
+                        Tamanho máximo: {MAX_FILE_SIZE_MB}MB. Para arquivos maiores, use um link externo (Google Drive, YouTube, etc.)
+                      </p>
                     </div>
-                    {isUploading && (
-                      <div className="mt-4">
-                        <div className="flex items-center justify-between text-sm mb-2">
-                          <span>Fazendo upload...</span>
-                          <span>{uploadProgress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-600 h-2 rounded-full transition-all"
-                            style={{ width: `${uploadProgress}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 
                 {/* Title */}
                 <div>
-                  <Label>Título *</Label>
+                  <Label>Título</Label>
                   <Input
-                    placeholder="Ex: Apostila de Introdução"
+                    placeholder="Nome do material"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   />
@@ -508,10 +594,9 @@ export default function TopicMaterialsManager() {
                 <div>
                   <Label>Descrição (opcional)</Label>
                   <Textarea
-                    placeholder="Descreva o conteúdo deste material..."
+                    placeholder="Breve descrição do material"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
                   />
                 </div>
 
@@ -527,17 +612,17 @@ export default function TopicMaterialsManager() {
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isUploading}>
                   Cancelar
                 </Button>
                 <Button
                   onClick={formData.type === 'link' ? handleAddLink : handleUploadFile}
-                  disabled={isUploading || createMaterialMutation.isPending}
+                  disabled={isUploading || createMaterialMutation.isPending || !!uploadError}
                 >
                   {isUploading || createMaterialMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Processando...
+                      {uploadStatus || "Processando..."}
                     </>
                   ) : (
                     <>
@@ -550,7 +635,7 @@ export default function TopicMaterialsManager() {
             </DialogContent>
           </Dialog>
         </div>
-      </PageWrapper>
-    </>
+      </div>
+    </PageWrapper>
   );
 }
