@@ -142,7 +142,7 @@ export default function StudentExercises() {
                 onClick={handleRefresh}
                 disabled={isFetching}
                 variant="secondary"
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                className="bg-white/90 hover:bg-white text-black border-white/50"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
                 {isFetching ? 'Atualizando...' : 'Atualizar'}

@@ -6002,3 +6002,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug - StudentLearningPaths Hooks Error (16/01/2026)
 - [x] Corrigir erro "Rendered more hooks than during the previous render" no StudentLearningPaths (criada rota getAllSubjectsStatistics para evitar hooks em loop)
+
+## Bug - Carga Horária Incorreta (16/01/2026)
+- [x] Corrigir carga horária da disciplina Segurança (atualizado de 60h para 40h no banco de dados)
+
+## UI - Botão Atualizar Exercícios (16/01/2026)
+- [x] Alterar cor da fonte do botão "Atualizar" para preto (fundo branco com texto preto)

@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, code, workload FROM subjects WHERE code = 'SEC' OR name LIKE '%Segurança%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, workload FROM subjects WHERE code = 'SEC' OR name LIKE '%Segurança%'",
+  "rows": [
+    {
+      "id": "930001",
+      "name": "Segurança",
+      "code": "SEC",
+      "workload": "60"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tworkload\n930001\tSegurança\tSEC\t60\n",
+  "stderr": "",
+  "execution_time_ms": 98
+}
