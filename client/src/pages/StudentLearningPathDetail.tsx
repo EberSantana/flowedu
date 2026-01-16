@@ -190,13 +190,6 @@ export default function StudentLearningPathDetail() {
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/student/learning-paths">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar para Trilhas
-            </Button>
-          </Link>
-          
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Trilha de Aprendizagem</h1>
