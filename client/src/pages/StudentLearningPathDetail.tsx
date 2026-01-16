@@ -332,8 +332,8 @@ export default function StudentLearningPathDetail() {
 
         {/* Modal de Detalhes do Tópico */}
         {selectedTopic && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0">
               <CardHeader className="bg-gradient-to-r from-accent/10 to-primary/10">
                 <div className="flex items-start justify-between">
                   <div>
@@ -382,25 +382,7 @@ export default function StudentLearningPathDetail() {
                   </div>
                 )}
 
-                {/* Minhas Dúvidas */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5 text-orange-600" />
-                    Minhas Dúvidas
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Envie suas dúvidas aos professores e acompanhe as respostas.
-                  </p>
-                  <Link href="/student/doubts">
-                    <Button 
-                      className="w-full"
-                      variant="outline"
-                    >
-                      <HelpCircle className="w-4 h-4 mr-2" />
-                      Ver Minhas Dúvidas
-                    </Button>
-                  </Link>
-                </div>
+
               </CardContent>
             </Card>
           </div>

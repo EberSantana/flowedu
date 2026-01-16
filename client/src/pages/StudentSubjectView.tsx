@@ -379,7 +379,7 @@ export default function StudentSubjectView() {
 
           {/* Materials and Notes Dialog */}
           <Dialog open={isMaterialsDialogOpen} onOpenChange={setIsMaterialsDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white border-0 shadow-2xl">
               <DialogHeader>
                 <DialogTitle>{selectedTopic?.title}</DialogTitle>
               </DialogHeader>

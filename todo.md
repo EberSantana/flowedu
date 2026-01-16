@@ -5938,3 +5938,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar validação de tamanho no frontend antes do upload
 - [x] Adicionar mensagens de erro claras para o usuário
 - [ ] Adicionar retry automático em caso de falha (futuro)
+
+## 🎨 Melhorias UI/UX Modal de Materiais
+
+- [x] Corrigir fundo preto do modal de materiais - melhorar cores e visual (backdrop-blur + bg-slate-900/60)
+- [x] Remover seção "Minhas Dúvidas" do modal de tópicos
