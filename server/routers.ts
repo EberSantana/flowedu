@@ -2955,10 +2955,16 @@ JSON (descrições MAX 15 chars):
             const professorId = enrollment.userId;
             const subject = await db.getSubjectById(enrollment.subjectId, professorId);
             const professor = await db.getUserById(professorId);
+            // Buscar progresso da disciplina
+            const progress = await db.getSubjectStatistics(
+              ctx.studentSession.studentId,
+              enrollment.subjectId
+            );
             return {
               ...enrollment,
               subject,
               professor,
+              progress,
             };
           })
         );

@@ -1,0 +1,31 @@
+{
+  "query": "SELECT * FROM students WHERE fullName LIKE '%KALIANDRA%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM students WHERE fullName LIKE '%KALIANDRA%';",
+  "rows": [
+    {
+      "id": "60063",
+      "userId": "1",
+      "registrationNumber": "2023306650",
+      "fullName": "KALIANDRA ANSELMO DOS SANTOS",
+      "createdAt": "2025-12-15 03:31:09",
+      "updatedAt": "2026-01-05 01:29:06",
+      "avatarSkinTone": "light",
+      "avatarKimonoColor": "white",
+      "avatarHairStyle": "short",
+      "avatarAccessories": "NULL",
+      "avatarHairColor": "black",
+      "avatarKimonoStyle": "traditional",
+      "avatarHeadAccessory": "none",
+      "avatarExpression": "neutral",
+      "avatarPose": "standing",
+      "specialKimono": "none",
+      "avatarGender": "male",
+      "hd2dCharacterId": "1",
+      "hd2dUnlockedCharacters": "[1]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tregistrationNumber\tfullName\tcreatedAt\tupdatedAt\tavatarSkinTone\tavatarKimonoColor\tavatarHairStyle\tavatarAccessories\tavatarHairColor\tavatarKimonoStyle\tavatarHeadAccessory\tavatarExpression\tavatarPose\tspecialKimono\tavatarGender\thd2dCharacterId\thd2dUnlockedCharacters\n60063\t1\t2023306650\tKALIANDRA ANSELMO DOS SANTOS\t2025-12-15 03:31:09\t2026-01-05 01:29:06\tlight\twhite\tshort\tNULL\tblack\ttraditional\tnone\tneutral\tstanding\tnone\tmale\t1\t[1]\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

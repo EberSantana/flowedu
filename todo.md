@@ -5988,3 +5988,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar página de solicitação de recuperação de senha (/esqueci-senha)
 - [x] Criar página de redefinição de senha (/redefinir-senha)
 - [x] Adicionar link "Esqueci minha senha" na página de login
+
+## Portal do Aluno - Card de Disciplina
+- [x] Remover botão "Ver Detalhes" do card de disciplina
+- [x] Adicionar barra de progressão da disciplina no card

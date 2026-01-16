@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, fullName, registrationNumber FROM students ORDER BY fullName LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, fullName, registrationNumber FROM students ORDER BY fullName LIMIT 20;",
+  "rows": [
+    {
+      "id": "480039",
+      "fullName": "Aluno none",
+      "registrationNumber": "TEST-KIMONO-none"
+    },
+    {
+      "id": "510023",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767640501621"
+    },
+    {
+      "id": "510011",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767639155205"
+    },
+    {
+      "id": "510065",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767641126378"
+    },
+    {
+      "id": "690036",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1768148187311"
+    },
+    {
+      "id": "450003",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767560859680"
+    },
+    {
+      "id": "510080",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767648201319"
+    },
+    {
+      "id": "690010",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1768139383592"
+    },
+    {
+      "id": "540010",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767886384135"
+    },
+    {
+      "id": "690023",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1768148027173"
+    },
+    {
+      "id": "510037",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767640641633"
+    },
+    {
+      "id": "750010",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1768525783185"
+    },
+    {
+      "id": "420013",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767548656016"
+    },
+    {
+      "id": "510051",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1767640967441"
+    },
+    {
+      "id": "420011",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-001"
+    },
+    {
+      "id": "420010",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-001"
+    },
+    {
+      "id": "480011",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1767569015122"
+    },
+    {
+      "id": "480007",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1767569014930"
+    },
+    {
+      "id": "1",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "2024001"
+    },
+    {
+      "id": "360001",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "1766890621485"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\tregistrationNumber\n480039\tAluno none\tTEST-KIMONO-none\n510023\tAluno PC Test\tPC-STUDENT-1767640501621\n510011\tAluno PC Test\tPC-STUDENT-1767639155205\n510065\tAluno PC Test\tPC-STUDENT-1767641126378\n690036\tAluno PC Test\tPC-STUDENT-1768148187311\n450003\tAluno PC Test\tPC-STUDENT-1767560859680\n510080\tAluno PC Test\tPC-STUDENT-1767648201319\n690010\tAluno PC Test\tPC-STUDENT-1768139383592\n540010\tAluno PC Test\tPC-STUDENT-1767886384135\n690023\tAluno PC Test\tPC-STUDENT-1768148027173\n510037\tAluno PC Test\tPC-STUDENT-1767640641633\n750010\tAluno PC Test\tPC-STUDENT-1768525783185\n420013\tAluno PC Test\tPC-STUDENT-1767548656016\n510051\tAluno PC Test\tPC-STUDENT-1767640967441\n420011\tAluno PC Test\tPC-STUDENT-001\n420010\tAluno PC Test\tPC-STUDENT-001\n480011\tAluno Teste\tENR1767569015122\n480007\tAluno Teste\tENR1767569014930\n1\tAluno Teste\t2024001\n360001\tAluno Teste\t1766890621485\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

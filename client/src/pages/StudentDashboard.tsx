@@ -1,19 +1,18 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { 
   BookOpen, 
   Clock, 
   GraduationCap, 
   AlertCircle, 
-  ArrowRight,
   FileText,
   Map,
-  Lightbulb,
   Bell,
   User,
-  BarChart3
+  BarChart3,
+  CheckCircle
 } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
@@ -121,60 +120,83 @@ export default function StudentDashboard() {
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {activeSubjects.slice(0, 6).map((enrollment: any) => (
-                    <Card 
-                      key={enrollment.id} 
-                      className="transition-all border"
-                    >
-                      <div 
-                        className="h-1" 
-                        style={{ backgroundColor: enrollment.subject?.color || '#3B82F6' }}
-                      />
-                      
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">
-                              {enrollment.subject?.name || 'Disciplina'}
-                            </CardTitle>
-                            <p className="text-sm text-gray-500 font-mono">
-                              {enrollment.subject?.code || ''}
-                            </p>
-                          </div>
-                          <Badge className="bg-success/20 text-success border-success/30">
-                            Ativa
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center text-gray-600 text-sm">
-                            <GraduationCap className="w-4 h-4 mr-2 text-primary" />
-                            Prof: {enrollment.professor?.name || 'N/A'}
-                          </div>
+                  {activeSubjects.slice(0, 6).map((enrollment: any) => {
+                    const progressPercentage = enrollment.progress?.progressPercentage || 0;
+                    const completedTopics = enrollment.progress?.completedTopics || 0;
+                    const totalTopics = enrollment.progress?.totalTopics || 0;
+                    
+                    return (
+                      <Link 
+                        key={enrollment.id} 
+                        href={`/student/subject-details/${enrollment.subjectId}/${enrollment.userId}`}
+                      >
+                        <Card className="transition-all border hover:shadow-lg hover:border-primary/50 cursor-pointer group">
+                          <div 
+                            className="h-1" 
+                            style={{ backgroundColor: enrollment.subject?.color || '#3B82F6' }}
+                          />
                           
-                          {enrollment.subject?.description && (
-                            <p className="text-gray-600 text-sm line-clamp-2">
-                              {enrollment.subject.description}
-                            </p>
-                          )}
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <CardTitle className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+                                  {enrollment.subject?.name || 'Disciplina'}
+                                </CardTitle>
+                                <p className="text-sm text-gray-500 font-mono">
+                                  {enrollment.subject?.code || ''}
+                                </p>
+                              </div>
+                              <Badge className="bg-success/20 text-success border-success/30">
+                                Ativa
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center text-gray-600 text-sm">
+                                <GraduationCap className="w-4 h-4 mr-2 text-primary" />
+                                Prof: {enrollment.professor?.name || 'N/A'}
+                              </div>
+                              
+                              {enrollment.subject?.description && (
+                                <p className="text-gray-600 text-sm line-clamp-2">
+                                  {enrollment.subject.description}
+                                </p>
+                              )}
 
-                          <div className="text-xs text-gray-500 flex items-center gap-1 pt-2 border-t">
-                            <Clock className="w-3 h-3" />
-                            Matriculado em: {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR') : 'N/A'}
-                          </div>
-
-                          <Link href={`/student/subject-details/${enrollment.subjectId}/${enrollment.userId}`}>
-                            <Button className="w-full mt-2 bg-primary hover:bg-primary/90">
-                              Ver Detalhes
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                              {/* Barra de Progresso */}
+                              <div className="pt-3 border-t">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-sm font-medium text-gray-700">Progresso</span>
+                                  <span className="text-sm font-bold" style={{ color: enrollment.subject?.color || '#3B82F6' }}>
+                                    {progressPercentage}%
+                                  </span>
+                                </div>
+                                <Progress 
+                                  value={progressPercentage} 
+                                  className="h-2"
+                                  style={{ 
+                                    backgroundColor: `${enrollment.subject?.color || '#3B82F6'}20`
+                                  }}
+                                />
+                                <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                                  <span className="flex items-center gap-1">
+                                    <CheckCircle className="w-3 h-3 text-success" />
+                                    {completedTopics} de {totalTopics} tópicos
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {new Date(enrollment.enrolledAt).toLocaleDateString('pt-BR')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>

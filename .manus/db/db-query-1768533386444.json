@@ -1,0 +1,80 @@
+{
+  "query": "SELECT s.id, s.fullName, s.registrationNumber, se.subjectId, se.status FROM students s LEFT JOIN subjectEnrollments se ON s.id = se.studentId LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id, s.fullName, s.registrationNumber, se.subjectId, se.status FROM students s LEFT JOIN subjectEnrollments se ON s.id = se.studentId LIMIT 10;",
+  "rows": [
+    {
+      "id": "60051",
+      "fullName": "ANGELA SABRINA COSTA DA SILVA",
+      "registrationNumber": "2023327800",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60052",
+      "fullName": "DARLESSON COELHO PAULO",
+      "registrationNumber": "2023308313",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60053",
+      "fullName": "DOUGLAS DA SILVA SOUZA",
+      "registrationNumber": "2023312281",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60054",
+      "fullName": "DOUGLAS DANIEL APARICIO",
+      "registrationNumber": "2023317958",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60055",
+      "fullName": "ELIANDRO COBOS FABA",
+      "registrationNumber": "2023308331",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60056",
+      "fullName": "FABIANO MACIEL LIMA",
+      "registrationNumber": "2023311702",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60057",
+      "fullName": "FELIPE SILVA DOS SANTOS",
+      "registrationNumber": "2023308082",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60058",
+      "fullName": "HIOJANDECY GAMA DE OLIVEIRA",
+      "registrationNumber": "2023327130",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "60059",
+      "fullName": "JANDERSON FREITAS DOS SANTOS",
+      "registrationNumber": "2023312343",
+      "subjectId": "930001",
+      "status": "active"
+    },
+    {
+      "id": "1",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "2024001",
+      "subjectId": "NULL",
+      "status": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\tregistrationNumber\tsubjectId\tstatus\n60051\tANGELA SABRINA COSTA DA SILVA\t2023327800\t930001\tactive\n60052\tDARLESSON COELHO PAULO\t2023308313\t930001\tactive\n60053\tDOUGLAS DA SILVA SOUZA\t2023312281\t930001\tactive\n60054\tDOUGLAS DANIEL APARICIO\t2023317958\t930001\tactive\n60055\tELIANDRO COBOS FABA\t2023308331\t930001\tactive\n60056\tFABIANO MACIEL LIMA\t2023311702\t930001\tactive\n60057\tFELIPE SILVA DOS SANTOS\t2023308082\t930001\tactive\n60058\tHIOJANDECY GAMA DE OLIVEIRA\t2023327130\t930001\tactive\n60059\tJANDERSON FREITAS DOS SANTOS\t2023312343\t930001\tactive\n1\tAluno Teste\t2024001\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

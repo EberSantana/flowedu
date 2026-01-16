@@ -59,11 +59,7 @@ export default function StudentLogin() {
       return;
     }
     
-    // Validar formato básico da matrícula (apenas números)
-    if (!/^[0-9]+$/.test(trimmedRegistration)) {
-      toast.error("A matrícula deve conter apenas números");
-      return;
-    }
+    // Matrículas podem ser alfanuméricas
 
     setIsLoading(true);
     

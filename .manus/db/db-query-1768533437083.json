@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, fullName, registrationNumber FROM students ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, fullName, registrationNumber FROM students ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "750010",
+      "fullName": "Aluno PC Test",
+      "registrationNumber": "PC-STUDENT-1768525783185"
+    },
+    {
+      "id": "750009",
+      "fullName": "Aluno Teste Dúvidas",
+      "registrationNumber": "REG-1768525782149"
+    },
+    {
+      "id": "750008",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525781433"
+    },
+    {
+      "id": "750007",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525781363"
+    },
+    {
+      "id": "750006",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525781295"
+    },
+    {
+      "id": "750005",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525781217"
+    },
+    {
+      "id": "750004",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525781149"
+    },
+    {
+      "id": "750002",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525781022"
+    },
+    {
+      "id": "750001",
+      "fullName": "Aluno Teste",
+      "registrationNumber": "ENR1768525780941"
+    },
+    {
+      "id": "720009",
+      "fullName": "Aluno Teste Dúvidas",
+      "registrationNumber": "REG-1768428861470"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\tregistrationNumber\n750010\tAluno PC Test\tPC-STUDENT-1768525783185\n750009\tAluno Teste Dúvidas\tREG-1768525782149\n750008\tAluno Teste\tENR1768525781433\n750007\tAluno Teste\tENR1768525781363\n750006\tAluno Teste\tENR1768525781295\n750005\tAluno Teste\tENR1768525781217\n750004\tAluno Teste\tENR1768525781149\n750002\tAluno Teste\tENR1768525781022\n750001\tAluno Teste\tENR1768525780941\n720009\tAluno Teste Dúvidas\tREG-1768428861470\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

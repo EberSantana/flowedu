@@ -1,0 +1,40 @@
+{
+  "query": "SELECT s.id, s.fullName, s.registrationNumber, se.status FROM students s INNER JOIN subjectEnrollments se ON s.id = se.studentId WHERE se.status = 'active' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id, s.fullName, s.registrationNumber, se.status FROM students s INNER JOIN subjectEnrollments se ON s.id = se.studentId WHERE se.status = 'active' LIMIT 5;",
+  "rows": [
+    {
+      "id": "60051",
+      "fullName": "ANGELA SABRINA COSTA DA SILVA",
+      "registrationNumber": "2023327800",
+      "status": "active"
+    },
+    {
+      "id": "60052",
+      "fullName": "DARLESSON COELHO PAULO",
+      "registrationNumber": "2023308313",
+      "status": "active"
+    },
+    {
+      "id": "60053",
+      "fullName": "DOUGLAS DA SILVA SOUZA",
+      "registrationNumber": "2023312281",
+      "status": "active"
+    },
+    {
+      "id": "60054",
+      "fullName": "DOUGLAS DANIEL APARICIO",
+      "registrationNumber": "2023317958",
+      "status": "active"
+    },
+    {
+      "id": "60055",
+      "fullName": "ELIANDRO COBOS FABA",
+      "registrationNumber": "2023308331",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfullName\tregistrationNumber\tstatus\n60051\tANGELA SABRINA COSTA DA SILVA\t2023327800\tactive\n60052\tDARLESSON COELHO PAULO\t2023308313\tactive\n60053\tDOUGLAS DA SILVA SOUZA\t2023312281\tactive\n60054\tDOUGLAS DANIEL APARICIO\t2023317958\tactive\n60055\tELIANDRO COBOS FABA\t2023308331\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}
