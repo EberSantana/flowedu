@@ -35,6 +35,7 @@ import TeacherRegister from "./pages/TeacherRegister";
 import TeacherLogin from "./pages/TeacherLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import SetPassword from "./pages/SetPassword";
 import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
@@ -79,6 +80,7 @@ function Router() {
         <Route path={"/login-professor"} component={TeacherLogin} />
         <Route path={"/esqueci-senha"} component={ForgotPassword} />
         <Route path={"/redefinir-senha"} component={ResetPassword} />
+        <Route path={"/definir-senha"} component={SetPassword} />
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
         <Route path={"/subjects/:id/ct-stats"} component={SubjectCTStats} />

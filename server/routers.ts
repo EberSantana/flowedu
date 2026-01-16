@@ -1279,7 +1279,7 @@ Regras:
       return db.getInactiveUsers();
     }),
 
-    // Cadastro manual de usuários
+    // Cadastro manual de usuários (com link para definir senha)
     createUser: protectedProcedure
       .input(z.object({
         name: z.string().min(1, 'Nome é obrigatório'),
@@ -1297,17 +1297,17 @@ Regras:
           throw new Error('Este e-mail já está cadastrado no sistema');
         }
 
-        // Gerar openId temporário (será substituído no primeiro login OAuth)
+        // Gerar openId temporário
         const crypto = await import('crypto');
         const tempOpenId = `manual-${crypto.randomBytes(16).toString('hex')}`;
         
-        // Criar usuário
+        // Criar usuário (sem senha - será definida pelo link)
         await db.upsertUser({
           openId: tempOpenId,
           name: input.name,
           email: input.email,
           role: input.role,
-          loginMethod: 'manual',
+          loginMethod: 'email',
           lastSignedIn: new Date(),
         });
 
@@ -1319,15 +1319,19 @@ Regras:
           throw new Error('Erro ao criar usuário');
         }
 
-        // Enviar e-mail de boas-vindas
-        const { sendEmail, getManualRegistrationEmailTemplate } = await import('./_core/email');
-        const emailHtml = getManualRegistrationEmailTemplate(input.name, input.role);
-        
-        const emailResult = await sendEmail({
-          to: input.email,
-          subject: 'Bem-vindo ao FlowEdu',
-          html: emailHtml,
-        });
+        // Gerar token para definição de senha (24 horas de validade)
+        const token = `${Date.now()}-${crypto.randomBytes(16).toString('hex')}`;
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
+        await db.createPasswordResetToken(newUser.id, token, expiresAt);
+
+        // Enviar e-mail com link para definir senha
+        const { sendSetPasswordEmail } = await import('./_core/email');
+        const emailResult = await sendSetPasswordEmail(
+          input.email,
+          token,
+          input.name,
+          input.role
+        );
 
         // Registrar log de auditoria
         await db.createAuditLog({

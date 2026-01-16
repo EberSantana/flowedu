@@ -6023,3 +6023,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## UI - Padronizar Card de Trilhas de Aprendizagem (16/01/2026)
 - [x] Alterar layout do card de Trilhas para ficar igual ao de Estatísticas (Concluídos, Total, Módulos, Carga)
+
+## Bug - Erro de Hooks do React (16/01/2026)
+- [x] Corrigir erro "Invalid hook call" / "Cannot read properties of null (reading 'useState')" (resolvido limpando cache do Vite)
+
+## Sistema de Cadastro Manual de Professores (16/01/2026)
+- [x] Campos de autenticação na tabela users já existentes (passwordHash, resetToken, resetTokenExpiry)
+- [x] Rotas de autenticação já existentes (loginTeacher, requestPasswordReset, resetPassword)
+- [x] Página admin para cadastrar professores já existe (AdminUsers)
+- [x] Página de login por email/senha já existe (TeacherLogin)
+- [x] Criar página SetPassword para professor definir senha inicial
+- [x] Atualizar rota admin.createUser para enviar email com link de definição de senha
+- [x] Criar template de email sendSetPasswordEmail
