@@ -6008,3 +6008,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## UI - Botão Atualizar Exercícios (16/01/2026)
 - [x] Alterar cor da fonte do botão "Atualizar" para preto (fundo branco com texto preto)
+
+## Bug - Progressão não atualiza ao concluir tópicos (16/01/2026)
+- [ ] Corrigir cálculo de progressão que não atualiza ao concluir tópicos por módulo
+
+## Progressão de Tópicos em Dois Passos (16/01/2026)
+- [x] Alterar lógica: primeiro clique marca como "em progresso", segundo clique marca como "concluído" (já estava implementado, limpeza de dados órfãos realizada)

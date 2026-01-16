@@ -1,0 +1,9 @@
+{
+  "query": "-- Primeiro, limpar registros órfãos\nDELETE FROM student_topic_progress WHERE topicId NOT IN (SELECT id FROM learning_topics);\n\n-- Agora atualizar 4 tópicos da disciplina SEC para em progresso\nUPDATE student_topic_progress \nSET status = 'in_progress' \nWHERE studentId = 60063 \nAND topicId IN (420005, 420006, 420007, 420008)\nAND status = 'completed';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute -- Primeiro, limpar registros órfãos\nDELETE FROM student_topic_progress WHERE topicId NOT IN (SELECT id FROM learning_topics);\n\n-- Agora atualizar 4 tópicos da disciplina SEC para em progresso\nUPDATE student_topic_progress \nSET status = 'in_progress' \nWHERE studentId = 60063 \nAND topicId IN (420005, 420006, 420007, 420008)\nAND status = 'completed';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 72
+}
