@@ -473,20 +473,20 @@ export default function TopicMaterialsManager() {
             if (!open) resetForm();
             setIsAddDialogOpen(open);
           }}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
                 <DialogTitle>Adicionar Material Didático</DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-4">
+              <div className="space-y-4 py-4">
                 {/* Type Selection */}
-                <div>
+                <div className="space-y-2">
                   <Label>Tipo de Material</Label>
                   <Select
                     value={formData.type}
                     onValueChange={(value) => setFormData({ ...formData, type: value as MaterialType })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -502,22 +502,23 @@ export default function TopicMaterialsManager() {
 
                 {/* File Upload or URL */}
                 {formData.type === 'link' ? (
-                  <div>
+                  <div className="space-y-2">
                     <Label>URL do Material</Label>
                     <Input
                       type="url"
                       placeholder="https://..."
                       value={formData.url}
                       onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                      className="w-full"
                     />
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-muted-foreground">
                       Ex: YouTube, Google Drive, artigos, etc.
                     </p>
                   </div>
                 ) : (
-                  <div>
+                  <div className="space-y-2">
                     <Label>Arquivo</Label>
-                    <div className="mt-2">
+                    <div className="space-y-2">
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -535,36 +536,40 @@ export default function TopicMaterialsManager() {
                         type="button"
                         variant="outline"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full"
+                        className="w-full justify-start text-left font-normal truncate"
                         disabled={isUploading}
                       >
-                        <Upload className="h-4 w-4 mr-2" />
-                        {selectedFile ? selectedFile.name : "Selecionar Arquivo"}
+                        <Upload className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <span className="truncate">{selectedFile ? selectedFile.name : "Selecionar Arquivo"}</span>
                       </Button>
                       
                       {/* Informação de tamanho */}
                       {selectedFile && (
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-muted-foreground">
                           Tamanho: {formatFileSize(selectedFile.size)}
                         </p>
                       )}
                       
+                      <p className="text-xs text-muted-foreground">
+                        Tamanho máximo: {MAX_FILE_SIZE_MB}MB. Para arquivos maiores, use um link externo (Google Drive, YouTube, etc.)
+                      </p>
+                      
                       {/* Erro de upload */}
                       {uploadError && (
-                        <div className="flex items-center gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
-                          <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
-                          <p className="text-sm text-red-700">{uploadError}</p>
+                        <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                          <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-destructive">{uploadError}</p>
                         </div>
                       )}
                       
                       {/* Progresso de upload */}
                       {isUploading && (
-                        <div className="mt-3 space-y-2">
+                        <div className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">{uploadStatus}</span>
+                            <span className="text-muted-foreground">{uploadStatus}</span>
                             <span className="font-medium">{uploadProgress}%</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full bg-secondary rounded-full h-2">
                             <div
                               className="bg-primary h-2 rounded-full transition-all duration-300"
                               style={{ width: `${uploadProgress}%` }}
@@ -572,37 +577,36 @@ export default function TopicMaterialsManager() {
                           </div>
                         </div>
                       )}
-                      
-                      <p className="text-xs text-gray-500 mt-2">
-                        Tamanho máximo: {MAX_FILE_SIZE_MB}MB. Para arquivos maiores, use um link externo (Google Drive, YouTube, etc.)
-                      </p>
                     </div>
                   </div>
                 )}
 
                 {/* Title */}
-                <div>
+                <div className="space-y-2">
                   <Label>Título</Label>
                   <Input
                     placeholder="Nome do material"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full"
                   />
                 </div>
 
                 {/* Description */}
-                <div>
+                <div className="space-y-2">
                   <Label>Descrição (opcional)</Label>
                   <Textarea
                     placeholder="Breve descrição do material"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full resize-none"
+                    rows={3}
                   />
                 </div>
 
                 {/* Required Switch */}
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="required-switch">Material Obrigatório</Label>
+                <div className="flex items-center justify-between py-2">
+                  <Label htmlFor="required-switch" className="cursor-pointer">Material Obrigatório</Label>
                   <Switch
                     id="required-switch"
                     checked={formData.isRequired}
@@ -611,7 +615,7 @@ export default function TopicMaterialsManager() {
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="gap-2 sm:gap-0">
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isUploading}>
                   Cancelar
                 </Button>

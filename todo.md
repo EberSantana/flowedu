@@ -5949,3 +5949,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir progresso zerado na trilha de aprendizagem (agora busca estatísticas por disciplina)
 - [x] Remover card "Revisão" do Acesso Rápido no portal do aluno
 - [x] Remover clique do card de disciplinas (manter apenas botão Ver Detalhes)
+
+## 🎨 Correção Layout Modal Adicionar Material Didático
+
+- [x] Corrigir layout desconfigurado do modal de adicionar material didático (ajustado espaçamento, largura e truncate no nome do arquivo)
