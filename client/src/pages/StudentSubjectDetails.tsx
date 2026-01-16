@@ -162,7 +162,7 @@ export default function StudentSubjectDetails() {
 
         {/* Sistema de Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Visão Geral</span>
@@ -175,12 +175,6 @@ export default function StudentSubjectDetails() {
               <Trophy className="h-4 w-4" />
               <span className="hidden sm:inline">Exercícios</span>
             </TabsTrigger>
-            {subject.computationalThinkingEnabled && (
-              <TabsTrigger value="ct" className="flex items-center gap-2">
-                <Brain className="h-4 w-4" />
-                <span className="hidden sm:inline">PC</span>
-              </TabsTrigger>
-            )}
           </TabsList>
 
           {/* Tab: Visão Geral */}
@@ -208,12 +202,7 @@ export default function StudentSubjectDetails() {
             />
           </TabsContent>
 
-          {/* Tab: Pensamento Computacional */}
-          {subject.computationalThinkingEnabled && (
-            <TabsContent value="ct">
-              <ComputationalThinkingTab subjectId={subjectId} />
-            </TabsContent>
-          )}
+
         </Tabs>
       </div>
     </StudentLayout>

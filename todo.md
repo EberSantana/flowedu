@@ -5925,3 +5925,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Colocar logo (F) ao lado do nome FlowEdu no sidebar
 - [x] Remover sino de alerta do sidebar do professor
 - [x] Aumentar logo e centralizar melhor com nome FlowEdu ao lado no sidebar
+- [x] Remover botão 'Ver Todas' da seção Minhas Disciplinas do aluno
+- [x] Remover aba 'PC' (Pensamento Computacional) da página de detalhes da disciplina do aluno

@@ -103,14 +103,7 @@ export default function StudentDashboard() {
                     </p>
                   </div>
                 </div>
-                {activeSubjects.length > 0 && (
-                  <Link href="/student-subjects">
-                    <Button variant="default" className="gap-2 bg-primary hover:bg-primary/90 text-white">
-                      Ver Todas
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                )}
+
               </div>
 
               {activeSubjects.length === 0 ? (
