@@ -1,0 +1,73 @@
+{
+  "query": "SELECT id, name, email, role, loginMethod, approvalStatus, passwordHash IS NOT NULL as has_password FROM users ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, email, role, loginMethod, approvalStatus, passwordHash IS NOT NULL as has_password FROM users ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Eber da Silva de Santana",
+      "email": "eberss@gmail.com",
+      "role": "admin",
+      "loginMethod": "email",
+      "approvalStatus": "approved",
+      "has_password": "1"
+    },
+    {
+      "id": "3030005",
+      "name": "Eber da Silva de Santana",
+      "email": "eber.santana@hotmail.com",
+      "role": "admin",
+      "loginMethod": "email",
+      "approvalStatus": "approved",
+      "has_password": "1"
+    },
+    {
+      "id": "3030009",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "has_password": "0"
+    },
+    {
+      "id": "3030010",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "has_password": "0"
+    },
+    {
+      "id": "3030011",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "has_password": "0"
+    },
+    {
+      "id": "3030012",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "has_password": "0"
+    },
+    {
+      "id": "3030013",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "has_password": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tloginMethod\tapprovalStatus\thas_password\n1\tEber da Silva de Santana\teberss@gmail.com\tadmin\temail\tapproved\t1\n3030005\tEber da Silva de Santana\teber.santana@hotmail.com\tadmin\temail\tapproved\t1\n3030009\tNULL\tNULL\tuser\tNULL\tapproved\t0\n3030010\tNULL\tNULL\tuser\tNULL\tapproved\t0\n3030011\tNULL\tNULL\tuser\tNULL\tapproved\t0\n3030012\tNULL\tNULL\tuser\tNULL\tapproved\t0\n3030013\tNULL\tNULL\tuser\tNULL\tapproved\t0\n",
+  "stderr": "",
+  "execution_time_ms": 130
+}

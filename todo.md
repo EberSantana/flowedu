@@ -6119,3 +6119,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar role do usuário eberss@gmail.com no banco
 - [x] Atualizar role para 'admin' e approvalStatus para 'approved'
 - [x] Entregar solução ao usuário
+
+## Investigar Login Mostrando Role Errado (18/01/2026)
+- [x] Verificar se existem múltiplos usuários com email eberss@gmail.com
+- [x] Deletar usuários duplicados com role='user'
+- [x] Verificar que apenas 1 usuário admin permanece
+- [x] Entregar solução ao usuário
