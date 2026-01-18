@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
-import { User, Mail, Calendar, Shield, LogOut, ArrowLeft } from "lucide-react";
+import { User, Mail, Calendar, Shield, LogOut, ArrowLeft, Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation, Link } from "wouter";
@@ -22,6 +22,18 @@ export default function Profile() {
     email: user?.email || "",
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+
   const updateProfileMutation = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
       toast.success("Perfil atualizado com sucesso!");
@@ -31,9 +43,54 @@ export default function Profile() {
     },
   });
 
+  const changePasswordMutation = trpc.auth.changePassword.useMutation({
+    onSuccess: () => {
+      toast.success("Senha alterada com sucesso!");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    },
+    onError: (error) => {
+      toast.error(`Erro ao alterar senha: ${error.message}`);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfileMutation.mutate(formData);
+  };
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!passwordData.currentPassword) {
+      toast.error("Digite sua senha atual");
+      return;
+    }
+
+    if (!passwordData.newPassword) {
+      toast.error("Digite a nova senha");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("As senhas não coincidem");
+      return;
+    }
+
+    if (passwordData.currentPassword === passwordData.newPassword) {
+      toast.error("A nova senha deve ser diferente da atual");
+      return;
+    }
+
+    changePasswordMutation.mutate(passwordData);
   };
 
   const handleLogout = async () => {
@@ -178,6 +235,94 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Segurança - Alterar Senha */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="w-5 h-5" />
+                Segurança
+              </CardTitle>
+              <CardDescription>Altere sua senha de acesso</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Senha Atual</Label>
+                  <div className="relative">
+                    <input
+                      id="currentPassword"
+                      type={showPasswords.current ? "text" : "password"}
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                      placeholder="Digite sua senha atual"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      disabled={changePasswordMutation.isPending}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nova Senha</Label>
+                  <div className="relative">
+                    <input
+                      id="newPassword"
+                      type={showPasswords.new ? "text" : "password"}
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                      placeholder="Digite a nova senha (mínimo 6 caracteres)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      disabled={changePasswordMutation.isPending}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                  <div className="relative">
+                    <input
+                      id="confirmPassword"
+                      type={showPasswords.confirm ? "text" : "password"}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                      placeholder="Confirme a nova senha"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      disabled={changePasswordMutation.isPending}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={changePasswordMutation.isPending}
+                  className="w-full"
+                >
+                  {changePasswordMutation.isPending ? "Alterando..." : "Alterar Senha"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 

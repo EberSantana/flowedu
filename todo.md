@@ -6051,3 +6051,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover campo "Código de Convite" da página TeacherRegister.tsx
 - [x] Remover validação de código de convite do backend
 - [x] Simplificar fluxo de cadastro (todos cadastros vão para aprovação do admin)
+
+## Alterar Senha Própria no Perfil (17/01/2026)
+- [x] Criar rota tRPC auth.changePassword para alterar senha
+- [x] Adicionar validação de senha atual
+- [x] Adicionar validação de nova senha (mínimo 6 caracteres)
+- [x] Adicionar interface no perfil do professor
+- [x] Criar seção "Segurança" com formulário de alterar senha
+- [x] Adicionar feedback visual (sucesso/erro)

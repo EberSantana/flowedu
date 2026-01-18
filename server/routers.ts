@@ -323,6 +323,51 @@ export const appRouter = router({
 
         return { success: true, message: "Senha redefinida com sucesso!" };
       }),
+
+    // Alterar senha própria (usuário logado)
+    changePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string().min(1, "Senha atual é obrigatória"),
+        newPassword: z.string().min(6, "Nova senha deve ter pelo menos 6 caracteres"),
+        confirmPassword: z.string().min(6, "Confirmação de senha deve ter pelo menos 6 caracteres"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Validar se as senhas novas coincidem
+        if (input.newPassword !== input.confirmPassword) {
+          throw new Error("As senhas não coincidem");
+        }
+
+        // Validar se a nova senha é diferente da atual
+        if (input.currentPassword === input.newPassword) {
+          throw new Error("A nova senha deve ser diferente da senha atual");
+        }
+
+        // Buscar usuário
+        const users = await db.getAllUsers();
+        const user = users.find(u => u.id === ctx.user.id);
+
+        if (!user || !user.passwordHash) {
+          throw new Error("Usuário não encontrado ou não possui senha definida");
+        }
+
+        // Validar senha atual
+        const passwordMatch = await bcrypt.compare(input.currentPassword, user.passwordHash);
+        if (!passwordMatch) {
+          throw new Error("Senha atual incorreta");
+        }
+
+        // Hash da nova senha
+        const newPasswordHash = await bcrypt.hash(input.newPassword, 10);
+
+        // Atualizar senha
+        const updated = await db.updateUserPassword(ctx.user.id, newPasswordHash);
+        
+        if (!updated) {
+          throw new Error("Erro ao atualizar senha");
+        }
+
+        return { success: true, message: "Senha alterada com sucesso!" };
+      }),
   }),
 
   subjects: router({
