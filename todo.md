@@ -6136,3 +6136,24 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover botão "Entrar com Google/GitHub"
 - [x] Ajustar layout para ficar igual ao Portal do Aluno (apenas botão "Entrar com E-mail")
 - [x] Testar visualmente a página inicial
+
+## Corrigir Sistema Não Abre Após Publicação (18/01/2026)
+- [ ] Investigar logs e erros do sistema publicado
+- [ ] Verificar configurações de build e produção
+- [ ] Verificar variáveis de ambiente necessárias
+- [ ] Identificar e corrigir problemas
+- [ ] Testar sistema publicado
+
+## Implementar Recuperação de Senha (18/01/2026)
+- [x] Adicionar campos resetPasswordToken e resetPasswordExpires no schema (tabela passwordResetTokens já existe)
+- [x] Aplicar alterações no banco de dados (db:push)
+- [x] Criar função requestPasswordReset no db.ts
+- [x] Criar função resetPassword no db.ts
+- [x] Implementar rota tRPC auth.requestPasswordReset
+- [x] Implementar rota tRPC auth.resetPassword
+- [x] Criar página ForgotPassword.tsx
+- [x] Criar página ResetPassword.tsx
+- [x] Adicionar link "Esqueci minha senha" nas páginas de login (TeacherLogin)
+- [x] Implementar envio de email com link de recuperação
+- [x] Adicionar validação de token e expiração
+- [x] Funcionalidade completa e operacional
