@@ -6100,3 +6100,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Remover botão "Entrar com Google" das páginas de login
 - [ ] Remover rotas OAuth do backend
 - [ ] Limpar código relacionado a autenticação Google
+
+## Corrigir Criação Automática de Usuário ao Login (18/01/2026)
+- [x] Investigar onde está ocorrendo a criação automática de usuário
+- [x] Verificar rotas de autenticação OAuth (server/_core/oauth.ts)
+- [x] Verificar função upsertUser no db.ts
+- [x] Desabilitar rota OAuth callback
+- [x] Remover botão "Entrar com Google" da página TeacherLogin
+- [x] Testar e validar
