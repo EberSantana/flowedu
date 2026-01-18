@@ -2901,15 +2901,7 @@ JSON (descrições MAX 15 chars):
     getModuleGuide: publicProcedure
       .input(z.object({ moduleId: z.number() }))
       .query(async ({ input }) => {
-        const dbInstance = await db.getDb();
-        if (!dbInstance) throw new Error("Database not available");
-        
-        const { learningModules } = await import('../drizzle/schema');
-        const { eq } = await import('drizzle-orm');
-        
-        const result = await dbInstance.query.learningModules.findFirst({
-          where: (table: any) => eq(table.id, input.moduleId),
-        });
+        const result = await db.getLearningModuleById(input.moduleId, 0);
         
         if (!result) {
           return null;
@@ -2931,6 +2923,11 @@ JSON (descrições MAX 15 chars):
         guideType: z.enum(["text", "video", "interactive", "mixed"]).default("text"),
       }))
       .mutation(async ({ ctx, input }) => {
+        const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
+        if (!module) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Você não tem permissão para editar este módulo' });
+        }
+        
         return await db.updateLearningModule(input.moduleId, {
           guideTitle: input.guideTitle,
           guideContent: input.guideContent,
@@ -2942,6 +2939,11 @@ JSON (descrições MAX 15 chars):
     deleteModuleGuide: protectedProcedure
       .input(z.object({ moduleId: z.number() }))
       .mutation(async ({ ctx, input }) => {
+        const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
+        if (!module) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Você não tem permissão para deletar este guia' });
+        }
+        
         return await db.updateLearningModule(input.moduleId, {
           guideTitle: null,
           guideContent: null,

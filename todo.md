@@ -6069,6 +6069,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar rota tRPC para salvar/atualizar guia de animação (updateModuleGuide)
 - [x] Criar rota tRPC para buscar guia de animação (getModuleGuide)
 - [x] Criar rota tRPC para deletar guia de animação (deleteModuleGuide)
+- [x] Adicionar validação de permissão nas rotas (professor só pode editar seus módulos)
 - [x] Criar componente modal para visualização do guia (ModuleGuideViewer.tsx)
 - [x] Adicionar botão "Ver Guia" nos módulos do aluno
 - [x] Integrar modal na página StudentLearningPathDetail

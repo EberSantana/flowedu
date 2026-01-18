@@ -1100,7 +1100,7 @@ export async function createLearningModule(data: { subjectId: number; title: str
   return { id: result.insertId, ...data, orderIndex: nextOrder };
 }
 
-export async function updateLearningModule(id: number, data: { title?: string; description?: string; infographicUrl?: string }, userId: number) {
+export async function updateLearningModule(id: number, data: { title?: string; description?: string; infographicUrl?: string; guideTitle?: string | null; guideContent?: string | null; guideType?: string }, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
