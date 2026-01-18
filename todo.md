@@ -6130,3 +6130,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar schema Drizzle adicionando .unique() no campo email
 - [x] Aplicar alteração no banco de dados via SQL (ALTER TABLE users ADD UNIQUE INDEX)
 - [x] Constraint UNIQUE aplicada com sucesso
+
+## Remover Botão Google/GitHub da Home (18/01/2026)
+- [x] Analisar código atual da Home.tsx
+- [x] Remover botão "Entrar com Google/GitHub"
+- [x] Ajustar layout para ficar igual ao Portal do Aluno (apenas botão "Entrar com E-mail")
+- [x] Testar visualmente a página inicial
