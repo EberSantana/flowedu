@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM users WHERE email = 'eberss@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM users WHERE email = 'eberss@gmail.com';",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "7sChm8RBMMiktScwVezDbQ",
+      "name": "Eber da Silva de Santana",
+      "email": "eberss@gmail.com",
+      "loginMethod": "email",
+      "role": "admin",
+      "profile": "enthusiast",
+      "createdAt": "2025-12-10 21:22:10",
+      "updatedAt": "2026-01-18 21:40:57",
+      "lastSignedIn": "2026-01-18 21:40:58",
+      "active": "1",
+      "approvalStatus": "approved",
+      "inviteCode": "NULL",
+      "passwordHash": "$2b$10$jZciEu8hzynurHD/gjHl0.buHzSphZi3DIjhE8vUkMYaTvkJ/gYZu"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tloginMethod\trole\tprofile\tcreatedAt\tupdatedAt\tlastSignedIn\tactive\tapprovalStatus\tinviteCode\tpasswordHash\n1\t7sChm8RBMMiktScwVezDbQ\tEber da Silva de Santana\teberss@gmail.com\temail\tadmin\tenthusiast\t2025-12-10 21:22:10\t2026-01-18 21:40:57\t2026-01-18 21:40:58\t1\tapproved\tNULL\t$2b$10$jZciEu8hzynurHD/gjHl0.buHzSphZi3DIjhE8vUkMYaTvkJ/gYZu\n",
+  "stderr": "",
+  "execution_time_ms": 70
+}

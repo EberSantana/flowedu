@@ -36,6 +36,7 @@ import TeacherLogin from "./pages/TeacherLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ClearSession from "./pages/ClearSession";
+import UserDebug from "./pages/UserDebug";
 import Announcements from "./pages/Announcements";
 import StudentAnnouncements from "./pages/StudentAnnouncements";
 import StudentSubjects from "./pages/StudentSubjects";
@@ -82,6 +83,7 @@ function Router() {
         <Route path={"/esqueci-senha"} component={ForgotPassword} />
         <Route path={"/redefinir-senha"} component={ResetPassword} />
         <Route path={"/clear-session"} component={ClearSession} />
+        <Route path={"/user-debug"} component={UserDebug} />
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/subjects"} component={Subjects} />
         <Route path={"/subjects/:id/ct-stats"} component={SubjectCTStats} />

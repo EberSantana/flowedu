@@ -6164,3 +6164,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar role e approvalStatus (tudo correto no banco)
 - [x] Testar login e identificar erro específico (sessão antiga com role desatualizada)
 - [x] Criar página /clear-session para limpar cookies e forçar novo login
+
+## Corrigir Problemas Identificados (18/01/2026)
+- [ ] Remover botão "Entrar com Google/GitHub" da Home.tsx (voltou a aparecer)
+- [ ] Investigar por que role admin não está sendo reconhecida após login
+- [ ] Verificar se JWT está incluindo role corretamente
+- [ ] Corrigir exibição no menu (mostrar "Administrador" em vez de "Professor")
+- [ ] Verificar se menu "Administração" aparece para usuários admin
+
+## ERRO CRÍTICO - React Invalid Hook Call (18/01/2026)
+- [x] Limpar completamente node_modules e cache
+- [x] Reinstalar todas as dependências
+- [x] Remover patch problemático do wouter
+- [x] Sistema funcionando novamente
