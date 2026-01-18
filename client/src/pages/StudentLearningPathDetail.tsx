@@ -1,4 +1,3 @@
-import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +10,11 @@ import {
   AlertCircle, HelpCircle, Smile, Meh, Frown, Sparkles
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
+import { ModuleGuideViewer } from "@/components/ModuleGuideViewer";
 import { useRoute, Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 export default function StudentLearningPathDetail() {
   const [, params] = useRoute("/student/learning-path/:subjectId/:professorId");
@@ -23,6 +24,8 @@ export default function StudentLearningPathDetail() {
   const [selectedTopic, setSelectedTopic] = useState<any>(null);
   const [journalContent, setJournalContent] = useState("");
   const [doubtQuestion, setDoubtQuestion] = useState("");
+  const [selectedModuleForGuide, setSelectedModuleForGuide] = useState<any>(null);
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   // Buscar trilha completa
   const { data: learningPath, isLoading, refetch } = trpc.student.getEnhancedLearningPath.useQuery(
@@ -227,9 +230,25 @@ export default function StudentLearningPathDetail() {
                         )}
                       </div>
                     </div>
-                    <Badge className="bg-primary/20 text-primary">
-                      {moduleCompletedTopics}/{module.topics?.length || 0} tópicos
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {module.guideTitle && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedModuleForGuide(module);
+                            setShowGuideModal(true);
+                          }}
+                          className="gap-2"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                          Ver Guia
+                        </Button>
+                      )}
+                      <Badge className="bg-primary/20 text-primary">
+                        {moduleCompletedTopics}/{module.topics?.length || 0} tópicos
+                      </Badge>
+                    </div>
                   </div>
                   <Progress value={moduleProgress} className="h-2 mt-3" />
                 </CardHeader>
@@ -388,6 +407,19 @@ export default function StudentLearningPathDetail() {
           </div>
         )}
       </div>
+
+      {/* Modal do Guia de Animação */}
+      {selectedModuleForGuide && (
+        <ModuleGuideViewer
+          moduleId={selectedModuleForGuide.id}
+          moduleName={selectedModuleForGuide.title}
+          isOpen={showGuideModal}
+          onClose={() => {
+            setShowGuideModal(false);
+            setSelectedModuleForGuide(null);
+          }}
+        />
+      )}
     </StudentLayout>
   );
 }

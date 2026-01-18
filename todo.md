@@ -6066,11 +6066,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar migration para adicionar novos campos (via SQL direto)
 - [x] Atualizar schema Drizzle com novos campos
 - [x] Sincronizar com banco de dados
-- [ ] Criar rota tRPC para salvar/atualizar guia de animação (updateModuleGuide)
-- [ ] Criar rota tRPC para buscar guia de animação (getModuleGuide)
-- [ ] Criar rota tRPC para deletar guia de animação (deleteModuleGuide)
+- [x] Criar rota tRPC para salvar/atualizar guia de animação (updateModuleGuide)
+- [x] Criar rota tRPC para buscar guia de animação (getModuleGuide)
+- [x] Criar rota tRPC para deletar guia de animação (deleteModuleGuide)
+- [x] Criar componente modal para visualização do guia (ModuleGuideViewer.tsx)
+- [x] Adicionar botão "Ver Guia" nos módulos do aluno
+- [x] Integrar modal na página StudentLearningPathDetail
 - [ ] Adicionar interface no formulário de edição de módulo (professor)
 - [ ] Editor de texto rico para conteúdo do guia
-- [ ] Criar visualização do guia para aluno (modal/página)
-- [ ] Adicionar botão "Ver Guia" nos módulos do aluno
 - [ ] Testar fluxo completo (professor cria guia → aluno visualiza)

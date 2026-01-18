@@ -2896,6 +2896,58 @@ JSON (descrições MAX 15 chars):
           throw new Error(`Erro ao gerar mapa mental: ${error.message || 'JSON malformado'}. Tente novamente.`);
         }
       }),
+
+    // Buscar guia de animação do módulo (para aluno)
+    getModuleGuide: publicProcedure
+      .input(z.object({ moduleId: z.number() }))
+      .query(async ({ input }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error("Database not available");
+        
+        const { learningModules } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        
+        const result = await dbInstance.query.learningModules.findFirst({
+          where: (table: any) => eq(table.id, input.moduleId),
+        });
+        
+        if (!result) {
+          return null;
+        }
+        
+        return {
+          guideTitle: result.guideTitle,
+          guideContent: result.guideContent,
+          guideType: result.guideType,
+        };
+      }),
+
+    // Salvar/Atualizar guia de animação (para professor)
+    updateModuleGuide: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+        guideTitle: z.string().min(1, "Título do guia é obrigatório"),
+        guideContent: z.string().min(1, "Conteúdo do guia é obrigatório"),
+        guideType: z.enum(["text", "video", "interactive", "mixed"]).default("text"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateLearningModule(input.moduleId, {
+          guideTitle: input.guideTitle,
+          guideContent: input.guideContent,
+          guideType: input.guideType,
+        }, ctx.user.id);
+      }),
+
+    // Deletar guia de animação (para professor)
+    deleteModuleGuide: protectedProcedure
+      .input(z.object({ moduleId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateLearningModule(input.moduleId, {
+          guideTitle: null,
+          guideContent: null,
+          guideType: "text",
+        }, ctx.user.id);
+      }),
   }),
 
   // Student Portal Routes
