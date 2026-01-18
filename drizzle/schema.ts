@@ -350,6 +350,9 @@ export const learningModules = mysqlTable("learning_modules", {
   orderIndex: int("orderIndex").default(0).notNull(),
   userId: int("userId").notNull(),
   infographicUrl: text("infographic_url"), // URL do infográfico gerado para este módulo
+  guideTitle: varchar("guideTitle", { length: 255 }), // Título do guia de animação
+  guideContent: text("guideContent"), // Conteúdo do guia de animação (HTML/Markdown)
+  guideType: mysqlEnum("guideType", ["text", "video", "interactive", "mixed"]).default("text"), // Tipo de guia
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

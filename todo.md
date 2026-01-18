@@ -6059,3 +6059,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar interface no perfil do professor
 - [x] Criar seção "Segurança" com formulário de alterar senha
 - [x] Adicionar feedback visual (sucesso/erro)
+
+## Guia de Animação por Módulo em Trilhas de Aprendizagem (17/01/2026)
+- [x] Analisar estrutura de módulos e trilhas (schema, rotas existentes)
+- [x] Adicionar campos de guia de animação no banco (moduleGuide, guideContent, guideType)
+- [x] Criar migration para adicionar novos campos (via SQL direto)
+- [x] Criar rota tRPC para salvar/atualizar guia de animação (updateModuleGuide)
+- [x] Criar rota tRPC para buscar guia de animação (getModuleGuide)
+- [x] Criar rota tRPC para deletar guia de animação (deleteModuleGuide)
+- [ ] Adicionar interface no formulário de edição de módulo (professor)
+- [ ] Editor de texto rico para conteúdo do guia
+- [ ] Criar visualização do guia para aluno (modal/página)
+- [ ] Adicionar botão "Ver Guia" nos módulos do aluno
+- [ ] Testar fluxo completo (professor cria guia → aluno visualiza)
