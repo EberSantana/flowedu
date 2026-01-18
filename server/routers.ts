@@ -2897,6 +2897,27 @@ JSON (descrições MAX 15 chars):
         }
       }),
 
+    // Dashboard de Desempenho - Resumo por disciplina
+    getPerformanceSummary: protectedProcedure.query(async ({ ctx }) => {
+      try {
+        return await db.getSubjectProgressSummary(ctx.user.id);
+      } catch (error) {
+        console.error('Erro ao buscar resumo de desempenho:', error);
+        return [];
+      }
+    }),
+
+    // Dashboard de Desempenho - Progresso dos alunos em uma disciplina
+    getStudentsProgressBySubject: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          return await db.getAllStudentsProgressBySubject(input.subjectId, ctx.user.id);
+        } catch (error) {
+          console.error('Erro ao buscar progresso dos alunos:', error);
+          return [];
+        }
+      }),
 
   }),
 

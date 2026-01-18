@@ -11128,3 +11128,79 @@ export async function getEnrolledStudentsByProfessor(professorId: number) {
 
   return enrollments;
 }
+
+
+/**
+ * Buscar resumo de progresso de todos os alunos em uma disciplina (para dashboard)
+ */
+export async function getAllStudentsProgressBySubject(subjectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar todos os alunos inscritos na disciplina
+  const enrolledStudents = await db.select({
+    studentId: subjectEnrollments.studentId,
+    studentName: students.fullName,
+    studentRegistration: students.registrationNumber,
+  }).from(subjectEnrollments)
+    .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
+    .where(eq(subjectEnrollments.subjectId, subjectId));
+  
+  // Para cada aluno, buscar progresso geral
+  const studentProgress = await Promise.all(enrolledStudents.map(async (enrollment) => {
+    const progress = await getStudentProgressBySubject(enrollment.studentId, subjectId);
+    
+    const totalTopics = progress.length;
+    const completedTopics = progress.filter(p => p.status === 'completed').length;
+    const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
+    const percentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+    
+    return {
+      studentId: enrollment.studentId,
+      studentName: enrollment.studentName,
+      studentRegistration: enrollment.studentRegistration,
+      totalTopics,
+      completedTopics,
+      inProgressTopics,
+      percentage,
+    };
+  }));
+  
+  return studentProgress;
+}
+
+/**
+ * Buscar resumo de progresso por disciplina
+ */
+export async function getSubjectProgressSummary(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const subjectsData = await db.select().from(subjects)
+    .where(eq(subjects.userId, userId));
+  
+  const summary = await Promise.all(subjectsData.map(async (subject) => {
+    const studentProgress = await getAllStudentsProgressBySubject(subject.id, userId);
+    
+    const totalStudents = studentProgress.length;
+    const avgProgress = totalStudents > 0 
+      ? Math.round(studentProgress.reduce((sum, s) => sum + s.percentage, 0) / totalStudents)
+      : 0;
+    
+    const studentsCompleted = studentProgress.filter(s => s.percentage === 100).length;
+    const studentsInProgress = studentProgress.filter(s => s.percentage > 0 && s.percentage < 100).length;
+    const studentsNotStarted = studentProgress.filter(s => s.percentage === 0).length;
+    
+    return {
+      subjectId: subject.id,
+      subjectName: subject.name,
+      totalStudents,
+      avgProgress,
+      studentsCompleted,
+      studentsInProgress,
+      studentsNotStarted,
+    };
+  }));
+  
+  return summary;
+}

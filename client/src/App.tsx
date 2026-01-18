@@ -66,6 +66,7 @@ import StudentStatistics from "./pages/StudentStatistics";
 import StudentNotebook from "./pages/StudentNotebook";
 
 import { MistakeNotebook } from "./pages/MistakeNotebook";
+import PerformanceDashboard from "./pages/PerformanceDashboard";
 
 
 function Router() {
@@ -88,6 +89,7 @@ function Router() {
         <Route path={"/schedule"} component={Schedule} />
         <Route path={"/calendar"} component={Calendar} />
         <Route path={"/reports"} component={Reports} />
+        <Route path="/performance-dashboard" component={PerformanceDashboard} />
         <Route path={"/learning-analytics"} component={LearningAnalytics} />
         <Route path="/exercise-performance" component={ExercisePerformanceReport} />
 

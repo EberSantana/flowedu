@@ -6067,3 +6067,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover componente modal do aluno (ModuleGuideViewer.tsx)
 - [x] Remover botão "Ver Guia" da trilha do aluno
 - [x] Remover estados de guia do StudentLearningPathDetail
+
+## Dashboard de Desempenho dos Alunos (18/01/2026)
+- [x] Criar rotas tRPC para buscar dados de progresso por disciplina
+- [x] Criar página PerformanceDashboard.tsx
+- [x] Implementar tabela com resumo de desempenho por disciplina
+- [x] Implementar tabela com progresso individual dos alunos
+- [x] Adicionar filtro por disciplina
+- [x] Adicionar cards de resumo geral (total disciplinas, alunos, média, concluídos)
+- [x] Integrar ao menu do professor (quick actions)
+- [x] Adicionar rota /performance-dashboard no App.tsx
