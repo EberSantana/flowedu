@@ -6108,3 +6108,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Desabilitar rota OAuth callback
 - [x] Remover botão "Entrar com Google" da página TeacherLogin
 - [x] Testar e validar
+
+## Definir Senha Temporária para Admin (18/01/2026)
+- [x] Identificar email do administrador no banco
+- [x] Gerar hash bcrypt da senha "Admin@2026"
+- [x] Atualizar registro com passwordHash e loginMethod='email'
+- [x] Entregar credenciais ao usuário
+
+## Corrigir Role de Administrador (18/01/2026)
+- [x] Verificar role do usuário eberss@gmail.com no banco
+- [x] Atualizar role para 'admin' e approvalStatus para 'approved'
+- [x] Entregar solução ao usuário

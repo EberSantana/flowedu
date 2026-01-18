@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, email, loginMethod, role FROM users WHERE role = 'admin' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, email, loginMethod, role FROM users WHERE role = 'admin' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Eber da Silva de Santana",
+      "email": "eberss@gmail.com",
+      "loginMethod": "email",
+      "role": "admin"
+    },
+    {
+      "id": "3030005",
+      "name": "Eber da Silva de Santana",
+      "email": "eber.santana@hotmail.com",
+      "loginMethod": "email",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tloginMethod\trole\n1\tEber da Silva de Santana\teberss@gmail.com\temail\tadmin\n3030005\tEber da Silva de Santana\teber.santana@hotmail.com\temail\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 84
+}
