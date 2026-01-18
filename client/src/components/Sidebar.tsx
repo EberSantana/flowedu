@@ -320,10 +320,15 @@ export default function Sidebar() {
   };
   
   // Filtrar categorias baseado em permissões
+  console.log('[Sidebar Debug] User data:', { user, role: user?.role });
   const filteredCategories = teacherNavCategories.filter(cat => {
-    if (cat.adminOnly && user?.role !== "admin") return false;
+    if (cat.adminOnly && user?.role !== "admin") {
+      console.log('[Sidebar Debug] Filtering out admin category:', cat.label, 'user role:', user?.role);
+      return false;
+    }
     return true;
   });
+  console.log('[Sidebar Debug] Filtered categories:', filteredCategories.map(c => c.label));
 
   // Renderizar item de navegação
   const renderNavItem = (item: NavItem, inCategory: boolean = false) => {

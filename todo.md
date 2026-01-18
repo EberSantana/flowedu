@@ -6157,3 +6157,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar envio de email com link de recuperação
 - [x] Adicionar validação de token e expiração
 - [x] Funcionalidade completa e operacional
+
+## Investigar Problema de Login Admin (18/01/2026)
+- [x] Verificar dados do usuário eberss@gmail.com no banco (role: admin, approvalStatus: approved)
+- [x] Verificar se senha está correta (Admin@2026)
+- [x] Verificar role e approvalStatus (tudo correto no banco)
+- [x] Testar login e identificar erro específico (sessão antiga com role desatualizada)
+- [x] Criar página /clear-session para limpar cookies e forçar novo login
