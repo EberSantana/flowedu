@@ -46,9 +46,12 @@ export default function AdminUsers() {
   
   const { data: activeUsers, isLoading: activeLoading, refetch: refetchActive } = trpc.admin.listActiveUsers.useQuery();
   const { data: inactiveUsers, isLoading: inactiveLoading, refetch: refetchInactive } = trpc.admin.listInactiveUsers.useQuery();
+  const { data: pendingUsers, isLoading: pendingLoading, refetch: refetchPending } = trpc.admin.listPendingUsers.useQuery();
   
-  const baseUsers = showInactive ? inactiveUsers : activeUsers;
-  const usersLoading = showInactive ? inactiveLoading : activeLoading;
+  const [viewMode, setViewMode] = useState<'active' | 'inactive' | 'pending'>('active');
+  
+  const baseUsers = viewMode === 'pending' ? pendingUsers : (viewMode === 'inactive' ? inactiveUsers : activeUsers);
+  const usersLoading = viewMode === 'pending' ? pendingLoading : (viewMode === 'inactive' ? inactiveLoading : activeLoading);
   
   // Aplicar filtros
   const filteredUsers = useMemo(() => {
@@ -84,7 +87,28 @@ export default function AdminUsers() {
   const refetch = () => {
     refetchActive();
     refetchInactive();
+    refetchPending();
   };
+
+  const approveUserMutation = trpc.admin.approveUser.useMutation({
+    onSuccess: () => {
+      toast.success("Usuário aprovado com sucesso!");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+
+  const rejectUserMutation = trpc.admin.rejectUser.useMutation({
+    onSuccess: () => {
+      toast.success("Usuário rejeitado com sucesso!");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
 
   const updateRoleMutation = trpc.admin.updateUserRole.useMutation({
     onSuccess: () => {
@@ -220,23 +244,32 @@ export default function AdminUsers() {
                 </h1>
                 <p className="text-slate-600">Administre contas e permissões do sistema</p>
               </div>
-              <Button
-                variant="outline"
-              onClick={() => setShowInactive(!showInactive)}
-              className="flex items-center gap-2"
-            >
-              {showInactive ? (
-                <>
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === 'active' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('active')}
+                  className="flex items-center gap-2"
+                >
                   <Eye className="w-4 h-4" />
-                  Ver Usuários Ativos
-                </>
-              ) : (
-                <>
+                  Ativos
+                </Button>
+                <Button
+                  variant={viewMode === 'pending' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('pending')}
+                  className="flex items-center gap-2"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  Pendentes {pendingUsers && pendingUsers.length > 0 && `(${pendingUsers.length})`}
+                </Button>
+                <Button
+                  variant={viewMode === 'inactive' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('inactive')}
+                  className="flex items-center gap-2"
+                >
                   <EyeOff className="w-4 h-4" />
-                  Ver Usuários Inativos
-                </>
-              )}
-            </Button>
+                  Inativos
+                </Button>
+              </div>
             
 
             <Button
@@ -523,7 +556,38 @@ export default function AdminUsers() {
                     <TableCell>
                       {u.id !== user.id && (
                         <div className="flex gap-2">
-                          {showInactive ? (
+                          {viewMode === 'pending' ? (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm(`Tem certeza que deseja APROVAR o usuário ${u.name}?`)) {
+                                    approveUserMutation.mutate({ userId: u.id });
+                                  }
+                                }}
+                                disabled={approveUserMutation.isPending}
+                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                              >
+                                <RefreshCw className="w-4 h-4 mr-1" />
+                                Aprovar
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  if (confirm(`Tem certeza que deseja REJEITAR o cadastro de ${u.name}?`)) {
+                                    rejectUserMutation.mutate({ userId: u.id });
+                                  }
+                                }}
+                                disabled={rejectUserMutation.isPending}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Rejeitar
+                              </Button>
+                            </>
+                          ) : viewMode === 'inactive' ? (
                             <>
                               <Button 
                                 variant="outline" 

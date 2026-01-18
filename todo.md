@@ -6077,3 +6077,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar cards de resumo geral (total disciplinas, alunos, média, concluídos)
 - [x] Integrar ao menu do professor (quick actions)
 - [x] Adicionar rota /performance-dashboard no App.tsx
+
+## Corrigir Problemas de Cadastro e Login (18/01/2026)
+- [x] Investigar por que cadastros de professores não aparecem para aprovação
+- [x] Verificar rota de registro de professor e status inicial
+- [x] Corrigir página de gerenciamento de usuários para mostrar pendentes
+- [x] Adicionar botões Ativos/Pendentes/Inativos na interface
+- [x] Adicionar botões Aprovar/Rejeitar para usuários pendentes
+- [x] Remover criação automática de usuário administrador eberss@gmail.com
+- [x] Remover lógica de auto-criação de admin no login (db.ts upsertUser)
+- [x] Modificar getActiveUsers para filtrar apenas aprovados
+- [ ] Testar fluxo completo de cadastro e aprovação

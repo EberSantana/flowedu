@@ -199,9 +199,6 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
     }
 
     if (!values.lastSignedIn) {
@@ -727,7 +724,7 @@ export async function updateUserLastSignIn(userId: number, lastSignedIn: Date) {
 export async function getActiveUsers() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(users).where(eq(users.active, true)).orderBy(desc(users.createdAt));
+  return db.select().from(users).where(and(eq(users.active, true), eq(users.approvalStatus, 'approved'))).orderBy(desc(users.createdAt));
 }
 
 export async function getInactiveUsers() {
@@ -11204,3 +11201,4 @@ export async function getSubjectProgressSummary(userId: number) {
   
   return summary;
 }
+
