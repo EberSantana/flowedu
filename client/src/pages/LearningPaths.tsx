@@ -58,9 +58,6 @@ export default function LearningPaths() {
   const [editingModule, setEditingModule] = useState<any>(null);
   const [moduleTitle, setModuleTitle] = useState("");
   const [moduleDescription, setModuleDescription] = useState("");
-  const [guideTitle, setGuideTitle] = useState("");
-  const [guideContent, setGuideContent] = useState("");
-  const [guideType, setGuideType] = useState<"text" | "video" | "interactive" | "mixed">("text");
 
   // Topic dialog state
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
@@ -109,16 +106,6 @@ export default function LearningPaths() {
     },
     onError: error => {
       toast.error("Erro ao criar módulo: " + error.message);
-    },
-  });
-
-  const updateGuideMutation = trpc.learningPath.updateModuleGuide.useMutation({
-    onSuccess: () => {
-      utils.learningPath.getBySubject.invalidate();
-      toast.success("Guia de animacao salvo com sucesso!");
-    },
-    onError: error => {
-      toast.error("Erro ao salvar guia: " + error.message);
     },
   });
 
@@ -345,9 +332,6 @@ export default function LearningPaths() {
     setEditingModule(null);
     setModuleTitle("");
     setModuleDescription("");
-    setGuideTitle("");
-    setGuideContent("");
-    setGuideType("text");
   };
 
   const openTopicDialog = (moduleId: number, topic?: any) => {
@@ -387,16 +371,6 @@ export default function LearningPaths() {
         title: moduleTitle,
         description: moduleDescription || undefined,
       });
-      
-      // Salvar guia se preenchido
-      if (guideTitle.trim() && guideContent.trim()) {
-        updateGuideMutation.mutate({
-          moduleId: editingModule.id,
-          guideTitle: guideTitle,
-          guideContent: guideContent,
-          guideType: guideType,
-        });
-      }
     } else {
       if (!selectedSubjectId) return;
       createModuleMutation.mutate({
@@ -952,51 +926,6 @@ export default function LearningPaths() {
                     placeholder="Descreva o conteúdo deste módulo..."
                     rows={3}
                   />
-                </div>
-                <hr className="my-4" />
-                <div>
-                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4" />
-                    Guia de Animacao (opcional)
-                  </h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Titulo do Guia
-                      </label>
-                      <Input
-                        value={guideTitle}
-                        onChange={e => setGuideTitle(e.target.value)}
-                        placeholder="Ex: Como comecar com variaveis"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Tipo de Guia
-                      </label>
-                      <select
-                        value={guideType}
-                        onChange={e => setGuideType(e.target.value as any)}
-                        className="w-full px-3 py-2 border rounded-md text-sm"
-                      >
-                        <option value="text">Texto</option>
-                        <option value="video">Video</option>
-                        <option value="interactive">Interativo</option>
-                        <option value="mixed">Misto</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Conteudo do Guia (Markdown)
-                      </label>
-                      <Textarea
-                        value={guideContent}
-                        onChange={e => setGuideContent(e.target.value)}
-                        placeholder="Escreva o guia em Markdown"
-                        rows={4}
-                      />
-                    </div>
-                  </div>
                 </div>
               </div>
               <DialogFooter>

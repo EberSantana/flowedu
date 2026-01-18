@@ -6060,21 +6060,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar seção "Segurança" com formulário de alterar senha
 - [x] Adicionar feedback visual (sucesso/erro)
 
-## Guia de Animação por Módulo em Trilhas de Aprendizagem (17/01/2026)
-- [x] Analisar estrutura de módulos e trilhas (schema, rotas existentes)
-- [x] Adicionar campos de guia de animação no banco (moduleGuide, guideContent, guideType)
-- [x] Criar migration para adicionar novos campos (via SQL direto)
-- [x] Atualizar schema Drizzle com novos campos
-- [x] Sincronizar com banco de dados
-- [x] Criar rota tRPC para salvar/atualizar guia de animação (updateModuleGuide)
-- [x] Criar rota tRPC para buscar guia de animação (getModuleGuide)
-- [x] Criar rota tRPC para deletar guia de animação (deleteModuleGuide)
-- [x] Adicionar validação de permissão nas rotas (professor só pode editar seus módulos)
-- [x] Criar componente modal para visualização do guia (ModuleGuideViewer.tsx)
-- [x] Adicionar botão "Ver Guia" nos módulos do aluno
-- [x] Integrar modal na página StudentLearningPathDetail
-- [x] Adicionar interface no formulário de edição de módulo (professor)
-- [x] Integrar chamadas tRPC para salvar guia
-- [x] Adicionar campos de guia (título, conteúdo, tipo) no Dialog
-- [ ] Editor de texto rico para conteúdo do guia
-- [ ] Testar fluxo completo (professor cria guia → aluno visualiza)
+## Guia de Animação por Módulo em Trilhas de Aprendizagem (17/01/2026) - REMOVIDO
+- [x] Remover campos de guia do banco de dados
+- [x] Remover rotas tRPC de guia (getModuleGuide, updateModuleGuide, deleteModuleGuide)
+- [x] Remover interface do professor (campos no LearningPaths.tsx)
+- [x] Remover componente modal do aluno (ModuleGuideViewer.tsx)
+- [x] Remover botão "Ver Guia" da trilha do aluno
+- [x] Remover estados de guia do StudentLearningPathDetail

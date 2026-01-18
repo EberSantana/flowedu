@@ -10,7 +10,6 @@ import {
   AlertCircle, HelpCircle, Smile, Meh, Frown, Sparkles
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
-import { ModuleGuideViewer } from "@/components/ModuleGuideViewer";
 import { useRoute, Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,8 +23,6 @@ export default function StudentLearningPathDetail() {
   const [selectedTopic, setSelectedTopic] = useState<any>(null);
   const [journalContent, setJournalContent] = useState("");
   const [doubtQuestion, setDoubtQuestion] = useState("");
-  const [selectedModuleForGuide, setSelectedModuleForGuide] = useState<any>(null);
-  const [showGuideModal, setShowGuideModal] = useState(false);
 
   // Buscar trilha completa
   const { data: learningPath, isLoading, refetch } = trpc.student.getEnhancedLearningPath.useQuery(
@@ -231,20 +228,7 @@ export default function StudentLearningPathDetail() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {module.guideTitle && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedModuleForGuide(module);
-                            setShowGuideModal(true);
-                          }}
-                          className="gap-2"
-                        >
-                          <BookOpen className="w-4 h-4" />
-                          Ver Guia
-                        </Button>
-                      )}
+
                       <Badge className="bg-primary/20 text-primary">
                         {moduleCompletedTopics}/{module.topics?.length || 0} tópicos
                       </Badge>
@@ -408,18 +392,7 @@ export default function StudentLearningPathDetail() {
         )}
       </div>
 
-      {/* Modal do Guia de Animação */}
-      {selectedModuleForGuide && (
-        <ModuleGuideViewer
-          moduleId={selectedModuleForGuide.id}
-          moduleName={selectedModuleForGuide.title}
-          isOpen={showGuideModal}
-          onClose={() => {
-            setShowGuideModal(false);
-            setSelectedModuleForGuide(null);
-          }}
-        />
-      )}
+
     </StudentLayout>
   );
 }
