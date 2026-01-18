@@ -121,7 +121,6 @@ export const appRouter = router({
         name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
         email: z.string().email("E-mail inválido"),
         password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
-        inviteCode: z.string().optional(), // Código de convite opcional
       }))
       .mutation(async ({ ctx, input }) => {
         // Verificar se e-mail já existe
@@ -133,53 +132,22 @@ export const appRouter = router({
         // Hash da senha
         const passwordHash = await bcrypt.hash(input.password, 10);
 
-        // Criar professor (com ou sem código de convite)
+        // Criar professor com status pendente (sempre aguarda aprovação do admin)
         const result = await db.createTeacherWithPassword({
           name: input.name,
           email: input.email,
           passwordHash,
-          inviteCode: input.inviteCode,
         });
 
         if (!result) {
           throw new Error("Erro ao criar conta. Tente novamente.");
         }
 
-        // Se o cadastro ficou pendente, não criar sessão
-        if (result.approvalStatus === 'pending') {
-          return {
-            success: true,
-            pending: true,
-            message: "Sua solicitação de cadastro foi enviada e está aguardando aprovação do administrador.",
-          };
-        }
-
-        // Buscar usuário criado para criar sessão
-        const user = await db.getUserByEmail(input.email);
-        if (!user) {
-          throw new Error("Erro ao criar sessão. Tente fazer login.");
-        }
-
-        // Criar sessão JWT standalone (sem dependência do OAuth Manus)
-        const token = await createStandaloneSession(user, {
-          expiresInMs: 7 * 24 * 60 * 60 * 1000, // 7 dias
-        });
-
-        // Configurar cookie de sessão
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, token, {
-          ...cookieOptions,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
-        });
-
+        // Todos os cadastros agora ficam pendentes de aprovação
         return {
           success: true,
-          pending: false,
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-          },
+          pending: true,
+          message: "Sua solicitação de cadastro foi enviada e está aguardando aprovação do administrador.",
         };
       }),
 

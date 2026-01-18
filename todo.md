@@ -6046,3 +6046,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar rota admin.createUser para aceitar senha inicial
 - [x] Atualizar formulário de cadastro para incluir campo de senha
 - [x] Remover botão "Reenviar Convite" da página de usuários
+
+## Remover Código de Convite do Cadastro de Professor (17/01/2026)
+- [x] Remover campo "Código de Convite" da página TeacherRegister.tsx
+- [x] Remover validação de código de convite do backend
+- [x] Simplificar fluxo de cadastro (todos cadastros vão para aprovação do admin)

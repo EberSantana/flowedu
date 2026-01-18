@@ -6,34 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { UserPlus, Mail, Lock, User, ArrowLeft, Loader2, CheckCircle, Eye, EyeOff, Ticket, Clock, AlertCircle } from "lucide-react";
+import { UserPlus, Mail, Lock, User, ArrowLeft, Loader2, CheckCircle, Eye, EyeOff, Clock, AlertCircle } from "lucide-react";
 
-type RegistrationStatus = 'form' | 'approved' | 'pending';
+type RegistrationStatus = 'form' | 'pending';
 
 export default function TeacherRegister() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus>('form');
 
   const registerMutation = trpc.auth.registerTeacher.useMutation({
-    onSuccess: (data) => {
-      if (data.pending) {
-        // Cadastro pendente de aprovação
-        toast.success("Solicitação enviada!");
-        setRegistrationStatus('pending');
-      } else {
-        // Cadastro aprovado automaticamente (com código de convite válido)
-        toast.success("Conta criada com sucesso!");
-        setRegistrationStatus('approved');
-        
-        // Redirecionar após 1.5 segundos
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 1500);
-      }
+    onSuccess: () => {
+      // Todos os cadastros vão para aprovação do admin
+      toast.success("Solicitação enviada!");
+      setRegistrationStatus('pending');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -44,7 +32,6 @@ export default function TeacherRegister() {
     e.preventDefault();
     const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
-    const trimmedInviteCode = inviteCode.trim().toUpperCase();
 
     if (!trimmedName) {
       toast.error("Digite seu nome");
@@ -75,34 +62,10 @@ export default function TeacherRegister() {
       name: trimmedName,
       email: trimmedEmail,
       password: password,
-      inviteCode: trimmedInviteCode || undefined,
     });
   };
 
-  // Tela de cadastro aprovado (com código de convite)
-  if (registrationStatus === 'approved') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="pt-8 pb-8">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Conta Criada!</h2>
-            <p className="text-gray-600 mb-4">
-              Sua conta foi criada com sucesso. Redirecionando para o sistema...
-            </p>
-            <div className="flex items-center justify-center gap-2 text-purple-600">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Aguarde...</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Tela de cadastro pendente (sem código de convite)
+  // Tela de cadastro pendente
   if (registrationStatus === 'pending') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
@@ -164,30 +127,6 @@ export default function TeacherRegister() {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Código de Convite (opcional) */}
-              <div className="space-y-2">
-                <Label htmlFor="inviteCode" className="flex items-center gap-2">
-                  Código de Convite
-                  <span className="text-xs text-gray-400 font-normal">(opcional)</span>
-                </Label>
-                <div className="relative">
-                  <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="inviteCode"
-                    type="text"
-                    placeholder="Ex: ABC123"
-                    className="pl-10 uppercase"
-                    value={inviteCode}
-                    onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                    disabled={registerMutation.isPending}
-                    autoComplete="off"
-                  />
-                </div>
-                <p className="text-xs text-gray-500">
-                  Com código de convite válido, sua conta é aprovada automaticamente
-                </p>
-              </div>
-
               {/* Nome */}
               <div className="space-y-2">
                 <Label htmlFor="name">Nome Completo</Label>
@@ -258,13 +197,11 @@ export default function TeacherRegister() {
               </div>
 
               {/* Aviso sobre aprovação */}
-              {!inviteCode && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-xs text-blue-700">
-                    <strong>Sem código de convite?</strong> Seu cadastro será enviado para aprovação do administrador.
-                  </p>
-                </div>
-              )}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-700">
+                  <strong>Atenção:</strong> Seu cadastro será enviado para aprovação do administrador.
+                </p>
+              </div>
 
               {/* Botão de Cadastro */}
               <Button
@@ -275,12 +212,12 @@ export default function TeacherRegister() {
                 {registerMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Criando conta...
+                    Enviando solicitação...
                   </>
                 ) : (
                   <>
                     <UserPlus className="h-4 w-4 mr-2" />
-                    {inviteCode ? "Criar Conta" : "Solicitar Cadastro"}
+                    Solicitar Cadastro
                   </>
                 )}
               </Button>
