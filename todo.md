@@ -6125,3 +6125,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Deletar usuários duplicados com role='user'
 - [x] Verificar que apenas 1 usuário admin permanece
 - [x] Entregar solução ao usuário
+
+## Adicionar Constraint UNIQUE no Email (18/01/2026)
+- [x] Atualizar schema Drizzle adicionando .unique() no campo email
+- [x] Aplicar alteração no banco de dados via SQL (ALTER TABLE users ADD UNIQUE INDEX)
+- [x] Constraint UNIQUE aplicada com sucesso
