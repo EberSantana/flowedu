@@ -11202,3 +11202,21 @@ export async function getSubjectProgressSummary(userId: number) {
   return summary;
 }
 
+
+
+/**
+ * Migrar conta Google para conta com email/senha
+ */
+export async function migrateGoogleAccountToEmail(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ 
+      passwordHash,
+      loginMethod: 'email',
+      updatedAt: new Date()
+    })
+    .where(eq(users.id, userId));
+  return true;
+}

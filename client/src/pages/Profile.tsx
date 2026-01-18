@@ -57,6 +57,31 @@ export default function Profile() {
     },
   });
 
+  const [googlePasswordData, setGooglePasswordData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [showGooglePasswords, setShowGooglePasswords] = useState({
+    new: false,
+    confirm: false,
+  });
+
+  const setGooglePasswordMutation = trpc.auth.setPasswordForGoogleAccount.useMutation({
+    onSuccess: () => {
+      toast.success("Senha definida com sucesso! Voc\u00ea agora pode fazer login com email e senha.");
+      setGooglePasswordData({
+        newPassword: "",
+        confirmPassword: "",
+      });
+      // Recarregar p\u00e1gina para atualizar informa\u00e7\u00f5es do usu\u00e1rio
+      setTimeout(() => window.location.reload(), 2000);
+    },
+    onError: (error) => {
+      toast.error(`Erro ao definir senha: ${error.message}`);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfileMutation.mutate(formData);
@@ -81,7 +106,7 @@ export default function Profile() {
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("As senhas não coincidem");
+      toast.error("As senhas n\u00e3o coincidem");
       return;
     }
 
@@ -91,6 +116,27 @@ export default function Profile() {
     }
 
     changePasswordMutation.mutate(passwordData);
+  };
+
+  const handleSetGooglePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!googlePasswordData.newPassword) {
+      toast.error("Digite a nova senha");
+      return;
+    }
+
+    if (googlePasswordData.newPassword.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    if (googlePasswordData.newPassword !== googlePasswordData.confirmPassword) {
+      toast.error("As senhas n\u00e3o coincidem");
+      return;
+    }
+
+    setGooglePasswordMutation.mutate(googlePasswordData);
   };
 
   const handleLogout = async () => {
@@ -238,17 +284,83 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          {/* Segurança - Alterar Senha */}
+          {/* Segurança - Definir/Alterar Senha */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="w-5 h-5" />
                 Segurança
               </CardTitle>
-              <CardDescription>Altere sua senha de acesso</CardDescription>
+              <CardDescription>
+                {user.loginMethod === 'google' 
+                  ? 'Defina uma senha para fazer login com email e senha' 
+                  : 'Altere sua senha de acesso'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleChangePassword} className="space-y-4">
+              {user.loginMethod === 'google' ? (
+                <form onSubmit={handleSetGooglePassword} className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                    <p className="text-sm text-blue-800">
+                      <strong>Atenção:</strong> Você está usando login com Google. 
+                      Defina uma senha para poder fazer login com email e senha também.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="googleNewPassword">Nova Senha</Label>
+                    <div className="relative">
+                      <input
+                        id="googleNewPassword"
+                        type={showGooglePasswords.new ? "text" : "password"}
+                        value={googlePasswordData.newPassword}
+                        onChange={(e) => setGooglePasswordData({ ...googlePasswordData, newPassword: e.target.value })}
+                        placeholder="Digite a nova senha (mínimo 6 caracteres)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                        disabled={setGooglePasswordMutation.isPending}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowGooglePasswords({ ...showGooglePasswords, new: !showGooglePasswords.new })}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showGooglePasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="googleConfirmPassword">Confirmar Nova Senha</Label>
+                    <div className="relative">
+                      <input
+                        id="googleConfirmPassword"
+                        type={showGooglePasswords.confirm ? "text" : "password"}
+                        value={googlePasswordData.confirmPassword}
+                        onChange={(e) => setGooglePasswordData({ ...googlePasswordData, confirmPassword: e.target.value })}
+                        placeholder="Confirme a nova senha"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                        disabled={setGooglePasswordMutation.isPending}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowGooglePasswords({ ...showGooglePasswords, confirm: !showGooglePasswords.confirm })}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showGooglePasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={setGooglePasswordMutation.isPending}
+                    className="w-full"
+                  >
+                    {setGooglePasswordMutation.isPending ? "Definindo..." : "Definir Senha"}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleChangePassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="currentPassword">Senha Atual</Label>
                   <div className="relative">
@@ -323,6 +435,7 @@ export default function Profile() {
                   {changePasswordMutation.isPending ? "Alterando..." : "Alterar Senha"}
                 </Button>
               </form>
+              )}
             </CardContent>
           </Card>
 

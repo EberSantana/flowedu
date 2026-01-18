@@ -6088,3 +6088,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover lógica de auto-criação de admin no login (db.ts upsertUser)
 - [x] Modificar getActiveUsers para filtrar apenas aprovados
 - [ ] Testar fluxo completo de cadastro e aprovação
+
+## Migração de Conta de Administrador e Remoção de Login com Google (18/01/2026)
+- [x] Criar rota tRPC auth.setPasswordForGoogleAccount para definir senha em conta existente
+- [x] Adicionar validação para garantir que apenas contas Google possam usar essa rota
+- [x] Criar função migrateGoogleAccountToEmail no db.ts
+- [x] Criar interface de definição de senha na página de perfil
+- [x] Adicionar indicador visual mostrando método de login atual
+- [x] Adicionar formulário condicional (Google vs Email)
+- [ ] Testar migração completa (Google → Email/Senha)
+- [ ] Remover botão "Entrar com Google" das páginas de login
+- [ ] Remover rotas OAuth do backend
+- [ ] Limpar código relacionado a autenticação Google

@@ -368,6 +368,44 @@ export const appRouter = router({
 
         return { success: true, message: "Senha alterada com sucesso!" };
       }),
+
+    // Definir senha para conta que usa login com Google
+    setPasswordForGoogleAccount: protectedProcedure
+      .input(z.object({
+        newPassword: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+        confirmPassword: z.string().min(6, "Confirma\u00e7\u00e3o de senha deve ter pelo menos 6 caracteres"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Validar se as senhas coincidem
+        if (input.newPassword !== input.confirmPassword) {
+          throw new Error("As senhas n\u00e3o coincidem");
+        }
+
+        // Buscar usu\u00e1rio
+        const users = await db.getAllUsers();
+        const user = users.find(u => u.id === ctx.user.id);
+
+        if (!user) {
+          throw new Error("Usu\u00e1rio n\u00e3o encontrado");
+        }
+
+        // Verificar se \u00e9 conta Google
+        if (user.loginMethod !== 'google') {
+          throw new Error("Esta fun\u00e7\u00e3o \u00e9 apenas para contas que usam login com Google");
+        }
+
+        // Hash da nova senha
+        const passwordHash = await bcrypt.hash(input.newPassword, 10);
+
+        // Atualizar senha e mudar loginMethod para 'email'
+        const updated = await db.migrateGoogleAccountToEmail(ctx.user.id, passwordHash);
+        
+        if (!updated) {
+          throw new Error("Erro ao definir senha");
+        }
+
+        return { success: true, message: "Senha definida com sucesso! Agora voc\u00ea pode fazer login com email e senha." };
+      }),
   }),
 
   subjects: router({
