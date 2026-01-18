@@ -6073,6 +6073,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar componente modal para visualização do guia (ModuleGuideViewer.tsx)
 - [x] Adicionar botão "Ver Guia" nos módulos do aluno
 - [x] Integrar modal na página StudentLearningPathDetail
-- [ ] Adicionar interface no formulário de edição de módulo (professor)
+- [x] Adicionar interface no formulário de edição de módulo (professor)
+- [x] Integrar chamadas tRPC para salvar guia
+- [x] Adicionar campos de guia (título, conteúdo, tipo) no Dialog
 - [ ] Editor de texto rico para conteúdo do guia
 - [ ] Testar fluxo completo (professor cria guia → aluno visualiza)
