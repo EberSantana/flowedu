@@ -1,0 +1,15 @@
+{
+  "query": "\n-- Primeiro verificar se o usuário já existe\nSELECT id, email, role FROM users WHERE email = 'eber.santana@hotmail.com';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \n-- Primeiro verificar se o usuário já existe\nSELECT id, email, role FROM users WHERE email = 'eber.santana@hotmail.com';\n",
+  "rows": [
+    {
+      "id": "3030005",
+      "email": "eber.santana@hotmail.com",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\n3030005\teber.santana@hotmail.com\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 748
+}

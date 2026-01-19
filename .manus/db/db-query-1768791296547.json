@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT id, name, email, role, approvalStatus, active FROM users WHERE email = 'eber.santana@hotmail.com';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \nSELECT id, name, email, role, approvalStatus, active FROM users WHERE email = 'eber.santana@hotmail.com';\n",
+  "rows": [
+    {
+      "id": "3030005",
+      "name": "Eber da Silva de Santana",
+      "email": "eber.santana@hotmail.com",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tapprovalStatus\tactive\n3030005\tEber da Silva de Santana\teber.santana@hotmail.com\tadmin\tapproved\t1\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

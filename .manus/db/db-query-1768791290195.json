@@ -1,0 +1,9 @@
+{
+  "query": "\nUPDATE users \nSET \n  passwordHash = '$2b$10$IZO5ERv2C83wozLjvHpKR.2KC8N39zwvH9Q93CWIurPj7sg8CwB4u',\n  role = 'admin',\n  approvalStatus = 'approved',\n  active = 1,\n  updatedAt = NOW()\nWHERE email = 'eber.santana@hotmail.com';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \nUPDATE users \nSET \n  passwordHash = '$2b$10$IZO5ERv2C83wozLjvHpKR.2KC8N39zwvH9Q93CWIurPj7sg8CwB4u',\n  role = 'admin',\n  approvalStatus = 'approved',\n  active = 1,\n  updatedAt = NOW()\nWHERE email = 'eber.santana@hotmail.com';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 173
+}

@@ -6193,3 +6193,25 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover rota do Dashboard no App.tsx
 - [x] Verificar links no menu/sidebar (nenhum encontrado)
 - [x] Dashboard de Desempenho completamente removido
+
+## Criar Usuário Administrador (19/01/2026)
+- [ ] Criar script para inserir admin no banco
+- [ ] Email: eber.santana@hotmail.com
+- [ ] Senha: 881154*/@Flow
+- [ ] Role: admin
+- [ ] ApprovalStatus: approved
+- [ ] Executar e validar
+
+## Problema: Não Consegue Configurar Turnos e Criar Disciplinas (19/01/2026)
+- [ ] Testar funcionalidade de criar disciplina no navegador
+- [ ] Testar funcionalidade de configurar turnos no navegador
+- [ ] Identificar erros ou bloqueios na interface
+- [ ] Verificar se há erros no console do navegador
+- [ ] Corrigir problemas identificados
+
+## Remover Card Desempenho das Ações Rápidas (19/01/2026)
+- [x] Identificar onde está o card Desempenho no código (Dashboard.tsx linha 177)
+- [x] Remover card Desempenho do Dashboard
+- [x] Verificar se há rotas relacionadas a desempenho (nenhuma encontrada)
+- [x] Página PerformanceDashboard já foi removida anteriormente
+- [x] Card Desempenho completamente removido
