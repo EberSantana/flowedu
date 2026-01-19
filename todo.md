@@ -6186,3 +6186,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Gerar tópicos automaticamente para cada módulo
 - [x] Distribuir carga horária proporcionalmente
 - [ ] Criar testes para geração de módulos
+
+## Remover Dashboard de Desempenho (19/01/2026)
+- [x] Identificar página/componente Dashboard de Desempenho (PerformanceDashboard.tsx)
+- [x] Remover arquivo PerformanceDashboard.tsx
+- [x] Remover rota do Dashboard no App.tsx
+- [x] Verificar links no menu/sidebar (nenhum encontrado)
+- [x] Dashboard de Desempenho completamente removido
