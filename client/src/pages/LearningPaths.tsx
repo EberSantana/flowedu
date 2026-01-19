@@ -1025,13 +1025,15 @@ export default function LearningPaths() {
                     <Input
                       type="number"
                       value={workload}
-                      readOnly
-                      className="bg-muted cursor-not-allowed"
+                      onChange={(e) => setWorkload(Number(e.target.value))}
+                      min={1}
+                      max={1000}
+                      placeholder="Ex: 60"
                     />
                     <span className="text-sm text-muted-foreground">horas</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    A carga horária é obtida automaticamente da disciplina selecionada.
+                    A carga horária é preenchida automaticamente da disciplina, mas você pode editá-la.
                     A IA distribuirá as horas EXATAMENTE conforme este valor.
                   </p>
                 </div>

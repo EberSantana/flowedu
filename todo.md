@@ -6254,3 +6254,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Integrar breadcrumbs no StudentLayout (Portal do Aluno)
 - [x] Adicionar breadcrumbs nas páginas principais (Subjects, Classes, Shifts, LearningPaths e outras)
 - [x] Testar navegação com breadcrumbs
+
+## Correção - Campo de Carga Horária (19/01/2026)
+
+- [x] Corrigir campo de carga horária no diálogo "Gerar Trilha com IA" para permitir edição manual
