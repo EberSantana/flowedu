@@ -72,6 +72,8 @@ export default function LearningPaths() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
   const [syllabusText, setSyllabusText] = useState("");
   const [workload, setWorkload] = useState<number>(60);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [estimatedModules, setEstimatedModules] = useState<number>(4);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isInfographicDialogOpen, setIsInfographicDialogOpen] = useState(false);
@@ -589,7 +591,15 @@ export default function LearningPaths() {
                     <div className="flex gap-2 flex-1 sm:flex-initial flex-wrap">
                       <Button
                         variant="outline"
-                        onClick={() => setIsAIDialogOpen(true)}
+                        onClick={() => {
+                          const selectedSubject = subjects?.find(s => s.id === selectedSubjectId);
+                          if (!selectedSubject?.workload || selectedSubject.workload === 0) {
+                            toast.error("Esta disciplina não possui carga horária definida. Configure a carga horária antes de gerar trilhas.");
+                            return;
+                          }
+                          setWorkload(selectedSubject.workload);
+                          setIsAIDialogOpen(true);
+                        }}
                         className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 flex-1 sm:flex-initial"
                       >
                         <Sparkles className="h-4 w-4 mr-2" />
@@ -668,12 +678,20 @@ export default function LearningPaths() {
 
                       {/* Botões de ação */}
                       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Button
-                          onClick={() => setIsAIDialogOpen(true)}
+                      <Button
+                          onClick={() => {
+                            const selectedSubject = subjects?.find(s => s.id === selectedSubjectId);
+                            if (!selectedSubject?.workload || selectedSubject.workload === 0) {
+                              toast.error("Esta disciplina não possui carga horária definida. Configure a carga horária antes de gerar trilhas.");
+                              return;
+                            }
+                            setWorkload(selectedSubject.workload);
+                            setIsAIDialogOpen(true);
+                          }}
                           className="bg-purple-600 hover:bg-purple-700"
                           size="lg"
                         >
-                          <Sparkles className="h-5 w-5 mr-2" />
+                          <Sparkles className="h-5 h-5 mr-2" />
                           Gerar com IA
                         </Button>
                         <Button
@@ -1025,7 +1043,11 @@ export default function LearningPaths() {
                     <Input
                       type="number"
                       value={workload}
-                      onChange={(e) => setWorkload(Number(e.target.value))}
+                      onChange={(e) => {
+                        const newWorkload = Number(e.target.value);
+                        setWorkload(newWorkload);
+                        setSelectedTemplate(null); // Reset template when workload changes
+                      }}
                       min={1}
                       max={1000}
                       placeholder="Ex: 60"
@@ -1037,6 +1059,72 @@ export default function LearningPaths() {
                     A IA distribuirá as horas EXATAMENTE conforme este valor.
                   </p>
                 </div>
+                
+                {/* Templates de Distribuição */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Sugestões de Distribuição (Opcional)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { modules: 3, label: `3 módulos de ${Math.round(workload / 3)}h` },
+                      { modules: 4, label: `4 módulos de ${Math.round(workload / 4)}h` },
+                      { modules: 5, label: `5 módulos de ${Math.round(workload / 5)}h` },
+                      { modules: 6, label: `6 módulos de ${Math.round(workload / 6)}h` },
+                    ].map((template) => (
+                      <Button
+                        key={template.modules}
+                        type="button"
+                        variant={selectedTemplate === template.label ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          setSelectedTemplate(template.label);
+                          setEstimatedModules(template.modules);
+                        }}
+                        className="text-xs"
+                      >
+                        {template.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Selecione uma sugestão para orientar a IA na distribuição das horas.
+                  </p>
+                </div>
+                
+                {/* Preview da Distribuição */}
+                {selectedTemplate && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-5 h-5 text-purple-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-sm text-purple-900 mb-2">
+                          Preview da Distribuição
+                        </h4>
+                        <div className="space-y-2">
+                          <p className="text-xs text-purple-700">
+                            <strong>Carga Horária Total:</strong> {workload} horas
+                          </p>
+                          <p className="text-xs text-purple-700">
+                            <strong>Distribuição Sugerida:</strong> {selectedTemplate}
+                          </p>
+                          <div className="mt-3 space-y-1">
+                            {Array.from({ length: estimatedModules }).map((_, i) => (
+                              <div key={i} className="flex items-center gap-2 text-xs text-purple-600">
+                                <div className="w-2 h-2 rounded-full bg-purple-400" />
+                                Módulo {i + 1}: ~{Math.round(workload / estimatedModules)} horas
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-xs text-purple-600 mt-2 italic">
+                            * A IA ajustará a distribuição final com base no conteúdo da ementa.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div>
                   <label className="text-sm font-medium mb-2 block">
                     Ementa da Disciplina *
