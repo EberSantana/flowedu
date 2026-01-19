@@ -43,9 +43,9 @@ export function FeatureGuard({ children, requiredProfile, featureName }: Feature
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/profile-selection">
+            <Link href="/profile">
               <Button className="w-full">
-                Selecionar Perfil
+                Ir para Perfil
               </Button>
             </Link>
           </CardContent>
@@ -105,10 +105,10 @@ export function FeatureGuard({ children, requiredProfile, featureName }: Feature
           </div>
 
           <div className="flex gap-3 pt-2">
-            <Link href="/profile-selection" className="flex-1">
+            <Link href="/profile" className="flex-1">
               <Button className="w-full gap-2">
                 <Sparkles className="h-4 w-4" />
-                Trocar de Perfil
+                Ir para Perfil
               </Button>
             </Link>
             <Link href="/dashboard" className="flex-1">

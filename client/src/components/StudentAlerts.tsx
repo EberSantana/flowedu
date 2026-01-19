@@ -187,9 +187,9 @@ export function StudentAlerts() {
                 Ver todos os avisos
               </Button>
             </Link>
-            <Link href="/student-tasks" className="flex-1">
+            <Link href="/student-exercises" className="flex-1">
               <Button variant="outline" size="sm" className="w-full text-xs">
-                Ver todas as tarefas
+                Ver todos os exercícios
               </Button>
             </Link>
           </div>

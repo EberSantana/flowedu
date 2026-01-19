@@ -95,12 +95,7 @@ const ONBOARDING_STEPS: Record<string, OnboardingStep[]> = {
       icon: <Lightbulb className="h-12 w-12 text-amber-600" />,
       targetElement: "[href='/active-methodologies']",
     },
-    {
-      title: "Projetos Interdisciplinares",
-      description: "Crie e gerencie projetos que integram múltiplas disciplinas e envolvem grupos de alunos.",
-      icon: <Users className="h-12 w-12 text-blue-600" />,
-      targetElement: "[href='/interactive-projects']",
-    },
+
     {
       title: "Trilhas de Aprendizagem Gamificadas",
       description: "Combine projetos com trilhas gamificadas para engajar seus alunos de forma inovadora.",
