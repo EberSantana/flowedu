@@ -227,37 +227,35 @@ export default function StudentLearningPaths() {
                               <span className="text-gray-900 font-bold">{Math.round(progress)}%</span>
                             </div>
                             <Progress value={progress} className="h-2" />
+                            {progress === 0 && totalTopics > 0 && (
+                              <p className="text-xs text-gray-500 italic">
+                                Comece a estudar os tópicos para ver seu progresso aqui!
+                              </p>
+                            )}
                           </div>
 
-                          {/* Estatísticas Rápidas - Layout igual ao de Estatísticas */}
-                          <div className="grid grid-cols-4 gap-2 pt-2 border-t">
+                          {/* Estatísticas Rápidas */}
+                          <div className="grid grid-cols-3 gap-3 pt-2 border-t">
                             <div className="text-center">
-                              <CheckCircle2 className="w-4 h-4 mx-auto mb-1 text-gray-400" />
+                              <CheckCircle2 className="w-5 h-5 mx-auto mb-1 text-gray-400" />
                               <div className="text-lg font-bold text-gray-900">
                                 {completedTopics}
                               </div>
                               <div className="text-xs text-gray-500">Concluídos</div>
                             </div>
                             <div className="text-center">
-                              <Target className="w-4 h-4 mx-auto mb-1 text-gray-400" />
+                              <Target className="w-5 h-5 mx-auto mb-1 text-gray-400" />
                               <div className="text-lg font-bold text-gray-900">
                                 {totalTopics}
                               </div>
                               <div className="text-xs text-gray-500">Total</div>
                             </div>
                             <div className="text-center">
-                              <BookOpen className="w-4 h-4 mx-auto mb-1 text-gray-400" />
+                              <BookOpen className="w-5 h-5 mx-auto mb-1 text-gray-400" />
                               <div className="text-lg font-bold text-gray-900">
                                 {subjectStats?.totalModules || 0}
                               </div>
                               <div className="text-xs text-gray-500">Módulos</div>
-                            </div>
-                            <div className="text-center">
-                              <Clock className="w-4 h-4 mx-auto mb-1 text-gray-400" />
-                              <div className="text-lg font-bold text-gray-900">
-                                {subjectStats?.workload || 0}h
-                              </div>
-                              <div className="text-xs text-gray-500">Carga</div>
                             </div>
                           </div>
 

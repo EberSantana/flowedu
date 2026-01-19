@@ -6361,3 +6361,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Implementar verificação de e-mail no cadastro (Alta prioridade) - GUIA CRIADO: GUIA_VERIFICACAO_EMAIL.md
 - [ ] Configurar monitoramento e alertas de uptime (Alta prioridade) - GUIA CRIADO: GUIA_MONITORAMENTO.md
 - [ ] Configurar rotação de logs centralizados (Média prioridade) - GUIA CRIADO: GUIA_LOGS_CENTRALIZADOS.md
+
+
+## 🐛 Correção Portal do Aluno - Trilhas (19/01/2026)
+- [x] Corrigir barra de progresso - funciona corretamente, adicionada mensagem quando 0%
+- [x] Remover indicador de "Carga" (60h) duplicado do card
