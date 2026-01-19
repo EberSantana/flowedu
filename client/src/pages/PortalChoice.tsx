@@ -1,7 +1,6 @@
 // Version: 2026-01-15-v3 - Cards com altura igual
 import { Link } from "wouter";
-import { GraduationCap, Users, Mail, LogIn, Shield, BookOpen, Award, TrendingUp } from "lucide-react";
-import { getLoginUrl } from "@/const";
+import { GraduationCap, Users, Mail, Shield, BookOpen, Award, TrendingUp } from "lucide-react";
 
 export default function PortalChoice() {
   return (
@@ -354,8 +353,8 @@ export default function PortalChoice() {
                   {/* Área de botões - flex-grow para empurrar para baixo */}
                   <div className="flex-grow" />
 
-                  {/* Botões de Login */}
-                  <div className="space-y-3 w-full max-w-xs mb-4">
+                  {/* Botão de Login */}
+                  <div className="w-full max-w-xs mb-4">
                     <Link href="/login-professor" className="block">
                       <div className="relative">
                         <div 
@@ -379,20 +378,6 @@ export default function PortalChoice() {
                         </div>
                       </div>
                     </Link>
-                    
-                    <a href={getLoginUrl()} className="block">
-                      <div 
-                        className="inline-flex items-center justify-center w-full px-6 py-3.5 rounded-xl font-semibold text-white transition-all duration-300 hover:bg-white/20"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          backdropFilter: 'blur(8px)',
-                          border: '1px solid rgba(255, 255, 255, 0.2)'
-                        }}
-                      >
-                        <LogIn className="w-5 h-5 mr-2" />
-                        Entrar com Google/GitHub
-                      </div>
-                    </a>
                   </div>
 
                   <div className="text-sm" style={{ color: '#94a3b8' }}>

@@ -6258,3 +6258,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Correção - Campo de Carga Horária (19/01/2026)
 
 - [x] Corrigir campo de carga horária no diálogo "Gerar Trilha com IA" para permitir edição manual
+
+## Remoção de Botão OAuth (19/01/2026)
+
+- [x] Remover botão "Entrar com Google/GitHub" do Portal do Professor na página de escolha de portal
