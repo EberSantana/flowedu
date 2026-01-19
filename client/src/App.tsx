@@ -70,7 +70,7 @@ const StudentLearningJournal = lazy(() => import("./pages/StudentLearningJournal
 const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
-const MistakeNotebook = lazy(() => import("./pages/MistakeNotebook").then(m => ({ default: m.MistakeNotebook })));
+// MistakeNotebook removido - funcionalidade consolidada em StudentSmartReview
 
 // Lazy loaded pages - Auth
 const Register = lazy(() => import("./pages/Register"));
@@ -144,7 +144,7 @@ function Router() {
           <Route path={"/student/doubts"} component={StudentDoubts} />
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
-          <Route path={"/student/mistake-notebook"} component={MistakeNotebook} />
+          {/* MistakeNotebook removido - usar /student/smart-review */}
 
           {/* 404 */}
           <Route path={"/404"} component={NotFound} />
