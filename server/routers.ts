@@ -2087,6 +2087,73 @@ Diretrizes OBRIGATÓRIAS:
           : JSON.stringify(response.choices[0].message.content);
         const result = JSON.parse(content || '{}');
         
+        // Calcular total de horas geradas pela IA
+        let totalGeneratedHours = 0;
+        for (const module of result.modules) {
+          for (const topic of module.topics) {
+            totalGeneratedHours += topic.estimatedHours || 0;
+          }
+        }
+        
+        // Se a soma não for igual à carga horária, redistribuir proporcionalmente
+        if (totalGeneratedHours !== totalWorkload && totalGeneratedHours > 0) {
+          const ratio = totalWorkload / totalGeneratedHours;
+          let adjustedTotal = 0;
+          const allTopics: any[] = [];
+          
+          // Coletar todos os tópicos e ajustar horas
+          for (const module of result.modules) {
+            for (const topic of module.topics) {
+              const adjustedHours = Math.round(topic.estimatedHours * ratio);
+              topic.estimatedHours = Math.max(1, adjustedHours); // Mínimo 1 hora
+              
+              // Redistribuir as horas internas proporcionalmente
+              const internalTotal = topic.theoryHours + topic.practiceHours + topic.individualWorkHours + topic.teamWorkHours;
+              if (internalTotal > 0) {
+                const internalRatio = topic.estimatedHours / internalTotal;
+                topic.theoryHours = Math.round(topic.theoryHours * internalRatio);
+                topic.practiceHours = Math.round(topic.practiceHours * internalRatio);
+                topic.individualWorkHours = Math.round(topic.individualWorkHours * internalRatio);
+                topic.teamWorkHours = Math.round(topic.teamWorkHours * internalRatio);
+                
+                // Ajustar para garantir que a soma interna seja igual a estimatedHours
+                const newInternalTotal = topic.theoryHours + topic.practiceHours + topic.individualWorkHours + topic.teamWorkHours;
+                if (newInternalTotal !== topic.estimatedHours) {
+                  topic.theoryHours += topic.estimatedHours - newInternalTotal;
+                }
+              } else {
+                // Se não houver distribuição, colocar tudo em teoria
+                topic.theoryHours = topic.estimatedHours;
+                topic.practiceHours = 0;
+                topic.individualWorkHours = 0;
+                topic.teamWorkHours = 0;
+              }
+              
+              adjustedTotal += topic.estimatedHours;
+              allTopics.push(topic);
+            }
+          }
+          
+          // Ajuste final para garantir soma exata
+          const diff = totalWorkload - adjustedTotal;
+          if (diff !== 0 && allTopics.length > 0) {
+            // Distribuir a diferença entre os tópicos
+            const perTopic = Math.floor(Math.abs(diff) / allTopics.length);
+            const remainder = Math.abs(diff) % allTopics.length;
+            
+            for (let i = 0; i < allTopics.length; i++) {
+              const adjustment = perTopic + (i < remainder ? 1 : 0);
+              if (diff > 0) {
+                allTopics[i].estimatedHours += adjustment;
+                allTopics[i].theoryHours += adjustment;
+              } else if (allTopics[i].estimatedHours > adjustment + 1) {
+                allTopics[i].estimatedHours -= adjustment;
+                allTopics[i].theoryHours = Math.max(0, allTopics[i].theoryHours - adjustment);
+              }
+            }
+          }
+        }
+        
         // Create modules and topics in database
         for (const [moduleIndex, module] of result.modules.entries()) {
           const createdModule = await db.createLearningModule({

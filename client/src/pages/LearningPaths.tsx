@@ -97,23 +97,6 @@ export default function LearningPaths() {
 
   const utils = trpc.useUtils();
 
-  const generateModulesMutation = trpc.learningPath.generateModulesFromEmenta.useMutation({
-    onSuccess: (data) => {
-      toast.success(`${data.modules.length} módulos gerados com sucesso!`, {
-        description: data.suggestions,
-        duration: 5000,
-      });
-      utils.learningPath.getBySubject.invalidate({ subjectId: selectedSubjectId! });
-      const newExpanded = new Set(data.modules.map(m => m.id));
-      setExpandedModules(newExpanded);
-    },
-    onError: (error) => {
-      toast.error("Erro ao gerar módulos", {
-        description: error.message,
-      });
-    },
-  });
-
   const createModuleMutation = trpc.learningPath.createModule.useMutation({
     onSuccess: () => {
       utils.learningPath.getBySubject.invalidate();
@@ -515,7 +498,13 @@ export default function LearningPaths() {
               {subjects?.map((subject: any) => (
                 <button
                   key={subject.id}
-                  onClick={() => setSelectedSubjectId(subject.id)}
+                  onClick={() => {
+                    setSelectedSubjectId(subject.id);
+                    // Atualizar workload com a carga horária da disciplina selecionada
+                    if (subject.workload) {
+                      setWorkload(subject.workload);
+                    }
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all text-left ${
                     selectedSubjectId === subject.id
                       ? "border-primary bg-primary/5"
@@ -596,34 +585,6 @@ export default function LearningPaths() {
                   <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     {/* Botões de IA */}
                     <div className="flex gap-2 flex-1 sm:flex-initial flex-wrap">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (!selectedSubjectId) return;
-                          const subject = subjects?.find(s => s.id === selectedSubjectId);
-                          if (!subject?.ementa || subject.ementa.trim().length < 50) {
-                            toast.error("Ementa não encontrada", {
-                              description: "Cadastre uma ementa detalhada na disciplina primeiro (mínimo 50 caracteres)."
-                            });
-                            return;
-                          }
-                          if (learningPath && learningPath.length > 0) {
-                            if (!confirm("Já existem módulos criados. Deseja gerar novos módulos baseados na ementa?")) {
-                              return;
-                            }
-                          }
-                          generateModulesMutation.mutate({ subjectId: selectedSubjectId });
-                        }}
-                        disabled={generateModulesMutation.isPending}
-                        className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 flex-1 sm:flex-initial"
-                      >
-                        {generateModulesMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Lightbulb className="h-4 w-4 mr-2" />
-                        )}
-                        {generateModulesMutation.isPending ? "Gerando..." : "Gerar da Ementa"}
-                      </Button>
                       <Button
                         variant="outline"
                         onClick={() => setIsAIDialogOpen(true)}
@@ -1056,19 +1017,20 @@ export default function LearningPaths() {
                 </p>
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Carga Horária Total (horas) *
+                    Carga Horária Total da Disciplina
                   </label>
-                  <Input
-                    type="number"
-                    value={workload}
-                    onChange={e => setWorkload(parseInt(e.target.value) || 60)}
-                    placeholder="60"
-                    min={1}
-                    max={500}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={workload}
+                      readOnly
+                      className="bg-muted cursor-not-allowed"
+                    />
+                    <span className="text-sm text-muted-foreground">horas</span>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    A IA distribuirá as horas proporcionalmente entre módulos e
-                    tópicos
+                    A carga horária é obtida automaticamente da disciplina selecionada.
+                    A IA distribuirá as horas EXATAMENTE conforme este valor.
                   </p>
                 </div>
                 <div>

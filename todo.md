@@ -6231,3 +6231,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
   - O token JWT criado pelo login do professor não era reconhecido pelo SDK do Manus
   - Erro no log: "Session payload missing required fields"
   - Solução: Forçar USE_STANDALONE_AUTH = true em server/_core/context.ts para sempre usar autenticação standalone
+
+## Correções em Módulos e Tópicos (19/01/2026)
+
+- [x] Remover botão "Gerar da Ementa" - não tem precisão adequada
+- [x] Corrigir cálculo de carga horária na geração por IA - deve respeitar a carga horária real da disciplina e distribuir adequadamente entre os módulos
