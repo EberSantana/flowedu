@@ -31,7 +31,7 @@ const routeLabels: Record<string, string> = {
   "student-announcements": "Avisos",
   "student-profile": "Meu Perfil",
   "student-exercises": "Exercícios",
-  "student-review": "Revisão",
+  "smart-review": "Revisão Inteligente",
   "student-stats": "Estatísticas",
   students: "Alunos",
   enrollments: "Matrículas",

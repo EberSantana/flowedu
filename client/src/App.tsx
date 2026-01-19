@@ -61,7 +61,7 @@ const StudentExercises = lazy(() => import("./pages/StudentExercises"));
 const StudentExerciseAttempt = lazy(() => import("./pages/StudentExerciseAttempt"));
 const StudentExerciseResults = lazy(() => import("./pages/StudentExerciseResults"));
 const StudentExerciseReview = lazy(() => import("./pages/StudentExerciseReview"));
-const StudentReview = lazy(() => import("./pages/StudentReview"));
+// StudentReview removido - consolidado em StudentSmartReview
 const StudentSmartReview = lazy(() => import("./pages/StudentSmartReview"));
 const StudentSmartReviewItem = lazy(() => import("./pages/StudentSmartReviewItem"));
 const StudentSubmitQuestion = lazy(() => import("./pages/StudentSubmitQuestion"));
@@ -133,7 +133,7 @@ function Router() {
           <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
           <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
           <Route path={"/student-exercises/:id/review"} component={StudentExerciseReview} />
-          <Route path={"/student-review"} component={StudentReview} />
+          {/* StudentReview removido - usar /student/smart-review */}
           <Route path={"/student/smart-review"} component={StudentSmartReview} />
           <Route path={"/student/smart-review/:id"} component={StudentSmartReviewItem} />
           <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
