@@ -6177,3 +6177,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Reinstalar todas as dependências
 - [x] Remover patch problemático do wouter
 - [x] Sistema funcionando novamente
+
+## Geração Automática de Módulos Baseada em Ementa (19/01/2026)
+- [x] Criar função generateModulesFromEmenta.ts com IA
+- [x] Implementar rota tRPC learningPath.generateModulesFromEmenta
+- [x] Adicionar botão "Gerar da Ementa" na página LearningPaths.tsx
+- [x] Validar ementa mínima de 50 caracteres
+- [x] Gerar tópicos automaticamente para cada módulo
+- [x] Distribuir carga horária proporcionalmente
+- [ ] Criar testes para geração de módulos

@@ -1860,6 +1860,60 @@ Regras:
         return await db.getLearningPathBySubject(input.subjectId, ctx.user.id);
       }),
     
+    generateModulesFromEmenta: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+        
+        if (!subject) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Disciplina não encontrada' });
+        }
+        
+        if (!subject.ementa || subject.ementa.trim().length < 50) {
+          throw new TRPCError({ 
+            code: 'BAD_REQUEST', 
+            message: 'A disciplina precisa ter uma ementa cadastrada com pelo menos 50 caracteres.' 
+          });
+        }
+        
+        const workload = subject.workload || 60;
+        const { generateModulesFromEmenta } = await import('./generateModulesFromEmenta');
+        
+        const result = await generateModulesFromEmenta(subject.ementa, workload, subject.name);
+        
+        const createdModules = [];
+        for (const module of result.modules) {
+          const createdModule = await db.createLearningModule({
+            subjectId: input.subjectId,
+            title: module.title,
+            description: module.description,
+            userId: ctx.user.id,
+          });
+          
+          for (const topicTitle of module.topics) {
+            await db.createLearningTopic({
+              moduleId: createdModule.id,
+              title: topicTitle,
+              description: `Tópico do módulo: ${module.title}`,
+              estimatedHours: Math.round(module.suggestedHours / module.topics.length),
+              userId: ctx.user.id,
+            });
+          }
+          
+          createdModules.push({
+            ...createdModule,
+            suggestedHours: module.suggestedHours,
+            topicsCount: module.topics.length,
+          });
+        }
+        
+        return {
+          modules: createdModules,
+          totalHours: result.totalHours,
+          suggestions: result.suggestions,
+        };
+      }),
+    
     createModule: protectedProcedure
       .input(z.object({
         subjectId: z.number(),
