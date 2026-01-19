@@ -6236,3 +6236,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Remover botão "Gerar da Ementa" - não tem precisão adequada
 - [x] Corrigir cálculo de carga horária na geração por IA - deve respeitar a carga horária real da disciplina e distribuir adequadamente entre os módulos
+
+## Correção de Link - Menu Trilhas (19/01/2026)
+
+- [x] Corrigir link "Trilhas" no menu para apontar para /learning-paths em vez de /trails

@@ -180,7 +180,7 @@ export default function Dashboard() {
         { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: themeColor, enabled: true },
         { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: themeColor, enabled: true },
         { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/methodologies", color: themeColor, enabled: true },
-        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/trails", color: themeColor, enabled: true },
+        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: themeColor, enabled: true },
       ]);
     }
   }, [preferences]);
