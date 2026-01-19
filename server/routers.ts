@@ -1258,6 +1258,20 @@ Regras:
       return db.getAllUsers();
     }),
 
+    // Listagem paginada de usuários (otimização VPS)
+    listUsersPaginated: protectedProcedure
+      .input(z.object({
+        page: z.number().min(1).default(1),
+        limit: z.number().min(1).max(100).default(20),
+        search: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.getUsersPaginated(input.page, input.limit, input.search);
+      }),
+
     updateUserRole: protectedProcedure
       .input(z.object({
         userId: z.number(),

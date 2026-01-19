@@ -1,145 +1,156 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch } from "wouter";
+import { Suspense, lazy } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { SidebarProvider } from "./contexts/SidebarContext";
-import Dashboard from "./pages/Dashboard";
-import Subjects from "./pages/Subjects";
-import SubjectCTStats from "./pages/SubjectCTStats";
-import Classes from "./pages/Classes";
-import Schedule from "./pages/Schedule";
-import Shifts from "./pages/Shifts";
-import TimeSlots from "./pages/TimeSlots";
-import Calendar from "./pages/Calendar";
-import Profile from "./pages/Profile";
-// ProfileSelection removido - perfil único tradicional
-import AdminUsers from "./pages/AdminUsers";
-import ActiveMethodologies from "./pages/ActiveMethodologies";
-import Tasks from "./pages/Tasks";
-import Reports from "./pages/Reports";
-import { LearningAnalytics } from "./pages/LearningAnalytics";
-import LearningPaths from "./pages/LearningPaths";
-import StudentDashboard from "./pages/StudentDashboard";
-import StudentSubjectView from "./pages/StudentSubjectView";
-import StudentSubjectDetails from "./pages/StudentSubjectDetails";
-import ManageEnrollments from "./pages/ManageEnrollments";
-import TopicMaterialsManager from "./pages/TopicMaterialsManager";
-import Students from "./pages/Students";
-import StudentProfile from "./pages/StudentProfile";
-import SubjectEnrollments from "./pages/SubjectEnrollments";
-import PortalChoice from "./pages/PortalChoice";
-import StudentLogin from "./pages/StudentLogin";
-import Register from "./pages/Register";
-import TeacherRegister from "./pages/TeacherRegister";
-import TeacherLogin from "./pages/TeacherLogin";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import ClearSession from "./pages/ClearSession";
-import UserDebug from "./pages/UserDebug";
-import Announcements from "./pages/Announcements";
-import StudentAnnouncements from "./pages/StudentAnnouncements";
-import StudentSubjects from "./pages/StudentSubjects";
-import StudentLearningPaths from "./pages/StudentLearningPaths";
-import StudentLearningPathDetail from "./pages/StudentLearningPathDetail";
-import StudentProfilePage from "./pages/StudentProfilePage";
-import StudentExercises from "./pages/StudentExercises";
-import StudentExerciseAttempt from "./pages/StudentExerciseAttempt";
-import StudentExerciseResults from "./pages/StudentExerciseResults";
-import StudentExerciseReview from "./pages/StudentExerciseReview";
-import ExercisePerformanceReport from "./pages/ExercisePerformanceReport";
-
-import StudentReview from "./pages/StudentReview";
-import StudentSmartReview from "./pages/StudentSmartReview";
-import StudentSmartReviewItem from "./pages/StudentSmartReviewItem";
-import StudentStats from "./pages/StudentStats";
 import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
 import { CommandPalette } from "./components/CommandPalette";
-import { TeacherAddActivity } from "./pages/TeacherAddActivity";
-import Questions from "./pages/Questions";
-import QuestionDetail from "./pages/QuestionDetail";
-import StudentSubmitQuestion from "./pages/StudentSubmitQuestion";
-import StudentMyQuestions from "./pages/StudentMyQuestions";
-import StudentLearningJournal from "./pages/StudentLearningJournal";
-import StudentDoubts from "./pages/StudentDoubts";
-import StudentStatistics from "./pages/StudentStatistics";
-import StudentNotebook from "./pages/StudentNotebook";
 
-import { MistakeNotebook } from "./pages/MistakeNotebook";
+// Páginas críticas carregadas imediatamente (login/portal)
+import PortalChoice from "./pages/PortalChoice";
+import StudentLogin from "./pages/StudentLogin";
+import TeacherLogin from "./pages/TeacherLogin";
+import NotFound from "./pages/NotFound";
 
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
+// Lazy loaded pages - Teacher Portal
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Subjects = lazy(() => import("./pages/Subjects"));
+const SubjectCTStats = lazy(() => import("./pages/SubjectCTStats"));
+const Classes = lazy(() => import("./pages/Classes"));
+const Schedule = lazy(() => import("./pages/Schedule"));
+const Shifts = lazy(() => import("./pages/Shifts"));
+const TimeSlots = lazy(() => import("./pages/TimeSlots"));
+const Calendar = lazy(() => import("./pages/Calendar"));
+const Profile = lazy(() => import("./pages/Profile"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
+const ActiveMethodologies = lazy(() => import("./pages/ActiveMethodologies"));
+const Tasks = lazy(() => import("./pages/Tasks"));
+const Reports = lazy(() => import("./pages/Reports"));
+const LearningAnalytics = lazy(() => import("./pages/LearningAnalytics").then(m => ({ default: m.LearningAnalytics })));
+const LearningPaths = lazy(() => import("./pages/LearningPaths"));
+const ManageEnrollments = lazy(() => import("./pages/ManageEnrollments"));
+const TopicMaterialsManager = lazy(() => import("./pages/TopicMaterialsManager"));
+const Students = lazy(() => import("./pages/Students"));
+const StudentProfile = lazy(() => import("./pages/StudentProfile"));
+const SubjectEnrollments = lazy(() => import("./pages/SubjectEnrollments"));
+const Announcements = lazy(() => import("./pages/Announcements"));
+const Questions = lazy(() => import("./pages/Questions"));
+const QuestionDetail = lazy(() => import("./pages/QuestionDetail"));
+const ExercisePerformanceReport = lazy(() => import("./pages/ExercisePerformanceReport"));
+
+// Lazy loaded pages - Student Portal
+const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
+const StudentSubjectView = lazy(() => import("./pages/StudentSubjectView"));
+const StudentSubjectDetails = lazy(() => import("./pages/StudentSubjectDetails"));
+const StudentAnnouncements = lazy(() => import("./pages/StudentAnnouncements"));
+const StudentSubjects = lazy(() => import("./pages/StudentSubjects"));
+const StudentLearningPaths = lazy(() => import("./pages/StudentLearningPaths"));
+const StudentLearningPathDetail = lazy(() => import("./pages/StudentLearningPathDetail"));
+const StudentProfilePage = lazy(() => import("./pages/StudentProfilePage"));
+const StudentExercises = lazy(() => import("./pages/StudentExercises"));
+const StudentExerciseAttempt = lazy(() => import("./pages/StudentExerciseAttempt"));
+const StudentExerciseResults = lazy(() => import("./pages/StudentExerciseResults"));
+const StudentExerciseReview = lazy(() => import("./pages/StudentExerciseReview"));
+const StudentReview = lazy(() => import("./pages/StudentReview"));
+const StudentSmartReview = lazy(() => import("./pages/StudentSmartReview"));
+const StudentSmartReviewItem = lazy(() => import("./pages/StudentSmartReviewItem"));
+const StudentSubmitQuestion = lazy(() => import("./pages/StudentSubmitQuestion"));
+const StudentMyQuestions = lazy(() => import("./pages/StudentMyQuestions"));
+const StudentLearningJournal = lazy(() => import("./pages/StudentLearningJournal"));
+const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
+const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
+const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
+const MistakeNotebook = lazy(() => import("./pages/MistakeNotebook").then(m => ({ default: m.MistakeNotebook })));
+
+// Lazy loaded pages - Auth
+const Register = lazy(() => import("./pages/Register"));
+const TeacherRegister = lazy(() => import("./pages/TeacherRegister"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ClearSession = lazy(() => import("./pages/ClearSession"));
 
 function Router() {
   return (
     <>
-      <Switch>
-        <Route path={"/"} component={PortalChoice} />
-        <Route path={"/student-login"} component={StudentLogin} />
-        <Route path={"/register"} component={Register} />
-        <Route path={"/cadastro-professor"} component={TeacherRegister} />
-        <Route path={"/login-professor"} component={TeacherLogin} />
-        <Route path={"/esqueci-senha"} component={ForgotPassword} />
-        <Route path={"/redefinir-senha"} component={ResetPassword} />
-        <Route path={"/clear-session"} component={ClearSession} />
-        <Route path={"/user-debug"} component={UserDebug} />
-        <Route path={"/dashboard"} component={Dashboard} />
-        <Route path={"/subjects"} component={Subjects} />
-        <Route path={"/subjects/:id/ct-stats"} component={SubjectCTStats} />
-        <Route path={"/classes"} component={Classes} />
-        <Route path={"/shifts"} component={Shifts} />
-        <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
-        <Route path={"/schedule"} component={Schedule} />
-        <Route path={"/calendar"} component={Calendar} />
-        <Route path={"/reports"} component={Reports} />
+      <Suspense fallback={<PageLoader />}>
+        <Switch>
+          {/* Portal principal - carregado imediatamente */}
+          <Route path={"/"} component={PortalChoice} />
+          <Route path={"/student-login"} component={StudentLogin} />
+          <Route path={"/login-professor"} component={TeacherLogin} />
+          
+          {/* Auth pages - lazy loaded */}
+          <Route path={"/register"} component={Register} />
+          <Route path={"/cadastro-professor"} component={TeacherRegister} />
+          <Route path={"/esqueci-senha"} component={ForgotPassword} />
+          <Route path={"/redefinir-senha"} component={ResetPassword} />
+          <Route path={"/clear-session"} component={ClearSession} />
 
-        <Route path={"/learning-analytics"} component={LearningAnalytics} />
-        <Route path="/exercise-performance" component={ExercisePerformanceReport} />
+          {/* Teacher Portal - lazy loaded */}
+          <Route path={"/dashboard"} component={Dashboard} />
+          <Route path={"/subjects"} component={Subjects} />
+          <Route path={"/subjects/:id/ct-stats"} component={SubjectCTStats} />
+          <Route path={"/classes"} component={Classes} />
+          <Route path={"/shifts"} component={Shifts} />
+          <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
+          <Route path={"/schedule"} component={Schedule} />
+          <Route path={"/calendar"} component={Calendar} />
+          <Route path={"/reports"} component={Reports} />
+          <Route path={"/learning-analytics"} component={LearningAnalytics} />
+          <Route path="/exercise-performance" component={ExercisePerformanceReport} />
+          <Route path={"/learning-paths"} component={LearningPaths} />
+          <Route path={"/active-methodologies"} component={ActiveMethodologies} />
+          <Route path={"/tasks"} component={Tasks} />
+          <Route path={"/announcements"} component={Announcements} />
+          <Route path={"/profile"} component={Profile} />
+          <Route path={"/admin/users"} component={AdminUsers} />
+          <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
+          <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
+          <Route path={"/students"} component={Students} />
+          <Route path={"/students/:id"} component={StudentProfile} />
+          <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
+          <Route path={"/questions"} component={Questions} />
+          <Route path={"/questions/:id"} component={QuestionDetail} />
 
-        <Route path={"/learning-paths"} component={LearningPaths} />
-        <Route path={"/active-methodologies"} component={ActiveMethodologies} />
-        <Route path={"/tasks"} component={Tasks} />
-        <Route path={"/announcements"} component={Announcements} />
-        <Route path={"/profile"} component={Profile} />
-        {/* ProfileSelection removido - perfil único tradicional */}
-        <Route path={"/admin/users"} component={AdminUsers} />
-        <Route path={"/student-dashboard"} component={StudentDashboard} />
-        <Route path={"/student-subjects"} component={StudentSubjects} />
-        <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
-        <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />
-        <Route path={"/student-announcements"} component={StudentAnnouncements} />
-        <Route path={"/student-profile"} component={StudentProfilePage} />
-        <Route path={"/student-exercises"} component={StudentExercises} />
-        <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
-        <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
-        <Route path={"/student-exercises/:id/review"} component={StudentExerciseReview} />
-        <Route path={"/student-review"} component={StudentReview} />
-        <Route path={"/student/smart-review"} component={StudentSmartReview} />
-        <Route path={"/student/smart-review/:id"} component={StudentSmartReviewItem} />
-        <Route path={"/student-stats"} component={StudentStats} />
-        <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
-        <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
-        <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
-        <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
-        <Route path={"/students"} component={Students} />
-        <Route path={"/students/:id"} component={StudentProfile} />
-        <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
-        <Route path={"/questions"} component={Questions} />
-        <Route path={"/questions/:id"} component={QuestionDetail} />
-        <Route path={"/student/submit-question"} component={StudentSubmitQuestion} />
-        <Route path={"/student/my-questions"} component={StudentMyQuestions} />
-        <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
-        <Route path={"/student/doubts"} component={StudentDoubts} />
-        <Route path={"/student/statistics"} component={StudentStatistics} />
-        <Route path={"/student/notebook"} component={StudentNotebook} />
-        <Route path={"/student/mistake-notebook"} component={MistakeNotebook} />
+          {/* Student Portal - lazy loaded */}
+          <Route path={"/student-dashboard"} component={StudentDashboard} />
+          <Route path={"/student-subjects"} component={StudentSubjects} />
+          <Route path={"/student-learning-paths"} component={StudentLearningPaths} />
+          <Route path={"/student/learning-path/:subjectId/:professorId"} component={StudentLearningPathDetail} />
+          <Route path={"/student-announcements"} component={StudentAnnouncements} />
+          <Route path={"/student-profile"} component={StudentProfilePage} />
+          <Route path={"/student-exercises"} component={StudentExercises} />
+          <Route path={"/student-exercises/:id/attempt"} component={StudentExerciseAttempt} />
+          <Route path={"/student-exercises/:id/results/:attemptId"} component={StudentExerciseResults} />
+          <Route path={"/student-exercises/:id/review"} component={StudentExerciseReview} />
+          <Route path={"/student-review"} component={StudentReview} />
+          <Route path={"/student/smart-review"} component={StudentSmartReview} />
+          <Route path={"/student/smart-review/:id"} component={StudentSmartReviewItem} />
+          <Route path={"/student/subject/:subjectId/:professorId"} component={StudentSubjectView} />
+          <Route path={"/student/subject-details/:subjectId/:professorId"} component={StudentSubjectDetails} />
+          <Route path={"/student/submit-question"} component={StudentSubmitQuestion} />
+          <Route path={"/student/my-questions"} component={StudentMyQuestions} />
+          <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
+          <Route path={"/student/doubts"} component={StudentDoubts} />
+          <Route path={"/student/statistics"} component={StudentStatistics} />
+          <Route path={"/student/notebook"} component={StudentNotebook} />
+          <Route path={"/student/mistake-notebook"} component={MistakeNotebook} />
 
-
-
-
-        <Route path={"/404"} component={NotFound} />
-        <Route component={NotFound} />
-      </Switch>
+          {/* 404 */}
+          <Route path={"/404"} component={NotFound} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
       <OfflineIndicator />
       <BibleFooter />
       <InstallPWA />

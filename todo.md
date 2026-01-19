@@ -6274,3 +6274,50 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Investigar onde os usuários "Sem nome" estão sendo criados automaticamente
 - [x] Corrigir o código que cria usuários duplicados
 - [x] Limpar usuários "Sem nome" do banco de dados
+
+## 🚀 Preparação para Deploy em VPS (19/01/2026)
+
+### Fase 1: Limpeza de Código
+- [x] Remover UserDebug.tsx
+- [x] Remover ComponentShowcase.tsx
+- [x] Remover HiddenAchievements.tsx
+- [x] Remover ProfileSelection.tsx
+- [x] Consolidar StudentStats.tsx e StudentStatistics.tsx (mantido StudentStatistics, removido StudentStats)
+- [x] Avaliar StudentProfile.tsx e StudentProfilePage.tsx (são diferentes, mantidas ambas)
+- [x] Avaliar StudentReview.tsx e StudentSmartReview.tsx (são complementares, mantidas ambas)
+- [ ] Remover imports não utilizados
+- [ ] Remover código morto
+
+### Fase 2: Otimização de Performance
+- [x] Implementar lazy loading de todas as páginas (App.tsx reescrito com React.lazy)
+- [x] Adicionar componente PageLoader para feedback durante carregamento
+- [x] Criar função getUsersPaginated no db.ts com suporte a busca
+- [x] Criar rota listUsersPaginated no routers.ts
+- [ ] Atualizar AdminUsers.tsx para usar paginação server-side
+- [ ] Implementar cache de queries frequentes no tRPC
+- [ ] Otimizar bundle JavaScript
+- [ ] Configurar compressão de assets
+
+### Fase 3: Segurança
+- [x] Implementar rate limiting em rotas de login (10 tentativas/15min)
+- [x] Implementar rate limiting em APIs públicas (100 req/min)
+- [x] Implementar rate limiting em APIs de IA (20 req/min)
+- [x] Adicionar helmet.js para headers de segurança HTTP
+- [x] Configurar Content-Security-Policy para produção
+- [ ] Validar e sanitizar todos os inputs de usuário (já implementado com Zod)
+- [ ] Adicionar validação de tamanho de arquivos (já implementado - 75MB)
+
+### Fase 4: Banco de Dados
+- [x] Criar índices em colunas frequentemente consultadas (scripts/add-indexes.sql)
+- [x] Configurar script de backup automatizado (scripts/backup-database.sh)
+- [ ] Limpar dados de teste/desenvolvimento (fazer manualmente antes do deploy)
+- [ ] Otimizar queries lentas identificadas (monitorar em produção)
+
+### Fase 5: Infraestrutura VPS
+- [x] Criar arquivo de configuração PM2 (ecosystem.config.js)
+- [x] Criar arquivo de configuração Nginx (nginx.conf)
+- [x] Documentar processo de instalação em VPS (DEPLOY_VPS.md)
+- [x] Incluir guia de configuração SSL/HTTPS (Let's Encrypt)
+- [x] Incluir guia de configuração de domínio
+- [x] Incluir configuração de logs de aplicação
+- [x] Incluir checklist de deploy completo

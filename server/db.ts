@@ -1,4 +1,4 @@
-import { and, or, desc, asc, eq, ne, gte, lte, gt, lt, inArray, sql } from "drizzle-orm";
+import { and, or, desc, asc, eq, ne, gte, lte, gt, lt, inArray, sql, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -667,6 +667,52 @@ export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(users).orderBy(users.createdAt);
+}
+
+// Função paginada para listagem de usuários (otimização VPS)
+export async function getUsersPaginated(page: number = 1, limit: number = 20, search?: string) {
+  const db = await getDb();
+  if (!db) return { users: [], total: 0, page, limit, totalPages: 0 };
+  
+  const offset = (page - 1) * limit;
+  
+  // Query base
+  let query = db.select().from(users);
+  let countQuery = db.select({ count: sql<number>`count(*)` }).from(users);
+  
+  // Aplicar filtro de busca se fornecido
+  if (search && search.trim()) {
+    const searchTerm = `%${search.trim()}%`;
+    query = query.where(
+      or(
+        like(users.name, searchTerm),
+        like(users.email, searchTerm)
+      )
+    ) as any;
+    countQuery = countQuery.where(
+      or(
+        like(users.name, searchTerm),
+        like(users.email, searchTerm)
+      )
+    ) as any;
+  }
+  
+  // Executar queries
+  const [countResult, usersResult] = await Promise.all([
+    countQuery,
+    query.orderBy(desc(users.createdAt)).limit(limit).offset(offset)
+  ]);
+  
+  const total = countResult[0]?.count || 0;
+  const totalPages = Math.ceil(total / limit);
+  
+  return {
+    users: usersResult,
+    total,
+    page,
+    limit,
+    totalPages
+  };
 }
 
 export async function getUserById(userId: number) {

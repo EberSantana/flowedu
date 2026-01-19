@@ -11,6 +11,8 @@ import uploadMaterialRouter from "../upload-material";
 import extractPdfRouter from "../extract-pdf";
 import { getSessionCookieOptions } from "./cookies";
 import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../../shared/const";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -35,6 +37,60 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // ============================================
+  // SEGURANÇA - Headers HTTP (Helmet)
+  // ============================================
+  app.use(helmet({
+    contentSecurityPolicy: process.env.NODE_ENV === "production" ? {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https:"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        connectSrc: ["'self'", "https://api.manus.im", "wss:"],
+      },
+    } : false, // Desabilitado em desenvolvimento para HMR funcionar
+    crossOriginEmbedderPolicy: false, // Permite embeds de terceiros
+  }));
+  
+  // ============================================
+  // SEGURANÇA - Rate Limiting
+  // ============================================
+  
+  // Rate limiter geral - 100 requisições por minuto por IP
+  const generalLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minuto
+    max: 100, // máximo 100 requisições por minuto
+    message: { error: "Muitas requisições. Tente novamente em 1 minuto." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  
+  // Rate limiter para rotas de autenticação - 10 tentativas por 15 minutos
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 10, // máximo 10 tentativas
+    message: { error: "Muitas tentativas de login. Tente novamente em 15 minutos." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true, // Não conta requisições bem-sucedidas
+  });
+  
+  // Rate limiter para APIs de IA - 20 requisições por minuto
+  const aiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minuto
+    max: 20, // máximo 20 requisições por minuto
+    message: { error: "Limite de requisições de IA atingido. Aguarde 1 minuto." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  
+  // Aplicar rate limiter geral em produção
+  if (process.env.NODE_ENV === "production") {
+    app.use(generalLimiter);
+  }
+  
   // Configure body parser with larger size limit for file uploads
   // 100MB to accommodate base64 encoding overhead (~33% increase)
   const uploadLimit = "100mb";
@@ -47,6 +103,7 @@ async function startServer() {
   app.use("/api", uploadMaterialRouter);
   // Extract PDF text endpoint
   app.use("/api", extractPdfRouter);
+  
   // Rota de logout via GET (para links diretos)
   app.get("/api/logout", (req, res) => {
     const cookieOptions = getSessionCookieOptions(req);
@@ -54,6 +111,20 @@ async function startServer() {
     res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
     res.redirect("/");
   });
+  
+  // ============================================
+  // Rate limiting específico para rotas de auth
+  // ============================================
+  // Aplicar rate limiter de auth em rotas específicas
+  app.use("/api/trpc/auth.loginStudent", authLimiter);
+  app.use("/api/trpc/auth.loginTeacher", authLimiter);
+  app.use("/api/trpc/auth.register", authLimiter);
+  app.use("/api/trpc/auth.requestPasswordReset", authLimiter);
+  
+  // Rate limiter para rotas de IA
+  app.use("/api/trpc/learningPath.generateWithAI", aiLimiter);
+  app.use("/api/trpc/learningPath.generateModulesFromEmenta", aiLimiter);
+  app.use("/api/trpc/studentReview.generateStudyMaterial", aiLimiter);
   
   // tRPC API
   app.use(
