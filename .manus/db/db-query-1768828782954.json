@@ -1,0 +1,43 @@
+{
+  "query": "SELECT id, openId, name, email, role, loginMethod, approvalStatus, createdAt, lastSignedIn \nFROM users \nWHERE name IS NULL OR name = ''\nORDER BY id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, openId, name, email, role, loginMethod, approvalStatus, createdAt, lastSignedIn \nFROM users \nWHERE name IS NULL OR name = ''\nORDER BY id DESC;",
+  "rows": [
+    {
+      "id": "3270004",
+      "openId": "teacher-1768761444210-i0ur7q6",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "createdAt": "2026-01-19 12:58:27",
+      "lastSignedIn": "2026-01-19 12:58:27"
+    },
+    {
+      "id": "3270003",
+      "openId": "teacher-1768761444210-i0ur7q6",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "createdAt": "2026-01-19 12:25:55",
+      "lastSignedIn": "2026-01-19 12:25:55"
+    },
+    {
+      "id": "3270002",
+      "openId": "teacher-1768761444210-i0ur7q6",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "loginMethod": "NULL",
+      "approvalStatus": "approved",
+      "createdAt": "2026-01-19 12:06:47",
+      "lastSignedIn": "2026-01-19 12:06:47"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\trole\tloginMethod\tapprovalStatus\tcreatedAt\tlastSignedIn\n3270004\tteacher-1768761444210-i0ur7q6\tNULL\tNULL\tuser\tNULL\tapproved\t2026-01-19 12:58:27\t2026-01-19 12:58:27\n3270003\tteacher-1768761444210-i0ur7q6\tNULL\tNULL\tuser\tNULL\tapproved\t2026-01-19 12:25:55\t2026-01-19 12:25:55\n3270002\tteacher-1768761444210-i0ur7q6\tNULL\tNULL\tuser\tNULL\tapproved\t2026-01-19 12:06:47\t2026-01-19 12:06:47\n",
+  "stderr": "",
+  "execution_time_ms": 71
+}

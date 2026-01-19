@@ -167,6 +167,12 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     throw new Error("User openId is required for upsert");
   }
 
+  // Validação adicional: prevenir criação de usuários sem nome e sem email
+  if (user.openId.startsWith('manual-') && (!user.name || user.name.trim() === '')) {
+    console.error('[Database] Tentativa de criar usuário manual sem nome:', user);
+    throw new Error("Nome é obrigatório para usuários criados manualmente");
+  }
+
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot upsert user: database not available");

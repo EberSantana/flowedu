@@ -1,0 +1,19 @@
+{
+  "query": "SELECT openId FROM users WHERE name IS NULL OR name = '' ORDER BY id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT openId FROM users WHERE name IS NULL OR name = '' ORDER BY id DESC;",
+  "rows": [
+    {
+      "openId": "teacher-1768761444210-i0ur7q6"
+    },
+    {
+      "openId": "teacher-1768761444210-i0ur7q6"
+    },
+    {
+      "openId": "teacher-1768761444210-i0ur7q6"
+    }
+  ],
+  "messages": [],
+  "stdout": "openId\nteacher-1768761444210-i0ur7q6\nteacher-1768761444210-i0ur7q6\nteacher-1768761444210-i0ur7q6\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

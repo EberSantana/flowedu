@@ -6268,3 +6268,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar validação de carga horária nas disciplinas - Garantir que todas as disciplinas tenham carga horária definida antes de gerar trilhas
 - [x] Criar templates de distribuição de horas - Oferecer opções predefinidas (ex: "4 módulos de 10h cada" para 40h totais)
 - [x] Adicionar preview da distribuição - Mostrar como as horas serão distribuídas entre os módulos antes de gerar
+
+## Correção - Usuários "Sem nome" (19/01/2026)
+
+- [x] Investigar onde os usuários "Sem nome" estão sendo criados automaticamente
+- [x] Corrigir o código que cria usuários duplicados
+- [x] Limpar usuários "Sem nome" do banco de dados
