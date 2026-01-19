@@ -14,6 +14,7 @@ import { Users, Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function Classes() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -95,6 +96,7 @@ export default function Classes() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-4 sm:py-6 lg:py-8">
+          <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Turmas" }]} />
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">

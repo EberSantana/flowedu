@@ -6246,3 +6246,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Auditar todos os links no sistema (menus, botões, ações rápidas)
 - [x] Corrigir links quebrados identificados
 - [x] Testar navegação completa do sistema
+
+## Implementação de Breadcrumbs (19/01/2026)
+
+- [x] Criar componente Breadcrumb reutilizável
+- [x] Integrar breadcrumbs no DashboardLayout (Portal do Professor)
+- [x] Integrar breadcrumbs no StudentLayout (Portal do Aluno)
+- [x] Adicionar breadcrumbs nas páginas principais (Subjects, Classes, Shifts, LearningPaths e outras)
+- [x] Testar navegação com breadcrumbs

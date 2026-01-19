@@ -21,6 +21,7 @@ import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import QuickEnrollModal from "@/components/QuickEnrollModal";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function Subjects() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -316,6 +317,7 @@ export default function Subjects() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-4 sm:py-6 lg:py-8">
+          <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Disciplinas" }]} />
           <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">

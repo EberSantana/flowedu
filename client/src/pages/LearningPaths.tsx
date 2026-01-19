@@ -39,6 +39,7 @@ import { toast } from "sonner";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import ExamGeneratorModal from "@/components/ExamGeneratorModal";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import ExerciseGeneratorModal from "@/components/ExerciseGeneratorModal";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
@@ -481,6 +482,7 @@ export default function LearningPaths() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
+          <Breadcrumb items={[{ label: "Recursos Pedagógicos" }, { label: "Trilhas de Aprendizagem" }]} />
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Trilhas de Aprendizagem</h1>
             <p className="text-muted-foreground">

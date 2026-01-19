@@ -10,6 +10,7 @@ import { Clock, Plus, Pencil, Trash2, ArrowLeft, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function Shifts() {
   const [, setLocation] = useLocation();
@@ -96,6 +97,7 @@ export default function Shifts() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container mx-auto py-8">
+          <Breadcrumb items={[{ label: "Planejamento" }, { label: "Turnos" }]} />
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
