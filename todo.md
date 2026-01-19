@@ -6355,3 +6355,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Validar criação de turmas
 - [ ] Validar criação de exercícios
 - [ ] Validar upload de materiais
+
+
+## 🚀 Tarefas Importantes (Resolver LOGO APÓS Deploy)
+- [ ] Implementar verificação de e-mail no cadastro (Alta prioridade) - GUIA CRIADO: GUIA_VERIFICACAO_EMAIL.md
+- [ ] Configurar monitoramento e alertas de uptime (Alta prioridade) - GUIA CRIADO: GUIA_MONITORAMENTO.md
+- [ ] Configurar rotação de logs centralizados (Média prioridade) - GUIA CRIADO: GUIA_LOGS_CENTRALIZADOS.md
