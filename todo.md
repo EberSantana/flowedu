@@ -6215,3 +6215,19 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar se há rotas relacionadas a desempenho (nenhuma encontrada)
 - [x] Página PerformanceDashboard já foi removida anteriormente
 - [x] Card Desempenho completamente removido
+
+## PROBLEMA CRÍTICO: Botões de Criar Não Funcionam (19/01/2026)
+- [ ] Testar criação de Turno via browser
+- [ ] Testar criação de Disciplina via browser
+- [ ] Testar criação de Turma via browser
+- [ ] Verificar erros no console do navegador
+- [ ] Verificar logs do servidor
+- [ ] Identificar e corrigir problema
+
+## Correção de Bug - Autenticação Standalone (19/01/2026)
+
+- [x] BUG CRÍTICO: Botões de criação (Turno, Disciplina, Turma) não funcionavam - ao clicar em "Criar" nada acontecia
+  - Causa: Sistema estava usando autenticação OAuth do Manus ao invés da autenticação standalone (email/senha)
+  - O token JWT criado pelo login do professor não era reconhecido pelo SDK do Manus
+  - Erro no log: "Session payload missing required fields"
+  - Solução: Forçar USE_STANDALONE_AUTH = true em server/_core/context.ts para sempre usar autenticação standalone

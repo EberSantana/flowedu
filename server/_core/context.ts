@@ -27,7 +27,8 @@ export type TrpcContext = {
 };
 
 // Flag para usar autenticação standalone (VPS) ou OAuth Manus
-const USE_STANDALONE_AUTH = process.env.USE_STANDALONE_AUTH === 'true' || !ENV.oAuthServerUrl;
+// SEMPRE usar standalone auth quando o login é por email/senha
+const USE_STANDALONE_AUTH = true;
 
 export async function createContext(
   opts: CreateExpressContextOptions
