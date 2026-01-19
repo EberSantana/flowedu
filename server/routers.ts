@@ -929,7 +929,7 @@ export const appRouter = router({
         subjectId: z.number(),
         classId: z.number(),
         timeSlotId: z.number(),
-        dayOfWeek: z.number().min(0).max(6),
+        dayOfWeek: z.number().min(0).max(6), // 0=domingo, 1=segunda, ..., 6=sábado
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {

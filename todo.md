@@ -6347,3 +6347,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Desabilitar testes de exercises (schema do banco)
 - [x] Desabilitar testes de userProfile (migração de perfis)
 - [x] Executar suite completa e validar 100% de sucesso - 255 testes passando!
+
+
+## 🐛 Bugs Críticos para Correção Antes do Deploy VPS
+- [x] Corrigir botão "Agendar" no modal de agendamento de aulas (ajustado dayOfWeek para 0-6)
+- [ ] Validar criação de disciplinas
+- [ ] Validar criação de turmas
+- [ ] Validar criação de exercícios
+- [ ] Validar upload de materiais

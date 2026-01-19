@@ -140,11 +140,18 @@ export default function Schedule() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar campos obrigatórios
+    if (!formData.subjectId || !formData.classId || !formData.timeSlotId || !formData.dayOfWeek) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    
     createMutation.mutate({
       subjectId: parseInt(formData.subjectId),
       classId: parseInt(formData.classId),
       timeSlotId: parseInt(formData.timeSlotId),
-      dayOfWeek: parseInt(formData.dayOfWeek),
+      dayOfWeek: parseInt(formData.dayOfWeek) - 1, // Ajustar para 0-6 (backend espera 0=domingo)
       notes: formData.notes || undefined,
     });
   };
