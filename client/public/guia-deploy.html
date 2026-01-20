@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Deploy FlowEdu - Para Iniciantes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --secondary: #EC4899;
+            --bg-dark: #0F0A1F;
+            --bg-card: #1A1333;
+            --bg-card-hover: #251D45;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-muted: #718096;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --border: #2D2654;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1A0F2E 100%);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 150px 20px 80px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #1A0F2E 100%);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            background: var(--bg-card);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .badge-icon {
+            margin-right: 8px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+        }
+
+        /* Glossary Section */
+        .glossary-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .glossary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .glossary-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .glossary-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .glossary-term {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .glossary-definition {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .glossary-analogy {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .glossary-analogy::before {
+            content: "💡 ";
+        }
+
+        /* Steps Section */
+        .steps-section {
+            margin-bottom: 60px;
+        }
+
+        .step-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .step-tab {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-tab:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .step-tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-color: transparent;
+        }
+
+        .step-tab.completed {
+            border-color: var(--success);
+        }
+
+        .step-tab.completed::after {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-tab.active .step-number {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Step Content */
+        .step-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .step-meta {
+            display: flex;
+            gap: 15px;
+        }
+
+        .step-meta-item {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Substeps */
+        .substep {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .substep-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .substep-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .substep-content {
+            color: var(--text-secondary);
+        }
+
+        .substep-content p {
+            margin-bottom: 15px;
+        }
+
+        .substep-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .substep-content li {
+            margin-bottom: 8px;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0D0D0D;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .code-header {
+            background: #1A1A1A;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-language {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .code-content {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .code-content code {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: #E2E8F0;
+            white-space: pre;
+        }
+
+        /* Info Box */
+        .info-box {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .info-box.tip {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .info-box.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .info-box.important {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .info-box-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .info-box-content {
+            color: var(--text-secondary);
+        }
+
+        .info-box-content strong {
+            color: var(--text-primary);
+        }
+
+        /* Navigation Buttons */
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 15px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .complete-btn {
+            background: var(--success);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .complete-btn:hover {
+            background: #059669;
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 60px;
+            border: 1px solid var(--border);
+        }
+
+        .checklist-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checklist-item.checked .checklist-checkbox::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+        }
+
+        .checklist-text {
+            color: var(--text-secondary);
+        }
+
+        .checklist-item.checked .checklist-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-card);
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .step-content {
+                padding: 25px;
+            }
+
+            .step-tabs {
+                flex-wrap: nowrap;
+            }
+
+            .step-tab {
+                padding: 12px 18px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🚀 FlowEdu Deploy</div>
+            <nav class="nav-links">
+                <a href="#glossario">Glossário</a>
+                <a href="#etapas">Etapas</a>
+                <a href="#checklist">Checklist</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Guia ULTRA-DETALHADO de Deploy</h1>
+        <p>Não se preocupe se você nunca fez isso antes - vou te guiar em cada clique!</p>
+        
+        <div class="hero-badges">
+            <span class="badge"><span class="badge-icon">⏱️</span> 2-3 horas</span>
+            <span class="badge"><span class="badge-icon">📚</span> 9 Etapas</span>
+            <span class="badge"><span class="badge-icon">🎯</span> Para Iniciantes</span>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text">Progresso: <span id="progressText">0%</span> concluído</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Glossary Section -->
+        <section class="glossary-section" id="glossario">
+            <h2 class="section-title">
+                <span class="section-icon">📚</span>
+                Glossário - Entenda os Termos
+            </h2>
+            
+            <div class="glossary-grid">
+                <div class="glossary-card">
+                    <div class="glossary-term">VPS</div>
+                    <div class="glossary-definition">Um computador na internet que fica ligado 24h</div>
+                    <div class="glossary-analogy">Como alugar um apartamento na nuvem para seu site morar</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">SSH</div>
+                    <div class="glossary-definition">Forma de acessar seu servidor remotamente</div>
+                    <div class="glossary-analogy">Como fazer uma ligação de vídeo para o computador</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">Terminal</div>
+                    <div class="glossary-definition">Tela preta onde você digita comandos</div>
+                    <div class="glossary-analogy">Como o WhatsApp, mas você conversa com o computador</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">Domínio</div>
+                    <div class="glossary-definition">O endereço do seu site (ex: flowedu.com.br)</div>
+                    <div class="glossary-analogy">O endereço da sua casa na internet</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">SSL/HTTPS</div>
+                    <div class="glossary-definition">Cadeado de segurança do site</div>
+                    <div class="glossary-analogy">Como um envelope lacrado para suas informações</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">Nginx</div>
+                    <div class="glossary-definition">Programa que recebe visitantes do site</div>
+                    <div class="glossary-analogy">Um porteiro que direciona as pessoas</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">PM2</div>
+                    <div class="glossary-definition">Programa que mantém seu site no ar</div>
+                    <div class="glossary-analogy">Um vigia que reinicia tudo se der problema</div>
+                </div>
+                
+                <div class="glossary-card">
+                    <div class="glossary-term">Banco de Dados</div>
+                    <div class="glossary-definition">Onde ficam salvos os dados (alunos, notas, etc)</div>
+                    <div class="glossary-analogy">Um arquivo gigante organizado</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Steps Section -->
+        <section class="steps-section" id="etapas">
+            <h2 class="section-title">
+                <span class="section-icon">📋</span>
+                Etapas do Deploy
+            </h2>
+
+            <div class="step-tabs" id="stepTabs">
+                <div class="step-tab active" data-step="1">
+                    <span class="step-number">1</span>
+                    Contratar VPS
+                </div>
+                <div class="step-tab" data-step="2">
+                    <span class="step-number">2</span>
+                    Acessar Servidor
+                </div>
+                <div class="step-tab" data-step="3">
+                    <span class="step-number">3</span>
+                    Preparar Servidor
+                </div>
+                <div class="step-tab" data-step="4">
+                    <span class="step-number">4</span>
+                    Instalar Node.js
+                </div>
+                <div class="step-tab" data-step="5">
+                    <span class="step-number">5</span>
+                    Banco de Dados
+                </div>
+                <div class="step-tab" data-step="6">
+                    <span class="step-number">6</span>
+                    Configurar FlowEdu
+                </div>
+                <div class="step-tab" data-step="7">
+                    <span class="step-number">7</span>
+                    Configurar Nginx
+                </div>
+                <div class="step-tab" data-step="8">
+                    <span class="step-number">8</span>
+                    Domínio e SSL
+                </div>
+                <div class="step-tab" data-step="9">
+                    <span class="step-number">9</span>
+                    Testar Tudo
+                </div>
+            </div>
+
+            <div class="step-content" id="stepContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Checklist -->
+        <section class="checklist" id="checklist">
+            <h3 class="checklist-title">✅ Checklist Final</h3>
+            
+            <div class="checklist-item" data-check="1">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">VPS contratado e acessível</span>
+            </div>
+            <div class="checklist-item" data-check="2">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Node.js e PM2 instalados</span>
+            </div>
+            <div class="checklist-item" data-check="3">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Banco de dados configurado</span>
+            </div>
+            <div class="checklist-item" data-check="4">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">FlowEdu instalado e rodando</span>
+            </div>
+            <div class="checklist-item" data-check="5">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Nginx configurado</span>
+            </div>
+            <div class="checklist-item" data-check="6">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Domínio apontando para o servidor</span>
+            </div>
+            <div class="checklist-item" data-check="7">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Certificado SSL instalado (HTTPS)</span>
+            </div>
+            <div class="checklist-item" data-check="8">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Login funcionando</span>
+            </div>
+            <div class="checklist-item" data-check="9">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Criação de disciplinas funcionando</span>
+            </div>
+            <div class="checklist-item" data-check="10">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Upload de materiais funcionando</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Guia criado por Manus AI • Janeiro 2026</p>
+        <p style="margin-top: 10px;">Lembre-se: Se algo der errado, respire fundo e tente novamente. Todo mundo erra no começo! 💪</p>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Comando copiado!</div>
+
+    <script>
+        // Step content data
+        const stepsData = {
+            1: {
+                title: "Contratar o VPS (Servidor)",
+                time: "15 minutos",
+                difficulty: "Fácil",
+                description: "Vamos contratar um servidor na nuvem para hospedar o FlowEdu. Recomendamos a Hostinger por ser mais fácil para brasileiros.",
+                substeps: [
+                    {
+                        title: "Acessar o site da Hostinger",
+                        content: `
+                            <p>1. Abra seu navegador (Chrome, Firefox, Edge...)</p>
+                            <p>2. Digite na barra de endereço: <strong>hostinger.com.br</strong></p>
+                            <p>3. Pressione <strong>Enter</strong></p>
+                        `
+                    },
+                    {
+                        title: "Criar uma conta",
+                        content: `
+                            <p>1. Clique no botão <strong>"Entrar"</strong> no canto superior direito</p>
+                            <p>2. Clique em <strong>"Criar conta"</strong></p>
+                            <p>3. Você pode criar usando Google (mais fácil) ou E-mail</p>
+                        `
+                    },
+                    {
+                        title: "Escolher o plano VPS",
+                        content: `
+                            <p>1. No menu superior, passe o mouse em <strong>"VPS"</strong></p>
+                            <p>2. Clique em <strong>"Hospedagem VPS"</strong></p>
+                            <p>3. Escolha o plano <strong>VPS 2</strong>:</p>
+                            <ul>
+                                <li>2 GB de RAM</li>
+                                <li>2 vCPU</li>
+                                <li>50 GB de armazenamento</li>
+                                <li>Preço: aproximadamente R$ 30-50/mês</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Configurar o VPS",
+                        content: `
+                            <p>Após a compra, configure:</p>
+                            <ul>
+                                <li><strong>Sistema operacional:</strong> Ubuntu 22.04</li>
+                                <li><strong>Localização:</strong> São Paulo</li>
+                                <li><strong>Senha do root:</strong> Crie uma senha FORTE (mínimo 12 caracteres)</li>
+                            </ul>
+                            <div class="info-box warning">
+                                <span class="info-box-icon">⚠️</span>
+                                <div class="info-box-content">
+                                    <strong>ANOTE ESSA SENHA!</strong> Você vai precisar dela para acessar o servidor.
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: "Anotar as informações",
+                        content: `
+                            <p>Após a criação, anote:</p>
+                            <ul>
+                                <li><strong>Endereço IP:</strong> (ex: 123.45.67.89)</li>
+                                <li><strong>Usuário:</strong> root</li>
+                                <li><strong>Senha:</strong> a que você criou</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            2: {
+                title: "Acessar o Servidor (SSH)",
+                time: "10 minutos",
+                difficulty: "Médio",
+                description: "Agora vamos 'entrar' no seu servidor pela internet usando SSH.",
+                substeps: [
+                    {
+                        title: "Se você usa WINDOWS - Baixar o PuTTY",
+                        content: `
+                            <p>1. Abra o navegador e acesse: <strong>putty.org</strong></p>
+                            <p>2. Clique em <strong>"Download PuTTY"</strong></p>
+                            <p>3. Baixe a versão <strong>64-bit x86</strong> para Windows</p>
+                            <p>4. Execute o instalador e siga as instruções</p>
+                        `
+                    },
+                    {
+                        title: "Conectar ao servidor (Windows)",
+                        content: `
+                            <p>1. Abra o <strong>PuTTY</strong></p>
+                            <p>2. Em <strong>"Host Name"</strong>, digite o IP do seu VPS</p>
+                            <p>3. <strong>Port:</strong> 22</p>
+                            <p>4. Clique em <strong>"Open"</strong></p>
+                            <p>5. Se aparecer aviso de segurança, clique em <strong>"Accept"</strong></p>
+                            <p>6. Digite: <strong>root</strong> e pressione Enter</p>
+                            <p>7. Digite sua senha (não aparece enquanto digita - é normal!)</p>
+                        `
+                    },
+                    {
+                        title: "Se você usa MAC - Abrir o Terminal",
+                        content: `
+                            <p>1. Pressione <strong>Command (⌘) + Espaço</strong></p>
+                            <p>2. Digite <strong>"Terminal"</strong></p>
+                            <p>3. Pressione <strong>Enter</strong></p>
+                            <p>4. Digite o comando abaixo (substitua pelo seu IP):</p>
+                        `,
+                        code: {
+                            language: "bash",
+                            content: "ssh root@123.45.67.89"
+                        }
+                    },
+                    {
+                        title: "Verificar se funcionou",
+                        content: `
+                            <p>Se você ver algo assim, <strong>PARABÉNS!</strong> Você está dentro do servidor!</p>
+                        `,
+                        code: {
+                            language: "terminal",
+                            content: "Welcome to Ubuntu 22.04 LTS\nroot@servidor:~#"
+                        }
+                    }
+                ]
+            },
+            3: {
+                title: "Preparar o Servidor",
+                time: "20 minutos",
+                difficulty: "Médio",
+                description: "Vamos atualizar o sistema e instalar os programas necessários.",
+                substeps: [
+                    {
+                        title: "Atualizar o sistema",
+                        content: `
+                            <p>Copie e cole este comando no terminal:</p>
+                            <div class="info-box tip">
+                                <span class="info-box-icon">💡</span>
+                                <div class="info-box-content">
+                                    <strong>Como colar:</strong> No PuTTY (Windows): Clique com o botão direito do mouse. No Mac: Command + V
+                                </div>
+                            </div>
+                        `,
+                        code: {
+                            language: "bash",
+                            content: "apt update && apt upgrade -y"
+                        }
+                    },
+                    {
+                        title: "Instalar programas básicos",
+                        content: `
+                            <p>Este comando instala vários programas que vamos precisar:</p>
+                        `,
+                        code: {
+                            language: "bash",
+                            content: "apt install -y curl wget git build-essential nginx certbot python3-certbot-nginx"
+                        }
+                    },
+                    {
+                        title: "Criar usuário para a aplicação",
+                        content: `
+                            <p>Por segurança, vamos criar um usuário específico:</p>
+                        `,
+                        code: {
+                            language: "bash",
+                            content: "adduser flowedu"
+                        }
+                    },
+                    {
+                        title: "Dar permissões ao usuário",
+                        content: `
+                            <p>Permite que o usuário execute comandos administrativos:</p>
+                        `,
+                        code: {
+                            language: "bash",
+                            content: "usermod -aG sudo flowedu"
+                        }
+                    }
+                ]
+            },
+            4: {
+                title: "Instalar o Node.js",
+                time: "5 minutos",
+                difficulty: "Fácil",
+                description: "O FlowEdu é feito em Node.js, então precisamos instalá-lo.",
+                substeps: [
+                    {
+                        title: "Instalar o NVM",
+                        content: `<p>O NVM facilita a instalação do Node.js:</p>`,
+                        code: {
+                            language: "bash",
+                            content: "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash"
+                        }
+                    },
+                    {
+                        title: "Ativar o NVM",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "source ~/.bashrc"
+                        }
+                    },
+                    {
+                        title: "Instalar o Node.js versão 22",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "nvm install 22"
+                        }
+                    },
+                    {
+                        title: "Verificar instalação",
+                        content: `<p>Deve mostrar algo como <strong>v22.13.0</strong>:</p>`,
+                        code: {
+                            language: "bash",
+                            content: "node --version"
+                        }
+                    },
+                    {
+                        title: "Instalar PNPM e PM2",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "npm install -g pnpm pm2"
+                        }
+                    }
+                ]
+            },
+            5: {
+                title: "Configurar Banco de Dados (TiDB Cloud)",
+                time: "15 minutos",
+                difficulty: "Médio",
+                description: "Vamos criar um banco de dados gratuito na nuvem usando TiDB Cloud.",
+                substeps: [
+                    {
+                        title: "Criar conta no TiDB Cloud",
+                        content: `
+                            <p>1. Abra uma <strong>nova aba</strong> no navegador</p>
+                            <p>2. Acesse: <strong>tidbcloud.com</strong></p>
+                            <p>3. Clique em <strong>"Start Free"</strong></p>
+                            <p>4. Crie uma conta usando Google, GitHub ou E-mail</p>
+                        `
+                    },
+                    {
+                        title: "Criar um cluster",
+                        content: `
+                            <p>1. Clique em <strong>"Create Cluster"</strong></p>
+                            <p>2. Selecione <strong>"Serverless"</strong> (é o gratuito!)</p>
+                            <p>3. Configure:</p>
+                            <ul>
+                                <li><strong>Cluster Name:</strong> flowedu-db</li>
+                                <li><strong>Region:</strong> São Paulo (se disponível)</li>
+                            </ul>
+                            <p>4. Clique em <strong>"Create"</strong></p>
+                        `
+                    },
+                    {
+                        title: "Configurar senha e acesso",
+                        content: `
+                            <p>1. Clique no cluster criado</p>
+                            <p>2. Clique em <strong>"Connect"</strong></p>
+                            <p>3. Crie uma <strong>senha do banco</strong> e ANOTE!</p>
+                            <p>4. Em <strong>"IP Access List"</strong>, adicione o IP do seu VPS</p>
+                        `
+                    },
+                    {
+                        title: "Copiar a Connection String",
+                        content: `
+                            <p>Copie a string de conexão e guarde. Será algo como:</p>
+                            <div class="info-box important">
+                                <span class="info-box-icon">⚠️</span>
+                                <div class="info-box-content">
+                                    <strong>GUARDE ESSA STRING!</strong> Você vai precisar dela na próxima etapa.
+                                </div>
+                            </div>
+                        `,
+                        code: {
+                            language: "text",
+                            content: "mysql://usuario:senha@gateway.tidbcloud.com:4000/flowedu?ssl=true"
+                        }
+                    }
+                ]
+            },
+            6: {
+                title: "Baixar e Configurar o FlowEdu",
+                time: "20 minutos",
+                difficulty: "Médio",
+                description: "Agora vamos colocar o código no servidor e configurar.",
+                substeps: [
+                    {
+                        title: "Trocar para o usuário flowedu",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "su - flowedu"
+                        }
+                    },
+                    {
+                        title: "Criar pasta e baixar código",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "mkdir -p ~/apps && cd ~/apps\ngit clone https://github.com/seu-usuario/flowedu.git\ncd flowedu"
+                        }
+                    },
+                    {
+                        title: "Instalar dependências",
+                        content: `<p>Isso pode demorar 3-5 minutos:</p>`,
+                        code: {
+                            language: "bash",
+                            content: "pnpm install"
+                        }
+                    },
+                    {
+                        title: "Criar arquivo de configuração",
+                        content: `
+                            <p>1. Execute: <strong>nano .env</strong></p>
+                            <p>2. Cole o conteúdo abaixo (substituindo pelos seus valores):</p>
+                        `,
+                        code: {
+                            language: "env",
+                            content: 'DATABASE_URL="mysql://usuario:senha@gateway.tidbcloud.com:4000/flowedu?ssl=true"\nJWT_SECRET="crie_uma_senha_muito_longa_aqui"\nNODE_ENV="production"\nPORT="3000"'
+                        }
+                    },
+                    {
+                        title: "Compilar e iniciar",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "pnpm build\npnpm db:push\npm2 start npm --name \"flowedu\" -- start\npm2 save"
+                        }
+                    }
+                ]
+            },
+            7: {
+                title: "Configurar o Nginx",
+                time: "10 minutos",
+                difficulty: "Médio",
+                description: "O Nginx é o 'porteiro' que vai receber os visitantes do seu site.",
+                substeps: [
+                    {
+                        title: "Voltar para o usuário root",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "exit"
+                        }
+                    },
+                    {
+                        title: "Criar arquivo de configuração",
+                        content: `<p>Execute: <strong>nano /etc/nginx/sites-available/flowedu</strong></p><p>Cole o conteúdo abaixo (substitua seudominio.com.br):</p>`,
+                        code: {
+                            language: "nginx",
+                            content: `server {
+    listen 80;
+    server_name seudominio.com.br www.seudominio.com.br;
+    client_max_body_size 75M;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cache_bypass $http_upgrade;
+    }
+}`
+                        }
+                    },
+                    {
+                        title: "Ativar configuração",
+                        content: ``,
+                        code: {
+                            language: "bash",
+                            content: "ln -s /etc/nginx/sites-available/flowedu /etc/nginx/sites-enabled/\nrm -f /etc/nginx/sites-enabled/default\nnginx -t\nsystemctl restart nginx"
+                        }
+                    }
+                ]
+            },
+            8: {
+                title: "Configurar Domínio e SSL",
+                time: "15-30 minutos",
+                difficulty: "Médio",
+                description: "Vamos apontar seu domínio para o servidor e adicionar o cadeado de segurança.",
+                substeps: [
+                    {
+                        title: "Configurar DNS do domínio",
+                        content: `
+                            <p>Acesse o painel do seu provedor de domínio e adicione:</p>
+                            <table style="width:100%; border-collapse: collapse; margin: 15px 0;">
+                                <tr style="background: rgba(139, 92, 246, 0.2);">
+                                    <th style="padding: 10px; border: 1px solid var(--border);">Tipo</th>
+                                    <th style="padding: 10px; border: 1px solid var(--border);">Nome</th>
+                                    <th style="padding: 10px; border: 1px solid var(--border);">Valor</th>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">A</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">@</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">IP do seu VPS</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">A</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">www</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">IP do seu VPS</td>
+                                </tr>
+                            </table>
+                        `
+                    },
+                    {
+                        title: "Verificar propagação do DNS",
+                        content: `<p>Pode levar de 5 minutos a 48 horas. Para verificar:</p>`,
+                        code: {
+                            language: "bash",
+                            content: "ping seudominio.com.br"
+                        }
+                    },
+                    {
+                        title: "Gerar certificado SSL (HTTPS)",
+                        content: `<p>Só execute DEPOIS que o DNS estiver propagado:</p>`,
+                        code: {
+                            language: "bash",
+                            content: "certbot --nginx -d seudominio.com.br -d www.seudominio.com.br"
+                        }
+                    }
+                ]
+            },
+            9: {
+                title: "Testar Tudo!",
+                time: "10 minutos",
+                difficulty: "Fácil",
+                description: "Vamos verificar se tudo está funcionando corretamente.",
+                substeps: [
+                    {
+                        title: "Acessar o site",
+                        content: `
+                            <p>1. Abra seu navegador</p>
+                            <p>2. Digite: <strong>https://seudominio.com.br</strong></p>
+                            <p>3. Você deve ver a página inicial do FlowEdu! 🎉</p>
+                        `
+                    },
+                    {
+                        title: "Verificar o cadeado de segurança",
+                        content: `
+                            <p>Olhe na barra de endereço - deve aparecer um <strong>cadeado 🔒</strong></p>
+                        `
+                    },
+                    {
+                        title: "Testar funcionalidades",
+                        content: `
+                            <p>Teste as seguintes funcionalidades:</p>
+                            <ul>
+                                <li>✅ Página inicial carrega</li>
+                                <li>✅ Consegue acessar o Portal do Professor</li>
+                                <li>✅ Consegue fazer cadastro/login</li>
+                                <li>✅ Consegue criar uma disciplina</li>
+                                <li>✅ Consegue criar uma turma</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Comandos úteis para o dia a dia",
+                        content: `
+                            <table style="width:100%; border-collapse: collapse; margin: 15px 0;">
+                                <tr style="background: rgba(139, 92, 246, 0.2);">
+                                    <th style="padding: 10px; border: 1px solid var(--border);">O que fazer</th>
+                                    <th style="padding: 10px; border: 1px solid var(--border);">Comando</th>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">Ver status</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);"><code>pm2 status</code></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">Ver logs</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);"><code>pm2 logs flowedu</code></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid var(--border);">Reiniciar</td>
+                                    <td style="padding: 10px; border: 1px solid var(--border);"><code>pm2 restart flowedu</code></td>
+                                </tr>
+                            </table>
+                        `
+                    }
+                ]
+            }
+        };
+
+        // Current step
+        let currentStep = 1;
+        let completedSteps = new Set();
+
+        // Load saved progress
+        function loadProgress() {
+            const saved = localStorage.getItem('deployProgress');
+            if (saved) {
+                completedSteps = new Set(JSON.parse(saved));
+                updateProgressUI();
+            }
+        }
+
+        // Save progress
+        function saveProgress() {
+            localStorage.setItem('deployProgress', JSON.stringify([...completedSteps]));
+        }
+
+        // Update progress UI
+        function updateProgressUI() {
+            const progress = (completedSteps.size / 9) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+
+            // Update tabs
+            document.querySelectorAll('.step-tab').forEach(tab => {
+                const step = parseInt(tab.dataset.step);
+                if (completedSteps.has(step)) {
+                    tab.classList.add('completed');
+                } else {
+                    tab.classList.remove('completed');
+                }
+            });
+        }
+
+        // Render step content
+        function renderStep(stepNum) {
+            const step = stepsData[stepNum];
+            if (!step) return;
+
+            currentStep = stepNum;
+
+            // Update active tab
+            document.querySelectorAll('.step-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (parseInt(tab.dataset.step) === stepNum) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Render content
+            let html = `
+                <div class="step-header">
+                    <h3 class="step-title">${step.title}</h3>
+                    <div class="step-meta">
+                        <span class="step-meta-item">⏱️ ${step.time}</span>
+                        <span class="step-meta-item">📊 ${step.difficulty}</span>
+                    </div>
+                </div>
+                <p class="step-description">${step.description}</p>
+            `;
+
+            step.substeps.forEach((substep, index) => {
+                html += `
+                    <div class="substep fade-in" style="animation-delay: ${index * 0.1}s">
+                        <h4 class="substep-title">
+                            <span class="substep-number">${index + 1}</span>
+                            ${substep.title}
+                        </h4>
+                        <div class="substep-content">
+                            ${substep.content}
+                            ${substep.code ? renderCodeBlock(substep.code) : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <button class="complete-btn" onclick="markStepComplete(${stepNum})">
+                    ✅ Marcar etapa como concluída
+                </button>
+                <div class="step-navigation">
+                    <button class="nav-btn" onclick="renderStep(${stepNum - 1})" ${stepNum === 1 ? 'disabled' : ''}>
+                        ← Anterior
+                    </button>
+                    <button class="nav-btn primary" onclick="renderStep(${stepNum + 1})" ${stepNum === 9 ? 'disabled' : ''}>
+                        Próxima →
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('stepContent').innerHTML = html;
+        }
+
+        // Render code block
+        function renderCodeBlock(code) {
+            const id = 'code-' + Math.random().toString(36).substr(2, 9);
+            return `
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">${code.language}</span>
+                        <button class="copy-btn" onclick="copyCode('${id}', this)">
+                            📋 Copiar
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <code id="${id}">${escapeHtml(code.content)}</code>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Copy code
+        function copyCode(id, btn) {
+            const code = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('copied');
+                btn.innerHTML = '✅ Copiado!';
+                showToast('Comando copiado!');
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '📋 Copiar';
+                }, 2000);
+            });
+        }
+
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Mark step complete
+        function markStepComplete(stepNum) {
+            completedSteps.add(stepNum);
+            saveProgress();
+            updateProgressUI();
+            showToast(`Etapa ${stepNum} concluída! 🎉`);
+            
+            if (stepNum < 9) {
+                setTimeout(() => renderStep(stepNum + 1), 500);
+            }
+        }
+
+        // Checklist functionality
+        document.querySelectorAll('.checklist-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('checked');
+            });
+        });
+
+        // Tab click handlers
+        document.querySelectorAll('.step-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                renderStep(parseInt(tab.dataset.step));
+            });
+        });
+
+        // Initialize
+        loadProgress();
+        renderStep(1);
+    </script>
+</body>
+</html>

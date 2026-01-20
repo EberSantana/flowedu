@@ -6366,3 +6366,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🐛 Correção Portal do Aluno - Trilhas (19/01/2026)
 - [x] Corrigir barra de progresso - funciona corretamente, adicionada mensagem quando 0%
 - [x] Remover indicador de "Carga" (60h) duplicado do card
+
+
+## 🌐 Landing Page do Guia de Deploy (19/01/2026)
+- [x] Criar landing page interativa do guia de deploy
+- [x] Adicionar navegação por etapas
+- [x] Incluir glossário interativo
+- [x] Adicionar botões de copiar comandos
