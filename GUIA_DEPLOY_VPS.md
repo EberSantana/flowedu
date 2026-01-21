@@ -206,7 +206,7 @@ cd flowedu
 **Opção B: Via SCP (transferir arquivos locais)**
 ```bash
 # No seu computador local, execute:
-scp -r ./teacher_schedule_system flowedu@seu_ip:/home/flowedu/flowedu
+scp -r ./flowedu flowedu@seu_ip:/home/flowedu/flowedu
 ```
 
 **Opção C: Via SFTP (usando FileZilla ou similar)**

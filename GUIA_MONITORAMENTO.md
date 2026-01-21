@@ -144,7 +144,7 @@ module.exports = {
 
 ```bash
 #!/bin/bash
-# /home/ubuntu/teacher_schedule_system/scripts/alert-restart.sh
+# /home/ubuntu/flowedu/scripts/alert-restart.sh
 
 APP_NAME="FlowEdu"
 EMAIL="admin@seudominio.com"
@@ -158,7 +158,7 @@ echo "O aplicativo $APP_NAME foi reiniciado em $TIMESTAMP" | \
 Tornar executável:
 
 ```bash
-chmod +x /home/ubuntu/teacher_schedule_system/scripts/alert-restart.sh
+chmod +x /home/ubuntu/flowedu/scripts/alert-restart.sh
 ```
 
 ---

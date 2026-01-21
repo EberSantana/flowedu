@@ -102,7 +102,7 @@ Um script Node.js (`export-data.mjs`) foi criado para automatizar a exportação
 
 ```bash
 # Executar exportação automática
-cd /home/ubuntu/teacher_schedule_system
+cd /home/ubuntu/flowedu
 node export-data.mjs
 ```
 

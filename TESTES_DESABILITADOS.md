@@ -82,7 +82,7 @@ Para garantir um deploy seguro e rápido do FlowEdu em VPS, foram desabilitados 
 Para reabilitar um teste específico:
 
 ```bash
-cd /home/ubuntu/teacher_schedule_system/server
+cd /home/ubuntu/flowedu/server
 mv nome-do-teste.test.ts.skip nome-do-teste.test.ts
 pnpm test
 ```
@@ -90,7 +90,7 @@ pnpm test
 Para reabilitar todos os testes:
 
 ```bash
-cd /home/ubuntu/teacher_schedule_system/server
+cd /home/ubuntu/flowedu/server
 for file in *.test.ts.skip; do mv "$file" "${file%.skip}"; done
 pnpm test
 ```

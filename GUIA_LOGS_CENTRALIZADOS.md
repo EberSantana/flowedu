@@ -33,7 +33,7 @@ Winston é a biblioteca de logging mais popular para Node.js, oferecendo flexibi
 ### Instalação
 
 ```bash
-cd /home/ubuntu/teacher_schedule_system
+cd /home/ubuntu/flowedu
 pnpm add winston winston-daily-rotate-file
 ```
 
@@ -282,7 +282,7 @@ tail -f /var/log/flowedu/access.log
 
 ```bash
 #!/bin/bash
-# /home/ubuntu/teacher_schedule_system/scripts/monitor-logs.sh
+# /home/ubuntu/flowedu/scripts/monitor-logs.sh
 
 echo "=== FlowEdu - Monitor de Logs ==="
 echo ""
@@ -319,7 +319,7 @@ esac
 Tornar executável:
 
 ```bash
-chmod +x /home/ubuntu/teacher_schedule_system/scripts/monitor-logs.sh
+chmod +x /home/ubuntu/flowedu/scripts/monitor-logs.sh
 ```
 
 ---
@@ -357,7 +357,7 @@ Criar script para enviar alerta quando muitos erros ocorrem:
 
 ```bash
 #!/bin/bash
-# /home/ubuntu/teacher_schedule_system/scripts/alert-errors.sh
+# /home/ubuntu/flowedu/scripts/alert-errors.sh
 
 LOG_FILE="/var/log/flowedu/error-$(date +%Y-%m-%d).log"
 THRESHOLD=10
@@ -381,7 +381,7 @@ crontab -e
 Adicionar linha:
 
 ```
-0 * * * * /home/ubuntu/teacher_schedule_system/scripts/alert-errors.sh
+0 * * * * /home/ubuntu/flowedu/scripts/alert-errors.sh
 ```
 
 ---
@@ -390,7 +390,7 @@ Adicionar linha:
 
 ```bash
 #!/bin/bash
-# /home/ubuntu/teacher_schedule_system/scripts/cleanup-logs.sh
+# /home/ubuntu/flowedu/scripts/cleanup-logs.sh
 
 LOG_DIR="/var/log/flowedu"
 DAYS_TO_KEEP=30
@@ -413,7 +413,7 @@ crontab -e
 Adicionar linha:
 
 ```
-0 3 * * * /home/ubuntu/teacher_schedule_system/scripts/cleanup-logs.sh
+0 3 * * * /home/ubuntu/flowedu/scripts/cleanup-logs.sh
 ```
 
 ---

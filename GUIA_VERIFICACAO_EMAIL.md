@@ -58,7 +58,7 @@ export const users = mysqlTable("users", {
 **Executar migração:**
 
 ```bash
-cd /home/ubuntu/teacher_schedule_system
+cd /home/ubuntu/flowedu
 pnpm db:push
 ```
 

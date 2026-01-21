@@ -4910,7 +4910,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## 🔍 Investigação de Problema de Visualização
 - [ ] Analisar captura de tela fornecida pelo usuário mostrando interface "Análise de Aprendizado com IA"
-- [ ] Verificar se a captura corresponde ao projeto teacher_schedule_system ou outro projeto
+- [ ] Verificar se a captura corresponde ao projeto flowedu ou outro projeto
 - [ ] Identificar causa do problema de visualização reportado
 - [ ] Implementar correções necessárias se aplicável
 - [x] Ajustar layout da página "Análise de Aprendizado com IA" para ter margens adequadas e centralização consistente com "Trilhas de Aprendizagem"

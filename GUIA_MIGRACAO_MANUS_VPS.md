@@ -66,7 +66,7 @@ Antes de começar, vamos entender alguns termos técnicos usando analogias do di
 
 ### 1.2 Salvar o arquivo
 
-1. O navegador vai baixar um arquivo chamado `teacher_schedule_system.zip` (ou similar)
+1. O navegador vai baixar um arquivo chamado `flowedu.zip` (ou similar)
 2. Salve na pasta **Downloads** do seu computador
 3. **NÃO descompacte ainda** - vamos fazer isso na VPS
 
@@ -397,12 +397,12 @@ Se você baixou o ZIP do Manus:
 
 #### Windows (PowerShell):
 ```powershell
-scp C:\Users\SEU_USUARIO\Downloads\teacher_schedule_system.zip root@SEU_IP:/var/www/
+scp C:\Users\SEU_USUARIO\Downloads\flowedu.zip root@SEU_IP:/var/www/
 ```
 
 #### Mac (Terminal):
 ```bash
-scp ~/Downloads/teacher_schedule_system.zip root@SEU_IP:/var/www/
+scp ~/Downloads/flowedu.zip root@SEU_IP:/var/www/
 ```
 
 **Na VPS, descompacte:**
@@ -412,11 +412,11 @@ cd /var/www
 ```
 
 ```bash
-unzip teacher_schedule_system.zip
+unzip flowedu.zip
 ```
 
 ```bash
-mv teacher_schedule_system flowedu
+mv flowedu flowedu
 ```
 
 ### 6.3 Verificar se o código está lá
