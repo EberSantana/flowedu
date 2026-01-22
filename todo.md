@@ -6373,3 +6373,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar navegação por etapas
 - [x] Incluir glossário interativo
 - [x] Adicionar botões de copiar comandos
+
+
+## 📚 Criação de Guias de Deploy (21/01/2026)
+- [x] Criar guia completo de deploy para Google Cloud Run (para iniciantes)
+- [x] Criar guia comparativo VPS vs Cloud Run
+- [x] Validar que ambos os guias estão completos e testáveis
