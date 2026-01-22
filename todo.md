@@ -6379,3 +6379,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar guia completo de deploy para Google Cloud Run (para iniciantes)
 - [x] Criar guia comparativo VPS vs Cloud Run
 - [x] Validar que ambos os guias estão completos e testáveis
+
+
+## 📖 Guia VPS Ultra-Detalhado para Leigos (22/01/2026)
+- [x] Criar guia VPS com explicação de CADA comando
+- [x] Adicionar glossário expandido com 15 termos técnicos
+- [x] Incluir descrição do que cada tecla faz (Enter, Ctrl+C, Ctrl+O, etc)
+- [x] Explicar o que aparece na tela em cada etapa
+- [x] Adicionar seção "O que pode dar errado" em TODAS as 12 etapas
