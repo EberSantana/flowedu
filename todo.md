@@ -6387,3 +6387,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Incluir descrição do que cada tecla faz (Enter, Ctrl+C, Ctrl+O, etc)
 - [x] Explicar o que aparece na tela em cada etapa
 - [x] Adicionar seção "O que pode dar errado" em TODAS as 12 etapas
+
+
+## 🤖 Script de Instalação Automatizado (22/01/2026)
+- [x] Criar script install-vps.sh que automatiza instalação completa
+- [x] Incluir verificação de pré-requisitos (root, Ubuntu)
+- [x] Adicionar prompts interativos para configurações (domínio, e-mail, DATABASE_URL)
+- [x] Criar guia de uso do script (GUIA_SCRIPT_AUTOMATIZADO.md)
+- [ ] Testar script em VPS limpa (requer VPS real)
