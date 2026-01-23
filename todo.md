@@ -6395,3 +6395,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar prompts interativos para configurações (domínio, e-mail, DATABASE_URL)
 - [x] Criar guia de uso do script (GUIA_SCRIPT_AUTOMATIZADO.md)
 - [ ] Testar script em VPS limpa (requer VPS real)
+
+
+## 🔍 Análise de Dependências - pdf-parse (22/01/2026)
+- [x] Investigar uso de pdf-parse no código
+- [x] Identificar funcionalidades sendo usadas
+- [x] Remover arquivo fileParser.ts (não utilizado)
+- [x] Remover rotas parseImportFile e confirmImport (não utilizadas)
+- [x] Manter pdf-parse (usado em Calendar.tsx para importar eventos de PDF)
+- [x] Manter mammoth (usado em extract-pdf.ts para DOCX)
+- [x] Manter multer (usado em extract-pdf.ts para upload)

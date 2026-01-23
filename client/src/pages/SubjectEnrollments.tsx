@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { UserPlus, Trash2, Download, FileSpreadsheet, FileText, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
-import ImportStudentsModal from "@/components/ImportStudentsModal";
 
 export default function SubjectEnrollments() {
   const [, params] = useRoute("/subjects/:id/enrollments");
@@ -394,13 +393,7 @@ export default function SubjectEnrollments() {
           </DialogContent>
         </Dialog>
 
-        {/* Import Students Modal */}
-        <ImportStudentsModal
-          open={isImportModalOpen}
-          onOpenChange={setIsImportModalOpen}
-          onSuccess={() => refetch()}
-          subjectId={subjectId}
-        />
+
       </div>
     </DashboardLayout>
   );

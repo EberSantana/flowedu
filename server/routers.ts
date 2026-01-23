@@ -1080,15 +1080,14 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { invokeLLM } = await import("./_core/llm");
-        const { PDFParse } = await import("pdf-parse");
+        const pdfParse = await import("pdf-parse") as any;
         
         // Converter base64 para buffer
         const pdfBuffer = Buffer.from(input.pdfBase64, 'base64');
         
         // Extrair texto do PDF
-        const parser = new PDFParse({ data: pdfBuffer });
-        const textResult = await parser.getText();
-        const pdfText = textResult.text;
+        const data = await pdfParse(pdfBuffer);
+        const pdfText = data.text;
         
         // Usar LLM para extrair eventos
         const response = await invokeLLM({
@@ -3777,63 +3776,7 @@ JSON (descrições MAX 15 chars):
         return await db.unenrollStudentFromClass(input.enrollmentId, ctx.user.id);
       }),
     
-    // Importação em massa de alunos
-    parseImportFile: protectedProcedure
-      .input(z.object({
-        fileData: z.string(), // base64
-        filename: z.string(),
-      }))
-      .mutation(async ({ input }) => {
-        const { parseStudentFile } = await import('./fileParser');
-        
-        // Converter base64 para buffer
-        const buffer = Buffer.from(input.fileData, 'base64');
-        
-        // Parse do arquivo
-        const result = await parseStudentFile(buffer, input.filename);
-        
-        return result;
-      }),
-    
-    confirmImport: protectedProcedure
-      .input(z.object({
-        students: z.array(z.object({
-          registrationNumber: z.string(),
-          fullName: z.string(),
-        })),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const results = {
-          success: [] as string[],
-          errors: [] as string[],
-        };
-        
-        for (const student of input.students) {
-          try {
-            // Verificar se já existe
-            const existing = await db.getStudentByRegistration(student.registrationNumber);
-            
-            if (existing) {
-              results.errors.push(`Matrícula ${student.registrationNumber} já existe`);
-              continue;
-            }
-            
-            // Criar aluno
-            await db.createStudent({
-              registrationNumber: student.registrationNumber,
-              fullName: student.fullName,
-              userId: ctx.user.id,
-            });
-            
-            results.success.push(`${student.fullName} (${student.registrationNumber})`);
-          } catch (error: any) {
-            results.errors.push(`Erro ao criar ${student.fullName}: ${error.message}`);
-          }
-        }
-        
-        return results;
-      }),
-    
+
     downloadTemplate: protectedProcedure
       .query(async () => {
         const XLSX = await import('xlsx');

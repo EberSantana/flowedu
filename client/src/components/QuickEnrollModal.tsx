@@ -7,8 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { UserPlus, Upload } from "lucide-react";
-import ImportStudentsModal from "./ImportStudentsModal";
+import { UserPlus } from "lucide-react";
 
 interface QuickEnrollModalProps {
   open: boolean;
@@ -128,9 +127,8 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess, defaul
 
             {/* Tabs: Manual ou Importação */}
             <Tabs defaultValue="manual" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="manual">Cadastro Manual</TabsTrigger>
-                <TabsTrigger value="import">Importação em Massa</TabsTrigger>
               </TabsList>
 
               <TabsContent value="manual" className="space-y-4 mt-4">
@@ -170,37 +168,13 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess, defaul
                 </Button>
               </TabsContent>
 
-              <TabsContent value="import" className="space-y-4 mt-4">
-                <div className="text-center py-8">
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-sm text-gray-600 mb-4">
-                    Importe múltiplos alunos de uma vez usando arquivos Excel, PDF ou DOCX
-                  </p>
-                  <Button onClick={handleImportClick}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Abrir Importação em Massa
-                  </Button>
-                </div>
-              </TabsContent>
+
             </Tabs>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Modal de Importação */}
-      {selectedSubjectId && (
-        <ImportStudentsModal
-          open={showImportModal}
-          onOpenChange={setShowImportModal}
-          onSuccess={() => {
-            setShowImportModal(false);
-            // utils.subjects.getEnrollmentCounts.invalidate();
-            onSuccess();
-            onOpenChange(false);
-          }}
-          subjectId={selectedSubjectId}
-        />
-      )}
+
     </>
   );
 }
