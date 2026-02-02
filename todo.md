@@ -6405,3 +6405,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Manter pdf-parse (usado em Calendar.tsx para importar eventos de PDF)
 - [x] Manter mammoth (usado em extract-pdf.ts para DOCX)
 - [x] Manter multer (usado em extract-pdf.ts para upload)
+
+
+## 🔒 Correção de Segurança - Express Rate Limiting (23/01/2026)
+- [x] Analisar erros de trust proxy e rate limiting em produção
+- [x] Configurar trust proxy de forma segura (apenas Nginx/proxy reverso - loopback)
+- [x] Implementar rate limiting com IP real do usuário via X-Forwarded-For
+- [x] Adicionar proteção contra ataques de path traversal (bloqueio de padrões suspeitos)
+- [x] Testar correção localmente (servidor rodando sem erros)
+- [ ] Atualizar código e fazer push para GitHub
+- [ ] Atualizar aplicação na VPS (flowedu.app)

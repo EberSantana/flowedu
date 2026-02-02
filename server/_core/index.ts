@@ -38,6 +38,38 @@ async function startServer() {
   const server = createServer(app);
   
   // ============================================
+  // SEGURANÇA - Trust Proxy (apenas Nginx)
+  // ============================================
+  // Configurar trust proxy apenas para Nginx local (127.0.0.1)
+  // Isso permite rate limiting correto sem permitir falsificação de IPs
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", "loopback"); // Apenas localhost/127.0.0.1
+  }
+  
+  // ============================================
+  // SEGURANÇA - Proteção contra Path Traversal
+  // ============================================
+  app.use((req, res, next) => {
+    // Bloquear tentativas de path traversal
+    const suspiciousPatterns = [
+      /\.\.[\/\\]/,  // ../ ou ..\\
+      /%2e%2e/i,      // URL encoded ..
+      /%252e/i,       // Double URL encoded .
+      /\/proc\//i,    // Acesso a /proc/
+      /\/etc\//i,     // Acesso a /etc/
+      /\/sys\//i,     // Acesso a /sys/
+    ];
+    
+    const path = decodeURIComponent(req.url);
+    if (suspiciousPatterns.some(pattern => pattern.test(path))) {
+      console.warn(`[Security] Blocked path traversal attempt: ${req.ip} -> ${req.url}`);
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    
+    next();
+  });
+  
+  // ============================================
   // SEGURANÇA - Headers HTTP (Helmet)
   // ============================================
   app.use(helmet({
@@ -65,6 +97,11 @@ async function startServer() {
     message: { error: "Muitas requisições. Tente novamente em 1 minuto." },
     standardHeaders: true,
     legacyHeaders: false,
+    // Usar IP real do usuário via X-Forwarded-For (apenas do Nginx)
+    skip: (req) => {
+      // Em desenvolvimento, não aplicar rate limiting
+      return process.env.NODE_ENV !== "production";
+    },
   });
   
   // Rate limiter para rotas de autenticação - 10 tentativas por 15 minutos
