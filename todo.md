@@ -6457,3 +6457,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar login manual de professor (tela de escolha aparecendo)
 - [x] Testar login manual de aluno (tela de escolha aparecendo)
 - [x] Salvar checkpoint
+
+
+## 🔄 Reativar Auto-login para Pré-visualização (03/02/2026)
+- [x] Reativar flag AUTO_LOGIN_DEV no context.ts (NODE_ENV === 'development')
+- [x] Testar pré-visualização mostrando dashboard do sistema (funcionando perfeitamente)
+- [x] Salvar checkpoint

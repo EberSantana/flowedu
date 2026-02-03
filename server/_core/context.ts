@@ -31,8 +31,8 @@ export type TrpcContext = {
 const USE_STANDALONE_AUTH = true;
 
 // Auto-login em desenvolvimento (pré-visualização Manus)
-// DESABILITADO: para permitir login manual de professor e aluno
-const AUTO_LOGIN_DEV = false; // process.env.NODE_ENV === 'development';
+// ATIVADO: para mostrar o sistema funcionando na pré-visualização do Manus
+const AUTO_LOGIN_DEV = process.env.NODE_ENV === 'development';
 
 export async function createContext(
   opts: CreateExpressContextOptions
