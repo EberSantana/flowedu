@@ -6528,3 +6528,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Validar configuração nginx-cache.conf (pronto para uso)
 - [x] Garantir que está pronto para aplicação na VPS (checklist final incluído)
 - [x] Salvar checkpoint
+
+
+## 🤖 Script de Automação de Instalação VPS (03/02/2026)
+- [x] Criar script install-flowedu.sh com instalação automatizada (18 passos)
+- [x] Criar guia GUIA_INSTALACAO_VPS_COMPLETO.md passo a passo (10 passos + FAQ)
+- [x] Incluir verificações de erro e mensagens coloridas
+- [x] Documentar comandos úteis e troubleshooting
+- [x] Salvar checkpoint
