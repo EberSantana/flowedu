@@ -6415,3 +6415,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar correção localmente (servidor rodando sem erros)
 - [ ] Atualizar código e fazer push para GitHub
 - [ ] Atualizar aplicação na VPS (flowedu.app)
+
+
+## 🚀 Correção Completa VPS - Frontend e CSP (03/02/2026)
+- [x] Corrigir CSP para permitir https://analytics.manus.im no script-src
+- [x] Adicionar data: ao font-src do CSP para fontes base64
+- [x] Adicionar scriptSrcAttr: ['unsafe-inline'] para permitir atributos de script
+- [x] Testar build completo localmente (dist/public/ criado com sucesso)
+- [x] Verificar se React está no bundle (createContext encontrado em múltiplos arquivos)
+- [ ] Salvar checkpoint e fazer push para GitHub
+- [ ] Criar guia simplificado de atualização para VPS
