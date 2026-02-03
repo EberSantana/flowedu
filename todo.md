@@ -6512,3 +6512,19 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover botão duplicado (removido LogoutButton do Dashboard.tsx)
 - [x] Testar dashboard após remoção (apenas 1 botão Sair agora)
 - [x] Salvar checkpoint
+
+
+## 🎨 Padronizar Página Tasks (Tarefas) - 03/02/2026
+- [x] Verificar página Tasks atual (usava text-4xl, py-8, sem botão Voltar)
+- [x] Adicionar botão "Voltar ao Dashboard" no topo
+- [x] Padronizar título para text-3xl com ícone CheckSquare
+- [x] Adicionar subtítulo "Organize e acompanhe suas tarefas e atividades"
+- [x] Garantir bg-background e padding consistente (py-6 px-4)
+- [x] Testar página Tasks (sem erros no console)
+
+## 📋 Revisar Guia de Cache do Nginx - 03/02/2026
+- [x] Ler GUIA_CACHE_NGINX.md completo (289 linhas, muito bem estruturado)
+- [x] Verificar se todas as instruções estão claras (7 passos detalhados + FAQ)
+- [x] Validar configuração nginx-cache.conf (pronto para uso)
+- [x] Garantir que está pronto para aplicação na VPS (checklist final incluído)
+- [x] Salvar checkpoint

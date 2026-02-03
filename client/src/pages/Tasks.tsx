@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "../lib/trpc";
+import { Link } from "wouter";
 import Sidebar from "../components/Sidebar";
 import PageWrapper from "../components/PageWrapper";
 import { Button } from "../components/ui/button";
@@ -33,6 +34,7 @@ import {
   Trash2,
   Edit,
   CheckSquare,
+  ArrowLeft,
 } from "lucide-react";
 
 type Priority = "low" | "medium" | "high";
@@ -245,15 +247,26 @@ export default function Tasks() {
     <>
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Dashboard
+            </Button>
+          </Link>
+          
           {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+              <CheckSquare className="w-8 h-8 text-primary" />
+              Gerenciar Tarefas
+            </h1>
+            <p className="text-gray-600">Organize e acompanhe suas tarefas e atividades</p>
+          </div>
+          
+          {/* Ações e Filtros */}
           <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <CheckSquare className="h-8 w-8 text-teal-600" />
-                Gerenciar Tarefas
-              </h1>
-            </div>
             <Dialog
               open={isCreateDialogOpen}
               onOpenChange={(open) => {
