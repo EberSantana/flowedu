@@ -6472,3 +6472,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar logout de professor (funcionando - redireciona para tela de escolha)
 - [x] Testar logout de aluno (mesma lógica, funciona)
 - [x] Salvar checkpoint
+
+
+## 🎨 Padronizar Layout da Grade Semanal (03/02/2026)
+- [x] Analisar página Grade Semanal atual e identificar diferenças (usava bg-gradient diferente)
+- [x] Ajustar para usar mesmo padrão visual das outras páginas (Sidebar + PageWrapper)
+- [x] Adicionar botão "Voltar ao Dashboard" no topo
+- [x] Garantir card branco centralizado com conteúdo
+- [x] Ajustar título e subtítulo para seguir padrão do Calendário
+- [x] Testar consistência visual com Calendário e outras páginas
+- [x] Salvar checkpoint

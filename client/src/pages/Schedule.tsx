@@ -463,11 +463,17 @@ export default function Schedule() {
     return (
       <>
         <Sidebar />
-        <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-          <div className="container mx-auto py-8">
+        <PageWrapper className="min-h-screen bg-background">
+          <div className="container mx-auto py-6 px-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="mb-4">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar ao Dashboard
+              </Button>
+            </Link>
             <div className="mb-6">
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <Calendar className="h-8 w-8 text-purple-600" />
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Calendar className="w-8 h-8 text-primary" />
                 Grade de Horários
               </h1>
             </div>
@@ -480,36 +486,52 @@ export default function Schedule() {
 
   if (!fullSchedule || fullSchedule.shifts.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="container mx-auto py-8">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar ao Dashboard
-            </Button>
-          </Link>
-          <Card className="bg-white shadow-lg">
-            <CardContent className="py-12 text-center">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">Nenhum turno configurado. Configure os turnos primeiro.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <>
+        <Sidebar />
+        <PageWrapper className="min-h-screen bg-background">
+          <div className="container mx-auto py-6 px-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="mb-4">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar ao Dashboard
+              </Button>
+            </Link>
+            <Card className="bg-white shadow-lg">
+              <CardContent className="py-12 text-center">
+                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">Nenhum turno configurado. Configure os turnos primeiro.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </PageWrapper>
+      </>
     );
   }
 
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="container mx-auto py-8">
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Dashboard
+            </Button>
+          </Link>
+          
           <div className="mb-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <Calendar className="h-8 w-8 text-purple-600" />
-                Grade de Horários
-              </h1>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                  <Calendar className="w-8 h-8 text-primary" />
+                  Grade de Horários
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Visualize e gerencie sua grade de horários semanal
+                </p>
+              </div>
               <div className="flex gap-2">
                 <Button
                   onClick={exportToPDF}
