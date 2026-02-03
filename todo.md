@@ -6495,3 +6495,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Padronizar padding e espaçamento (py-6 px-4)
 - [x] Testar navegação em todas as páginas (Disciplinas, Turmas, Turnos)
 - [x] Salvar checkpoint
+
+
+## 🎨 Padronizar Página Announcements (Avisos) - 03/02/2026
+- [x] Analisar página Announcements (usava text-4xl, sem botão Voltar)
+- [x] Adicionar botão "Voltar ao Dashboard" no topo
+- [x] Padronizar título para text-3xl com ícone Megaphone
+- [x] Garantir bg-background e padding consistente (py-6 px-4)
+- [x] Testar (sem erros no console)
+- [x] Salvar checkpoint
