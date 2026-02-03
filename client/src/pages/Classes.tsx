@@ -94,15 +94,26 @@ export default function Classes() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="container mx-auto py-4 sm:py-6 lg:py-8">
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Dashboard
+            </Button>
+          </Link>
+          
           <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Turmas" }]} />
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-                <Users className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary" />
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Users className="w-8 h-8 text-primary" />
                 Gerenciar Turmas
               </h1>
+              <p className="text-gray-600 mt-1">
+                Organize e gerencie as turmas das suas disciplinas
+              </p>
             </div>
             <Button 
               onClick={() => setIsDialogOpen(true)} 

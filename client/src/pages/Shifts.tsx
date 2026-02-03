@@ -95,16 +95,24 @@ export default function Shifts() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="container mx-auto py-8">
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Dashboard
+            </Button>
+          </Link>
+          
           <Breadcrumb items={[{ label: "Planejamento" }, { label: "Turnos" }]} />
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                <Clock className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Clock className="w-8 h-8 text-primary" />
                 Configurar Turnos
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 mt-1">
                 Gerencie os turnos e seus horários antes de criar a grade de aulas
               </p>
             </div>

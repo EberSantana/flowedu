@@ -6482,3 +6482,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Ajustar título e subtítulo para seguir padrão do Calendário
 - [x] Testar consistência visual com Calendário e outras páginas
 - [x] Salvar checkpoint
+
+
+## 🎨 Padronização Visual de Todas as Páginas (03/02/2026)
+- [x] Auditar página Disciplinas (/subjects) - usava bg-gradient e text-4xl
+- [x] Auditar página Turmas (/classes) - usava bg-gradient e text-4xl
+- [x] Auditar página Turnos (/shifts) - usava bg-gradient e text-4xl
+- [x] Identificar inconsistências (todas sem botão Voltar, títulos grandes)
+- [x] Padronizar com botão "Voltar ao Dashboard" no topo
+- [x] Padronizar títulos (text-3xl fixo) e adicionar subtítulos descritivos
+- [x] Padronizar background (bg-background ao invés de bg-gradient)
+- [x] Padronizar padding e espaçamento (py-6 px-4)
+- [x] Testar navegação em todas as páginas (Disciplinas, Turmas, Turnos)
+- [x] Salvar checkpoint
