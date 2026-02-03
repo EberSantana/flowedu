@@ -6536,3 +6536,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Incluir verificações de erro e mensagens coloridas
 - [x] Documentar comandos úteis e troubleshooting
 - [x] Salvar checkpoint
+
+
+## ✅ Script de Verificação de Instalação (03/02/2026)
+- [x] Criar script verify-installation.sh (11 verificações completas)
+- [x] Verificar Node.js, pnpm, PM2, Nginx, Certbot, Git
+- [x] Verificar se aplicação está rodando (status PM2)
+- [x] Verificar se banco de dados está acessível (teste de conexão)
+- [x] Verificar se SSL está configurado (certificados)
+- [x] Verificar portas (80, 443, 3000)
+- [x] Verificar recursos do sistema (RAM, disco, CPU)
+- [x] Gerar relatório colorido com status (✓ ✗ ⚠)
+- [x] Salvar checkpoint
