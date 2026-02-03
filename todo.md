@@ -6441,3 +6441,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir estrutura HTML removendo aninhamento inválido (substituído Link por onClick com useLocation)
 - [x] Testar correção no navegador (sem erros no console)
 - [x] Salvar checkpoint
+
+
+## ⚡ Sistema de Cache de Assets Estáticos - Nginx (03/02/2026)
+- [x] Criar configuração de cache do Nginx com headers apropriados
+- [x] Configurar expiração por tipo de arquivo (imagens 1 ano, CSS/JS 1 mês, fontes 1 ano)
+- [x] Adicionar compressão gzip para assets (nível 6, tipos otimizados)
+- [x] Criar guia de aplicação na VPS (GUIA_CACHE_NGINX.md completo)
+- [x] Documentar benefícios e métricas esperadas (80-90% redução de banda)
+- [x] Salvar checkpoint
