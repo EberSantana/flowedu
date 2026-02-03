@@ -6450,3 +6450,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar guia de aplicação na VPS (GUIA_CACHE_NGINX.md completo)
 - [x] Documentar benefícios e métricas esperadas (80-90% redução de banda)
 - [x] Salvar checkpoint
+
+
+## 🔓 Desabilitar Auto-login para Testes (03/02/2026)
+- [x] Remover/comentar código de auto-login no context.ts (AUTO_LOGIN_DEV = false)
+- [x] Testar login manual de professor (tela de escolha aparecendo)
+- [x] Testar login manual de aluno (tela de escolha aparecendo)
+- [x] Salvar checkpoint
