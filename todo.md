@@ -6434,3 +6434,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar auto-login com usuário de teste (Professor Demo)
 - [x] Testar pré-visualização mostrando sistema funcionando
 - [x] Salvar checkpoint
+
+
+## 🐛 Correção de Erro HTML - Nested <a> tags (03/02/2026)
+- [x] Identificar onde está o erro de <a> aninhado na página /subjects
+- [x] Corrigir estrutura HTML removendo aninhamento inválido (substituído Link por onClick com useLocation)
+- [x] Testar correção no navegador (sem erros no console)
+- [x] Salvar checkpoint

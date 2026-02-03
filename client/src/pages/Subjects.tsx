@@ -17,13 +17,14 @@ import { BookOpen, Plus, Pencil, Trash2, ArrowLeft, FileText, Download, Users, R
 import { AdvancedPagination, usePagination } from "@/components/ui/advanced-pagination";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { jsPDF } from "jspdf";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import QuickEnrollModal from "@/components/QuickEnrollModal";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function Subjects() {
+  const [, setLocation] = useLocation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSubject, setEditingSubject] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -490,16 +491,15 @@ export default function Subjects() {
                     <div className="flex gap-2">
                       <div className="flex-1">
                         {/* Botão Ver Detalhes Completos com contador de alunos */}
-                        <Link href={`/subjects/${subject.id}/enrollments`} className="block">
-                          <Button
-                            variant="default"
-                            size="sm"
-                            className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white"
-                          >
-                            <Users className="mr-2 h-3 w-3" />
-                            {enrollmentCounts[subject.id] || 0} Aluno(s) - Ver Detalhes
-                          </Button>
-                        </Link>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => setLocation(`/subjects/${subject.id}/enrollments`)}
+                          className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white"
+                        >
+                          <Users className="mr-2 h-3 w-3" />
+                          {enrollmentCounts[subject.id] || 0} Aluno(s) - Ver Detalhes
+                        </Button>
                       </div>
                       <Button
                         variant="default"
@@ -514,16 +514,15 @@ export default function Subjects() {
                         <UserPlus className="h-3 w-3" />
                       </Button>
                     </div>
-                    <Link href="/learning-paths">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                      >
-                        <Route className="mr-2 h-3 w-3" />
-                        Trilhas de Aprendizagem
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setLocation('/learning-paths')}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <Route className="mr-2 h-3 w-3" />
+                      Trilhas de Aprendizagem
+                    </Button>
 
                     <div className="flex gap-2">
                       <Button
