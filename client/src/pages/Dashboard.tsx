@@ -58,19 +58,6 @@ ChartJS.register(
 
 const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-// Componente de botão de logout
-function LogoutButton() {
-  return (
-    <a
-      href="/api/logout"
-      className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background h-9 rounded-md px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-    >
-      <LogOut className="h-4 w-4" />
-      Sair
-    </a>
-  );
-}
-
 export default function Dashboard() {
   const { user } = useAuth();
   
@@ -454,7 +441,7 @@ export default function Dashboard() {
             </div>
             <div className="flex gap-2 items-center">
               {/* Botão de perfil removido - perfil único tradicional */}
-              <LogoutButton />
+              {/* Botão Sair removido - disponível no Sidebar */}
               {isCustomizing && (
                 <Button
                   onClick={resetToDefault}

@@ -6504,3 +6504,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Garantir bg-background e padding consistente (py-6 px-4)
 - [x] Testar (sem erros no console)
 - [x] Salvar checkpoint
+
+
+## 🔧 Remover Botão Sair Duplicado (03/02/2026)
+- [x] Identificar onde estão os dois botões "Sair" (LogoutButton no header + botão no Sidebar)
+- [x] Decidir qual botão manter (mantido apenas no Sidebar)
+- [x] Remover botão duplicado (removido LogoutButton do Dashboard.tsx)
+- [x] Testar dashboard após remoção (apenas 1 botão Sair agora)
+- [x] Salvar checkpoint
