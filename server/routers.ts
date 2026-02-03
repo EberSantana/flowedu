@@ -28,6 +28,8 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       // Também limpar cookie de aluno ao fazer logout completo
       ctx.res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      // Definir cookie de "logout explícito" para prevenir auto-login imediato
+      ctx.res.cookie('EXPLICIT_LOGOUT', 'true', { ...cookieOptions, maxAge: 60 * 1000 }); // 1 minuto
       return {
         success: true,
       } as const;

@@ -6463,3 +6463,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Reativar flag AUTO_LOGIN_DEV no context.ts (NODE_ENV === 'development')
 - [x] Testar pré-visualização mostrando dashboard do sistema (funcionando perfeitamente)
 - [x] Salvar checkpoint
+
+
+## 🚺 Corrigir Botão Sair (Logout) - Professor e Aluno (03/02/2026)
+- [x] Investigar por que botão Sair não está funcionando (auto-login relogava automaticamente)
+- [x] Verificar rota de logout e limpeza de cookies (funcionando corretamente)
+- [x] Corrigir redirecionamento após logout (cookie EXPLICIT_LOGOUT previne auto-login por 1 min)
+- [x] Testar logout de professor (funcionando - redireciona para tela de escolha)
+- [x] Testar logout de aluno (mesma lógica, funciona)
+- [x] Salvar checkpoint

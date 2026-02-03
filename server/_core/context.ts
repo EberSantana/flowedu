@@ -88,7 +88,9 @@ export async function createContext(
     }
     
     // Auto-login em desenvolvimento: criar usuário demo se não autenticado
-    if (AUTO_LOGIN_DEV && !user) {
+    // MAS NÃO se o usuário acabou de fazer logout explícito
+    const hasExplicitLogout = cookies && cookies.includes('EXPLICIT_LOGOUT=true');
+    if (AUTO_LOGIN_DEV && !user && !hasExplicitLogout) {
       try {
         // Importar dinamicamente para evitar dependência circular
         const dbModule = await import('../db');
