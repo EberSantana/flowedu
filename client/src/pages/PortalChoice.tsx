@@ -1,8 +1,35 @@
 // Version: 2026-01-15-v3 - Cards com altura igual
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { GraduationCap, Users, Mail, Shield, BookOpen, Award, TrendingUp } from "lucide-react";
+import { useEffect } from "react";
+import { trpc } from "@/lib/trpc";
 
 export default function PortalChoice() {
+  const [, setLocation] = useLocation();
+  const { data: user, isLoading } = trpc.auth.me.useQuery();
+  const { data: studentSession } = trpc.auth.studentSession.useQuery();
+  
+  // Redirecionar automaticamente se já estiver autenticado
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (studentSession) {
+      // Se é aluno, redirecionar para dashboard de aluno
+      setLocation('/student/dashboard');
+    } else if (user) {
+      // Se é professor, redirecionar para dashboard
+      setLocation('/dashboard');
+    }
+  }, [user, studentSession, isLoading, setLocation]);
+  
+  // Mostrar loading enquanto verifica autenticação
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)' }}>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
   return (
     <div 
       className="min-h-screen relative overflow-hidden"

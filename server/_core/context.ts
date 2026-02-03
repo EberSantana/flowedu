@@ -30,6 +30,9 @@ export type TrpcContext = {
 // SEMPRE usar standalone auth quando o login é por email/senha
 const USE_STANDALONE_AUTH = true;
 
+// Auto-login em desenvolvimento (pré-visualização Manus)
+const AUTO_LOGIN_DEV = process.env.NODE_ENV === 'development';
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
@@ -81,6 +84,54 @@ export async function createContext(
     } catch (error) {
       // Authentication is optional for public procedures.
       user = null;
+    }
+    
+    // Auto-login em desenvolvimento: criar usuário demo se não autenticado
+    if (AUTO_LOGIN_DEV && !user) {
+      try {
+        // Importar dinamicamente para evitar dependência circular
+        const dbModule = await import('../db');
+        const database = await dbModule.getDb();
+        
+        if (database) {
+          const schemaModule = await import('../../drizzle/schema');
+          const ormModule = await import('drizzle-orm');
+          
+          // Buscar ou criar usuário demo
+          const demoEmail = 'demo@flowedu.app';
+          const existingUsers = await database.select().from(schemaModule.users).where(ormModule.eq(schemaModule.users.email, demoEmail)).limit(1);
+          let demoUser = existingUsers[0];
+          
+          if (!demoUser) {
+            // Criar usuário demo se não existir
+            const bcrypt = await import('bcryptjs');
+            const passwordHash = await bcrypt.default.hash('demo123', 10);
+            
+            await database.insert(schemaModule.users).values({
+              openId: `demo-${Date.now()}`,
+              name: 'Professor Demo',
+              email: demoEmail,
+              passwordHash,
+              role: 'admin',
+              active: true,
+              createdAt: new Date(),
+              lastSignedIn: new Date(),
+            });
+            
+            // Buscar o usuário recém-criado
+            const newlyCreated = await database.select().from(schemaModule.users).where(ormModule.eq(schemaModule.users.email, demoEmail)).limit(1);
+            demoUser = newlyCreated[0];
+          }
+          
+          if (demoUser) {
+            user = demoUser;
+            userType = 'teacher';
+          }
+        }
+      } catch (error) {
+        // Falha no auto-login não deve quebrar a aplicação
+        console.error('[Auto-login] Erro ao criar usuário demo:', error);
+      }
     }
   }
 

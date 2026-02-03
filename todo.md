@@ -6423,5 +6423,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar scriptSrcAttr: ['unsafe-inline'] para permitir atributos de script
 - [x] Testar build completo localmente (dist/public/ criado com sucesso)
 - [x] Verificar se React está no bundle (createContext encontrado em múltiplos arquivos)
-- [ ] Salvar checkpoint e fazer push para GitHub
-- [ ] Criar guia simplificado de atualização para VPS
+- [x] Salvar checkpoint e fazer push para GitHub (checkpoint 2ef423b4)
+- [x] Criar guia simplificado de atualização para VPS (GUIA_ATUALIZACAO_VPS_SIMPLES.md)
+
+
+## 🔍 Correção de Pré-visualização - Auto-login (03/02/2026)
+- [x] Investigar por que pré-visualização mostra apenas tela de login
+- [x] Verificar se OAuth está funcionando em desenvolvimento
+- [x] Implementar bypass de autenticação para ambiente de desenvolvimento
+- [x] Criar auto-login com usuário de teste (Professor Demo)
+- [x] Testar pré-visualização mostrando sistema funcionando
+- [x] Salvar checkpoint
