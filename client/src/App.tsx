@@ -1,5 +1,5 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import { Suspense, lazy } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -80,6 +80,21 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ClearSession = lazy(() => import("./pages/ClearSession"));
 
 function Router() {
+  const [location] = useLocation();
+  
+  // Páginas onde o BibleFooter NÃO deve aparecer
+  const hideFooterPages = [
+    '/',
+    '/student-login',
+    '/login-professor',
+    '/cadastro-professor',
+    '/register',
+    '/esqueci-senha',
+    '/redefinir-senha',
+  ];
+  
+  const shouldShowFooter = !hideFooterPages.includes(location);
+  
   return (
     <>
       <Suspense fallback={<PageLoader />}>
@@ -152,7 +167,7 @@ function Router() {
         </Switch>
       </Suspense>
       <OfflineIndicator />
-      <BibleFooter />
+      {shouldShowFooter && <BibleFooter />}
       <InstallPWA />
       <CommandPalette />
     </>

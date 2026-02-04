@@ -109,6 +109,15 @@
 - [ ] Documentar rotas da API
 - [ ] Criar guia de uso do sistema
 
+## Sistema de Login com Email/Senha (Sem OAuth)
+- [x] Adicionar campo password na tabela users (já existia no schema)
+- [x] Criar rotas de autenticação com bcrypt (já implementado - loginTeacher)
+- [x] Modificar interface de login para aceitar email/senha (já implementado - TeacherLogin.tsx)
+- [x] Criar script SQL para usuários admin: eberss@flowedu.app e eber.santana@flowedu.app
+- [x] Criar guia completo de instruções (GUIA_LOGIN_FLOWEDU.md)
+- [ ] Executar script SQL na VPS para criar usuários
+- [ ] Testar login com email/senha no site
+
 ## Correção de Layout - Relatório de Desempenho
 - [x] Corrigir layout da página de Relatório de Desempenho para usar Sidebar + PageWrapper
 - [x] Remover DashboardLayout e substituir por Sidebar
@@ -6559,3 +6568,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Incluir verificações do site (6 itens + performance)
 - [x] Adicionar comandos rápidos e troubleshooting
 - [x] Salvar checkpoint
+
+## 🐛 Correção de Layout - Versículo do Dia (04/02/2026)
+- [x] Corrigir layout do "Versículo do Dia" na página de login do professor (imagem de fundo cortada)
+- [x] Remover BibleFooter das páginas de login e portal inicial
+- [x] Implementar lógica condicional para mostrar BibleFooter apenas em páginas internas
+- [x] Testar correção no servidor de desenvolvimento
