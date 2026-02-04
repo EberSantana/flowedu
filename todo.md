@@ -6574,3 +6574,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover BibleFooter das páginas de login e portal inicial
 - [x] Implementar lógica condicional para mostrar BibleFooter apenas em páginas internas
 - [x] Testar correção no servidor de desenvolvimento
+
+## 🚀 Script de Aplicação Automática de Cache Nginx (04/02/2026)
+- [x] Criar script bash apply-nginx-cache.sh para aplicação automática
+- [x] Implementar backup automático da configuração atual
+- [x] Adicionar validação e testes de configuração
+- [x] Implementar rollback automático em caso de erro
+- [x] Criar guia completo APLICAR_CACHE_NGINX.md
+- [x] Adicionar verificação de cache funcionando
+- [x] Documentar comandos úteis e troubleshooting
