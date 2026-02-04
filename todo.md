@@ -6597,3 +6597,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar meta tag apple-mobile-web-app-capable para mobile-web-app-capable
 - [x] Incrementar versão do cache do Service Worker para v1.2.0
 - [ ] Testar correções no navegador após atualização da VPS
+
+## 📊 Configuração do Umami Analytics (04/02/2026)
+- [x] Criar conta no Umami Cloud
+- [x] Adicionar website FlowEdu no painel
+- [x] Copiar Website ID e Script URL (dbc83760-c2c2-4692-b678-308efa974f60)
+- [x] Atualizar código do index.html com script do Umami
+- [ ] Atualizar VPS com git pull + build + restart
+- [ ] Testar analytics no navegador (verificar console sem erros)
+- [ ] Verificar dados no painel do Umami (visitas sendo registradas)
