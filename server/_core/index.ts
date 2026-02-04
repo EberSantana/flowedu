@@ -81,7 +81,8 @@ async function startServer() {
         imgSrc: ["'self'", "data:", "blob:", "https:"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://analytics.manus.im", "https://cloud.umami.is"],
         scriptSrcAttr: ["'unsafe-inline'"],
-        connectSrc: ["'self'", "https://api.manus.im", "https://analytics.manus.im", "https://cloud.umami.is", "wss:"],
+        connectSrc: ["'self'", "https://api.manus.im", "https://analytics.manus.im", "https://cloud.umami.is", "https://api-gateway.umami.dev", "wss:"],
+        mediaSrc: ["'self'", "data:", "blob:"],
       },
     } : false, // Desabilitado em desenvolvimento para HMR funcionar
     crossOriginEmbedderPolicy: false, // Permite embeds de terceiros

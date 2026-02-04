@@ -6614,3 +6614,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Substituir Link por button com window.location.href
 - [ ] Testar Umami Analytics funcionando após atualização da VPS
 - [ ] Testar página /admin/users sem erros no console
+
+## 🔧 Correção Final de CSP (05/02/2026)
+- [x] Adicionar https://api-gateway.umami.dev ao connectSrc
+- [x] Adicionar mediaSrc com data: e blob: para permitir áudio
+- [ ] Testar Umami Analytics sem erros no ambiente de desenvolvimento
+- [ ] Atualizar VPS com git pull + build + restart
+- [ ] Testar em produção sem erros de CSP
