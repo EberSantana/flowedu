@@ -79,9 +79,9 @@ async function startServer() {
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
         imgSrc: ["'self'", "data:", "blob:", "https:"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://analytics.manus.im"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://analytics.manus.im", "https://cloud.umami.is"],
         scriptSrcAttr: ["'unsafe-inline'"],
-        connectSrc: ["'self'", "https://api.manus.im", "https://analytics.manus.im", "wss:"],
+        connectSrc: ["'self'", "https://api.manus.im", "https://analytics.manus.im", "https://cloud.umami.is", "wss:"],
       },
     } : false, // Desabilitado em desenvolvimento para HMR funcionar
     crossOriginEmbedderPolicy: false, // Permite embeds de terceiros

@@ -555,15 +555,17 @@ export default function Sidebar() {
                   
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          window.location.href = '/profile';
+                        }}
                         className="p-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200 group"
                       >
                         <span className="inline-block transition-transform duration-200 group-hover:scale-110">
                           <User className="h-4 w-4" />
                         </span>
-                      </Link>
+                      </button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
                       <p>Meu Perfil</p>

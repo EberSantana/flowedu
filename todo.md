@@ -6606,3 +6606,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Atualizar VPS com git pull + build + restart
 - [ ] Testar analytics no navegador (verificar console sem erros)
 - [ ] Verificar dados no painel do Umami (visitas sendo registradas)
+
+## 🐛 Correção de CSP e Nested Anchor Tags (05/02/2026)
+- [x] Localizar configuração de CSP no servidor (server/_core/index.ts)
+- [x] Adicionar https://cloud.umami.is à whitelist do CSP
+- [x] Localizar e corrigir nested anchor tags (Sidebar.tsx - TooltipTrigger com Link)
+- [x] Substituir Link por button com window.location.href
+- [ ] Testar Umami Analytics funcionando após atualização da VPS
+- [ ] Testar página /admin/users sem erros no console
