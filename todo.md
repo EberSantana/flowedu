@@ -6583,3 +6583,17 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar guia completo APLICAR_CACHE_NGINX.md
 - [x] Adicionar verificação de cache funcionando
 - [x] Documentar comandos úteis e troubleshooting
+
+## 🐛 Debug de Login na VPS (04/02/2026)
+- [ ] Verificar logs do PM2 durante tentativa de login
+- [ ] Verificar hash da senha no banco de dados
+- [ ] Limpar bloqueio de login no banco
+- [ ] Testar validação de hash com bcrypt
+- [ ] Corrigir problema de autenticação
+
+## 🐛 Correção de Erros do Console (04/02/2026)
+- [x] Corrigir bug do Service Worker (Response body already used)
+- [x] Corrigir analytics endpoint (removido script com variáveis não substituídas)
+- [x] Atualizar meta tag apple-mobile-web-app-capable para mobile-web-app-capable
+- [x] Incrementar versão do cache do Service Worker para v1.2.0
+- [ ] Testar correções no navegador após atualização da VPS

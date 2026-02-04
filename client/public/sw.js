@@ -1,6 +1,6 @@
 // Service Worker para PWA - FlowEdu
 // Versão do cache - incrementar quando houver mudanças importantes
-const CACHE_VERSION = 'v1.1.0';
+const CACHE_VERSION = 'v1.2.0';
 const CACHE_NAME = `teacher-schedule-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 
@@ -167,10 +167,18 @@ async function networkFirstStrategy(request, cacheName) {
 async function staleWhileRevalidate(request, cacheName) {
   const cachedResponse = await caches.match(request);
   
-  const fetchPromise = fetch(request).then((networkResponse) => {
-    if (networkResponse && networkResponse.status === 200) {
-      const cache = caches.open(cacheName);
-      cache.then(c => c.put(request, networkResponse.clone()));
+  // Fetch em background para atualizar cache
+  const fetchPromise = fetch(request).then(async (networkResponse) => {
+    // Verificar se a resposta é válida antes de clonar
+    if (networkResponse && networkResponse.status === 200 && networkResponse.ok) {
+      try {
+        // Clonar ANTES de usar a resposta
+        const responseToCache = networkResponse.clone();
+        const cache = await caches.open(cacheName);
+        await cache.put(request, responseToCache);
+      } catch (error) {
+        console.warn('[SW] Failed to cache response:', error);
+      }
     }
     return networkResponse;
   }).catch(error => {
@@ -178,6 +186,7 @@ async function staleWhileRevalidate(request, cacheName) {
     return cachedResponse || createOfflineResponse();
   });
   
+  // Retornar cache imediatamente se disponível, senão esperar fetch
   return cachedResponse || fetchPromise;
 }
 
