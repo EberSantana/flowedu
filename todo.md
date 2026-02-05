@@ -6629,3 +6629,30 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar conexão no ambiente de desenvolvimento
 - [ ] Atualizar VPS com git pull + build + restart
 - [ ] Testar login em produção
+
+## 📚 Sistema de Ajuda e Documentação
+
+### Fase 1 (Essencial):
+- [x] Criar página principal de ajuda (/ajuda)
+- [x] Criar página de manual do professor (/ajuda/professor)
+- [x] Criar página de manual do aluno (/ajuda/aluno)
+- [x] Adicionar link "Ajuda" no menu lateral (Sidebar)
+- [x] Adicionar ícone de ajuda (?) no header (sempre visível)
+
+### Fase 2 (Importante):
+- [x] Criar página de FAQ (Perguntas Frequentes)
+- [ ] Implementar funcionalidade de busca no conteúdo da ajuda
+- [ ] Adicionar ajuda contextual (botão "?" em páginas complexas)
+- [ ] Criar componente de tooltip para dicas rápidas
+
+### Componentes Necessários:
+- [ ] HelpSearch.tsx - Componente de busca
+- [ ] HelpCard.tsx - Card de seção de ajuda
+- [ ] ContextualHelp.tsx - Ajuda contextual
+- [ ] HelpModal.tsx - Modal de ajuda rápida
+
+### Conteúdo:
+- [ ] Converter manual Markdown para componentes React
+- [ ] Adicionar imagens e screenshots (opcional)
+- [ ] Criar índice navegável
+- [ ] Adicionar breadcrumbs para navegação

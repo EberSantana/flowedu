@@ -576,8 +576,8 @@ export default function Sidebar() {
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => {
-                          localStorage.removeItem('onboarding_completed_traditional');
-                          window.location.reload();
+                          setIsMobileMenuOpen(false);
+                          window.location.href = '/ajuda';
                         }}
                         className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
                       >
@@ -587,7 +587,7 @@ export default function Sidebar() {
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
-                      <p>Refazer Tour</p>
+                      <p>Central de Ajuda</p>
                     </TooltipContent>
                   </Tooltip>
               
@@ -634,13 +634,13 @@ export default function Sidebar() {
                   
                   <button
                     onClick={() => {
-                      localStorage.removeItem('onboarding_completed_traditional');
-                      window.location.reload();
+                      setIsMobileMenuOpen(false);
+                      window.location.href = '/ajuda';
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200"
                   >
                     <HelpCircle className="h-4 w-4" />
-                    <span className="text-sm">Refazer Tour</span>
+                    <span className="text-sm">Central de Ajuda</span>
                   </button>
                   
                   <ThemeSelector

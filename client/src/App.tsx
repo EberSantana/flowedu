@@ -72,6 +72,12 @@ const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
 // MistakeNotebook removido - funcionalidade consolidada em StudentSmartReview
 
+// Lazy loaded pages - Help/Ajuda
+const Help = lazy(() => import("./pages/Help"));
+const HelpProfessor = lazy(() => import("./pages/HelpProfessor"));
+const HelpAluno = lazy(() => import("./pages/HelpAluno"));
+const HelpFAQ = lazy(() => import("./pages/HelpFAQ"));
+
 // Lazy loaded pages - Auth
 const Register = lazy(() => import("./pages/Register"));
 const TeacherRegister = lazy(() => import("./pages/TeacherRegister"));
@@ -157,9 +163,14 @@ function Router() {
           <Route path={"/student/my-questions"} component={StudentMyQuestions} />
           <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
           <Route path={"/student/doubts"} component={StudentDoubts} />
-          <Route path={"/student/statistics"} component={StudentStatistics} />
-          <Route path={"/student/notebook"} component={StudentNotebook} />
+          <Route path={"/student/statistics"} component={StudentStatistics} />          <Route path={" /student/notebook"} component={StudentNotebook} />
           {/* MistakeNotebook removido - usar /student/smart-review */}
+
+          {/* Help/Ajuda - lazy loaded */}
+          <Route path={"/ajuda"} component={Help} />
+          <Route path={"/ajuda/professor"} component={HelpProfessor} />
+          <Route path={"/ajuda/aluno"} component={HelpAluno} />
+          <Route path={"/ajuda/faq"} component={HelpFAQ} />
 
           {/* 404 */}
           <Route path={"/404"} component={NotFound} />
