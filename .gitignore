@@ -113,3 +113,11 @@ temp/
 
 # Logs temporários
 *.log
+# Backups de configuração
+.env.backup*
+
+# Schemas SQL temporários
+*.sql
+
+# Logs temporários
+*.log
