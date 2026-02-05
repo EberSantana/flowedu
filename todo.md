@@ -6621,3 +6621,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar Umami Analytics sem erros no ambiente de desenvolvimento
 - [ ] Atualizar VPS com git pull + build + restart
 - [ ] Testar em produção sem erros de CSP
+
+## 🔧 Configuração SSL para TiDB Cloud (05/02/2026)
+- [x] Localizar arquivo de conexão do banco de dados (server/db.ts)
+- [x] Adicionar configuração SSL na conexão mysql2 (ssl: { rejectUnauthorized: true })
+- [x] Criar pool de conexões com configuração explícita
+- [ ] Testar conexão no ambiente de desenvolvimento
+- [ ] Atualizar VPS com git pull + build + restart
+- [ ] Testar login em produção
