@@ -121,3 +121,6 @@ temp/
 
 # Logs temporários
 *.log
+.env.backup*
+*.sql
+*.log
