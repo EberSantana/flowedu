@@ -7,11 +7,22 @@ import {
   Video,
   Mail,
   FileText,
-  Users
+  Users,
+  Copy,
+  ExternalLink,
+  ChevronDown
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -176,11 +187,67 @@ export default function Help() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Não encontrou o que procurava? Nossa equipe está pronta para ajudar.
                 </p>
-                <Button variant="default" className="w-full" asChild>
-                  <a href="mailto:ebersantana@flowedu.app">
-                    Entrar em Contato
-                  </a>
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="default" className="w-full">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Entrar em Contato
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem asChild>
+                      <a 
+                        href="mailto:ebersantana@flowedu.app?subject=Suporte FlowEdu&body=Olá, preciso de ajuda com:%0D%0A%0D%0A"
+                        className="flex items-center cursor-pointer"
+                      >
+                        <Mail className="h-4 w-4 mr-2" />
+                        Abrir Email Local
+                      </a>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem
+                      onClick={() => {
+                        navigator.clipboard.writeText('ebersantana@flowedu.app');
+                        toast.success('Email copiado para a área de transferência!');
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copiar Email
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem asChild>
+                      <a 
+                        href="https://mail.google.com/mail/?view=cm&fs=1&to=ebersantana@flowedu.app&su=Suporte FlowEdu&body=Olá, preciso de ajuda com:"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center cursor-pointer"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Abrir no Gmail
+                      </a>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
+                      <a 
+                        href="https://outlook.live.com/mail/0/deeplink/compose?to=ebersantana@flowedu.app&subject=Suporte FlowEdu&body=Olá, preciso de ajuda com:"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center cursor-pointer"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Abrir no Outlook Web
+                      </a>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                <p className="text-xs text-muted-foreground mt-3 text-center">
+                  📧 ebersantana@flowedu.app
+                </p>
               </CardContent>
             </Card>
           </div>
