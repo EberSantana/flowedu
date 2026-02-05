@@ -196,16 +196,6 @@ export default function Help() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56">
-                    <DropdownMenuItem asChild>
-                      <a 
-                        href="mailto:ebersantana@flowedu.app?subject=Suporte FlowEdu&body=Olá, preciso de ajuda com:%0D%0A%0D%0A"
-                        className="flex items-center cursor-pointer"
-                      >
-                        <Mail className="h-4 w-4 mr-2" />
-                        Abrir Email Local
-                      </a>
-                    </DropdownMenuItem>
-                    
                     <DropdownMenuItem
                       onClick={() => {
                         navigator.clipboard.writeText('ebersantana@flowedu.app');

@@ -6662,3 +6662,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar link de email (ebersantana@flowedu.app) no botão "Entrar em Contato" da página principal de ajuda
 
 - [x] Implementar dropdown com múltiplas opções de contato (mailto, copiar email, Gmail, Outlook Web)
+
+- [x] Remover opção "Abrir Email Local" do dropdown de contato
