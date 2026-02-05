@@ -6656,3 +6656,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Adicionar imagens e screenshots (opcional)
 - [ ] Criar índice navegável
 - [ ] Adicionar breadcrumbs para navegação
+
+## 📧 Ajustes na Central de Ajuda
+
+- [x] Adicionar link de email (ebersantana@flowedu.app) no botão "Entrar em Contato" da página principal de ajuda

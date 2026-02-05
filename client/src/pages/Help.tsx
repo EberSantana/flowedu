@@ -177,7 +177,7 @@ export default function Help() {
                   Não encontrou o que procurava? Nossa equipe está pronta para ajudar.
                 </p>
                 <Button variant="default" className="w-full" asChild>
-                  <a href="mailto:suporte@flowedu.app">
+                  <a href="mailto:ebersantana@flowedu.app">
                     Entrar em Contato
                   </a>
                 </Button>
