@@ -1,29 +1,31 @@
-# Arquivos de ambiente
-.env.backup*
+# FlowEdu - .gitignore
+.env
 .env.local
-
-# Logs
+.env.production
+.env.backup*
 *.log
 logs/
-
-# SQL temporários
 *.sql
-
-# Backups temporários
+*.sql.gz
 *.backup
 *.bak
-
-# Node modules (se usar)
+*.old
+*.tmp
 node_modules/
-
-# Build
 dist/
 build/
-
-# Sistema
 .DS_Store
 Thumbs.db
-
-# IDEs
 .vscode/
 .idea/
+*.swp
+*.pem
+*.key
+*.p12
+id_rsa
+coverage/
+tmp/
+temp/
+.pm2/
+uploads/
+.cache/
