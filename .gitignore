@@ -105,3 +105,11 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+# Backups de configuração
+.env.backup*
+
+# Schemas SQL temporários
+*.sql
+
+# Logs temporários
+*.log
