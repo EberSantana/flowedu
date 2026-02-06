@@ -6752,3 +6752,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Melhorar visual com gradiente azul e lista de benefícios
 - [x] Adicionar ícones ilustrativos (Smartphone, Zap, Wifi)
 - [ ] Testar instalação em diferentes dispositivos
+
+## 🐛 Bug: IDBKeyRange.only() parâmetro inválido
+
+- [x] Corrigir erro "Failed to execute 'only' on 'IDBKeyRange': The parameter is not a valid key"
+- [x] Usar getAll() ao invés de count() com IDBKeyRange
+- [x] Filtrar resultados manualmente para contar apenas não sincronizados

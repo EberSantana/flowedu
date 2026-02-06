@@ -199,12 +199,15 @@ export async function countPendingActions(): Promise<number> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([STORE_NAME], 'readonly');
     const store = transaction.objectStore(STORE_NAME);
-    const index = store.index('synced');
     
-    const request = index.count(IDBKeyRange.only(false));
+    // Obter todas as ações e filtrar manualmente
+    const request = store.getAll();
     
     request.onsuccess = () => {
-      resolve(request.result);
+      const allActions = request.result as PendingAction[];
+      // Contar apenas as ações não sincronizadas
+      const pendingCount = allActions.filter(action => !action.synced).length;
+      resolve(pendingCount);
     };
     
     request.onerror = () => {
