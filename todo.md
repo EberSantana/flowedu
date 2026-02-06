@@ -6819,3 +6819,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aplicar cache em getStudentsProgressBySubject (TTL: 3 min)
 - [x] Criar exemplos de cache com invalidação
 - [x] Testar funcionalidade do cache
+
+## 🐛 Bug: Botões com Ícones Transparentes
+
+- [x] Identificar componente dos botões de ações rápidas
+- [x] Aplicar cores da paleta nos botões: Turmas, Calendário, Metodologias, Trilhas
+- [x] Corrigir Dashboard.tsx para usar action.color ao invés de primary
+- [x] Garantir consistência visual com outros botões (Nova Disciplina, Grade Completa, etc.)
+- [ ] Testar em diferentes temas (claro/escuro)
