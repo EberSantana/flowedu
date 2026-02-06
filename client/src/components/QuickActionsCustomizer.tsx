@@ -19,15 +19,15 @@ export interface QuickAction {
 // Cores hexadecimais para consistência visual
 // Verde: #10b981, Azul: #3b82f6, Vermelho: #ef4444, Laranja: #f59e0b, Roxo: #8b5cf6
 const DEFAULT_ACTIONS: QuickAction[] = [
-  { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "#10b981", enabled: true },
-  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "#3b82f6", enabled: true },
-  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "#10b981", enabled: true },
-  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "#3b82f6", enabled: true },
-  { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "#ef4444", enabled: true },
-  { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "#10b981", enabled: false },
-  { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "#f59e0b", enabled: false },
-  { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/active-methodologies", color: "#f59e0b", enabled: false },
-  { id: "learning-paths", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: "#8b5cf6", enabled: false },
+  { id: 'new-subject', label: 'Nova Disciplina', icon: 'Plus', href: '/subjects', color: 'from-primary to-primary/80', enabled: true, order: 1 },
+  { id: 'schedule', label: 'Grade Completa', icon: 'Calendar', href: '/schedule', color: 'from-primary to-primary/80', enabled: true, order: 2 },
+  { id: 'reports', label: 'Relatórios', icon: 'BarChart3', href: '/reports', color: 'from-primary to-primary/80', enabled: true, order: 3 },
+  { id: 'tasks', label: 'Tarefas', icon: 'CheckSquare', href: '/tasks', color: 'from-primary to-primary/80', enabled: true, order: 4 },
+  { id: 'announcements', label: 'Avisos', icon: 'Bell', href: '/announcements', color: 'from-primary to-primary/80', enabled: true, order: 5 },
+  { id: 'classes', label: 'Turmas', icon: 'Users', href: '/classes', color: 'from-primary to-primary/80', enabled: false, order: 6 },
+  { id: 'calendar', label: 'Calendário', icon: 'CalendarDays', href: '/calendar', color: 'from-primary to-primary/80', enabled: false, order: 7 },
+  { id: 'methodologies', label: 'Metodologias', icon: 'Lightbulb', href: '/active-methodologies', color: 'from-primary to-primary/80', enabled: false, order: 8 },
+  { id: 'learning-paths', label: 'Trilhas', icon: 'Route', href: '/learning-paths', color: 'from-primary to-primary/80', enabled: false, order: 9 },
 ];
 
 interface QuickActionsCustomizerProps {
@@ -140,17 +140,8 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
                   action.enabled ? 'text-primary' : 'text-gray-400'
                 }`} />
                 
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${
-                  // Mapear cores hexadecimais para classes do tema
-                  action.color === '#10b981' ? 'from-success to-success/80' :
-                  action.color === '#3b82f6' ? 'from-primary to-primary/80' :
-                  action.color === '#ef4444' ? 'from-destructive to-destructive/80' :
-                  action.color === '#f59e0b' ? 'from-warning to-warning/80' :
-                  action.color === '#8b5cf6' ? 'from-accent to-accent/80' :
-                  action.color.includes('from-') ? action.color :
-                  'from-primary to-primary/80'
-                }`}>
-                  <IconComponent className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary to-primary/80">
+                  <IconComponent className="h-5 w-5 text-primary-foreground" />
                 </div>
 
                 <div className="flex-1">

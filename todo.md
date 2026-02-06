@@ -6848,3 +6848,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar em tema claro
 - [ ] Testar em tema escuro
 - [ ] Garantir contraste adequado em ambos os temas
+
+## 🎯 SIMPLIFICAR: Todos os Botões com Cor Primária do Tema
+
+- [x] Remover TODAS as cores personalizadas (verde, vermelho, laranja, roxo)
+- [x] Fazer TODOS os botões usarem APENAS from-primary to-primary/80
+- [x] Atualizar Dashboard.tsx
+- [x] Atualizar QuickActionsCustomizer.tsx
+- [x] Atualizar DEFAULT_ACTIONS
+- [x] Atualizar getQuickActionsPreferences no db.ts
+- [ ] Testar

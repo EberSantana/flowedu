@@ -9073,35 +9073,14 @@ export async function getQuickActionsPreferences(userId: number) {
   
   const actions = JSON.parse(preferences[0].quickActionsConfig);
   
-  // Migrar cores antigas para novas (hexadecimais)
-  const migratedActions = actions.map((action: any) => {
-    let newColor = action.color;
-    
-    // Se a cor é uma classe Tailwind, migrar para hexadecimal
-    if (COLOR_MIGRATION_MAP[action.color]) {
-      newColor = COLOR_MIGRATION_MAP[action.color];
-    }
-    // Se a cor ainda não é hexadecimal, usar cor padrão
-    else if (!action.color.startsWith('#')) {
-      newColor = DEFAULT_COLORS[action.id] || '#3b82f6';
-    }
-    
-    return {
-      ...action,
-      color: newColor
-    };
-  });
-  
-  // Salvar cores migradas de volta no banco
-  if (JSON.stringify(actions) !== JSON.stringify(migratedActions)) {
-    await db
-      .update(dashboardPreferences)
-      .set({ quickActionsConfig: JSON.stringify(migratedActions) })
-      .where(eq(dashboardPreferences.userId, userId));
-  }
+  // Todos os botões usam a cor primária do tema
+  const normalizedActions = actions.map((action: any) => ({
+    ...action,
+    color: 'from-primary to-primary/80'
+  }));
   
   return {
-    actions: migratedActions
+    actions: normalizedActions
   };
 }
 
