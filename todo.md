@@ -6679,3 +6679,20 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover cores fixas (gradientes) e usar variáveis CSS do tema
 - [x] Garantir que as cores mudem automaticamente com o tema escolhido
 - [x] Testar com diferentes temas (claro, escuro, personalizados)
+
+## 🎨 Sistema de Temas Pré-Configurados
+
+- [ ] Definir 4 paletas de cores (Azul Profissional, Verde Educação, Roxo Moderno, Laranja Energia)
+- [ ] Criar componente ThemeSelector com preview visual dos temas
+- [ ] Implementar aplicação de tema com um clique
+- [ ] Salvar tema escolhido nas preferências do usuário
+- [ ] Aplicar tema automaticamente ao carregar o sistema
+- [ ] Adicionar botão de acesso rápido ao seletor de temas no menu
+
+## 🔴 URGENTE: Remover Cores Fixas das Ações Rápidas
+
+- [x] Investigar onde as cores fixas (azul, verde, vermelho, etc.) estão sendo aplicadas
+- [x] Remover todas as cores fixas das Ações Rápidas
+- [x] Aplicar apenas a cor primária do tema (from-primary to-primary/80)
+- [x] Garantir que TODAS as ações usem a mesma cor do tema
+- [x] Testar com diferentes temas para verificar consistência

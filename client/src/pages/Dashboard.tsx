@@ -749,9 +749,9 @@ export default function Dashboard() {
                     const IconComponent = (LucideIcons as any)[action.icon] || LucideIcons.HelpCircle;
                     return (
                       <Link key={action.id} href={action.href}>
-                        <div className={`group relative overflow-hidden rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32 ${action.color === 'theme' ? 'bg-sidebar-primary' : `bg-gradient-to-br ${action.color}`}`}>
+                        <div className="group relative overflow-hidden rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer h-32 bg-gradient-to-br from-primary to-primary/80">
                           <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                          <div className={`relative z-10 flex flex-col items-center justify-center h-full ${action.color === 'theme' ? 'text-sidebar-primary-foreground' : 'text-white'}`}>
+                          <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
                             <IconComponent className="h-8 w-8 mb-2 group-hover:scale-110 transition-transform" />
                             <span className="text-sm font-semibold text-center">{action.label}</span>
                           </div>
