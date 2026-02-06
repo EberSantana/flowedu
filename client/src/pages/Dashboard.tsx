@@ -155,8 +155,8 @@ export default function Dashboard() {
       setQuickActions(preferences.actions);
     } else if (!isLoadingPreferences) {
       // Ações padrão se não houver preferências salvas - usando variável CSS do tema
-      // A cor "theme" indica que deve usar a cor do tema dinâmico
-      const themeColor = "theme";
+      // Usa a cor primary do tema escolhido pelo usuário
+      const themeColor = "from-primary to-primary/80";
       setQuickActions([
         { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: themeColor, enabled: true },
         { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: themeColor, enabled: true },

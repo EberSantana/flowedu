@@ -6672,3 +6672,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Melhorar UX e feedback visual
 - [x] Adicionar validações e tratamento de erros
 - [x] Testar todas as ações (Nova Disciplina, Grade Completa, Relatórios, etc.)
+
+## 🎨 Ajustar Cores das Ações Rápidas
+
+- [x] Analisar sistema de cores atual das Ações Rápidas
+- [x] Remover cores fixas (gradientes) e usar variáveis CSS do tema
+- [x] Garantir que as cores mudem automaticamente com o tema escolhido
+- [x] Testar com diferentes temas (claro, escuro, personalizados)
