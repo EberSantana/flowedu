@@ -9034,6 +9034,29 @@ export async function getStudentGamificationStats(studentId: number) {
 
 // ==================== PREFERÊNCIAS DE DASHBOARD ====================
 
+// Mapeamento de cores antigas (classes Tailwind) para novas (hexadecimais)
+const COLOR_MIGRATION_MAP: Record<string, string> = {
+  'from-primary to-primary/80': '#3b82f6', // Azul padrão
+  'from-green-500 to-green-600': '#10b981',
+  'from-blue-500 to-blue-600': '#3b82f6',
+  'from-red-500 to-red-600': '#ef4444',
+  'from-orange-500 to-orange-600': '#f59e0b',
+  'from-purple-500 to-purple-600': '#8b5cf6',
+};
+
+// Cores padrão por tipo de ação
+const DEFAULT_COLORS: Record<string, string> = {
+  'new-subject': '#10b981',
+  'schedule': '#3b82f6',
+  'reports': '#10b981',
+  'tasks': '#3b82f6',
+  'announcements': '#ef4444',
+  'classes': '#10b981',
+  'calendar': '#f59e0b',
+  'methodologies': '#f59e0b',
+  'learning-paths': '#8b5cf6',
+};
+
 export async function getQuickActionsPreferences(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -9048,8 +9071,37 @@ export async function getQuickActionsPreferences(userId: number) {
     return null;
   }
   
+  const actions = JSON.parse(preferences[0].quickActionsConfig);
+  
+  // Migrar cores antigas para novas (hexadecimais)
+  const migratedActions = actions.map((action: any) => {
+    let newColor = action.color;
+    
+    // Se a cor é uma classe Tailwind, migrar para hexadecimal
+    if (COLOR_MIGRATION_MAP[action.color]) {
+      newColor = COLOR_MIGRATION_MAP[action.color];
+    }
+    // Se a cor ainda não é hexadecimal, usar cor padrão
+    else if (!action.color.startsWith('#')) {
+      newColor = DEFAULT_COLORS[action.id] || '#3b82f6';
+    }
+    
+    return {
+      ...action,
+      color: newColor
+    };
+  });
+  
+  // Salvar cores migradas de volta no banco
+  if (JSON.stringify(actions) !== JSON.stringify(migratedActions)) {
+    await db
+      .update(dashboardPreferences)
+      .set({ quickActionsConfig: JSON.stringify(migratedActions) })
+      .where(eq(dashboardPreferences.userId, userId));
+  }
+  
   return {
-    actions: JSON.parse(preferences[0].quickActionsConfig)
+    actions: migratedActions
   };
 }
 

@@ -6827,3 +6827,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir Dashboard.tsx para usar action.color ao invés de primary
 - [x] Garantir consistência visual com outros botões (Nova Disciplina, Grade Completa, etc.)
 - [ ] Testar em diferentes temas (claro/escuro)
+
+## 🚨 Bug Crítico: Botões de Ações Rápidas Completamente Brancos
+
+- [x] Investigar renderização dos botões no Dashboard.tsx
+- [x] Identificar que cores antigas estão salvas no banco de dados
+- [x] Criar migração automática em getQuickActionsPreferences
+- [x] Mapear classes Tailwind antigas para cores hexadecimais
+- [x] Salvar cores migradas automaticamente no banco
+- [ ] Testar no navegador
