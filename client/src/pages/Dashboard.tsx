@@ -477,7 +477,7 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                   <button
                     onClick={() => toggleWidget('stats')}
                     className={`p-3 rounded-lg border-2 transition-all ${
@@ -555,7 +555,7 @@ export default function Dashboard() {
 
           {/* Cards          {/* Estatísticas */}
           {widgetVisibility.stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
                 <Card className="border-l-4 border-l-primary">
@@ -639,7 +639,7 @@ export default function Dashboard() {
           )}
 
           {/* Grid Principal: Ações Rápidas + Próximas Aulas */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
           {/* Ações Rápidas */}
           {widgetVisibility.quickActions && (
           <Card className="overflow-hidden" data-tour="quick-actions">
@@ -744,7 +744,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Grid de Ações Dinâmico */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
                   {quickActions.filter(action => action.enabled).map((action) => {
                     const IconComponent = (LucideIcons as any)[action.icon] || LucideIcons.HelpCircle;
                     return (
@@ -963,7 +963,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
                   {calendarUpcomingEvents.map((event: any) => {
                     const eventDate = new Date(event.eventDate + 'T00:00:00');
                     const today = new Date();
@@ -1061,7 +1061,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="p-6">
                 {/* Grid de 5 Cards - Um por dia */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
                   {DAYS_OF_WEEK.map((day, index) => {
                     const dayClasses = scheduledClasses?.filter(c => c.dayOfWeek === index) || [];
                     const count = dayClasses.length;

@@ -451,9 +451,10 @@ export default function Sidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-primary-foreground rounded-lg shadow-lg"
+        className="lg:hidden fixed top-3 left-3 z-50 p-2.5 bg-primary text-primary-foreground rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+        aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
       >
-        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {/* Overlay for mobile */}
@@ -471,7 +472,7 @@ export default function Sidebar() {
           transition-all duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
-          ${isCompact ? 'w-16' : 'w-64'}
+          ${isCompact ? 'w-16' : 'w-64 max-w-[85vw] sm:max-w-[320px]'}
         `}
       >
         <div className="flex flex-col h-full">

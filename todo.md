@@ -6696,3 +6696,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aplicar apenas a cor primária do tema (from-primary to-primary/80)
 - [x] Garantir que TODAS as ações usem a mesma cor do tema
 - [x] Testar com diferentes temas para verificar consistência
+
+## 📱 Melhorias de Responsividade Mobile
+
+- [ ] Otimizar Sidebar para mobile com menu hamburguer e overlay
+- [ ] Melhorar responsividade de cards em Subjects, Classes e Dashboard
+- [ ] Ajustar tabelas para scroll horizontal em telas pequenas
+- [ ] Otimizar formulários para mobile (inputs, selects, textareas)
+- [ ] Ajustar tipografia (tamanhos de fonte) para telas pequenas
+- [ ] Reduzir espaçamentos (padding, margin) em mobile
+- [ ] Melhorar navegação touch-friendly (botões maiores, espaçamento adequado)
+- [ ] Testar em resoluções 320px, 375px, 768px e 1024px

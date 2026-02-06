@@ -7,6 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --breakpoint-xs: 480px;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -260,6 +261,48 @@
   }
   .border-info {
     border-color: var(--info);
+  }
+  
+  /* ===== TIPOGRAFIA RESPONSIVA ===== */
+  /* Ajustes de tamanho de fonte para mobile */
+  @media (max-width: 640px) {
+    h1, .text-4xl, .text-5xl {
+      font-size: 1.875rem !important; /* 30px */
+      line-height: 2.25rem !important;
+    }
+    
+    h2, .text-3xl {
+      font-size: 1.5rem !important; /* 24px */
+      line-height: 2rem !important;
+    }
+    
+    h3, .text-2xl {
+      font-size: 1.25rem !important; /* 20px */
+      line-height: 1.75rem !important;
+    }
+    
+    h4, .text-xl {
+      font-size: 1.125rem !important; /* 18px */
+      line-height: 1.75rem !important;
+    }
+    
+    /* Reduzir padding de cards em mobile */
+    .card-header, [class*="CardHeader"] {
+      padding: 1rem !important;
+    }
+    
+    .card-content, [class*="CardContent"] {
+      padding: 1rem !important;
+    }
+    
+    /* Reduzir espaçamento entre elementos */
+    .space-y-6 > * + * {
+      margin-top: 1rem !important;
+    }
+    
+    .space-y-4 > * + * {
+      margin-top: 0.75rem !important;
+    }
   }
 }
 
