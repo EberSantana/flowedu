@@ -148,12 +148,12 @@ export default function Dashboard() {
   }, [widgetVisibility]);
   
   // Carregar preferências de ações rápidas
-  const { data: preferences } = trpc.dashboard.getQuickActionsPreferences.useQuery();
+  const { data: preferences, isLoading: isLoadingPreferences, refetch: refetchPreferences } = trpc.dashboard.getQuickActionsPreferences.useQuery();
   
   useEffect(() => {
-    if (preferences?.actions) {
+    if (preferences?.actions && preferences.actions.length > 0) {
       setQuickActions(preferences.actions);
-    } else {
+    } else if (!isLoadingPreferences) {
       // Ações padrão se não houver preferências salvas - usando variável CSS do tema
       // A cor "theme" indica que deve usar a cor do tema dinâmico
       const themeColor = "theme";
@@ -161,7 +161,6 @@ export default function Dashboard() {
         { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: themeColor, enabled: true },
         { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: themeColor, enabled: true },
         { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: themeColor, enabled: true },
-
         { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: themeColor, enabled: true },
         { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: themeColor, enabled: true },
         { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: themeColor, enabled: true },
@@ -170,7 +169,7 @@ export default function Dashboard() {
         { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: themeColor, enabled: true },
       ]);
     }
-  }, [preferences]);
+  }, [preferences, isLoadingPreferences]);
   
   const toggleWidget = (widgetKey: string) => {
     setWidgetVisibility((prev: any) => ({ ...prev, [widgetKey]: !prev[widgetKey] }));
@@ -1240,7 +1239,10 @@ export default function Dashboard() {
       <QuickActionsCustomizer
         open={isCustomizingActions}
         onOpenChange={setIsCustomizingActions}
-        onSave={(actions) => setQuickActions(actions)}
+        onSave={(actions) => {
+          setQuickActions(actions);
+          refetchPreferences(); // Recarregar preferências do servidor
+        }}
       />
       
       {/* Tour Guiado removido - usando apenas OnboardingTour (Shepherd.js) */}

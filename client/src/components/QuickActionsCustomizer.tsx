@@ -43,14 +43,18 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
     enabled: open,
   });
 
+  const utils = trpc.useUtils();
+  
   const saveMutation = trpc.dashboard.saveQuickActionsPreferences.useMutation({
-    onSuccess: () => {
-      toast.success("Preferências salvas com sucesso!");
+    onSuccess: async () => {
+      // Invalidar cache para recarregar preferências
+      await utils.dashboard.getQuickActionsPreferences.invalidate();
+      toast.success("✅ Preferências salvas com sucesso!");
       onSave(actions);
       onOpenChange(false);
     },
     onError: (error) => {
-      toast.error("Erro ao salvar preferências: " + error.message);
+      toast.error("❌ Erro ao salvar preferências: " + error.message);
     },
   });
 
@@ -89,10 +93,16 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
 
   const handleReset = () => {
     setActions(DEFAULT_ACTIONS);
-    toast.info("Preferências restauradas para o padrão");
+    toast.info("🔄 Preferências restauradas para o padrão");
   };
 
   const handleSave = () => {
+    // Validar se pelo menos uma ação está habilitada
+    if (enabledCount === 0) {
+      toast.error("⚠️ Selecione pelo menos uma ação!");
+      return;
+    }
+    
     saveMutation.mutate({ actions });
   };
 
@@ -104,7 +114,7 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
         <DialogHeader>
           <DialogTitle>Personalizar Ações Rápidas</DialogTitle>
           <DialogDescription>
-            Escolha quais ações exibir no dashboard e arraste para reordenar. {enabledCount} ações selecionadas.
+            Escolha quais ações exibir no dashboard e arraste para reordenar. <span className="font-semibold text-primary">{enabledCount} ações selecionadas</span>.
           </DialogDescription>
         </DialogHeader>
 
@@ -121,11 +131,13 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
                 onDragEnd={handleDragEnd}
                 className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all cursor-move ${
                   action.enabled 
-                    ? 'bg-white border-blue-200 hover:border-blue-400 hover:shadow-md' 
-                    : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                } ${draggedIndex === index ? 'opacity-50 scale-95' : ''}`}
+                    ? 'bg-white border-primary/30 hover:border-primary hover:shadow-md hover:bg-primary/5' 
+                    : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                } ${draggedIndex === index ? 'opacity-30 scale-95 rotate-2' : ''}`}
               >
-                <GripVertical className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                <GripVertical className={`h-5 w-5 flex-shrink-0 transition-colors ${
+                  action.enabled ? 'text-primary' : 'text-gray-400'
+                }`} />
                 
                 <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0`}>
                   <IconComponent className="h-5 w-5 text-white" />
@@ -159,8 +171,12 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleSave} disabled={saveMutation.isPending}>
-            {saveMutation.isPending ? "Salvando..." : "Salvar"}
+          <Button 
+            onClick={handleSave} 
+            disabled={saveMutation.isPending || enabledCount === 0}
+            className={enabledCount === 0 ? "opacity-50 cursor-not-allowed" : ""}
+          >
+            {saveMutation.isPending ? "Salvando..." : "Salvar Alterações"}
           </Button>
         </div>
       </DialogContent>
