@@ -6735,3 +6735,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar cache de recursos estáticos
 - [ ] Testar sincronização ao voltar online
 - [ ] Criar checkpoint e atualizar na VPS
+
+## 🐛 Bug: IndexedDB countPendingActions
+
+- [x] Corrigir erro "Failed to execute 'count' on 'IDBIndex': The parameter is not a valid key"
+- [x] Usar IDBKeyRange.only(false) ao invés de passar false diretamente
+- [x] Testar contagem de ações pendentes

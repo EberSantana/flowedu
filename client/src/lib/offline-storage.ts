@@ -201,7 +201,7 @@ export async function countPendingActions(): Promise<number> {
     const store = transaction.objectStore(STORE_NAME);
     const index = store.index('synced');
     
-    const request = index.count(false);
+    const request = index.count(IDBKeyRange.only(false));
     
     request.onsuccess = () => {
       resolve(request.result);
