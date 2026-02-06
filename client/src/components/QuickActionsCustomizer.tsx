@@ -12,22 +12,22 @@ export interface QuickAction {
   label: string;
   icon: keyof typeof Icons;
   href: string;
-  color: string; // Gradiente de cores (from-X-500 to-X-600)
+  color: string; // Cor hexadecimal (ex: #10b981 para verde)
   enabled: boolean;
 }
 
-// Cores baseadas nas variáveis do tema para consistência visual
-// Todas as ações usam as cores do tema escolhido pelo usuário
+// Cores hexadecimais para consistência visual
+// Verde: #10b981, Azul: #3b82f6, Vermelho: #ef4444, Laranja: #f59e0b, Roxo: #8b5cf6
 const DEFAULT_ACTIONS: QuickAction[] = [
-  { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "from-primary to-primary/80", enabled: true },
-  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "from-primary to-primary/80", enabled: true },
-  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "from-primary to-primary/80", enabled: true },
-  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "from-primary to-primary/80", enabled: true },
-  { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "from-primary to-primary/80", enabled: true },
-  { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "from-primary to-primary/80", enabled: false },
-  { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "from-primary to-primary/80", enabled: false },
-  { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/active-methodologies", color: "from-primary to-primary/80", enabled: false },
-  { id: "learning-paths", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: "from-primary to-primary/80", enabled: false },
+  { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: "#10b981", enabled: true },
+  { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: "#3b82f6", enabled: true },
+  { id: "reports", label: "Relatórios", icon: "BarChart3", href: "/reports", color: "#10b981", enabled: true },
+  { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: "#3b82f6", enabled: true },
+  { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: "#ef4444", enabled: true },
+  { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: "#10b981", enabled: false },
+  { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: "#f59e0b", enabled: false },
+  { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/active-methodologies", color: "#f59e0b", enabled: false },
+  { id: "learning-paths", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: "#8b5cf6", enabled: false },
 ];
 
 interface QuickActionsCustomizerProps {
@@ -140,7 +140,12 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
                   action.enabled ? 'text-primary' : 'text-gray-400'
                 }`} />
                 
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0`}>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${action.color} 0%, ${action.color}CC 100%)`
+                  }}
+                >
                   <IconComponent className="h-5 w-5 text-white" />
                 </div>
 
