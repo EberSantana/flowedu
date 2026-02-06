@@ -6707,3 +6707,31 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Reduzir espaçamentos (padding, margin) em mobile
 - [ ] Melhorar navegação touch-friendly (botões maiores, espaçamento adequado)
 - [ ] Testar em resoluções 320px, 375px, 768px e 1024px
+
+## 📴 Modo Offline (PWA)
+
+- [ ] Criar service worker com estratégias de cache (Cache First, Network First, Stale While Revalidate)
+- [ ] Implementar cache de recursos estáticos (HTML, CSS, JS, imagens, fontes)
+- [ ] Implementar cache de dados da API (disciplinas, turmas, exercícios)
+- [ ] Criar manifesto PWA (manifest.json)
+- [ ] Registrar service worker no cliente
+- [ ] Adicionar indicador visual de status online/offline no header
+- [ ] Implementar sincronização de dados pendentes quando voltar online
+- [ ] Adicionar página offline customizada
+- [ ] Testar funcionalidade offline em diferentes cenários
+- [ ] Adicionar instruções de instalação do PWA
+
+## 📱 Modo Offline e PWA
+
+- [x] Service Worker já implementado (server/service-worker.ts)
+- [x] Service Worker registrado no cliente (main.tsx)
+- [x] Manifesto PWA completo com ícones e shortcuts
+- [x] Componente OfflineIndicator criado e integrado
+- [x] Módulo IndexedDB para armazenamento offline (offline-storage.ts)
+- [x] Hook useOfflineSync para sincronização de dados
+- [x] Integração do hook no OfflineIndicator
+- [x] Criar testes automatizados para funcionalidades offline (20 testes passando)
+- [ ] Testar modo offline no navegador (DevTools → Network → Offline)
+- [ ] Testar cache de recursos estáticos
+- [ ] Testar sincronização ao voltar online
+- [ ] Criar checkpoint e atualizar na VPS

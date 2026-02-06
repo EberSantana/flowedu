@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { WifiOff, Wifi, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 export default function OfflineIndicator() {
+  const { isSyncing, pendingCount, isOnline: isOnlineFromHook, syncPendingActions } = useOfflineSync();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showBanner, setShowBanner] = useState(!navigator.onLine);
 
@@ -10,17 +12,15 @@ export default function OfflineIndicator() {
     const handleOnline = () => {
       setIsOnline(true);
       setShowBanner(false);
-      toast.success("Você está online novamente!", {
-        description: "Sincronizando dados...",
-        icon: <Wifi className="h-4 w-4" />,
-      });
-
-      // Tentar sincronizar dados offline
-      if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
-        navigator.serviceWorker.ready.then((registration: any) => {
-          return registration.sync.register('sync-offline-data');
-        }).catch((err: Error) => {
-          console.error('Background sync registration failed:', err);
+      
+      if (pendingCount > 0) {
+        toast.success("Você está online novamente!", {
+          description: `Sincronizando ${pendingCount} ${pendingCount === 1 ? 'ação pendente' : 'ações pendentes'}...`,
+          icon: <Wifi className="h-4 w-4" />,
+        });
+      } else {
+        toast.success("Você está online novamente!", {
+          icon: <Wifi className="h-4 w-4" />,
         });
       }
     };
@@ -42,7 +42,7 @@ export default function OfflineIndicator() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [pendingCount]);
 
   // Escutar mensagens do Service Worker
   useEffect(() => {
@@ -70,16 +70,34 @@ export default function OfflineIndicator() {
           <div className="flex-1">
             <p className="font-semibold text-sm">Modo Offline</p>
             <p className="text-xs opacity-90">
-              Você está sem conexão. Suas alterações serão sincronizadas quando voltar online.
+              {pendingCount > 0
+                ? `${pendingCount} ${pendingCount === 1 ? 'ação pendente' : 'ações pendentes'} para sincronizar`
+                : 'Você está sem conexão. Suas alterações serão sincronizadas quando voltar online.'}
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setShowBanner(false)}
-          className="text-white hover:bg-yellow-600 rounded px-3 py-1 text-sm font-medium transition-colors"
-        >
-          Entendi
-        </button>
+        
+        {/* Botão de sincronização manual (aparece quando há ações pendentes e está online) */}
+        {pendingCount > 0 && isOnline && (
+          <button
+            onClick={syncPendingActions}
+            disabled={isSyncing}
+            className="text-white hover:bg-yellow-600 rounded px-3 py-1 text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}
+          </button>
+        )}
+        
+        {/* Botão "Entendi" (aparece quando está offline e não há ações pendentes) */}
+        {(!isOnline || pendingCount === 0) && (
+          <button
+            onClick={() => setShowBanner(false)}
+            className="text-white hover:bg-yellow-600 rounded px-3 py-1 text-sm font-medium transition-colors"
+          >
+            Entendi
+          </button>
+        )}
       </div>
     </div>
   );
