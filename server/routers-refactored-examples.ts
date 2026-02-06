@@ -1,0 +1,302 @@
+/**
+ * Exemplos de Refatoração com Utilitários de Otimização
+ * 
+ * Este arquivo demonstra como aplicar os utilitários criados
+ * (errorHandler, queryOptimizer) em procedures existentes.
+ */
+
+import { z } from "zod";
+import { protectedProcedure, studentProcedure } from "./_core/trpc";
+import * as db from "./db";
+import { 
+  handleAsync, 
+  validateExists, 
+  validateOwnership,
+  createError,
+  handleAIOperation 
+} from "./errorHandler";
+import { createCachedQuery, batchQuery } from "./queryOptimizer";
+
+// ============================================================================
+// EXEMPLO 1: Refatoração de getPerformanceSummary
+// ============================================================================
+
+// ❌ ANTES: Tratamento de erro genérico, retorna array vazio
+const getPerformanceSummaryOLD = protectedProcedure.query(async ({ ctx }) => {
+  try {
+    return await db.getSubjectProgressSummary(ctx.user.id);
+  } catch (error) {
+    console.error('Erro ao buscar resumo de desempenho:', error);
+    return [];
+  }
+});
+
+// ✅ DEPOIS: Usa handleAsync e cache
+const getCachedPerformanceSummary = createCachedQuery(
+  async (userId: number) => {
+    return await db.getSubjectProgressSummary(userId);
+  },
+  300 // Cache de 5 minutos
+);
+
+const getPerformanceSummaryNEW = protectedProcedure.query(async ({ ctx }) => {
+  return handleAsync(
+    async () => {
+      return await getCachedPerformanceSummary(ctx.user.id);
+    },
+    { operation: 'getPerformanceSummary', userId: ctx.user.id }
+  );
+});
+
+// ============================================================================
+// EXEMPLO 2: Refatoração de getStudentsProgressBySubject
+// ============================================================================
+
+// ❌ ANTES: Tratamento de erro genérico, retorna array vazio
+const getStudentsProgressBySubjectOLD = protectedProcedure
+  .input(z.object({ subjectId: z.number() }))
+  .query(async ({ ctx, input }) => {
+    try {
+      return await db.getAllStudentsProgressBySubject(input.subjectId, ctx.user.id);
+    } catch (error) {
+      console.error('Erro ao buscar progresso dos alunos:', error);
+      return [];
+    }
+  });
+
+// ✅ DEPOIS: Usa handleAsync, validateOwnership e cache
+const getCachedStudentsProgress = createCachedQuery(
+  async (subjectId: number, userId: number) => {
+    return await db.getAllStudentsProgressBySubject(subjectId, userId);
+  },
+  180 // Cache de 3 minutos
+);
+
+const getStudentsProgressBySubjectNEW = protectedProcedure
+  .input(z.object({ subjectId: z.number() }))
+  .query(async ({ ctx, input }) => {
+    return handleAsync(
+      async () => {
+        // Validar que o professor tem acesso à disciplina
+        const subject = await db.getSubjectById(input.subjectId);
+        validateExists(subject, 'disciplina');
+        validateOwnership(subject.userId, ctx.user.id, 'disciplina');
+
+        // Buscar progresso com cache
+        return await getCachedStudentsProgress(input.subjectId, ctx.user.id);
+      },
+      { 
+        operation: 'getStudentsProgressBySubject', 
+        userId: ctx.user.id,
+        resource: 'subject',
+        details: { subjectId: input.subjectId }
+      }
+    );
+  });
+
+// ============================================================================
+// EXEMPLO 3: Refatoração de operação com IA (generateMindMap)
+// ============================================================================
+
+// ❌ ANTES: Try-catch com fallback manual
+const generateMindMapOLD = protectedProcedure
+  .input(z.object({ content: z.string() }))
+  .mutation(async ({ input }) => {
+    try {
+      const response = await invokeLLM({
+        messages: [{ role: 'user', content: input.content }]
+      });
+      return JSON.parse(response.choices[0].message.content);
+    } catch (error: any) {
+      console.error('Erro ao gerar mapa mental:', error);
+      throw new Error(`Erro ao gerar mapa mental: ${error.message || 'JSON malformado'}`);
+    }
+  });
+
+// ✅ DEPOIS: Usa handleAIOperation com fallback estruturado
+const generateMindMapNEW = protectedProcedure
+  .input(z.object({ content: z.string() }))
+  .mutation(async ({ input, ctx }) => {
+    return handleAIOperation(
+      async () => {
+        const response = await invokeLLM({
+          messages: [{ role: 'user', content: input.content }]
+        });
+        return JSON.parse(response.choices[0].message.content);
+      },
+      {
+        // Fallback estruturado
+        nodes: [],
+        edges: [],
+        error: 'Não foi possível gerar o mapa mental. Tente novamente.'
+      },
+      { 
+        operation: 'generateMindMap', 
+        userId: ctx.user.id 
+      }
+    );
+  });
+
+// ============================================================================
+// EXEMPLO 4: Correção de Query N+1
+// ============================================================================
+
+// ❌ ANTES: Query N+1 - busca progresso de cada aluno individualmente
+async function getClassProgressOLD(classId: number) {
+  const students = await db.getStudentsByClass(classId);
+  const results = [];
+
+  for (const student of students) {
+    const progress = await db.getStudentProgress(student.id); // N+1!
+    results.push({ ...student, progress });
+  }
+
+  return results;
+}
+
+// ✅ DEPOIS: Usa batchQuery para executar em paralelo
+async function getClassProgressNEW(classId: number) {
+  const students = await db.getStudentsByClass(classId);
+
+  // Buscar todos os progressos em paralelo
+  const progresses = await batchQuery(
+    students,
+    (student) => db.getStudentProgress(student.id)
+  );
+
+  // Combinar resultados
+  return students.map((student, index) => ({
+    ...student,
+    progress: progresses[index],
+  }));
+}
+
+// ============================================================================
+// EXEMPLO 5: Validação de Ownership em Operação de Update
+// ============================================================================
+
+// ❌ ANTES: Validação manual com throw genérico
+const updateSubjectOLD = protectedProcedure
+  .input(z.object({
+    id: z.number(),
+    name: z.string(),
+  }))
+  .mutation(async ({ ctx, input }) => {
+    const subject = await db.getSubjectById(input.id);
+    
+    if (!subject) {
+      throw new Error('Disciplina não encontrada');
+    }
+    
+    if (subject.userId !== ctx.user.id) {
+      throw new Error('Você não tem permissão para editar esta disciplina');
+    }
+
+    return await db.updateSubject(input.id, { name: input.name });
+  });
+
+// ✅ DEPOIS: Usa validateExists e validateOwnership
+const updateSubjectNEW = protectedProcedure
+  .input(z.object({
+    id: z.number(),
+    name: z.string().min(1, 'Nome é obrigatório'),
+  }))
+  .mutation(async ({ ctx, input }) => {
+    return handleAsync(
+      async () => {
+        const subject = await db.getSubjectById(input.id);
+        validateExists(subject, 'disciplina');
+        validateOwnership(subject.userId, ctx.user.id, 'disciplina');
+
+        return await db.updateSubject(input.id, { name: input.name });
+      },
+      { 
+        operation: 'updateSubject', 
+        userId: ctx.user.id,
+        details: { subjectId: input.id }
+      }
+    );
+  });
+
+// ============================================================================
+// EXEMPLO 6: Cache com Invalidação
+// ============================================================================
+
+// Criar cache para estatísticas de disciplina
+const getCachedSubjectStats = createCachedQuery(
+  async (subjectId: number) => {
+    return await db.calculateSubjectStats(subjectId);
+  },
+  600 // Cache de 10 minutos
+);
+
+// Procedure para buscar estatísticas (usa cache)
+const getSubjectStats = protectedProcedure
+  .input(z.object({ subjectId: z.number() }))
+  .query(async ({ input, ctx }) => {
+    return handleAsync(
+      async () => {
+        const subject = await db.getSubjectById(input.subjectId);
+        validateExists(subject, 'disciplina');
+        validateOwnership(subject.userId, ctx.user.id, 'disciplina');
+
+        return await getCachedSubjectStats(input.subjectId);
+      },
+      { operation: 'getSubjectStats', userId: ctx.user.id }
+    );
+  });
+
+// Quando atualizar dados, invalidar cache manualmente
+const addStudentToSubject = protectedProcedure
+  .input(z.object({
+    subjectId: z.number(),
+    studentId: z.number(),
+  }))
+  .mutation(async ({ input, ctx }) => {
+    return handleAsync(
+      async () => {
+        const subject = await db.getSubjectById(input.subjectId);
+        validateExists(subject, 'disciplina');
+        validateOwnership(subject.userId, ctx.user.id, 'disciplina');
+
+        const result = await db.addStudentToSubject(input.subjectId, input.studentId);
+
+        // Invalidar cache após modificação
+        // (Nota: createCachedQuery não expõe método clear por padrão,
+        //  mas você pode implementar um sistema de invalidação mais sofisticado)
+        
+        return result;
+      },
+      { operation: 'addStudentToSubject', userId: ctx.user.id }
+    );
+  });
+
+// ============================================================================
+// RESUMO DE MELHORIAS
+// ============================================================================
+
+/**
+ * ANTES:
+ * - Try-catch genéricos com console.error
+ * - Retorno de arrays vazios em erros
+ * - Queries N+1 em loops
+ * - Sem cache em operações pesadas
+ * - Validações manuais repetidas
+ * - Mensagens de erro técnicas
+ * 
+ * DEPOIS:
+ * - handleAsync() para tratamento padronizado
+ * - createError() com códigos apropriados
+ * - batchQuery() para evitar N+1
+ * - createCachedQuery() para operações pesadas
+ * - validateExists() e validateOwnership() reutilizáveis
+ * - Mensagens de erro amigáveis
+ * - Logging estruturado com contexto
+ * 
+ * BENEFÍCIOS:
+ * - ✅ Código mais limpo e consistente
+ * - ✅ Melhor experiência do usuário
+ * - ✅ Performance otimizada
+ * - ✅ Mais fácil de debugar
+ * - ✅ Menos bugs em produção
+ */

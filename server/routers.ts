@@ -15,6 +15,8 @@ import { createSessionToken as createStandaloneSession } from "./_core/auth-stan
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
 import { sendPasswordResetEmail } from "./_core/email";
+import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
+import { createCachedQuery } from "./queryOptimizer";
 
 export const appRouter = router({
   system: systemRouter,
@@ -3073,24 +3075,50 @@ JSON (descrições MAX 15 chars):
 
     // Dashboard de Desempenho - Resumo por disciplina
     getPerformanceSummary: protectedProcedure.query(async ({ ctx }) => {
-      try {
-        return await db.getSubjectProgressSummary(ctx.user.id);
-      } catch (error) {
-        console.error('Erro ao buscar resumo de desempenho:', error);
-        return [];
-      }
+      // Cache de 5 minutos para resumo de desempenho
+      const getCachedSummary = createCachedQuery(
+        async (userId: number) => {
+          return await db.getSubjectProgressSummary(userId);
+        },
+        300
+      );
+
+      return handleAsync(
+        async () => {
+          return await getCachedSummary(ctx.user.id);
+        },
+        { operation: 'getPerformanceSummary', userId: ctx.user.id }
+      );
     }),
 
     // Dashboard de Desempenho - Progresso dos alunos em uma disciplina
     getStudentsProgressBySubject: protectedProcedure
       .input(z.object({ subjectId: z.number() }))
       .query(async ({ ctx, input }) => {
-        try {
-          return await db.getAllStudentsProgressBySubject(input.subjectId, ctx.user.id);
-        } catch (error) {
-          console.error('Erro ao buscar progresso dos alunos:', error);
-          return [];
-        }
+        // Cache de 3 minutos para progresso dos alunos
+        const getCachedProgress = createCachedQuery(
+          async (subjectId: number, userId: number) => {
+            return await db.getAllStudentsProgressBySubject(subjectId, userId);
+          },
+          180
+        );
+
+        return handleAsync(
+          async () => {
+            // Validar que o professor tem acesso à disciplina
+            const subject = await db.getSubjectById(input.subjectId);
+            validateExists(subject, 'disciplina');
+            validateOwnership(subject.userId, ctx.user.id, 'disciplina');
+
+            return await getCachedProgress(input.subjectId, ctx.user.id);
+          },
+          { 
+            operation: 'getStudentsProgressBySubject', 
+            userId: ctx.user.id,
+            resource: 'subject',
+            details: { subjectId: input.subjectId }
+          }
+        );
       }),
 
   }),

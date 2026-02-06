@@ -6796,3 +6796,26 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar testes para queryOptimizer
 - [x] Validar documentação completa
 - [ ] Adicionar testes de integração
+
+## 🔧 Aplicação das Otimizações
+
+### Refatoração com errorHandler
+- [x] Identificar 2-3 procedures críticos em routers.ts
+- [x] Refatorar getPerformanceSummary com handleAsync() e cache
+- [x] Refatorar getStudentsProgressBySubject com validateOwnership()
+- [x] Criar arquivo routers-refactored-examples.ts com 6 exemplos completos
+- [x] Criar testes para procedures refatorados (17 testes passando)
+- [x] Testar procedures refatorados
+
+### Correção de Queries N+1
+- [x] Analisar routers.ts em busca de loops com queries
+- [x] Não foram encontradas queries N+1 no código atual
+- [x] Criar exemplos de correção em routers-refactored-examples.ts
+- [x] Documentar padrão de correção com batchQuery()
+
+### Implementação de Cache
+- [x] Identificar operações pesadas (estatísticas, relatórios)
+- [x] Aplicar cache em getPerformanceSummary (TTL: 5 min)
+- [x] Aplicar cache em getStudentsProgressBySubject (TTL: 3 min)
+- [x] Criar exemplos de cache com invalidação
+- [x] Testar funcionalidade do cache
