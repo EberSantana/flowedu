@@ -6741,3 +6741,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir erro "Failed to execute 'count' on 'IDBIndex': The parameter is not a valid key"
 - [x] Usar IDBKeyRange.only(false) ao invés de passar false diretamente
 - [x] Testar contagem de ações pendentes
+
+## 📱 Banner de Instalação PWA
+
+- [x] Criar componente InstallPWABanner
+- [x] Detectar evento beforeinstallprompt do navegador
+- [x] Mostrar banner elegante com botão de instalação
+- [x] Permitir usuário dispensar banner (salvar preferência no localStorage)
+- [x] Integrar banner no App.tsx
+- [x] Melhorar visual com gradiente azul e lista de benefícios
+- [x] Adicionar ícones ilustrativos (Smartphone, Zap, Wifi)
+- [ ] Testar instalação em diferentes dispositivos
