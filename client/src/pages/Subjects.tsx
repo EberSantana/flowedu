@@ -319,12 +319,15 @@ export default function Subjects() {
       <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4">
           {/* Botão Voltar ao Dashboard */}
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar ao Dashboard
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="mb-4"
+            onClick={() => setLocation('/dashboard')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Dashboard
+          </Button>
           
           <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Disciplinas" }]} />
           <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
