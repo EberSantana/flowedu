@@ -140,12 +140,16 @@ export function QuickActionsCustomizer({ open, onOpenChange, onSave }: QuickActi
                   action.enabled ? 'text-primary' : 'text-gray-400'
                 }`} />
                 
-                <div 
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${action.color} 0%, ${action.color}CC 100%)`
-                  }}
-                >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${
+                  // Mapear cores hexadecimais para classes do tema
+                  action.color === '#10b981' ? 'from-success to-success/80' :
+                  action.color === '#3b82f6' ? 'from-primary to-primary/80' :
+                  action.color === '#ef4444' ? 'from-destructive to-destructive/80' :
+                  action.color === '#f59e0b' ? 'from-warning to-warning/80' :
+                  action.color === '#8b5cf6' ? 'from-accent to-accent/80' :
+                  action.color.includes('from-') ? action.color :
+                  'from-primary to-primary/80'
+                }`}>
                   <IconComponent className="h-5 w-5 text-white" />
                 </div>
 

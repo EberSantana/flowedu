@@ -6836,3 +6836,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Mapear classes Tailwind antigas para cores hexadecimais
 - [x] Salvar cores migradas automaticamente no banco
 - [ ] Testar no navegador
+
+## 🎨 Cores Dinâmicas das Ações Rápidas por Tema
+
+- [x] Analisar variáveis CSS do tema em index.css
+- [x] Identificar hook useThemeColors existente
+- [x] Criar mapeamento de cores hexadecimais para classes CSS do tema
+- [x] Atualizar Dashboard.tsx para usar classes CSS do tema
+- [x] Atualizar QuickActionsCustomizer.tsx para usar classes CSS do tema
+- [x] Adicionar suporte para tema escuro (dark:bg-black)
+- [ ] Testar em tema claro
+- [ ] Testar em tema escuro
+- [ ] Garantir contraste adequado em ambos os temas
