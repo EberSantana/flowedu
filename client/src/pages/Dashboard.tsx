@@ -25,7 +25,7 @@ import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useOnboardingTour } from "@/components/OnboardingTour";
 // GuidedTour removido - usando apenas OnboardingTour (Shepherd.js)
 import { useAdaptiveDashboard } from "@/hooks/useAdaptiveDashboard";
@@ -58,7 +58,7 @@ ChartJS.register(
 
 const DAYS_OF_WEEK = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
-export default function Dashboard() {
+function Dashboard() {
   const { user } = useAuth();
   
   // Tour interativo para novos usuários
@@ -1250,3 +1250,5 @@ export default function Dashboard() {
     </>
   );
 }
+
+export default React.memo(Dashboard);

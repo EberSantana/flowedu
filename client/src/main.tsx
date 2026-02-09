@@ -13,7 +13,13 @@ const queryClient = new QueryClient({
       refetchOnMount: false,
       refetchOnReconnect: false,
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutos
+      staleTime: 10 * 60 * 1000, // 10 minutos - cache mais agressivo
+      gcTime: 30 * 60 * 1000, // 30 minutos - mantém dados em cache por mais tempo
+      networkMode: 'online', // Só faz requests quando online
+    },
+    mutations: {
+      retry: 1,
+      networkMode: 'online',
     },
   },
 });

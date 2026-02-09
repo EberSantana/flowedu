@@ -63,17 +63,17 @@
 }
 
 :root {
-  /* Primary - Cinza azulado neutro e discreto */
-  --primary: oklch(0.45 0.03 240);
+  /* Primary - Azul vibrante educacional */
+  --primary: oklch(0.55 0.20 250);
   --primary-foreground: oklch(0.98 0 0);
   
-  /* Success - Verde acinzentado suave */
-  --success: oklch(0.55 0.06 150);
+  /* Success - Verde vibrante */
+  --success: oklch(0.60 0.18 150);
   --success-foreground: oklch(0.98 0 0);
   
-  /* Warning - Amarelo acinzentado discreto */
-  --warning: oklch(0.65 0.08 80);
-  --warning-foreground: oklch(0.25 0 0);
+  /* Warning - Laranja vibrante */
+  --warning: oklch(0.68 0.18 50);
+  --warning-foreground: oklch(0.98 0 0);
   
   /* Info - Azul acinzentado suave */
   --info: oklch(0.52 0.05 235);
@@ -83,12 +83,12 @@
   --sidebar-primary: oklch(0.42 0.03 240);
   --sidebar-primary-foreground: oklch(0.98 0 0);
   
-  /* Charts - Paleta neutra e profissional */
-  --chart-1: oklch(0.50 0.04 240);
-  --chart-2: oklch(0.55 0.05 200);
-  --chart-3: oklch(0.58 0.04 160);
-  --chart-4: oklch(0.52 0.05 280);
-  --chart-5: oklch(0.54 0.04 320);
+  /* Charts - Paleta vibrante educacional */
+  --chart-1: oklch(0.55 0.20 250);
+  --chart-2: oklch(0.60 0.18 150);
+  --chart-3: oklch(0.68 0.18 50);
+  --chart-4: oklch(0.58 0.16 280);
+  --chart-5: oklch(0.62 0.15 320);
   --radius: 0.5rem;
   --background: oklch(0.98 0.002 240);
   --foreground: oklch(0.28 0.01 240);
