@@ -18,11 +18,9 @@ export function Breadcrumb({ items, showHome = true }: BreadcrumbProps) {
         {showHome && (
           <>
             <li>
-              <Link href="/dashboard">
-                <a className="flex items-center gap-1 hover:text-foreground transition-colors">
-                  <Home className="h-4 w-4" />
-                  <span className="sr-only md:not-sr-only">Início</span>
-                </a>
+              <Link href="/dashboard" className="flex items-center gap-1 hover:text-foreground transition-colors">
+                <Home className="h-4 w-4" />
+                <span className="sr-only md:not-sr-only">Início</span>
               </Link>
             </li>
             {items.length > 0 && (
@@ -39,10 +37,8 @@ export function Breadcrumb({ items, showHome = true }: BreadcrumbProps) {
           return (
             <li key={index} className="flex items-center gap-2">
               {item.href && !isLast ? (
-                <Link href={item.href}>
-                  <a className="hover:text-foreground transition-colors">
-                    {item.label}
-                  </a>
+                <Link href={item.href} className="hover:text-foreground transition-colors">
+                  {item.label}
                 </Link>
               ) : (
                 <span className={isLast ? "text-foreground font-medium" : ""}>

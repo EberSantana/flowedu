@@ -92,11 +92,9 @@ export function Breadcrumbs() {
           {index === breadcrumbs.length - 1 ? (
             <span className="font-medium text-foreground">{crumb.label}</span>
           ) : (
-            <Link href={crumb.path}>
-              <a className="hover:text-foreground transition-colors flex items-center gap-1">
-                {index === 0 && <Home className="w-4 h-4" />}
-                {crumb.label}
-              </a>
+            <Link href={crumb.path} className="hover:text-foreground transition-colors flex items-center gap-1">
+              {index === 0 && <Home className="w-4 h-4" />}
+              {crumb.label}
             </Link>
           )}
         </div>
