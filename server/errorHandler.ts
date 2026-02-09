@@ -56,14 +56,14 @@ export function createError(
   // Log estruturado do erro
   console.error('[Error]', {
     code,
-    message: message || ERROR_MESSAGES[code],
+    message: message || ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES],
     context,
     timestamp: new Date().toISOString(),
   });
 
   return new TRPCError({
     code,
-    message: message || ERROR_MESSAGES[code],
+    message: message || ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES],
   });
 }
 

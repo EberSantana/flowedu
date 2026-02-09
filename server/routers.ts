@@ -3106,7 +3106,7 @@ JSON (descrições MAX 15 chars):
         return handleAsync(
           async () => {
             // Validar que o professor tem acesso à disciplina
-            const subject = await db.getSubjectById(input.subjectId);
+            const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
             validateExists(subject, 'disciplina');
             validateOwnership(subject.userId, ctx.user.id, 'disciplina');
 
