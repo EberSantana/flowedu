@@ -1,0 +1,66 @@
+{
+  "query": "\nSELECT 'activities' AS table_name, COUNT(*) AS row_count FROM activities\nUNION ALL SELECT 'class_groups', COUNT(*) FROM class_groups\nUNION ALL SELECT 'gamificationNotifications', COUNT(*) FROM gamificationNotifications\nUNION ALL SELECT 'pointsHistory', COUNT(*) FROM pointsHistory\nUNION ALL SELECT 'practice_question_attempts', COUNT(*) FROM practice_question_attempts\nUNION ALL SELECT 'practice_question_feedback', COUNT(*) FROM practice_question_feedback\nUNION ALL SELECT 'practice_question_hints', COUNT(*) FROM practice_question_hints\nUNION ALL SELECT 'practice_questions', COUNT(*) FROM practice_questions\nUNION ALL SELECT 'professional_bands', COUNT(*) FROM professional_bands\nUNION ALL SELECT 'schedules', COUNT(*) FROM schedules\nUNION ALL SELECT 'studentBadges', COUNT(*) FROM studentBadges\nUNION ALL SELECT 'studentPoints', COUNT(*) FROM studentPoints\nUNION ALL SELECT 'teachers', COUNT(*) FROM teachers\nUNION ALL SELECT '__drizzle_migrations', COUNT(*) FROM __drizzle_migrations\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \nSELECT 'activities' AS table_name, COUNT(*) AS row_count FROM activities\nUNION ALL SELECT 'class_groups', COUNT(*) FROM class_groups\nUNION ALL SELECT 'gamificationNotifications', COUNT(*) FROM gamificationNotifications\nUNION ALL SELECT 'pointsHistory', COUNT(*) FROM pointsHistory\nUNION ALL SELECT 'practice_question_attempts', COUNT(*) FROM practice_question_attempts\nUNION ALL SELECT 'practice_question_feedback', COUNT(*) FROM practice_question_feedback\nUNION ALL SELECT 'practice_question_hints', COUNT(*) FROM practice_question_hints\nUNION ALL SELECT 'practice_questions', COUNT(*) FROM practice_questions\nUNION ALL SELECT 'professional_bands', COUNT(*) FROM professional_bands\nUNION ALL SELECT 'schedules', COUNT(*) FROM schedules\nUNION ALL SELECT 'studentBadges', COUNT(*) FROM studentBadges\nUNION ALL SELECT 'studentPoints', COUNT(*) FROM studentPoints\nUNION ALL SELECT 'teachers', COUNT(*) FROM teachers\nUNION ALL SELECT '__drizzle_migrations', COUNT(*) FROM __drizzle_migrations\n",
+  "rows": [
+    {
+      "table_name": "activities",
+      "row_count": "0"
+    },
+    {
+      "table_name": "pointsHistory",
+      "row_count": "0"
+    },
+    {
+      "table_name": "class_groups",
+      "row_count": "0"
+    },
+    {
+      "table_name": "practice_question_attempts",
+      "row_count": "0"
+    },
+    {
+      "table_name": "gamificationNotifications",
+      "row_count": "0"
+    },
+    {
+      "table_name": "practice_question_feedback",
+      "row_count": "0"
+    },
+    {
+      "table_name": "professional_bands",
+      "row_count": "0"
+    },
+    {
+      "table_name": "practice_questions",
+      "row_count": "0"
+    },
+    {
+      "table_name": "schedules",
+      "row_count": "0"
+    },
+    {
+      "table_name": "practice_question_hints",
+      "row_count": "0"
+    },
+    {
+      "table_name": "studentBadges",
+      "row_count": "0"
+    },
+    {
+      "table_name": "__drizzle_migrations",
+      "row_count": "5"
+    },
+    {
+      "table_name": "teachers",
+      "row_count": "0"
+    },
+    {
+      "table_name": "studentPoints",
+      "row_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "table_name\trow_count\nactivities\t0\npointsHistory\t0\nclass_groups\t0\npractice_question_attempts\t0\ngamificationNotifications\t0\npractice_question_feedback\t0\nprofessional_bands\t0\npractice_questions\t0\nschedules\t0\npractice_question_hints\t0\nstudentBadges\t0\n__drizzle_migrations\t5\nteachers\t0\nstudentPoints\t0\n",
+  "stderr": "",
+  "execution_time_ms": 82
+}

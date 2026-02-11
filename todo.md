@@ -6890,3 +6890,17 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Identificar colunas faltantes no banco - 908 colunas adicionadas + 9 UNIQUE corrigidas
 - [x] Gerar e executar script SQL para criar tabelas e colunas faltantes - Executado com sucesso
 - [x] Verificar se todas as discrepâncias foram resolvidas - 100% sincronizado! 0 tabelas e 0 colunas faltantes
+
+## Limpeza de Tabelas Extras do Banco
+
+- [ ] Verificar as 14 tabelas extras e seus dados
+- [ ] Remover tabelas extras que não estão no schema Drizzle
+- [ ] Verificar resultado final
+
+## Deploy na VPS flowedu.app
+
+- [x] Conectar na VPS e verificar estado atual - VPS IP 76.13.67.5
+- [x] Atualizar código com correções do GitHub - 36 arquivos atualizados via git pull
+- [x] Alinhar banco de produção - 48/48 operações SQL executadas com sucesso
+- [x] Rebuildar e reiniciar servidor - Build em 38.71s + PM2 restart OK
+- [x] Testar botão Criar no flowedu.app - FUNCIONANDO! Disciplina 'Teste Final Criar' criada com sucesso
