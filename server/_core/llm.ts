@@ -210,33 +210,46 @@ const normalizeToolChoice = (
 };
 
 const resolveApiUrl = () => {
-  // Se tem Forge API (Manus built-in), usa ela
+  // Prioridade 1: Forge API (Manus built-in) - ambiente de desenvolvimento
   if (ENV.forgeApiKey) {
     return ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
       ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
       : "https://forge.manus.im/v1/chat/completions";
   }
-  // Fallback: Google Gemini API direta (OpenAI-compatible endpoint)
+  // Prioridade 2: Groq API (gratuita, rápida) - produção VPS
+  if (ENV.groqApiKey) {
+    return "https://api.groq.com/openai/v1/chat/completions";
+  }
+  // Prioridade 3: Google Gemini API direta
   if (ENV.geminiApiKey) {
     return "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
   }
-  throw new Error("No LLM API key configured (BUILT_IN_FORGE_API_KEY or GEMINI_API_KEY)");
+  throw new Error("No LLM API key configured (BUILT_IN_FORGE_API_KEY, GROQ_API_KEY or GEMINI_API_KEY)");
 };
 
 const resolveApiKey = () => {
   if (ENV.forgeApiKey) return ENV.forgeApiKey;
+  if (ENV.groqApiKey) return ENV.groqApiKey;
   if (ENV.geminiApiKey) return ENV.geminiApiKey;
-  throw new Error("No LLM API key configured (BUILT_IN_FORGE_API_KEY or GEMINI_API_KEY)");
+  throw new Error("No LLM API key configured (BUILT_IN_FORGE_API_KEY, GROQ_API_KEY or GEMINI_API_KEY)");
 };
 
 const resolveModel = () => {
   if (ENV.forgeApiKey) return "gemini-2.5-flash";
+  if (ENV.groqApiKey) return "llama-3.3-70b-versatile"; // Modelo Groq gratuito e poderoso
   return "gemini-2.0-flash"; // Modelo estável para API direta do Google
 };
 
+const resolveProvider = () => {
+  if (ENV.forgeApiKey) return "Manus Forge";
+  if (ENV.groqApiKey) return "Groq (Llama 3.3 70B)";
+  if (ENV.geminiApiKey) return "Google Gemini";
+  return "Unknown";
+};
+
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey && !ENV.geminiApiKey) {
-    throw new Error("No LLM API key configured. Set BUILT_IN_FORGE_API_KEY or GEMINI_API_KEY.");
+  if (!ENV.forgeApiKey && !ENV.groqApiKey && !ENV.geminiApiKey) {
+    throw new Error("No LLM API key configured. Set BUILT_IN_FORGE_API_KEY, GROQ_API_KEY or GEMINI_API_KEY.");
   }
 };
 
@@ -324,6 +337,11 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     };
   }
 
+  // Groq tem limite de max_tokens diferente
+  if (ENV.groqApiKey && !ENV.forgeApiKey) {
+    payload.max_tokens = 8192; // Groq free tier limit
+  }
+
   const normalizedResponseFormat = normalizeResponseFormat({
     responseFormat,
     response_format,
@@ -338,7 +356,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   const apiUrl = resolveApiUrl();
   const apiKey = resolveApiKey();
   
-  console.log(`[LLM] Using ${ENV.forgeApiKey ? 'Manus Forge' : 'Google Gemini'} API`);
+  console.log(`[LLM] Using ${resolveProvider()} API`);
   
   const response = await fetch(apiUrl, {
     method: "POST",
