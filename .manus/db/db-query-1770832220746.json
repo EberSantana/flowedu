@@ -1,0 +1,349 @@
+{
+  "query": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations"
+    },
+    {
+      "TABLE_NAME": "achievements"
+    },
+    {
+      "TABLE_NAME": "active_methodologies"
+    },
+    {
+      "TABLE_NAME": "activities"
+    },
+    {
+      "TABLE_NAME": "ai_analysis_cache"
+    },
+    {
+      "TABLE_NAME": "ai_insights"
+    },
+    {
+      "TABLE_NAME": "alerts"
+    },
+    {
+      "TABLE_NAME": "announcementReads"
+    },
+    {
+      "TABLE_NAME": "announcements"
+    },
+    {
+      "TABLE_NAME": "assessment_questions"
+    },
+    {
+      "TABLE_NAME": "assessments"
+    },
+    {
+      "TABLE_NAME": "assignment_submissions"
+    },
+    {
+      "TABLE_NAME": "audit_logs"
+    },
+    {
+      "TABLE_NAME": "badges"
+    },
+    {
+      "TABLE_NAME": "belt_history"
+    },
+    {
+      "TABLE_NAME": "belts"
+    },
+    {
+      "TABLE_NAME": "calendar_events"
+    },
+    {
+      "TABLE_NAME": "challenge_rankings"
+    },
+    {
+      "TABLE_NAME": "challenge_submissions"
+    },
+    {
+      "TABLE_NAME": "class_groups"
+    },
+    {
+      "TABLE_NAME": "class_statuses"
+    },
+    {
+      "TABLE_NAME": "classes"
+    },
+    {
+      "TABLE_NAME": "coin_transactions"
+    },
+    {
+      "TABLE_NAME": "collaborative_tools"
+    },
+    {
+      "TABLE_NAME": "computational_thinking_scores"
+    },
+    {
+      "TABLE_NAME": "content_tags"
+    },
+    {
+      "TABLE_NAME": "ct_badges"
+    },
+    {
+      "TABLE_NAME": "ct_exercises"
+    },
+    {
+      "TABLE_NAME": "ct_submissions"
+    },
+    {
+      "TABLE_NAME": "dashboard_preferences"
+    },
+    {
+      "TABLE_NAME": "exercise_tags"
+    },
+    {
+      "TABLE_NAME": "gamificationNotifications"
+    },
+    {
+      "TABLE_NAME": "gamification_notifications"
+    },
+    {
+      "TABLE_NAME": "hidden_achievements"
+    },
+    {
+      "TABLE_NAME": "interactive_projects"
+    },
+    {
+      "TABLE_NAME": "invite_codes"
+    },
+    {
+      "TABLE_NAME": "learning_modules"
+    },
+    {
+      "TABLE_NAME": "learning_patterns"
+    },
+    {
+      "TABLE_NAME": "learning_recommendations"
+    },
+    {
+      "TABLE_NAME": "learning_topics"
+    },
+    {
+      "TABLE_NAME": "level_up_history"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_attempts"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_insights"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_questions"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_study_plans"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_topics"
+    },
+    {
+      "TABLE_NAME": "notifications"
+    },
+    {
+      "TABLE_NAME": "password_reset_tokens"
+    },
+    {
+      "TABLE_NAME": "performance_metrics"
+    },
+    {
+      "TABLE_NAME": "pointsHistory"
+    },
+    {
+      "TABLE_NAME": "points_history"
+    },
+    {
+      "TABLE_NAME": "practice_question_attempts"
+    },
+    {
+      "TABLE_NAME": "practice_question_feedback"
+    },
+    {
+      "TABLE_NAME": "practice_question_hints"
+    },
+    {
+      "TABLE_NAME": "practice_questions"
+    },
+    {
+      "TABLE_NAME": "professional_bands"
+    },
+    {
+      "TABLE_NAME": "project_activities"
+    },
+    {
+      "TABLE_NAME": "project_students"
+    },
+    {
+      "TABLE_NAME": "question_answers"
+    },
+    {
+      "TABLE_NAME": "question_type_instructions"
+    },
+    {
+      "TABLE_NAME": "questions"
+    },
+    {
+      "TABLE_NAME": "review_history"
+    },
+    {
+      "TABLE_NAME": "review_notifications"
+    },
+    {
+      "TABLE_NAME": "review_sessions"
+    },
+    {
+      "TABLE_NAME": "review_statistics"
+    },
+    {
+      "TABLE_NAME": "scheduled_classes"
+    },
+    {
+      "TABLE_NAME": "schedules"
+    },
+    {
+      "TABLE_NAME": "shifts"
+    },
+    {
+      "TABLE_NAME": "shop_items"
+    },
+    {
+      "TABLE_NAME": "smart_review_queue"
+    },
+    {
+      "TABLE_NAME": "specialization_skills"
+    },
+    {
+      "TABLE_NAME": "studentBadges"
+    },
+    {
+      "TABLE_NAME": "studentPoints"
+    },
+    {
+      "TABLE_NAME": "student_achievements"
+    },
+    {
+      "TABLE_NAME": "student_actions"
+    },
+    {
+      "TABLE_NAME": "student_attendance"
+    },
+    {
+      "TABLE_NAME": "student_badges"
+    },
+    {
+      "TABLE_NAME": "student_behaviors"
+    },
+    {
+      "TABLE_NAME": "student_class_enrollments"
+    },
+    {
+      "TABLE_NAME": "student_ct_badges"
+    },
+    {
+      "TABLE_NAME": "student_enrollments"
+    },
+    {
+      "TABLE_NAME": "student_equipped_items"
+    },
+    {
+      "TABLE_NAME": "student_exercise_answers"
+    },
+    {
+      "TABLE_NAME": "student_exercise_attempts"
+    },
+    {
+      "TABLE_NAME": "student_exercises"
+    },
+    {
+      "TABLE_NAME": "student_hidden_achievements"
+    },
+    {
+      "TABLE_NAME": "student_learning_journal"
+    },
+    {
+      "TABLE_NAME": "student_points"
+    },
+    {
+      "TABLE_NAME": "student_progress"
+    },
+    {
+      "TABLE_NAME": "student_purchased_items"
+    },
+    {
+      "TABLE_NAME": "student_skills"
+    },
+    {
+      "TABLE_NAME": "student_specializations"
+    },
+    {
+      "TABLE_NAME": "student_subject_badges"
+    },
+    {
+      "TABLE_NAME": "student_subject_points"
+    },
+    {
+      "TABLE_NAME": "student_topic_doubts"
+    },
+    {
+      "TABLE_NAME": "student_topic_progress"
+    },
+    {
+      "TABLE_NAME": "student_wallets"
+    },
+    {
+      "TABLE_NAME": "students"
+    },
+    {
+      "TABLE_NAME": "study_sessions"
+    },
+    {
+      "TABLE_NAME": "subjectEnrollments"
+    },
+    {
+      "TABLE_NAME": "subject_badges"
+    },
+    {
+      "TABLE_NAME": "subject_points_history"
+    },
+    {
+      "TABLE_NAME": "subjects"
+    },
+    {
+      "TABLE_NAME": "tasks"
+    },
+    {
+      "TABLE_NAME": "teachers"
+    },
+    {
+      "TABLE_NAME": "time_slots"
+    },
+    {
+      "TABLE_NAME": "topic_assignments"
+    },
+    {
+      "TABLE_NAME": "topic_class_links"
+    },
+    {
+      "TABLE_NAME": "topic_comments"
+    },
+    {
+      "TABLE_NAME": "topic_materials"
+    },
+    {
+      "TABLE_NAME": "topic_progress_history"
+    },
+    {
+      "TABLE_NAME": "users"
+    },
+    {
+      "TABLE_NAME": "weekly_challenges"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\n__drizzle_migrations\nachievements\nactive_methodologies\nactivities\nai_analysis_cache\nai_insights\nalerts\nannouncementReads\nannouncements\nassessment_questions\nassessments\nassignment_submissions\naudit_logs\nbadges\nbelt_history\nbelts\ncalendar_events\nchallenge_rankings\nchallenge_submissions\nclass_groups\nclass_statuses\nclasses\ncoin_transactions\ncollaborative_tools\ncomputational_thinking_scores\ncontent_tags\nct_badges\nct_exercises\nct_submissions\ndashboard_preferences\nexercise_tags\ngamificationNotifications\ngamification_notifications\nhidden_achievements\ninteractive_projects\ninvite_codes\nlearning_modules\nlearning_patterns\nlearning_recommendations\nlearning_topics\nlevel_up_history\nmistake_notebook_attempts\nmistake_notebook_insights\nmistake_notebook_questions\nmistake_notebook_study_plans\nmistake_notebook_topics\nnotifications\npassword_reset_tokens\nperformance_metrics\npointsHistory\npoints_history\npractice_question_attempts\npractice_question_feedback\npractice_question_hints\npractice_questions\nprofessional_bands\nproject_activities\nproject_students\nquestion_answers\nquestion_type_instructions\nquestions\nreview_history\nreview_notifications\nreview_sessions\nreview_statistics\nscheduled_classes\nschedules\nshifts\nshop_items\nsmart_review_queue\nspecialization_skills\nstudentBadges\nstudentPoints\nstudent_achievements\nstudent_actions\nstudent_attendance\nstudent_badges\nstudent_behaviors\nstudent_class_enrollments\nstudent_ct_badges\nstudent_enrollments\nstudent_equipped_items\nstudent_exercise_answers\nstudent_exercise_attempts\nstudent_exercises\nstudent_hidden_achievements\nstudent_learning_journal\nstudent_points\nstudent_progress\nstudent_purchased_items\nstudent_skills\nstudent_specializations\nstudent_subject_badges\nstudent_subject_points\nstudent_topic_doubts\nstudent_topic_progress\nstudent_wallets\nstudents\nstudy_sessions\nsubjectEnrollments\nsubject_badges\nsubject_points_history\nsubjects\ntasks\nteachers\ntime_slots\ntopic_assignments\ntopic_class_links\ntopic_comments\ntopic_materials\ntopic_progress_history\nusers\nweekly_challenges\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

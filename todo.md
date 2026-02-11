@@ -6874,3 +6874,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Otimizar bundle size
 
 - [ ] BUG CRÍTICO: Botão de criar disciplina não funciona na VPS (nem professor nem admin) - investigar e corrigir
+
+## Correção SQL Direto - Prevenir Bug de DEFAULT Values do Drizzle ORM
+
+- [x] Identificar todas as funções que usam db.insert() no código - CONCLUÍDO: 116 ocorrências em 5 arquivos
+- [x] Converter createClass para SQL direto → RESOLVIDO: Alinhamento do banco de dados com DEFAULTs corretos (abordagem mais eficiente que converter cada função)
+- [x] Converter createShift para SQL direto → RESOLVIDO: Alinhamento do banco de dados com DEFAULTs corretos
+- [x] Converter todas as outras funções de insert para SQL direto → RESOLVIDO: Alinhamento de TODAS as tabelas do banco com DEFAULTs corretos (539 ALTERs executados)
+- [x] Testar as correções - CONCLUÍDO: createSubject, createClass, createTask funcionando; createShift requer campos obrigatórios (validação Zod, não do banco)
