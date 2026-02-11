@@ -1,0 +1,46 @@
+{
+  "query": "SELECT id, name, code, userId FROM subjects ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, userId FROM subjects ORDER BY id;",
+  "rows": [
+    {
+      "id": "990002",
+      "name": "Test Subject 1768835097918",
+      "code": "TS1768835097918",
+      "userId": "1"
+    },
+    {
+      "id": "1020001",
+      "name": "Test Subject 1768836205508",
+      "code": "TS1768836205508",
+      "userId": "1"
+    },
+    {
+      "id": "1020029",
+      "name": "Test Subject 1768836285877",
+      "code": "TS1768836285877",
+      "userId": "1"
+    },
+    {
+      "id": "1020054",
+      "name": "Test Subject 1768836316503",
+      "code": "TS1768836316503",
+      "userId": "1"
+    },
+    {
+      "id": "1020078",
+      "name": "Test Subject 1768836351272",
+      "code": "TS1768836351272",
+      "userId": "1"
+    },
+    {
+      "id": "1020109",
+      "name": "Matemática",
+      "code": "MAT1768836382706",
+      "userId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\n990002\tTest Subject 1768835097918\tTS1768835097918\t1\n1020001\tTest Subject 1768836205508\tTS1768836205508\t1\n1020029\tTest Subject 1768836285877\tTS1768836285877\t1\n1020054\tTest Subject 1768836316503\tTS1768836316503\t1\n1020078\tTest Subject 1768836351272\tTS1768836351272\t1\n1020109\tMatemática\tMAT1768836382706\t1\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

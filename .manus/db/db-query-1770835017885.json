@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total_nao_teste FROM subjects WHERE code NOT IN ('TFC-001', 'OSC001', 'OSC002', 'OSC003', 'OSC-TESTE', 'TEST123', 'TESTE-FINAL') AND name NOT LIKE '%Teste%' AND name NOT LIKE '%teste%' AND name NOT LIKE '%Test%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total_nao_teste FROM subjects WHERE code NOT IN ('TFC-001', 'OSC001', 'OSC002', 'OSC003', 'OSC-TESTE', 'TEST123', 'TESTE-FINAL') AND name NOT LIKE '%Teste%' AND name NOT LIKE '%teste%' AND name NOT LIKE '%Test%';",
+  "rows": [
+    {
+      "total_nao_teste": "34"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_nao_teste\n34\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

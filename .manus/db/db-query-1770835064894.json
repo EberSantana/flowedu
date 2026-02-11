@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, name, code FROM subjects WHERE userId = 600002 ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code FROM subjects WHERE userId = 600002 ORDER BY id;",
+  "rows": [
+    {
+      "id": "1110001",
+      "name": "Teste SQL Direto",
+      "code": "SQL001"
+    },
+    {
+      "id": "1110002",
+      "name": "Teste Drizzle",
+      "code": "DRZ001"
+    },
+    {
+      "id": "1140001",
+      "name": "Teste Drizzle Direto",
+      "code": "TDD001"
+    },
+    {
+      "id": "1170001",
+      "name": "TesteDireto",
+      "code": "TDIR001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\n1110001\tTeste SQL Direto\tSQL001\n1110002\tTeste Drizzle\tDRZ001\n1140001\tTeste Drizzle Direto\tTDD001\n1170001\tTesteDireto\tTDIR001\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

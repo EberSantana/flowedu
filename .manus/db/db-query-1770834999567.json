@@ -1,0 +1,1072 @@
+{
+  "query": "SELECT id, name, code, userId FROM subjects WHERE code IN ('TFC-001', 'OSC001', 'OSC002', 'OSC003', 'OSC-TESTE', 'TEST123', 'TESTE-FINAL') OR name LIKE '%Teste%' OR name LIKE '%teste%' ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, userId FROM subjects WHERE code IN ('TFC-001', 'OSC001', 'OSC002', 'OSC003', 'OSC-TESTE', 'TEST123', 'TESTE-FINAL') OR name LIKE '%Teste%' OR name LIKE '%teste%' ORDER BY id;",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "Matemática Teste",
+      "code": "MAT1766800399052",
+      "userId": "1560004"
+    },
+    {
+      "id": "300002",
+      "name": "Matemática Teste",
+      "code": "MAT1766800417394",
+      "userId": "1560005"
+    },
+    {
+      "id": "360001",
+      "name": "Matemática Teste",
+      "code": "MAT001",
+      "userId": "1710001"
+    },
+    {
+      "id": "450001",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950002"
+    },
+    {
+      "id": "450002",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950003"
+    },
+    {
+      "id": "450003",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950004"
+    },
+    {
+      "id": "510002",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569014946",
+      "userId": "2010010"
+    },
+    {
+      "id": "510003",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569014998",
+      "userId": "2010011"
+    },
+    {
+      "id": "510004",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015046",
+      "userId": "2010012"
+    },
+    {
+      "id": "510005",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015092",
+      "userId": "2010013"
+    },
+    {
+      "id": "510006",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015135",
+      "userId": "2010014"
+    },
+    {
+      "id": "510007",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015194",
+      "userId": "2010015"
+    },
+    {
+      "id": "510008",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015239",
+      "userId": "2010016"
+    },
+    {
+      "id": "510009",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032346",
+      "userId": "2010017"
+    },
+    {
+      "id": "510010",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032444",
+      "userId": "2010018"
+    },
+    {
+      "id": "510011",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032503",
+      "userId": "2010019"
+    },
+    {
+      "id": "510012",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032583",
+      "userId": "2010020"
+    },
+    {
+      "id": "510013",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032670",
+      "userId": "2010021"
+    },
+    {
+      "id": "510014",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032738",
+      "userId": "2010022"
+    },
+    {
+      "id": "510015",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032812",
+      "userId": "2010023"
+    },
+    {
+      "id": "510016",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046122",
+      "userId": "2010024"
+    },
+    {
+      "id": "510017",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046311",
+      "userId": "2010025"
+    },
+    {
+      "id": "510018",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046404",
+      "userId": "2010026"
+    },
+    {
+      "id": "510019",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046739",
+      "userId": "2010027"
+    },
+    {
+      "id": "510020",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046848",
+      "userId": "2010028"
+    },
+    {
+      "id": "510021",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046961",
+      "userId": "2010029"
+    },
+    {
+      "id": "510022",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569047108",
+      "userId": "2010030"
+    },
+    {
+      "id": "510023",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073002",
+      "userId": "2010031"
+    },
+    {
+      "id": "510024",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073083",
+      "userId": "2010032"
+    },
+    {
+      "id": "510025",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073154",
+      "userId": "2010033"
+    },
+    {
+      "id": "510026",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073224",
+      "userId": "2010034"
+    },
+    {
+      "id": "510027",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073309",
+      "userId": "2010035"
+    },
+    {
+      "id": "510028",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073378",
+      "userId": "2010036"
+    },
+    {
+      "id": "510029",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073444",
+      "userId": "2010037"
+    },
+    {
+      "id": "600006",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2100013"
+    },
+    {
+      "id": "600010",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150208",
+      "userId": "2100025"
+    },
+    {
+      "id": "600011",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150309",
+      "userId": "2100027"
+    },
+    {
+      "id": "600012",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150408",
+      "userId": "2100028"
+    },
+    {
+      "id": "600013",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150497",
+      "userId": "2100029"
+    },
+    {
+      "id": "600014",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150757",
+      "userId": "2100030"
+    },
+    {
+      "id": "600015",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150828",
+      "userId": "2100031"
+    },
+    {
+      "id": "600016",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150898",
+      "userId": "2100032"
+    },
+    {
+      "id": "600026",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489146",
+      "userId": "2100065"
+    },
+    {
+      "id": "600027",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489237",
+      "userId": "2100067"
+    },
+    {
+      "id": "600028",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489328",
+      "userId": "2100068"
+    },
+    {
+      "id": "600029",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489410",
+      "userId": "2100069"
+    },
+    {
+      "id": "600030",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489501",
+      "userId": "2100070"
+    },
+    {
+      "id": "600031",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489578",
+      "userId": "2100071"
+    },
+    {
+      "id": "600032",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489655",
+      "userId": "2100072"
+    },
+    {
+      "id": "600044",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636468",
+      "userId": "2100108"
+    },
+    {
+      "id": "600045",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636549",
+      "userId": "2100109"
+    },
+    {
+      "id": "600046",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636645",
+      "userId": "2100110"
+    },
+    {
+      "id": "600047",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636719",
+      "userId": "2100111"
+    },
+    {
+      "id": "600048",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636798",
+      "userId": "2100112"
+    },
+    {
+      "id": "600049",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636869",
+      "userId": "2100113"
+    },
+    {
+      "id": "600050",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636938",
+      "userId": "2100114"
+    },
+    {
+      "id": "600062",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640961920",
+      "userId": "2100151"
+    },
+    {
+      "id": "600063",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640961983",
+      "userId": "2100152"
+    },
+    {
+      "id": "600064",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962051",
+      "userId": "2100153"
+    },
+    {
+      "id": "600065",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962116",
+      "userId": "2100154"
+    },
+    {
+      "id": "600066",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962189",
+      "userId": "2100155"
+    },
+    {
+      "id": "600067",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962254",
+      "userId": "2100156"
+    },
+    {
+      "id": "600068",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962312",
+      "userId": "2100157"
+    },
+    {
+      "id": "600080",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120101",
+      "userId": "2100194"
+    },
+    {
+      "id": "600081",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120170",
+      "userId": "2100195"
+    },
+    {
+      "id": "600082",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120254",
+      "userId": "2100196"
+    },
+    {
+      "id": "600083",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120320",
+      "userId": "2100197"
+    },
+    {
+      "id": "600084",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120387",
+      "userId": "2100198"
+    },
+    {
+      "id": "600085",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120449",
+      "userId": "2100199"
+    },
+    {
+      "id": "600086",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120508",
+      "userId": "2100200"
+    },
+    {
+      "id": "600100",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178119",
+      "userId": "2100238"
+    },
+    {
+      "id": "600101",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178205",
+      "userId": "2100239"
+    },
+    {
+      "id": "600102",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178281",
+      "userId": "2100240"
+    },
+    {
+      "id": "600103",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178355",
+      "userId": "2100241"
+    },
+    {
+      "id": "600104",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178436",
+      "userId": "2100242"
+    },
+    {
+      "id": "600105",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178503",
+      "userId": "2100243"
+    },
+    {
+      "id": "600106",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178572",
+      "userId": "2100244"
+    },
+    {
+      "id": "600115",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2100270"
+    },
+    {
+      "id": "600116",
+      "name": "Disciplina Teste",
+      "code": "TEST-001",
+      "userId": "2100278"
+    },
+    {
+      "id": "600118",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648464847",
+      "userId": "2100282"
+    },
+    {
+      "id": "600119",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648464933",
+      "userId": "2100283"
+    },
+    {
+      "id": "600120",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465015",
+      "userId": "2100284"
+    },
+    {
+      "id": "600121",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465094",
+      "userId": "2100285"
+    },
+    {
+      "id": "600122",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465171",
+      "userId": "2100287"
+    },
+    {
+      "id": "600123",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465241",
+      "userId": "2100288"
+    },
+    {
+      "id": "600124",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465310",
+      "userId": "2100289"
+    },
+    {
+      "id": "630001",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2130004"
+    },
+    {
+      "id": "630004",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886378984",
+      "userId": "2130015"
+    },
+    {
+      "id": "630005",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379073",
+      "userId": "2130016"
+    },
+    {
+      "id": "630006",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379161",
+      "userId": "2130017"
+    },
+    {
+      "id": "630007",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379241",
+      "userId": "2130018"
+    },
+    {
+      "id": "630008",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379359",
+      "userId": "2130019"
+    },
+    {
+      "id": "630009",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379438",
+      "userId": "2130020"
+    },
+    {
+      "id": "630010",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379521",
+      "userId": "2130021"
+    },
+    {
+      "id": "660001",
+      "name": "Matemática Teste",
+      "code": "MAT-1767967882418",
+      "userId": "2190002"
+    },
+    {
+      "id": "690001",
+      "name": "Matemática Teste",
+      "code": "MAT-1767970733429",
+      "userId": "2220002"
+    },
+    {
+      "id": "720004",
+      "name": "Disciplina Teste Revisão",
+      "code": "TEST-REV-001",
+      "userId": "999"
+    },
+    {
+      "id": "780008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380511",
+      "userId": "2310013"
+    },
+    {
+      "id": "780009",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380591",
+      "userId": "2310015"
+    },
+    {
+      "id": "780010",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380663",
+      "userId": "2310016"
+    },
+    {
+      "id": "780011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380738",
+      "userId": "2310017"
+    },
+    {
+      "id": "780012",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380818",
+      "userId": "2310018"
+    },
+    {
+      "id": "780013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380912",
+      "userId": "2310019"
+    },
+    {
+      "id": "780014",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139381035",
+      "userId": "2310020"
+    },
+    {
+      "id": "780016",
+      "name": "Matemática Teste",
+      "code": "MAT-1768139382504",
+      "userId": "2310023"
+    },
+    {
+      "id": "780042",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014630",
+      "userId": "2310164"
+    },
+    {
+      "id": "780043",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014715",
+      "userId": "2310165"
+    },
+    {
+      "id": "780044",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014800",
+      "userId": "2310166"
+    },
+    {
+      "id": "780045",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014888",
+      "userId": "2310167"
+    },
+    {
+      "id": "780046",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014973",
+      "userId": "2310168"
+    },
+    {
+      "id": "780047",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148015052",
+      "userId": "2310169"
+    },
+    {
+      "id": "780050",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148015151",
+      "userId": "2310171"
+    },
+    {
+      "id": "780053",
+      "name": "Matemática Teste",
+      "code": "MAT-1768148022693",
+      "userId": "2310177"
+    },
+    {
+      "id": "780069",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148174795",
+      "userId": "2310213"
+    },
+    {
+      "id": "780070",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148174889",
+      "userId": "2310214"
+    },
+    {
+      "id": "780071",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175043",
+      "userId": "2310215"
+    },
+    {
+      "id": "780074",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175203",
+      "userId": "2310216"
+    },
+    {
+      "id": "780076",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175277",
+      "userId": "2310218"
+    },
+    {
+      "id": "780077",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175347",
+      "userId": "2310219"
+    },
+    {
+      "id": "780078",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175413",
+      "userId": "2310220"
+    },
+    {
+      "id": "780081",
+      "name": "Matemática Teste",
+      "code": "MAT-1768148183038",
+      "userId": "2310226"
+    },
+    {
+      "id": "810006",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428859784",
+      "userId": "2610017"
+    },
+    {
+      "id": "810007",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428859876",
+      "userId": "2610018"
+    },
+    {
+      "id": "810008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428859958",
+      "userId": "2610019"
+    },
+    {
+      "id": "810009",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860033",
+      "userId": "2610020"
+    },
+    {
+      "id": "810011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860130",
+      "userId": "2610022"
+    },
+    {
+      "id": "810013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860206",
+      "userId": "2610024"
+    },
+    {
+      "id": "810015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860284",
+      "userId": "2610025"
+    },
+    {
+      "id": "810017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768428861453",
+      "userId": "2610026"
+    },
+    {
+      "id": "900001",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2820006"
+    },
+    {
+      "id": "900006",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525780962",
+      "userId": "2820017"
+    },
+    {
+      "id": "900007",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781085",
+      "userId": "2820018"
+    },
+    {
+      "id": "900010",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781162",
+      "userId": "2820021"
+    },
+    {
+      "id": "900011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781230",
+      "userId": "2820022"
+    },
+    {
+      "id": "900013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781309",
+      "userId": "2820023"
+    },
+    {
+      "id": "900014",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781378",
+      "userId": "2820024"
+    },
+    {
+      "id": "900015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781447",
+      "userId": "2820025"
+    },
+    {
+      "id": "900017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768525782136",
+      "userId": "2820027"
+    },
+    {
+      "id": "990006",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100556",
+      "userId": "3300012"
+    },
+    {
+      "id": "990007",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100685",
+      "userId": "3300013"
+    },
+    {
+      "id": "990008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100794",
+      "userId": "3300014"
+    },
+    {
+      "id": "990009",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100888",
+      "userId": "3300015"
+    },
+    {
+      "id": "990012",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100994",
+      "userId": "3300017"
+    },
+    {
+      "id": "990013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835101093",
+      "userId": "3300018"
+    },
+    {
+      "id": "990015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835101187",
+      "userId": "3300019"
+    },
+    {
+      "id": "990017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768835102485",
+      "userId": "3300023"
+    },
+    {
+      "id": "1020008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209364",
+      "userId": "3330013"
+    },
+    {
+      "id": "1020010",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209454",
+      "userId": "3330014"
+    },
+    {
+      "id": "1020011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209540",
+      "userId": "3330015"
+    },
+    {
+      "id": "1020012",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209625",
+      "userId": "3330017"
+    },
+    {
+      "id": "1020013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209715",
+      "userId": "3330018"
+    },
+    {
+      "id": "1020014",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209790",
+      "userId": "3330019"
+    },
+    {
+      "id": "1020015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209867",
+      "userId": "3330020"
+    },
+    {
+      "id": "1020017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768836210987",
+      "userId": "3330023"
+    },
+    {
+      "id": "1020036",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288648",
+      "userId": "3330057"
+    },
+    {
+      "id": "1020037",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288734",
+      "userId": "3330058"
+    },
+    {
+      "id": "1020038",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288822",
+      "userId": "3330059"
+    },
+    {
+      "id": "1020039",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288911",
+      "userId": "3330061"
+    },
+    {
+      "id": "1020040",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288998",
+      "userId": "3330062"
+    },
+    {
+      "id": "1020041",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836289087",
+      "userId": "3330063"
+    },
+    {
+      "id": "1020042",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836289166",
+      "userId": "3330064"
+    },
+    {
+      "id": "1020060",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836318934",
+      "userId": "3330090"
+    },
+    {
+      "id": "1020062",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319041",
+      "userId": "3330091"
+    },
+    {
+      "id": "1020063",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319133",
+      "userId": "3330093"
+    },
+    {
+      "id": "1020064",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319219",
+      "userId": "3330094"
+    },
+    {
+      "id": "1020065",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319312",
+      "userId": "3330095"
+    },
+    {
+      "id": "1020066",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319387",
+      "userId": "3330096"
+    },
+    {
+      "id": "1020067",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319473",
+      "userId": "3330097"
+    },
+    {
+      "id": "1050001",
+      "name": "TESTE",
+      "code": "TESTE",
+      "userId": "3390001"
+    },
+    {
+      "id": "1080001",
+      "name": "Test",
+      "code": "TEST123",
+      "userId": "3390001"
+    },
+    {
+      "id": "1080002",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC003",
+      "userId": "3390001"
+    },
+    {
+      "id": "1110001",
+      "name": "Teste SQL Direto",
+      "code": "SQL001",
+      "userId": "600002"
+    },
+    {
+      "id": "1110002",
+      "name": "Teste Drizzle",
+      "code": "DRZ001",
+      "userId": "600002"
+    },
+    {
+      "id": "1140001",
+      "name": "Teste Drizzle Direto",
+      "code": "TDD001",
+      "userId": "600002"
+    },
+    {
+      "id": "1170001",
+      "name": "TesteDireto",
+      "code": "TDIR001",
+      "userId": "600002"
+    },
+    {
+      "id": "1170002",
+      "name": "TesteSQL",
+      "code": "TSQL99",
+      "userId": "3390001"
+    },
+    {
+      "id": "1170003",
+      "name": "Teste Final",
+      "code": "TF001",
+      "userId": "3390001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\n300001\tMatemática Teste\tMAT1766800399052\t1560004\n300002\tMatemática Teste\tMAT1766800417394\t1560005\n360001\tMatemática Teste\tMAT001\t1710001\n450001\tDisciplina Teste Details\tTEST-DETAILS-001\t1950002\n450002\tDisciplina Teste Details\tTEST-DETAILS-001\t1950003\n450003\tDisciplina Teste Details\tTEST-DETAILS-001\t1950004\n510002\tDisciplina Teste\tDISC1767569014946\t2010010\n510003\tDisciplina Teste\tDISC1767569014998\t2010011\n510004\tDisciplina Teste\tDISC1767569015046\t2010012\n510005\tDisciplina Teste\tDISC1767569015092\t2010013\n510006\tDisciplina Teste\tDISC1767569015135\t2010014\n510007\tDisciplina Teste\tDISC1767569015194\t2010015\n510008\tDisciplina Teste\tDISC1767569015239\t2010016\n510009\tDisciplina Teste\tDISC1767569032346\t2010017\n510010\tDisciplina Teste\tDISC1767569032444\t2010018\n510011\tDisciplina Teste\tDISC1767569032503\t2010019\n510012\tDisciplina Teste\tDISC1767569032583\t2010020\n510013\tDisciplina Teste\tDISC1767569032670\t2010021\n510014\tDisciplina Teste\tDISC1767569032738\t2010022\n510015\tDisciplina Teste\tDISC1767569032812\t2010023\n510016\tDisciplina Teste\tDISC1767569046122\t2010024\n510017\tDisciplina Teste\tDISC1767569046311\t2010025\n510018\tDisciplina Teste\tDISC1767569046404\t2010026\n510019\tDisciplina Teste\tDISC1767569046739\t2010027\n510020\tDisciplina Teste\tDISC1767569046848\t2010028\n510021\tDisciplina Teste\tDISC1767569046961\t2010029\n510022\tDisciplina Teste\tDISC1767569047108\t2010030\n510023\tDisciplina Teste\tDISC1767569073002\t2010031\n510024\tDisciplina Teste\tDISC1767569073083\t2010032\n510025\tDisciplina Teste\tDISC1767569073154\t2010033\n510026\tDisciplina Teste\tDISC1767569073224\t2010034\n510027\tDisciplina Teste\tDISC1767569073309\t2010035\n510028\tDisciplina Teste\tDISC1767569073378\t2010036\n510029\tDisciplina Teste\tDISC1767569073444\t2010037\n600006\tDisciplina Teste Quiz\tQUIZ-TEST\t2100013\n600010\tDisciplina Teste\tDISC1767639150208\t2100025\n600011\tDisciplina Teste\tDISC1767639150309\t2100027\n600012\tDisciplina Teste\tDISC1767639150408\t2100028\n600013\tDisciplina Teste\tDISC1767639150497\t2100029\n600014\tDisciplina Teste\tDISC1767639150757\t2100030\n600015\tDisciplina Teste\tDISC1767639150828\t2100031\n600016\tDisciplina Teste\tDISC1767639150898\t2100032\n600026\tDisciplina Teste\tDISC1767640489146\t2100065\n600027\tDisciplina Teste\tDISC1767640489237\t2100067\n600028\tDisciplina Teste\tDISC1767640489328\t2100068\n600029\tDisciplina Teste\tDISC1767640489410\t2100069\n600030\tDisciplina Teste\tDISC1767640489501\t2100070\n600031\tDisciplina Teste\tDISC1767640489578\t2100071\n600032\tDisciplina Teste\tDISC1767640489655\t2100072\n600044\tDisciplina Teste\tDISC1767640636468\t2100108\n600045\tDisciplina Teste\tDISC1767640636549\t2100109\n600046\tDisciplina Teste\tDISC1767640636645\t2100110\n600047\tDisciplina Teste\tDISC1767640636719\t2100111\n600048\tDisciplina Teste\tDISC1767640636798\t2100112\n600049\tDisciplina Teste\tDISC1767640636869\t2100113\n600050\tDisciplina Teste\tDISC1767640636938\t2100114\n600062\tDisciplina Teste\tDISC1767640961920\t2100151\n600063\tDisciplina Teste\tDISC1767640961983\t2100152\n600064\tDisciplina Teste\tDISC1767640962051\t2100153\n600065\tDisciplina Teste\tDISC1767640962116\t2100154\n600066\tDisciplina Teste\tDISC1767640962189\t2100155\n600067\tDisciplina Teste\tDISC1767640962254\t2100156\n600068\tDisciplina Teste\tDISC1767640962312\t2100157\n600080\tDisciplina Teste\tDISC1767641120101\t2100194\n600081\tDisciplina Teste\tDISC1767641120170\t2100195\n600082\tDisciplina Teste\tDISC1767641120254\t2100196\n600083\tDisciplina Teste\tDISC1767641120320\t2100197\n600084\tDisciplina Teste\tDISC1767641120387\t2100198\n600085\tDisciplina Teste\tDISC1767641120449\t2100199\n600086\tDisciplina Teste\tDISC1767641120508\t2100200\n600100\tDisciplina Teste\tDISC1767648178119\t2100238\n600101\tDisciplina Teste\tDISC1767648178205\t2100239\n600102\tDisciplina Teste\tDISC1767648178281\t2100240\n600103\tDisciplina Teste\tDISC1767648178355\t2100241\n600104\tDisciplina Teste\tDISC1767648178436\t2100242\n600105\tDisciplina Teste\tDISC1767648178503\t2100243\n600106\tDisciplina Teste\tDISC1767648178572\t2100244\n600115\tDisciplina Teste Quiz\tQUIZ-TEST\t2100270\n600116\tDisciplina Teste\tTEST-001\t2100278\n600118\tDisciplina Teste\tDISC1767648464847\t2100282\n600119\tDisciplina Teste\tDISC1767648464933\t2100283\n600120\tDisciplina Teste\tDISC1767648465015\t2100284\n600121\tDisciplina Teste\tDISC1767648465094\t2100285\n600122\tDisciplina Teste\tDISC1767648465171\t2100287\n600123\tDisciplina Teste\tDISC1767648465241\t2100288\n600124\tDisciplina Teste\tDISC1767648465310\t2100289\n630001\tDisciplina Teste Quiz\tQUIZ-TEST\t2130004\n630004\tDisciplina Teste\tDISC1767886378984\t2130015\n630005\tDisciplina Teste\tDISC1767886379073\t2130016\n630006\tDisciplina Teste\tDISC1767886379161\t2130017\n630007\tDisciplina Teste\tDISC1767886379241\t2130018\n630008\tDisciplina Teste\tDISC1767886379359\t2130019\n630009\tDisciplina Teste\tDISC1767886379438\t2130020\n630010\tDisciplina Teste\tDISC1767886379521\t2130021\n660001\tMatemática Teste\tMAT-1767967882418\t2190002\n690001\tMatemática Teste\tMAT-1767970733429\t2220002\n720004\tDisciplina Teste Revisão\tTEST-REV-001\t999\n780008\tDisciplina Teste\tDISC1768139380511\t2310013\n780009\tDisciplina Teste\tDISC1768139380591\t2310015\n780010\tDisciplina Teste\tDISC1768139380663\t2310016\n780011\tDisciplina Teste\tDISC1768139380738\t2310017\n780012\tDisciplina Teste\tDISC1768139380818\t2310018\n780013\tDisciplina Teste\tDISC1768139380912\t2310019\n780014\tDisciplina Teste\tDISC1768139381035\t2310020\n780016\tMatemática Teste\tMAT-1768139382504\t2310023\n780042\tDisciplina Teste\tDISC1768148014630\t2310164\n780043\tDisciplina Teste\tDISC1768148014715\t2310165\n780044\tDisciplina Teste\tDISC1768148014800\t2310166\n780045\tDisciplina Teste\tDISC1768148014888\t2310167\n780046\tDisciplina Teste\tDISC1768148014973\t2310168\n780047\tDisciplina Teste\tDISC1768148015052\t2310169\n780050\tDisciplina Teste\tDISC1768148015151\t2310171\n780053\tMatemática Teste\tMAT-1768148022693\t2310177\n780069\tDisciplina Teste\tDISC1768148174795\t2310213\n780070\tDisciplina Teste\tDISC1768148174889\t2310214\n780071\tDisciplina Teste\tDISC1768148175043\t2310215\n780074\tDisciplina Teste\tDISC1768148175203\t2310216\n780076\tDisciplina Teste\tDISC1768148175277\t2310218\n780077\tDisciplina Teste\tDISC1768148175347\t2310219\n780078\tDisciplina Teste\tDISC1768148175413\t2310220\n780081\tMatemática Teste\tMAT-1768148183038\t2310226\n810006\tDisciplina Teste\tDISC1768428859784\t2610017\n810007\tDisciplina Teste\tDISC1768428859876\t2610018\n810008\tDisciplina Teste\tDISC1768428859958\t2610019\n810009\tDisciplina Teste\tDISC1768428860033\t2610020\n810011\tDisciplina Teste\tDISC1768428860130\t2610022\n810013\tDisciplina Teste\tDISC1768428860206\t2610024\n810015\tDisciplina Teste\tDISC1768428860284\t2610025\n810017\tMatemática Teste\tMAT-1768428861453\t2610026\n900001\tDisciplina Teste Quiz\tQUIZ-TEST\t2820006\n900006\tDisciplina Teste\tDISC1768525780962\t2820017\n900007\tDisciplina Teste\tDISC1768525781085\t2820018\n900010\tDisciplina Teste\tDISC1768525781162\t2820021\n900011\tDisciplina Teste\tDISC1768525781230\t2820022\n900013\tDisciplina Teste\tDISC1768525781309\t2820023\n900014\tDisciplina Teste\tDISC1768525781378\t2820024\n900015\tDisciplina Teste\tDISC1768525781447\t2820025\n900017\tMatemática Teste\tMAT-1768525782136\t2820027\n990006\tDisciplina Teste\tDISC1768835100556\t3300012\n990007\tDisciplina Teste\tDISC1768835100685\t3300013\n990008\tDisciplina Teste\tDISC1768835100794\t3300014\n990009\tDisciplina Teste\tDISC1768835100888\t3300015\n990012\tDisciplina Teste\tDISC1768835100994\t3300017\n990013\tDisciplina Teste\tDISC1768835101093\t3300018\n990015\tDisciplina Teste\tDISC1768835101187\t3300019\n990017\tMatemática Teste\tMAT-1768835102485\t3300023\n1020008\tDisciplina Teste\tDISC1768836209364\t3330013\n1020010\tDisciplina Teste\tDISC1768836209454\t3330014\n1020011\tDisciplina Teste\tDISC1768836209540\t3330015\n1020012\tDisciplina Teste\tDISC1768836209625\t3330017\n1020013\tDisciplina Teste\tDISC1768836209715\t3330018\n1020014\tDisciplina Teste\tDISC1768836209790\t3330019\n1020015\tDisciplina Teste\tDISC1768836209867\t3330020\n1020017\tMatemática Teste\tMAT-1768836210987\t3330023\n1020036\tDisciplina Teste\tDISC1768836288648\t3330057\n1020037\tDisciplina Teste\tDISC1768836288734\t3330058\n1020038\tDisciplina Teste\tDISC1768836288822\t3330059\n1020039\tDisciplina Teste\tDISC1768836288911\t3330061\n1020040\tDisciplina Teste\tDISC1768836288998\t3330062\n1020041\tDisciplina Teste\tDISC1768836289087\t3330063\n1020042\tDisciplina Teste\tDISC1768836289166\t3330064\n1020060\tDisciplina Teste\tDISC1768836318934\t3330090\n1020062\tDisciplina Teste\tDISC1768836319041\t3330091\n1020063\tDisciplina Teste\tDISC1768836319133\t3330093\n1020064\tDisciplina Teste\tDISC1768836319219\t3330094\n1020065\tDisciplina Teste\tDISC1768836319312\t3330095\n1020066\tDisciplina Teste\tDISC1768836319387\t3330096\n1020067\tDisciplina Teste\tDISC1768836319473\t3330097\n1050001\tTESTE\tTESTE\t3390001\n1080001\tTest\tTEST123\t3390001\n1080002\tOdontologia na Saúde Coletiva\tOSC003\t3390001\n1110001\tTeste SQL Direto\tSQL001\t600002\n1110002\tTeste Drizzle\tDRZ001\t600002\n1140001\tTeste Drizzle Direto\tTDD001\t600002\n1170001\tTesteDireto\tTDIR001\t600002\n1170002\tTesteSQL\tTSQL99\t3390001\n1170003\tTeste Final\tTF001\t3390001\n",
+  "stderr": "",
+  "execution_time_ms": 69
+}

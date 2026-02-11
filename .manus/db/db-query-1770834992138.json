@@ -1,0 +1,2236 @@
+{
+  "query": "SELECT id, name, code, userId, createdAt FROM subjects ORDER BY createdAt;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, userId, createdAt FROM subjects ORDER BY createdAt;",
+  "rows": [
+    {
+      "id": "10",
+      "name": "Test Subject Regular",
+      "code": "TST1765416971096",
+      "userId": "150600",
+      "createdAt": "2025-12-11 01:36:11"
+    },
+    {
+      "id": "11",
+      "name": "Test Subject Admin",
+      "code": "TST1765416971107",
+      "userId": "150598",
+      "createdAt": "2025-12-11 01:36:11"
+    },
+    {
+      "id": "14",
+      "name": "Test Subject Regular",
+      "code": "TST1765420169197",
+      "userId": "150600",
+      "createdAt": "2025-12-11 02:29:29"
+    },
+    {
+      "id": "15",
+      "name": "Test Subject Admin",
+      "code": "TST1765420169207",
+      "userId": "150598",
+      "createdAt": "2025-12-11 02:29:29"
+    },
+    {
+      "id": "17",
+      "name": "Test Subject Regular",
+      "code": "TST1765422001928",
+      "userId": "150815",
+      "createdAt": "2025-12-11 03:00:01"
+    },
+    {
+      "id": "18",
+      "name": "Test Subject Admin",
+      "code": "TST1765422001939",
+      "userId": "150813",
+      "createdAt": "2025-12-11 03:00:01"
+    },
+    {
+      "id": "30001",
+      "name": "Test Subject Regular",
+      "code": "TST1765467693391",
+      "userId": "180006",
+      "createdAt": "2025-12-11 15:41:33"
+    },
+    {
+      "id": "30002",
+      "name": "Test Subject Admin",
+      "code": "TST1765467693406",
+      "userId": "180001",
+      "createdAt": "2025-12-11 15:41:33"
+    },
+    {
+      "id": "30004",
+      "name": "Test Subject Regular",
+      "code": "TST1765468068564",
+      "userId": "180021",
+      "createdAt": "2025-12-11 15:47:48"
+    },
+    {
+      "id": "30005",
+      "name": "Test Subject Admin",
+      "code": "TST1765468068593",
+      "userId": "180017",
+      "createdAt": "2025-12-11 15:47:48"
+    },
+    {
+      "id": "30007",
+      "name": "Test Subject Regular",
+      "code": "TST1765468675596",
+      "userId": "180032",
+      "createdAt": "2025-12-11 15:57:55"
+    },
+    {
+      "id": "30008",
+      "name": "Test Subject Admin",
+      "code": "TST1765468675606",
+      "userId": "180030",
+      "createdAt": "2025-12-11 15:57:55"
+    },
+    {
+      "id": "60001",
+      "name": "Test Subject Regular",
+      "code": "TST1765560341734",
+      "userId": "240012",
+      "createdAt": "2025-12-12 17:25:41"
+    },
+    {
+      "id": "60002",
+      "name": "Test Subject Admin",
+      "code": "TST1765560341751",
+      "userId": "240009",
+      "createdAt": "2025-12-12 17:25:41"
+    },
+    {
+      "id": "60004",
+      "name": "Test Subject Regular",
+      "code": "TST1765560351799",
+      "userId": "240024",
+      "createdAt": "2025-12-12 17:25:51"
+    },
+    {
+      "id": "60005",
+      "name": "Test Subject Admin",
+      "code": "TST1765560351808",
+      "userId": "240021",
+      "createdAt": "2025-12-12 17:25:51"
+    },
+    {
+      "id": "90001",
+      "name": "Test Subject Regular",
+      "code": "TST1765563163334",
+      "userId": "270003",
+      "createdAt": "2025-12-12 18:12:43"
+    },
+    {
+      "id": "90002",
+      "name": "Test Subject Admin",
+      "code": "TST1765563163351",
+      "userId": "270002",
+      "createdAt": "2025-12-12 18:12:43"
+    },
+    {
+      "id": "150001",
+      "name": "Test Subject Regular",
+      "code": "TST1766019771650",
+      "userId": "930009",
+      "createdAt": "2025-12-18 01:02:51"
+    },
+    {
+      "id": "150002",
+      "name": "Test Subject Admin",
+      "code": "TST1766019771668",
+      "userId": "930008",
+      "createdAt": "2025-12-18 01:02:51"
+    },
+    {
+      "id": "180001",
+      "name": "Test Subject Regular",
+      "code": "TST1766091455496",
+      "userId": "1050009",
+      "createdAt": "2025-12-18 20:57:35"
+    },
+    {
+      "id": "180002",
+      "name": "Test Subject Admin",
+      "code": "TST1766091455517",
+      "userId": "1050008",
+      "createdAt": "2025-12-18 20:57:35"
+    },
+    {
+      "id": "210001",
+      "name": "Test Subject Regular",
+      "code": "TST1766094355929",
+      "userId": "1110010",
+      "createdAt": "2025-12-18 21:45:55"
+    },
+    {
+      "id": "210002",
+      "name": "Test Subject Admin",
+      "code": "TST1766094355955",
+      "userId": "1110009",
+      "createdAt": "2025-12-18 21:45:55"
+    },
+    {
+      "id": "240001",
+      "name": "Test Subject Regular",
+      "code": "TST1766104515923",
+      "userId": "1140021",
+      "createdAt": "2025-12-19 00:35:15"
+    },
+    {
+      "id": "240002",
+      "name": "Test Subject Admin",
+      "code": "TST1766104515944",
+      "userId": "1140020",
+      "createdAt": "2025-12-19 00:35:15"
+    },
+    {
+      "id": "240004",
+      "name": "Test Subject Regular",
+      "code": "TST1766104544873",
+      "userId": "1140037",
+      "createdAt": "2025-12-19 00:35:44"
+    },
+    {
+      "id": "240005",
+      "name": "Test Subject Admin",
+      "code": "TST1766104544884",
+      "userId": "1140036",
+      "createdAt": "2025-12-19 00:35:44"
+    },
+    {
+      "id": "240007",
+      "name": "Test Subject Regular",
+      "code": "TST1766104556316",
+      "userId": "1140054",
+      "createdAt": "2025-12-19 00:35:56"
+    },
+    {
+      "id": "240008",
+      "name": "Test Subject Admin",
+      "code": "TST1766104556325",
+      "userId": "1140052",
+      "createdAt": "2025-12-19 00:35:56"
+    },
+    {
+      "id": "270001",
+      "name": "Test Subject Regular",
+      "code": "TST1766462174534",
+      "userId": "1290017",
+      "createdAt": "2025-12-23 03:56:14"
+    },
+    {
+      "id": "270002",
+      "name": "Test Subject Admin",
+      "code": "TST1766462174550",
+      "userId": "1290016",
+      "createdAt": "2025-12-23 03:56:14"
+    },
+    {
+      "id": "270003",
+      "name": "Test Subject Regular",
+      "code": "TST1766462191879",
+      "userId": "1290028",
+      "createdAt": "2025-12-23 03:56:31"
+    },
+    {
+      "id": "270004",
+      "name": "Test Subject Admin",
+      "code": "TST1766462191903",
+      "userId": "1290027",
+      "createdAt": "2025-12-23 03:56:31"
+    },
+    {
+      "id": "300001",
+      "name": "Matemática Teste",
+      "code": "MAT1766800399052",
+      "userId": "1560004",
+      "createdAt": "2025-12-27 01:53:19"
+    },
+    {
+      "id": "300002",
+      "name": "Matemática Teste",
+      "code": "MAT1766800417394",
+      "userId": "1560005",
+      "createdAt": "2025-12-27 01:53:37"
+    },
+    {
+      "id": "330001",
+      "name": "Disciplina Rankings Test",
+      "code": "RANK1766867721427",
+      "userId": "1680001",
+      "createdAt": "2025-12-27 20:35:21"
+    },
+    {
+      "id": "330002",
+      "name": "Disciplina Rankings Test",
+      "code": "RANK1766867746033",
+      "userId": "1680002",
+      "createdAt": "2025-12-27 20:35:46"
+    },
+    {
+      "id": "330003",
+      "name": "Disciplina Rankings Test",
+      "code": "RANK1766867799632",
+      "userId": "1680003",
+      "createdAt": "2025-12-27 20:36:39"
+    },
+    {
+      "id": "360001",
+      "name": "Matemática Teste",
+      "code": "MAT001",
+      "userId": "1710001",
+      "createdAt": "2025-12-28 02:57:01"
+    },
+    {
+      "id": "450001",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950002",
+      "createdAt": "2026-01-04 17:08:01"
+    },
+    {
+      "id": "450002",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950003",
+      "createdAt": "2026-01-04 17:09:02"
+    },
+    {
+      "id": "450003",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950004",
+      "createdAt": "2026-01-04 17:09:35"
+    },
+    {
+      "id": "450010",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "999999",
+      "createdAt": "2026-01-04 17:42:54"
+    },
+    {
+      "id": "450011",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-04 17:43:13"
+    },
+    {
+      "id": "450012",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-04 17:43:57"
+    },
+    {
+      "id": "450013",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-04 17:44:16"
+    },
+    {
+      "id": "480004",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-04 21:07:39"
+    },
+    {
+      "id": "480005",
+      "name": "Test Subject Regular",
+      "code": "TST1767560859677",
+      "userId": "1980015",
+      "createdAt": "2026-01-04 21:07:39"
+    },
+    {
+      "id": "480006",
+      "name": "Test Subject Admin",
+      "code": "TST1767560859699",
+      "userId": "1980014",
+      "createdAt": "2026-01-04 21:07:39"
+    },
+    {
+      "id": "510002",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569014946",
+      "userId": "2010010",
+      "createdAt": "2026-01-04 23:23:34"
+    },
+    {
+      "id": "510003",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569014998",
+      "userId": "2010011",
+      "createdAt": "2026-01-04 23:23:35"
+    },
+    {
+      "id": "510004",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015046",
+      "userId": "2010012",
+      "createdAt": "2026-01-04 23:23:35"
+    },
+    {
+      "id": "510005",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015092",
+      "userId": "2010013",
+      "createdAt": "2026-01-04 23:23:35"
+    },
+    {
+      "id": "510006",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015135",
+      "userId": "2010014",
+      "createdAt": "2026-01-04 23:23:35"
+    },
+    {
+      "id": "510007",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015194",
+      "userId": "2010015",
+      "createdAt": "2026-01-04 23:23:35"
+    },
+    {
+      "id": "510008",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569015239",
+      "userId": "2010016",
+      "createdAt": "2026-01-04 23:23:35"
+    },
+    {
+      "id": "510009",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032346",
+      "userId": "2010017",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510010",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032444",
+      "userId": "2010018",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510011",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032503",
+      "userId": "2010019",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510012",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032583",
+      "userId": "2010020",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510013",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032670",
+      "userId": "2010021",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510014",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032738",
+      "userId": "2010022",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510015",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569032812",
+      "userId": "2010023",
+      "createdAt": "2026-01-04 23:23:52"
+    },
+    {
+      "id": "510016",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046122",
+      "userId": "2010024",
+      "createdAt": "2026-01-04 23:24:06"
+    },
+    {
+      "id": "510017",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046311",
+      "userId": "2010025",
+      "createdAt": "2026-01-04 23:24:06"
+    },
+    {
+      "id": "510018",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046404",
+      "userId": "2010026",
+      "createdAt": "2026-01-04 23:24:06"
+    },
+    {
+      "id": "510019",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046739",
+      "userId": "2010027",
+      "createdAt": "2026-01-04 23:24:06"
+    },
+    {
+      "id": "510020",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046848",
+      "userId": "2010028",
+      "createdAt": "2026-01-04 23:24:06"
+    },
+    {
+      "id": "510021",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569046961",
+      "userId": "2010029",
+      "createdAt": "2026-01-04 23:24:06"
+    },
+    {
+      "id": "510022",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569047108",
+      "userId": "2010030",
+      "createdAt": "2026-01-04 23:24:07"
+    },
+    {
+      "id": "510023",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073002",
+      "userId": "2010031",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "510024",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073083",
+      "userId": "2010032",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "510025",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073154",
+      "userId": "2010033",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "510026",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073224",
+      "userId": "2010034",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "510027",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073309",
+      "userId": "2010035",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "510028",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073378",
+      "userId": "2010036",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "510029",
+      "name": "Disciplina Teste",
+      "code": "DISC1767569073444",
+      "userId": "2010037",
+      "createdAt": "2026-01-04 23:24:33"
+    },
+    {
+      "id": "540001",
+      "name": "Matemática",
+      "code": "MAT-1767578329585",
+      "userId": "2040009",
+      "createdAt": "2026-01-05 01:58:49"
+    },
+    {
+      "id": "570001",
+      "name": "Matemática",
+      "code": "MAT-1767581814952",
+      "userId": "2070009",
+      "createdAt": "2026-01-05 02:56:54"
+    },
+    {
+      "id": "570002",
+      "name": "Test Subject Gamification",
+      "code": "TSG-1767584224706",
+      "userId": "2070014",
+      "createdAt": "2026-01-05 03:37:04"
+    },
+    {
+      "id": "600006",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2100013",
+      "createdAt": "2026-01-05 18:49:43"
+    },
+    {
+      "id": "600010",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150208",
+      "userId": "2100025",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600011",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150309",
+      "userId": "2100027",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600012",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150408",
+      "userId": "2100028",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600013",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150497",
+      "userId": "2100029",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600014",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150757",
+      "userId": "2100030",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600015",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150828",
+      "userId": "2100031",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600016",
+      "name": "Disciplina Teste",
+      "code": "DISC1767639150898",
+      "userId": "2100032",
+      "createdAt": "2026-01-05 18:52:30"
+    },
+    {
+      "id": "600018",
+      "name": "Test Subject Regular",
+      "code": "TST1767639152788",
+      "userId": "2100034",
+      "createdAt": "2026-01-05 18:52:32"
+    },
+    {
+      "id": "600019",
+      "name": "Test Subject Admin",
+      "code": "TST1767639152810",
+      "userId": "2100033",
+      "createdAt": "2026-01-05 18:52:32"
+    },
+    {
+      "id": "600021",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-05 18:52:35"
+    },
+    {
+      "id": "600022",
+      "name": "Matemática",
+      "code": "MAT-1767639157258",
+      "userId": "2100044",
+      "createdAt": "2026-01-05 18:52:37"
+    },
+    {
+      "id": "600026",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489146",
+      "userId": "2100065",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600027",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489237",
+      "userId": "2100067",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600028",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489328",
+      "userId": "2100068",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600029",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489410",
+      "userId": "2100069",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600030",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489501",
+      "userId": "2100070",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600031",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489578",
+      "userId": "2100071",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600032",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640489655",
+      "userId": "2100072",
+      "createdAt": "2026-01-05 19:14:49"
+    },
+    {
+      "id": "600034",
+      "name": "Test Subject Regular",
+      "code": "TST1767640497235",
+      "userId": "2100076",
+      "createdAt": "2026-01-05 19:14:57"
+    },
+    {
+      "id": "600035",
+      "name": "Test Subject Admin",
+      "code": "TST1767640497257",
+      "userId": "2100075",
+      "createdAt": "2026-01-05 19:14:57"
+    },
+    {
+      "id": "600036",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-05 19:15:01"
+    },
+    {
+      "id": "600038",
+      "name": "Matemática",
+      "code": "MAT-1767640501748",
+      "userId": "2100084",
+      "createdAt": "2026-01-05 19:15:01"
+    },
+    {
+      "id": "600044",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636468",
+      "userId": "2100108",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600045",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636549",
+      "userId": "2100109",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600046",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636645",
+      "userId": "2100110",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600047",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636719",
+      "userId": "2100111",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600048",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636798",
+      "userId": "2100112",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600049",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636869",
+      "userId": "2100113",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600050",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640636938",
+      "userId": "2100114",
+      "createdAt": "2026-01-05 19:17:16"
+    },
+    {
+      "id": "600051",
+      "name": "Test Subject Regular",
+      "code": "TST1767640640137",
+      "userId": "2100117",
+      "createdAt": "2026-01-05 19:17:20"
+    },
+    {
+      "id": "600052",
+      "name": "Test Subject Admin",
+      "code": "TST1767640640155",
+      "userId": "2100116",
+      "createdAt": "2026-01-05 19:17:20"
+    },
+    {
+      "id": "600054",
+      "name": "Matemática",
+      "code": "MAT-1767640641545",
+      "userId": "2100126",
+      "createdAt": "2026-01-05 19:17:21"
+    },
+    {
+      "id": "600055",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-05 19:17:21"
+    },
+    {
+      "id": "600062",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640961920",
+      "userId": "2100151",
+      "createdAt": "2026-01-05 19:22:41"
+    },
+    {
+      "id": "600063",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640961983",
+      "userId": "2100152",
+      "createdAt": "2026-01-05 19:22:41"
+    },
+    {
+      "id": "600064",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962051",
+      "userId": "2100153",
+      "createdAt": "2026-01-05 19:22:42"
+    },
+    {
+      "id": "600065",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962116",
+      "userId": "2100154",
+      "createdAt": "2026-01-05 19:22:42"
+    },
+    {
+      "id": "600066",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962189",
+      "userId": "2100155",
+      "createdAt": "2026-01-05 19:22:42"
+    },
+    {
+      "id": "600067",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962254",
+      "userId": "2100156",
+      "createdAt": "2026-01-05 19:22:42"
+    },
+    {
+      "id": "600068",
+      "name": "Disciplina Teste",
+      "code": "DISC1767640962312",
+      "userId": "2100157",
+      "createdAt": "2026-01-05 19:22:42"
+    },
+    {
+      "id": "600070",
+      "name": "Test Subject Regular",
+      "code": "TST1767640965502",
+      "userId": "2100160",
+      "createdAt": "2026-01-05 19:22:45"
+    },
+    {
+      "id": "600071",
+      "name": "Test Subject Admin",
+      "code": "TST1767640965526",
+      "userId": "2100159",
+      "createdAt": "2026-01-05 19:22:45"
+    },
+    {
+      "id": "600072",
+      "name": "Matemática",
+      "code": "MAT-1767640967048",
+      "userId": "2100169",
+      "createdAt": "2026-01-05 19:22:47"
+    },
+    {
+      "id": "600073",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-05 19:22:47"
+    },
+    {
+      "id": "600080",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120101",
+      "userId": "2100194",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600081",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120170",
+      "userId": "2100195",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600082",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120254",
+      "userId": "2100196",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600083",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120320",
+      "userId": "2100197",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600084",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120387",
+      "userId": "2100198",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600085",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120449",
+      "userId": "2100199",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600086",
+      "name": "Disciplina Teste",
+      "code": "DISC1767641120508",
+      "userId": "2100200",
+      "createdAt": "2026-01-05 19:25:20"
+    },
+    {
+      "id": "600088",
+      "name": "Test Subject Regular",
+      "code": "TST1767641123623",
+      "userId": "2100204",
+      "createdAt": "2026-01-05 19:25:23"
+    },
+    {
+      "id": "600089",
+      "name": "Test Subject Admin",
+      "code": "TST1767641123639",
+      "userId": "2100203",
+      "createdAt": "2026-01-05 19:25:23"
+    },
+    {
+      "id": "600090",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-05 19:25:26"
+    },
+    {
+      "id": "600091",
+      "name": "Matemática",
+      "code": "MAT-1767641126431",
+      "userId": "2100213",
+      "createdAt": "2026-01-05 19:25:26"
+    },
+    {
+      "id": "600100",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178119",
+      "userId": "2100238",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600101",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178205",
+      "userId": "2100239",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600102",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178281",
+      "userId": "2100240",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600103",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178355",
+      "userId": "2100241",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600104",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178436",
+      "userId": "2100242",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600105",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178503",
+      "userId": "2100243",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600106",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648178572",
+      "userId": "2100244",
+      "createdAt": "2026-01-05 21:22:58"
+    },
+    {
+      "id": "600108",
+      "name": "Test Subject Regular",
+      "code": "TST1767648191813",
+      "userId": "2100249",
+      "createdAt": "2026-01-05 21:23:11"
+    },
+    {
+      "id": "600109",
+      "name": "Test Subject Admin",
+      "code": "TST1767648191831",
+      "userId": "2100248",
+      "createdAt": "2026-01-05 21:23:11"
+    },
+    {
+      "id": "600111",
+      "name": "Matemática",
+      "code": "MAT-1767648197196",
+      "userId": "2100257",
+      "createdAt": "2026-01-05 21:23:17"
+    },
+    {
+      "id": "600112",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-05 21:23:21"
+    },
+    {
+      "id": "600115",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2100270",
+      "createdAt": "2026-01-05 21:27:41"
+    },
+    {
+      "id": "600116",
+      "name": "Disciplina Teste",
+      "code": "TEST-001",
+      "userId": "2100278",
+      "createdAt": "2026-01-05 21:27:42"
+    },
+    {
+      "id": "600118",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648464847",
+      "userId": "2100282",
+      "createdAt": "2026-01-05 21:27:44"
+    },
+    {
+      "id": "600119",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648464933",
+      "userId": "2100283",
+      "createdAt": "2026-01-05 21:27:44"
+    },
+    {
+      "id": "600120",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465015",
+      "userId": "2100284",
+      "createdAt": "2026-01-05 21:27:45"
+    },
+    {
+      "id": "600121",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465094",
+      "userId": "2100285",
+      "createdAt": "2026-01-05 21:27:45"
+    },
+    {
+      "id": "600122",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465171",
+      "userId": "2100287",
+      "createdAt": "2026-01-05 21:27:45"
+    },
+    {
+      "id": "600123",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465241",
+      "userId": "2100288",
+      "createdAt": "2026-01-05 21:27:45"
+    },
+    {
+      "id": "600124",
+      "name": "Disciplina Teste",
+      "code": "DISC1767648465310",
+      "userId": "2100289",
+      "createdAt": "2026-01-05 21:27:45"
+    },
+    {
+      "id": "630001",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2130004",
+      "createdAt": "2026-01-08 15:32:56"
+    },
+    {
+      "id": "630004",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886378984",
+      "userId": "2130015",
+      "createdAt": "2026-01-08 15:32:58"
+    },
+    {
+      "id": "630005",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379073",
+      "userId": "2130016",
+      "createdAt": "2026-01-08 15:32:59"
+    },
+    {
+      "id": "630006",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379161",
+      "userId": "2130017",
+      "createdAt": "2026-01-08 15:32:59"
+    },
+    {
+      "id": "630007",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379241",
+      "userId": "2130018",
+      "createdAt": "2026-01-08 15:32:59"
+    },
+    {
+      "id": "630008",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379359",
+      "userId": "2130019",
+      "createdAt": "2026-01-08 15:32:59"
+    },
+    {
+      "id": "630009",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379438",
+      "userId": "2130020",
+      "createdAt": "2026-01-08 15:32:59"
+    },
+    {
+      "id": "630010",
+      "name": "Disciplina Teste",
+      "code": "DISC1767886379521",
+      "userId": "2130021",
+      "createdAt": "2026-01-08 15:32:59"
+    },
+    {
+      "id": "630015",
+      "name": "Test Subject Regular",
+      "code": "TST1767886382556",
+      "userId": "2130026",
+      "createdAt": "2026-01-08 15:33:02"
+    },
+    {
+      "id": "630016",
+      "name": "Test Subject Admin",
+      "code": "TST1767886382575",
+      "userId": "2130025",
+      "createdAt": "2026-01-08 15:33:02"
+    },
+    {
+      "id": "630021",
+      "name": "Matemática",
+      "code": "MAT-1767886383959",
+      "userId": "2130037",
+      "createdAt": "2026-01-08 15:33:03"
+    },
+    {
+      "id": "630022",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-08 15:33:04"
+    },
+    {
+      "id": "660001",
+      "name": "Matemática Teste",
+      "code": "MAT-1767967882418",
+      "userId": "2190002",
+      "createdAt": "2026-01-09 14:11:22"
+    },
+    {
+      "id": "690001",
+      "name": "Matemática Teste",
+      "code": "MAT-1767970733429",
+      "userId": "2220002",
+      "createdAt": "2026-01-09 14:58:53"
+    },
+    {
+      "id": "720004",
+      "name": "Disciplina Teste Revisão",
+      "code": "TEST-REV-001",
+      "userId": "999",
+      "createdAt": "2026-01-10 21:09:49"
+    },
+    {
+      "id": "750001",
+      "name": "Test Subject for Answer Notebook",
+      "code": "TST-1768091502321",
+      "userId": "2280008",
+      "createdAt": "2026-01-11 00:31:42"
+    },
+    {
+      "id": "750002",
+      "name": "Test Subject for Answer Notebook",
+      "code": "TST-1768091522013",
+      "userId": "2280009",
+      "createdAt": "2026-01-11 00:32:02"
+    },
+    {
+      "id": "750003",
+      "name": "Test Subject for Answer Notebook",
+      "code": "TST-1768091542197",
+      "userId": "2280010",
+      "createdAt": "2026-01-11 00:32:22"
+    },
+    {
+      "id": "750004",
+      "name": "Test Subject for Answer Notebook",
+      "code": "TST-1768091558136",
+      "userId": "2280011",
+      "createdAt": "2026-01-11 00:32:38"
+    },
+    {
+      "id": "780008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380511",
+      "userId": "2310013",
+      "createdAt": "2026-01-11 13:49:40"
+    },
+    {
+      "id": "780009",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380591",
+      "userId": "2310015",
+      "createdAt": "2026-01-11 13:49:40"
+    },
+    {
+      "id": "780010",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380663",
+      "userId": "2310016",
+      "createdAt": "2026-01-11 13:49:40"
+    },
+    {
+      "id": "780011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380738",
+      "userId": "2310017",
+      "createdAt": "2026-01-11 13:49:40"
+    },
+    {
+      "id": "780012",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380818",
+      "userId": "2310018",
+      "createdAt": "2026-01-11 13:49:40"
+    },
+    {
+      "id": "780013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139380912",
+      "userId": "2310019",
+      "createdAt": "2026-01-11 13:49:40"
+    },
+    {
+      "id": "780014",
+      "name": "Disciplina Teste",
+      "code": "DISC1768139381035",
+      "userId": "2310020",
+      "createdAt": "2026-01-11 13:49:41"
+    },
+    {
+      "id": "780016",
+      "name": "Matemática Teste",
+      "code": "MAT-1768139382504",
+      "userId": "2310023",
+      "createdAt": "2026-01-11 13:49:42"
+    },
+    {
+      "id": "780017",
+      "name": "Test Subject Regular",
+      "code": "TST1768139382695",
+      "userId": "2310025",
+      "createdAt": "2026-01-11 13:49:42"
+    },
+    {
+      "id": "780018",
+      "name": "Test Subject Admin",
+      "code": "TST1768139382716",
+      "userId": "2310024",
+      "createdAt": "2026-01-11 13:49:42"
+    },
+    {
+      "id": "780023",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-11 13:49:43"
+    },
+    {
+      "id": "780024",
+      "name": "Matemática",
+      "code": "MAT-1768139384056",
+      "userId": "2310036",
+      "createdAt": "2026-01-11 13:49:44"
+    },
+    {
+      "id": "780028",
+      "name": "Conflict Subject 1768147351759",
+      "code": "CS1768147351759",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:02:31"
+    },
+    {
+      "id": "780030",
+      "name": "Conflict Subject 1768147389345",
+      "code": "CS1768147389345",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:03:09"
+    },
+    {
+      "id": "780032",
+      "name": "Conflict Subject 1768147416603",
+      "code": "CS1768147416603",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:03:36"
+    },
+    {
+      "id": "780034",
+      "name": "Conflict Subject 1768147436515",
+      "code": "CS1768147436515",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:03:56"
+    },
+    {
+      "id": "780036",
+      "name": "Conflict Subject 1768147454194",
+      "code": "CS1768147454194",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:04:14"
+    },
+    {
+      "id": "780039",
+      "name": "Conflict Subject 1768148007809",
+      "code": "CS1768148007809",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:13:27"
+    },
+    {
+      "id": "780042",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014630",
+      "userId": "2310164",
+      "createdAt": "2026-01-11 16:13:34"
+    },
+    {
+      "id": "780043",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014715",
+      "userId": "2310165",
+      "createdAt": "2026-01-11 16:13:34"
+    },
+    {
+      "id": "780044",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014800",
+      "userId": "2310166",
+      "createdAt": "2026-01-11 16:13:34"
+    },
+    {
+      "id": "780045",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014888",
+      "userId": "2310167",
+      "createdAt": "2026-01-11 16:13:34"
+    },
+    {
+      "id": "780046",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148014973",
+      "userId": "2310168",
+      "createdAt": "2026-01-11 16:13:34"
+    },
+    {
+      "id": "780047",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148015052",
+      "userId": "2310169",
+      "createdAt": "2026-01-11 16:13:35"
+    },
+    {
+      "id": "780050",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148015151",
+      "userId": "2310171",
+      "createdAt": "2026-01-11 16:13:35"
+    },
+    {
+      "id": "780053",
+      "name": "Matemática Teste",
+      "code": "MAT-1768148022693",
+      "userId": "2310177",
+      "createdAt": "2026-01-11 16:13:42"
+    },
+    {
+      "id": "780054",
+      "name": "Test Subject Regular",
+      "code": "TST1768148022760",
+      "userId": "2310176",
+      "createdAt": "2026-01-11 16:13:42"
+    },
+    {
+      "id": "780055",
+      "name": "Test Subject Admin",
+      "code": "TST1768148022783",
+      "userId": "2310175",
+      "createdAt": "2026-01-11 16:13:42"
+    },
+    {
+      "id": "780060",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-11 16:13:47"
+    },
+    {
+      "id": "780061",
+      "name": "Matemática",
+      "code": "MAT-1768148027843",
+      "userId": "2310188",
+      "createdAt": "2026-01-11 16:13:47"
+    },
+    {
+      "id": "780066",
+      "name": "Conflict Subject 1768148167739",
+      "code": "CS1768148167739",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:16:07"
+    },
+    {
+      "id": "780069",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148174795",
+      "userId": "2310213",
+      "createdAt": "2026-01-11 16:16:14"
+    },
+    {
+      "id": "780070",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148174889",
+      "userId": "2310214",
+      "createdAt": "2026-01-11 16:16:14"
+    },
+    {
+      "id": "780071",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175043",
+      "userId": "2310215",
+      "createdAt": "2026-01-11 16:16:15"
+    },
+    {
+      "id": "780074",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175203",
+      "userId": "2310216",
+      "createdAt": "2026-01-11 16:16:15"
+    },
+    {
+      "id": "780076",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175277",
+      "userId": "2310218",
+      "createdAt": "2026-01-11 16:16:15"
+    },
+    {
+      "id": "780077",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175347",
+      "userId": "2310219",
+      "createdAt": "2026-01-11 16:16:15"
+    },
+    {
+      "id": "780078",
+      "name": "Disciplina Teste",
+      "code": "DISC1768148175413",
+      "userId": "2310220",
+      "createdAt": "2026-01-11 16:16:15"
+    },
+    {
+      "id": "780080",
+      "name": "Test Subject Regular",
+      "code": "TST1768148183028",
+      "userId": "2310225",
+      "createdAt": "2026-01-11 16:16:23"
+    },
+    {
+      "id": "780081",
+      "name": "Matemática Teste",
+      "code": "MAT-1768148183038",
+      "userId": "2310226",
+      "createdAt": "2026-01-11 16:16:23"
+    },
+    {
+      "id": "780082",
+      "name": "Test Subject Admin",
+      "code": "TST1768148183048",
+      "userId": "2310224",
+      "createdAt": "2026-01-11 16:16:23"
+    },
+    {
+      "id": "780087",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-11 16:16:27"
+    },
+    {
+      "id": "780088",
+      "name": "Matemática",
+      "code": "MAT-1768148187891",
+      "userId": "2310237",
+      "createdAt": "2026-01-11 16:16:27"
+    },
+    {
+      "id": "780091",
+      "name": "Conflict Subject 1768148209515",
+      "code": "CS1768148209515",
+      "userId": "2",
+      "createdAt": "2026-01-11 16:16:49"
+    },
+    {
+      "id": "810003",
+      "name": "Conflict Subject 1768428857202",
+      "code": "CS1768428857202",
+      "userId": "2",
+      "createdAt": "2026-01-14 22:14:17"
+    },
+    {
+      "id": "810006",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428859784",
+      "userId": "2610017",
+      "createdAt": "2026-01-14 22:14:19"
+    },
+    {
+      "id": "810007",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428859876",
+      "userId": "2610018",
+      "createdAt": "2026-01-14 22:14:19"
+    },
+    {
+      "id": "810008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428859958",
+      "userId": "2610019",
+      "createdAt": "2026-01-14 22:14:19"
+    },
+    {
+      "id": "810009",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860033",
+      "userId": "2610020",
+      "createdAt": "2026-01-14 22:14:20"
+    },
+    {
+      "id": "810011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860130",
+      "userId": "2610022",
+      "createdAt": "2026-01-14 22:14:20"
+    },
+    {
+      "id": "810013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860206",
+      "userId": "2610024",
+      "createdAt": "2026-01-14 22:14:20"
+    },
+    {
+      "id": "810015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768428860284",
+      "userId": "2610025",
+      "createdAt": "2026-01-14 22:14:20"
+    },
+    {
+      "id": "810017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768428861453",
+      "userId": "2610026",
+      "createdAt": "2026-01-14 22:14:21"
+    },
+    {
+      "id": "810018",
+      "name": "Test Subject Regular",
+      "code": "TST1768428861984",
+      "userId": "2610030",
+      "createdAt": "2026-01-14 22:14:21"
+    },
+    {
+      "id": "810019",
+      "name": "Test Subject Admin",
+      "code": "TST1768428862002",
+      "userId": "2610029",
+      "createdAt": "2026-01-14 22:14:22"
+    },
+    {
+      "id": "810022",
+      "name": "Conflict Subject 1768428877413",
+      "code": "CS1768428877414",
+      "userId": "2",
+      "createdAt": "2026-01-14 22:14:37"
+    },
+    {
+      "id": "840001",
+      "name": "Matemática Básica QA",
+      "code": "MAT-QA-001",
+      "userId": "2700001",
+      "createdAt": "2026-01-15 09:38:19"
+    },
+    {
+      "id": "900001",
+      "name": "Disciplina Teste Quiz",
+      "code": "QUIZ-TEST",
+      "userId": "2820006",
+      "createdAt": "2026-01-16 01:09:38"
+    },
+    {
+      "id": "900003",
+      "name": "Conflict Subject 1768525778972",
+      "code": "CS1768525778972",
+      "userId": "2",
+      "createdAt": "2026-01-16 01:09:38"
+    },
+    {
+      "id": "900006",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525780962",
+      "userId": "2820017",
+      "createdAt": "2026-01-16 01:09:40"
+    },
+    {
+      "id": "900007",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781085",
+      "userId": "2820018",
+      "createdAt": "2026-01-16 01:09:41"
+    },
+    {
+      "id": "900010",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781162",
+      "userId": "2820021",
+      "createdAt": "2026-01-16 01:09:41"
+    },
+    {
+      "id": "900011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781230",
+      "userId": "2820022",
+      "createdAt": "2026-01-16 01:09:41"
+    },
+    {
+      "id": "900013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781309",
+      "userId": "2820023",
+      "createdAt": "2026-01-16 01:09:41"
+    },
+    {
+      "id": "900014",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781378",
+      "userId": "2820024",
+      "createdAt": "2026-01-16 01:09:41"
+    },
+    {
+      "id": "900015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768525781447",
+      "userId": "2820025",
+      "createdAt": "2026-01-16 01:09:41"
+    },
+    {
+      "id": "900017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768525782136",
+      "userId": "2820027",
+      "createdAt": "2026-01-16 01:09:42"
+    },
+    {
+      "id": "900018",
+      "name": "Test Subject Regular",
+      "code": "TST1768525782491",
+      "userId": "2820030",
+      "createdAt": "2026-01-16 01:09:42"
+    },
+    {
+      "id": "900019",
+      "name": "Test Subject Admin",
+      "code": "TST1768525782507",
+      "userId": "2820029",
+      "createdAt": "2026-01-16 01:09:42"
+    },
+    {
+      "id": "900024",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "1950014",
+      "createdAt": "2026-01-16 01:09:43"
+    },
+    {
+      "id": "900025",
+      "name": "Matemática",
+      "code": "MAT-1768525783407",
+      "userId": "2820041",
+      "createdAt": "2026-01-16 01:09:43"
+    },
+    {
+      "id": "960001",
+      "name": "SEC",
+      "code": "SEC01",
+      "userId": "3030005",
+      "createdAt": "2026-01-19 11:15:08"
+    },
+    {
+      "id": "990002",
+      "name": "Test Subject 1768835097918",
+      "code": "TS1768835097918",
+      "userId": "1",
+      "createdAt": "2026-01-19 15:04:58"
+    },
+    {
+      "id": "990003",
+      "name": "Conflict Subject 1768835098277",
+      "code": "CS1768835098277",
+      "userId": "2",
+      "createdAt": "2026-01-19 15:04:58"
+    },
+    {
+      "id": "990006",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100556",
+      "userId": "3300012",
+      "createdAt": "2026-01-19 15:05:00"
+    },
+    {
+      "id": "990007",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100685",
+      "userId": "3300013",
+      "createdAt": "2026-01-19 15:05:00"
+    },
+    {
+      "id": "990008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100794",
+      "userId": "3300014",
+      "createdAt": "2026-01-19 15:05:00"
+    },
+    {
+      "id": "990009",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100888",
+      "userId": "3300015",
+      "createdAt": "2026-01-19 15:05:00"
+    },
+    {
+      "id": "990012",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835100994",
+      "userId": "3300017",
+      "createdAt": "2026-01-19 15:05:00"
+    },
+    {
+      "id": "990013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835101093",
+      "userId": "3300018",
+      "createdAt": "2026-01-19 15:05:01"
+    },
+    {
+      "id": "990015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768835101187",
+      "userId": "3300019",
+      "createdAt": "2026-01-19 15:05:01"
+    },
+    {
+      "id": "990017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768835102485",
+      "userId": "3300023",
+      "createdAt": "2026-01-19 15:05:02"
+    },
+    {
+      "id": "990018",
+      "name": "Test Subject Regular",
+      "code": "TST1768835102761",
+      "userId": "3300025",
+      "createdAt": "2026-01-19 15:05:02"
+    },
+    {
+      "id": "990019",
+      "name": "Test Subject Admin",
+      "code": "TST1768835102784",
+      "userId": "3300024",
+      "createdAt": "2026-01-19 15:05:02"
+    },
+    {
+      "id": "990024",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "3300029",
+      "createdAt": "2026-01-19 15:05:03"
+    },
+    {
+      "id": "990025",
+      "name": "Matemática",
+      "code": "MAT-1768835104188",
+      "userId": "3300036",
+      "createdAt": "2026-01-19 15:05:04"
+    },
+    {
+      "id": "1020001",
+      "name": "Test Subject 1768836205508",
+      "code": "TS1768836205508",
+      "userId": "1",
+      "createdAt": "2026-01-19 15:23:25"
+    },
+    {
+      "id": "1020002",
+      "name": "Conflict Subject 1768836206235",
+      "code": "CS1768836206235",
+      "userId": "2",
+      "createdAt": "2026-01-19 15:23:26"
+    },
+    {
+      "id": "1020008",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209364",
+      "userId": "3330013",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020010",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209454",
+      "userId": "3330014",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020011",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209540",
+      "userId": "3330015",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020012",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209625",
+      "userId": "3330017",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020013",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209715",
+      "userId": "3330018",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020014",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209790",
+      "userId": "3330019",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020015",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836209867",
+      "userId": "3330020",
+      "createdAt": "2026-01-19 15:23:29"
+    },
+    {
+      "id": "1020017",
+      "name": "Matemática Teste",
+      "code": "MAT-1768836210987",
+      "userId": "3330023",
+      "createdAt": "2026-01-19 15:23:30"
+    },
+    {
+      "id": "1020018",
+      "name": "Test Subject Regular",
+      "code": "TST1768836211145",
+      "userId": "3330025",
+      "createdAt": "2026-01-19 15:23:31"
+    },
+    {
+      "id": "1020019",
+      "name": "Test Subject Admin",
+      "code": "TST1768836211165",
+      "userId": "3330024",
+      "createdAt": "2026-01-19 15:23:31"
+    },
+    {
+      "id": "1020024",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "3300029",
+      "createdAt": "2026-01-19 15:23:32"
+    },
+    {
+      "id": "1020025",
+      "name": "Matemática",
+      "code": "MAT-1768836212671",
+      "userId": "3330036",
+      "createdAt": "2026-01-19 15:23:32"
+    },
+    {
+      "id": "1020029",
+      "name": "Test Subject 1768836285877",
+      "code": "TS1768836285877",
+      "userId": "1",
+      "createdAt": "2026-01-19 15:24:45"
+    },
+    {
+      "id": "1020030",
+      "name": "Conflict Subject 1768836286233",
+      "code": "CS1768836286233",
+      "userId": "2",
+      "createdAt": "2026-01-19 15:24:46"
+    },
+    {
+      "id": "1020036",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288648",
+      "userId": "3330057",
+      "createdAt": "2026-01-19 15:24:48"
+    },
+    {
+      "id": "1020037",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288734",
+      "userId": "3330058",
+      "createdAt": "2026-01-19 15:24:48"
+    },
+    {
+      "id": "1020038",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288822",
+      "userId": "3330059",
+      "createdAt": "2026-01-19 15:24:48"
+    },
+    {
+      "id": "1020039",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288911",
+      "userId": "3330061",
+      "createdAt": "2026-01-19 15:24:48"
+    },
+    {
+      "id": "1020040",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836288998",
+      "userId": "3330062",
+      "createdAt": "2026-01-19 15:24:49"
+    },
+    {
+      "id": "1020041",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836289087",
+      "userId": "3330063",
+      "createdAt": "2026-01-19 15:24:49"
+    },
+    {
+      "id": "1020042",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836289166",
+      "userId": "3330064",
+      "createdAt": "2026-01-19 15:24:49"
+    },
+    {
+      "id": "1020044",
+      "name": "Test Subject Regular",
+      "code": "TST1768836290229",
+      "userId": "3330068",
+      "createdAt": "2026-01-19 15:24:50"
+    },
+    {
+      "id": "1020045",
+      "name": "Test Subject Admin",
+      "code": "TST1768836290251",
+      "userId": "3330067",
+      "createdAt": "2026-01-19 15:24:50"
+    },
+    {
+      "id": "1020050",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "3300029",
+      "createdAt": "2026-01-19 15:24:51"
+    },
+    {
+      "id": "1020054",
+      "name": "Test Subject 1768836316503",
+      "code": "TS1768836316503",
+      "userId": "1",
+      "createdAt": "2026-01-19 15:25:16"
+    },
+    {
+      "id": "1020055",
+      "name": "Conflict Subject 1768836316821",
+      "code": "CS1768836316821",
+      "userId": "2",
+      "createdAt": "2026-01-19 15:25:16"
+    },
+    {
+      "id": "1020060",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836318934",
+      "userId": "3330090",
+      "createdAt": "2026-01-19 15:25:18"
+    },
+    {
+      "id": "1020062",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319041",
+      "userId": "3330091",
+      "createdAt": "2026-01-19 15:25:19"
+    },
+    {
+      "id": "1020063",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319133",
+      "userId": "3330093",
+      "createdAt": "2026-01-19 15:25:19"
+    },
+    {
+      "id": "1020064",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319219",
+      "userId": "3330094",
+      "createdAt": "2026-01-19 15:25:19"
+    },
+    {
+      "id": "1020065",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319312",
+      "userId": "3330095",
+      "createdAt": "2026-01-19 15:25:19"
+    },
+    {
+      "id": "1020066",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319387",
+      "userId": "3330096",
+      "createdAt": "2026-01-19 15:25:19"
+    },
+    {
+      "id": "1020067",
+      "name": "Disciplina Teste",
+      "code": "DISC1768836319473",
+      "userId": "3330097",
+      "createdAt": "2026-01-19 15:25:19"
+    },
+    {
+      "id": "1020069",
+      "name": "Test Subject Regular",
+      "code": "TST1768836320917",
+      "userId": "3330101",
+      "createdAt": "2026-01-19 15:25:20"
+    },
+    {
+      "id": "1020070",
+      "name": "Test Subject Admin",
+      "code": "TST1768836320938",
+      "userId": "3330100",
+      "createdAt": "2026-01-19 15:25:20"
+    },
+    {
+      "id": "1020075",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "3300029",
+      "createdAt": "2026-01-19 15:25:21"
+    },
+    {
+      "id": "1020078",
+      "name": "Test Subject 1768836351272",
+      "code": "TS1768836351272",
+      "userId": "1",
+      "createdAt": "2026-01-19 15:25:51"
+    },
+    {
+      "id": "1020079",
+      "name": "Conflict Subject 1768836351522",
+      "code": "CS1768836351522",
+      "userId": "2",
+      "createdAt": "2026-01-19 15:25:51"
+    },
+    {
+      "id": "1020086",
+      "name": "Test Subject Regular",
+      "code": "TST1768836354492",
+      "userId": "3330126",
+      "createdAt": "2026-01-19 15:25:54"
+    },
+    {
+      "id": "1020087",
+      "name": "Test Subject Admin",
+      "code": "TST1768836354517",
+      "userId": "3330125",
+      "createdAt": "2026-01-19 15:25:54"
+    },
+    {
+      "id": "1020089",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "3300029",
+      "createdAt": "2026-01-19 15:25:54"
+    },
+    {
+      "id": "1020105",
+      "name": "Test Subject Regular",
+      "code": "TST1768836379298",
+      "userId": "3330152",
+      "createdAt": "2026-01-19 15:26:19"
+    },
+    {
+      "id": "1020106",
+      "name": "Test Subject Admin",
+      "code": "TST1768836379325",
+      "userId": "3330150",
+      "createdAt": "2026-01-19 15:26:19"
+    },
+    {
+      "id": "1020107",
+      "name": "Disciplina PC Test",
+      "code": "PC-TEST-001",
+      "userId": "3300029",
+      "createdAt": "2026-01-19 15:26:19"
+    },
+    {
+      "id": "1020109",
+      "name": "Matemática",
+      "code": "MAT1768836382706",
+      "userId": "1",
+      "createdAt": "2026-01-19 15:26:22"
+    },
+    {
+      "id": "1050001",
+      "name": "TESTE",
+      "code": "TESTE",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 01:12:36"
+    },
+    {
+      "id": "1080001",
+      "name": "Test",
+      "code": "TEST123",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 14:22:15"
+    },
+    {
+      "id": "1080002",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC003",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 14:24:35"
+    },
+    {
+      "id": "1110001",
+      "name": "Teste SQL Direto",
+      "code": "SQL001",
+      "userId": "600002",
+      "createdAt": "2026-02-11 15:51:56"
+    },
+    {
+      "id": "1110002",
+      "name": "Teste Drizzle",
+      "code": "DRZ001",
+      "userId": "600002",
+      "createdAt": "2026-02-11 15:55:10"
+    },
+    {
+      "id": "1140001",
+      "name": "Teste Drizzle Direto",
+      "code": "TDD001",
+      "userId": "600002",
+      "createdAt": "2026-02-11 16:34:30"
+    },
+    {
+      "id": "1170001",
+      "name": "TesteDireto",
+      "code": "TDIR001",
+      "userId": "600002",
+      "createdAt": "2026-02-11 17:17:43"
+    },
+    {
+      "id": "1170002",
+      "name": "TesteSQL",
+      "code": "TSQL99",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 17:22:29"
+    },
+    {
+      "id": "1170003",
+      "name": "Teste Final",
+      "code": "TF001",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 17:52:48"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\tcreatedAt\n10\tTest Subject Regular\tTST1765416971096\t150600\t2025-12-11 01:36:11\n11\tTest Subject Admin\tTST1765416971107\t150598\t2025-12-11 01:36:11\n14\tTest Subject Regular\tTST1765420169197\t150600\t2025-12-11 02:29:29\n15\tTest Subject Admin\tTST1765420169207\t150598\t2025-12-11 02:29:29\n17\tTest Subject Regular\tTST1765422001928\t150815\t2025-12-11 03:00:01\n18\tTest Subject Admin\tTST1765422001939\t150813\t2025-12-11 03:00:01\n30001\tTest Subject Regular\tTST1765467693391\t180006\t2025-12-11 15:41:33\n30002\tTest Subject Admin\tTST1765467693406\t180001\t2025-12-11 15:41:33\n30004\tTest Subject Regular\tTST1765468068564\t180021\t2025-12-11 15:47:48\n30005\tTest Subject Admin\tTST1765468068593\t180017\t2025-12-11 15:47:48\n30007\tTest Subject Regular\tTST1765468675596\t180032\t2025-12-11 15:57:55\n30008\tTest Subject Admin\tTST1765468675606\t180030\t2025-12-11 15:57:55\n60001\tTest Subject Regular\tTST1765560341734\t240012\t2025-12-12 17:25:41\n60002\tTest Subject Admin\tTST1765560341751\t240009\t2025-12-12 17:25:41\n60004\tTest Subject Regular\tTST1765560351799\t240024\t2025-12-12 17:25:51\n60005\tTest Subject Admin\tTST1765560351808\t240021\t2025-12-12 17:25:51\n90001\tTest Subject Regular\tTST1765563163334\t270003\t2025-12-12 18:12:43\n90002\tTest Subject Admin\tTST1765563163351\t270002\t2025-12-12 18:12:43\n150001\tTest Subject Regular\tTST1766019771650\t930009\t2025-12-18 01:02:51\n150002\tTest Subject Admin\tTST1766019771668\t930008\t2025-12-18 01:02:51\n180001\tTest Subject Regular\tTST1766091455496\t1050009\t2025-12-18 20:57:35\n180002\tTest Subject Admin\tTST1766091455517\t1050008\t2025-12-18 20:57:35\n210001\tTest Subject Regular\tTST1766094355929\t1110010\t2025-12-18 21:45:55\n210002\tTest Subject Admin\tTST1766094355955\t1110009\t2025-12-18 21:45:55\n240001\tTest Subject Regular\tTST1766104515923\t1140021\t2025-12-19 00:35:15\n240002\tTest Subject Admin\tTST1766104515944\t1140020\t2025-12-19 00:35:15\n240004\tTest Subject Regular\tTST1766104544873\t1140037\t2025-12-19 00:35:44\n240005\tTest Subject Admin\tTST1766104544884\t1140036\t2025-12-19 00:35:44\n240007\tTest Subject Regular\tTST1766104556316\t1140054\t2025-12-19 00:35:56\n240008\tTest Subject Admin\tTST1766104556325\t1140052\t2025-12-19 00:35:56\n270001\tTest Subject Regular\tTST1766462174534\t1290017\t2025-12-23 03:56:14\n270002\tTest Subject Admin\tTST1766462174550\t1290016\t2025-12-23 03:56:14\n270003\tTest Subject Regular\tTST1766462191879\t1290028\t2025-12-23 03:56:31\n270004\tTest Subject Admin\tTST1766462191903\t1290027\t2025-12-23 03:56:31\n300001\tMatemática Teste\tMAT1766800399052\t1560004\t2025-12-27 01:53:19\n300002\tMatemática Teste\tMAT1766800417394\t1560005\t2025-12-27 01:53:37\n330001\tDisciplina Rankings Test\tRANK1766867721427\t1680001\t2025-12-27 20:35:21\n330002\tDisciplina Rankings Test\tRANK1766867746033\t1680002\t2025-12-27 20:35:46\n330003\tDisciplina Rankings Test\tRANK1766867799632\t1680003\t2025-12-27 20:36:39\n360001\tMatemática Teste\tMAT001\t1710001\t2025-12-28 02:57:01\n450001\tDisciplina Teste Details\tTEST-DETAILS-001\t1950002\t2026-01-04 17:08:01\n450002\tDisciplina Teste Details\tTEST-DETAILS-001\t1950003\t2026-01-04 17:09:02\n450003\tDisciplina Teste Details\tTEST-DETAILS-001\t1950004\t2026-01-04 17:09:35\n450010\tDisciplina PC Test\tPC-TEST-001\t999999\t2026-01-04 17:42:54\n450011\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-04 17:43:13\n450012\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-04 17:43:57\n450013\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-04 17:44:16\n480004\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-04 21:07:39\n480005\tTest Subject Regular\tTST1767560859677\t1980015\t2026-01-04 21:07:39\n480006\tTest Subject Admin\tTST1767560859699\t1980014\t2026-01-04 21:07:39\n510002\tDisciplina Teste\tDISC1767569014946\t2010010\t2026-01-04 23:23:34\n510003\tDisciplina Teste\tDISC1767569014998\t2010011\t2026-01-04 23:23:35\n510004\tDisciplina Teste\tDISC1767569015046\t2010012\t2026-01-04 23:23:35\n510005\tDisciplina Teste\tDISC1767569015092\t2010013\t2026-01-04 23:23:35\n510006\tDisciplina Teste\tDISC1767569015135\t2010014\t2026-01-04 23:23:35\n510007\tDisciplina Teste\tDISC1767569015194\t2010015\t2026-01-04 23:23:35\n510008\tDisciplina Teste\tDISC1767569015239\t2010016\t2026-01-04 23:23:35\n510009\tDisciplina Teste\tDISC1767569032346\t2010017\t2026-01-04 23:23:52\n510010\tDisciplina Teste\tDISC1767569032444\t2010018\t2026-01-04 23:23:52\n510011\tDisciplina Teste\tDISC1767569032503\t2010019\t2026-01-04 23:23:52\n510012\tDisciplina Teste\tDISC1767569032583\t2010020\t2026-01-04 23:23:52\n510013\tDisciplina Teste\tDISC1767569032670\t2010021\t2026-01-04 23:23:52\n510014\tDisciplina Teste\tDISC1767569032738\t2010022\t2026-01-04 23:23:52\n510015\tDisciplina Teste\tDISC1767569032812\t2010023\t2026-01-04 23:23:52\n510016\tDisciplina Teste\tDISC1767569046122\t2010024\t2026-01-04 23:24:06\n510017\tDisciplina Teste\tDISC1767569046311\t2010025\t2026-01-04 23:24:06\n510018\tDisciplina Teste\tDISC1767569046404\t2010026\t2026-01-04 23:24:06\n510019\tDisciplina Teste\tDISC1767569046739\t2010027\t2026-01-04 23:24:06\n510020\tDisciplina Teste\tDISC1767569046848\t2010028\t2026-01-04 23:24:06\n510021\tDisciplina Teste\tDISC1767569046961\t2010029\t2026-01-04 23:24:06\n510022\tDisciplina Teste\tDISC1767569047108\t2010030\t2026-01-04 23:24:07\n510023\tDisciplina Teste\tDISC1767569073002\t2010031\t2026-01-04 23:24:33\n510024\tDisciplina Teste\tDISC1767569073083\t2010032\t2026-01-04 23:24:33\n510025\tDisciplina Teste\tDISC1767569073154\t2010033\t2026-01-04 23:24:33\n510026\tDisciplina Teste\tDISC1767569073224\t2010034\t2026-01-04 23:24:33\n510027\tDisciplina Teste\tDISC1767569073309\t2010035\t2026-01-04 23:24:33\n510028\tDisciplina Teste\tDISC1767569073378\t2010036\t2026-01-04 23:24:33\n510029\tDisciplina Teste\tDISC1767569073444\t2010037\t2026-01-04 23:24:33\n540001\tMatemática\tMAT-1767578329585\t2040009\t2026-01-05 01:58:49\n570001\tMatemática\tMAT-1767581814952\t2070009\t2026-01-05 02:56:54\n570002\tTest Subject Gamification\tTSG-1767584224706\t2070014\t2026-01-05 03:37:04\n600006\tDisciplina Teste Quiz\tQUIZ-TEST\t2100013\t2026-01-05 18:49:43\n600010\tDisciplina Teste\tDISC1767639150208\t2100025\t2026-01-05 18:52:30\n600011\tDisciplina Teste\tDISC1767639150309\t2100027\t2026-01-05 18:52:30\n600012\tDisciplina Teste\tDISC1767639150408\t2100028\t2026-01-05 18:52:30\n600013\tDisciplina Teste\tDISC1767639150497\t2100029\t2026-01-05 18:52:30\n600014\tDisciplina Teste\tDISC1767639150757\t2100030\t2026-01-05 18:52:30\n600015\tDisciplina Teste\tDISC1767639150828\t2100031\t2026-01-05 18:52:30\n600016\tDisciplina Teste\tDISC1767639150898\t2100032\t2026-01-05 18:52:30\n600018\tTest Subject Regular\tTST1767639152788\t2100034\t2026-01-05 18:52:32\n600019\tTest Subject Admin\tTST1767639152810\t2100033\t2026-01-05 18:52:32\n600021\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-05 18:52:35\n600022\tMatemática\tMAT-1767639157258\t2100044\t2026-01-05 18:52:37\n600026\tDisciplina Teste\tDISC1767640489146\t2100065\t2026-01-05 19:14:49\n600027\tDisciplina Teste\tDISC1767640489237\t2100067\t2026-01-05 19:14:49\n600028\tDisciplina Teste\tDISC1767640489328\t2100068\t2026-01-05 19:14:49\n600029\tDisciplina Teste\tDISC1767640489410\t2100069\t2026-01-05 19:14:49\n600030\tDisciplina Teste\tDISC1767640489501\t2100070\t2026-01-05 19:14:49\n600031\tDisciplina Teste\tDISC1767640489578\t2100071\t2026-01-05 19:14:49\n600032\tDisciplina Teste\tDISC1767640489655\t2100072\t2026-01-05 19:14:49\n600034\tTest Subject Regular\tTST1767640497235\t2100076\t2026-01-05 19:14:57\n600035\tTest Subject Admin\tTST1767640497257\t2100075\t2026-01-05 19:14:57\n600036\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-05 19:15:01\n600038\tMatemática\tMAT-1767640501748\t2100084\t2026-01-05 19:15:01\n600044\tDisciplina Teste\tDISC1767640636468\t2100108\t2026-01-05 19:17:16\n600045\tDisciplina Teste\tDISC1767640636549\t2100109\t2026-01-05 19:17:16\n600046\tDisciplina Teste\tDISC1767640636645\t2100110\t2026-01-05 19:17:16\n600047\tDisciplina Teste\tDISC1767640636719\t2100111\t2026-01-05 19:17:16\n600048\tDisciplina Teste\tDISC1767640636798\t2100112\t2026-01-05 19:17:16\n600049\tDisciplina Teste\tDISC1767640636869\t2100113\t2026-01-05 19:17:16\n600050\tDisciplina Teste\tDISC1767640636938\t2100114\t2026-01-05 19:17:16\n600051\tTest Subject Regular\tTST1767640640137\t2100117\t2026-01-05 19:17:20\n600052\tTest Subject Admin\tTST1767640640155\t2100116\t2026-01-05 19:17:20\n600054\tMatemática\tMAT-1767640641545\t2100126\t2026-01-05 19:17:21\n600055\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-05 19:17:21\n600062\tDisciplina Teste\tDISC1767640961920\t2100151\t2026-01-05 19:22:41\n600063\tDisciplina Teste\tDISC1767640961983\t2100152\t2026-01-05 19:22:41\n600064\tDisciplina Teste\tDISC1767640962051\t2100153\t2026-01-05 19:22:42\n600065\tDisciplina Teste\tDISC1767640962116\t2100154\t2026-01-05 19:22:42\n600066\tDisciplina Teste\tDISC1767640962189\t2100155\t2026-01-05 19:22:42\n600067\tDisciplina Teste\tDISC1767640962254\t2100156\t2026-01-05 19:22:42\n600068\tDisciplina Teste\tDISC1767640962312\t2100157\t2026-01-05 19:22:42\n600070\tTest Subject Regular\tTST1767640965502\t2100160\t2026-01-05 19:22:45\n600071\tTest Subject Admin\tTST1767640965526\t2100159\t2026-01-05 19:22:45\n600072\tMatemática\tMAT-1767640967048\t2100169\t2026-01-05 19:22:47\n600073\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-05 19:22:47\n600080\tDisciplina Teste\tDISC1767641120101\t2100194\t2026-01-05 19:25:20\n600081\tDisciplina Teste\tDISC1767641120170\t2100195\t2026-01-05 19:25:20\n600082\tDisciplina Teste\tDISC1767641120254\t2100196\t2026-01-05 19:25:20\n600083\tDisciplina Teste\tDISC1767641120320\t2100197\t2026-01-05 19:25:20\n600084\tDisciplina Teste\tDISC1767641120387\t2100198\t2026-01-05 19:25:20\n600085\tDisciplina Teste\tDISC1767641120449\t2100199\t2026-01-05 19:25:20\n600086\tDisciplina Teste\tDISC1767641120508\t2100200\t2026-01-05 19:25:20\n600088\tTest Subject Regular\tTST1767641123623\t2100204\t2026-01-05 19:25:23\n600089\tTest Subject Admin\tTST1767641123639\t2100203\t2026-01-05 19:25:23\n600090\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-05 19:25:26\n600091\tMatemática\tMAT-1767641126431\t2100213\t2026-01-05 19:25:26\n600100\tDisciplina Teste\tDISC1767648178119\t2100238\t2026-01-05 21:22:58\n600101\tDisciplina Teste\tDISC1767648178205\t2100239\t2026-01-05 21:22:58\n600102\tDisciplina Teste\tDISC1767648178281\t2100240\t2026-01-05 21:22:58\n600103\tDisciplina Teste\tDISC1767648178355\t2100241\t2026-01-05 21:22:58\n600104\tDisciplina Teste\tDISC1767648178436\t2100242\t2026-01-05 21:22:58\n600105\tDisciplina Teste\tDISC1767648178503\t2100243\t2026-01-05 21:22:58\n600106\tDisciplina Teste\tDISC1767648178572\t2100244\t2026-01-05 21:22:58\n600108\tTest Subject Regular\tTST1767648191813\t2100249\t2026-01-05 21:23:11\n600109\tTest Subject Admin\tTST1767648191831\t2100248\t2026-01-05 21:23:11\n600111\tMatemática\tMAT-1767648197196\t2100257\t2026-01-05 21:23:17\n600112\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-05 21:23:21\n600115\tDisciplina Teste Quiz\tQUIZ-TEST\t2100270\t2026-01-05 21:27:41\n600116\tDisciplina Teste\tTEST-001\t2100278\t2026-01-05 21:27:42\n600118\tDisciplina Teste\tDISC1767648464847\t2100282\t2026-01-05 21:27:44\n600119\tDisciplina Teste\tDISC1767648464933\t2100283\t2026-01-05 21:27:44\n600120\tDisciplina Teste\tDISC1767648465015\t2100284\t2026-01-05 21:27:45\n600121\tDisciplina Teste\tDISC1767648465094\t2100285\t2026-01-05 21:27:45\n600122\tDisciplina Teste\tDISC1767648465171\t2100287\t2026-01-05 21:27:45\n600123\tDisciplina Teste\tDISC1767648465241\t2100288\t2026-01-05 21:27:45\n600124\tDisciplina Teste\tDISC1767648465310\t2100289\t2026-01-05 21:27:45\n630001\tDisciplina Teste Quiz\tQUIZ-TEST\t2130004\t2026-01-08 15:32:56\n630004\tDisciplina Teste\tDISC1767886378984\t2130015\t2026-01-08 15:32:58\n630005\tDisciplina Teste\tDISC1767886379073\t2130016\t2026-01-08 15:32:59\n630006\tDisciplina Teste\tDISC1767886379161\t2130017\t2026-01-08 15:32:59\n630007\tDisciplina Teste\tDISC1767886379241\t2130018\t2026-01-08 15:32:59\n630008\tDisciplina Teste\tDISC1767886379359\t2130019\t2026-01-08 15:32:59\n630009\tDisciplina Teste\tDISC1767886379438\t2130020\t2026-01-08 15:32:59\n630010\tDisciplina Teste\tDISC1767886379521\t2130021\t2026-01-08 15:32:59\n630015\tTest Subject Regular\tTST1767886382556\t2130026\t2026-01-08 15:33:02\n630016\tTest Subject Admin\tTST1767886382575\t2130025\t2026-01-08 15:33:02\n630021\tMatemática\tMAT-1767886383959\t2130037\t2026-01-08 15:33:03\n630022\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-08 15:33:04\n660001\tMatemática Teste\tMAT-1767967882418\t2190002\t2026-01-09 14:11:22\n690001\tMatemática Teste\tMAT-1767970733429\t2220002\t2026-01-09 14:58:53\n720004\tDisciplina Teste Revisão\tTEST-REV-001\t999\t2026-01-10 21:09:49\n750001\tTest Subject for Answer Notebook\tTST-1768091502321\t2280008\t2026-01-11 00:31:42\n750002\tTest Subject for Answer Notebook\tTST-1768091522013\t2280009\t2026-01-11 00:32:02\n750003\tTest Subject for Answer Notebook\tTST-1768091542197\t2280010\t2026-01-11 00:32:22\n750004\tTest Subject for Answer Notebook\tTST-1768091558136\t2280011\t2026-01-11 00:32:38\n780008\tDisciplina Teste\tDISC1768139380511\t2310013\t2026-01-11 13:49:40\n780009\tDisciplina Teste\tDISC1768139380591\t2310015\t2026-01-11 13:49:40\n780010\tDisciplina Teste\tDISC1768139380663\t2310016\t2026-01-11 13:49:40\n780011\tDisciplina Teste\tDISC1768139380738\t2310017\t2026-01-11 13:49:40\n780012\tDisciplina Teste\tDISC1768139380818\t2310018\t2026-01-11 13:49:40\n780013\tDisciplina Teste\tDISC1768139380912\t2310019\t2026-01-11 13:49:40\n780014\tDisciplina Teste\tDISC1768139381035\t2310020\t2026-01-11 13:49:41\n780016\tMatemática Teste\tMAT-1768139382504\t2310023\t2026-01-11 13:49:42\n780017\tTest Subject Regular\tTST1768139382695\t2310025\t2026-01-11 13:49:42\n780018\tTest Subject Admin\tTST1768139382716\t2310024\t2026-01-11 13:49:42\n780023\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-11 13:49:43\n780024\tMatemática\tMAT-1768139384056\t2310036\t2026-01-11 13:49:44\n780028\tConflict Subject 1768147351759\tCS1768147351759\t2\t2026-01-11 16:02:31\n780030\tConflict Subject 1768147389345\tCS1768147389345\t2\t2026-01-11 16:03:09\n780032\tConflict Subject 1768147416603\tCS1768147416603\t2\t2026-01-11 16:03:36\n780034\tConflict Subject 1768147436515\tCS1768147436515\t2\t2026-01-11 16:03:56\n780036\tConflict Subject 1768147454194\tCS1768147454194\t2\t2026-01-11 16:04:14\n780039\tConflict Subject 1768148007809\tCS1768148007809\t2\t2026-01-11 16:13:27\n780042\tDisciplina Teste\tDISC1768148014630\t2310164\t2026-01-11 16:13:34\n780043\tDisciplina Teste\tDISC1768148014715\t2310165\t2026-01-11 16:13:34\n780044\tDisciplina Teste\tDISC1768148014800\t2310166\t2026-01-11 16:13:34\n780045\tDisciplina Teste\tDISC1768148014888\t2310167\t2026-01-11 16:13:34\n780046\tDisciplina Teste\tDISC1768148014973\t2310168\t2026-01-11 16:13:34\n780047\tDisciplina Teste\tDISC1768148015052\t2310169\t2026-01-11 16:13:35\n780050\tDisciplina Teste\tDISC1768148015151\t2310171\t2026-01-11 16:13:35\n780053\tMatemática Teste\tMAT-1768148022693\t2310177\t2026-01-11 16:13:42\n780054\tTest Subject Regular\tTST1768148022760\t2310176\t2026-01-11 16:13:42\n780055\tTest Subject Admin\tTST1768148022783\t2310175\t2026-01-11 16:13:42\n780060\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-11 16:13:47\n780061\tMatemática\tMAT-1768148027843\t2310188\t2026-01-11 16:13:47\n780066\tConflict Subject 1768148167739\tCS1768148167739\t2\t2026-01-11 16:16:07\n780069\tDisciplina Teste\tDISC1768148174795\t2310213\t2026-01-11 16:16:14\n780070\tDisciplina Teste\tDISC1768148174889\t2310214\t2026-01-11 16:16:14\n780071\tDisciplina Teste\tDISC1768148175043\t2310215\t2026-01-11 16:16:15\n780074\tDisciplina Teste\tDISC1768148175203\t2310216\t2026-01-11 16:16:15\n780076\tDisciplina Teste\tDISC1768148175277\t2310218\t2026-01-11 16:16:15\n780077\tDisciplina Teste\tDISC1768148175347\t2310219\t2026-01-11 16:16:15\n780078\tDisciplina Teste\tDISC1768148175413\t2310220\t2026-01-11 16:16:15\n780080\tTest Subject Regular\tTST1768148183028\t2310225\t2026-01-11 16:16:23\n780081\tMatemática Teste\tMAT-1768148183038\t2310226\t2026-01-11 16:16:23\n780082\tTest Subject Admin\tTST1768148183048\t2310224\t2026-01-11 16:16:23\n780087\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-11 16:16:27\n780088\tMatemática\tMAT-1768148187891\t2310237\t2026-01-11 16:16:27\n780091\tConflict Subject 1768148209515\tCS1768148209515\t2\t2026-01-11 16:16:49\n810003\tConflict Subject 1768428857202\tCS1768428857202\t2\t2026-01-14 22:14:17\n810006\tDisciplina Teste\tDISC1768428859784\t2610017\t2026-01-14 22:14:19\n810007\tDisciplina Teste\tDISC1768428859876\t2610018\t2026-01-14 22:14:19\n810008\tDisciplina Teste\tDISC1768428859958\t2610019\t2026-01-14 22:14:19\n810009\tDisciplina Teste\tDISC1768428860033\t2610020\t2026-01-14 22:14:20\n810011\tDisciplina Teste\tDISC1768428860130\t2610022\t2026-01-14 22:14:20\n810013\tDisciplina Teste\tDISC1768428860206\t2610024\t2026-01-14 22:14:20\n810015\tDisciplina Teste\tDISC1768428860284\t2610025\t2026-01-14 22:14:20\n810017\tMatemática Teste\tMAT-1768428861453\t2610026\t2026-01-14 22:14:21\n810018\tTest Subject Regular\tTST1768428861984\t2610030\t2026-01-14 22:14:21\n810019\tTest Subject Admin\tTST1768428862002\t2610029\t2026-01-14 22:14:22\n810022\tConflict Subject 1768428877413\tCS1768428877414\t2\t2026-01-14 22:14:37\n840001\tMatemática Básica QA\tMAT-QA-001\t2700001\t2026-01-15 09:38:19\n900001\tDisciplina Teste Quiz\tQUIZ-TEST\t2820006\t2026-01-16 01:09:38\n900003\tConflict Subject 1768525778972\tCS1768525778972\t2\t2026-01-16 01:09:38\n900006\tDisciplina Teste\tDISC1768525780962\t2820017\t2026-01-16 01:09:40\n900007\tDisciplina Teste\tDISC1768525781085\t2820018\t2026-01-16 01:09:41\n900010\tDisciplina Teste\tDISC1768525781162\t2820021\t2026-01-16 01:09:41\n900011\tDisciplina Teste\tDISC1768525781230\t2820022\t2026-01-16 01:09:41\n900013\tDisciplina Teste\tDISC1768525781309\t2820023\t2026-01-16 01:09:41\n900014\tDisciplina Teste\tDISC1768525781378\t2820024\t2026-01-16 01:09:41\n900015\tDisciplina Teste\tDISC1768525781447\t2820025\t2026-01-16 01:09:41\n900017\tMatemática Teste\tMAT-1768525782136\t2820027\t2026-01-16 01:09:42\n900018\tTest Subject Regular\tTST1768525782491\t2820030\t2026-01-16 01:09:42\n900019\tTest Subject Admin\tTST1768525782507\t2820029\t2026-01-16 01:09:42\n900024\tDisciplina PC Test\tPC-TEST-001\t1950014\t2026-01-16 01:09:43\n900025\tMatemática\tMAT-1768525783407\t2820041\t2026-01-16 01:09:43\n960001\tSEC\tSEC01\t3030005\t2026-01-19 11:15:08\n990002\tTest Subject 1768835097918\tTS1768835097918\t1\t2026-01-19 15:04:58\n990003\tConflict Subject 1768835098277\tCS1768835098277\t2\t2026-01-19 15:04:58\n990006\tDisciplina Teste\tDISC1768835100556\t3300012\t2026-01-19 15:05:00\n990007\tDisciplina Teste\tDISC1768835100685\t3300013\t2026-01-19 15:05:00\n990008\tDisciplina Teste\tDISC1768835100794\t3300014\t2026-01-19 15:05:00\n990009\tDisciplina Teste\tDISC1768835100888\t3300015\t2026-01-19 15:05:00\n990012\tDisciplina Teste\tDISC1768835100994\t3300017\t2026-01-19 15:05:00\n990013\tDisciplina Teste\tDISC1768835101093\t3300018\t2026-01-19 15:05:01\n990015\tDisciplina Teste\tDISC1768835101187\t3300019\t2026-01-19 15:05:01\n990017\tMatemática Teste\tMAT-1768835102485\t3300023\t2026-01-19 15:05:02\n990018\tTest Subject Regular\tTST1768835102761\t3300025\t2026-01-19 15:05:02\n990019\tTest Subject Admin\tTST1768835102784\t3300024\t2026-01-19 15:05:02\n990024\tDisciplina PC Test\tPC-TEST-001\t3300029\t2026-01-19 15:05:03\n990025\tMatemática\tMAT-1768835104188\t3300036\t2026-01-19 15:05:04\n1020001\tTest Subject 1768836205508\tTS1768836205508\t1\t2026-01-19 15:23:25\n1020002\tConflict Subject 1768836206235\tCS1768836206235\t2\t2026-01-19 15:23:26\n1020008\tDisciplina Teste\tDISC1768836209364\t3330013\t2026-01-19 15:23:29\n1020010\tDisciplina Teste\tDISC1768836209454\t3330014\t2026-01-19 15:23:29\n1020011\tDisciplina Teste\tDISC1768836209540\t3330015\t2026-01-19 15:23:29\n1020012\tDisciplina Teste\tDISC1768836209625\t3330017\t2026-01-19 15:23:29\n1020013\tDisciplina Teste\tDISC1768836209715\t3330018\t2026-01-19 15:23:29\n1020014\tDisciplina Teste\tDISC1768836209790\t3330019\t2026-01-19 15:23:29\n1020015\tDisciplina Teste\tDISC1768836209867\t3330020\t2026-01-19 15:23:29\n1020017\tMatemática Teste\tMAT-1768836210987\t3330023\t2026-01-19 15:23:30\n1020018\tTest Subject Regular\tTST1768836211145\t3330025\t2026-01-19 15:23:31\n1020019\tTest Subject Admin\tTST1768836211165\t3330024\t2026-01-19 15:23:31\n1020024\tDisciplina PC Test\tPC-TEST-001\t3300029\t2026-01-19 15:23:32\n1020025\tMatemática\tMAT-1768836212671\t3330036\t2026-01-19 15:23:32\n1020029\tTest Subject 1768836285877\tTS1768836285877\t1\t2026-01-19 15:24:45\n1020030\tConflict Subject 1768836286233\tCS1768836286233\t2\t2026-01-19 15:24:46\n1020036\tDisciplina Teste\tDISC1768836288648\t3330057\t2026-01-19 15:24:48\n1020037\tDisciplina Teste\tDISC1768836288734\t3330058\t2026-01-19 15:24:48\n1020038\tDisciplina Teste\tDISC1768836288822\t3330059\t2026-01-19 15:24:48\n1020039\tDisciplina Teste\tDISC1768836288911\t3330061\t2026-01-19 15:24:48\n1020040\tDisciplina Teste\tDISC1768836288998\t3330062\t2026-01-19 15:24:49\n1020041\tDisciplina Teste\tDISC1768836289087\t3330063\t2026-01-19 15:24:49\n1020042\tDisciplina Teste\tDISC1768836289166\t3330064\t2026-01-19 15:24:49\n1020044\tTest Subject Regular\tTST1768836290229\t3330068\t2026-01-19 15:24:50\n1020045\tTest Subject Admin\tTST1768836290251\t3330067\t2026-01-19 15:24:50\n1020050\tDisciplina PC Test\tPC-TEST-001\t3300029\t2026-01-19 15:24:51\n1020054\tTest Subject 1768836316503\tTS1768836316503\t1\t2026-01-19 15:25:16\n1020055\tConflict Subject 1768836316821\tCS1768836316821\t2\t2026-01-19 15:25:16\n1020060\tDisciplina Teste\tDISC1768836318934\t3330090\t2026-01-19 15:25:18\n1020062\tDisciplina Teste\tDISC1768836319041\t3330091\t2026-01-19 15:25:19\n1020063\tDisciplina Teste\tDISC1768836319133\t3330093\t2026-01-19 15:25:19\n1020064\tDisciplina Teste\tDISC1768836319219\t3330094\t2026-01-19 15:25:19\n1020065\tDisciplina Teste\tDISC1768836319312\t3330095\t2026-01-19 15:25:19\n1020066\tDisciplina Teste\tDISC1768836319387\t3330096\t2026-01-19 15:25:19\n1020067\tDisciplina Teste\tDISC1768836319473\t3330097\t2026-01-19 15:25:19\n1020069\tTest Subject Regular\tTST1768836320917\t3330101\t2026-01-19 15:25:20\n1020070\tTest Subject Admin\tTST1768836320938\t3330100\t2026-01-19 15:25:20\n1020075\tDisciplina PC Test\tPC-TEST-001\t3300029\t2026-01-19 15:25:21\n1020078\tTest Subject 1768836351272\tTS1768836351272\t1\t2026-01-19 15:25:51\n1020079\tConflict Subject 1768836351522\tCS1768836351522\t2\t2026-01-19 15:25:51\n1020086\tTest Subject Regular\tTST1768836354492\t3330126\t2026-01-19 15:25:54\n1020087\tTest Subject Admin\tTST1768836354517\t3330125\t2026-01-19 15:25:54\n1020089\tDisciplina PC Test\tPC-TEST-001\t3300029\t2026-01-19 15:25:54\n1020105\tTest Subject Regular\tTST1768836379298\t3330152\t2026-01-19 15:26:19\n1020106\tTest Subject Admin\tTST1768836379325\t3330150\t2026-01-19 15:26:19\n1020107\tDisciplina PC Test\tPC-TEST-001\t3300029\t2026-01-19 15:26:19\n1020109\tMatemática\tMAT1768836382706\t1\t2026-01-19 15:26:22\n1050001\tTESTE\tTESTE\t3390001\t2026-02-11 01:12:36\n1080001\tTest\tTEST123\t3390001\t2026-02-11 14:22:15\n1080002\tOdontologia na Saúde Coletiva\tOSC003\t3390001\t2026-02-11 14:24:35\n1110001\tTeste SQL Direto\tSQL001\t600002\t2026-02-11 15:51:56\n1110002\tTeste Drizzle\tDRZ001\t600002\t2026-02-11 15:55:10\n1140001\tTeste Drizzle Direto\tTDD001\t600002\t2026-02-11 16:34:30\n1170001\tTesteDireto\tTDIR001\t600002\t2026-02-11 17:17:43\n1170002\tTesteSQL\tTSQL99\t3390001\t2026-02-11 17:22:29\n1170003\tTeste Final\tTF001\t3390001\t2026-02-11 17:52:48\n",
+  "stderr": "",
+  "execution_time_ms": 114
+}

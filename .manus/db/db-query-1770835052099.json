@@ -1,0 +1,160 @@
+{
+  "query": "SELECT DISTINCT name, code, COUNT(*) as qtd FROM subjects WHERE code NOT IN ('TFC-001', 'OSC001', 'OSC002', 'OSC003', 'OSC-TESTE', 'TEST123', 'TESTE-FINAL') AND name NOT LIKE '%Teste%' AND name NOT LIKE '%teste%' AND name NOT LIKE '%Test%' GROUP BY name, code ORDER BY qtd DESC LIMIT 30;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT DISTINCT name, code, COUNT(*) as qtd FROM subjects WHERE code NOT IN ('TFC-001', 'OSC001', 'OSC002', 'OSC003', 'OSC-TESTE', 'TEST123', 'TESTE-FINAL') AND name NOT LIKE '%Teste%' AND name NOT LIKE '%teste%' AND name NOT LIKE '%Test%' GROUP BY name, code ORDER BY qtd DESC LIMIT 30;",
+  "rows": [
+    {
+      "name": "Conflict Subject 1768836351522",
+      "code": "CS1768836351522",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768147389345",
+      "code": "CS1768147389345",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1768148187891",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767578329585",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767641126431",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768835098277",
+      "code": "CS1768835098277",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767648197196",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768147351759",
+      "code": "CS1768147351759",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1768148027843",
+      "qtd": "1"
+    },
+    {
+      "name": "SEC",
+      "code": "SEC01",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767640967048",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768147416603",
+      "code": "CS1768147416603",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768428857202",
+      "code": "CS1768428857202",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768148007809",
+      "code": "CS1768148007809",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767886383959",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT1768836382706",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768147454194",
+      "code": "CS1768147454194",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768148209515",
+      "code": "CS1768148209515",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768836206235",
+      "code": "CS1768836206235",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1768836212671",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768428877413",
+      "code": "CS1768428877414",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768525778972",
+      "code": "CS1768525778972",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1768525783407",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767640501748",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767640641545",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768147436515",
+      "code": "CS1768147436515",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1767581814952",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática Básica QA",
+      "code": "MAT-QA-001",
+      "qtd": "1"
+    },
+    {
+      "name": "Matemática",
+      "code": "MAT-1768835104188",
+      "qtd": "1"
+    },
+    {
+      "name": "Conflict Subject 1768836286233",
+      "code": "CS1768836286233",
+      "qtd": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tcode\tqtd\nConflict Subject 1768836351522\tCS1768836351522\t1\nConflict Subject 1768147389345\tCS1768147389345\t1\nMatemática\tMAT-1768148187891\t1\nMatemática\tMAT-1767578329585\t1\nMatemática\tMAT-1767641126431\t1\nConflict Subject 1768835098277\tCS1768835098277\t1\nMatemática\tMAT-1767648197196\t1\nConflict Subject 1768147351759\tCS1768147351759\t1\nMatemática\tMAT-1768148027843\t1\nSEC\tSEC01\t1\nMatemática\tMAT-1767640967048\t1\nConflict Subject 1768147416603\tCS1768147416603\t1\nConflict Subject 1768428857202\tCS1768428857202\t1\nConflict Subject 1768148007809\tCS1768148007809\t1\nMatemática\tMAT-1767886383959\t1\nMatemática\tMAT1768836382706\t1\nConflict Subject 1768147454194\tCS1768147454194\t1\nConflict Subject 1768148209515\tCS1768148209515\t1\nConflict Subject 1768836206235\tCS1768836206235\t1\nMatemática\tMAT-1768836212671\t1\nConflict Subject 1768428877413\tCS1768428877414\t1\nConflict Subject 1768525778972\tCS1768525778972\t1\nMatemática\tMAT-1768525783407\t1\nMatemática\tMAT-1767640501748\t1\nMatemática\tMAT-1767640641545\t1\nConflict Subject 1768147436515\tCS1768147436515\t1\nMatemática\tMAT-1767581814952\t1\nMatemática Básica QA\tMAT-QA-001\t1\nMatemática\tMAT-1768835104188\t1\nConflict Subject 1768836286233\tCS1768836286233\t1\n",
+  "stderr": "",
+  "execution_time_ms": 75
+}

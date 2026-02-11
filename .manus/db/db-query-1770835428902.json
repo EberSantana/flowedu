@@ -1,0 +1,16 @@
+{
+  "query": "DELETE FROM subjects WHERE code = 'TCD01'; SELECT id, name, code, userId FROM subjects;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute DELETE FROM subjects WHERE code = 'TCD01'; SELECT id, name, code, userId FROM subjects;",
+  "rows": [
+    {
+      "id": "1170004",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC",
+      "userId": "600002"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\n1170004\tOdontologia na Saúde Coletiva\tOSC\t600002\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

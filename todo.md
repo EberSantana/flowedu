@@ -6904,3 +6904,20 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Alinhar banco de produção - 48/48 operações SQL executadas com sucesso
 - [x] Rebuildar e reiniciar servidor - Build em 38.71s + PM2 restart OK
 - [x] Testar botão Criar no flowedu.app - FUNCIONANDO! Disciplina 'Teste Final Criar' criada com sucesso
+
+## Limpeza de Disciplinas de Teste
+
+- [ ] Identificar todas as disciplinas de teste no banco de produção
+- [ ] Remover disciplinas de teste (OSC001, OSC002, OSC003, TEST123, Teste Final Criar, etc.)
+- [ ] Verificar que apenas disciplinas reais permanecem
+
+## Limpeza e Organização do Banco de Dados
+
+- [x] Limpar banco de desenvolvimento - remover todas as disciplinas de teste (318 → 1 disciplina real)
+- [x] Limpar tabelas relacionadas de teste (classes, shifts, tasks, scheduled_classes, learning_modules, learning_topics)
+- [x] Limpar usuários de teste (mantidos apenas 2 usuários reais: Eber e Juliane)
+- [x] Limpar banco de produção (1 disciplina de teste removida)
+- [x] Cadastrar disciplina "Odontologia na Saúde Coletiva" (OSC) com 40h e 9 temas no banco de desenvolvimento
+- [x] Verificar funcionamento do botão "Criar" no ambiente de desenvolvimento - OK
+- [x] Alinhamento completo Schema Drizzle ↔ Banco de Dados (105 tabelas, 908 colunas, 9 índices UNIQUE)
+- [x] Deploy na VPS concluído (git pull, rebuild, PM2 restart)
