@@ -6941,5 +6941,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar logs da VPS para identificar erro (erro 500 - LLM API key não configurada)
 - [x] Corrigir o bug no código: migrar gemini.ts → llm.ts com fallback Gemini direto
 - [x] Configurar GEMINI_API_KEY na VPS (AIzaSyCE7QWeJ-UhuD6FQXlTvi57bGeDtHYbXtk)
-- [ ] Deploy da correção na VPS (git push, pull, build, restart)
-- [ ] Testar geração de trilha no flowedu.app
+- [x] Deploy da correção na VPS (git push, pull, build, restart)
+- [x] Testar geração de trilha no flowedu.app
+- [x] Configurar Groq API como alternativa gratuita ao Gemini (quota excedida)
+- [x] Migrar banco de produção (6 colunas faltantes em learning_topics)
+- [x] BUG RESOLVIDO - Geração de trilha com IA funcionando com Groq API (Llama 3.3 70B)
