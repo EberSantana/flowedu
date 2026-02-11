@@ -2015,11 +2015,15 @@ Regras:
         workload: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        try {
         const { invokeLLM } = await import('./_core/llm');
+        
+        console.log('[generateFromAI] Starting generation for subjectId:', input.subjectId);
         
         // Buscar carga horária da disciplina se não foi fornecida
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
         const totalWorkload = input.workload || subject?.workload || 60;
+        console.log('[generateFromAI] Subject found:', subject?.name, 'Workload:', totalWorkload);
         
         const prompt = `Você é um especialista em design instrucional e pedagogia. Analise a seguinte ementa de disciplina e crie uma trilha de aprendizagem estruturada.
 
@@ -2063,9 +2067,10 @@ Diretrizes OBRIGATÓRIAS:
 7. A soma de theoryHours + practiceHours + individualWorkHours + teamWorkHours DEVE ser igual a estimatedHours
 8. Use linguagem clara e objetiva`;
         
+        console.log('[generateFromAI] Calling LLM...');
         const response = await invokeLLM({
           messages: [
-            { role: 'system', content: 'Você é um especialista em design instrucional e pedagogia.' },
+            { role: 'system', content: 'Você é um especialista em design instrucional e pedagogia. Responda APENAS em JSON válido.' },
             { role: 'user', content: prompt }
           ],
           response_format: {
@@ -2113,10 +2118,20 @@ Diretrizes OBRIGATÓRIAS:
           }
         });
         
-        const content = typeof response.choices[0].message.content === 'string' 
-          ? response.choices[0].message.content 
-          : JSON.stringify(response.choices[0].message.content);
-        const result = JSON.parse(content || '{}');
+        console.log('[generateFromAI] LLM response received, finish_reason:', response.choices?.[0]?.finish_reason);
+        const rawContent = response.choices?.[0]?.message?.content;
+        console.log('[generateFromAI] Raw content type:', typeof rawContent, 'length:', String(rawContent || '').length);
+        const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
+        console.log('[generateFromAI] Content preview:', String(content || '').substring(0, 200));
+        let result;
+        try {
+          result = JSON.parse(content || '{}');
+        } catch (parseErr: any) {
+          console.error('[generateFromAI] JSON parse error:', parseErr.message);
+          console.error('[generateFromAI] Raw content:', content);
+          throw new Error('Erro ao interpretar resposta da IA: ' + parseErr.message);
+        }
+        console.log('[generateFromAI] Parsed result, modules count:', result.modules?.length);
         
         // Calcular total de horas geradas pela IA
         let totalGeneratedHours = 0;
@@ -2209,7 +2224,13 @@ Diretrizes OBRIGATÓRIAS:
           }
         }
         
+        console.log('[generateFromAI] All modules and topics created successfully');
         return { success: true, modulesCreated: result.modules.length };
+        } catch (err: any) {
+          console.error('[generateFromAI] ERROR:', err.message);
+          console.error('[generateFromAI] Stack:', err.stack);
+          throw err;
+        }
       }),
     
     generateInfographic: protectedProcedure
