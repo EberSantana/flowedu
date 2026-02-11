@@ -1,0 +1,178 @@
+{
+  "query": "SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT, DATA_TYPE, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'subjects' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT, DATA_TYPE, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'subjects' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "name",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(100)"
+    },
+    {
+      "COLUMN_NAME": "code",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(20)"
+    },
+    {
+      "COLUMN_NAME": "description",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "color",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "#3b82f6",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(7)"
+    },
+    {
+      "COLUMN_NAME": "userId",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "courseObjectives",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "courseContent",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "methodology",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "evaluation",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "bibliography",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "coursePlanPdfUrl",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "ementa",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "generalObjective",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "specificObjectives",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "programContent",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "basicBibliography",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "complementaryBibliography",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "googleDriveUrl",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "googleClassroomUrl",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "workload",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "60",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "computationalThinkingEnabled",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "0",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_TYPE": "tinyint(1)"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tIS_NULLABLE\tCOLUMN_DEFAULT\tDATA_TYPE\tCOLUMN_TYPE\nid\tNO\tNULL\tint\tint(11)\nname\tNO\tNULL\tvarchar\tvarchar(100)\ncode\tNO\tNULL\tvarchar\tvarchar(20)\ndescription\tYES\tNULL\ttext\ttext\ncolor\tYES\t#3b82f6\tvarchar\tvarchar(7)\nuserId\tNO\tNULL\tint\tint(11)\ncreatedAt\tNO\tCURRENT_TIMESTAMP\ttimestamp\ttimestamp\nupdatedAt\tNO\tCURRENT_TIMESTAMP\ttimestamp\ttimestamp\ncourseObjectives\tYES\tNULL\ttext\ttext\ncourseContent\tYES\tNULL\ttext\ttext\nmethodology\tYES\tNULL\ttext\ttext\nevaluation\tYES\tNULL\ttext\ttext\nbibliography\tYES\tNULL\ttext\ttext\ncoursePlanPdfUrl\tYES\tNULL\ttext\ttext\nementa\tYES\tNULL\ttext\ttext\ngeneralObjective\tYES\tNULL\ttext\ttext\nspecificObjectives\tYES\tNULL\ttext\ttext\nprogramContent\tYES\tNULL\ttext\ttext\nbasicBibliography\tYES\tNULL\ttext\ttext\ncomplementaryBibliography\tYES\tNULL\ttext\ttext\ngoogleDriveUrl\tYES\tNULL\ttext\ttext\ngoogleClassroomUrl\tYES\tNULL\ttext\ttext\nworkload\tYES\t60\tint\tint(11)\ncomputationalThinkingEnabled\tNO\t0\ttinyint\ttinyint(1)\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

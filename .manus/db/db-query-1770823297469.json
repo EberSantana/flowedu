@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO users (id, email, name, role, openId, active, createdAt, updatedAt) \nVALUES (600002, 'fagundesjuliane@yahoo.com.br', 'Juliane Kel Fagundes Silva', 'user', 'teacher-1770728588265-cq3mfpg', 1, NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO users (id, email, name, role, openId, active, createdAt, updatedAt) \nVALUES (600002, 'fagundesjuliane@yahoo.com.br', 'Juliane Kel Fagundes Silva', 'user', 'teacher-1770728588265-cq3mfpg', 1, NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 82
+}

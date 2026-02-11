@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, email, name, role, active, openId FROM users WHERE id = 600002;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, role, active, openId FROM users WHERE id = 600002;",
+  "rows": [
+    {
+      "id": "600002",
+      "email": "fagundesjuliane@yahoo.com.br",
+      "name": "Juliane Kel Fagundes Silva",
+      "role": "user",
+      "active": "1",
+      "openId": "teacher-1770728588265-cq3mfpg"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tactive\topenId\n600002\tfagundesjuliane@yahoo.com.br\tJuliane Kel Fagundes Silva\tuser\t1\tteacher-1770728588265-cq3mfpg\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

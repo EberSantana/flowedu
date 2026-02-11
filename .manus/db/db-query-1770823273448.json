@@ -1,0 +1,66 @@
+{
+  "query": "SELECT s.id, s.name, s.code, s.userId, u.email \nFROM subjects s \nLEFT JOIN users u ON s.userId = u.id \nWHERE s.code LIKE 'OSC%' OR s.code LIKE 'TEST%' \nORDER BY s.id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT s.id, s.name, s.code, s.userId, u.email \nFROM subjects s \nLEFT JOIN users u ON s.userId = u.id \nWHERE s.code LIKE 'OSC%' OR s.code LIKE 'TEST%' \nORDER BY s.id DESC;",
+  "rows": [
+    {
+      "id": "1080002",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC003",
+      "userId": "3390001",
+      "email": "demo@flowedu.app"
+    },
+    {
+      "id": "1080001",
+      "name": "Test",
+      "code": "TEST123",
+      "userId": "3390001",
+      "email": "demo@flowedu.app"
+    },
+    {
+      "id": "1050001",
+      "name": "TESTE",
+      "code": "TESTE",
+      "userId": "3390001",
+      "email": "demo@flowedu.app"
+    },
+    {
+      "id": "720004",
+      "name": "Disciplina Teste Revisão",
+      "code": "TEST-REV-001",
+      "userId": "999",
+      "email": "NULL"
+    },
+    {
+      "id": "600116",
+      "name": "Disciplina Teste",
+      "code": "TEST-001",
+      "userId": "2100278",
+      "email": "NULL"
+    },
+    {
+      "id": "450003",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950004",
+      "email": "NULL"
+    },
+    {
+      "id": "450002",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950003",
+      "email": "NULL"
+    },
+    {
+      "id": "450001",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950002",
+      "email": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\temail\n1080002\tOdontologia na Saúde Coletiva\tOSC003\t3390001\tdemo@flowedu.app\n1080001\tTest\tTEST123\t3390001\tdemo@flowedu.app\n1050001\tTESTE\tTESTE\t3390001\tdemo@flowedu.app\n720004\tDisciplina Teste Revisão\tTEST-REV-001\t999\tNULL\n600116\tDisciplina Teste\tTEST-001\t2100278\tNULL\n450003\tDisciplina Teste Details\tTEST-DETAILS-001\t1950004\tNULL\n450002\tDisciplina Teste Details\tTEST-DETAILS-001\t1950003\tNULL\n450001\tDisciplina Teste Details\tTEST-DETAILS-001\t1950002\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 145
+}

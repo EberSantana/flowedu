@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, code, userId FROM subjects WHERE code LIKE 'OSC%' ORDER BY id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, userId FROM subjects WHERE code LIKE 'OSC%' ORDER BY id DESC;",
+  "rows": [
+    {
+      "id": "1080002",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC003",
+      "userId": "3390001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\n1080002\tOdontologia na Saúde Coletiva\tOSC003\t3390001\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

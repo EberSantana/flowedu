@@ -1,0 +1,36 @@
+{
+  "query": "SELECT * FROM subjects WHERE code = 'TEST123';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT * FROM subjects WHERE code = 'TEST123';",
+  "rows": [
+    {
+      "id": "1080001",
+      "name": "Test",
+      "code": "TEST123",
+      "description": "Test",
+      "color": "#3b82f6",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 14:22:15",
+      "updatedAt": "2026-02-11 14:22:15",
+      "courseObjectives": "NULL",
+      "courseContent": "NULL",
+      "methodology": "NULL",
+      "evaluation": "NULL",
+      "bibliography": "NULL",
+      "coursePlanPdfUrl": "NULL",
+      "ementa": "NULL",
+      "generalObjective": "NULL",
+      "specificObjectives": "NULL",
+      "programContent": "NULL",
+      "basicBibliography": "NULL",
+      "complementaryBibliography": "NULL",
+      "googleDriveUrl": "NULL",
+      "googleClassroomUrl": "NULL",
+      "workload": "60",
+      "computationalThinkingEnabled": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tdescription\tcolor\tuserId\tcreatedAt\tupdatedAt\tcourseObjectives\tcourseContent\tmethodology\tevaluation\tbibliography\tcoursePlanPdfUrl\tementa\tgeneralObjective\tspecificObjectives\tprogramContent\tbasicBibliography\tcomplementaryBibliography\tgoogleDriveUrl\tgoogleClassroomUrl\tworkload\tcomputationalThinkingEnabled\n1080001\tTest\tTEST123\tTest\t#3b82f6\t3390001\t2026-02-11 14:22:15\t2026-02-11 14:22:15\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t60\t0\n",
+  "stderr": "",
+  "execution_time_ms": 126
+}

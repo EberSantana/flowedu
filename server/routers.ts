@@ -444,11 +444,25 @@ export const appRouter = router({
         googleClassroomUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.createSubject({
-          ...input,
-          userId: ctx.user.id,
-        });
-        return { success: true };
+        try {
+          console.log('[subjects.create] Usuário:', ctx.user.id, ctx.user.email);
+          console.log('[subjects.create] Input recebido:', JSON.stringify(input, null, 2));
+          
+          const result = await db.createSubject({
+            ...input,
+            userId: ctx.user.id,
+          });
+          
+          console.log('[subjects.create] Disciplina criada com sucesso:', result.id);
+          return { success: true };
+        } catch (error: any) {
+          console.error('[subjects.create] Erro na criação:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `Erro ao criar disciplina: ${error.message}`,
+            cause: error,
+          });
+        }
       }),
     
     update: protectedProcedure

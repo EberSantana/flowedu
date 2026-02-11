@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO subjects (name, code, description, color, userId, ementa, generalObjective, specificObjectives, programContent, basicBibliography, complementaryBibliography, coursePlanPdfUrl, googleDriveUrl, googleClassroomUrl, workload, computationalThinkingEnabled) VALUES ('Teste SQL Direto', 'SQL001', 'Teste', '#3b82f6', 600002, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 60, 0);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute INSERT INTO subjects (name, code, description, color, userId, ementa, generalObjective, specificObjectives, programContent, basicBibliography, complementaryBibliography, coursePlanPdfUrl, googleDriveUrl, googleClassroomUrl, workload, computationalThinkingEnabled) VALUES ('Teste SQL Direto', 'SQL001', 'Teste', '#3b82f6', 600002, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 60, 0);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 61
+}

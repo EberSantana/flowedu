@@ -10,11 +10,43 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
-  // Rota OAuth desabilitada - sistema usa apenas login com email/senha
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
-    res.status(403).json({ 
-      error: "OAuth login desabilitado",
-      message: "Este sistema usa apenas login com email e senha. Por favor, acesse a p\u00e1gina de login." 
-    });
+    const code = getQueryParam(req, "code");
+    if (!code) {
+      return res.status(400).send("Missing authorization code");
+    }
+
+    try {
+      // Exchange code for JWT
+      const jwt = await sdk.exchangeCodeForJwt(code);
+      
+      // Get user info from Manus OAuth
+      const userInfo = await sdk.getUserInfoWithJwt(jwt);
+      
+      console.log('[OAuth] User info received:', userInfo);
+
+      // Upsert user in local database
+      const user = await db.upsertUser({
+        openId: userInfo.openId,
+        name: userInfo.name,
+        email: userInfo.email,
+        loginMethod: "oauth",
+      });
+
+      console.log('[OAuth] User upserted:', user.id, user.email);
+
+      // Set session cookie
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, jwt, {
+        ...cookieOptions,
+        maxAge: ONE_YEAR_MS,
+      });
+
+      // Redirect to home
+      res.redirect("/");
+    } catch (error) {
+      console.error("[OAuth] Callback error:", error);
+      res.status(500).send("OAuth authentication failed");
+    }
   });
 }

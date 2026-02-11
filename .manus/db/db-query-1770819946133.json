@@ -1,0 +1,66 @@
+{
+  "query": "SELECT id, name, code, userId, createdAt FROM subjects WHERE code LIKE 'OSC%' OR code LIKE 'TEST%' ORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, userId, createdAt FROM subjects WHERE code LIKE 'OSC%' OR code LIKE 'TEST%' ORDER BY createdAt DESC;",
+  "rows": [
+    {
+      "id": "1080002",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC003",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 14:24:35"
+    },
+    {
+      "id": "1080001",
+      "name": "Test",
+      "code": "TEST123",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 14:22:15"
+    },
+    {
+      "id": "1050001",
+      "name": "TESTE",
+      "code": "TESTE",
+      "userId": "3390001",
+      "createdAt": "2026-02-11 01:12:36"
+    },
+    {
+      "id": "720004",
+      "name": "Disciplina Teste Revisão",
+      "code": "TEST-REV-001",
+      "userId": "999",
+      "createdAt": "2026-01-10 21:09:49"
+    },
+    {
+      "id": "600116",
+      "name": "Disciplina Teste",
+      "code": "TEST-001",
+      "userId": "2100278",
+      "createdAt": "2026-01-05 21:27:42"
+    },
+    {
+      "id": "450003",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950004",
+      "createdAt": "2026-01-04 17:09:35"
+    },
+    {
+      "id": "450002",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950003",
+      "createdAt": "2026-01-04 17:09:02"
+    },
+    {
+      "id": "450001",
+      "name": "Disciplina Teste Details",
+      "code": "TEST-DETAILS-001",
+      "userId": "1950002",
+      "createdAt": "2026-01-04 17:08:01"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\tcreatedAt\n1080002\tOdontologia na Saúde Coletiva\tOSC003\t3390001\t2026-02-11 14:24:35\n1080001\tTest\tTEST123\t3390001\t2026-02-11 14:22:15\n1050001\tTESTE\tTESTE\t3390001\t2026-02-11 01:12:36\n720004\tDisciplina Teste Revisão\tTEST-REV-001\t999\t2026-01-10 21:09:49\n600116\tDisciplina Teste\tTEST-001\t2100278\t2026-01-05 21:27:42\n450003\tDisciplina Teste Details\tTEST-DETAILS-001\t1950004\t2026-01-04 17:09:35\n450002\tDisciplina Teste Details\tTEST-DETAILS-001\t1950003\t2026-01-04 17:09:02\n450001\tDisciplina Teste Details\tTEST-DETAILS-001\t1950002\t2026-01-04 17:08:01\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

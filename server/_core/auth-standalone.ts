@@ -75,13 +75,16 @@ export async function verifySessionToken(
 
     const { userId, openId, email, name, role } = payload as Record<string, unknown>;
 
-    if (typeof userId !== "number" || typeof openId !== "string") {
-      console.warn("[Auth] Session payload missing required fields");
+    // userId pode vir como number ou string do JWT, precisamos converter
+    const parsedUserId = typeof userId === 'number' ? userId : (typeof userId === 'string' ? parseInt(userId, 10) : NaN);
+    
+    if (isNaN(parsedUserId) || typeof openId !== "string") {
+      console.warn("[Auth] Session payload missing required fields. userId:", typeof userId, userId, "openId:", typeof openId, openId);
       return null;
     }
 
     return {
-      userId: userId as number,
+      userId: parsedUserId,
       openId: openId as string,
       email: (email as string) || "",
       name: (name as string) || "",

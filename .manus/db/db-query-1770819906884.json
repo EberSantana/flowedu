@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, code, userId FROM subjects WHERE code LIKE 'OSC%' OR code LIKE 'TEST%' ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, code, userId FROM subjects WHERE code LIKE 'OSC%' OR code LIKE 'TEST%' ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1080002",
+      "name": "Odontologia na Saúde Coletiva",
+      "code": "OSC003",
+      "userId": "3390001"
+    },
+    {
+      "id": "1080001",
+      "name": "Test",
+      "code": "TEST123",
+      "userId": "3390001"
+    },
+    {
+      "id": "1050001",
+      "name": "TESTE",
+      "code": "TESTE",
+      "userId": "3390001"
+    },
+    {
+      "id": "720004",
+      "name": "Disciplina Teste Revisão",
+      "code": "TEST-REV-001",
+      "userId": "999"
+    },
+    {
+      "id": "600116",
+      "name": "Disciplina Teste",
+      "code": "TEST-001",
+      "userId": "2100278"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tuserId\n1080002\tOdontologia na Saúde Coletiva\tOSC003\t3390001\n1080001\tTest\tTEST123\t3390001\n1050001\tTESTE\tTESTE\t3390001\n720004\tDisciplina Teste Revisão\tTEST-REV-001\t999\n600116\tDisciplina Teste\tTEST-001\t2100278\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

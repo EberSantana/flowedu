@@ -264,15 +264,47 @@ export async function createSubject(data: InsertSubject) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(subjects).values(data);
-  const insertId = Number(result[0].insertId);
-  
-  // Buscar o registro criado para retornar com todos os campos
-  const [created] = await db.select()
-    .from(subjects)
-    .where(eq(subjects.id, insertId));
-  
-  return created;
+  try {
+    console.log('[createSubject] Dados recebidos:', JSON.stringify(data, null, 2));
+    
+    // Usar SQL direto para contornar problema do Drizzle ORM com DEFAULT values
+    const result = await db.execute(sql`
+      INSERT INTO subjects (name, code, description, color, userId, ementa, generalObjective, specificObjectives, programContent, basicBibliography, complementaryBibliography, coursePlanPdfUrl, googleDriveUrl, googleClassroomUrl, workload, computationalThinkingEnabled)
+      VALUES (
+        ${data.name},
+        ${data.code},
+        ${data.description || null},
+        ${data.color || '#3b82f6'},
+        ${data.userId},
+        ${data.ementa || null},
+        ${data.generalObjective || null},
+        ${data.specificObjectives || null},
+        ${data.programContent || null},
+        ${data.basicBibliography || null},
+        ${data.complementaryBibliography || null},
+        ${data.coursePlanPdfUrl || null},
+        ${data.googleDriveUrl || null},
+        ${data.googleClassroomUrl || null},
+        ${data.workload || 60},
+        ${data.computationalThinkingEnabled ? 1 : 0}
+      )
+    `);
+    
+    const insertId = Number((result as any)[0]?.insertId);
+    console.log('[createSubject] Disciplina criada com ID:', insertId);
+    
+    // Buscar o registro criado para retornar com todos os campos
+    const [created] = await db.select()
+      .from(subjects)
+      .where(eq(subjects.id, insertId));
+    
+    return created;
+  } catch (error: any) {
+    console.error('[createSubject] Erro COMPLETO:', error);
+    console.error('[createSubject] error.sqlMessage:', error.sqlMessage);
+    console.error('[createSubject] Dados que causaram o erro:', JSON.stringify(data, null, 2));
+    throw new Error(`Falha ao criar disciplina: ${error.sqlMessage || error.message || 'Erro desconhecido'}`);
+  }
 }
 
 export async function getSubjectsByUserId(userId: number) {
