@@ -246,6 +246,16 @@ export default function Subjects() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.name.trim()) {
+      toast.error("Nome da disciplina eh obrigatorio");
+      return;
+    }
+    
+    if (!formData.code.trim()) {
+      toast.error("Codigo da disciplina eh obrigatorio");
+      return;
+    }
+    
     // Converter strings vazias para undefined para campos opcionais
     const cleanedData = {
       name: formData.name,
@@ -263,9 +273,15 @@ export default function Subjects() {
 
     };
     
+    console.log("Enviando dados para criar disciplina:", cleanedData);
+    console.log("createMutation:", createMutation);
+    console.log("updateMutation:", updateMutation);
+    
     if (editingSubject) {
+      console.log("Atualizando disciplina");
       updateMutation.mutate({ id: editingSubject.id, ...cleanedData });
     } else {
+      console.log("Criando nova disciplina");
       createMutation.mutate(cleanedData);
     }
   };
