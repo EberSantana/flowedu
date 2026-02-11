@@ -1,0 +1,25 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE '%review%' ORDER BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE '%review%' ORDER BY TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "review_history"
+    },
+    {
+      "TABLE_NAME": "review_notifications"
+    },
+    {
+      "TABLE_NAME": "review_sessions"
+    },
+    {
+      "TABLE_NAME": "review_statistics"
+    },
+    {
+      "TABLE_NAME": "smart_review_queue"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\nreview_history\nreview_notifications\nreview_sessions\nreview_statistics\nsmart_review_queue\n",
+  "stderr": "",
+  "execution_time_ms": 72
+}

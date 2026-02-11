@@ -163,7 +163,8 @@ function Router() {
           <Route path={"/student/my-questions"} component={StudentMyQuestions} />
           <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
           <Route path={"/student/doubts"} component={StudentDoubts} />
-          <Route path={"/student/statistics"} component={StudentStatistics} />          <Route path={" /student/notebook"} component={StudentNotebook} />
+          <Route path={"/student/statistics"} component={StudentStatistics} />
+          <Route path={"/student/notebook"} component={StudentNotebook} />
           {/* MistakeNotebook removido - usar /student/smart-review */}
 
           {/* Help/Ajuda - lazy loaded */}

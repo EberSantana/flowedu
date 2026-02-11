@@ -6946,3 +6946,26 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Configurar Groq API como alternativa gratuita ao Gemini (quota excedida)
 - [x] Migrar banco de produção (6 colunas faltantes em learning_topics)
 - [x] BUG RESOLVIDO - Geração de trilha com IA funcionando com Groq API (Llama 3.3 70B)
+
+## Teste de Funcionalidades de IA com Groq API
+- [x] Identificar todas as funcionalidades de IA no sistema (13 procedures com invokeLLM)
+- [x] Testar "Criar Prova com IA" no flowedu.app - FUNCIONANDO (10 questões mistas geradas)
+- [x] Testar "Criar Exercícios com IA" no flowedu.app - FUNCIONANDO (5 exercícios mistos gerados)
+- [x] Testar "Sugerir Plano de Aula com IA" no flowedu.app - FUNCIONANDO (objetivos + atividades + tempos)
+- [x] Testar "Gerar Trilha com IA" no flowedu.app - FUNCIONANDO (4 módulos com tópicos gerados)
+- [x] Verificar "Análise de Aprendizado com IA" - Página carrega OK (requer alunos cadastrados para testar)
+- [x] Verificar "Mapa Mental" e "Infográfico" - Componentes existem mas NÃO estão integrados à UI (órfãos)
+- [x] Nenhum problema encontrado nas funcionalidades ativas
+
+## Verificação Completa do Portal do Aluno
+- [ ] Mapear todas as páginas e rotas do portal do aluno
+- [ ] Testar navegação e menu lateral do portal do aluno
+- [ ] Testar página inicial/dashboard do aluno
+- [ ] Testar página de disciplinas do aluno
+- [ ] Testar página de exercícios do aluno
+- [ ] Testar página de trilhas de aprendizagem do aluno
+- [ ] Testar página de avisos/comunicação do aluno
+- [ ] Testar todos os botões e interações
+- [ ] Verificar console do navegador para erros JavaScript
+- [ ] Corrigir todos os erros encontrados
+- [ ] Deploy das correções na VPS
