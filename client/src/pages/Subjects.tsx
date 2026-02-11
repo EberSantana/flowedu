@@ -824,9 +824,12 @@ export default function Subjects() {
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <LoadingButton 
+                  type="submit" 
+                  loading={createMutation.isPending || updateMutation.isPending}
+                >
                   {editingSubject ? "Atualizar" : "Criar"}
-                </Button>
+                </LoadingButton>
               </DialogFooter>
             </form>
           </DialogContent>

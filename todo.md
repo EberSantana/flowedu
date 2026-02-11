@@ -6871,3 +6871,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar memoização de componentes pesados (React.memo no Dashboard)
 - [x] Implementar code splitting automático - JÁ IMPLEMENTADO com React.lazy
 - [x] Otimizar bundle size
+
+- [ ] BUG CRÍTICO: Botão de criar disciplina não funciona na VPS (nem professor nem admin) - investigar e corrigir
