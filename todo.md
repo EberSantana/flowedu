@@ -6882,3 +6882,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Converter createShift para SQL direto → RESOLVIDO: Alinhamento do banco de dados com DEFAULTs corretos
 - [x] Converter todas as outras funções de insert para SQL direto → RESOLVIDO: Alinhamento de TODAS as tabelas do banco com DEFAULTs corretos (539 ALTERs executados)
 - [x] Testar as correções - CONCLUÍDO: createSubject, createClass, createTask funcionando; createShift requer campos obrigatórios (validação Zod, não do banco)
+
+## Alinhamento Completo Schema Drizzle ↔ Banco de Dados
+
+- [x] Analisar schema Drizzle completo e comparar com banco de dados real - 105 tabelas, 1000+ colunas
+- [x] Identificar tabelas faltantes no banco - 6 tabelas faltantes encontradas e criadas
+- [x] Identificar colunas faltantes no banco - 908 colunas adicionadas + 9 UNIQUE corrigidas
+- [x] Gerar e executar script SQL para criar tabelas e colunas faltantes - Executado com sucesso
+- [x] Verificar se todas as discrepâncias foram resolvidas - 100% sincronizado! 0 tabelas e 0 colunas faltantes
