@@ -278,6 +278,11 @@ const normalizeResponseFormat = ({
         "responseFormat json_schema requires a defined schema object"
       );
     }
+    // Groq não suporta json_schema com strict mode - converter para json_object
+    if (explicitFormat.type === "json_schema" && ENV.groqApiKey && !ENV.forgeApiKey) {
+      console.log('[LLM] Groq detected: converting json_schema to json_object');
+      return { type: "json_object" };
+    }
     return explicitFormat;
   }
 
