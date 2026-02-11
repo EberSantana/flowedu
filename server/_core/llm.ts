@@ -209,14 +209,34 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+const resolveApiUrl = () => {
+  // Se tem Forge API (Manus built-in), usa ela
+  if (ENV.forgeApiKey) {
+    return ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
+      ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
+      : "https://forge.manus.im/v1/chat/completions";
+  }
+  // Fallback: Google Gemini API direta (OpenAI-compatible endpoint)
+  if (ENV.geminiApiKey) {
+    return "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+  }
+  throw new Error("No LLM API key configured (BUILT_IN_FORGE_API_KEY or GEMINI_API_KEY)");
+};
+
+const resolveApiKey = () => {
+  if (ENV.forgeApiKey) return ENV.forgeApiKey;
+  if (ENV.geminiApiKey) return ENV.geminiApiKey;
+  throw new Error("No LLM API key configured (BUILT_IN_FORGE_API_KEY or GEMINI_API_KEY)");
+};
+
+const resolveModel = () => {
+  if (ENV.forgeApiKey) return "gemini-2.5-flash";
+  return "gemini-2.0-flash"; // Modelo estável para API direta do Google
+};
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
+  if (!ENV.forgeApiKey && !ENV.geminiApiKey) {
+    throw new Error("No LLM API key configured. Set BUILT_IN_FORGE_API_KEY or GEMINI_API_KEY.");
   }
 };
 
@@ -280,7 +300,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: resolveModel(),
     messages: messages.map(normalizeMessage),
   };
 
@@ -296,9 +316,12 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = 32768
-  payload.thinking = {
-    "budget_tokens": 128
+  payload.max_tokens = 32768;
+  // Thinking só funciona com Forge API (Manus built-in)
+  if (ENV.forgeApiKey) {
+    payload.thinking = {
+      "budget_tokens": 128
+    };
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
@@ -312,11 +335,16 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.response_format = normalizedResponseFormat;
   }
 
-  const response = await fetch(resolveApiUrl(), {
+  const apiUrl = resolveApiUrl();
+  const apiKey = resolveApiKey();
+  
+  console.log(`[LLM] Using ${ENV.forgeApiKey ? 'Manus Forge' : 'Google Gemini'} API`);
+  
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(payload),
   });

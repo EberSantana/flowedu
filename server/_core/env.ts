@@ -8,4 +8,5 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   appUrl: process.env.VITE_APP_URL || 'http://localhost:3000',
+  geminiApiKey: process.env.GEMINI_API_KEY ?? "",
 };

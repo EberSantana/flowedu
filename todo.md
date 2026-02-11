@@ -6921,3 +6921,25 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar funcionamento do botão "Criar" no ambiente de desenvolvimento - OK
 - [x] Alinhamento completo Schema Drizzle ↔ Banco de Dados (105 tabelas, 908 colunas, 9 índices UNIQUE)
 - [x] Deploy na VPS concluído (git pull, rebuild, PM2 restart)
+
+## Cadastro OSC em Produção
+- [x] Cadastrar disciplina "Odontologia na Saúde Coletiva" no banco de produção (VPS) para userId 600002
+- [x] Cadastrar os 9 temas (learning_modules) da disciplina OSC no banco de produção
+- [x] Verificar cadastro no flowedu.app
+
+## Verificação de Sincronização VPS ↔ Desenvolvimento
+- [x] Comparar commits do Git entre Manus e VPS
+- [x] Verificar build e PM2 na VPS
+- [x] Sincronizar VPS se necessário (git pull, rebuild, PM2 restart)
+
+## Monitoramento Contínuo VPS ↔ GitHub
+- [x] Configurar tarefa agendada (a cada 1 hora) para verificar sincronização VPS com GitHub
+- [x] Avisar o usuário e orientar passo a passo quando houver diferença
+
+## BUG URGENTE: Gerar Trilha com IA não funciona
+- [x] Investigar bug na funcionalidade "Gerar Minha Trilha com IA" após criar/selecionar disciplina
+- [x] Verificar logs da VPS para identificar erro (erro 500 - LLM API key não configurada)
+- [x] Corrigir o bug no código: migrar gemini.ts → llm.ts com fallback Gemini direto
+- [x] Configurar GEMINI_API_KEY na VPS (AIzaSyCE7QWeJ-UhuD6FQXlTvi57bGeDtHYbXtk)
+- [ ] Deploy da correção na VPS (git push, pull, build, restart)
+- [ ] Testar geração de trilha no flowedu.app

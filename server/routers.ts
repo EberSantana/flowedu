@@ -13,7 +13,7 @@ import { ENV } from "./_core/env";
 import { sdk } from "./_core/sdk";
 import { createSessionToken as createStandaloneSession } from "./_core/auth-standalone";
 import { TRPCError } from "@trpc/server";
-import { invokeLLM } from "./_core/gemini";
+import { invokeLLM } from "./_core/llm";
 import { sendPasswordResetEmail } from "./_core/email";
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
@@ -1097,7 +1097,7 @@ export const appRouter = router({
         pdfBase64: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import("./_core/gemini");
+        const { invokeLLM } = await import("./_core/llm");
         const pdfParse = await import("pdf-parse") as any;
         
         // Converter base64 para buffer
@@ -2015,7 +2015,7 @@ Regras:
         workload: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         
         // Buscar carga horária da disciplina se não foi fornecida
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
@@ -2319,7 +2319,7 @@ Crie um infográfico que torne o aprendizado visual e divertido, com PORTUGUÊS 
     suggestLessonPlans: protectedProcedure
       .input(z.object({ topicId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         const topic = await db.getLearningTopicById(input.topicId, ctx.user.id);
         
         if (!topic) {
@@ -2407,7 +2407,7 @@ Crie sugestões no formato JSON:
         difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         
         // Buscar dados da disciplina e módulos
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
@@ -2544,7 +2544,7 @@ Retorne um JSON com a estrutura:
         questionCount: z.number().min(1).max(20).default(5),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         
         // Buscar dados do módulo
         const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
@@ -2738,7 +2738,7 @@ Retorne um JSON com a estrutura:
         subjectId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         
         // Buscar dados da disciplina e módulos
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
@@ -2865,7 +2865,7 @@ JSON (descrições MAX 20 chars):
         subjectId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         
         // Buscar dados da disciplina e módulos
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
@@ -2994,7 +2994,7 @@ Retorne JSON:
         moduleId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { invokeLLM } = await import('./_core/gemini');
+        const { invokeLLM } = await import('./_core/llm');
         
         const module = await db.getLearningModuleById(input.moduleId, ctx.user.id);
         if (!module) throw new Error('Módulo não encontrado');
