@@ -4,12 +4,19 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { execSync } from "child_process";
 
 // Versão do package.json
-const pkg = JSON.parse(readFileSync(path.resolve(import.meta.dirname, "package.json"), "utf-8"));
-const APP_VERSION = pkg.version;
+let APP_VERSION = "2.5.0";
+try {
+  // Tenta ler do diretório atual, depois do diretório pai (para quando executado de dist/)
+  const pkgPath = path.resolve(import.meta.dirname, "package.json");
+  const pkgPathAlt = path.resolve(import.meta.dirname, "..", "package.json");
+  const pkgFile = existsSync(pkgPath) ? pkgPath : pkgPathAlt;
+  const pkg = JSON.parse(readFileSync(pkgFile, "utf-8"));
+  APP_VERSION = pkg.version;
+} catch { /* usa fallback */ }
 
 // Data do build
 const BUILD_DATE = new Date().toISOString();
