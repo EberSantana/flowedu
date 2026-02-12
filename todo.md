@@ -6983,5 +6983,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug: Gerenciar Materiais nas Trilhas de Aprendizagem
 - [x] Verificar se a opção "Gerenciar Materiais" aparece nos tópicos das Trilhas de Aprendizagem
-- [ ] Adicionar botão "Gerenciar Materiais" no nível do módulo quando não há tópicos
-- [ ] Manter botão "Gerenciar Materiais" apenas no nível do tópico quando há tópicos
+- [x] Adicionar botão "Gerenciar Materiais" no nível do módulo quando não há tópicos
+- [x] Manter botão "Gerenciar Materiais" apenas no nível do tópico quando há tópicos
+
+## Bug: Botão Voltar para Trilha dando erro de página não encontrada
+- [ ] Corrigir rota do botão "Voltar para Trilha" no TopicMaterialsManager
