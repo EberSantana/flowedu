@@ -310,7 +310,9 @@ export default function Sidebar() {
   
   const confirmLogout = () => {
     setShowLogoutDialog(false);
-    logoutMutation.mutate();
+    // Usar redirecionamento direto ao endpoint REST de logout
+    // Mais confiável que a mutação tRPC pois funciona com qualquer tipo de sessão
+    window.location.href = "/api/logout";
   };
   
   const handleExitStudentMode = () => {

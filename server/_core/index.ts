@@ -146,8 +146,15 @@ async function startServer() {
   // Rota de logout via GET (para links diretos)
   app.get("/api/logout", (req, res) => {
     const cookieOptions = getSessionCookieOptions(req);
+    // Limpar cookies com domínio definido
     res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
     res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+    // Também limpar cookies sem domínio (fallback para cookies definidos de forma diferente)
+    res.clearCookie(COOKIE_NAME, { path: "/", httpOnly: true, maxAge: -1 });
+    res.clearCookie(STUDENT_COOKIE_NAME, { path: "/", httpOnly: true, maxAge: -1 });
+    // Definir cookie de "logout explícito" para prevenir auto-login imediato
+    res.cookie('EXPLICIT_LOGOUT', 'true', { ...cookieOptions, maxAge: 60 * 1000 });
+    console.log('[Logout] User logged out via /api/logout, hostname:', req.hostname, 'cookieOptions:', JSON.stringify(cookieOptions));
     res.redirect("/");
   });
   
