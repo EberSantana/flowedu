@@ -104,7 +104,7 @@
 - [x] Criar testes para rotas de turmas
 - [ ] Criar testes para rotas de agendamento
 - [x] Configurar Nginx na VPS para resolver cache de assets antigos (erro "Failed to fetch dynamically imported module")
-- [ ] Adicionar versionamento visual no rodapé do site para identificação da versão em produção
+- [x] Adicionar versionamento visual no rodapé do site para identificação da versão em produção
 - [ ] Criar testes de validação de conflitos
 
 ## Documentação
@@ -6971,3 +6971,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Verificar console do navegador para erros JavaScript
 - [ ] Corrigir todos os erros encontrados
 - [ ] Deploy das correções na VPS
+
+## Limpeza Automática de Service Worker
+- [ ] Adicionar script de limpeza automática de Service Worker no index.html
+- [ ] Detectar mudança de versão e forçar atualização do cache PWA
+- [ ] Garantir que usuários recebam versão mais recente após cada deploy
+
+## Auto-Incremento de Versão no Deploy
+- [ ] Criar script de deploy que incrementa versão automaticamente no package.json
+- [ ] Integrar script no fluxo de deploy da VPS

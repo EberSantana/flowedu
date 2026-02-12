@@ -50,21 +50,48 @@ createRoot(document.getElementById("root")!).render(
   </QueryClientProvider>
 );
 
-// Registrar Service Worker para PWA
+// Registrar Service Worker para PWA com atualização automática
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js')
       .then((registration) => {
-        console.log('[PWA] Service Worker registrado com sucesso:', registration.scope);
+        console.log('[PWA] Service Worker registrado, versão app:', __APP_VERSION__);
         
-        // Verificar atualizações a cada 1 hora
+        // Verificar atualizações a cada 30 minutos
         setInterval(() => {
           registration.update();
-        }, 60 * 60 * 1000);
+        }, 30 * 60 * 1000);
+        
+        // Quando uma nova versão do SW for encontrada
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (!newWorker) return;
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Nova versão disponível - forçar ativação imediata
+              console.log('[PWA] Nova versão detectada, atualizando...');
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
       })
       .catch((error) => {
         console.error('[PWA] Falha ao registrar Service Worker:', error);
       });
+  });
+  
+  // Quando o novo SW assumir controle, recarregar a página
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('[PWA] Novo Service Worker ativo, recarregando...');
+    window.location.reload();
+  });
+  
+  // Ouvir mensagens do SW (ex: notificação de atualização)
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'SW_UPDATED') {
+      console.log('[PWA] Cache atualizado para versão:', event.data.version);
+    }
   });
 }
