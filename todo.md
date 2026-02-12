@@ -6987,4 +6987,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Manter botão "Gerenciar Materiais" apenas no nível do tópico quando há tópicos
 
 ## Bug: Botão Voltar para Trilha dando erro de página não encontrada
-- [ ] Corrigir rota do botão "Voltar para Trilha" no TopicMaterialsManager
+- [x] Corrigir rota do botão "Voltar para Trilha" no TopicMaterialsManager
+
+## Bug: Botão Sair não volta para tela principal
+- [ ] Corrigir botão Sair para redirecionar para a tela principal (página com portal do aluno e professor)
+
+## Bug: Botão Personalizar Ações Rápidas não funciona na VPS
+- [ ] Corrigir funcionalidade de marcar/desmarcar ações rápidas na VPS (funciona no Manus mas não na VPS)

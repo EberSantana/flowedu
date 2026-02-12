@@ -54,6 +54,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface NavItem {
   label: string;
@@ -226,6 +236,10 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCompact, setIsCompact } = useSidebarContext();
   
+  // Estado para dialog de logout
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showExitStudentDialog, setShowExitStudentDialog] = useState(false);
+  
   // Estado para categorias expandidas
   const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
     // Inicializar com categorias que contêm a página atual
@@ -291,15 +305,21 @@ export default function Sidebar() {
   });
 
   const handleLogout = () => {
-    if (confirm("Deseja realmente sair do sistema?")) {
-      logoutMutation.mutate();
-    }
+    setShowLogoutDialog(true);
+  };
+  
+  const confirmLogout = () => {
+    setShowLogoutDialog(false);
+    logoutMutation.mutate();
   };
   
   const handleExitStudentMode = () => {
-    if (confirm("👨‍🏫 Deseja voltar ao modo Professor?")) {
-      exitStudentModeMutation.mutate();
-    }
+    setShowExitStudentDialog(true);
+  };
+  
+  const confirmExitStudentMode = () => {
+    setShowExitStudentDialog(false);
+    exitStudentModeMutation.mutate();
   };
   
   const toggleCategory = (categoryId: string) => {
@@ -666,6 +686,45 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
+      
+      {/* Dialog de confirmação de logout */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sair do Sistema</AlertDialogTitle>
+            <AlertDialogDescription>
+              Deseja realmente sair do FlowEdu? Você precisará fazer login novamente para acessar o sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmLogout}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sair
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Dialog de confirmação de sair do modo aluno */}
+      <AlertDialog open={showExitStudentDialog} onOpenChange={setShowExitStudentDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Voltar ao Modo Professor</AlertDialogTitle>
+            <AlertDialogDescription>
+              Deseja voltar ao modo Professor? Você sairá da visualização de aluno.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmExitStudentMode}>
+              Voltar ao Modo Professor
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
