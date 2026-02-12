@@ -60,7 +60,14 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // Assets com hash (JS/CSS do Vite) que não existem devem retornar 404
+  // Isso evita o erro "Failed to fetch dynamically imported module" quando
+  // o browser tenta carregar um asset de um build antigo
+  app.use("/assets/*", (_req, res) => {
+    res.status(404).send("Asset not found");
+  });
+
+  // fall through to index.html if the file doesn't exist (SPA routing)
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
