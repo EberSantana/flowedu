@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Info } from "lucide-react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Versículos inspiradores da Bíblia NVI para cada dia do ano
 const DAILY_VERSES = [
@@ -37,6 +43,22 @@ const DAILY_VERSES = [
   { reference: "Salmos 121:1-2", text: "Elevo os meus olhos para os montes; de onde me vem o socorro? O meu socorro vem do Senhor, que fez os céus e a terra." },
 ];
 
+// Formata a data do build para exibição
+function formatBuildDate(isoDate: string): string {
+  try {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return isoDate;
+  }
+}
+
 export default function BibleFooter() {
   const [verse, setVerse] = useState(DAILY_VERSES[0]);
   const { isCompact } = useSidebarContext();
@@ -53,6 +75,10 @@ export default function BibleFooter() {
     const verseIndex = dayOfYear % DAILY_VERSES.length;
     setVerse(DAILY_VERSES[verseIndex]);
   }, []);
+
+  const version = __APP_VERSION__;
+  const buildDate = formatBuildDate(__BUILD_DATE__);
+  const gitHash = __GIT_HASH__;
 
   return (
     <footer className={`bg-white border-t border-gray-200 py-8 mt-auto transition-all duration-300 ${
@@ -71,18 +97,38 @@ export default function BibleFooter() {
           {/* Verse */}
           <blockquote className="text-center max-w-2xl">
             <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              "{verse.text}"
+              &ldquo;{verse.text}&rdquo;
             </p>
             <cite className="block mt-3 text-sm font-medium text-gray-600">
               — {verse.reference}
             </cite>
           </blockquote>
           
-          {/* Copyright */}
-          <div className="pt-4 border-t border-gray-100 w-full text-center">
-            <p className="text-xs text-gray-500">
-              FlowEdu - Onde a educação flui © {new Date().getFullYear()}
-            </p>
+          {/* Copyright + Versão */}
+          <div className="pt-4 border-t border-gray-100 w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+              <p className="text-xs text-gray-500">
+                FlowEdu - Onde a educação flui © {new Date().getFullYear()}
+              </p>
+              <span className="hidden sm:inline text-gray-300">|</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center gap-1 text-xs text-gray-400 cursor-help hover:text-gray-500 transition-colors">
+                      <Info className="h-3 w-3" />
+                      v{version}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    <div className="space-y-1">
+                      <p><strong>Versão:</strong> {version}</p>
+                      <p><strong>Build:</strong> {buildDate}</p>
+                      <p><strong>Commit:</strong> {gitHash}</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
       </div>

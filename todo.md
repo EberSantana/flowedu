@@ -103,7 +103,8 @@
 - [x] Criar testes para rotas de disciplinas
 - [x] Criar testes para rotas de turmas
 - [ ] Criar testes para rotas de agendamento
-- [ ] Configurar Nginx na VPS para resolver cache de assets antigos (erro "Failed to fetch dynamically imported module")
+- [x] Configurar Nginx na VPS para resolver cache de assets antigos (erro "Failed to fetch dynamically imported module")
+- [ ] Adicionar versionamento visual no rodapé do site para identificação da versão em produção
 - [ ] Criar testes de validação de conflitos
 
 ## Documentação
