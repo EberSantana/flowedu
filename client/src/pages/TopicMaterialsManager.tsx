@@ -47,9 +47,13 @@ const MAX_FILE_SIZE = 75 * 1024 * 1024;
 const MAX_FILE_SIZE_MB = 75;
 
 export default function TopicMaterialsManager() {
-  const [, params] = useRoute("/learning-paths/:subjectId/topic/:topicId/materials");
+  const [, topicParams] = useRoute("/learning-paths/:subjectId/topic/:topicId/materials");
+  const [, moduleParams] = useRoute("/learning-paths/:subjectId/module/:moduleId/materials");
+  const params = topicParams || moduleParams;
   const subjectId = params?.subjectId ? parseInt(params.subjectId) : 0;
-  const topicId = params?.topicId ? parseInt(params.topicId) : 0;
+  const topicId = topicParams?.topicId ? parseInt(topicParams.topicId) : 0;
+  const moduleId = moduleParams?.moduleId ? parseInt(moduleParams.moduleId) : 0;
+  const isModuleMode = !!moduleId && !topicId;
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -76,10 +80,18 @@ export default function TopicMaterialsManager() {
     { enabled: !!subjectId }
   );
 
-  const { data: materials, isLoading: loadingMaterials } = trpc.materials.getByTopic.useQuery(
+  const { data: topicMaterials, isLoading: loadingTopicMaterials } = trpc.materials.getByTopic.useQuery(
     { topicId },
-    { enabled: !!topicId }
+    { enabled: !!topicId && !isModuleMode }
   );
+
+  const { data: moduleMaterials, isLoading: loadingModuleMaterials } = trpc.materials.getByModule.useQuery(
+    { moduleId },
+    { enabled: !!moduleId && isModuleMode }
+  );
+
+  const materials = isModuleMode ? moduleMaterials : topicMaterials;
+  const loadingMaterials = isModuleMode ? loadingModuleMaterials : loadingTopicMaterials;
 
   const utils = trpc.useUtils();
 
@@ -95,9 +107,25 @@ export default function TopicMaterialsManager() {
     },
   });
 
+  const createModuleMaterialMutation = trpc.materials.createForModule.useMutation({
+    onSuccess: () => {
+      utils.materials.getByModule.invalidate();
+      toast.success("Material adicionado com sucesso!");
+      setIsAddDialogOpen(false);
+      resetForm();
+    },
+    onError: (error) => {
+      toast.error("Erro ao adicionar material: " + error.message);
+    },
+  });
+
   const updateMaterialMutation = trpc.materials.update.useMutation({
     onSuccess: () => {
-      utils.materials.getByTopic.invalidate();
+      if (isModuleMode) {
+        utils.materials.getByModule.invalidate();
+      } else {
+        utils.materials.getByTopic.invalidate();
+      }
       toast.success("Material atualizado!");
     },
     onError: (error) => {
@@ -107,7 +135,11 @@ export default function TopicMaterialsManager() {
 
   const deleteMaterialMutation = trpc.materials.delete.useMutation({
     onSuccess: () => {
-      utils.materials.getByTopic.invalidate();
+      if (isModuleMode) {
+        utils.materials.getByModule.invalidate();
+      } else {
+        utils.materials.getByTopic.invalidate();
+      }
       toast.success("Material removido!");
     },
     onError: (error) => {
@@ -115,11 +147,13 @@ export default function TopicMaterialsManager() {
     },
   });
 
-  // Find current topic info
+  // Find current topic or module info
   const currentTopic = learningPath?.reduce((found: any, module: any) => {
     if (found) return found;
     return module.topics?.find((t: any) => t.id === topicId);
   }, null);
+
+  const currentModule = isModuleMode ? learningPath?.find((m: any) => m.id === moduleId) : null;
 
   const resetForm = () => {
     setFormData({
@@ -254,15 +288,27 @@ export default function TopicMaterialsManager() {
           setUploadStatus("Salvando material...");
 
           // Create material with uploaded URL
-          await createMaterialMutation.mutateAsync({
-            topicId,
-            title: formData.title,
-            description: formData.description,
-            type: formData.type,
-            url,
-            fileSize: selectedFile.size,
-            isRequired: formData.isRequired,
-          });
+          if (isModuleMode) {
+            await createModuleMaterialMutation.mutateAsync({
+              moduleId,
+              title: formData.title,
+              description: formData.description,
+              type: formData.type,
+              url,
+              fileSize: selectedFile.size,
+              isRequired: formData.isRequired,
+            });
+          } else {
+            await createMaterialMutation.mutateAsync({
+              topicId,
+              title: formData.title,
+              description: formData.description,
+              type: formData.type,
+              url,
+              fileSize: selectedFile.size,
+              isRequired: formData.isRequired,
+            });
+          }
 
           setUploadProgress(100);
           setUploadStatus("Concluído!");
@@ -304,14 +350,25 @@ export default function TopicMaterialsManager() {
       return;
     }
 
-    createMaterialMutation.mutate({
-      topicId,
-      title: formData.title,
-      description: formData.description,
-      type: formData.type,
-      url: formData.url,
-      isRequired: formData.isRequired,
-    });
+    if (isModuleMode) {
+      createModuleMaterialMutation.mutate({
+        moduleId,
+        title: formData.title,
+        description: formData.description,
+        type: formData.type,
+        url: formData.url,
+        isRequired: formData.isRequired,
+      });
+    } else {
+      createMaterialMutation.mutate({
+        topicId,
+        title: formData.title,
+        description: formData.description,
+        type: formData.type,
+        url: formData.url,
+        isRequired: formData.isRequired,
+      });
+    }
   };
 
   const handleDelete = (materialId: number, title: string) => {
@@ -365,13 +422,13 @@ export default function TopicMaterialsManager() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Materiais do Tópico
+                  {isModuleMode ? "Materiais do Módulo" : "Materiais do Tópico"}
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  {currentTopic?.title || "Carregando..."} • {currentSubject?.name}
+                  {isModuleMode ? (currentModule?.title || "Carregando...") : (currentTopic?.title || "Carregando...")} • {currentSubject?.name}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Gerencie os materiais de estudo deste tópico
+                  {isModuleMode ? "Gerencie os materiais de estudo deste módulo" : "Gerencie os materiais de estudo deste tópico"}
                 </p>
               </div>
               <Button onClick={() => setIsAddDialogOpen(true)}>

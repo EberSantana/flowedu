@@ -137,6 +137,7 @@ function Router() {
           <Route path={"/admin/users"} component={AdminUsers} />
           <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
           <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
+          <Route path={"/learning-paths/:subjectId/module/:moduleId/materials"} component={TopicMaterialsManager} />
           <Route path={"/students"} component={Students} />
           <Route path={"/students/:id"} component={StudentProfile} />
           <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />

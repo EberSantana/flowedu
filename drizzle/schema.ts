@@ -437,7 +437,8 @@ export type InsertStudentTopicProgress = typeof studentTopicProgress.$inferInser
  */
 export const topicMaterials = mysqlTable("topic_materials", {
   id: int("id").autoincrement().primaryKey(),
-  topicId: int("topicId").notNull(),
+  topicId: int("topicId"),
+  moduleId: int("moduleId"),
   professorId: int("professorId").notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),

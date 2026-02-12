@@ -3513,6 +3513,30 @@ JSON (descrições MAX 15 chars):
       .query(async ({ ctx, input }) => {
         return await db.getTopicMaterials(input.topicId);
       }),
+
+    createForModule: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+        title: z.string(),
+        description: z.string().optional(),
+        type: z.enum(['pdf', 'video', 'link', 'presentation', 'document', 'other']),
+        url: z.string(),
+        fileSize: z.number().optional(),
+        isRequired: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const material = await db.createModuleMaterial({
+          ...input,
+          professorId: ctx.user.id,
+        });
+        return material;
+      }),
+
+    getByModule: protectedProcedure
+      .input(z.object({ moduleId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getModuleMaterials(input.moduleId);
+      }),
   }),
 
   // Professor Enrollment Management

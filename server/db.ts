@@ -1574,6 +1574,38 @@ export async function deleteTopicMaterial(id: number, professorId: number) {
   return { success: true };
 }
 
+// ==================== MODULE MATERIALS ====================
+
+export async function createModuleMaterial(data: { moduleId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'other'; url: string; fileSize?: number; isRequired?: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [lastMaterial] = await db.select({ orderIndex: topicMaterials.orderIndex })
+    .from(topicMaterials)
+    .where(eq(topicMaterials.moduleId, data.moduleId))
+    .orderBy(desc(topicMaterials.orderIndex))
+    .limit(1);
+  
+  const nextOrder = lastMaterial ? lastMaterial.orderIndex + 1 : 0;
+  
+  const [result] = await db.insert(topicMaterials).values({
+    ...data,
+    topicId: null,
+    orderIndex: nextOrder,
+  });
+  
+  return { id: result.insertId };
+}
+
+export async function getModuleMaterials(moduleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(topicMaterials)
+    .where(eq(topicMaterials.moduleId, moduleId))
+    .orderBy(topicMaterials.orderIndex);
+}
+
 // ==================== TOPIC ASSIGNMENTS ====================
 
 export async function createTopicAssignment(data: { topicId: number; professorId: number; title: string; description: string; type: 'exercise' | 'essay' | 'project' | 'quiz' | 'practical'; dueDate?: Date; maxScore?: number; isRequired?: boolean }) {

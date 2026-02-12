@@ -739,6 +739,17 @@ export default function LearningPaths() {
                               <Badge variant="outline">
                                 {module.topics?.length || 0} tópico(s)
                               </Badge>
+                              {(!module.topics || module.topics.length === 0) && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  title="Gerenciar Materiais do Módulo"
+                                  onClick={() => setLocation(`/learning-paths/${selectedSubjectId}/module/${module.id}/materials`)}
+                                >
+                                  <FileText className="h-4 w-4" />
+                                </Button>
+                              )}
                               <Button
                                 size="sm"
                                 variant="ghost"

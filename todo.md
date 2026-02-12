@@ -6973,10 +6973,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Deploy das correções na VPS
 
 ## Limpeza Automática de Service Worker
-- [ ] Adicionar script de limpeza automática de Service Worker no index.html
-- [ ] Detectar mudança de versão e forçar atualização do cache PWA
-- [ ] Garantir que usuários recebam versão mais recente após cada deploy
+- [x] Adicionar script de limpeza automática de Service Worker no index.html
+- [x] Detectar mudança de versão e forçar atualização do cache PWA
+- [x] Garantir que usuários recebam versão mais recente após cada deploy
 
 ## Auto-Incremento de Versão no Deploy
-- [ ] Criar script de deploy que incrementa versão automaticamente no package.json
-- [ ] Integrar script no fluxo de deploy da VPS
+- [x] Criar script de deploy que incrementa versão automaticamente no package.json
+- [x] Integrar script no fluxo de deploy da VPS
+
+## Bug: Gerenciar Materiais nas Trilhas de Aprendizagem
+- [x] Verificar se a opção "Gerenciar Materiais" aparece nos tópicos das Trilhas de Aprendizagem
+- [ ] Adicionar botão "Gerenciar Materiais" no nível do módulo quando não há tópicos
+- [ ] Manter botão "Gerenciar Materiais" apenas no nível do tópico quando há tópicos
