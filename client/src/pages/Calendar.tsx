@@ -273,7 +273,9 @@ export default function Calendar() {
       const base64 = reader.result?.toString().split(',')[1];
       if (base64) {
         try {
+          console.log('[Calendar] Iniciando extração de eventos do PDF...');
           const extractedEventsData = await importMutation.mutateAsync({ pdfBase64: base64 });
+          console.log('[Calendar] Eventos extraídos:', extractedEventsData.length);
           setNewYearEvents(extractedEventsData);
           
           // Calcular eventos a deletar (apenas institucionais do ano selecionado)
@@ -286,6 +288,7 @@ export default function Calendar() {
           setIsProcessing(false);
           toast.success(`Preview pronto! ${yearEvents.length} eventos serão removidos, ${extractedEventsData.length} serão adicionados.`);
         } catch (error: any) {
+          console.error('[Calendar] Erro ao processar PDF:', error);
           setIsProcessing(false);
           toast.error('Erro ao processar PDF: ' + error.message);
         }

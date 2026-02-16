@@ -1097,15 +1097,20 @@ export const appRouter = router({
         pdfBase64: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
+        console.log('[importFromPDF] Iniciando extração de eventos do PDF...');
         const { invokeLLM } = await import("./_core/llm");
         const pdfParse = await import("pdf-parse") as any;
         
-        // Converter base64 para buffer
-        const pdfBuffer = Buffer.from(input.pdfBase64, 'base64');
-        
-        // Extrair texto do PDF
-        const data = await pdfParse(pdfBuffer);
-        const pdfText = data.text;
+        try {
+          // Converter base64 para buffer
+          console.log('[importFromPDF] Convertendo base64 para buffer...');
+          const pdfBuffer = Buffer.from(input.pdfBase64, 'base64');
+          
+          // Extrair texto do PDF
+          console.log('[importFromPDF] Extraindo texto do PDF...');
+          const data = await pdfParse(pdfBuffer);
+          const pdfText = data.text;
+          console.log('[importFromPDF] Texto extraído:', pdfText.length, 'caracteres');
         
         // Usar LLM para extrair eventos
         const response = await invokeLLM({
@@ -1169,9 +1174,18 @@ Regras:
           }
         });
         
-        const content = response.choices[0].message.content;
-        const parsedResult = JSON.parse(typeof content === 'string' ? content : '{ "events": [] }');
-        return parsedResult.events;
+          console.log('[importFromPDF] Chamando LLM para extrair eventos...');
+          const content = response.choices[0].message.content;
+          const parsedResult = JSON.parse(typeof content === 'string' ? content : '{ "events": [] }');
+          console.log('[importFromPDF] Eventos extraídos:', parsedResult.events.length);
+          return parsedResult.events;
+        } catch (error: any) {
+          console.error('[importFromPDF] Erro ao processar PDF:', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `Erro ao processar PDF: ${error.message}`,
+          });
+        }
       }),
     
     bulkCreate: protectedProcedure

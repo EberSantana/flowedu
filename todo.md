@@ -6995,3 +6995,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Botão Personalizar Ações Rápidas não funciona na VPS
 - [ ] Corrigir funcionalidade de marcar/desmarcar ações rápidas na VPS (funciona no Manus mas não na VPS)
 - [ ] Fix: Logout não funciona para usuário Eber Santana (login via Manus OAuth)
+- [ ] Fix: Não consegue atualizar eventos no calendário (Planejamento > Calendário)
+- [ ] Fix: Botão 'Aplicar Atualização' no modal de atualização do calendário não funciona
