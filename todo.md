@@ -7075,3 +7075,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Investigar mapeamento de dayOfWeek no frontend (Schedule.tsx) e backend (routers.ts)
 - [x] Corrigir bug: aula agendada para Terça-Feira cai na Segunda-Feira (removido -1 no submit, corrigido dayMap no ICS export, atualizado registros existentes no banco)
 - [x] Sincronizar correção na VPS
+
+## Feature: Drag and Drop na Grade de Horários
+- [x] Implementar drag and drop com HTML5 Drag API nativa no Schedule.tsx
+- [x] Adicionar feedback visual durante o arraste (highlight da célula destino)
+- [x] Implementar troca de aulas (swap) quando destino já tem aula
+- [x] Adicionar mutation de update no backend para mover aulas + procedure swap dedicada
+- [x] Verificar conflitos ao mover aula
+- [x] Sincronizar na VPS (novo IP 76.13.67.5)

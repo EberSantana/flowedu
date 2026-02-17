@@ -1089,6 +1089,35 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    swap: protectedProcedure
+      .input(z.object({
+        classAId: z.number(),
+        classBId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Buscar ambas as aulas
+        const classA = await db.getScheduledClassById(input.classAId, ctx.user.id);
+        const classB = await db.getScheduledClassById(input.classBId, ctx.user.id);
+        
+        if (!classA || !classB) {
+          throw new Error("Uma ou ambas as aulas não foram encontradas");
+        }
+        
+        // Trocar posições atomicamente (sem verificação de conflito entre elas)
+        await Promise.all([
+          db.updateScheduledClass(input.classAId, ctx.user.id, {
+            timeSlotId: classB.timeSlotId,
+            dayOfWeek: classB.dayOfWeek,
+          }),
+          db.updateScheduledClass(input.classBId, ctx.user.id, {
+            timeSlotId: classA.timeSlotId,
+            dayOfWeek: classA.dayOfWeek,
+          }),
+        ]);
+        
+        return { success: true };
+      }),
+
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {

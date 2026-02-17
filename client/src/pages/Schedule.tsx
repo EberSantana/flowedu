@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Calendar, ArrowLeft, Plus, Trash2, Download, FileText, FileSpreadsheet } from "lucide-react";
+import { Calendar, ArrowLeft, Plus, Trash2, Download, FileText, FileSpreadsheet, GripVertical, ArrowRightLeft } from "lucide-react";
 import { ScheduleGridSkeleton } from "@/components/ui/skeleton-loaders";
 import { Link } from "wouter";
 import Sidebar from "@/components/Sidebar";
@@ -42,6 +42,11 @@ export default function Schedule() {
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [selectedClassForStatus, setSelectedClassForStatus] = useState<any>(null);
   const [statusReason, setStatusReason] = useState("");
+
+  // Drag and Drop state
+  const [draggedClass, setDraggedClass] = useState<{ id: number; timeSlotId: number; dayOfWeek: number; subjectId: number; classId: number } | null>(null);
+  const [dragOverCell, setDragOverCell] = useState<{ timeSlotId: number; dayOfWeek: number } | null>(null);
+  const dragCounterRef = useRef(0);
 
   const { data: fullSchedule, isLoading, error } = trpc.schedule.getFullSchedule.useQuery();
   
@@ -82,6 +87,101 @@ export default function Schedule() {
       toast.error("Erro ao remover aula: " + error.message);
     },
   });
+
+  const updateMutation = trpc.schedule.update.useMutation({
+    onSuccess: () => {
+      utils.schedule.getFullSchedule.invalidate();
+    },
+    onError: (error) => {
+      toast.error("Erro ao mover aula: " + error.message);
+    },
+  });
+
+  const swapMutation = trpc.schedule.swap.useMutation({
+    onSuccess: () => {
+      utils.schedule.getFullSchedule.invalidate();
+      toast.success("Aulas trocadas com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao trocar aulas: " + error.message);
+    },
+  });
+
+  // Drag and Drop handlers
+  const handleDragStart = useCallback((e: React.DragEvent, sc: any) => {
+    setDraggedClass({ id: sc.id, timeSlotId: sc.timeSlotId, dayOfWeek: sc.dayOfWeek, subjectId: sc.subjectId, classId: sc.classId });
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', sc.id.toString());
+    // Make the drag image slightly transparent
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.5';
+    }
+  }, []);
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '1';
+    }
+    setDraggedClass(null);
+    setDragOverCell(null);
+    dragCounterRef.current = 0;
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent, timeSlotId: number, dayOfWeek: number) => {
+    e.preventDefault();
+    dragCounterRef.current++;
+    setDragOverCell({ timeSlotId, dayOfWeek });
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) {
+      setDragOverCell(null);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetTimeSlotId: number, targetDayOfWeek: number) => {
+    e.preventDefault();
+    setDragOverCell(null);
+    dragCounterRef.current = 0;
+
+    if (!draggedClass) return;
+
+    // Same cell - do nothing
+    if (draggedClass.timeSlotId === targetTimeSlotId && draggedClass.dayOfWeek === targetDayOfWeek) {
+      setDraggedClass(null);
+      return;
+    }
+
+    // Check if target cell has a class (swap scenario)
+    const targetClass = scheduleMap.get(`${targetTimeSlotId}-${targetDayOfWeek}`);
+
+    if (targetClass) {
+      // Swap: use dedicated swap procedure for atomic operation
+      swapMutation.mutate({
+        classAId: draggedClass.id,
+        classBId: targetClass.id,
+      });
+    } else {
+      // Move to empty cell
+      updateMutation.mutate({
+        id: draggedClass.id,
+        timeSlotId: targetTimeSlotId,
+        dayOfWeek: targetDayOfWeek,
+      }, {
+        onSuccess: () => {
+          toast.success("Aula movida com sucesso!");
+        },
+      });
+    }
+
+    setDraggedClass(null);
+  }, [draggedClass, scheduleMap, updateMutation, utils]);
 
   const setStatusMutation = trpc.classStatus.set.useMutation({
     onSuccess: () => {
@@ -702,38 +802,79 @@ export default function Schedule() {
                               const scheduledClass = getScheduledClass(slot.id, day.id);
                               const subject = scheduledClass ? getSubjectById(scheduledClass.subjectId) : null;
                               const classInfo = scheduledClass ? getClassById(scheduledClass.classId) : null;
+                              const isDragOver = dragOverCell?.timeSlotId === slot.id && dragOverCell?.dayOfWeek === day.id;
+                              const isDragging = draggedClass?.timeSlotId === slot.id && draggedClass?.dayOfWeek === day.id;
 
                               return (
-                                <td key={day.id} className="border border-gray-300 p-2">
+                                <td
+                                  key={day.id}
+                                  className={`border border-gray-300 p-2 transition-all duration-150 ${
+                                    isDragOver && !isDragging
+                                      ? scheduledClass
+                                        ? 'bg-amber-100 ring-2 ring-amber-400 ring-inset'
+                                        : 'bg-blue-100 ring-2 ring-blue-400 ring-inset'
+                                      : ''
+                                  }`}
+                                  onDragOver={handleDragOver}
+                                  onDragEnter={(e) => handleDragEnter(e, slot.id, day.id)}
+                                  onDragLeave={handleDragLeave}
+                                  onDrop={(e) => handleDrop(e, slot.id, day.id)}
+                                >
                                   {scheduledClass ? (
                                     <div
-                                      className="rounded p-2 text-white text-sm relative group cursor-pointer"
+                                      draggable
+                                      onDragStart={(e) => handleDragStart(e, scheduledClass)}
+                                      onDragEnd={handleDragEnd}
+                                      className={`rounded p-2 text-white text-sm relative group cursor-grab active:cursor-grabbing select-none ${
+                                        isDragging ? 'opacity-50 ring-2 ring-white' : ''
+                                      }`}
                                       style={{ backgroundColor: subject?.color || "#3b82f6" }}
                                     >
+                                      {/* Drag handle indicator */}
+                                      <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-70 transition-opacity">
+                                        <GripVertical className="h-3 w-3" />
+                                      </div>
                                       <div className="font-semibold">{subject?.name}</div>
                                       <div className="text-xs opacity-90">{classInfo?.name}</div>
                                       {scheduledClass.notes && (
                                         <div className="text-xs opacity-80 mt-1">{scheduledClass.notes}</div>
                                       )}
-                                      
 
                                       {/* Botão de Deletar */}
                                       <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100">
                                         <button
-                                          onClick={() => handleDelete(scheduledClass.id)}
+                                          onClick={(e) => { e.stopPropagation(); handleDelete(scheduledClass.id); }}
                                           className="bg-red-500 hover:bg-red-600 rounded p-1 transition-colors"
                                         >
                                           <Trash2 className="h-3 w-3" />
                                         </button>
                                       </div>
+
+                                      {/* Swap indicator when dragging over occupied cell */}
+                                      {isDragOver && !isDragging && (
+                                        <div className="absolute inset-0 bg-black/30 rounded flex items-center justify-center">
+                                          <div className="bg-white text-gray-800 rounded-full px-2 py-1 text-xs font-semibold flex items-center gap-1 shadow">
+                                            <ArrowRightLeft className="h-3 w-3" />
+                                            Trocar
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
                                   ) : (
-                                    <button
-                                      onClick={() => handleOpenDialog(slot.id, day.id)}
-                                      className="w-full h-full min-h-[60px] flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary rounded transition-colors"
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </button>
+                                    <div className="min-h-[60px] flex items-center justify-center">
+                                      {isDragOver && draggedClass ? (
+                                        <div className="w-full h-full min-h-[60px] flex items-center justify-center text-blue-500 bg-blue-50 rounded border-2 border-dashed border-blue-300">
+                                          <Plus className="h-5 w-5" />
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={() => handleOpenDialog(slot.id, day.id)}
+                                          className="w-full h-full min-h-[60px] flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary rounded transition-colors"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </button>
+                                      )}
+                                    </div>
                                   )}
                                 </td>
                               );
