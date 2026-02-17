@@ -2423,14 +2423,14 @@ export type InsertMistakeNotebookStudyPlan = typeof mistakeNotebookStudyPlans.$i
  */
 export const pushSubscriptions = mysqlTable("push_subscriptions", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
+  userId: int("user_id").notNull(),
   endpoint: text("endpoint").notNull(),
-  p256dh: text("p256dh").notNull(), // Public key
-  auth: text("auth").notNull(), // Auth secret
-  userAgent: varchar("userAgent", { length: 500 }),
+  p256dh: text("keys_p256dh").notNull(), // Public key
+  auth: text("keys_auth").notNull(), // Auth secret
+  userAgent: varchar("user_agent", { length: 500 }),
   isActive: boolean("isActive").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
@@ -2442,28 +2442,28 @@ export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
  */
 export const notificationPreferences = mysqlTable("notification_preferences", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull().unique(),
+  userId: int("user_id").notNull().unique(),
   
   // Tipos de notificação habilitados
-  classReminders: boolean("classReminders").default(true).notNull(), // Lembrete antes das aulas
-  eventReminders: boolean("eventReminders").default(true).notNull(), // Lembrete de eventos do calendário
-  taskReminders: boolean("taskReminders").default(true).notNull(), // Lembrete de tarefas com prazo
-  dailySummary: boolean("dailySummary").default(false).notNull(), // Resumo diário das aulas
+  classReminders: boolean("class_reminders").default(true).notNull(), // Lembrete antes das aulas
+  eventReminders: boolean("event_reminders").default(true).notNull(), // Lembrete de eventos do calendário
+  taskReminders: boolean("task_reminders").default(true).notNull(), // Lembrete de tarefas com prazo
+  dailySummary: boolean("daily_summary").default(false).notNull(), // Resumo diário das aulas
   
   // Tempo de antecedência para lembretes (em minutos)
-  classReminderMinutes: int("classReminderMinutes").default(15).notNull(), // 15 min antes da aula
-  eventReminderMinutes: int("eventReminderMinutes").default(60).notNull(), // 1h antes do evento
-  dailySummaryTime: varchar("dailySummaryTime", { length: 5 }).default("07:00").notNull(), // Horário do resumo diário
+  classReminderMinutes: int("class_reminder_minutes").default(15).notNull(), // 15 min antes da aula
+  eventReminderMinutes: int("event_reminder_minutes").default(60).notNull(), // 1h antes do evento
+  dailySummaryTime: varchar("daily_summary_time", { length: 5 }).default("07:00").notNull(), // Horário do resumo diário
   
   // Dias da semana para notificações (JSON array: [1,2,3,4,5] = seg-sex)
-  activeDays: text("activeDays").default("[1,2,3,4,5]").notNull(),
+  activeDays: text("active_days").default("[1,2,3,4,5]").notNull(),
   
   // Horário silencioso (não enviar notificações)
-  quietHoursStart: varchar("quietHoursStart", { length: 5 }).default("22:00").notNull(),
-  quietHoursEnd: varchar("quietHoursEnd", { length: 5 }).default("06:00").notNull(),
+  quietHoursStart: varchar("quiet_hours_start", { length: 5 }).default("22:00").notNull(),
+  quietHoursEnd: varchar("quiet_hours_end", { length: 5 }).default("06:00").notNull(),
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
@@ -2475,15 +2475,15 @@ export type InsertNotificationPreference = typeof notificationPreferences.$infer
  */
 export const pushNotificationLog = mysqlTable("push_notification_log", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  type: mysqlEnum("pushType", ["class_reminder", "event_reminder", "task_reminder", "daily_summary"]).notNull(),
+  userId: int("user_id").notNull(),
+  type: mysqlEnum("type", ["class_reminder", "event_reminder", "task_reminder", "daily_summary"]).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   body: text("body").notNull(),
-  referenceId: varchar("referenceId", { length: 100 }), // ID do evento/aula referenciado
-  referenceDate: varchar("referenceDate", { length: 10 }), // Data de referência YYYY-MM-DD
+  referenceId: varchar("data", { length: 100 }), // ID do evento/aula referenciado
+  referenceDate: varchar("status", { length: 10 }), // Data de referência YYYY-MM-DD
   delivered: boolean("delivered").default(false).notNull(),
-  error: text("error"),
-  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  error: text("error_message"),
+  sentAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export type PushNotificationLog = typeof pushNotificationLog.$inferSelect;
