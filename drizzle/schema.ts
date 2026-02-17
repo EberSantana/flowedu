@@ -2428,7 +2428,7 @@ export const pushSubscriptions = mysqlTable("push_subscriptions", {
   p256dh: text("keys_p256dh").notNull(), // Public key
   auth: text("keys_auth").notNull(), // Auth secret
   userAgent: varchar("user_agent", { length: 500 }),
-  isActive: boolean("isActive").default(true).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

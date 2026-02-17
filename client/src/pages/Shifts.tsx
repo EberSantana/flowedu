@@ -95,8 +95,8 @@ export default function Shifts() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-background">
-        <div className="container mx-auto py-6 px-4">
+      <PageWrapper className="min-h-[calc(100vh-120px)] bg-background flex flex-col">
+        <div className="container mx-auto py-6 px-4 flex-1">
           {/* Botão Voltar ao Dashboard */}
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="mb-4">

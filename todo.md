@@ -6970,7 +6970,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar todos os botões e interações
 - [ ] Verificar console do navegador para erros JavaScript
 - [ ] Corrigir todos os erros encontrados
-- [ ] Deploy das correções na VPS
+- [x] Deploy das correções na VPS
 
 ## Limpeza Automática de Service Worker
 - [x] Adicionar script de limpeza automática de Service Worker no index.html
@@ -7027,4 +7027,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir datas/feriados errados no calendário (ex: 1 de maio não aparece como feriado)
 - [x] Validar todas as datas contra o calendário acadêmico oficial (PDF)
 - [x] Garantir que a lógica de feriados nacionais esteja correta para todos os anos
+- [x] Deploy das correções na VPS
+
+## Correções - Grade Semanal e Layout Turnos (Fev 17)
+- [ ] Bug: Grade semanal não gera mesmo com turnos configurados (mostra "Nenhum turno configurado")
+- [ ] Bug: Layout da página de configurar turno está fora - devocional cortado pela metade
 - [ ] Deploy das correções na VPS
