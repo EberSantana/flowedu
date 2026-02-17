@@ -1116,8 +1116,26 @@ export const appRouter = router({
           for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
             const page = await pdfDocument.getPage(pageNum);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map((item: any) => item.str).join(' ');
-            pdfText += pageText + '\n';
+            // Agrupar itens por posicao Y para preservar estrutura de linhas
+            const items = textContent.items as any[];
+            const sortedItems = items.sort((a: any, b: any) => {
+              const yDiff = b.transform[5] - a.transform[5];
+              if (Math.abs(yDiff) > 5) return yDiff;
+              return a.transform[4] - b.transform[4];
+            });
+            let lastY = -1;
+            let pageText = '';
+            for (const item of sortedItems) {
+              const y = Math.round(item.transform[5]);
+              if (lastY !== -1 && Math.abs(y - lastY) > 5) {
+                pageText += '\n';
+              } else if (lastY !== -1) {
+                pageText += ' ';
+              }
+              pageText += item.str;
+              lastY = y;
+            }
+            pdfText += '\n--- PAGINA ' + pageNum + ' ---\n' + pageText + '\n';
           }
           
           console.log('[importFromPDF] Texto extraído:', pdfText.length, 'caracteres');
@@ -1127,31 +1145,23 @@ export const appRouter = router({
           messages: [
             {
               role: "system",
-              content: `Você é um assistente especializado em extrair eventos de calendários acadêmicos. 
-Analise o texto fornecido e extraia TODOS os eventos com suas datas.
-Retorne um JSON com array de eventos no formato:
-{
-  "events": [
-    {
-      "title": "Nome do evento",
-      "description": "Descrição completa",
-      "eventDate": "YYYY-MM-DD",
-      "eventType": "holiday" | "commemorative" | "school_event" | "personal"
-    }
-  ]
-}
+              content: `Voce e um assistente especializado em extrair eventos de calendarios academicos brasileiros.
+O texto esta organizado por MES (JANEIRO, FEVEREIRO, MARCO, etc). Cada evento tem um numero de dia seguido de traco e o nome.
+A data do evento = DIA do texto + MES da secao + ANO do calendario.
 
-Regras:
-- Identifique feriados como "holiday"
-- Datas comemorativas como "commemorative"
-- Eventos escolares/acadêmicos como "school_event"
-- Se houver períodos (ex: "01 a 18 - Férias"), crie evento para o primeiro dia
-- Ignore informações de dias letivos/sábados letivos
-- IMPORTANTE: Retorne APENAS o JSON, sem texto adicional`
+REGRAS CRITICAS:
+1. Preste MUITA ATENCAO ao mes de cada secao. Se esta na secao MAIO, o dia 01 = 2026-05-01, NAO 2026-04-30.
+2. Feriados nacionais DEVEM estar nas datas corretas: 01/01 Confraternizacao, 21/04 Tiradentes, 01/05 Trabalhador, 07/09 Independencia, 12/10 N.S. Aparecida, 02/11 Finados, 15/11 Proclamacao Republica, 20/11 Zumbi Palmares, 25/12 Natal.
+3. Para periodos (ex: "02 a 13 - Ajuste"), crie UM evento com a data do PRIMEIRO dia.
+4. NAO invente eventos. Extraia SOMENTE o que esta escrito no texto.
+5. Classificacao: "holiday" = feriados e pontos facultativos, "commemorative" = datas comemorativas, "school_event" = eventos academicos.
+6. Ignore linhas de "Dias Letivos" e "Total semestre".
+7. Sabados Letivos sao "school_event", NAO ignore.
+8. Formato eventDate: YYYY-MM-DD (ex: 2026-05-01 para 1 de maio de 2026).`
             },
             {
               role: "user",
-              content: `Extraia todos os eventos deste calendário escolar:\n\n${pdfText.slice(0, 15000)}`
+              content: `Extraia todos os eventos deste calendario academico de 2026. Preste MUITA ATENCAO ao mes de cada secao para atribuir as datas corretas:\n\n${pdfText.slice(0, 20000)}`
             }
           ],
           response_format: {

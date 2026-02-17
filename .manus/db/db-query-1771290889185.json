@@ -1,0 +1,1000 @@
+{
+  "query": "SELECT id, title, eventDate, eventType FROM calendar_events WHERE eventDate LIKE '2026%' ORDER BY eventDate ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, title, eventDate, eventType FROM calendar_events WHERE eventDate LIKE '2026%' ORDER BY eventDate ASC;",
+  "rows": [
+    {
+      "id": "300001",
+      "title": "Confraternização Universal",
+      "eventDate": "2026-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300002",
+      "title": "Semana Nacional de Prevenção da Gravidez na Adolescência",
+      "eventDate": "2026-01-01",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300003",
+      "title": "Férias Docentes",
+      "eventDate": "2026-01-02",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300005",
+      "title": "Preenchimento de vagas do Processo Seletivo (PS) 2026/1",
+      "eventDate": "2026-01-06",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300004",
+      "title": "Início da coleta de dados SISPENAES (2º semestre de 2025)",
+      "eventDate": "2026-01-19",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300006",
+      "title": "Início do Período de solicitação de Progressão Parcial e Aproveitamento de Estudos",
+      "eventDate": "2026-01-26",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300007",
+      "title": "Solicitação de Reabertura e Renovação de Matrícula para 2026/1 – Cursos EPTNM Semestrais",
+      "eventDate": "2026-01-26",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300008",
+      "title": "Publicação Portaria Orçamento",
+      "eventDate": "2026-01-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300009",
+      "title": "Início do Ano Acadêmico - EFRA",
+      "eventDate": "2026-02-02",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300010",
+      "title": "Período de solicitação de Progressão Parcial e Aproveitamento de Estudos",
+      "eventDate": "2026-02-02",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300011",
+      "title": "Preenchimento de vagas residuais do PS 2026/1",
+      "eventDate": "2026-02-02",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300012",
+      "title": "Planejamento e Reunião Administrativa dos Campi",
+      "eventDate": "2026-02-03",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300013",
+      "title": "Início do Ano Letivo – Integrado, Subsequente e Proeja",
+      "eventDate": "2026-02-04",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300014",
+      "title": "Abertura para Cadastro dos Planos de Ensino e do PIT",
+      "eventDate": "2026-02-04",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300015",
+      "title": "I Laboratório de Práticas Bibliotecárias do IFAM: Alinhando Conhecimento e Excelência em Serviços",
+      "eventDate": "2026-02-05",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300016",
+      "title": "Fechamento SIGPP – metas anuais",
+      "eventDate": "2026-02-06",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300017",
+      "title": "Início Avaliação da Gestão",
+      "eventDate": "2026-02-09",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300018",
+      "title": "Dia Internacional de Mulheres e Meninas na Ciência",
+      "eventDate": "2026-02-11",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300019",
+      "title": "Carnaval",
+      "eventDate": "2026-02-16",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300020",
+      "title": "Carnaval",
+      "eventDate": "2026-02-17",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300021",
+      "title": "Quarta-feira de Cinzas",
+      "eventDate": "2026-02-18",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300022",
+      "title": "Data Limite de solicitação de Progressão Parcial e Aproveitamento de Estudos",
+      "eventDate": "2026-02-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300023",
+      "title": "Entrega do PIT para as Diretorias/Departamentos responsáveis",
+      "eventDate": "2026-02-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300024",
+      "title": "Prazo máximo para preenchimento de vagas do Processo 2026/1",
+      "eventDate": "2026-03-04",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300025",
+      "title": "Processo Seletivo 2026/1 – Prazo final para Matrículas e Preenchimento de Vagas Remanescentes",
+      "eventDate": "2026-03-06",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300026",
+      "title": "Dia Internacional da Mulher",
+      "eventDate": "2026-03-08",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300027",
+      "title": "Publicação do Resultado de Progressão Parcial e Aproveitamento de Estudos",
+      "eventDate": "2026-03-13",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300028",
+      "title": "Fim da Avaliação da Gestão",
+      "eventDate": "2026-03-18",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300029",
+      "title": "VIII Dia Nacional da Aquicultura - NUPA",
+      "eventDate": "2026-03-20",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300030",
+      "title": "Data limite para consolidação dos Planos de Ensino no SIGAA (2026/1)",
+      "eventDate": "2026-03-20",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300031",
+      "title": "Data limite para validação do Plano Individual de Trabalho - PIT no SIGAA (2026/1)",
+      "eventDate": "2026-03-20",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300032",
+      "title": "Dia Internacional da Síndrome de Down",
+      "eventDate": "2026-03-21",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300033",
+      "title": "Dia Mundial da Água",
+      "eventDate": "2026-03-22",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300034",
+      "title": "Reunião Pedagógica e Planejamento das Práticas Diretorias de Ensino dos Campi",
+      "eventDate": "2026-03-23",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300035",
+      "title": "Data Limite para envio para a PROEN das propostas de novos PPCs da EPTNM e da Graduação para o PS 2027.1",
+      "eventDate": "2026-03-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300036",
+      "title": "Data limite de envio à PROEN das demandas de cursos e vagas para o PS 2026/2",
+      "eventDate": "2026-03-31",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300037",
+      "title": "Publicação Relatório de Gestão - TCU",
+      "eventDate": "2026-03-31",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300038",
+      "title": "Dia Mundial e Nacional da Conscientização do Autismo",
+      "eventDate": "2026-04-02",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300039",
+      "title": "Sexta-feira Santa",
+      "eventDate": "2026-04-03",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300040",
+      "title": "Páscoa",
+      "eventDate": "2026-04-05",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300041",
+      "title": "Dia Mundial da Saúde",
+      "eventDate": "2026-04-07",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300042",
+      "title": "Dia Nacional de Combate ao Bullying e à Violência na Escola",
+      "eventDate": "2026-04-07",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300043",
+      "title": "Semana dos Povos Indígenas – NEABI",
+      "eventDate": "2026-04-13",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300044",
+      "title": "I Simpósio de EaD do IFAM e III Encontro dos Núcleos de Tecnologias de EaD - NUTEaDs",
+      "eventDate": "2026-04-13",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300045",
+      "title": "Dia Nacional da Luta pela Educação Inclusiva",
+      "eventDate": "2026-04-14",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300046",
+      "title": "Prazo final do período de solicitação de Trancamento de Matrícula - cursos EPTNM semestrais",
+      "eventDate": "2026-04-17",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300047",
+      "title": "Abertura do Prazo de solicitação de trancamento de matrícula. – EPTNM",
+      "eventDate": "2026-04-17",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300048",
+      "title": "Término da 1ª Etapa - Forma Integrada",
+      "eventDate": "2026-04-20",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300049",
+      "title": "Tiradentes",
+      "eventDate": "2026-04-21",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300050",
+      "title": "Deflagração do PS 2026/2",
+      "eventDate": "2026-04-22",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300051",
+      "title": "Início da 2ª etapa - Forma Integrada",
+      "eventDate": "2026-04-22",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300052",
+      "title": "Publicação da Avaliação da Gestão",
+      "eventDate": "2026-04-23",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300053",
+      "title": "Dia Nacional da Língua Brasileira de Sinais (Libras)",
+      "eventDate": "2026-04-24",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300054",
+      "title": "Data Limite de lançamento de notas, frequência e conteúdo da 1ª etapa",
+      "eventDate": "2026-04-24",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300055",
+      "title": "Dia Mundial da Propriedade Intelectual",
+      "eventDate": "2026-04-26",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300056",
+      "title": "Reunião Pedagógica: Planejamento das Práticas Integradoras - Diretorias de Ensino dos Campi",
+      "eventDate": "2026-04-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300057",
+      "title": "Lançamento de pelo menos uma nota de cada componente curricular dos cursos Semestrais",
+      "eventDate": "2026-04-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300058",
+      "title": "Início do Período de Revisão das Metas do PDI",
+      "eventDate": "2026-04-28",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300059",
+      "title": "Conselhos de Classe Diagnóstico / Prognóstico da 1ª etapa. - Forma Integrada",
+      "eventDate": "2026-04-29",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300060",
+      "title": "Ciclo de Formação Continuada PROEN",
+      "eventDate": "2026-04-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300061",
+      "title": "Dia do Trabalhador",
+      "eventDate": "2026-05-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300062",
+      "title": "Reunião de Pais e Mestres",
+      "eventDate": "2026-05-04",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300063",
+      "title": "XIV Encontro dos Gestores de Extensão",
+      "eventDate": "2026-05-05",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300064",
+      "title": "Dia das Mães",
+      "eventDate": "2026-05-10",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300065",
+      "title": "Semana Nacional de Combate à Exploração Sexual de Crianças e Adolescentes",
+      "eventDate": "2026-05-11",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300066",
+      "title": "Dia Internacional contra a Homofobia, Transfobia e Bifobia",
+      "eventDate": "2026-05-17",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300067",
+      "title": "Dia Nacional de Combate ao Abuso e à Exploração Sexual de Crianças e Adolescentes",
+      "eventDate": "2026-05-18",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300068",
+      "title": "Prazo final de solicitação de trancamento de matrícula. – EPTNM",
+      "eventDate": "2026-05-18",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300069",
+      "title": "Dia Global de Conscientização sobre Acessibilidade",
+      "eventDate": "2026-05-20",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300070",
+      "title": "Reunião Pedagógica: Planejamento das Práticas Integradoras e Atividades Complementares - Diretorias de Ensino dos campi",
+      "eventDate": "2026-05-25",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300071",
+      "title": "Preenchimento de vagas do PS 2026/2",
+      "eventDate": "2026-06-01",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300072",
+      "title": "VII FORGRAD",
+      "eventDate": "2026-06-02",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300073",
+      "title": "Corpus Christi",
+      "eventDate": "2026-06-04",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300074",
+      "title": "Ponto Facultativo",
+      "eventDate": "2026-06-05",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300075",
+      "title": "Dia Mundial do Meio Ambiente",
+      "eventDate": "2026-06-05",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300076",
+      "title": "JIFAM",
+      "eventDate": "2026-06-09",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300077",
+      "title": "I Encontro dos Coordenadores da Ayty",
+      "eventDate": "2026-06-14",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300078",
+      "title": "Ciclo de Formação Continuada PROEN",
+      "eventDate": "2026-06-25",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300079",
+      "title": "Fim do Período de Revisão das Metas do PDI",
+      "eventDate": "2026-06-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300080",
+      "title": "Preenchimento de vagas do PS 2026/2",
+      "eventDate": "2026-07-01",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300083",
+      "title": "Data limite para lançamento de notas, frequência e conteúdo - Cursos EPTNM - Cursos Semestrais",
+      "eventDate": "2026-07-03",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300082",
+      "title": "Término da 2ª Etapa – Cursos da Forma Integrada",
+      "eventDate": "2026-07-03",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300081",
+      "title": "Término do 1° Semestre (Cursos EPTNM Semestrais)",
+      "eventDate": "2026-07-03",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300084",
+      "title": "Data limite para comunicar os discentes da disponibilização de notas no SIGAA e Convocação para Exames Finais nos Cursos Semestrais",
+      "eventDate": "2026-07-03",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300085",
+      "title": "Início da 3ª etapa – Abertura para cadastro dos Planos de Ensino e do PIT (2026/2) - Forma Integrada",
+      "eventDate": "2026-07-06",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300086",
+      "title": "Exames Finais: Cursos Semestrais - Subsequente/EJA",
+      "eventDate": "2026-07-06",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300087",
+      "title": "Lançamento das Notas do Exame Final - Subsequente/EJA",
+      "eventDate": "2026-07-07",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300088",
+      "title": "Conselho de Classe Final: Subsequente/EJA",
+      "eventDate": "2026-07-08",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300089",
+      "title": "Publicação do Resultado do Conselho de Classe Final: Subsequente/EJA",
+      "eventDate": "2026-07-08",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300090",
+      "title": "Dia Nacional da Ciência e do Pesquisador(a) Científico(a)",
+      "eventDate": "2026-07-08",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300091",
+      "title": "Data Limite de lançamento de notas, frequência e conteúdo da 1ª etapa",
+      "eventDate": "2026-07-08",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300092",
+      "title": "Recesso Escolar",
+      "eventDate": "2026-07-09",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300093",
+      "title": "Início da coleta de dados SISPENAES (1º semestre de 2026)",
+      "eventDate": "2026-07-20",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300094",
+      "title": "EFRA 2026/02 (Turno Vespertino)",
+      "eventDate": "2026-07-24",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300099",
+      "title": "Período de solicitação de Aproveitamento de Estudos e Solicitação de Reabertura e Renovação de Matrícula para 2026/2",
+      "eventDate": "2026-07-24",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300095",
+      "title": "Feriado Municipal – Sant’ana",
+      "eventDate": "2026-07-26",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300096",
+      "title": "Início do 2° semestre (cursos semestrais) e abertura para cadastro dos Planos de Ensino e do PIT (2026/2) – Cursos Semestrais",
+      "eventDate": "2026-07-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300097",
+      "title": "Conselhos de Classe Diagnóstico / Prognóstico da 2ª etapa. - Forma Integrada",
+      "eventDate": "2026-07-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300098",
+      "title": "Reunião de pais e mestres da 2ª etapa. - Forma Integrada",
+      "eventDate": "2026-07-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300100",
+      "title": "Feriado Municipal - Aniversário da cidade",
+      "eventDate": "2026-08-02",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300101",
+      "title": "VII Encontro de Representantes de Bibliotecas do IFAM - ERBI",
+      "eventDate": "2026-08-05",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300102",
+      "title": "Dia dos Pais",
+      "eventDate": "2026-08-09",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300103",
+      "title": "Dia do estudante",
+      "eventDate": "2026-08-11",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300104",
+      "title": "VIII Encontro do Centro de Idiomas",
+      "eventDate": "2026-08-11",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300105",
+      "title": "VIII Seminário do Ensino Médio Integrado e VII Simpósio da EJA EPT do IFAM",
+      "eventDate": "2026-08-19",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300106",
+      "title": "Semana Nacional da Pessoa com Deficiência Intelectual e Múltipla",
+      "eventDate": "2026-08-21",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300110",
+      "title": "Reunião Pedagógica: Planejamento das Práticas Integradoras e Atividades Complementares - Diretorias de Ensino dos campi",
+      "eventDate": "2026-08-24",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300107",
+      "title": "Fórum da Política Nacional de Assistência Estudantil (PNAES)",
+      "eventDate": "2026-08-25",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300108",
+      "title": "Prazo máximo de preenchimento de vagas do PS 2026/2",
+      "eventDate": "2026-08-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300109",
+      "title": "Prazo final de Cadastro do PIT no SIGAA",
+      "eventDate": "2026-08-28",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300111",
+      "title": "Feriado Estadual - Elevação do Amazonas à Categoria de Província",
+      "eventDate": "2026-09-05",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300112",
+      "title": "Independência do Brasil",
+      "eventDate": "2026-09-07",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300113",
+      "title": "Semana de incentivo ao consumo de pescado – NUPA",
+      "eventDate": "2026-09-08",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300114",
+      "title": "Data limite para a consolidação do Plano Individual de Trabalho – PIT (2026/2)",
+      "eventDate": "2026-09-09",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300115",
+      "title": "Dia Mundial da Prevenção do Suicídio",
+      "eventDate": "2026-09-10",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300116",
+      "title": "Data limite para publicação do Aproveitamento de Estudos",
+      "eventDate": "2026-09-11",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300117",
+      "title": "I Fórum de Processo Seletivo do IFAM",
+      "eventDate": "2026-09-17",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300119",
+      "title": "Dia Nacional de Luta da Pessoa com Deficiência",
+      "eventDate": "2026-09-21",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300120",
+      "title": "II Congresso de Educação Superior a Distância Pública da Região Norte – CONEaD",
+      "eventDate": "2026-09-22",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300118",
+      "title": "II Encontro dos Gestores de Estágio",
+      "eventDate": "2026-09-23",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300121",
+      "title": "Início da 4ª etapa",
+      "eventDate": "2026-09-23",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300122",
+      "title": "Reunião Pedagógica: Planejamento das Práticas Integradoras - Diretorias de Ensino dos campi",
+      "eventDate": "2026-09-23",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300123",
+      "title": "Ciclo de Formação Continuada PROEN",
+      "eventDate": "2026-09-24",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300124",
+      "title": "Término da 3ª etapa",
+      "eventDate": "2026-09-29",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300126",
+      "title": "Data limite de envio à PROEN das demandas de cursos e vagas para o PS 2027/1",
+      "eventDate": "2026-09-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300127",
+      "title": "Envio para a PROEN das propostas de novos PPCs da EPTNM e da Graduação para o PS 2027.2",
+      "eventDate": "2026-09-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300125",
+      "title": "Início da 4ª etapa – Forma Integrada",
+      "eventDate": "2026-10-01",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300128",
+      "title": "Feriado Municipal – São Francisco",
+      "eventDate": "2026-10-04",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300129",
+      "title": "Deflagração do PS 2027/1",
+      "eventDate": "2026-10-05",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300130",
+      "title": "Lançamento de pelo menos uma nota de cada componente curricular dos cursos Semestrais",
+      "eventDate": "2026-10-05",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300131",
+      "title": "Data limite para lançamento de notas, frequência e conteúdo – Cursos da EPTNM forma Integrada",
+      "eventDate": "2026-10-06",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300134",
+      "title": "Conselhos de Classe Diagnóstico / Prognóstico da 3ª etapa. - Forma Integrada",
+      "eventDate": "2026-10-09",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300132",
+      "title": "Dia Mundial da Saúde Mental",
+      "eventDate": "2026-10-10",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300133",
+      "title": "Nossa Senhora Aparecida",
+      "eventDate": "2026-10-12",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300135",
+      "title": "Reunião Pais e Mestre (3º etapa)",
+      "eventDate": "2026-10-15",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300136",
+      "title": "Dia do Professor",
+      "eventDate": "2026-10-15",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300137",
+      "title": "VIII Mostra de Extensão do IFAM",
+      "eventDate": "2026-10-19",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300138",
+      "title": "Dia do Servidor Público",
+      "eventDate": "2026-10-28",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300139",
+      "title": "Reunião Pedagógica: Planejamento das Práticas Integradoras - Diretorias de Ensino dos campi",
+      "eventDate": "2026-10-29",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300140",
+      "title": "Preenchimento de vagas do PS 2027/1",
+      "eventDate": "2026-11-02",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300141",
+      "title": "Finados",
+      "eventDate": "2026-11-02",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300142",
+      "title": "Proclamação da República",
+      "eventDate": "2026-11-15",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300143",
+      "title": "Dia Estadual do Pesquisador Científico",
+      "eventDate": "2026-11-18",
+      "eventType": "commemorative"
+    },
+    {
+      "id": "300144",
+      "title": "Dia de Zumbi dos Palmares e da Consciência Negra",
+      "eventDate": "2026-11-20",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300145",
+      "title": "Reunião Pedagógica e Planejamento das Práticas Integradoras - Diretorias de Ensino dos campi",
+      "eventDate": "2026-11-23",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300146",
+      "title": "III Seminário de Internacionalização do IFAM",
+      "eventDate": "2026-11-25",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300147",
+      "title": "Ciclo de Formação Continuada PROEN",
+      "eventDate": "2026-11-26",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300148",
+      "title": "III Encontro dos Núcleos de Tecnologias de EaD - NUTEaDs",
+      "eventDate": "2026-11-27",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300149",
+      "title": "XVIII ENUPA - Encontro do NUPA",
+      "eventDate": "2026-11-30",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300150",
+      "title": "Preenchimento de vagas do PS 2027/1",
+      "eventDate": "2026-12-01",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300151",
+      "title": "Data limite para lançamento de notas, frequência e conteúdo – cursos EPTNM – Forma Integrada",
+      "eventDate": "2026-12-03",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300152",
+      "title": "Ponto Facultativo",
+      "eventDate": "2026-12-07",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300153",
+      "title": "N. S. da Imaculada Conceição",
+      "eventDate": "2026-12-08",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300154",
+      "title": "Término da 4ª etapa",
+      "eventDate": "2026-12-10",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300155",
+      "title": "Data limite para comunicar os discentes da disponibilização de notas no SIGAA e Convocação para exames finais",
+      "eventDate": "2026-12-12",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300156",
+      "title": "Exames Finais – Forma Integrada",
+      "eventDate": "2026-12-14",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300157",
+      "title": "Término do 2º Semestre",
+      "eventDate": "2026-12-15",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300158",
+      "title": "Consolidação final de notas e frequência EJA e Subsequente, comunicação aos discentes da disponibilização de notas no SIGAAConvocação para exames finais",
+      "eventDate": "2026-12-15",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300159",
+      "title": "Exame Final – Curso Semestrais",
+      "eventDate": "2026-12-16",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300160",
+      "title": "Conselho de Classe Final – Forma Integrada",
+      "eventDate": "2026-12-16",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300161",
+      "title": "Conselho de Classe – Cursos Semestrais",
+      "eventDate": "2026-12-18",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300162",
+      "title": "Ajuste no SIGAA do Resultado do Conselho de Classe Final",
+      "eventDate": "2026-12-21",
+      "eventType": "school_event"
+    },
+    {
+      "id": "300163",
+      "title": "Véspera de Natal",
+      "eventDate": "2026-12-24",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300164",
+      "title": "Natal",
+      "eventDate": "2026-12-25",
+      "eventType": "holiday"
+    },
+    {
+      "id": "300165",
+      "title": "Fim do Ano Acadêmico",
+      "eventDate": "2026-12-30",
+      "eventType": "school_event"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\teventDate\teventType\n300001\tConfraternização Universal\t2026-01-01\tholiday\n300002\tSemana Nacional de Prevenção da Gravidez na Adolescência\t2026-01-01\tcommemorative\n300003\tFérias Docentes\t2026-01-02\tschool_event\n300005\tPreenchimento de vagas do Processo Seletivo (PS) 2026/1\t2026-01-06\tschool_event\n300004\tInício da coleta de dados SISPENAES (2º semestre de 2025)\t2026-01-19\tschool_event\n300006\tInício do Período de solicitação de Progressão Parcial e Aproveitamento de Estudos\t2026-01-26\tschool_event\n300007\tSolicitação de Reabertura e Renovação de Matrícula para 2026/1 – Cursos EPTNM Semestrais\t2026-01-26\tschool_event\n300008\tPublicação Portaria Orçamento\t2026-01-30\tschool_event\n300009\tInício do Ano Acadêmico - EFRA\t2026-02-02\tschool_event\n300010\tPeríodo de solicitação de Progressão Parcial e Aproveitamento de Estudos\t2026-02-02\tschool_event\n300011\tPreenchimento de vagas residuais do PS 2026/1\t2026-02-02\tschool_event\n300012\tPlanejamento e Reunião Administrativa dos Campi\t2026-02-03\tschool_event\n300013\tInício do Ano Letivo – Integrado, Subsequente e Proeja\t2026-02-04\tschool_event\n300014\tAbertura para Cadastro dos Planos de Ensino e do PIT\t2026-02-04\tschool_event\n300015\tI Laboratório de Práticas Bibliotecárias do IFAM: Alinhando Conhecimento e Excelência em Serviços\t2026-02-05\tschool_event\n300016\tFechamento SIGPP – metas anuais\t2026-02-06\tschool_event\n300017\tInício Avaliação da Gestão\t2026-02-09\tschool_event\n300018\tDia Internacional de Mulheres e Meninas na Ciência\t2026-02-11\tcommemorative\n300019\tCarnaval\t2026-02-16\tholiday\n300020\tCarnaval\t2026-02-17\tholiday\n300021\tQuarta-feira de Cinzas\t2026-02-18\tholiday\n300022\tData Limite de solicitação de Progressão Parcial e Aproveitamento de Estudos\t2026-02-27\tschool_event\n300023\tEntrega do PIT para as Diretorias/Departamentos responsáveis\t2026-02-27\tschool_event\n300024\tPrazo máximo para preenchimento de vagas do Processo 2026/1\t2026-03-04\tschool_event\n300025\tProcesso Seletivo 2026/1 – Prazo final para Matrículas e Preenchimento de Vagas Remanescentes\t2026-03-06\tschool_event\n300026\tDia Internacional da Mulher\t2026-03-08\tcommemorative\n300027\tPublicação do Resultado de Progressão Parcial e Aproveitamento de Estudos\t2026-03-13\tschool_event\n300028\tFim da Avaliação da Gestão\t2026-03-18\tschool_event\n300029\tVIII Dia Nacional da Aquicultura - NUPA\t2026-03-20\tcommemorative\n300030\tData limite para consolidação dos Planos de Ensino no SIGAA (2026/1)\t2026-03-20\tschool_event\n300031\tData limite para validação do Plano Individual de Trabalho - PIT no SIGAA (2026/1)\t2026-03-20\tschool_event\n300032\tDia Internacional da Síndrome de Down\t2026-03-21\tcommemorative\n300033\tDia Mundial da Água\t2026-03-22\tcommemorative\n300034\tReunião Pedagógica e Planejamento das Práticas Diretorias de Ensino dos Campi\t2026-03-23\tschool_event\n300035\tData Limite para envio para a PROEN das propostas de novos PPCs da EPTNM e da Graduação para o PS 2027.1\t2026-03-30\tschool_event\n300036\tData limite de envio à PROEN das demandas de cursos e vagas para o PS 2026/2\t2026-03-31\tschool_event\n300037\tPublicação Relatório de Gestão - TCU\t2026-03-31\tschool_event\n300038\tDia Mundial e Nacional da Conscientização do Autismo\t2026-04-02\tcommemorative\n300039\tSexta-feira Santa\t2026-04-03\tholiday\n300040\tPáscoa\t2026-04-05\tcommemorative\n300041\tDia Mundial da Saúde\t2026-04-07\tcommemorative\n300042\tDia Nacional de Combate ao Bullying e à Violência na Escola\t2026-04-07\tcommemorative\n300043\tSemana dos Povos Indígenas – NEABI\t2026-04-13\tcommemorative\n300044\tI Simpósio de EaD do IFAM e III Encontro dos Núcleos de Tecnologias de EaD - NUTEaDs\t2026-04-13\tschool_event\n300045\tDia Nacional da Luta pela Educação Inclusiva\t2026-04-14\tcommemorative\n300046\tPrazo final do período de solicitação de Trancamento de Matrícula - cursos EPTNM semestrais\t2026-04-17\tschool_event\n300047\tAbertura do Prazo de solicitação de trancamento de matrícula. – EPTNM\t2026-04-17\tschool_event\n300048\tTérmino da 1ª Etapa - Forma Integrada\t2026-04-20\tschool_event\n300049\tTiradentes\t2026-04-21\tholiday\n300050\tDeflagração do PS 2026/2\t2026-04-22\tschool_event\n300051\tInício da 2ª etapa - Forma Integrada\t2026-04-22\tschool_event\n300052\tPublicação da Avaliação da Gestão\t2026-04-23\tschool_event\n300053\tDia Nacional da Língua Brasileira de Sinais (Libras)\t2026-04-24\tcommemorative\n300054\tData Limite de lançamento de notas, frequência e conteúdo da 1ª etapa\t2026-04-24\tschool_event\n300055\tDia Mundial da Propriedade Intelectual\t2026-04-26\tcommemorative\n300056\tReunião Pedagógica: Planejamento das Práticas Integradoras - Diretorias de Ensino dos Campi\t2026-04-27\tschool_event\n300057\tLançamento de pelo menos uma nota de cada componente curricular dos cursos Semestrais\t2026-04-27\tschool_event\n300058\tInício do Período de Revisão das Metas do PDI\t2026-04-28\tschool_event\n300059\tConselhos de Classe Diagnóstico / Prognóstico da 1ª etapa. - Forma Integrada\t2026-04-29\tschool_event\n300060\tCiclo de Formação Continuada PROEN\t2026-04-30\tschool_event\n300061\tDia do Trabalhador\t2026-05-01\tholiday\n300062\tReunião de Pais e Mestres\t2026-05-04\tschool_event\n300063\tXIV Encontro dos Gestores de Extensão\t2026-05-05\tschool_event\n300064\tDia das Mães\t2026-05-10\tcommemorative\n300065\tSemana Nacional de Combate à Exploração Sexual de Crianças e Adolescentes\t2026-05-11\tcommemorative\n300066\tDia Internacional contra a Homofobia, Transfobia e Bifobia\t2026-05-17\tcommemorative\n300067\tDia Nacional de Combate ao Abuso e à Exploração Sexual de Crianças e Adolescentes\t2026-05-18\tcommemorative\n300068\tPrazo final de solicitação de trancamento de matrícula. – EPTNM\t2026-05-18\tschool_event\n300069\tDia Global de Conscientização sobre Acessibilidade\t2026-05-20\tcommemorative\n300070\tReunião Pedagógica: Planejamento das Práticas Integradoras e Atividades Complementares - Diretorias de Ensino dos campi\t2026-05-25\tschool_event\n300071\tPreenchimento de vagas do PS 2026/2\t2026-06-01\tschool_event\n300072\tVII FORGRAD\t2026-06-02\tschool_event\n300073\tCorpus Christi\t2026-06-04\tholiday\n300074\tPonto Facultativo\t2026-06-05\tholiday\n300075\tDia Mundial do Meio Ambiente\t2026-06-05\tcommemorative\n300076\tJIFAM\t2026-06-09\tschool_event\n300077\tI Encontro dos Coordenadores da Ayty\t2026-06-14\tschool_event\n300078\tCiclo de Formação Continuada PROEN\t2026-06-25\tschool_event\n300079\tFim do Período de Revisão das Metas do PDI\t2026-06-30\tschool_event\n300080\tPreenchimento de vagas do PS 2026/2\t2026-07-01\tschool_event\n300083\tData limite para lançamento de notas, frequência e conteúdo - Cursos EPTNM - Cursos Semestrais\t2026-07-03\tschool_event\n300082\tTérmino da 2ª Etapa – Cursos da Forma Integrada\t2026-07-03\tschool_event\n300081\tTérmino do 1° Semestre (Cursos EPTNM Semestrais)\t2026-07-03\tschool_event\n300084\tData limite para comunicar os discentes da disponibilização de notas no SIGAA e Convocação para Exames Finais nos Cursos Semestrais\t2026-07-03\tschool_event\n300085\tInício da 3ª etapa – Abertura para cadastro dos Planos de Ensino e do PIT (2026/2) - Forma Integrada\t2026-07-06\tschool_event\n300086\tExames Finais: Cursos Semestrais - Subsequente/EJA\t2026-07-06\tschool_event\n300087\tLançamento das Notas do Exame Final - Subsequente/EJA\t2026-07-07\tschool_event\n300088\tConselho de Classe Final: Subsequente/EJA\t2026-07-08\tschool_event\n300089\tPublicação do Resultado do Conselho de Classe Final: Subsequente/EJA\t2026-07-08\tschool_event\n300090\tDia Nacional da Ciência e do Pesquisador(a) Científico(a)\t2026-07-08\tcommemorative\n300091\tData Limite de lançamento de notas, frequência e conteúdo da 1ª etapa\t2026-07-08\tschool_event\n300092\tRecesso Escolar\t2026-07-09\tschool_event\n300093\tInício da coleta de dados SISPENAES (1º semestre de 2026)\t2026-07-20\tschool_event\n300094\tEFRA 2026/02 (Turno Vespertino)\t2026-07-24\tschool_event\n300099\tPeríodo de solicitação de Aproveitamento de Estudos e Solicitação de Reabertura e Renovação de Matrícula para 2026/2\t2026-07-24\tschool_event\n300095\tFeriado Municipal – Sant’ana\t2026-07-26\tholiday\n300096\tInício do 2° semestre (cursos semestrais) e abertura para cadastro dos Planos de Ensino e do PIT (2026/2) – Cursos Semestrais\t2026-07-27\tschool_event\n300097\tConselhos de Classe Diagnóstico / Prognóstico da 2ª etapa. - Forma Integrada\t2026-07-27\tschool_event\n300098\tReunião de pais e mestres da 2ª etapa. - Forma Integrada\t2026-07-30\tschool_event\n300100\tFeriado Municipal - Aniversário da cidade\t2026-08-02\tholiday\n300101\tVII Encontro de Representantes de Bibliotecas do IFAM - ERBI\t2026-08-05\tschool_event\n300102\tDia dos Pais\t2026-08-09\tcommemorative\n300103\tDia do estudante\t2026-08-11\tcommemorative\n300104\tVIII Encontro do Centro de Idiomas\t2026-08-11\tschool_event\n300105\tVIII Seminário do Ensino Médio Integrado e VII Simpósio da EJA EPT do IFAM\t2026-08-19\tschool_event\n300106\tSemana Nacional da Pessoa com Deficiência Intelectual e Múltipla\t2026-08-21\tcommemorative\n300110\tReunião Pedagógica: Planejamento das Práticas Integradoras e Atividades Complementares - Diretorias de Ensino dos campi\t2026-08-24\tschool_event\n300107\tFórum da Política Nacional de Assistência Estudantil (PNAES)\t2026-08-25\tschool_event\n300108\tPrazo máximo de preenchimento de vagas do PS 2026/2\t2026-08-27\tschool_event\n300109\tPrazo final de Cadastro do PIT no SIGAA\t2026-08-28\tschool_event\n300111\tFeriado Estadual - Elevação do Amazonas à Categoria de Província\t2026-09-05\tholiday\n300112\tIndependência do Brasil\t2026-09-07\tholiday\n300113\tSemana de incentivo ao consumo de pescado – NUPA\t2026-09-08\tcommemorative\n300114\tData limite para a consolidação do Plano Individual de Trabalho – PIT (2026/2)\t2026-09-09\tschool_event\n300115\tDia Mundial da Prevenção do Suicídio\t2026-09-10\tcommemorative\n300116\tData limite para publicação do Aproveitamento de Estudos\t2026-09-11\tschool_event\n300117\tI Fórum de Processo Seletivo do IFAM\t2026-09-17\tschool_event\n300119\tDia Nacional de Luta da Pessoa com Deficiência\t2026-09-21\tcommemorative\n300120\tII Congresso de Educação Superior a Distância Pública da Região Norte – CONEaD\t2026-09-22\tschool_event\n300118\tII Encontro dos Gestores de Estágio\t2026-09-23\tschool_event\n300121\tInício da 4ª etapa\t2026-09-23\tschool_event\n300122\tReunião Pedagógica: Planejamento das Práticas Integradoras - Diretorias de Ensino dos campi\t2026-09-23\tschool_event\n300123\tCiclo de Formação Continuada PROEN\t2026-09-24\tschool_event\n300124\tTérmino da 3ª etapa\t2026-09-29\tschool_event\n300126\tData limite de envio à PROEN das demandas de cursos e vagas para o PS 2027/1\t2026-09-30\tschool_event\n300127\tEnvio para a PROEN das propostas de novos PPCs da EPTNM e da Graduação para o PS 2027.2\t2026-09-30\tschool_event\n300125\tInício da 4ª etapa – Forma Integrada\t2026-10-01\tschool_event\n300128\tFeriado Municipal – São Francisco\t2026-10-04\tholiday\n300129\tDeflagração do PS 2027/1\t2026-10-05\tschool_event\n300130\tLançamento de pelo menos uma nota de cada componente curricular dos cursos Semestrais\t2026-10-05\tschool_event\n300131\tData limite para lançamento de notas, frequência e conteúdo – Cursos da EPTNM forma Integrada\t2026-10-06\tschool_event\n300134\tConselhos de Classe Diagnóstico / Prognóstico da 3ª etapa. - Forma Integrada\t2026-10-09\tschool_event\n300132\tDia Mundial da Saúde Mental\t2026-10-10\tcommemorative\n300133\tNossa Senhora Aparecida\t2026-10-12\tholiday\n300135\tReunião Pais e Mestre (3º etapa)\t2026-10-15\tschool_event\n300136\tDia do Professor\t2026-10-15\tcommemorative\n300137\tVIII Mostra de Extensão do IFAM\t2026-10-19\tschool_event\n300138\tDia do Servidor Público\t2026-10-28\tcommemorative\n300139\tReunião Pedagógica: Planejamento das Práticas Integradoras - Diretorias de Ensino dos campi\t2026-10-29\tschool_event\n300140\tPreenchimento de vagas do PS 2027/1\t2026-11-02\tschool_event\n300141\tFinados\t2026-11-02\tholiday\n300142\tProclamação da República\t2026-11-15\tholiday\n300143\tDia Estadual do Pesquisador Científico\t2026-11-18\tcommemorative\n300144\tDia de Zumbi dos Palmares e da Consciência Negra\t2026-11-20\tholiday\n300145\tReunião Pedagógica e Planejamento das Práticas Integradoras - Diretorias de Ensino dos campi\t2026-11-23\tschool_event\n300146\tIII Seminário de Internacionalização do IFAM\t2026-11-25\tschool_event\n300147\tCiclo de Formação Continuada PROEN\t2026-11-26\tschool_event\n300148\tIII Encontro dos Núcleos de Tecnologias de EaD - NUTEaDs\t2026-11-27\tschool_event\n300149\tXVIII ENUPA - Encontro do NUPA\t2026-11-30\tschool_event\n300150\tPreenchimento de vagas do PS 2027/1\t2026-12-01\tschool_event\n300151\tData limite para lançamento de notas, frequência e conteúdo – cursos EPTNM – Forma Integrada\t2026-12-03\tschool_event\n300152\tPonto Facultativo\t2026-12-07\tholiday\n300153\tN. S. da Imaculada Conceição\t2026-12-08\tholiday\n300154\tTérmino da 4ª etapa\t2026-12-10\tschool_event\n300155\tData limite para comunicar os discentes da disponibilização de notas no SIGAA e Convocação para exames finais\t2026-12-12\tschool_event\n300156\tExames Finais – Forma Integrada\t2026-12-14\tschool_event\n300157\tTérmino do 2º Semestre\t2026-12-15\tschool_event\n300158\tConsolidação final de notas e frequência EJA e Subsequente, comunicação aos discentes da disponibilização de notas no SIGAAConvocação para exames finais\t2026-12-15\tschool_event\n300159\tExame Final – Curso Semestrais\t2026-12-16\tschool_event\n300160\tConselho de Classe Final – Forma Integrada\t2026-12-16\tschool_event\n300161\tConselho de Classe – Cursos Semestrais\t2026-12-18\tschool_event\n300162\tAjuste no SIGAA do Resultado do Conselho de Classe Final\t2026-12-21\tschool_event\n300163\tVéspera de Natal\t2026-12-24\tholiday\n300164\tNatal\t2026-12-25\tholiday\n300165\tFim do Ano Acadêmico\t2026-12-30\tschool_event\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}
