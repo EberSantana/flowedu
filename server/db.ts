@@ -11468,5 +11468,107 @@ export async function upsertSystemSetting(key: string, value: string, descriptio
  */
 export async function getStorageLimitMB(): Promise<number> {
   const value = await getSystemSetting('storage_limit_mb');
-  return value ? parseInt(value, 10) : 500; // Padrão: 500MB
+  return value ? parseInt(value, 10) : 500; // Padrão global: 500MB (fallback)
+}
+
+/**
+ * Obter o uso de armazenamento de um professor específico (soma de fileSize dos materiais)
+ */
+export async function getTeacherStorageUsage(professorId: number): Promise<{ usedBytes: number; usedMB: number; fileCount: number }> {
+  const db = await getDb();
+  if (!db) return { usedBytes: 0, usedMB: 0, fileCount: 0 };
+  
+  const result = await db.select({
+    totalSize: sql<number>`COALESCE(SUM(${topicMaterials.fileSize}), 0)`,
+    fileCount: sql<number>`COUNT(*)`,
+  })
+    .from(topicMaterials)
+    .where(eq(topicMaterials.professorId, professorId));
+  
+  const totalSize = Number(result[0]?.totalSize || 0);
+  const fileCount = Number(result[0]?.fileCount || 0);
+  
+  return {
+    usedBytes: totalSize,
+    usedMB: Math.round((totalSize / (1024 * 1024)) * 100) / 100,
+    fileCount,
+  };
+}
+
+/**
+ * Obter o limite de armazenamento individual de um professor
+ */
+export async function getTeacherStorageLimit(professorId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 1024; // Padrão 1GB
+  
+  const result = await db.select({ storageLimitMB: users.storageLimitMB })
+    .from(users)
+    .where(eq(users.id, professorId))
+    .limit(1);
+  
+  return result[0]?.storageLimitMB || 1024;
+}
+
+/**
+ * Atualizar o limite de armazenamento de um professor
+ */
+export async function updateTeacherStorageLimit(professorId: number, limitMB: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ storageLimitMB: limitMB })
+    .where(eq(users.id, professorId));
+  
+  return { professorId, limitMB };
+}
+
+/**
+ * Obter resumo de armazenamento de todos os professores (para admin)
+ */
+export async function getAllTeachersStorageUsage(): Promise<Array<{
+  userId: number;
+  userName: string | null;
+  userEmail: string | null;
+  storageLimitMB: number;
+  usedBytes: number;
+  usedMB: number;
+  fileCount: number;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Buscar todos os professores (role = user ou admin)
+  const allUsers = await db.select({
+    id: users.id,
+    name: users.name,
+    email: users.email,
+    storageLimitMB: users.storageLimitMB,
+  }).from(users).where(eq(users.active, true));
+  
+  // Buscar uso de cada professor
+  const usageData = await db.select({
+    professorId: topicMaterials.professorId,
+    totalSize: sql<number>`COALESCE(SUM(${topicMaterials.fileSize}), 0)`,
+    fileCount: sql<number>`COUNT(*)`,
+  })
+    .from(topicMaterials)
+    .groupBy(topicMaterials.professorId);
+  
+  const usageMap = new Map(usageData.map(u => [u.professorId, u]));
+  
+  return allUsers.map(user => {
+    const usage = usageMap.get(user.id);
+    const usedBytes = Number(usage?.totalSize || 0);
+    return {
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      storageLimitMB: user.storageLimitMB,
+      usedBytes,
+      usedMB: Math.round((usedBytes / (1024 * 1024)) * 100) / 100,
+      fileCount: Number(usage?.fileCount || 0),
+    };
+  });
 }

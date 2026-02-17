@@ -1798,17 +1798,29 @@ export const appRouter = router({
       return db.getAllSystemSettings();
     }),
 
-    // Obter limite de armazenamento
-    getStorageLimit: protectedProcedure.query(async ({ ctx }) => {
+    // Obter resumo de armazenamento de todos os professores
+    getTeachersStorage: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== 'admin') {
         throw new Error('Acesso negado: apenas administradores');
       }
-      const limitMB = await db.getStorageLimitMB();
-      return { limitMB };
+      return db.getAllTeachersStorageUsage();
     }),
 
-    // Atualizar limite de armazenamento
-    updateStorageLimit: protectedProcedure
+    // Atualizar limite de armazenamento de um professor específico
+    updateTeacherStorageLimit: protectedProcedure
+      .input(z.object({
+        professorId: z.number(),
+        limitMB: z.number().min(50).max(10000),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.updateTeacherStorageLimit(input.professorId, input.limitMB);
+      }),
+
+    // Atualizar limite de armazenamento de TODOS os professores de uma vez
+    updateAllTeachersStorageLimit: protectedProcedure
       .input(z.object({
         limitMB: z.number().min(50).max(10000),
       }))
@@ -1816,27 +1828,11 @@ export const appRouter = router({
         if (ctx.user.role !== 'admin') {
           throw new Error('Acesso negado: apenas administradores');
         }
-        await db.upsertSystemSetting(
-          'storage_limit_mb',
-          String(input.limitMB),
-          'Limite máximo de armazenamento por professor em MB',
-          ctx.user.id
-        );
-        return { success: true, limitMB: input.limitMB };
-      }),
-
-    // Atualizar configuração genérica
-    updateSetting: protectedProcedure
-      .input(z.object({
-        key: z.string(),
-        value: z.string(),
-        description: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new Error('Acesso negado: apenas administradores');
+        const allUsers = await db.getAllTeachersStorageUsage();
+        for (const user of allUsers) {
+          await db.updateTeacherStorageLimit(user.userId, input.limitMB);
         }
-        return db.upsertSystemSetting(input.key, input.value, input.description, ctx.user.id);
+        return { success: true, updatedCount: allUsers.length, limitMB: input.limitMB };
       }),
   }),
 
@@ -3811,10 +3807,11 @@ JSON (descrições MAX 15 chars):
         return await db.getModuleMaterials(input.moduleId);
       }),
 
-    // Obter limite de armazenamento configurado pelo admin
-    getStorageLimit: protectedProcedure.query(async () => {
-      const limitMB = await db.getStorageLimitMB();
-      return { limitMB };
+    // Obter uso e limite de armazenamento individual do professor logado
+    getMyStorageInfo: protectedProcedure.query(async ({ ctx }) => {
+      const usage = await db.getTeacherStorageUsage(ctx.user.id);
+      const limitMB = await db.getTeacherStorageLimit(ctx.user.id);
+      return { ...usage, limitMB };
     }),
   }),
 

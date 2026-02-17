@@ -72,24 +72,11 @@ export default function TopicMaterialsManager() {
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [storageInfo, setStorageInfo] = useState<{ totalSizeMB: string; fileCount: number } | null>(null);
-
-  // Buscar limite de armazenamento configurado pelo admin
-  const { data: storageLimitData } = trpc.materials.getStorageLimit.useQuery();
-  const storageLimitMB = storageLimitData?.limitMB || 500;
-
-  // Buscar info de armazenamento
-  const fetchStorageInfo = async () => {
-    try {
-      const res = await fetch('/api/storage-info');
-      if (res.ok) {
-        const data = await res.json();
-        setStorageInfo({ totalSizeMB: data.totalSizeMB, fileCount: data.fileCount });
-      }
-    } catch (e) {
-      // Silently fail
-    }
-  };
+  // Buscar uso e limite de armazenamento individual do professor logado
+  const { data: myStorageInfo, refetch: refetchStorage } = trpc.materials.getMyStorageInfo.useQuery();
+  const storageLimitMB = myStorageInfo?.limitMB || 1024;
+  const storageUsedMB = myStorageInfo?.usedMB || 0;
+  const storageFileCount = myStorageInfo?.fileCount || 0;
 
   const { data: subject } = trpc.subjects.list.useQuery();
   const currentSubject = subject?.find(s => s.id === subjectId);
@@ -114,13 +101,12 @@ export default function TopicMaterialsManager() {
 
   const utils = trpc.useUtils();
 
-  // Carregar info de armazenamento ao montar
-  useEffect(() => { fetchStorageInfo(); }, []);
+
 
   const createMaterialMutation = trpc.materials.create.useMutation({
     onSuccess: () => {
       utils.materials.getByTopic.invalidate();
-      fetchStorageInfo();
+      refetchStorage();
       toast.success("Material adicionado com sucesso!");
       setIsAddDialogOpen(false);
       resetForm();
@@ -133,7 +119,7 @@ export default function TopicMaterialsManager() {
   const createModuleMaterialMutation = trpc.materials.createForModule.useMutation({
     onSuccess: () => {
       utils.materials.getByModule.invalidate();
-      fetchStorageInfo();
+      refetchStorage();
       toast.success("Material adicionado com sucesso!");
       setIsAddDialogOpen(false);
       resetForm();
@@ -164,7 +150,7 @@ export default function TopicMaterialsManager() {
       } else {
         utils.materials.getByTopic.invalidate();
       }
-      fetchStorageInfo();
+      refetchStorage();
       toast.success("Material removido! Arquivo deletado do servidor.");
     },
     onError: (error) => {
@@ -249,12 +235,11 @@ export default function TopicMaterialsManager() {
       return;
     }
 
-    // Verificar limite de armazenamento do servidor
-    if (storageInfo) {
-      const usedMB = parseFloat(storageInfo.totalSizeMB);
+    // Verificar limite de armazenamento individual do professor
+    if (myStorageInfo) {
       const fileSizeMB = selectedFile.size / (1024 * 1024);
-      if (usedMB + fileSizeMB > storageLimitMB) {
-        toast.error(`Limite de armazenamento atingido (${storageLimitMB} MB). Remova materiais antigos ou contate o administrador.`);
+      if (storageUsedMB + fileSizeMB > storageLimitMB) {
+        toast.error(`Limite de armazenamento atingido (${storageUsedMB.toFixed(1)} MB / ${storageLimitMB} MB). Remova materiais antigos ou contate o administrador.`);
         return;
       }
     }
@@ -473,19 +458,20 @@ export default function TopicMaterialsManager() {
             </div>
           </div>
 
-          {/* Storage Info with Progress Bar */}
-          {storageInfo && (() => {
-            const usedMB = parseFloat(storageInfo.totalSizeMB);
-            const usedPercent = (usedMB / storageLimitMB) * 100;
+          {/* Storage Info with Progress Bar - Limite Individual */}
+          {myStorageInfo && (() => {
+            const usedPercent = storageLimitMB > 0 ? (storageUsedMB / storageLimitMB) * 100 : 0;
             const barColor = usedPercent >= 90 ? 'bg-red-500' : usedPercent >= 70 ? 'bg-amber-500' : 'bg-primary';
             const textColor = usedPercent >= 90 ? 'text-red-600' : usedPercent >= 70 ? 'text-amber-600' : 'text-green-600';
+            const limitLabel = storageLimitMB >= 1024 ? `${(storageLimitMB / 1024).toFixed(storageLimitMB % 1024 === 0 ? 0 : 1)} GB` : `${storageLimitMB} MB`;
             return (
               <div className="mb-4 bg-muted/50 px-4 py-3 rounded-lg space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <HardDrive className="h-4 w-4" />
                     <span>
-                      <strong className={textColor}>{storageInfo.totalSizeMB} MB</strong> de <strong className="text-foreground">{storageLimitMB} MB</strong>
+                      <strong className={textColor}>{storageUsedMB.toFixed(1)} MB</strong> de <strong className="text-foreground">{limitLabel}</strong>
+                      <span className="ml-2 text-xs">({storageFileCount} arquivo{storageFileCount !== 1 ? 's' : ''})</span>
                     </span>
                   </div>
                   <Badge variant={usedPercent >= 90 ? 'destructive' : usedPercent >= 70 ? 'secondary' : 'default'}>
@@ -498,7 +484,13 @@ export default function TopicMaterialsManager() {
                     style={{ width: `${Math.min(usedPercent, 100)}%` }}
                   />
                 </div>
-                {usedPercent >= 90 && (
+                {usedPercent >= 80 && usedPercent < 90 && (
+                  <div className="flex items-center gap-2 text-xs text-amber-600">
+                    <AlertCircle className="h-3 w-3" />
+                    <span>Seu armazenamento está ficando cheio. Considere remover materiais antigos.</span>
+                  </div>
+                )}
+                {usedPercent >= 90 && usedPercent < 100 && (
                   <div className="flex items-center gap-2 text-xs text-red-600">
                     <AlertCircle className="h-3 w-3" />
                     <span>Armazenamento quase cheio! Remova materiais antigos para liberar espaço.</span>
@@ -754,7 +746,7 @@ export default function TopicMaterialsManager() {
                 </Button>
                 <Button
                   onClick={formData.type === 'link' ? handleAddLink : handleUploadFile}
-                  disabled={isUploading || createMaterialMutation.isPending || !!uploadError || (formData.type !== 'link' && storageInfo ? parseFloat(storageInfo.totalSizeMB) >= storageLimitMB : false)}
+                  disabled={isUploading || createMaterialMutation.isPending || !!uploadError || (formData.type !== 'link' && myStorageInfo ? storageUsedMB >= storageLimitMB : false)}
                 >
                   {isUploading || createMaterialMutation.isPending ? (
                     <>

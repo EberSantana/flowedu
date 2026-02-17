@@ -16,6 +16,7 @@ export const users = mysqlTable("users", {
   approvalStatus: mysqlEnum("approvalStatus", ["approved", "pending", "rejected"]).default("approved").notNull(),
   inviteCode: varchar("inviteCode", { length: 20 }), // Código de convite usado no cadastro
   passwordHash: varchar("passwordHash", { length: 255 }), // Hash da senha para login direto
+  storageLimitMB: int("storageLimitMB").default(1024).notNull(), // Limite de armazenamento individual em MB (padrão 1GB)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

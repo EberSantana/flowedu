@@ -7125,3 +7125,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Implementar verificação de limite antes do upload de materiais
 - [ ] Exibir barra de progresso de armazenamento na página de materiais do professor
 - [ ] Bloquear upload quando limite for atingido com mensagem clara
+
+## Limite Individual de Armazenamento por Professor
+- [x] Adicionar campo storageLimitMB na tabela users (padrão 1024 = 1GB)
+- [x] Criar endpoint para calcular uso de armazenamento por professor (baseado em topicMaterials.fileSize)
+- [x] Atualizar endpoint de upload para verificar limite individual do professor
+- [x] Criar painel admin para visualizar e ajustar limite de cada professor
+- [x] Atualizar UI do professor para mostrar seu uso individual vs seu limite
+- [x] Bloquear upload quando professor atingir seu limite individual
