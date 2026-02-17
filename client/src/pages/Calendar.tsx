@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { CalendarDays, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Clock, Upload, FileText, Check, X } from "lucide-react";
+import { CalendarDays, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Clock, Upload, FileText, Check, X, Download, Share2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 
@@ -48,6 +49,12 @@ export default function Calendar() {
   const [extractedEvents, setExtractedEvents] = useState<any[]>([]);
   const [selectedEvents, setSelectedEvents] = useState<Set<number>>(new Set());
   
+  // Estados para exportação
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [exportIncludeSchedule, setExportIncludeSchedule] = useState(false);
+  const [exportEventTypes, setExportEventTypes] = useState<string[]>(["holiday", "commemorative", "school_event", "personal"]);
+  const [isExporting, setIsExporting] = useState(false);
+
   // Estados para atualização anual
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [updateYear, setUpdateYear] = useState<number>(new Date().getFullYear() - 1);
@@ -309,6 +316,74 @@ export default function Calendar() {
     });
   };
 
+  const handleExportICS = async () => {
+    setIsExporting(true);
+    try {
+      const result = await utils.client.calendar.exportToICS.query({
+        year: selectedYear,
+        includeSchedule: exportIncludeSchedule,
+        eventTypes: exportEventTypes as any,
+      });
+      
+      // Criar e baixar o arquivo .ics
+      const blob = new Blob([result.icsContent], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `FlowEdu_Calendario_${selectedYear}.ics`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.success(`Arquivo exportado com ${result.totalEvents} eventos!`);
+      setIsExportDialogOpen(false);
+    } catch (error: any) {
+      toast.error('Erro ao exportar: ' + (error.message || 'Tente novamente'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportGoogleCalendar = async () => {
+    setIsExporting(true);
+    try {
+      const result = await utils.client.calendar.exportToICS.query({
+        year: selectedYear,
+        includeSchedule: exportIncludeSchedule,
+        eventTypes: exportEventTypes as any,
+      });
+      
+      // Criar blob e upload temporário
+      const blob = new Blob([result.icsContent], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      // Abrir Google Calendar com importação
+      // Google Calendar não suporta importação direta via URL, então baixamos o .ics
+      // e instruímos o usuário a importar
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `FlowEdu_Calendario_${selectedYear}.ics`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      // Abrir a página de importação do Google Calendar
+      window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+      
+      toast.success(
+        `Arquivo baixado com ${result.totalEvents} eventos! Importe-o no Google Calendar que acabou de abrir.`,
+        { duration: 8000 }
+      );
+      setIsExportDialogOpen(false);
+    } catch (error: any) {
+      toast.error('Erro ao exportar: ' + (error.message || 'Tente novamente'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const handleDayClick = (date: Date) => {
     setSelectedDate(date);
     setFormData({
@@ -377,6 +452,14 @@ export default function Calendar() {
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Importar Calendário PDF
+              </Button>
+              <Button
+                onClick={() => setIsExportDialogOpen(true)}
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Exportar Calendário
               </Button>
             </div>
           </div>
@@ -885,6 +968,122 @@ export default function Calendar() {
                 className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
                 {updateAnnualMutation.isPending ? 'Aplicando...' : 'Aplicar Atualização'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Dialog de Exportação para Google Calendar / iCal */}
+        <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <Download className="w-5 h-5 text-primary" />
+                Exportar Calendário
+              </DialogTitle>
+              <DialogDescription>
+                Exporte seus eventos para Google Calendar, Apple Calendar ou qualquer aplicativo compatível com iCal.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-5">
+              {/* Ano */}
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Ano</Label>
+                <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[selectedYear - 1, selectedYear, selectedYear + 1].map(y => (
+                      <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Tipos de eventos */}
+              <div>
+                <Label className="text-sm font-medium mb-3 block">Tipos de Eventos</Label>
+                <div className="space-y-3">
+                  {Object.entries(EVENT_TYPES).map(([key, { label, dotColor }]) => (
+                    <div key={key} className="flex items-center gap-3">
+                      <Checkbox
+                        id={`export-${key}`}
+                        checked={exportEventTypes.includes(key)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setExportEventTypes(prev => [...prev, key]);
+                          } else {
+                            setExportEventTypes(prev => prev.filter(t => t !== key));
+                          }
+                        }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dotColor }} />
+                        <label htmlFor={`export-${key}`} className="text-sm cursor-pointer">{label}</label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Incluir grade semanal */}
+              <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                <Checkbox
+                  id="export-schedule"
+                  checked={exportIncludeSchedule}
+                  onCheckedChange={(checked) => setExportIncludeSchedule(!!checked)}
+                />
+                <div>
+                  <label htmlFor="export-schedule" className="text-sm font-medium cursor-pointer block">
+                    Incluir Aulas da Grade Semanal
+                  </label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Adiciona todas as aulas semanais como eventos com horário no calendário
+                  </p>
+                </div>
+              </div>
+              
+              {/* Resumo */}
+              {events && (
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>{events.filter((e: any) => exportEventTypes.includes(e.eventType)).length}</strong> eventos do calendário serão exportados
+                    {exportIncludeSchedule && " + aulas da grade semanal"}
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsExportDialogOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleExportICS}
+                disabled={isExporting || exportEventTypes.length === 0}
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+              >
+                {isExporting ? (
+                  <><span className="animate-spin mr-2">⏳</span> Gerando...</>
+                ) : (
+                  <><Download className="w-4 h-4 mr-2" /> Baixar arquivo .ics</>
+                )}
+              </Button>
+              <Button
+                onClick={handleExportGoogleCalendar}
+                disabled={isExporting || exportEventTypes.length === 0}
+                variant="outline"
+                className="border-red-400 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+              >
+                {isExporting ? (
+                  <><span className="animate-spin mr-2">⏳</span> Gerando...</>
+                ) : (
+                  <><Share2 className="w-4 h-4 mr-2" /> Abrir no Google Calendar</>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

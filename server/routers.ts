@@ -1239,6 +1239,77 @@ Regras:
         return { deletedCount };
       }),
       
+    exportToICS: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        includeSchedule: z.boolean().default(false),
+        eventTypes: z.array(z.enum(["holiday", "commemorative", "school_event", "personal"])).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { generateICSContent } = await import("./ics-generator.js");
+        
+        const events = await db.getCalendarEventsByYear(ctx.user.id, input.year);
+        const filteredEvents = input.eventTypes
+          ? events.filter((e: any) => input.eventTypes!.includes(e.eventType))
+          : events;
+        
+        const icsEvents: any[] = filteredEvents.map((e: any) => ({
+          id: e.id,
+          title: e.title,
+          description: e.description,
+          eventDate: e.eventDate,
+          eventType: e.eventType,
+        }));
+        
+        let scheduleCount = 0;
+        
+        if (input.includeSchedule) {
+          const [scList, subList, clsList, tsList] = await Promise.all([
+            db.getScheduledClassesByUserId(ctx.user.id),
+            db.getSubjectsByUserId(ctx.user.id),
+            db.getClassesByUserId(ctx.user.id),
+            db.getTimeSlotsByUserId(ctx.user.id),
+          ]);
+          
+          const startDate = new Date(`${input.year}-01-01`);
+          const endDate = new Date(`${input.year}-12-31`);
+          const dayMap: Record<number, number> = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 0 };
+          
+          for (const sc of scList) {
+            const subject = subList.find((s: any) => s.id === sc.subjectId);
+            const cls = clsList.find((c: any) => c.id === sc.classId);
+            const ts = tsList.find((t: any) => t.id === sc.timeSlotId);
+            if (!subject || !ts) continue;
+            
+            const targetDay = dayMap[sc.dayOfWeek] ?? sc.dayOfWeek;
+            const current = new Date(startDate);
+            while (current <= endDate) {
+              if (current.getDay() === targetDay) {
+                icsEvents.push({
+                  title: `${subject.name}${cls ? ` - ${cls.name}` : ""}`,
+                  description: sc.notes || `Aula de ${subject.name}${cls ? ` para turma ${cls.name}` : ""}`,
+                  eventDate: current.toISOString().split("T")[0],
+                  startTime: ts.startTime,
+                  endTime: ts.endTime,
+                  eventType: "schedule",
+                });
+                scheduleCount++;
+              }
+              current.setDate(current.getDate() + 1);
+            }
+          }
+        }
+        
+        const icsContent = generateICSContent(icsEvents, input.year);
+        
+        return {
+          icsContent,
+          totalEvents: icsEvents.length,
+          calendarEvents: filteredEvents.length,
+          scheduleEvents: scheduleCount,
+        };
+      }),
+
     updateCalendarAnnually: protectedProcedure
       .input(z.object({
         year: z.number(),

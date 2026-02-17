@@ -6997,3 +6997,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Fix: Logout não funciona para usuário Eber Santana (login via Manus OAuth)
 - [ ] Fix: Não consegue atualizar eventos no calendário (Planejamento > Calendário)
 - [x] Fix: Botão 'Aplicar Atualização' no modal de atualização do calendário não funciona
+- [x] Implementar exportação de eventos do calendário para Google Calendar e iCal (.ics)
