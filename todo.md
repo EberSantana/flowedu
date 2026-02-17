@@ -7104,3 +7104,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Bug: Upload de lista de alunos (.docx) não registra alunos - CORRIGIDO: parsing movido para backend
 - [x] Corrigir parser do QuickEnrollModal - parsing agora feito no servidor via /api/parse-student-list
 - [x] Backend importAndEnrollInSubject verificado e funcionando corretamente (27 alunos extraídos do LISTADECHAMADA.docx)
+- [x] Bug: Portal do Aluno - Trilha de Aprendizagem dá erro 404 - CORRIGIDO: coluna contentType faltava na tabela topic_materials do banco VPS
+- [x] Deploy VPS: Sincronizar arquivos e rebuild para corrigir 404 na trilha de aprendizagem
+- [x] Deploy VPS: Copiar parse-student-list.ts, QuickEnrollModal.tsx, _core/index.ts atualizados + rebuild + pm2 restart
