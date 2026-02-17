@@ -1,0 +1,94 @@
+{
+  "query": "SELECT COUNT(*) as total FROM calendar_events; SELECT DISTINCT userId FROM calendar_events LIMIT 5; SELECT id, title, eventDate, eventType FROM calendar_events ORDER BY eventDate DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total FROM calendar_events; SELECT DISTINCT userId FROM calendar_events LIMIT 5; SELECT id, title, eventDate, eventType FROM calendar_events ORDER BY eventDate DESC LIMIT 20",
+  "rows": [
+    {
+      "total": "289"
+    },
+    {
+      "total": "userId"
+    },
+    {
+      "total": "1"
+    },
+    {
+      "total": "150601"
+    },
+    {
+      "total": "150729"
+    },
+    {
+      "total": "150817"
+    },
+    {
+      "total": "180002"
+    },
+    {
+      "total": "id\ttitle\teventDate\teventType"
+    },
+    {
+      "total": "30002\tFim do ano letivo\t2025-12-12\tschool_event"
+    },
+    {
+      "total": "30001\tConselho de Classe\t2025-12-11\tschool_event"
+    },
+    {
+      "total": "150015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "60045\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "270030\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "240015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "240045\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "45\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "210015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "30\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "120015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "60030\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "15\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "180015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "240030\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "270015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "90030\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "60015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "90015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    },
+    {
+      "total": "330015\tNovo Evento Escolar\t2024-12-01\tschool_event"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n289\nuserId\n1\n150601\n150729\n150817\n180002\nid\ttitle\teventDate\teventType\n30002\tFim do ano letivo\t2025-12-12\tschool_event\n30001\tConselho de Classe\t2025-12-11\tschool_event\n150015\tNovo Evento Escolar\t2024-12-01\tschool_event\n60045\tNovo Evento Escolar\t2024-12-01\tschool_event\n270030\tNovo Evento Escolar\t2024-12-01\tschool_event\n240015\tNovo Evento Escolar\t2024-12-01\tschool_event\n240045\tNovo Evento Escolar\t2024-12-01\tschool_event\n45\tNovo Evento Escolar\t2024-12-01\tschool_event\n210015\tNovo Evento Escolar\t2024-12-01\tschool_event\n30\tNovo Evento Escolar\t2024-12-01\tschool_event\n120015\tNovo Evento Escolar\t2024-12-01\tschool_event\n60030\tNovo Evento Escolar\t2024-12-01\tschool_event\n15\tNovo Evento Escolar\t2024-12-01\tschool_event\n180015\tNovo Evento Escolar\t2024-12-01\tschool_event\n240030\tNovo Evento Escolar\t2024-12-01\tschool_event\n270015\tNovo Evento Escolar\t2024-12-01\tschool_event\n90030\tNovo Evento Escolar\t2024-12-01\tschool_event\n60015\tNovo Evento Escolar\t2024-12-01\tschool_event\n90015\tNovo Evento Escolar\t2024-12-01\tschool_event\n330015\tNovo Evento Escolar\t2024-12-01\tschool_event\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

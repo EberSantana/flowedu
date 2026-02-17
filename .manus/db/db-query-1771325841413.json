@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, title, eventDate, eventType FROM calendar_events WHERE userId = (SELECT id FROM users LIMIT 1) AND eventDate LIKE '2026%' AND eventType = 'holiday' ORDER BY eventDate LIMIT 50",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, title, eventDate, eventType FROM calendar_events WHERE userId = (SELECT id FROM users LIMIT 1) AND eventDate LIKE '2026%' AND eventType = 'holiday' ORDER BY eventDate LIMIT 50",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 61
+}

@@ -1,0 +1,220 @@
+{
+  "query": "SELECT id, userId, title, eventDate, eventType FROM calendar_events ORDER BY eventDate LIMIT 30",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, userId, title, eventDate, eventType FROM calendar_events ORDER BY eventDate LIMIT 30",
+  "rows": [
+    {
+      "id": "420039",
+      "userId": "2310221",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360024",
+      "userId": "2100066",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "420024",
+      "userId": "2310172",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360084",
+      "userId": "2100245",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360009",
+      "userId": "2100026",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "270009",
+      "userId": "1290008",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "420009",
+      "userId": "2310014",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360099",
+      "userId": "2100286",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360069",
+      "userId": "2100201",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360054",
+      "userId": "2100158",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "330009",
+      "userId": "1980011",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "270024",
+      "userId": "1290020",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "240039",
+      "userId": "1140045",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "210009",
+      "userId": "1110004",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "390009",
+      "userId": "2130022",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "39",
+      "userId": "150817",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "240024",
+      "userId": "1140029",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "120009",
+      "userId": "270001",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "24",
+      "userId": "150729",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "90024",
+      "userId": "240022",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "360039",
+      "userId": "2100115",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "240009",
+      "userId": "1140013",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "9",
+      "userId": "150601",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "180009",
+      "userId": "1050004",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "60009",
+      "userId": "180002",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "90009",
+      "userId": "240007",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "60039",
+      "userId": "180034",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "60024",
+      "userId": "180016",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "150009",
+      "userId": "930002",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    },
+    {
+      "id": "450009",
+      "userId": "2610021",
+      "title": "Feriado 2023",
+      "eventDate": "2023-01-01",
+      "eventType": "holiday"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\ttitle\teventDate\teventType\n420039\t2310221\tFeriado 2023\t2023-01-01\tholiday\n360024\t2100066\tFeriado 2023\t2023-01-01\tholiday\n420024\t2310172\tFeriado 2023\t2023-01-01\tholiday\n360084\t2100245\tFeriado 2023\t2023-01-01\tholiday\n360009\t2100026\tFeriado 2023\t2023-01-01\tholiday\n270009\t1290008\tFeriado 2023\t2023-01-01\tholiday\n420009\t2310014\tFeriado 2023\t2023-01-01\tholiday\n360099\t2100286\tFeriado 2023\t2023-01-01\tholiday\n360069\t2100201\tFeriado 2023\t2023-01-01\tholiday\n360054\t2100158\tFeriado 2023\t2023-01-01\tholiday\n330009\t1980011\tFeriado 2023\t2023-01-01\tholiday\n270024\t1290020\tFeriado 2023\t2023-01-01\tholiday\n240039\t1140045\tFeriado 2023\t2023-01-01\tholiday\n210009\t1110004\tFeriado 2023\t2023-01-01\tholiday\n390009\t2130022\tFeriado 2023\t2023-01-01\tholiday\n39\t150817\tFeriado 2023\t2023-01-01\tholiday\n240024\t1140029\tFeriado 2023\t2023-01-01\tholiday\n120009\t270001\tFeriado 2023\t2023-01-01\tholiday\n24\t150729\tFeriado 2023\t2023-01-01\tholiday\n90024\t240022\tFeriado 2023\t2023-01-01\tholiday\n360039\t2100115\tFeriado 2023\t2023-01-01\tholiday\n240009\t1140013\tFeriado 2023\t2023-01-01\tholiday\n9\t150601\tFeriado 2023\t2023-01-01\tholiday\n180009\t1050004\tFeriado 2023\t2023-01-01\tholiday\n60009\t180002\tFeriado 2023\t2023-01-01\tholiday\n90009\t240007\tFeriado 2023\t2023-01-01\tholiday\n60039\t180034\tFeriado 2023\t2023-01-01\tholiday\n60024\t180016\tFeriado 2023\t2023-01-01\tholiday\n150009\t930002\tFeriado 2023\t2023-01-01\tholiday\n450009\t2610021\tFeriado 2023\t2023-01-01\tholiday\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

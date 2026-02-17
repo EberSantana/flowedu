@@ -7018,3 +7018,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar link no Sidebar (Comunicação > Notificações Push)
 - [x] Adicionar rota /notification-settings no App.tsx
 - [x] Criar testes automatizados (10 testes passando)
+
+## Deploy na VPS
+- [x] Fazer deploy das atualizações de notificações push na VPS
+
+## Correções Calendário - Fev 2026
+- [x] Corrigir visibilidade dos botões na página do Calendário (muito claros, difícil ver sem hover)
+- [x] Corrigir datas/feriados errados no calendário (ex: 1 de maio não aparece como feriado)
+- [x] Validar todas as datas contra o calendário acadêmico oficial (PDF)
+- [x] Garantir que a lógica de feriados nacionais esteja correta para todos os anos
+- [ ] Deploy das correções na VPS

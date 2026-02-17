@@ -1142,27 +1142,49 @@ export const appRouter = router({
           console.log('[importFromPDF] Texto extraído:', pdfText.length, 'caracteres');
         
         // Usar LLM para extrair eventos
+        // Detectar o ano do calendário a partir do texto
+        const yearMatch = pdfText.match(/(20\d{2})/);
+        const calendarYear = yearMatch ? parseInt(yearMatch[1]) : new Date().getFullYear();
+        console.log('[importFromPDF] Ano detectado:', calendarYear);
+
         const response = await invokeLLM({
           messages: [
             {
               role: "system",
               content: `Voce e um assistente especializado em extrair eventos de calendarios academicos brasileiros. Responda APENAS em JSON valido.
 O texto esta organizado por MES (JANEIRO, FEVEREIRO, MARCO, etc). Cada evento tem um numero de dia seguido de traco e o nome.
-A data do evento = DIA do texto + MES da secao + ANO do calendario.
+A data do evento = DIA do texto + MES da secao + ANO do calendario (${calendarYear}).
 
 REGRAS CRITICAS:
-1. Preste MUITA ATENCAO ao mes de cada secao. Se esta na secao MAIO, o dia 01 = 2026-05-01, NAO 2026-04-30.
-2. Feriados nacionais DEVEM estar nas datas corretas: 01/01 Confraternizacao, 21/04 Tiradentes, 01/05 Trabalhador, 07/09 Independencia, 12/10 N.S. Aparecida, 02/11 Finados, 15/11 Proclamacao Republica, 20/11 Zumbi Palmares, 25/12 Natal.
-3. Para periodos (ex: "02 a 13 - Ajuste"), crie UM evento com a data do PRIMEIRO dia.
-4. NAO invente eventos. Extraia SOMENTE o que esta escrito no texto.
-5. Classificacao: "holiday" = feriados e pontos facultativos, "commemorative" = datas comemorativas, "school_event" = eventos academicos.
-6. Ignore linhas de "Dias Letivos" e "Total semestre".
-7. Sabados Letivos sao "school_event", NAO ignore.
-8. Formato eventDate: YYYY-MM-DD (ex: 2026-05-01 para 1 de maio de 2026).`
+1. Preste MUITA ATENCAO ao mes de cada secao. Se esta na secao MAIO, o dia 01 = ${calendarYear}-05-01, NAO ${calendarYear}-04-30.
+2. Feriados nacionais DEVEM estar nas datas corretas:
+   - 01/01 Confraternizacao Universal -> ${calendarYear}-01-01
+   - 21/04 Tiradentes -> ${calendarYear}-04-21
+   - 01/05 Dia do Trabalhador -> ${calendarYear}-05-01
+   - 07/09 Independencia do Brasil -> ${calendarYear}-09-07
+   - 12/10 Nossa Senhora Aparecida -> ${calendarYear}-10-12
+   - 02/11 Finados -> ${calendarYear}-11-02
+   - 15/11 Proclamacao da Republica -> ${calendarYear}-11-15
+   - 20/11 Dia de Zumbi dos Palmares / Consciencia Negra -> ${calendarYear}-11-20
+   - 25/12 Natal -> ${calendarYear}-12-25
+3. Feriados MOVEIS de ${calendarYear} (calcule com base na Pascoa):
+   - Carnaval: segunda e terca antes da Quarta de Cinzas
+   - Sexta-feira Santa: sexta antes da Pascoa
+   - Corpus Christi: 60 dias apos a Pascoa
+4. Para periodos (ex: "02 a 13 - Ajuste"), crie UM evento com a data do PRIMEIRO dia.
+5. NAO invente eventos. Extraia SOMENTE o que esta escrito no texto.
+6. Classificacao:
+   - "holiday" = feriados nacionais, estaduais, municipais e pontos facultativos
+   - "commemorative" = datas comemorativas (Dia das Maes, Dia dos Pais, etc)
+   - "school_event" = eventos academicos, reunioes, semanas tematicas, sabados letivos, inicio/fim de semestre
+7. Ignore linhas de "Dias Letivos" e "Total semestre".
+8. Sabados Letivos sao "school_event", NAO ignore.
+9. Formato eventDate: YYYY-MM-DD (ex: ${calendarYear}-05-01 para 1 de maio de ${calendarYear}).
+10. VERIFIQUE DUAS VEZES cada data antes de incluir. O mes da data DEVE corresponder ao mes da secao do texto.`
             },
             {
               role: "user",
-              content: `Extraia todos os eventos deste calendario academico de 2026 e retorne em formato JSON. Preste MUITA ATENCAO ao mes de cada secao para atribuir as datas corretas:\n\n${pdfText.slice(0, 20000)}`
+              content: `Extraia todos os eventos deste calendario academico de ${calendarYear} e retorne em formato JSON. Preste MUITA ATENCAO ao mes de cada secao para atribuir as datas corretas:\n\n${pdfText.slice(0, 20000)}`
             }
           ],
           response_format: {
@@ -1198,8 +1220,72 @@ REGRAS CRITICAS:
           console.log('[importFromPDF] Chamando LLM para extrair eventos...');
           const content = response.choices[0].message.content;
           const parsedResult = JSON.parse(typeof content === 'string' ? content : '{ "events": [] }');
-          console.log('[importFromPDF] Eventos extraídos:', parsedResult.events.length);
-          return parsedResult.events;
+          console.log('[importFromPDF] Eventos extraídos (antes da validação):', parsedResult.events.length);
+          
+          // === VALIDAÇÃO PÓS-EXTRAÇÃO ===
+          // Feriados nacionais fixos - garantir que estão corretos
+          const feriadosNacionaisFixos: Record<string, string> = {
+            '01-01': 'Confraternização Universal',
+            '04-21': 'Tiradentes',
+            '05-01': 'Dia do Trabalhador',
+            '09-07': 'Independência do Brasil',
+            '10-12': 'Nossa Senhora Aparecida',
+            '11-02': 'Finados',
+            '11-15': 'Proclamação da República',
+            '11-20': 'Dia de Zumbi dos Palmares / Consciência Negra',
+            '12-25': 'Natal',
+          };
+          
+          // Validar e corrigir eventos
+          const validatedEvents = parsedResult.events.map((event: any) => {
+            // Validar formato da data
+            if (!event.eventDate || !/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) {
+              console.warn('[importFromPDF] Data inválida ignorada:', event.title, event.eventDate);
+              return null;
+            }
+            
+            // Verificar se o ano está correto
+            const eventYear = parseInt(event.eventDate.substring(0, 4));
+            if (eventYear !== calendarYear) {
+              console.warn('[importFromPDF] Ano incorreto corrigido:', event.title, event.eventDate, '->', `${calendarYear}${event.eventDate.substring(4)}`);
+              event.eventDate = `${calendarYear}${event.eventDate.substring(4)}`;
+            }
+            
+            // Validar dia/mês (não pode ter dia 0 ou mês 0)
+            const month = parseInt(event.eventDate.substring(5, 7));
+            const day = parseInt(event.eventDate.substring(8, 10));
+            if (month < 1 || month > 12 || day < 1 || day > 31) {
+              console.warn('[importFromPDF] Data inválida ignorada:', event.title, event.eventDate);
+              return null;
+            }
+            
+            return event;
+          }).filter(Boolean);
+          
+          // Verificar se feriados nacionais fixos estão presentes
+          const existingDates = new Set(validatedEvents.map((e: any) => e.eventDate.substring(5)));
+          const missingHolidays: any[] = [];
+          
+          for (const [monthDay, name] of Object.entries(feriadosNacionaisFixos)) {
+            if (!existingDates.has(monthDay)) {
+              // Verificar se o feriado está mencionado no texto do PDF
+              const nameNormalized = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+              const textNormalized = pdfText.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+              if (textNormalized.includes(nameNormalized) || textNormalized.includes(monthDay.replace('-', '/'))) {
+                missingHolidays.push({
+                  title: name,
+                  description: `Feriado Nacional - ${name}`,
+                  eventDate: `${calendarYear}-${monthDay}`,
+                  eventType: 'holiday'
+                });
+                console.log('[importFromPDF] Feriado nacional faltante adicionado:', name, `${calendarYear}-${monthDay}`);
+              }
+            }
+          }
+          
+          const finalEvents = [...validatedEvents, ...missingHolidays];
+          console.log('[importFromPDF] Eventos finais (após validação):', finalEvents.length, `(${missingHolidays.length} feriados adicionados)`);
+          return finalEvents;
         } catch (error: any) {
           console.error('[importFromPDF] Erro ao processar PDF:', error);
           throw new TRPCError({

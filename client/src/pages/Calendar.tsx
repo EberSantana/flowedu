@@ -441,22 +441,21 @@ export default function Calendar() {
             <div className="flex gap-3">
               <Button
                 onClick={() => setIsUpdateDialogOpen(true)}
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
               >
                 <Clock className="w-4 h-4 mr-2" />
                 Atualizar Calendário Anual
               </Button>
               <Button
                 onClick={() => setIsImportDialogOpen(true)}
-                className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70"
+                className="bg-success text-success-foreground hover:bg-success/90 shadow-md"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Importar Calendário PDF
               </Button>
               <Button
                 onClick={() => setIsExportDialogOpen(true)}
-                variant="outline"
-                className="border-primary text-primary hover:bg-primary/10"
+                className="bg-secondary text-secondary-foreground border-2 border-primary/30 hover:bg-primary hover:text-primary-foreground shadow-md transition-colors"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Exportar Calendário
