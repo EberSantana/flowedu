@@ -15,7 +15,7 @@ export default function PortalChoice() {
     
     if (studentSession) {
       // Se é aluno, redirecionar para dashboard de aluno
-      setLocation('/student/dashboard');
+      setLocation('/student-dashboard');
     } else if (user) {
       // Se é professor, redirecionar para dashboard
       setLocation('/dashboard');
