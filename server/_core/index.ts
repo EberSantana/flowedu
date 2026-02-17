@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -139,6 +140,11 @@ async function startServer() {
   
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  // Serve uploaded files from local storage (fallback when S3 is not available)
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), {
+    maxAge: '7d',
+    immutable: true,
+  }));
   // Upload material endpoint
   app.use("/api", uploadMaterialRouter);
   // Extract PDF text endpoint

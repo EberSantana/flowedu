@@ -1,10 +1,58 @@
 import { Router } from 'express';
-import { storagePut } from './storage';
+import path from 'path';
+import fs from 'fs';
 
 const router = Router();
 
 // Limite máximo de arquivo em bytes (75MB)
 const MAX_FILE_SIZE = 75 * 1024 * 1024;
+
+// Diretório de uploads local (fallback quando S3 não está disponível)
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads', 'materials');
+
+// Garantir que o diretório de uploads existe
+function ensureUploadsDir() {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+}
+
+// Tentar upload via S3, com fallback para armazenamento local
+async function uploadFile(fileKey: string, buffer: Buffer, contentType: string): Promise<{ url: string; key: string }> {
+  // Tentar S3 primeiro
+  try {
+    const { storagePut } = await import('./storage');
+    const result = await storagePut(fileKey, buffer, contentType);
+    console.log(`[Upload] S3 upload successful: ${fileKey}`);
+    return result;
+  } catch (s3Error: any) {
+    // Se o erro for de credenciais ausentes, usar armazenamento local
+    if (s3Error.message?.includes('credentials missing') || s3Error.message?.includes('BUILT_IN_FORGE')) {
+      console.log(`[Upload] S3 not available, using local storage for: ${fileKey}`);
+      return await saveLocally(fileKey, buffer);
+    }
+    // Para outros erros S3, tentar local como fallback
+    console.error(`[Upload] S3 error, falling back to local:`, s3Error.message);
+    return await saveLocally(fileKey, buffer);
+  }
+}
+
+async function saveLocally(fileKey: string, buffer: Buffer): Promise<{ url: string; key: string }> {
+  ensureUploadsDir();
+  
+  // Sanitizar o nome do arquivo
+  const sanitizedKey = fileKey.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const filePath = path.join(UPLOADS_DIR, sanitizedKey);
+  
+  // Salvar arquivo
+  fs.writeFileSync(filePath, buffer);
+  
+  // Retornar URL relativa que será servida pelo Express
+  const url = `/uploads/materials/${sanitizedKey}`;
+  
+  console.log(`[Upload] Local save successful: ${filePath} -> ${url}`);
+  return { url, key: sanitizedKey };
+}
 
 router.post('/upload-material', async (req, res) => {
   const startTime = Date.now();
@@ -37,24 +85,16 @@ router.post('/upload-material', async (req, res) => {
 
     console.log(`[Upload] Processing file: ${fileKey}, Size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB, Type: ${contentType}`);
 
-    // Upload to S3
-    const result = await storagePut(fileKey, buffer, contentType);
+    // Upload to S3 or local storage
+    const result = await uploadFile(fileKey, buffer, contentType);
     
     const duration = Date.now() - startTime;
-    console.log(`[Upload] Success: ${fileKey} uploaded in ${duration}ms`);
+    console.log(`[Upload] Success: ${fileKey} uploaded in ${duration}ms -> ${result.url}`);
 
     res.json({ url: result.url, key: result.key });
   } catch (error: any) {
     const duration = Date.now() - startTime;
     console.error(`[Upload] Error after ${duration}ms:`, error.message || error);
-    
-    // Determinar tipo de erro
-    if (error.message?.includes('Storage upload failed')) {
-      return res.status(502).json({ 
-        error: 'Erro no servidor de armazenamento',
-        message: 'Não foi possível salvar o arquivo. Tente novamente em alguns instantes.'
-      });
-    }
     
     res.status(500).json({ 
       error: 'Upload failed',
