@@ -103,4 +103,68 @@ router.post('/upload-material', async (req, res) => {
   }
 });
 
+// Endpoint para verificar espaço em disco usado por materiais
+router.get('/storage-info', async (req, res) => {
+  try {
+    ensureUploadsDir();
+    
+    let totalSize = 0;
+    let fileCount = 0;
+    
+    const files = fs.readdirSync(UPLOADS_DIR);
+    for (const file of files) {
+      if (file.startsWith('.')) continue;
+      const filePath = path.join(UPLOADS_DIR, file);
+      const stats = fs.statSync(filePath);
+      if (stats.isFile()) {
+        totalSize += stats.size;
+        fileCount++;
+      }
+    }
+    
+    res.json({
+      totalSize,
+      totalSizeMB: (totalSize / (1024 * 1024)).toFixed(2),
+      fileCount,
+      uploadsDir: UPLOADS_DIR,
+    });
+  } catch (error: any) {
+    console.error('[Storage Info] Error:', error.message);
+    res.status(500).json({ error: 'Erro ao verificar armazenamento' });
+  }
+});
+
+// Endpoint para deletar arquivo do disco (chamado internamente)
+router.delete('/delete-file', async (req, res) => {
+  try {
+    const { filePath: relPath } = req.body;
+    
+    if (!relPath || !relPath.startsWith('/uploads/')) {
+      return res.status(400).json({ error: 'Caminho inválido' });
+    }
+    
+    const fullPath = path.join(process.cwd(), relPath);
+    
+    // Segurança: garantir que o caminho está dentro do diretório de uploads
+    const resolvedPath = path.resolve(fullPath);
+    const uploadsBase = path.resolve(path.join(process.cwd(), 'uploads'));
+    
+    if (!resolvedPath.startsWith(uploadsBase)) {
+      return res.status(403).json({ error: 'Acesso negado' });
+    }
+    
+    if (fs.existsSync(resolvedPath)) {
+      fs.unlinkSync(resolvedPath);
+      console.log(`[Storage] Arquivo deletado: ${resolvedPath}`);
+      res.json({ success: true, deleted: relPath });
+    } else {
+      console.log(`[Storage] Arquivo não encontrado: ${resolvedPath}`);
+      res.json({ success: true, deleted: null, message: 'Arquivo não encontrado no disco' });
+    }
+  } catch (error: any) {
+    console.error('[Storage Delete] Error:', error.message);
+    res.status(500).json({ error: 'Erro ao deletar arquivo' });
+  }
+});
+
 export default router;

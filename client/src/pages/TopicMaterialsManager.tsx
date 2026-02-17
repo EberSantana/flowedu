@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,7 @@ import {
   Loader2,
   GripVertical,
   AlertCircle,
+  HardDrive,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -71,6 +72,20 @@ export default function TopicMaterialsManager() {
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [storageInfo, setStorageInfo] = useState<{ totalSizeMB: string; fileCount: number } | null>(null);
+
+  // Buscar info de armazenamento
+  const fetchStorageInfo = async () => {
+    try {
+      const res = await fetch('/api/storage-info');
+      if (res.ok) {
+        const data = await res.json();
+        setStorageInfo({ totalSizeMB: data.totalSizeMB, fileCount: data.fileCount });
+      }
+    } catch (e) {
+      // Silently fail
+    }
+  };
 
   const { data: subject } = trpc.subjects.list.useQuery();
   const currentSubject = subject?.find(s => s.id === subjectId);
@@ -95,9 +110,13 @@ export default function TopicMaterialsManager() {
 
   const utils = trpc.useUtils();
 
+  // Carregar info de armazenamento ao montar
+  useEffect(() => { fetchStorageInfo(); }, []);
+
   const createMaterialMutation = trpc.materials.create.useMutation({
     onSuccess: () => {
       utils.materials.getByTopic.invalidate();
+      fetchStorageInfo();
       toast.success("Material adicionado com sucesso!");
       setIsAddDialogOpen(false);
       resetForm();
@@ -110,6 +129,7 @@ export default function TopicMaterialsManager() {
   const createModuleMaterialMutation = trpc.materials.createForModule.useMutation({
     onSuccess: () => {
       utils.materials.getByModule.invalidate();
+      fetchStorageInfo();
       toast.success("Material adicionado com sucesso!");
       setIsAddDialogOpen(false);
       resetForm();
@@ -140,7 +160,8 @@ export default function TopicMaterialsManager() {
       } else {
         utils.materials.getByTopic.invalidate();
       }
-      toast.success("Material removido!");
+      fetchStorageInfo();
+      toast.success("Material removido! Arquivo deletado do servidor.");
     },
     onError: (error) => {
       toast.error("Erro ao remover material: " + error.message);
@@ -437,6 +458,16 @@ export default function TopicMaterialsManager() {
               </Button>
             </div>
           </div>
+
+          {/* Storage Info */}
+          {storageInfo && (
+            <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-lg">
+              <HardDrive className="h-4 w-4" />
+              <span>
+                Armazenamento: <strong className="text-foreground">{storageInfo.totalSizeMB} MB</strong> usados em <strong className="text-foreground">{storageInfo.fileCount}</strong> arquivo(s) no servidor
+              </span>
+            </div>
+          )}
 
           {/* Materials List */}
           <Card>

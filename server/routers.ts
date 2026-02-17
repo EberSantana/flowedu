@@ -3710,7 +3710,25 @@ JSON (descrições MAX 15 chars):
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        return await db.deleteTopicMaterial(input.id, ctx.user.id);
+        const result = await db.deleteTopicMaterial(input.id, ctx.user.id);
+        
+        // Apagar arquivo físico do disco se for armazenamento local
+        if (result.deletedUrl && result.deletedUrl.startsWith('/uploads/')) {
+          try {
+            const fs = await import('fs');
+            const path = await import('path');
+            const filePath = path.default.join(process.cwd(), result.deletedUrl);
+            if (fs.default.existsSync(filePath)) {
+              fs.default.unlinkSync(filePath);
+              console.log(`[Materials] Arquivo deletado do disco: ${filePath}`);
+            }
+          } catch (fileErr: any) {
+            console.error(`[Materials] Erro ao deletar arquivo: ${fileErr.message}`);
+            // Não falhar a operação se o arquivo não puder ser deletado
+          }
+        }
+        
+        return { success: true };
       }),
     
     getByTopic: protectedProcedure

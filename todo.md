@@ -7112,3 +7112,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug - Upload de Materiais Didáticos
 - [x] Corrigir erro interno ao processar upload de materiais didáticos na trilha de aprendizagem
+
+## Gestão de Armazenamento - Materiais Didáticos
+- [x] Implementar deleção física do arquivo no disco ao remover material da trilha
+- [x] Exibir espaço em disco usado por materiais no painel do professor
+- [ ] Implementar limpeza automática de arquivos órfãos (cron)

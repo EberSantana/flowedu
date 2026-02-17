@@ -1565,13 +1565,22 @@ export async function deleteTopicMaterial(id: number, professorId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Buscar o material antes de deletar para obter a URL do arquivo
+  const [material] = await db.select({ url: topicMaterials.url })
+    .from(topicMaterials)
+    .where(and(
+      eq(topicMaterials.id, id),
+      eq(topicMaterials.professorId, professorId)
+    ))
+    .limit(1);
+  
   await db.delete(topicMaterials)
     .where(and(
       eq(topicMaterials.id, id),
       eq(topicMaterials.professorId, professorId)
     ));
   
-  return { success: true };
+  return { success: true, deletedUrl: material?.url || null };
 }
 
 // ==================== MODULE MATERIALS ====================
