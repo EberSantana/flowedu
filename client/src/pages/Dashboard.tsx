@@ -301,8 +301,9 @@ function Dashboard() {
   
   // Prazos importantes (eventos dos próximos 7 dias)
   const importantDeadlines = calendarUpcomingEvents?.filter((event: any) => {
-    const eventDate = new Date(event.eventDate);
+    const eventDate = new Date(event.eventDate + 'T12:00:00');
     const now = new Date();
+    now.setHours(12, 0, 0, 0);
     const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return diffDays >= 0 && diffDays <= 7 && (event.eventType === 'school_event' || event.eventType === 'holiday');
   }).slice(0, 5) || [];
@@ -966,21 +967,25 @@ function Dashboard() {
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
                   {calendarUpcomingEvents.map((event: any) => {
-                    const eventDate = new Date(event.eventDate + 'T00:00:00');
+                    // Parsear data sem timezone issues
+                    const [evY, evM, evD] = event.eventDate.split('-').map(Number);
+                    const eventDate = new Date(evY, evM - 1, evD, 12, 0, 0);
                     const today = new Date();
-                    today.setHours(0, 0, 0, 0);
+                    today.setHours(12, 0, 0, 0);
                     const tomorrow = new Date(today);
                     tomorrow.setDate(today.getDate() + 1);
                     const dayAfterTomorrow = new Date(today);
                     dayAfterTomorrow.setDate(today.getDate() + 2);
                     
-                    // Determinar urgência
+                    // Determinar urgência usando string comparison
+                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                    const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
                     let urgencyColor = 'bg-yellow-500';
                     let urgencyText = 'Em 2-3 dias';
-                    if (eventDate.getTime() === today.getTime()) {
+                    if (event.eventDate === todayStr) {
                       urgencyColor = 'bg-red-500';
                       urgencyText = 'HOJE';
-                    } else if (eventDate.getTime() === tomorrow.getTime()) {
+                    } else if (event.eventDate === tomorrowStr) {
                       urgencyColor = 'bg-orange-500';
                       urgencyText = 'AMANHÃ';
                     }

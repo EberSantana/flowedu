@@ -158,12 +158,18 @@ export default function Calendar() {
   }, [selectedYear, selectedMonth]);
 
   // Eventos do mês selecionado
+  // Helper para parsear YYYY-MM-DD sem timezone issues
+  const parseDateStr = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return { year: y, month: m - 1, day: d }; // month é 0-indexed
+  };
+
   const monthEvents = useMemo(() => {
     if (!events) return [];
     return events.filter((event: any) => {
-      const eventDate = new Date(event.eventDate);
-      return eventDate.getMonth() === selectedMonth && eventDate.getFullYear() === selectedYear;
-    }).sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      const { year, month } = parseDateStr(event.eventDate);
+      return month === selectedMonth && year === selectedYear;
+    }).sort((a: any, b: any) => a.eventDate.localeCompare(b.eventDate));
   }, [events, selectedMonth, selectedYear]);
 
   // Eventos por dia
@@ -172,8 +178,8 @@ export default function Calendar() {
     if (!events) return map;
     
     events.forEach((event: any) => {
-      const eventDate = new Date(event.eventDate);
-      const key = `${eventDate.getFullYear()}-${eventDate.getMonth()}-${eventDate.getDate()}`;
+      const { year, month, day } = parseDateStr(event.eventDate);
+      const key = `${year}-${month}-${day}`;
       if (!map.has(key)) {
         map.set(key, []);
       }
@@ -211,7 +217,7 @@ export default function Calendar() {
     setFormData({
       title: event.title,
       description: event.description || "",
-      eventDate: new Date(event.eventDate).toISOString().split('T')[0],
+      eventDate: event.eventDate, // Já é YYYY-MM-DD, não converter via Date
       eventType: event.eventType,
       isRecurring: event.isRecurring,
       color: event.color,
@@ -287,7 +293,7 @@ export default function Calendar() {
           
           // Calcular eventos a deletar (apenas institucionais do ano selecionado)
           const yearEvents = events?.filter(e => {
-            const eventYear = new Date(e.eventDate).getFullYear();
+            const eventYear = parseInt(e.eventDate.substring(0, 4));
             return eventYear === updateYear && e.eventType !== 'personal';
           }) || [];
           setEventsToDelete(yearEvents);
@@ -614,7 +620,7 @@ export default function Calendar() {
                   ) : (
                     <div className="space-y-3">
                       {monthEvents.map((event: any) => {
-                        const eventDate = new Date(event.eventDate);
+                        const { day: evDay, month: evMonth } = parseDateStr(event.eventDate);
                         const eventType = EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES];
                         
                         return (
@@ -629,7 +635,7 @@ export default function Calendar() {
                                   {event.title}
                                 </h4>
                                 <p className="text-xs text-gray-500 mt-0.5">
-                                  {eventDate.getDate()} de {MONTHS[eventDate.getMonth()]}
+                                  {evDay} de {MONTHS[evMonth]}
                                 </p>
                                 <span className={`inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${eventType.color}`}>
                                   {eventType.label}
@@ -739,7 +745,7 @@ export default function Calendar() {
         
         {/* Dialog de Importação de PDF */}
         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogContent className="sm:!max-w-2xl md:!max-w-3xl lg:!max-w-4xl max-h-[80vh] !flex !flex-col overflow-hidden">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-success" />

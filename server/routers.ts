@@ -1123,18 +1123,18 @@ export const appRouter = router({
       }),
     getUpcomingEvents: protectedProcedure
       .query(async ({ ctx }) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const threeDaysLater = new Date(today);
-        threeDaysLater.setDate(today.getDate() + 3);
+        // Usar strings YYYY-MM-DD para comparação, evitando timezone issues
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const threeDaysLater = new Date(now);
+        threeDaysLater.setDate(now.getDate() + 3);
+        const threeDaysStr = `${threeDaysLater.getFullYear()}-${String(threeDaysLater.getMonth() + 1).padStart(2, '0')}-${String(threeDaysLater.getDate()).padStart(2, '0')}`;
         
-        const allEvents = await db.getCalendarEventsByYear(ctx.user.id, today.getFullYear());
+        const allEvents = await db.getCalendarEventsByYear(ctx.user.id, now.getFullYear());
         
         return allEvents.filter((event: any) => {
-          const eventDate = new Date(event.eventDate);
-          eventDate.setHours(0, 0, 0, 0);
-          return eventDate >= today && eventDate < threeDaysLater;
-        }).sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+          return event.eventDate >= todayStr && event.eventDate < threeDaysStr;
+        }).sort((a: any, b: any) => a.eventDate.localeCompare(b.eventDate));
       }),
     create: protectedProcedure
       .input(
@@ -1347,9 +1347,15 @@ export const appRouter = router({
             db.getTimeSlotsByUserId(ctx.user.id),
           ]);
           
-          const startDate = new Date(`${input.year}-01-01`);
-          const endDate = new Date(`${input.year}-12-31`);
+          // Usar datas com T12:00:00 para evitar timezone shift
+          const startDate = new Date(`${input.year}-01-01T12:00:00`);
+          const endDate = new Date(`${input.year}-12-31T12:00:00`);
           const dayMap: Record<number, number> = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 0 };
+          
+          // Helper para formatar data local como YYYY-MM-DD
+          const formatLocalDate = (d: Date) => {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          };
           
           for (const sc of scList) {
             const subject = subList.find((s: any) => s.id === sc.subjectId);
@@ -1364,7 +1370,7 @@ export const appRouter = router({
                 icsEvents.push({
                   title: `${subject.name}${cls ? ` - ${cls.name}` : ""}`,
                   description: sc.notes || `Aula de ${subject.name}${cls ? ` para turma ${cls.name}` : ""}`,
-                  eventDate: current.toISOString().split("T")[0],
+                  eventDate: formatLocalDate(current),
                   startTime: ts.startTime,
                   endTime: ts.endTime,
                   eventType: "schedule",

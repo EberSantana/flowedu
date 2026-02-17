@@ -7065,3 +7065,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Garantir contraste adequado dos botões no modal
 - [x] Corrigir data exibida (31/12/2025 em vez de 01/01/2026 para Confraternização Universal)
 - [x] Sincronizar correção na VPS
+
+## Bug: Layout modal importação e datas erradas
+- [x] Corrigir layout do modal - scrollbar fora da caixa e botões desalinhados
+- [x] Corrigir bug de timezone: datas ficam 1 dia a menos ao salvar (ex: 18/02 vira 17/02)
+- [x] Sincronizar correções na VPS

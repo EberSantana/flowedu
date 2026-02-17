@@ -40,6 +40,33 @@ function formatICSDate(dateStr: string): string {
   return dateStr.replace(/-/g, "");
 }
 
+/**
+ * Calcula o dia seguinte a partir de uma string YYYY-MM-DD
+ * SEM usar new Date() para evitar problemas de timezone
+ */
+function getNextDayStr(dateStr: string): string {
+  const [yearStr, monthStr, dayStr] = dateStr.split('-');
+  let year = parseInt(yearStr);
+  let month = parseInt(monthStr);
+  let day = parseInt(dayStr);
+  
+  // Dias por mês (considerando ano bissexto)
+  const isLeapYear = (y: number) => (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+  const daysInMonth = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  
+  day++;
+  if (day > daysInMonth[month - 1]) {
+    day = 1;
+    month++;
+    if (month > 12) {
+      month = 1;
+      year++;
+    }
+  }
+  
+  return `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+}
+
 function generateUID(prefix: string, id: string | number): string {
   return `flowedu-${prefix}-${id}@flowedu.app`;
 }
@@ -85,12 +112,9 @@ export function generateICSContent(
       lines.push(`DTSTART;TZID=America/Manaus:${startDT}`);
       lines.push(`DTEND;TZID=America/Manaus:${endDT}`);
     } else {
-      // Evento de dia inteiro
+      // Evento de dia inteiro - usar cálculo de string para evitar timezone
       lines.push(`DTSTART;VALUE=DATE:${dateStr}`);
-      // Para eventos all-day, DTEND deve ser o dia seguinte
-      const nextDay = new Date(event.eventDate);
-      nextDay.setDate(nextDay.getDate() + 1);
-      const nextDayStr = nextDay.toISOString().split("T")[0].replace(/-/g, "");
+      const nextDayStr = getNextDayStr(event.eventDate);
       lines.push(`DTEND;VALUE=DATE:${nextDayStr}`);
     }
 
@@ -121,10 +145,8 @@ export function generateGoogleCalendarURL(event: CalendarEventICS): string {
     const end = `${dateStr}T${event.endTime.replace(":", "")}00`;
     dates = `${start}/${end}`;
   } else {
-    // Evento de dia inteiro
-    const nextDay = new Date(event.eventDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    const nextDayStr = nextDay.toISOString().split("T")[0].replace(/-/g, "");
+    // Evento de dia inteiro - usar cálculo de string para evitar timezone
+    const nextDayStr = getNextDayStr(event.eventDate);
     dates = `${dateStr}/${nextDayStr}`;
   }
 
