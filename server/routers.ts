@@ -1108,7 +1108,8 @@ export const appRouter = router({
           
           // Extrair texto do PDF usando pdfjs-dist
           console.log('[importFromPDF] Extraindo texto do PDF...');
-          const loadingTask = pdfjsLib.getDocument({ data: pdfBuffer });
+          const uint8Array = new Uint8Array(pdfBuffer.buffer, pdfBuffer.byteOffset, pdfBuffer.byteLength);
+          const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
           const pdfDocument = await loadingTask.promise;
           
           let pdfText = '';
