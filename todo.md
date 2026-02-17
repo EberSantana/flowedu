@@ -7053,3 +7053,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar importFromPDF no routers.ts para usar nova abordagem com posições
 - [x] Validar: 130 eventos extraídos, todos os 12 meses com eventos, 13 feriados corretos
 - [x] Todos os 327 testes passando
+
+## Atualização de Versão 2.5.7
+- [x] Atualizar package.json para 2.5.7 no Manus
+- [x] Atualizar package.json para 2.5.7 na VPS
+- [x] Rebuild completo na VPS (esbuild + vite build)
+- [x] Verificar parser v2 funcionando na VPS + correção tolerância Y para meses limítrofes

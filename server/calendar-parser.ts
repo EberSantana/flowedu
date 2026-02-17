@@ -263,21 +263,24 @@ export function extractStructuredText(pages: Array<{items: Array<{str: string; t
       if (!eventText) continue;
       
       // Encontrar o mês correto para esta linha baseado na posição Y
-      // A linha pertence ao mês cujo cabeçalho está ACIMA (Y maior ou igual) e mais próximo
+      // IMPORTANTE: No PDF, cada página tem 3 seções de meses empilhadas.
+      // Os cabeçalhos de meses estão em Y altos e os eventos abaixo deles.
+      // Porém, alguns eventos do mês seguinte aparecem ACIMA do cabeçalho
+      // do mês seguinte (ex: Y=963 para evento de Maio, mas header Maio Y=956).
+      // Usamos margem de tolerância de 50px para resolver isso.
+      const Y_TOLERANCE = 50;
+      
       let bestBlock: MonthBlock | null = null;
       for (const block of monthBlocks) {
-        // O cabeçalho do mês está acima (Y >= lineY) ou na mesma altura
-        // Mas como os meses estão empilhados, o mês correto é o que tem Y >= lineY
-        // e é o mais próximo (menor diferença)
-        if (block.monthY >= y) {
+        // O cabeçalho do mês está acima (Y >= lineY) ou próximo (com tolerância)
+        if (block.monthY >= y - Y_TOLERANCE) {
           if (!bestBlock || block.monthY < bestBlock.monthY) {
             bestBlock = block;
           }
         }
       }
       
-      // Se não encontrou mês acima, pode ser um evento que está acima do cabeçalho
-      // (eventos "órfãos" que aparecem antes do nome do mês na mesma seção)
+      // Se não encontrou mês acima (com tolerância), pode ser um evento órfão
       if (!bestBlock && monthBlocks.length > 0) {
         // Atribuir ao mês com Y mais próximo abaixo
         for (const block of monthBlocks) {
@@ -287,8 +290,7 @@ export function extractStructuredText(pages: Array<{items: Array<{str: string; t
             }
           }
         }
-      }
-      
+      }      
       if (bestBlock) {
         bestBlock.eventLines.push({ y, text: eventText });
       }
