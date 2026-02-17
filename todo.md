@@ -7070,3 +7070,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir layout do modal - scrollbar fora da caixa e botões desalinhados
 - [x] Corrigir bug de timezone: datas ficam 1 dia a menos ao salvar (ex: 18/02 vira 17/02)
 - [x] Sincronizar correções na VPS
+
+## Bug: Mapeamento de dias da semana na grade de horários
+- [x] Investigar mapeamento de dayOfWeek no frontend (Schedule.tsx) e backend (routers.ts)
+- [x] Corrigir bug: aula agendada para Terça-Feira cai na Segunda-Feira (removido -1 no submit, corrigido dayMap no ICS export, atualizado registros existentes no banco)
+- [x] Sincronizar correção na VPS

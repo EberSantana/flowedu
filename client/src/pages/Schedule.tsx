@@ -151,7 +151,7 @@ export default function Schedule() {
       subjectId: parseInt(formData.subjectId),
       classId: parseInt(formData.classId),
       timeSlotId: parseInt(formData.timeSlotId),
-      dayOfWeek: parseInt(formData.dayOfWeek) - 1, // Ajustar para 0-6 (backend espera 0=domingo)
+      dayOfWeek: parseInt(formData.dayOfWeek), // 1=Segunda, 2=Terça, ..., 6=Sábado (coincide com JS getDay())
       notes: formData.notes || undefined,
     });
   };

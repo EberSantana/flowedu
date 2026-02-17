@@ -1350,8 +1350,6 @@ export const appRouter = router({
           // Usar datas com T12:00:00 para evitar timezone shift
           const startDate = new Date(`${input.year}-01-01T12:00:00`);
           const endDate = new Date(`${input.year}-12-31T12:00:00`);
-          const dayMap: Record<number, number> = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 0 };
-          
           // Helper para formatar data local como YYYY-MM-DD
           const formatLocalDate = (d: Date) => {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1363,7 +1361,8 @@ export const appRouter = router({
             const ts = tsList.find((t: any) => t.id === sc.timeSlotId);
             if (!subject || !ts) continue;
             
-            const targetDay = dayMap[sc.dayOfWeek] ?? sc.dayOfWeek;
+            // dayOfWeek no banco: 1=Segunda, 2=Terça, ..., 6=Sábado (coincide com JS getDay())
+            const targetDay = sc.dayOfWeek;
             const current = new Date(startDate);
             while (current <= endDate) {
               if (current.getDay() === targetDay) {
