@@ -7094,3 +7094,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Investigar erro nos logs da VPS (erro: Cannot access 'De' before initialization)
 - [x] Corrigir: mover scheduledClassesMap (useMemo) antes dos useCallbacks de drag and drop
 - [x] Sincronizar na VPS
+
+## Bug: Cadastro de aluno manual e importação Word não funcionam
+- [x] Corrigir cadastro manual: reescrito QuickEnrollModal com formulário funcional
+- [x] Adicionar aba de importação por upload de arquivo Word/Excel (.docx, .xlsx, .csv, .txt)
+- [x] Implementar parser de Word (.docx) com mammoth e Excel (.xlsx) com xlsx
+- [x] Login do aluno = matrícula, senha = matrícula (já funcionava no backend)
+- [x] Sincronizar correções na VPS (QuickEnrollModal.tsx copiado, mammoth+xlsx instalados, build+restart OK)
