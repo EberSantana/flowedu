@@ -2408,3 +2408,83 @@ export const mistakeNotebookStudyPlans = mysqlTable("mistake_notebook_study_plan
 
 export type MistakeNotebookStudyPlan = typeof mistakeNotebookStudyPlans.$inferSelect;
 export type InsertMistakeNotebookStudyPlan = typeof mistakeNotebookStudyPlans.$inferInsert;
+
+
+/**
+ * ========================================
+ * SISTEMA DE NOTIFICAÇÕES PUSH
+ * ========================================
+ * Web Push API para lembrar professores sobre aulas e eventos
+ */
+
+/**
+ * Assinaturas Push do navegador
+ * Armazena as subscriptions para enviar notificações push
+ */
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  endpoint: text("endpoint").notNull(),
+  p256dh: text("p256dh").notNull(), // Public key
+  auth: text("auth").notNull(), // Auth secret
+  userAgent: varchar("userAgent", { length: 500 }),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+
+/**
+ * Preferências de Notificação do Professor
+ * Configura quais tipos de lembretes o professor deseja receber
+ */
+export const notificationPreferences = mysqlTable("notification_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  
+  // Tipos de notificação habilitados
+  classReminders: boolean("classReminders").default(true).notNull(), // Lembrete antes das aulas
+  eventReminders: boolean("eventReminders").default(true).notNull(), // Lembrete de eventos do calendário
+  taskReminders: boolean("taskReminders").default(true).notNull(), // Lembrete de tarefas com prazo
+  dailySummary: boolean("dailySummary").default(false).notNull(), // Resumo diário das aulas
+  
+  // Tempo de antecedência para lembretes (em minutos)
+  classReminderMinutes: int("classReminderMinutes").default(15).notNull(), // 15 min antes da aula
+  eventReminderMinutes: int("eventReminderMinutes").default(60).notNull(), // 1h antes do evento
+  dailySummaryTime: varchar("dailySummaryTime", { length: 5 }).default("07:00").notNull(), // Horário do resumo diário
+  
+  // Dias da semana para notificações (JSON array: [1,2,3,4,5] = seg-sex)
+  activeDays: text("activeDays").default("[1,2,3,4,5]").notNull(),
+  
+  // Horário silencioso (não enviar notificações)
+  quietHoursStart: varchar("quietHoursStart", { length: 5 }).default("22:00").notNull(),
+  quietHoursEnd: varchar("quietHoursEnd", { length: 5 }).default("06:00").notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NotificationPreference = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
+
+/**
+ * Histórico de Notificações Push Enviadas
+ * Para evitar duplicatas e rastrear entregas
+ */
+export const pushNotificationLog = mysqlTable("push_notification_log", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  type: mysqlEnum("pushType", ["class_reminder", "event_reminder", "task_reminder", "daily_summary"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body").notNull(),
+  referenceId: varchar("referenceId", { length: 100 }), // ID do evento/aula referenciado
+  referenceDate: varchar("referenceDate", { length: 10 }), // Data de referência YYYY-MM-DD
+  delivered: boolean("delivered").default(false).notNull(),
+  error: text("error"),
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+});
+
+export type PushNotificationLog = typeof pushNotificationLog.$inferSelect;
+export type InsertPushNotificationLog = typeof pushNotificationLog.$inferInsert;

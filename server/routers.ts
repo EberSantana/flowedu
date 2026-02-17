@@ -17,6 +17,7 @@ import { invokeLLM } from "./_core/llm";
 import { sendPasswordResetEmail } from "./_core/email";
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
+import * as pushNotif from './push-notifications';
 // Importar pdfjs-dist para extração de texto do PDF
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
@@ -8168,6 +8169,78 @@ Retorne em formato JSON com estrutura:
         
         await db.markInsightAsRead(input.insightId);
         return { success: true };
+      }),
+  }),
+
+  // ==================== PUSH NOTIFICATIONS ====================
+  pushNotifications: router({
+    // Obter chave pública VAPID
+    getVapidKey: protectedProcedure
+      .query(() => {
+        return { key: pushNotif.getVapidPublicKey() };
+      }),
+
+    // Registrar subscription push
+    subscribe: protectedProcedure
+      .input(z.object({
+        endpoint: z.string(),
+        keys: z.object({
+          p256dh: z.string(),
+          auth: z.string(),
+        }),
+        userAgent: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const id = await pushNotif.savePushSubscription(
+          ctx.user.id,
+          { endpoint: input.endpoint, keys: input.keys },
+          input.userAgent
+        );
+        return { success: true, subscriptionId: id };
+      }),
+
+    // Remover subscription push
+    unsubscribe: protectedProcedure
+      .input(z.object({ endpoint: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        await pushNotif.removePushSubscription(ctx.user.id, input.endpoint);
+        return { success: true };
+      }),
+
+    // Obter preferências de notificação
+    getPreferences: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await pushNotif.getNotificationPrefs(ctx.user.id);
+      }),
+
+    // Salvar preferências de notificação
+    savePreferences: protectedProcedure
+      .input(z.object({
+        classReminders: z.boolean().optional(),
+        eventReminders: z.boolean().optional(),
+        taskReminders: z.boolean().optional(),
+        dailySummary: z.boolean().optional(),
+        classReminderMinutes: z.number().min(5).max(60).optional(),
+        eventReminderMinutes: z.number().min(15).max(1440).optional(),
+        dailySummaryTime: z.string().optional(),
+        activeDays: z.array(z.number().min(0).max(6)).optional(),
+        quietHoursStart: z.string().optional(),
+        quietHoursEnd: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await pushNotif.saveNotificationPrefs(ctx.user.id, input);
+      }),
+
+    // Enviar notificação de teste
+    sendTest: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return await pushNotif.sendTestNotification(ctx.user.id);
+      }),
+
+    // Obter estatísticas
+    getStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await pushNotif.getNotificationStats(ctx.user.id);
       }),
   }),
 });

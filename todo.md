@@ -7001,3 +7001,20 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Fix: Corrigir datas erradas dos eventos importados do calendário acadêmico 2026 (ex: Dia do Trabalhador em 30/04 em vez de 01/05)
 - [x] Fix: Corrigir teste falhando em refactored-procedures.test.ts
 - [x] Desativar Tour automático após primeira visualização (salvar no localStorage)
+
+## Notificações Push (Web Push API)
+- [x] Criar tabelas push_subscriptions, notification_preferences e push_notification_log no banco de dados
+- [x] Instalar e configurar web-push com VAPID keys
+- [x] Criar módulo server/push-notifications.ts com lógica de envio
+- [x] Implementar job periódico (5 min) para verificar aulas e eventos próximos
+- [x] Implementar lembretes de aula (antecedência configurável)
+- [x] Implementar lembretes de eventos do calendário
+- [x] Implementar lembretes de tarefas com prazo
+- [x] Implementar resumo diário opcional
+- [x] Implementar horário silencioso e dias ativos
+- [x] Criar procedures tRPC para push notifications (subscribe, unsubscribe, preferences, test, stats)
+- [x] Criar página de configuração de notificações push (NotificationSettings.tsx)
+- [x] Atualizar Service Worker com handlers de push, notificationclick e notificationclose
+- [x] Adicionar link no Sidebar (Comunicação > Notificações Push)
+- [x] Adicionar rota /notification-settings no App.tsx
+- [x] Criar testes automatizados (10 testes passando)

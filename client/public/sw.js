@@ -186,6 +186,81 @@ function createOfflineResponse() {
   );
 }
 
+// ==================== PUSH NOTIFICATIONS ====================
+
+// Receber notificação push
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push recebido:', event);
+  
+  let data = {
+    title: 'FlowEdu',
+    body: 'Você tem uma nova notificação',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'flowedu-notification',
+    data: { url: '/dashboard' },
+  };
+  
+  try {
+    if (event.data) {
+      const payload = event.data.json();
+      data = { ...data, ...payload };
+    }
+  } catch (e) {
+    console.warn('[SW] Erro ao parsear push data:', e);
+  }
+  
+  const options = {
+    body: data.body,
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/icon-192.png',
+    tag: data.tag || 'flowedu-notification',
+    vibrate: [200, 100, 200],
+    requireInteraction: false,
+    data: data.data || { url: '/dashboard' },
+    actions: [
+      { action: 'open', title: 'Abrir' },
+      { action: 'dismiss', title: 'Dispensar' },
+    ],
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Clique na notificação
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notificação clicada:', event.action);
+  event.notification.close();
+  
+  if (event.action === 'dismiss') return;
+  
+  const url = event.notification.data?.url || '/dashboard';
+  
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Se já tem uma aba aberta, focar nela
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            client.navigate(url);
+            return client.focus();
+          }
+        }
+        // Senão, abrir nova aba
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(url);
+        }
+      })
+  );
+});
+
+// Fechar notificação
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notificação fechada:', event.notification.tag);
+});
+
 // Mensagens do cliente
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {

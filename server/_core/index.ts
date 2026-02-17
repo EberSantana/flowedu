@@ -210,6 +210,14 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Inicializar sistema de notificações push
+    import('../push-notifications').then(({ initializeVapid, startReminderJob }) => {
+      initializeVapid();
+      startReminderJob();
+    }).catch(error => {
+      console.warn('[Push] Falha ao inicializar notificações push:', error);
+    });
   });
 }
 

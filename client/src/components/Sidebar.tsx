@@ -28,7 +28,8 @@ import {
   GraduationCap,
   MessageSquare,
   Settings,
-  FolderOpen
+  FolderOpen,
+  BellRing
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -186,6 +187,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Avisos",
         icon: <Megaphone className="h-5 w-5" />,
         href: "/announcements",
+      },
+      {
+        label: "Notificações Push",
+        icon: <BellRing className="h-5 w-5" />,
+        href: "/notification-settings",
       },
     ],
   },
