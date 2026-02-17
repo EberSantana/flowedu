@@ -7089,3 +7089,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Carga horária incorreta no Dashboard (corrigido dayOfWeek: index+1 para 1=Segunda, weeklyProgress filtro 1-5)
 - [x] Corrigido timezone em getUpcomingClasses e getTodayClasses (toISOString → formato local)
 - [x] Sincronizar correções na VPS
+
+## Bug: Erro ao clicar em Grade Semanal na VPS
+- [x] Investigar erro nos logs da VPS (erro: Cannot access 'De' before initialization)
+- [x] Corrigir: mover scheduledClassesMap (useMemo) antes dos useCallbacks de drag and drop
+- [x] Sincronizar na VPS

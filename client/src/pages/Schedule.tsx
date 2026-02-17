@@ -107,6 +107,17 @@ export default function Schedule() {
     },
   });
 
+  // Schedule map - MUST be before drag handlers that reference it
+  const scheduleMap = useMemo(() => {
+    if (!fullSchedule) return new Map();
+    const map = new Map();
+    fullSchedule.scheduledClasses.forEach((sc) => {
+      const key = `${sc.timeSlotId}-${sc.dayOfWeek}`;
+      map.set(key, sc);
+    });
+    return map;
+  }, [fullSchedule]);
+
   // Drag and Drop handlers
   const handleDragStart = useCallback((e: React.DragEvent, sc: any) => {
     setDraggedClass({ id: sc.id, timeSlotId: sc.timeSlotId, dayOfWeek: sc.dayOfWeek, subjectId: sc.subjectId, classId: sc.classId });
@@ -261,16 +272,6 @@ export default function Schedule() {
       deleteMutation.mutate({ id });
     }
   };
-
-  const scheduleMap = useMemo(() => {
-    if (!fullSchedule) return new Map();
-    const map = new Map();
-    fullSchedule.scheduledClasses.forEach((sc) => {
-      const key = `${sc.timeSlotId}-${sc.dayOfWeek}`;
-      map.set(key, sc);
-    });
-    return map;
-  }, [fullSchedule]);
 
   const getScheduledClass = (timeSlotId: number, dayOfWeek: number) => {
     const scheduledClass = scheduleMap.get(`${timeSlotId}-${dayOfWeek}`);
