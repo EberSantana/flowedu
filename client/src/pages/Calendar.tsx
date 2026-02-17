@@ -739,8 +739,8 @@ export default function Calendar() {
         
         {/* Dialog de Importação de PDF */}
         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
+          <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+            <DialogHeader className="flex-shrink-0">
               <DialogTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-success" />
                 Importar Calendário Escolar (PDF)
@@ -751,7 +751,7 @@ export default function Calendar() {
             </DialogHeader>
             
             {extractedEvents.length === 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-y-auto flex-1">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-success transition-colors">
                   <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                   <Label htmlFor="pdf-upload" className="cursor-pointer">
@@ -777,8 +777,8 @@ export default function Calendar() {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between bg-success/10 p-4 rounded-lg">
+              <>
+                <div className="flex-shrink-0 flex items-center justify-between bg-success/10 p-4 rounded-lg">
                   <div>
                     <p className="font-medium text-success">{extractedEvents.length} eventos extraídos</p>
                     <p className="text-sm text-success/80">{selectedEvents.size} selecionados para importar</p>
@@ -803,7 +803,7 @@ export default function Calendar() {
                   </div>
                 </div>
                 
-                <div className="max-h-96 overflow-y-auto space-y-2">
+                <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
                   {extractedEvents.map((event, index) => (
                     <div
                       key={index}
@@ -834,7 +834,10 @@ export default function Calendar() {
                           <p className="text-sm text-gray-600 mb-1">{event.description}</p>
                           <p className="text-xs text-gray-500 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            {new Date(event.eventDate).toLocaleDateString('pt-BR')}
+                            {(() => {
+                              const parts = event.eventDate.split('-');
+                              return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                            })()}
                           </p>
                         </div>
                       </div>
@@ -842,9 +845,10 @@ export default function Calendar() {
                   ))}
                 </div>
                 
-                <DialogFooter>
+                <DialogFooter className="flex-shrink-0 border-t pt-4 mt-2">
                   <Button
                     variant="outline"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100"
                     onClick={() => {
                       setExtractedEvents([]);
                       setSelectedEvents(new Set());
@@ -856,12 +860,12 @@ export default function Calendar() {
                   <Button
                     onClick={handleConfirmImport}
                     disabled={selectedEvents.size === 0 || bulkCreateMutation.isPending}
-                    className="bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70"
+                    className="bg-green-600 hover:bg-green-700 text-white font-medium shadow-md"
                   >
                     {bulkCreateMutation.isPending ? 'Importando...' : `Importar ${selectedEvents.size} Eventos`}
                   </Button>
                 </DialogFooter>
-              </div>
+              </>
             )}
           </DialogContent>
         </Dialog>

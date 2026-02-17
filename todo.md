@@ -7059,3 +7059,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar package.json para 2.5.7 na VPS
 - [x] Rebuild completo na VPS (esbuild + vite build)
 - [x] Verificar parser v2 funcionando na VPS + correção tolerância Y para meses limítrofes
+
+## Bug: Botões invisíveis no modal de importação de calendário
+- [x] Corrigir visibilidade dos botões "Cancelar" e "Importar X Eventos" no modal de importação PDF
+- [x] Garantir contraste adequado dos botões no modal
+- [x] Corrigir data exibida (31/12/2025 em vez de 01/01/2026 para Confraternização Universal)
+- [x] Sincronizar correção na VPS
