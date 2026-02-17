@@ -7117,3 +7117,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar deleção física do arquivo no disco ao remover material da trilha
 - [x] Exibir espaço em disco usado por materiais no painel do professor
 - [ ] Implementar limpeza automática de arquivos órfãos (cron)
+
+## Limite de Armazenamento por Professor (Admin)
+- [ ] Criar tabela system_settings no banco para armazenar configurações globais
+- [ ] Criar endpoint para admin definir limite de armazenamento (MB) por professor
+- [ ] Criar painel admin para ajustar limite de armazenamento
+- [ ] Implementar verificação de limite antes do upload de materiais
+- [ ] Exibir barra de progresso de armazenamento na página de materiais do professor
+- [ ] Bloquear upload quando limite for atingido com mensagem clara

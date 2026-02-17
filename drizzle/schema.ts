@@ -2488,3 +2488,19 @@ export const pushNotificationLog = mysqlTable("push_notification_log", {
 
 export type PushNotificationLog = typeof pushNotificationLog.$inferSelect;
 export type InsertPushNotificationLog = typeof pushNotificationLog.$inferInsert;
+
+/**
+ * Configurações do Sistema (Admin)
+ * Armazena configurações globais como limite de armazenamento
+ */
+export const systemSettings = mysqlTable("system_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  settingKey: varchar("setting_key", { length: 100 }).notNull().unique(),
+  settingValue: text("setting_value").notNull(),
+  description: varchar("description", { length: 255 }),
+  updatedBy: int("updated_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = typeof systemSettings.$inferInsert;

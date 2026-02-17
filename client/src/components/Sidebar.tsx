@@ -207,6 +207,12 @@ const teacherNavCategories: NavCategory[] = [
         href: "/admin/users",
         adminOnly: true,
       },
+      {
+        label: "Configurações",
+        icon: <Settings className="h-5 w-5" />,
+        href: "/admin/settings",
+        adminOnly: true,
+      },
     ],
   },
 ];

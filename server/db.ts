@@ -145,7 +145,10 @@ import {
   questions,
   questionAnswers,
   InsertQuestion,
-  InsertQuestionAnswer,} from "../drizzle/schema";
+  InsertQuestionAnswer,
+  systemSettings,
+  SystemSetting,
+  InsertSystemSetting,} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -11397,4 +11400,73 @@ export async function migrateGoogleAccountToEmail(userId: number, passwordHash: 
     })
     .where(eq(users.id, userId));
   return true;
+}
+
+
+// ==================== CONFIGURAÇÕES DO SISTEMA ====================
+
+/**
+ * Obter uma configuração do sistema pelo key
+ */
+export async function getSystemSetting(key: string): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(systemSettings)
+    .where(eq(systemSettings.settingKey, key))
+    .limit(1);
+  
+  return result[0]?.settingValue || null;
+}
+
+/**
+ * Obter todas as configurações do sistema
+ */
+export async function getAllSystemSettings(): Promise<SystemSetting[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(systemSettings);
+}
+
+/**
+ * Atualizar ou criar uma configuração do sistema
+ */
+export async function upsertSystemSetting(key: string, value: string, description?: string, updatedBy?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Tentar atualizar primeiro
+  const existing = await db.select()
+    .from(systemSettings)
+    .where(eq(systemSettings.settingKey, key))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    await db.update(systemSettings)
+      .set({ 
+        settingValue: value,
+        updatedBy: updatedBy || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(systemSettings.settingKey, key));
+  } else {
+    await db.insert(systemSettings).values({
+      settingKey: key,
+      settingValue: value,
+      description: description || null,
+      updatedBy: updatedBy || null,
+    });
+  }
+  
+  return { key, value };
+}
+
+/**
+ * Obter o limite de armazenamento em MB
+ */
+export async function getStorageLimitMB(): Promise<number> {
+  const value = await getSystemSetting('storage_limit_mb');
+  return value ? parseInt(value, 10) : 500; // Padrão: 500MB
 }

@@ -33,6 +33,7 @@ const TimeSlots = lazy(() => import("./pages/TimeSlots"));
 const Calendar = lazy(() => import("./pages/Calendar"));
 const Profile = lazy(() => import("./pages/Profile"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
+const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const ActiveMethodologies = lazy(() => import("./pages/ActiveMethodologies"));
 const Tasks = lazy(() => import("./pages/Tasks"));
 const Reports = lazy(() => import("./pages/Reports"));
@@ -137,6 +138,7 @@ function Router() {
           <Route path={"/profile"} component={Profile} />
           <Route path={"/notification-settings"} component={NotificationSettings} />
           <Route path={"/admin/users"} component={AdminUsers} />
+          <Route path={"/admin/settings"} component={AdminSettings} />
           <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
           <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
           <Route path={"/learning-paths/:subjectId/module/:moduleId/materials"} component={TopicMaterialsManager} />

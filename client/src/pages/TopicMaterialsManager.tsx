@@ -74,6 +74,10 @@ export default function TopicMaterialsManager() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [storageInfo, setStorageInfo] = useState<{ totalSizeMB: string; fileCount: number } | null>(null);
 
+  // Buscar limite de armazenamento configurado pelo admin
+  const { data: storageLimitData } = trpc.materials.getStorageLimit.useQuery();
+  const storageLimitMB = storageLimitData?.limitMB || 500;
+
   // Buscar info de armazenamento
   const fetchStorageInfo = async () => {
     try {
@@ -243,6 +247,16 @@ export default function TopicMaterialsManager() {
     if (selectedFile.size > MAX_FILE_SIZE) {
       toast.error(`O arquivo excede o limite de ${MAX_FILE_SIZE_MB}MB`);
       return;
+    }
+
+    // Verificar limite de armazenamento do servidor
+    if (storageInfo) {
+      const usedMB = parseFloat(storageInfo.totalSizeMB);
+      const fileSizeMB = selectedFile.size / (1024 * 1024);
+      if (usedMB + fileSizeMB > storageLimitMB) {
+        toast.error(`Limite de armazenamento atingido (${storageLimitMB} MB). Remova materiais antigos ou contate o administrador.`);
+        return;
+      }
     }
 
     setIsUploading(true);
@@ -459,15 +473,46 @@ export default function TopicMaterialsManager() {
             </div>
           </div>
 
-          {/* Storage Info */}
-          {storageInfo && (
-            <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-lg">
-              <HardDrive className="h-4 w-4" />
-              <span>
-                Armazenamento: <strong className="text-foreground">{storageInfo.totalSizeMB} MB</strong> usados em <strong className="text-foreground">{storageInfo.fileCount}</strong> arquivo(s) no servidor
-              </span>
-            </div>
-          )}
+          {/* Storage Info with Progress Bar */}
+          {storageInfo && (() => {
+            const usedMB = parseFloat(storageInfo.totalSizeMB);
+            const usedPercent = (usedMB / storageLimitMB) * 100;
+            const barColor = usedPercent >= 90 ? 'bg-red-500' : usedPercent >= 70 ? 'bg-amber-500' : 'bg-primary';
+            const textColor = usedPercent >= 90 ? 'text-red-600' : usedPercent >= 70 ? 'text-amber-600' : 'text-green-600';
+            return (
+              <div className="mb-4 bg-muted/50 px-4 py-3 rounded-lg space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <HardDrive className="h-4 w-4" />
+                    <span>
+                      <strong className={textColor}>{storageInfo.totalSizeMB} MB</strong> de <strong className="text-foreground">{storageLimitMB} MB</strong>
+                    </span>
+                  </div>
+                  <Badge variant={usedPercent >= 90 ? 'destructive' : usedPercent >= 70 ? 'secondary' : 'default'}>
+                    {usedPercent.toFixed(1)}%
+                  </Badge>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-500 ${barColor}`}
+                    style={{ width: `${Math.min(usedPercent, 100)}%` }}
+                  />
+                </div>
+                {usedPercent >= 90 && (
+                  <div className="flex items-center gap-2 text-xs text-red-600">
+                    <AlertCircle className="h-3 w-3" />
+                    <span>Armazenamento quase cheio! Remova materiais antigos para liberar espaço.</span>
+                  </div>
+                )}
+                {usedPercent >= 100 && (
+                  <div className="flex items-center gap-2 text-xs text-red-700 font-semibold">
+                    <AlertCircle className="h-3 w-3" />
+                    <span>Limite atingido! Não é possível enviar novos arquivos. Contate o administrador.</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Materials List */}
           <Card>
@@ -709,7 +754,7 @@ export default function TopicMaterialsManager() {
                 </Button>
                 <Button
                   onClick={formData.type === 'link' ? handleAddLink : handleUploadFile}
-                  disabled={isUploading || createMaterialMutation.isPending || !!uploadError}
+                  disabled={isUploading || createMaterialMutation.isPending || !!uploadError || (formData.type !== 'link' && storageInfo ? parseFloat(storageInfo.totalSizeMB) >= storageLimitMB : false)}
                 >
                   {isUploading || createMaterialMutation.isPending ? (
                     <>

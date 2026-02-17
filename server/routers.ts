@@ -1788,6 +1788,56 @@ export const appRouter = router({
         return result;
       }),
 
+    // ==================== CONFIGURAÇÕES DO SISTEMA ====================
+    
+    // Obter todas as configurações
+    getSettings: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      return db.getAllSystemSettings();
+    }),
+
+    // Obter limite de armazenamento
+    getStorageLimit: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Acesso negado: apenas administradores');
+      }
+      const limitMB = await db.getStorageLimitMB();
+      return { limitMB };
+    }),
+
+    // Atualizar limite de armazenamento
+    updateStorageLimit: protectedProcedure
+      .input(z.object({
+        limitMB: z.number().min(50).max(10000),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        await db.upsertSystemSetting(
+          'storage_limit_mb',
+          String(input.limitMB),
+          'Limite máximo de armazenamento por professor em MB',
+          ctx.user.id
+        );
+        return { success: true, limitMB: input.limitMB };
+      }),
+
+    // Atualizar configuração genérica
+    updateSetting: protectedProcedure
+      .input(z.object({
+        key: z.string(),
+        value: z.string(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Acesso negado: apenas administradores');
+        }
+        return db.upsertSystemSetting(input.key, input.value, input.description, ctx.user.id);
+      }),
   }),
 
   // Metodologias Ativas
@@ -3760,6 +3810,12 @@ JSON (descrições MAX 15 chars):
       .query(async ({ ctx, input }) => {
         return await db.getModuleMaterials(input.moduleId);
       }),
+
+    // Obter limite de armazenamento configurado pelo admin
+    getStorageLimit: protectedProcedure.query(async () => {
+      const limitMB = await db.getStorageLimitMB();
+      return { limitMB };
+    }),
   }),
 
   // Professor Enrollment Management
