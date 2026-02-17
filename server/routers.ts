@@ -17,6 +17,8 @@ import { invokeLLM } from "./_core/llm";
 import { sendPasswordResetEmail } from "./_core/email";
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
+// Importar PDFParse do módulo pdf-parse
+import { PDFParse } from "pdf-parse";
 
 export const appRouter = router({
   system: systemRouter,
@@ -1098,9 +1100,6 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         console.log('[importFromPDF] Iniciando extração de eventos do PDF...');
-        const { invokeLLM } = await import("./_core/llm");
-        const pdfParseModule = await import("pdf-parse");
-        const pdfParse = pdfParseModule.default || pdfParseModule;
         
         try {
           // Converter base64 para buffer
@@ -1109,8 +1108,9 @@ export const appRouter = router({
           
           // Extrair texto do PDF
           console.log('[importFromPDF] Extraindo texto do PDF...');
-          const data = await pdfParse(pdfBuffer);
-          const pdfText = data.text;
+          const parser = new PDFParse({ data: pdfBuffer });
+          const textResult = await parser.text();
+          const pdfText = textResult.text;
           console.log('[importFromPDF] Texto extraído:', pdfText.length, 'caracteres');
         
         // Usar LLM para extrair eventos
