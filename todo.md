@@ -6995,8 +6995,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Botão Personalizar Ações Rápidas não funciona na VPS
 - [ ] Corrigir funcionalidade de marcar/desmarcar ações rápidas na VPS (funciona no Manus mas não na VPS)
 - [ ] Fix: Logout não funciona para usuário Eber Santana (login via Manus OAuth)
-- [ ] Fix: Não consegue atualizar eventos no calendário (Planejamento > Calendário)
+- [x] Fix: Não consegue atualizar eventos no calendário (Planejamento > Calendário)
 - [x] Fix: Botão 'Aplicar Atualização' no modal de atualização do calendário não funciona
 - [x] Implementar exportação de eventos do calendário para Google Calendar e iCal (.ics)
 - [ ] Fix: Corrigir datas erradas dos eventos importados do calendário acadêmico 2026 (ex: Dia do Trabalhador em 30/04 em vez de 01/05)
-- [ ] Fix: Corrigir teste falhando em refactored-procedures.test.ts
+- [x] Fix: Corrigir teste falhando em refactored-procedures.test.ts
