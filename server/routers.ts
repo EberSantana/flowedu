@@ -21,6 +21,86 @@ import * as pushNotif from './push-notifications';
 // Importar pdfjs-dist para extração de texto do PDF
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
+// Função auxiliar para nomear páginas do PDF por mês
+function getMesNome(pageNum: number): string {
+  // O calendário acadêmico geralmente tem 2-3 meses por página
+  // Retornamos o número da página como referência
+  return `PAGINA ${pageNum}`;
+}
+
+// Função auxiliar para extrair eventos com LLM (fallback)
+async function extractEventsWithLLM(pdfText: string, calendarYear: number): Promise<Array<{title: string; description: string; eventDate: string; eventType: 'holiday' | 'commemorative' | 'school_event' | 'personal'}>> {
+  const response = await invokeLLM({
+    messages: [
+      {
+        role: "system",
+        content: `Voce e um assistente especializado em extrair eventos de calendarios academicos brasileiros. Responda APENAS em JSON valido.
+O texto esta organizado por MES (JANEIRO, FEVEREIRO, MARCO, etc). Cada evento tem um numero de dia seguido de traco e o nome.
+A data do evento = DIA do texto + MES da secao + ANO do calendario (${calendarYear}).
+
+REGRAS CRITICAS:
+1. Preste MUITA ATENCAO ao mes de cada secao. Se esta na secao MAIO, o dia 01 = ${calendarYear}-05-01.
+2. Feriados nacionais DEVEM estar nas datas corretas:
+   - 01/01 Confraternizacao Universal, 21/04 Tiradentes, 01/05 Dia do Trabalhador
+   - 07/09 Independencia, 12/10 N.S. Aparecida, 02/11 Finados
+   - 15/11 Proclamacao da Republica, 20/11 Consciencia Negra, 25/12 Natal
+3. Para periodos (ex: "02 a 13 - Ajuste"), crie UM evento com a data do PRIMEIRO dia.
+4. NAO invente eventos. Extraia SOMENTE o que esta escrito no texto.
+5. Classificacao: "holiday" = feriados/pontos facultativos, "commemorative" = datas comemorativas, "school_event" = eventos academicos
+6. Ignore linhas de "Dias Letivos" e "Total semestre".
+7. Formato eventDate: YYYY-MM-DD.`
+      },
+      {
+        role: "user",
+        content: `Extraia todos os eventos deste calendario academico de ${calendarYear}:\n\n${pdfText.slice(0, 15000)}`
+      }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "calendar_events",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            events: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  eventDate: { type: "string" },
+                  eventType: { type: "string", enum: ["holiday", "commemorative", "school_event", "personal"] }
+                },
+                required: ["title", "description", "eventDate", "eventType"],
+                additionalProperties: false
+              }
+            }
+          },
+          required: ["events"],
+          additionalProperties: false
+        }
+      }
+    }
+  });
+  
+  const content = response.choices[0].message.content;
+  const parsedResult = JSON.parse(typeof content === 'string' ? content : '{ "events": [] }');
+  
+  // Validar eventos do LLM
+  return parsedResult.events.filter((event: any) => {
+    if (!event.eventDate || !/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) return false;
+    const eventYear = parseInt(event.eventDate.substring(0, 4));
+    if (eventYear !== calendarYear) {
+      event.eventDate = `${calendarYear}${event.eventDate.substring(4)}`;
+    }
+    const month = parseInt(event.eventDate.substring(5, 7));
+    const day = parseInt(event.eventDate.substring(8, 10));
+    return month >= 1 && month <= 12 && day >= 1 && day <= 31;
+  });
+}
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -1100,192 +1180,91 @@ export const appRouter = router({
         pdfBase64: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
-        console.log('[importFromPDF] Iniciando extração de eventos do PDF...');
+        const { parseCalendarText, detectCalendarYear, extractStructuredText } = await import('./calendar-parser.js');
+        
+        console.log('[importFromPDF] Iniciando extração de eventos do PDF (parser determinístico v2)...');
         
         try {
           // Converter base64 para buffer
-          console.log('[importFromPDF] Convertendo base64 para buffer...');
           const pdfBuffer = Buffer.from(input.pdfBase64, 'base64');
           
-          // Extrair texto do PDF usando pdfjs-dist
-          console.log('[importFromPDF] Extraindo texto do PDF...');
+          // Extrair texto do PDF usando pdfjs-dist com informação de posição
+          console.log('[importFromPDF] Extraindo texto do PDF com posições...');
           const uint8Array = new Uint8Array(pdfBuffer.buffer, pdfBuffer.byteOffset, pdfBuffer.byteLength);
           const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
           const pdfDocument = await loadingTask.promise;
           
-          let pdfText = '';
+          // Coletar itens com posição para separação de colunas
+          const pages: Array<{items: Array<{str: string; transform: number[]}>}> = [];
+          let rawText = ''; // Texto bruto para detecção de ano
+          
           for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
             const page = await pdfDocument.getPage(pageNum);
             const textContent = await page.getTextContent();
-            // Agrupar itens por posicao Y para preservar estrutura de linhas
-            const items = textContent.items as any[];
-            const sortedItems = items.sort((a: any, b: any) => {
-              const yDiff = b.transform[5] - a.transform[5];
-              if (Math.abs(yDiff) > 5) return yDiff;
-              return a.transform[4] - b.transform[4];
-            });
-            let lastY = -1;
-            let pageText = '';
-            for (const item of sortedItems) {
-              const y = Math.round(item.transform[5]);
-              if (lastY !== -1 && Math.abs(y - lastY) > 5) {
-                pageText += '\n';
-              } else if (lastY !== -1) {
-                pageText += ' ';
-              }
-              pageText += item.str;
-              lastY = y;
-            }
-            pdfText += '\n--- PAGINA ' + pageNum + ' ---\n' + pageText + '\n';
+            const items = (textContent.items as any[]).map((item: any) => ({
+              str: item.str,
+              transform: item.transform,
+            }));
+            pages.push({ items });
+            rawText += items.map((it: any) => it.str).join(' ') + '\n';
           }
           
-          console.log('[importFromPDF] Texto extraído:', pdfText.length, 'caracteres');
-        
-        // Usar LLM para extrair eventos
-        // Detectar o ano do calendário a partir do texto
-        const yearMatch = pdfText.match(/(20\d{2})/);
-        const calendarYear = yearMatch ? parseInt(yearMatch[1]) : new Date().getFullYear();
-        console.log('[importFromPDF] Ano detectado:', calendarYear);
-
-        const response = await invokeLLM({
-          messages: [
-            {
-              role: "system",
-              content: `Voce e um assistente especializado em extrair eventos de calendarios academicos brasileiros. Responda APENAS em JSON valido.
-O texto esta organizado por MES (JANEIRO, FEVEREIRO, MARCO, etc). Cada evento tem um numero de dia seguido de traco e o nome.
-A data do evento = DIA do texto + MES da secao + ANO do calendario (${calendarYear}).
-
-REGRAS CRITICAS:
-1. Preste MUITA ATENCAO ao mes de cada secao. Se esta na secao MAIO, o dia 01 = ${calendarYear}-05-01, NAO ${calendarYear}-04-30.
-2. Feriados nacionais DEVEM estar nas datas corretas:
-   - 01/01 Confraternizacao Universal -> ${calendarYear}-01-01
-   - 21/04 Tiradentes -> ${calendarYear}-04-21
-   - 01/05 Dia do Trabalhador -> ${calendarYear}-05-01
-   - 07/09 Independencia do Brasil -> ${calendarYear}-09-07
-   - 12/10 Nossa Senhora Aparecida -> ${calendarYear}-10-12
-   - 02/11 Finados -> ${calendarYear}-11-02
-   - 15/11 Proclamacao da Republica -> ${calendarYear}-11-15
-   - 20/11 Dia de Zumbi dos Palmares / Consciencia Negra -> ${calendarYear}-11-20
-   - 25/12 Natal -> ${calendarYear}-12-25
-3. Feriados MOVEIS de ${calendarYear} (calcule com base na Pascoa):
-   - Carnaval: segunda e terca antes da Quarta de Cinzas
-   - Sexta-feira Santa: sexta antes da Pascoa
-   - Corpus Christi: 60 dias apos a Pascoa
-4. Para periodos (ex: "02 a 13 - Ajuste"), crie UM evento com a data do PRIMEIRO dia.
-5. NAO invente eventos. Extraia SOMENTE o que esta escrito no texto.
-6. Classificacao:
-   - "holiday" = feriados nacionais, estaduais, municipais e pontos facultativos
-   - "commemorative" = datas comemorativas (Dia das Maes, Dia dos Pais, etc)
-   - "school_event" = eventos academicos, reunioes, semanas tematicas, sabados letivos, inicio/fim de semestre
-7. Ignore linhas de "Dias Letivos" e "Total semestre".
-8. Sabados Letivos sao "school_event", NAO ignore.
-9. Formato eventDate: YYYY-MM-DD (ex: ${calendarYear}-05-01 para 1 de maio de ${calendarYear}).
-10. VERIFIQUE DUAS VEZES cada data antes de incluir. O mes da data DEVE corresponder ao mes da secao do texto.`
-            },
-            {
-              role: "user",
-              content: `Extraia todos os eventos deste calendario academico de ${calendarYear} e retorne em formato JSON. Preste MUITA ATENCAO ao mes de cada secao para atribuir as datas corretas:\n\n${pdfText.slice(0, 20000)}`
-            }
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "calendar_events",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  events: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        title: { type: "string" },
-                        description: { type: "string" },
-                        eventDate: { type: "string" },
-                        eventType: { type: "string", enum: ["holiday", "commemorative", "school_event", "personal"] }
-                      },
-                      required: ["title", "description", "eventDate", "eventType"],
-                      additionalProperties: false
-                    }
+          // Detectar o ano do calendário
+          const calendarYear = detectCalendarYear(rawText);
+          console.log('[importFromPDF] Ano detectado:', calendarYear);
+          
+          // Extrair texto estruturado com separação de colunas
+          const structuredText = extractStructuredText(pages);
+          console.log('[importFromPDF] Texto estruturado:', structuredText.length, 'caracteres');
+          
+          // Parser determinístico com texto estruturado
+          let events = parseCalendarText(structuredText, calendarYear);
+          console.log('[importFromPDF] Parser determinístico extraiu:', events.length, 'eventos');
+          
+          // Se o parser extraiu poucos eventos (< 20), tentar com LLM como complemento
+          if (events.length < 20) {
+            console.log('[importFromPDF] Poucos eventos extraídos, usando LLM como complemento...');
+            try {
+              const llmEvents = await extractEventsWithLLM(structuredText, calendarYear);
+              console.log('[importFromPDF] LLM extraiu:', llmEvents.length, 'eventos adicionais');
+              
+              const existingDates = new Map<string, Set<string>>();
+              for (const e of events) {
+                if (!existingDates.has(e.eventDate)) {
+                  existingDates.set(e.eventDate, new Set());
+                }
+                existingDates.get(e.eventDate)!.add(e.title.toLowerCase().substring(0, 30));
+              }
+              
+              for (const llmEvent of llmEvents) {
+                const dateSet = existingDates.get(llmEvent.eventDate);
+                const titleNorm = llmEvent.title.toLowerCase().substring(0, 30);
+                if (!dateSet || !dateSet.has(titleNorm)) {
+                  events.push(llmEvent);
+                  if (!existingDates.has(llmEvent.eventDate)) {
+                    existingDates.set(llmEvent.eventDate, new Set());
                   }
-                },
-                required: ["events"],
-                additionalProperties: false
+                  existingDates.get(llmEvent.eventDate)!.add(titleNorm);
+                }
               }
-            }
-          }
-        });
-        
-          console.log('[importFromPDF] Chamando LLM para extrair eventos...');
-          const content = response.choices[0].message.content;
-          const parsedResult = JSON.parse(typeof content === 'string' ? content : '{ "events": [] }');
-          console.log('[importFromPDF] Eventos extraídos (antes da validação):', parsedResult.events.length);
-          
-          // === VALIDAÇÃO PÓS-EXTRAÇÃO ===
-          // Feriados nacionais fixos - garantir que estão corretos
-          const feriadosNacionaisFixos: Record<string, string> = {
-            '01-01': 'Confraternização Universal',
-            '04-21': 'Tiradentes',
-            '05-01': 'Dia do Trabalhador',
-            '09-07': 'Independência do Brasil',
-            '10-12': 'Nossa Senhora Aparecida',
-            '11-02': 'Finados',
-            '11-15': 'Proclamação da República',
-            '11-20': 'Dia de Zumbi dos Palmares / Consciência Negra',
-            '12-25': 'Natal',
-          };
-          
-          // Validar e corrigir eventos
-          const validatedEvents = parsedResult.events.map((event: any) => {
-            // Validar formato da data
-            if (!event.eventDate || !/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) {
-              console.warn('[importFromPDF] Data inválida ignorada:', event.title, event.eventDate);
-              return null;
-            }
-            
-            // Verificar se o ano está correto
-            const eventYear = parseInt(event.eventDate.substring(0, 4));
-            if (eventYear !== calendarYear) {
-              console.warn('[importFromPDF] Ano incorreto corrigido:', event.title, event.eventDate, '->', `${calendarYear}${event.eventDate.substring(4)}`);
-              event.eventDate = `${calendarYear}${event.eventDate.substring(4)}`;
-            }
-            
-            // Validar dia/mês (não pode ter dia 0 ou mês 0)
-            const month = parseInt(event.eventDate.substring(5, 7));
-            const day = parseInt(event.eventDate.substring(8, 10));
-            if (month < 1 || month > 12 || day < 1 || day > 31) {
-              console.warn('[importFromPDF] Data inválida ignorada:', event.title, event.eventDate);
-              return null;
-            }
-            
-            return event;
-          }).filter(Boolean);
-          
-          // Verificar se feriados nacionais fixos estão presentes
-          const existingDates = new Set(validatedEvents.map((e: any) => e.eventDate.substring(5)));
-          const missingHolidays: any[] = [];
-          
-          for (const [monthDay, name] of Object.entries(feriadosNacionaisFixos)) {
-            if (!existingDates.has(monthDay)) {
-              // Verificar se o feriado está mencionado no texto do PDF
-              const nameNormalized = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-              const textNormalized = pdfText.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-              if (textNormalized.includes(nameNormalized) || textNormalized.includes(monthDay.replace('-', '/'))) {
-                missingHolidays.push({
-                  title: name,
-                  description: `Feriado Nacional - ${name}`,
-                  eventDate: `${calendarYear}-${monthDay}`,
-                  eventType: 'holiday'
-                });
-                console.log('[importFromPDF] Feriado nacional faltante adicionado:', name, `${calendarYear}-${monthDay}`);
-              }
+              
+              console.log('[importFromPDF] Total após mesclagem:', events.length, 'eventos');
+            } catch (llmError: any) {
+              console.warn('[importFromPDF] LLM falhou, usando apenas parser determinístico:', llmError.message);
             }
           }
           
-          const finalEvents = [...validatedEvents, ...missingHolidays];
-          console.log('[importFromPDF] Eventos finais (após validação):', finalEvents.length, `(${missingHolidays.length} feriados adicionados)`);
-          return finalEvents;
+          // Ordenar por data
+          events.sort((a, b) => a.eventDate.localeCompare(b.eventDate));
+          
+          console.log('[importFromPDF] Eventos finais:', events.length);
+          
+          // Log de amostra para verificação
+          const feriados = events.filter(e => e.eventType === 'holiday');
+          console.log('[importFromPDF] Feriados encontrados:', feriados.length);
+          feriados.forEach(f => console.log(`  ${f.eventDate}: ${f.title}`));
+          
+          return events;
         } catch (error: any) {
           console.error('[importFromPDF] Erro ao processar PDF:', error);
           throw new TRPCError({

@@ -7033,3 +7033,23 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Bug: Grade semanal não gera mesmo com turnos configurados (mostra "Nenhum turno configurado")
 - [ ] Bug: Layout da página de configurar turno está fora - devocional cortado pela metade
 - [ ] Deploy das correções na VPS
+
+## Bug - Turmas não aparecem na Grade de Horários
+- [ ] Investigar por que turmas cadastradas não aparecem para inserção na grade semanal
+- [ ] Corrigir o bug
+- [ ] Deploy na VPS
+
+## Bug - Importação do Calendário com Datas Erradas (Persistente)
+- [ ] Analisar texto extraído do PDF e comparar com o que o LLM retorna
+- [ ] Reescrever lógica de importação para garantir datas corretas
+- [ ] Testar importação localmente
+- [ ] Deploy na VPS
+
+## Parser de Calendário PDF v2
+- [x] Reescrever parser para separar colunas do PDF por posição X (coluna esquerda: grid, coluna direita: eventos)
+- [x] Corrigir detecção de Julho (antes não era detectado porque cabeçalho estava na mesma linha que evento)
+- [x] Corrigir detecção de ano (2026 em vez de 2025 - "20  26" separado por espaços)
+- [x] Implementar extractStructuredText() que gera marcadores [MONTH:N] para cada seção de mês
+- [x] Atualizar importFromPDF no routers.ts para usar nova abordagem com posições
+- [x] Validar: 130 eventos extraídos, todos os 12 meses com eventos, 13 feriados corretos
+- [x] Todos os 327 testes passando
