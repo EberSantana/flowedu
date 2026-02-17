@@ -1099,7 +1099,8 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         console.log('[importFromPDF] Iniciando extração de eventos do PDF...');
         const { invokeLLM } = await import("./_core/llm");
-        const pdfParse = await import("pdf-parse") as any;
+        const pdfParseModule = await import("pdf-parse");
+        const pdfParse = pdfParseModule.default || pdfParseModule;
         
         try {
           // Converter base64 para buffer
