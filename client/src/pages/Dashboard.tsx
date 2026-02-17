@@ -230,7 +230,7 @@ function Dashboard() {
     
     // Filtrar aulas da semana (segunda a sexta) e excluir as não dadas/canceladas
     const validWeekClasses = scheduledClasses.filter(c => {
-      if (c.dayOfWeek < 0 || c.dayOfWeek > 4) return false; // Apenas seg-sex
+      if (c.dayOfWeek < 1 || c.dayOfWeek > 5) return false; // Apenas seg-sex (1=Segunda, 5=Sexta)
       const status = statusMap.get(c.id);
       return status !== 'not_given' && status !== 'cancelled'; // Excluir não dadas e canceladas
     });
@@ -325,11 +325,11 @@ function Dashboard() {
     datasets: [{
       label: 'Aulas por Dia',
       data: [
-        scheduledClasses?.filter(c => c.dayOfWeek === 0).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 1).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 2).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 3).length || 0,
-        scheduledClasses?.filter(c => c.dayOfWeek === 4).length || 0,
+        scheduledClasses?.filter(c => c.dayOfWeek === 1).length || 0, // Segunda
+        scheduledClasses?.filter(c => c.dayOfWeek === 2).length || 0, // Terça
+        scheduledClasses?.filter(c => c.dayOfWeek === 3).length || 0, // Quarta
+        scheduledClasses?.filter(c => c.dayOfWeek === 4).length || 0, // Quinta
+        scheduledClasses?.filter(c => c.dayOfWeek === 5).length || 0, // Sexta
       ],
       borderColor: 'var(--chart-1, rgb(59, 130, 246))',
       backgroundColor: 'color-mix(in oklch, var(--chart-1, rgb(59, 130, 246)) 15%, transparent)',
@@ -1069,9 +1069,9 @@ function Dashboard() {
                 {/* Grid de 5 Cards - Um por dia */}
                 <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
                   {DAYS_OF_WEEK.map((day, index) => {
-                    const dayClasses = scheduledClasses?.filter(c => c.dayOfWeek === index) || [];
+                    const dayClasses = scheduledClasses?.filter(c => c.dayOfWeek === (index + 1)) || [];
                     const count = dayClasses.length;
-                    const maxCount = Math.max(...DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0), 1);
+                    const maxCount = Math.max(...DAYS_OF_WEEK.map((_, i) => scheduledClasses?.filter(c => c.dayOfWeek === (i + 1)).length || 0), 1);
                     const isMaxDay = count === maxCount && count > 0;
                     // Simplificado - sem acesso a subjectName diretamente
                     
@@ -1157,7 +1157,7 @@ function Dashboard() {
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-emerald-500" />
                         <span className="text-muted-foreground">Dias ativos:</span>
-                        <span className="font-bold text-foreground">{DAYS_OF_WEEK.filter((_, i) => (scheduledClasses?.filter(c => c.dayOfWeek === i).length || 0) > 0).length}/5</span>
+                        <span className="font-bold text-foreground">{DAYS_OF_WEEK.filter((_, i) => (scheduledClasses?.filter(c => c.dayOfWeek === (i + 1)).length || 0) > 0).length}/5</span>
                       </div>
                     </div>
                     <Link href="/schedule">

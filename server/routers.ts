@@ -864,7 +864,7 @@ export const appRouter = router({
         const checkDate = new Date(now);
         checkDate.setDate(now.getDate() + i);
         const dayOfWeek = checkDate.getDay();
-        const dateStr = checkDate.toISOString().split('T')[0];
+        const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
         
         // Verificar se é feriado
         const holiday = calendarEvents.find(
@@ -906,7 +906,7 @@ export const appRouter = router({
       });
       
       // Filtrar apenas aulas futuras (após o horário atual)
-      const todayStr = now.toISOString().split('T')[0];
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const futureClasses = upcomingClasses.filter(c => {
         // Se for dia futuro, incluir
         if (c.date > todayStr) return true;
@@ -937,7 +937,7 @@ export const appRouter = router({
       const todayClasses = [];
       const checkDate = new Date(now);
       const dayOfWeek = checkDate.getDay();
-      const dateStr = checkDate.toISOString().split('T')[0];
+      const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
       
       // Verificar se é feriado
       const holiday = calendarEvents.find(

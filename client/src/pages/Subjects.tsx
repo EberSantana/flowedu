@@ -175,6 +175,7 @@ export default function Subjects() {
   const updateMutation = trpc.subjects.update.useMutation({
     onSuccess: () => {
       utils.subjects.list.invalidate();
+      utils.schedule.getFullSchedule.invalidate();
       toast.success("Disciplina atualizada com sucesso!");
       resetForm();
     },

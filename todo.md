@@ -7083,3 +7083,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar mutation de update no backend para mover aulas + procedure swap dedicada
 - [x] Verificar conflitos ao mover aula
 - [x] Sincronizar na VPS (novo IP 76.13.67.5)
+
+## Bug: Cor da disciplina e carga horária
+- [x] Cor da disciplina editada não reflete na grade semanal (adicionado invalidate getFullSchedule no Subjects.tsx)
+- [x] Carga horária incorreta no Dashboard (corrigido dayOfWeek: index+1 para 1=Segunda, weeklyProgress filtro 1-5)
+- [x] Corrigido timezone em getUpcomingClasses e getTodayClasses (toISOString → formato local)
+- [x] Sincronizar correções na VPS
