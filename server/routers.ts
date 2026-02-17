@@ -1145,7 +1145,7 @@ export const appRouter = router({
           messages: [
             {
               role: "system",
-              content: `Voce e um assistente especializado em extrair eventos de calendarios academicos brasileiros.
+              content: `Voce e um assistente especializado em extrair eventos de calendarios academicos brasileiros. Responda APENAS em JSON valido.
 O texto esta organizado por MES (JANEIRO, FEVEREIRO, MARCO, etc). Cada evento tem um numero de dia seguido de traco e o nome.
 A data do evento = DIA do texto + MES da secao + ANO do calendario.
 
@@ -1161,7 +1161,7 @@ REGRAS CRITICAS:
             },
             {
               role: "user",
-              content: `Extraia todos os eventos deste calendario academico de 2026. Preste MUITA ATENCAO ao mes de cada secao para atribuir as datas corretas:\n\n${pdfText.slice(0, 20000)}`
+              content: `Extraia todos os eventos deste calendario academico de 2026 e retorne em formato JSON. Preste MUITA ATENCAO ao mes de cada secao para atribuir as datas corretas:\n\n${pdfText.slice(0, 20000)}`
             }
           ],
           response_format: {
