@@ -44,7 +44,6 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess, defaul
   }, [defaultSubjectId]);
 
   const { data: subjects = [] } = trpc.subjects.list.useQuery();
-  const utils = trpc.useUtils();
 
   const importAndEnrollMutation = trpc.students.importAndEnrollInSubject.useMutation({
     onSuccess: (result) => {
@@ -118,19 +117,28 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess, defaul
     setIsParsing(true);
 
     try {
-      const ext = file.name.toLowerCase().split('.').pop();
-      
-      if (ext === 'docx') {
-        await parseDocx(file);
-      } else if (ext === 'xlsx' || ext === 'xls') {
-        await parseExcel(file);
-      } else if (ext === 'csv' || ext === 'txt') {
-        await parseCsv(file);
+      // Enviar arquivo para o backend para parsing
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/parse-student-list', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.students && result.students.length > 0) {
+        setParsedStudents(result.students);
+        toast.success(`${result.students.length} aluno(s) encontrado(s) no arquivo`);
+      } else if (result.success && (!result.students || result.students.length === 0)) {
+        setParseError("Nenhum aluno encontrado no arquivo. Verifique se o formato está correto.\n\nFormato esperado: uma linha por aluno com matrícula e nome separados por tab ou espaço.\nEx:\n2024001  João da Silva\n2024002  Maria Santos");
       } else {
-        setParseError("Formato não suportado. Use .docx, .xlsx, .csv ou .txt");
+        setParseError(result.message || "Erro ao processar o arquivo");
       }
     } catch (error: any) {
-      setParseError(`Erro ao processar arquivo: ${error.message}`);
+      console.error('Erro ao enviar arquivo:', error);
+      setParseError(`Erro ao processar arquivo: ${error.message || 'Erro de conexão'}`);
     } finally {
       setIsParsing(false);
     }
@@ -139,151 +147,6 @@ export default function QuickEnrollModal({ open, onOpenChange, onSuccess, defaul
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };
-
-  const parseDocx = async (file: File) => {
-    try {
-      // Dynamically import mammoth for docx parsing
-      const mammoth = await import('mammoth');
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer });
-      const text = result.value;
-      
-      const students = parseTextContent(text);
-      
-      if (students.length === 0) {
-        setParseError("Nenhum aluno encontrado no arquivo. O formato esperado é: uma linha por aluno com matrícula e nome separados por tab, espaço ou hífen. Ex:\n2024001 João da Silva\n2024002 Maria Santos");
-      } else {
-        setParsedStudents(students);
-      }
-    } catch (error: any) {
-      // Fallback: try reading as text
-      try {
-        const text = await file.text();
-        const students = parseTextContent(text);
-        if (students.length > 0) {
-          setParsedStudents(students);
-        } else {
-          setParseError("Não foi possível extrair alunos do arquivo Word. Verifique o formato.");
-        }
-      } catch {
-        setParseError("Erro ao ler o arquivo Word. Tente salvar como .txt ou .csv.");
-      }
-    }
-  };
-
-  const parseExcel = async (file: File) => {
-    try {
-      const XLSX = await import('xlsx');
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json<any>(firstSheet, { header: 1 });
-      
-      const students: ParsedStudent[] = [];
-      
-      for (const row of data) {
-        if (!Array.isArray(row) || row.length < 2) continue;
-        
-        const firstCol = String(row[0] || '').trim();
-        const secondCol = String(row[1] || '').trim();
-        
-        // Skip header rows
-        if (!firstCol || !secondCol) continue;
-        if (firstCol.toLowerCase().includes('matrícula') || firstCol.toLowerCase().includes('matricula') || 
-            firstCol.toLowerCase().includes('registro') || firstCol.toLowerCase() === 'ra' ||
-            firstCol.toLowerCase() === 'nº' || firstCol.toLowerCase() === 'numero') continue;
-        
-        // Check if first column looks like a registration number (contains digits)
-        if (/\d/.test(firstCol)) {
-          students.push({
-            registrationNumber: firstCol,
-            fullName: secondCol,
-          });
-        } else if (/\d/.test(secondCol)) {
-          // Maybe columns are reversed
-          students.push({
-            registrationNumber: secondCol,
-            fullName: firstCol,
-          });
-        }
-      }
-      
-      if (students.length === 0) {
-        setParseError("Nenhum aluno encontrado na planilha. O formato esperado é: Coluna A = Matrícula, Coluna B = Nome Completo");
-      } else {
-        setParsedStudents(students);
-      }
-    } catch (error: any) {
-      setParseError("Erro ao processar a planilha. Verifique se o arquivo está correto.");
-    }
-  };
-
-  const parseCsv = async (file: File) => {
-    const text = await file.text();
-    const students = parseTextContent(text);
-    
-    if (students.length === 0) {
-      setParseError("Nenhum aluno encontrado no arquivo. O formato esperado é: uma linha por aluno com matrícula e nome separados por vírgula, tab ou espaço.");
-    } else {
-      setParsedStudents(students);
-    }
-  };
-
-  const parseTextContent = (text: string): ParsedStudent[] => {
-    const students: ParsedStudent[] = [];
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
-    
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      
-      // Skip header-like lines
-      if (trimmed.toLowerCase().includes('matrícula') || trimmed.toLowerCase().includes('matricula') ||
-          trimmed.toLowerCase().includes('nome completo') || trimmed.toLowerCase().includes('registro') ||
-          trimmed.toLowerCase().includes('aluno') && trimmed.toLowerCase().includes('nome')) continue;
-      
-      let regNum = '';
-      let name = '';
-      
-      // Try different separators: tab, semicolon, comma, dash with spaces, multiple spaces
-      const separators = ['\t', ';', ',', ' - ', /\s{2,}/];
-      
-      for (const sep of separators) {
-        const parts = typeof sep === 'string' ? trimmed.split(sep) : trimmed.split(sep);
-        if (parts.length >= 2) {
-          const first = parts[0].trim();
-          const rest = parts.slice(1).join(typeof sep === 'string' ? sep : ' ').trim();
-          
-          if (/^\d+/.test(first) && rest.length > 2) {
-            regNum = first.replace(/[^\d\w.-]/g, '');
-            name = rest;
-            break;
-          } else if (/^\d+/.test(rest) && first.length > 2) {
-            regNum = rest.replace(/[^\d\w.-]/g, '');
-            name = first;
-            break;
-          }
-        }
-      }
-      
-      // Fallback: try to extract leading number as registration
-      if (!regNum) {
-        const match = trimmed.match(/^(\d[\d.\-\/]*\d?)\s+(.+)/);
-        if (match) {
-          regNum = match[1].trim();
-          name = match[2].trim();
-        }
-      }
-      
-      if (regNum && name && name.length > 1) {
-        // Clean up name - remove extra whitespace
-        name = name.replace(/\s+/g, ' ').trim();
-        students.push({ registrationNumber: regNum, fullName: name });
-      }
-    }
-    
-    return students;
   };
 
   const removeStudent = (index: number) => {

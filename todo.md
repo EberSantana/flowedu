@@ -7101,3 +7101,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar parser de Word (.docx) com mammoth e Excel (.xlsx) com xlsx
 - [x] Login do aluno = matrícula, senha = matrícula (já funcionava no backend)
 - [x] Sincronizar correções na VPS (QuickEnrollModal.tsx copiado, mammoth+xlsx instalados, build+restart OK)
+- [x] Bug: Upload de lista de alunos (.docx) não registra alunos - CORRIGIDO: parsing movido para backend
+- [x] Corrigir parser do QuickEnrollModal - parsing agora feito no servidor via /api/parse-student-list
+- [x] Backend importAndEnrollInSubject verificado e funcionando corretamente (27 alunos extraídos do LISTADECHAMADA.docx)

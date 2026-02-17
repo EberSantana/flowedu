@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import uploadMaterialRouter from "../upload-material";
 import extractPdfRouter from "../extract-pdf";
+import parseStudentListRouter from "../parse-student-list";
 import { getSessionCookieOptions } from "./cookies";
 import { COOKIE_NAME, STUDENT_COOKIE_NAME } from "../../shared/const";
 import helmet from "helmet";
@@ -142,6 +143,8 @@ async function startServer() {
   app.use("/api", uploadMaterialRouter);
   // Extract PDF text endpoint
   app.use("/api", extractPdfRouter);
+  // Parse student list endpoint
+  app.use("/api", parseStudentListRouter);
   
   // Rota de logout via GET (para links diretos)
   app.get("/api/logout", (req, res) => {
