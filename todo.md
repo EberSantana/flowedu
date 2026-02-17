@@ -7108,3 +7108,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Deploy VPS: Sincronizar arquivos e rebuild para corrigir 404 na trilha de aprendizagem
 - [x] Deploy VPS: Copiar parse-student-list.ts, QuickEnrollModal.tsx, _core/index.ts atualizados + rebuild + pm2 restart
 - [x] Bug: VPS dando erro 404 ao acessar flowedu.app - CORRIGIDO: PortalChoice.tsx redirecionava para /student/dashboard (errado) ao invés de /student-dashboard
+- [ ] Atualizar versão para v2.5.8 no package.json e na VPS
