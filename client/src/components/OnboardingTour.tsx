@@ -32,6 +32,16 @@ export function useOnboardingTour() {
       },
     });
 
+    // Marcar como completado quando o tour é cancelado (botão X ou clique fora)
+    tour.on('cancel', () => {
+      localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+    });
+
+    // Marcar como completado quando o tour é finalizado normalmente
+    tour.on('complete', () => {
+      localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+    });
+
     // Passo 1: Dashboard
     tour.addStep({
       id: 'dashboard',
@@ -54,7 +64,6 @@ export function useOnboardingTour() {
         {
           text: 'Pular Tour',
           action: () => {
-            localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
             tour.cancel();
           },
           secondary: true,
@@ -186,7 +195,6 @@ export function useOnboardingTour() {
         {
           text: 'Concluir',
           action: () => {
-            localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
             tour.complete();
           },
         },

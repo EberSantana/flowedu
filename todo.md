@@ -7000,3 +7000,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Implementar exportação de eventos do calendário para Google Calendar e iCal (.ics)
 - [ ] Fix: Corrigir datas erradas dos eventos importados do calendário acadêmico 2026 (ex: Dia do Trabalhador em 30/04 em vez de 01/05)
 - [x] Fix: Corrigir teste falhando em refactored-procedures.test.ts
+- [x] Desativar Tour automático após primeira visualização (salvar no localStorage)
