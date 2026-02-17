@@ -17,8 +17,8 @@ import { invokeLLM } from "./_core/llm";
 import { sendPasswordResetEmail } from "./_core/email";
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
-// Importar PDFParse do módulo pdf-parse
-import { PDFParse } from "pdf-parse";
+// Importar pdfjs-dist para extração de texto do PDF
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 export const appRouter = router({
   system: systemRouter,
@@ -1106,11 +1106,19 @@ export const appRouter = router({
           console.log('[importFromPDF] Convertendo base64 para buffer...');
           const pdfBuffer = Buffer.from(input.pdfBase64, 'base64');
           
-          // Extrair texto do PDF
+          // Extrair texto do PDF usando pdfjs-dist
           console.log('[importFromPDF] Extraindo texto do PDF...');
-          const parser = new PDFParse({ data: pdfBuffer });
-          const textResult = await parser.text();
-          const pdfText = textResult.text;
+          const loadingTask = pdfjsLib.getDocument({ data: pdfBuffer });
+          const pdfDocument = await loadingTask.promise;
+          
+          let pdfText = '';
+          for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+            const page = await pdfDocument.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map((item: any) => item.str).join(' ');
+            pdfText += pageText + '\n';
+          }
+          
           console.log('[importFromPDF] Texto extraído:', pdfText.length, 'caracteres');
         
         // Usar LLM para extrair eventos
