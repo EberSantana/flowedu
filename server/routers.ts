@@ -3393,10 +3393,34 @@ JSON (descrições MAX 15 chars):
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.updateStudentTopicProgress({
+        const result = await db.updateStudentTopicProgress({
           studentId: ctx.studentSession.studentId,
           ...input,
         });
+        
+        // Registro automático de comportamento
+        try {
+          if (input.status === 'completed') {
+            await db.recordStudentBehavior({
+              studentId: ctx.studentSession.studentId,
+              userId: ctx.studentSession.professorId,
+              behaviorType: 'topic_access',
+              score: input.selfAssessment === 'understood' ? 100 : input.selfAssessment === 'have_doubts' ? 60 : 30,
+              metadata: JSON.stringify({ topicId: input.topicId, status: 'completed', selfAssessment: input.selfAssessment }),
+            });
+          } else if (input.status === 'in_progress') {
+            await db.recordStudentBehavior({
+              studentId: ctx.studentSession.studentId,
+              userId: ctx.studentSession.professorId,
+              behaviorType: 'topic_access',
+              metadata: JSON.stringify({ topicId: input.topicId, status: 'in_progress' }),
+            });
+          }
+        } catch (e) {
+          console.error('Erro ao registrar comportamento:', e);
+        }
+        
+        return result;
       }),
     
     getTopicMaterials: studentProcedure
@@ -4963,6 +4987,24 @@ JSON (descrições MAX 15 chars):
         // Verificar e conceder badges automaticamente
         await db.checkAndAwardCTBadges(ctx.studentSession.studentId, input.subjectId);
 
+        // Registro automático de comportamento - exercício CT completado
+        try {
+          await db.recordStudentBehavior({
+            studentId: ctx.studentSession.studentId,
+            userId: ctx.studentSession.professorId,
+            subjectId: input.subjectId,
+            behaviorType: 'exercise_completion',
+            score: analysis.score,
+            metadata: JSON.stringify({
+              exerciseId: input.exerciseId,
+              dimension: exercise.dimension,
+              type: 'computational_thinking',
+            }),
+          });
+        } catch (e) {
+          console.error('Erro ao registrar comportamento CT:', e);
+        }
+
         return {
           score: analysis.score,
           feedback: analysis.feedback,
@@ -5207,15 +5249,23 @@ JSON (descrições MAX 15 chars):
           exercise.exerciseData
         );
         
-        // Gamificação removida - pontos não são mais adicionados
-        // if (result.pointsEarned > 0) {
-        //   await db.addExercisePoints(
-        //     studentId,
-        //     exercise.subjectId,
-        //     result.pointsEarned,
-        //     `Exercício: ${exercise.title} (${result.correctAnswers}/${result.totalQuestions} acertos)`
-        //   );
-        // }
+        // Registro automático de comportamento - exercício completado
+        try {
+          await db.recordStudentBehavior({
+            studentId,
+            userId: ctx.studentSession.professorId,
+            behaviorType: 'exercise_completion',
+            score: result.score || 0,
+            metadata: JSON.stringify({
+              exerciseId: input.exerciseId,
+              correctAnswers: result.correctAnswers,
+              totalQuestions: result.totalQuestions,
+              score: result.score,
+            }),
+          });
+        } catch (e) {
+          console.error('Erro ao registrar comportamento de exercício:', e);
+        }
         
         return result;
       }),
@@ -7035,86 +7085,224 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         subjectId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { analyzeLearningBehavior } = await import('./learningAnalytics');
-        
         // Buscar dados do aluno
         const student = await db.getStudentById(input.studentId, ctx.user.id);
         if (!student) {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Aluno não encontrado' });
         }
 
-        // Buscar comportamentos recentes
-        const recentBehaviors = await db.getRecentBehaviors(input.studentId, ctx.user.id, 30);
-
-        // Buscar exercícios recentes
-        const recentExercises = await db.getStudentExerciseHistory(input.studentId, input.subjectId);
-
-        // Preparar dados para análise
-        const behaviorData = {
-          studentId: student.id,
-          studentName: student.fullName,
-          subjectName: input.subjectId ? 'Disciplina' : undefined,
-          recentBehaviors: recentBehaviors.map(b => ({
-            type: b.behaviorType,
-            date: b.recordedAt.toISOString(),
-            score: b.score || undefined,
-            metadata: b.metadata || undefined,
-          })),
-          recentExercises: recentExercises.slice(0, 10).map(e => ({
-            title: 'Exercício',
-            score: e.attempt.score || 0,
-            completedAt: e.attempt.completedAt?.toISOString() || new Date().toISOString(),
-            timeSpent: e.attempt.timeSpent || undefined,
-          })),
-        };
-
-        // Analisar com IA
-        const analysis = await analyzeLearningBehavior(behaviorData);
-
-        // Salvar insights gerados
-        for (const alert of analysis.alerts) {
-          await db.createAlert({
-            studentId: input.studentId,
-            userId: ctx.user.id,
-            subjectId: input.subjectId,
-            alertType: 'needs_attention',
-            severity: alert.severity,
-            title: alert.type,
-            message: alert.message,
-            recommendedAction: analysis.recommendations.join('\n'),
-          });
+        // ===== COLETAR DADOS EXISTENTES DO SISTEMA =====
+        
+        // 1. Buscar disciplinas do aluno
+        const studentSubjects = await db.getSubjectsByStudent(input.studentId, ctx.user.id);
+        
+        // 2. Buscar nome da disciplina selecionada (se houver)
+        let subjectName = 'Todas as disciplinas';
+        if (input.subjectId) {
+          const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
+          subjectName = subject?.name || 'Disciplina';
         }
-
-        // Salvar padrões detectados
-        for (const pattern of analysis.patterns) {
-          await db.saveLearningPattern({
-            studentId: input.studentId,
-            userId: ctx.user.id,
-            subjectId: input.subjectId,
-            patternType: 'engagement_pattern',
-            patternDescription: pattern.description,
-            confidence: pattern.confidence,
-            evidence: JSON.stringify([pattern.type]),
-          });
+        
+        // 3. Buscar trilha de aprendizagem (módulos e tópicos)
+        const subjectsToAnalyze = input.subjectId 
+          ? [input.subjectId] 
+          : studentSubjects.map(s => s.subjectId);
+        
+        let totalModules = 0;
+        let totalTopics = 0;
+        const learningPathInfo: Array<{ subjectName: string; modules: Array<{ title: string; topics: Array<{ title: string }> }> }> = [];
+        
+        for (const subId of subjectsToAnalyze) {
+          try {
+            const modules = await db.getLearningPathBySubject(subId, ctx.user.id);
+            const subjectInfo = await db.getSubjectById(subId, ctx.user.id);
+            if (modules.length > 0) {
+              totalModules += modules.length;
+              const moduleInfo = modules.map(m => {
+                totalTopics += m.topics?.length || 0;
+                return {
+                  title: m.title,
+                  topics: (m.topics || []).map(t => ({ title: t.title })),
+                };
+              });
+              learningPathInfo.push({
+                subjectName: subjectInfo?.name || 'Disciplina',
+                modules: moduleInfo,
+              });
+            }
+          } catch (e) {
+            // Ignorar erros ao buscar trilha
+          }
         }
+        
+        // 4. Buscar progresso do aluno nos tópicos
+        let completedTopics = 0;
+        let inProgressTopics = 0;
+        const progressDetails: Array<{ subject: string; completed: number; inProgress: number; total: number }> = [];
+        
+        for (const subId of subjectsToAnalyze) {
+          try {
+            const progress = await db.getStudentProgressBySubject(input.studentId, subId);
+            const subjectInfo = await db.getSubjectById(subId, ctx.user.id);
+            const modules = await db.getLearningPathBySubject(subId, ctx.user.id);
+            const subjectTotalTopics = modules.reduce((sum, m) => sum + (m.topics?.length || 0), 0);
+            const completed = progress.filter(p => p.status === 'completed').length;
+            const inProg = progress.filter(p => p.status === 'in_progress').length;
+            completedTopics += completed;
+            inProgressTopics += inProg;
+            progressDetails.push({
+              subject: subjectInfo?.name || 'Disciplina',
+              completed,
+              inProgress: inProg,
+              total: subjectTotalTopics,
+            });
+          } catch (e) {
+            // Ignorar erros
+          }
+        }
+        
+        // 5. Buscar exercícios recentes (se houver)
+        let exerciseInfo = 'Nenhum exercício respondido ainda';
+        try {
+          const recentExercises = await db.getStudentExerciseHistory(input.studentId, input.subjectId);
+          if (recentExercises.length > 0) {
+            const avgScore = recentExercises.reduce((sum, e) => sum + (e.attempt.score || 0), 0) / recentExercises.length;
+            exerciseInfo = `${recentExercises.length} exercícios respondidos, média de ${avgScore.toFixed(1)}%`;
+          }
+        } catch (e) {
+          // Ignorar
+        }
+        
+        // 6. Buscar comportamentos recentes (se houver)
+        let behaviorInfo = 'Sem registros de comportamento';
+        try {
+          const recentBehaviors = await db.getRecentBehaviors(input.studentId, ctx.user.id, 30);
+          if (recentBehaviors.length > 0) {
+            behaviorInfo = recentBehaviors.map(b => `${b.behaviorType} em ${new Date(b.recordedAt).toLocaleDateString('pt-BR')}`).join('; ');
+          }
+        } catch (e) {
+          // Ignorar
+        }
+        
+        // ===== MONTAR PROMPT RICO PARA A IA =====
+        const progressPercentage = totalTopics > 0 ? ((completedTopics / totalTopics) * 100).toFixed(1) : '0';
+        
+        const prompt = `Você é um especialista em pedagogia e análise de aprendizado. Analise os dados do aluno abaixo e forneça uma análise detalhada com recomendações práticas para o professor.
 
-        // Salvar insight geral
-        await db.saveAIInsight({
-          studentId: input.studentId,
-          userId: ctx.user.id,
-          subjectId: input.subjectId,
-          insightType: 'recommendation',
-          title: 'Análise de Comportamento',
-          description: analysis.overallAssessment,
-          actionable: true,
-          actionSuggestion: analysis.recommendations.join('\n'),
-          priority: analysis.alerts.length > 0 ? 'high' : 'medium',
-          confidence: analysis.confidence,
-          relatedData: JSON.stringify({
-            strengths: analysis.strengths,
-            weaknesses: analysis.weaknesses,
-          }),
+**DADOS DO ALUNO:**
+- Nome: ${student.fullName}
+- Email: ${student.email || 'Não informado'}
+- Disciplina analisada: ${subjectName}
+- Disciplinas matriculadas: ${studentSubjects.map(s => s.subjectName).join(', ') || 'Nenhuma matrícula encontrada'}
+
+**TRILHA DE APRENDIZAGEM:**
+- Total de módulos disponíveis: ${totalModules}
+- Total de tópicos disponíveis: ${totalTopics}
+- Tópicos concluídos: ${completedTopics} (${progressPercentage}%)
+- Tópicos em andamento: ${inProgressTopics}
+- Tópicos não iniciados: ${totalTopics - completedTopics - inProgressTopics}
+
+**PROGRESSO POR DISCIPLINA:**
+${progressDetails.length > 0 ? progressDetails.map(p => `- ${p.subject}: ${p.completed}/${p.total} concluídos (${p.total > 0 ? ((p.completed/p.total)*100).toFixed(0) : 0}%), ${p.inProgress} em andamento`).join('\n') : 'Sem dados de progresso registrados'}
+
+**ESTRUTURA DA TRILHA:**
+${learningPathInfo.length > 0 ? learningPathInfo.map(lp => `Disciplina: ${lp.subjectName}\n${lp.modules.map(m => `  Módulo: ${m.title} (${m.topics.length} tópicos: ${m.topics.map(t => t.title).join(', ')})`).join('\n')}`).join('\n\n') : 'Nenhuma trilha configurada'}
+
+**EXERCÍCIOS:** ${exerciseInfo}
+
+**COMPORTAMENTOS REGISTRADOS:** ${behaviorInfo}
+
+Com base nesses dados, forneça uma análise estruturada em JSON.`;
+
+        // ===== CHAMAR IA =====
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: 'Você é um especialista em pedagogia e análise de aprendizado. Analise os dados do aluno e forneça insights práticos. Sempre responda em JSON válido. Seja realista: se não há dados suficientes, diga isso claramente e foque nas recomendações baseadas na estrutura da trilha.'
+            },
+            { role: 'user', content: prompt }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'student_analysis',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  overallAssessment: { type: 'string', description: 'Avaliação geral do aluno' },
+                  strengths: { type: 'array', items: { type: 'string' }, description: 'Pontos fortes identificados' },
+                  weaknesses: { type: 'array', items: { type: 'string' }, description: 'Áreas que precisam de atenção' },
+                  patterns: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: { type: 'string' },
+                        description: { type: 'string' },
+                        confidence: { type: 'number' }
+                      },
+                      required: ['type', 'description', 'confidence'],
+                      additionalProperties: false
+                    },
+                    description: 'Padrões de aprendizado detectados'
+                  },
+                  recommendations: { type: 'array', items: { type: 'string' }, description: 'Recomendações práticas para o professor' },
+                  alerts: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: { type: 'string' },
+                        severity: { type: 'string', enum: ['info', 'warning', 'urgent', 'critical'] },
+                        message: { type: 'string' }
+                      },
+                      required: ['type', 'severity', 'message'],
+                      additionalProperties: false
+                    },
+                    description: 'Alertas importantes'
+                  },
+                  confidence: { type: 'number', description: 'Nível de confiança da análise (0-1)' }
+                },
+                required: ['overallAssessment', 'strengths', 'weaknesses', 'patterns', 'recommendations', 'alerts', 'confidence'],
+                additionalProperties: false
+              }
+            }
+          }
         });
+
+        const content = response.choices[0]?.message?.content;
+        if (!content || typeof content !== 'string') {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Resposta inválida da IA' });
+        }
+
+        const analysis = JSON.parse(content);
+
+        // Salvar insight geral no histórico
+        try {
+          await db.saveAIInsight({
+            studentId: input.studentId,
+            userId: ctx.user.id,
+            subjectId: input.subjectId,
+            insightType: 'recommendation',
+            title: 'Análise de Aprendizado',
+            description: analysis.overallAssessment,
+            actionable: true,
+            actionSuggestion: analysis.recommendations.join('\n'),
+            priority: analysis.alerts.length > 0 ? 'high' : 'medium',
+            confidence: analysis.confidence,
+            relatedData: JSON.stringify({
+              strengths: analysis.strengths,
+              weaknesses: analysis.weaknesses,
+              progressPercentage,
+              totalTopics,
+              completedTopics,
+            }),
+          });
+        } catch (e) {
+          console.error('Erro ao salvar insight:', e);
+        }
 
         return analysis;
       }),

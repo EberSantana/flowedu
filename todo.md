@@ -7144,3 +7144,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover link "Relatórios" do Sidebar
 - [x] Remover procedure reports.getStats do router
 - [x] Limpar imports e referências em CommandPalette, QuickActions, ProfileOnboarding e Dashboard
+
+## Refatorar Análise de Aprendizado com IA
+- [x] Refatorar analyzeStudent para coletar dados de trilhas (módulos, tópicos, progresso)
+- [x] Refatorar analyzeStudent para coletar dados de exercícios respondidos pelo aluno
+- [x] Registrar comportamentos automaticamente quando aluno faz exercício ou acessa trilha
+- [x] Garantir que a IA funcione mesmo sem dados de comportamento (usando dados de trilha/exercícios)
+- [x] Testar análise com dados reais na VPS - Deploy v2.5.15 concluído
