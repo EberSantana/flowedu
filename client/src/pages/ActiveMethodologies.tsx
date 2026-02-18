@@ -44,6 +44,7 @@ export default function ActiveMethodologies() {
   const createMutation = trpc.activeMethodologies.create.useMutation();
   const updateMutation = trpc.activeMethodologies.update.useMutation();
   const deleteMutation = trpc.activeMethodologies.delete.useMutation();
+  const toggleFavoriteMutation = trpc.activeMethodologies.toggleFavorite.useMutation();
 
   const handleCreate = async () => {
     try {
@@ -87,12 +88,9 @@ export default function ActiveMethodologies() {
     }
   };
 
-  const toggleFavorite = async (methodology: any) => {
+  const handleToggleFavorite = async (id: number) => {
     try {
-      await updateMutation.mutateAsync({ 
-        id: methodology.id, 
-        isFavorite: !methodology.isFavorite 
-      });
+      await toggleFavoriteMutation.mutateAsync({ id });
       refetch();
     } catch (error: any) {
       toast.error("Erro ao atualizar favorito: " + error.message);
@@ -126,11 +124,13 @@ export default function ActiveMethodologies() {
     setEditingMethodology(null);
   };
 
-  // Filtrar metodologias por busca e categoria
+  // Filtrar metodologias por busca, categoria e favoritos
   const filteredMethodologies = methodologies.filter((methodology) => {
     const matchesSearch = methodology.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          methodology.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || methodology.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || 
+                           selectedCategory === "favorites" && methodology.isFavorite ||
+                           methodology.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -189,6 +189,7 @@ export default function ActiveMethodologies() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas as categorias</SelectItem>
+              <SelectItem value="favorites">⭐ Favoritos</SelectItem>
               {CATEGORIES.map((cat) => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -265,6 +266,18 @@ export default function ActiveMethodologies() {
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Acessar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleToggleFavorite(methodology.id)}
+                    title={methodology.isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                  >
+                    {methodology.isFavorite ? (
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ) : (
+                      <Star className="h-4 w-4" />
+                    )}
                   </Button>
                   <Button
                     size="sm"

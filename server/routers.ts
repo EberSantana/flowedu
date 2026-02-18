@@ -1881,6 +1881,12 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         return await db.deleteActiveMethodology(input.id, ctx.user.id);
       }),
+
+    toggleFavorite: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.toggleActiveMethodologyFavorite(input.id, ctx.user.id);
+      }),
   }),
 
   classStatus: router({

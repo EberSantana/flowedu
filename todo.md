@@ -7161,3 +7161,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar botão "Voltar ao Dashboard" em Calendário/Turnos
 - [x] Padronizar todas as páginas com botão "Voltar ao Dashboard"
 - [x] Remover duplicidades de layout se houver
+
+- [ ] Criar componente Breadcrumbs reutilizável
+- [ ] Implementar breadcrumbs em todas as páginas principais
+- [ ] Adicionar sistema de favoritos no schema (isFavorite)
+- [ ] Criar procedures toggleFavorite no backend
+- [ ] Implementar UI de favoritos (estrela) em Metodologias
+- [ ] Adicionar filtro "Favoritos" na página de Metodologias
+- [ ] Atualizar versão para 2.5.18 e fazer deploy na VPS

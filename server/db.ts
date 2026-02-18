@@ -984,6 +984,29 @@ export async function deleteActiveMethodology(id: number, userId: number) {
   return { success: true };
 }
 
+export async function toggleActiveMethodologyFavorite(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Buscar o estado atual
+  const current = await db.select().from(activeMethodologies)
+    .where(and(eq(activeMethodologies.id, id), eq(activeMethodologies.userId, userId)))
+    .limit(1);
+  
+  if (current.length === 0) {
+    throw new Error("Metodologia não encontrada");
+  }
+  
+  // Inverter o estado de favorito
+  const newFavoriteState = !current[0].isFavorite;
+  
+  await db.update(activeMethodologies)
+    .set({ isFavorite: newFavoriteState, updatedAt: new Date() })
+    .where(and(eq(activeMethodologies.id, id), eq(activeMethodologies.userId, userId)));
+  
+  return { success: true, isFavorite: newFavoriteState };
+}
+
 
 // Class Status Management
 export async function setClassStatus(
