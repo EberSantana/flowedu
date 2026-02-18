@@ -7938,17 +7938,22 @@ Forneça:
           const db_instance = await getDb();
           if (!db_instance) throw new Error("Database not available");
           
+          // Armazenar material de estudo como JSON no campo feedback
+          const feedbackData = JSON.stringify({
+            type: 'study_material',
+            detailedExplanation: material.detailedExplanation,
+            studyStrategy: material.studyStrategy,
+            relatedConcepts: material.relatedConcepts,
+            additionalResources: material.additionalResources,
+            practiceExamples: material.practiceExamples,
+            commonMistakes: material.commonMistakes,
+            timeToMaster: material.timeToMaster,
+            difficultyLevel: material.difficultyLevel,
+          });
           await db_instance
             .update(studentExerciseAnswers)
             .set({
-              detailedExplanation: material.detailedExplanation,
-              studyStrategy: material.studyStrategy,
-              relatedConcepts: JSON.stringify(material.relatedConcepts),
-              additionalResources: JSON.stringify(material.additionalResources),
-              practiceExamples: JSON.stringify(material.practiceExamples),
-              commonMistakes: material.commonMistakes,
-              timeToMaster: material.timeToMaster,
-              difficultyLevel: material.difficultyLevel,
+              feedback: feedbackData,
             })
             .where(eq(studentExerciseAnswers.id, input.answerId));
           

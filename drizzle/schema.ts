@@ -1186,20 +1186,16 @@ export type InsertStudentExercise = typeof studentExercises.$inferInsert;
  */
 export const studentExerciseAttempts = mysqlTable("student_exercise_attempts", {
   id: int("id").autoincrement().primaryKey(),
-  exerciseId: int("exerciseId").notNull(),
   studentId: int("studentId").notNull(),
-  attemptNumber: int("attemptNumber").notNull(), // 1, 2, 3...
-  answers: json("answers").notNull(), // Array de respostas do aluno
-  score: int("score").notNull(), // Pontuação obtida (0-100)
-  correctAnswers: int("correctAnswers").notNull(),
-  totalQuestions: int("totalQuestions").notNull(),
-  pointsEarned: int("pointsEarned").notNull(), // Pontos de gamificação ganhos
-  timeSpent: int("timeSpent"), // Tempo gasto em segundos
+  exerciseId: int("exerciseId").notNull(),
+  score: int("score").notNull().default(0),
+  maxScore: int("maxScore").notNull().default(100),
+  timeSpent: int("timeSpent").notNull().default(0),
+  attemptNumber: int("attemptNumber").notNull().default(1),
   status: mysqlEnum("status", ["in_progress", "completed", "abandoned"]).default("in_progress").notNull(),
   startedAt: timestamp("startedAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export type StudentExerciseAttempt = typeof studentExerciseAttempts.$inferSelect;
@@ -1211,36 +1207,18 @@ export type InsertStudentExerciseAttempt = typeof studentExerciseAttempts.$infer
 export const studentExerciseAnswers = mysqlTable("student_exercise_answers", {
   id: int("id").autoincrement().primaryKey(),
   attemptId: int("attemptId").notNull(),
-  questionNumber: int("questionNumber").notNull(),
-  questionType: varchar("questionType", { length: 50 }).notNull(), // objective, subjective, case_study
-  studentAnswer: text("studentAnswer").notNull(),
-  correctAnswer: text("correctAnswer"),
-  isCorrect: boolean("isCorrect"),
-  pointsAwarded: int("pointsAwarded").default(0).notNull(),
-  teacherFeedback: text("teacherFeedback"), // Feedback manual do professor (para subjetivas)
-  aiFeedback: text("aiFeedback"), // Feedback automático gerado por IA para questões erradas
-  studyTips: text("studyTips"), // Dicas de estudo personalizadas geradas por IA
-  // Campos de validação inteligente de respostas abertas
-  aiScore: int("aiScore"), // Nota automática da IA (0-100) para questões abertas
-  aiConfidence: int("aiConfidence"), // Confiança da IA na avaliação (0-100)
-  aiAnalysis: text("aiAnalysis"), // Análise completa da IA em JSON (strengths, weaknesses, reasoning)
-  needsReview: boolean("needsReview").default(false), // true se confiança < 70% ou professor solicitou revisão
-  reviewedBy: int("reviewedBy"), // ID do professor que revisou manualmente
-  reviewedAt: timestamp("reviewedAt"), // Data da revisão manual
-  finalScore: int("finalScore"), // Nota final após revisão manual (se houver)
-  // Campos para Revisão Inteligente - Modelo de Exercícios para Estudo
-  detailedExplanation: text("detailedExplanation"), // Explicação detalhada do conceito (gerada por IA)
-  studyStrategy: text("studyStrategy"), // Estratégia personalizada de como estudar este tópico
-  relatedConcepts: text("relatedConcepts"), // Conceitos relacionados que o aluno deve revisar (JSON array)
-  additionalResources: text("additionalResources"), // Recursos complementares: vídeos, artigos, exemplos (JSON array)
-  practiceExamples: text("practiceExamples"), // Exemplos práticos para o aluno praticar (JSON array)
-  commonMistakes: text("commonMistakes"), // Erros comuns neste tipo de questão (gerado por IA)
-  difficultyLevel: int("difficultyLevel"), // Nível de dificuldade percebido pelo aluno (1-5)
-  timeToMaster: int("timeToMaster"), // Tempo estimado para dominar o conceito (em minutos)
-  masteryStatus: mysqlEnum("masteryStatus", ["not_started", "studying", "practicing", "mastered"]).default("not_started"), // Status de domínio do conceito
-  lastReviewedAt: timestamp("lastReviewedAt"), // Última vez que o aluno revisou esta questão
-  reviewCount: int("reviewCount").default(0).notNull(), // Quantas vezes o aluno revisou
-  markedForReview: boolean("markedForReview").default(false).notNull(), // Marcada pelo aluno para revisar depois
+  exerciseId: int("exerciseId").notNull(),
+  studentId: int("studentId").notNull(),
+  questionText: text("questionText").notNull(),
+  correctAnswer: text("correctAnswer").notNull(),
+  studentAnswer: text("studentAnswer"),
+  isCorrect: boolean("isCorrect").notNull().default(false),
+  pointsEarned: int("pointsEarned").notNull().default(0),
+  maxPoints: int("maxPoints").notNull().default(10),
+  explanation: text("explanation"),
+  feedback: text("feedback"),
+  timeSpent: int("timeSpent").notNull().default(0),
+  options: json("options"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

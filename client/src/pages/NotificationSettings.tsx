@@ -9,11 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 import { 
   Bell, BellRing, BellOff, Clock, Calendar, CheckSquare, 
-  Sun, Moon, Send, BarChart3, Smartphone, Loader2,
-  BookOpen, CalendarDays, ListTodo, Sunrise
+  Sun, Moon, Send, BarChart3, Smartphone, Loader2, ArrowLeft,
+  BookOpen, CalendarDays, ListTodo, Sunrise, Search
 } from "lucide-react";
 
 const DAYS_OF_WEEK = [
@@ -52,10 +54,13 @@ const SUMMARY_TIME_OPTIONS = [
 ];
 
 export default function NotificationSettings() {
+  const [, setLocation] = useLocation();
   const [pushSupported, setPushSupported] = useState(false);
   const [pushPermission, setPushPermission] = useState<NotificationPermission>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
 
   const { data: vapidKey } = trpc.pushNotifications.getVapidKey.useQuery();
   const { data: prefs, refetch: refetchPrefs } = trpc.pushNotifications.getPreferences.useQuery();
@@ -207,24 +212,59 @@ export default function NotificationSettings() {
     updatePref("activeDays", newDays);
   };
 
+  const tabs = [
+    { id: "all", label: "Todas" },
+    { id: "active", label: "Ativas" },
+    { id: "inactive", label: "Inativas" },
+  ];
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <PageWrapper>
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
+        <div className="w-full flex justify-center">
+          <div className="w-full max-w-3xl px-6 space-y-6">
+          {/* Voltar ao Dashboard */}
+          <button
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar ao Dashboard
+          </button>
+
+          {/* Header com Título e Subtítulo */}
+          <div>
+            <div className="flex items-start gap-3 mb-2">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Bell className="h-6 w-6 text-primary" />
-                Notificações Push
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Configure lembretes automáticos para aulas, eventos e tarefas
-              </p>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Notificações Push</h1>
+                <p className="text-gray-600 mt-1">
+                  Configure lembretes automáticos para aulas, eventos e tarefas
+                </p>
+              </div>
             </div>
+          </div>
+
+          {/* Botão de Ação e Stats */}
+          <div className="flex items-center justify-between">
+            <Button 
+              onClick={handleEnablePush}
+              disabled={!pushSupported || pushPermission === "denied" || subscribing || isSubscribed}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {subscribing ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <BellRing className="h-4 w-4 mr-2" />
+              )}
+              {isSubscribed ? "Notificações Ativas" : "Ativar Notificações"}
+            </Button>
+            
             {stats && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Badge variant="outline" className="flex items-center gap-1">
                   <Smartphone className="h-3 w-3" />
                   {stats.activeSubscriptions} dispositivo(s)
@@ -237,80 +277,99 @@ export default function NotificationSettings() {
             )}
           </div>
 
+          {/* Barra de Pesquisa */}
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar notificações..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white"
+            />
+          </div>
+
+          {/* Abas de Filtro */}
+          <div className="flex gap-2 border-b border-gray-200">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 font-medium text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? "text-primary border-b-2 border-primary -mb-px"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
           {/* Status Card */}
-          <Card>
+          <Card className="bg-white border border-gray-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {isSubscribed ? (
-                  <BellRing className="h-5 w-5 text-green-600" />
-                ) : (
-                  <BellOff className="h-5 w-5 text-muted-foreground" />
-                )}
-                Status das Notificações
-              </CardTitle>
-              <CardDescription>
-                {!pushSupported 
-                  ? "Seu navegador não suporta notificações push. Use Chrome, Firefox ou Edge."
-                  : pushPermission === "denied"
-                  ? "Notificações bloqueadas. Habilite nas configurações do navegador."
-                  : isSubscribed
-                  ? "Notificações ativadas. Você receberá lembretes sobre aulas e eventos."
-                  : "Ative as notificações para receber lembretes automáticos."
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4">
-                {isSubscribed ? (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleDisablePush}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                    >
-                      <BellOff className="h-4 w-4 mr-2" />
-                      Desativar Notificações
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => sendTestMutation.mutate()}
-                      disabled={sendTestMutation.isPending}
-                    >
-                      {sendTestMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4 mr-2" />
-                      )}
-                      Enviar Teste
-                    </Button>
-                  </>
-                ) : (
-                  <Button 
-                    onClick={handleEnablePush}
-                    disabled={!pushSupported || pushPermission === "denied" || subscribing}
-                    className="bg-primary"
-                  >
-                    {subscribing ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <BellRing className="h-4 w-4 mr-2" />
-                    )}
-                    Ativar Notificações Push
-                  </Button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isSubscribed ? (
+                    <BellRing className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <BellOff className="h-5 w-5 text-gray-400" />
+                  )}
+                  <div>
+                    <CardTitle>Status das Notificações</CardTitle>
+                    <CardDescription>
+                      {!pushSupported 
+                        ? "Seu navegador não suporta notificações push. Use Chrome, Firefox ou Edge."
+                        : pushPermission === "denied"
+                        ? "Notificações bloqueadas. Habilite nas configurações do navegador."
+                        : isSubscribed
+                        ? "Notificações ativadas. Você receberá lembretes sobre aulas e eventos."
+                        : "Ative as notificações para receber lembretes automáticos."
+                      }
+                    </CardDescription>
+                  </div>
+                </div>
+                {isSubscribed && (
+                  <Badge className="bg-green-100 text-green-700 border-green-300">
+                    Ativo
+                  </Badge>
                 )}
               </div>
-              
-              {pushPermission === "denied" && (
-                <p className="text-sm text-red-600 mt-3">
-                  As notificações foram bloqueadas. Para reativar, acesse as configurações do navegador 
-                  e permita notificações para este site.
+            </CardHeader>
+            <CardContent className="flex gap-2">
+              {isSubscribed ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleDisablePush}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <BellOff className="h-4 w-4 mr-2" />
+                    Desativar
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => sendTestMutation.mutate()}
+                    disabled={sendTestMutation.isPending}
+                  >
+                    {sendTestMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4 mr-2" />
+                    )}
+                    Enviar Teste
+                  </Button>
+                </>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  {pushPermission === "denied" && "As notificações foram bloqueadas. Habilite nas configurações do navegador."}
                 </p>
               )}
             </CardContent>
           </Card>
 
           {/* Tipos de Lembrete */}
-          <Card>
+          <Card className="bg-white border border-gray-200">
             <CardHeader>
               <CardTitle>Tipos de Lembrete</CardTitle>
               <CardDescription>
@@ -326,7 +385,7 @@ export default function NotificationSettings() {
                   </div>
                   <div>
                     <Label className="text-base font-medium">Lembretes de Aula</Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600">
                       Receba um lembrete antes de cada aula
                     </p>
                   </div>
@@ -339,7 +398,7 @@ export default function NotificationSettings() {
 
               {prefs?.classReminders && (
                 <div className="ml-13 pl-4 border-l-2 border-blue-200">
-                  <Label className="text-sm text-muted-foreground">Antecedência</Label>
+                  <Label className="text-sm text-gray-600">Antecedência</Label>
                   <Select 
                     value={String(prefs?.classReminderMinutes ?? 15)}
                     onValueChange={(v) => updatePref("classReminderMinutes", parseInt(v))}
@@ -368,7 +427,7 @@ export default function NotificationSettings() {
                   </div>
                   <div>
                     <Label className="text-base font-medium">Lembretes de Eventos</Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600">
                       Feriados, eventos escolares e datas comemorativas
                     </p>
                   </div>
@@ -389,7 +448,7 @@ export default function NotificationSettings() {
                   </div>
                   <div>
                     <Label className="text-base font-medium">Lembretes de Tarefas</Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600">
                       Tarefas com prazo para hoje ou amanhã
                     </p>
                   </div>
@@ -410,7 +469,7 @@ export default function NotificationSettings() {
                   </div>
                   <div>
                     <Label className="text-base font-medium">Resumo Diário</Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600">
                       Resumo das aulas e eventos do dia pela manhã
                     </p>
                   </div>
@@ -423,7 +482,7 @@ export default function NotificationSettings() {
 
               {prefs?.dailySummary && (
                 <div className="ml-13 pl-4 border-l-2 border-green-200">
-                  <Label className="text-sm text-muted-foreground">Horário do resumo</Label>
+                  <Label className="text-sm text-gray-600">Horário do resumo</Label>
                   <Select 
                     value={prefs?.dailySummaryTime ?? "07:00"}
                     onValueChange={(v) => updatePref("dailySummaryTime", v)}
@@ -445,7 +504,7 @@ export default function NotificationSettings() {
           </Card>
 
           {/* Dias e Horários */}
-          <Card>
+          <Card className="bg-white border border-gray-200">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
@@ -472,7 +531,7 @@ export default function NotificationSettings() {
                         size="sm"
                         onClick={() => toggleDay(day.value)}
                         className={`w-12 h-12 rounded-full ${
-                          isActive ? "" : "text-muted-foreground"
+                          isActive ? "" : "text-gray-600"
                         }`}
                         title={day.fullLabel}
                       >
@@ -491,12 +550,12 @@ export default function NotificationSettings() {
                   <Moon className="h-4 w-4" />
                   Horário Silencioso
                 </Label>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-gray-600 mb-3">
                   Nenhuma notificação será enviada durante este período
                 </p>
                 <div className="flex items-center gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Início</Label>
+                    <Label className="text-xs text-gray-600">Início</Label>
                     <Select 
                       value={prefs?.quietHoursStart ?? "22:00"}
                       onValueChange={(v) => updatePref("quietHoursStart", v)}
@@ -516,9 +575,9 @@ export default function NotificationSettings() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <span className="text-muted-foreground mt-4">até</span>
+                  <span className="text-gray-600 mt-4">até</span>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Fim</Label>
+                    <Label className="text-xs text-gray-600">Fim</Label>
                     <Select 
                       value={prefs?.quietHoursEnd ?? "06:00"}
                       onValueChange={(v) => updatePref("quietHoursEnd", v)}
@@ -543,7 +602,7 @@ export default function NotificationSettings() {
             </CardContent>
           </Card>
 
-          {/* Info */}
+          {/* Info Card */}
           <Card className="border-blue-200 bg-blue-50/50">
             <CardContent className="pt-6">
               <div className="flex gap-3">
@@ -563,6 +622,7 @@ export default function NotificationSettings() {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
       </PageWrapper>
     </div>

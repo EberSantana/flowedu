@@ -7,13 +7,77 @@ import {
   BookOpen, ChevronRight, CheckCircle2, Clock, Circle, 
   Lock, Unlock, FileText, Video, FileQuestion, Zap, Brain,
   MessageCircle, BookMarked, ArrowLeft, Play, CheckCircle,
-  AlertCircle, HelpCircle, Smile, Meh, Frown, Sparkles
+  AlertCircle, HelpCircle, Smile, Meh, Frown, Sparkles, Target, Trophy
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useLocation } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+
+function ExerciseCard({ exercise }: { exercise: any }) {
+  const [, setLocation] = useLocation();
+  const totalQuestions = exercise.exerciseData?.exercises?.length || exercise.totalQuestions || 0;
+  const passingScore = exercise.passingScore || 70;
+  
+  const getExerciseStatus = () => {
+    if (exercise.lastAttempt?.status === 'completed') {
+      const score = exercise.lastAttempt.score || 0;
+      if (score >= passingScore) {
+        return { label: `Aprovado (${score}%)`, color: 'bg-green-100 text-green-700 border-green-300', icon: '✅' };
+      }
+      return { label: `${score}%`, color: 'bg-yellow-100 text-yellow-700 border-yellow-300', icon: '⚠️' };
+    }
+    if (exercise.lastAttempt?.status === 'in_progress') {
+      return { label: 'Em andamento', color: 'bg-blue-100 text-blue-700 border-blue-300', icon: '⏳' };
+    }
+    return { label: 'Disponível', color: 'bg-primary/10 text-primary border-primary/30', icon: '✏️' };
+  };
+  
+  const status = getExerciseStatus();
+  
+  return (
+    <Card className="border-2 hover:border-primary/50 transition-all cursor-pointer" onClick={() => setLocation(`/student-exercises/${exercise.id}/attempt`)}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h4 className="font-semibold text-sm text-gray-900">{exercise.title}</h4>
+          <Badge className={`text-xs whitespace-nowrap ${status.color}`}>
+            {status.icon} {status.label}
+          </Badge>
+        </div>
+        {exercise.description && (
+          <p className="text-xs text-gray-600 mb-3 line-clamp-2">{exercise.description}</p>
+        )}
+        <div className="flex items-center gap-4 text-xs text-gray-500">
+          <span className="flex items-center gap-1">
+            <BookOpen className="w-3 h-3" />
+            {totalQuestions} questões
+          </span>
+          <span className="flex items-center gap-1">
+            <Target className="w-3 h-3" />
+            Mínimo: {passingScore}%
+          </span>
+          {exercise.attempts > 0 && (
+            <span className="flex items-center gap-1">
+              <Trophy className="w-3 h-3" />
+              {exercise.attempts} tentativa(s)
+            </span>
+          )}
+        </div>
+        {exercise.canAttempt && (
+          <Button size="sm" className="w-full mt-3 bg-primary hover:bg-primary/90">
+            {exercise.attempts > 0 ? 'Tentar Novamente' : 'Iniciar Exercício'}
+          </Button>
+        )}
+        {!exercise.canAttempt && exercise.attempts > 0 && (
+          <div className="text-xs text-center text-gray-500 mt-3 py-2 bg-gray-50 rounded">
+            Tentativas esgotadas — Melhor nota: {exercise.bestScore}%
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function StudentLearningPathDetail() {
   const [, params] = useRoute("/student/learning-path/:subjectId/:professorId");
@@ -238,6 +302,22 @@ export default function StudentLearningPathDetail() {
                 </CardHeader>
 
                 <CardContent className="pt-6">
+                  {/* Exercícios do Módulo */}
+                  {(module as any).exercises && (module as any).exercises.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-primary">
+                        <FileQuestion className="w-5 h-5" />
+                        Exercícios do Módulo
+                      </h3>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {(module as any).exercises.map((exercise: any) => (
+                          <ExerciseCard key={exercise.id} exercise={exercise} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tópicos */}
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {module.topics?.map((topic: any, topicIndex: number) => {
                       const isUnlocked = topic.isUnlocked !== false;

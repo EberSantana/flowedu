@@ -46,13 +46,24 @@ export default function ActiveMethodologies() {
   const deleteMutation = trpc.activeMethodologies.delete.useMutation();
 
   const handleCreate = async () => {
+    console.log('handleCreate chamado com formData:', formData);
     try {
-      await createMutation.mutateAsync(formData);
+      console.log('Iniciando mutateAsync...');
+      // Converter strings vazias em undefined para campos opcionais
+      const dataToSend = {
+        ...formData,
+        tips: formData.tips || undefined,
+        logoUrl: formData.logoUrl || undefined,
+      };
+      console.log('Dados a enviar:', dataToSend);
+      await createMutation.mutateAsync(dataToSend);
+      console.log('Mutation sucesso!');
       toast.success("Metodologia criada com sucesso!");
       setIsCreateOpen(false);
       resetForm();
       refetch();
     } catch (error: any) {
+      console.error('Erro na mutation:', error);
       toast.error("Erro ao criar metodologia: " + error.message);
     }
   };
@@ -359,7 +370,20 @@ export default function ActiveMethodologies() {
             <Button variant="outline" onClick={() => { setIsCreateOpen(false); resetForm(); }}>
               Cancelar
             </Button>
-            <Button onClick={handleCreate} disabled={!formData.name || !formData.description || !formData.category || !formData.url}>
+            <Button 
+              onClick={() => {
+                alert('Botão clicado!');
+                console.log('Botão clicado! formData:', formData);
+                console.log('Validação:', {
+                  name: !!formData.name,
+                  description: !!formData.description,
+                  category: !!formData.category,
+                  url: !!formData.url
+                });
+                handleCreate();
+              }}
+              disabled={!formData.name || !formData.description || !formData.category || !formData.url}
+            >
               Criar Ferramenta
             </Button>
           </DialogFooter>

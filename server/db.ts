@@ -955,8 +955,14 @@ export async function createActiveMethodology(methodology: InsertActiveMethodolo
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const [result] = await db.insert(activeMethodologies).values(methodology);
-  return result;
+  const result = await db.insert(activeMethodologies).values(methodology);
+  // Buscar o registro criado para retornar os dados completos
+  const created = await db.select().from(activeMethodologies)
+    .where(eq(activeMethodologies.userId, methodology.userId))
+    .orderBy(desc(activeMethodologies.createdAt))
+    .limit(1);
+  
+  return created[0] || { success: true };
 }
 
 export async function updateActiveMethodology(id: number, userId: number, data: Partial<InsertActiveMethodology>) {
@@ -4671,11 +4677,9 @@ export async function startExerciseAttempt(exerciseId: number, studentId: number
     exerciseId,
     studentId,
     attemptNumber,
-    answers: [],
     score: 0,
-    correctAnswers: 0,
-    totalQuestions: 0,
-    pointsEarned: 0,
+    maxScore: 100,
+    timeSpent: 0,
     status: "in_progress",
     startedAt: new Date(),
   });
@@ -4772,12 +4776,18 @@ export async function submitExerciseAttempt(
     if (!question) {
       return {
         attemptId,
-        questionNumber: idx + 1,
-        questionType: 'unknown',
+        exerciseId: attempt[0].exerciseId,
+        studentId: attempt[0].studentId,
+        questionText: `Questão ${idx + 1}`,
         studentAnswer: answer.answer || "",
-        correctAnswer: null,
-        isCorrect: null,
-        pointsAwarded: 0,
+        correctAnswer: "",
+        isCorrect: false,
+        pointsEarned: 0,
+        maxPoints: 10,
+        explanation: null,
+        feedback: null,
+        timeSpent: 0,
+        options: null,
       };
     }
     
@@ -4821,12 +4831,18 @@ export async function submitExerciseAttempt(
     
     return {
       attemptId,
-      questionNumber: idx + 1,
-      questionType: question.type,
+      exerciseId: attempt[0].exerciseId,
+      studentId: attempt[0].studentId,
+      questionText: question.question || question.text || `Questão ${idx + 1}`,
       studentAnswer: normalizedStudentAnswer,
-      correctAnswer: normalizedCorrectAnswer,
-      isCorrect: isObjectiveQuestion ? isCorrect : null,
-      pointsAwarded: isCorrect ? 10 : 0, // 10 pontos por questão correta
+      correctAnswer: normalizedCorrectAnswer || "",
+      isCorrect: isObjectiveQuestion ? isCorrect : false,
+      pointsEarned: isCorrect ? 10 : 0,
+      maxPoints: 10,
+      explanation: question.explanation || null,
+      feedback: null,
+      timeSpent: 0,
+      options: question.options ? JSON.stringify(question.options) : null,
     };
   });
   
@@ -4839,11 +4855,8 @@ export async function submitExerciseAttempt(
   await db
     .update(studentExerciseAttempts)
     .set({
-      answers: JSON.stringify(answers),
       score,
-      correctAnswers,
-      totalQuestions,
-      pointsEarned,
+      maxScore: totalQuestions * 10,
       timeSpent,
       status: "completed",
       completedAt: new Date(),
@@ -4851,39 +4864,32 @@ export async function submitExerciseAttempt(
     .where(eq(studentExerciseAttempts.id, attemptId));
   
   // Salvar respostas individuais e gerar feedback com IA para questões erradas
-  for (const answer of detailedAnswers) {
-    let aiFeedback = null;
-    let studyTips = null;
+  for (let i = 0; i < detailedAnswers.length; i++) {
+    const answer = detailedAnswers[i];
+    let feedbackText = null;
     
-    const question = questions[answer.questionNumber - 1];
+    const question = questions[i];
     
-    // Gerar feedback para questões objetivas
-    if (answer.questionType === "objective") {
+    // Gerar feedback para questões erradas
+    if (question && answer.isCorrect === false) {
       try {
-        if (answer.isCorrect === false) {
-          // Feedback detalhado para respostas incorretas
-          const feedbackResponse = await generateQuestionFeedback(
-            question.question,
-            answer.studentAnswer,
-            answer.correctAnswer,
-            question.explanation || ""
-          );
-          aiFeedback = feedbackResponse.feedback;
-          studyTips = feedbackResponse.studyTips;
-        } else if (answer.isCorrect === true && question.explanation) {
-          // Para respostas corretas, mostrar a explicação do professor como reforço
-          aiFeedback = `Parabéns! Você acertou. ${question.explanation}`;
-        }
+        const feedbackResponse = await generateQuestionFeedback(
+          question.question || answer.questionText,
+          answer.studentAnswer || "",
+          answer.correctAnswer || "",
+          question.explanation || ""
+        );
+        feedbackText = `${feedbackResponse.feedback}\n\nDicas: ${feedbackResponse.studyTips}`;
       } catch (error) {
         console.error("Erro ao gerar feedback com IA:", error);
       }
+    } else if (question && answer.isCorrect === true && question.explanation) {
+      feedbackText = `Parabéns! Você acertou. ${question.explanation}`;
     }
 
-    
     await db.insert(studentExerciseAnswers).values({
       ...answer,
-      aiFeedback,
-      studyTips,
+      feedback: feedbackText || answer.feedback,
     });
   }
   
@@ -4907,26 +4913,17 @@ export async function submitExerciseAttempt(
     
     // Adicionar questões erradas à fila de revisão inteligente
     for (const answer of insertedAnswers) {
-      // Apenas questões objetivas erradas ou subjetivas com baixa pontuação
-      const shouldAddToQueue = 
-        (answer.questionType === "objective" && answer.isCorrect === false) ||
-        (answer.questionType === "subjective" && answer.aiScore && answer.aiScore < 70);
-      
-      if (shouldAddToQueue) {
+      if (answer.isCorrect === false) {
         try {
-          // Calcular dificuldade inicial baseada na pontuação
-          const initialDifficulty = answer.aiScore ? (100 - answer.aiScore) : 80;
-          
           await addToReviewQueue({
             studentId: attempt[0].studentId,
             answerId: answer.id,
             exerciseId: attempt[0].exerciseId,
             subjectId: exercise[0].subjectId,
-            initialDifficulty,
+            initialDifficulty: 80,
           });
         } catch (error) {
           console.error("Erro ao adicionar questão à fila de revisão:", error);
-          // Não falhar a submissão se houver erro na fila de revisão
         }
       }
     }
@@ -4968,49 +4965,41 @@ export async function getExerciseResults(attemptId: number) {
     .select()
     .from(studentExerciseAnswers)
     .where(eq(studentExerciseAnswers.attemptId, attemptId))
-    .orderBy(asc(studentExerciseAnswers.questionNumber));
+    .orderBy(asc(studentExerciseAnswers.id));
   
   // exerciseData já é um objeto JSON (tipo json no Drizzle), não precisa fazer parse
   const exerciseData = exercise[0]?.exerciseData as any || { exercises: [] };
   
   // Combinar respostas com questões originais
   const questionsWithAnswers = answers.map((answer, idx) => {
-    // Buscar questão original pelo número (index + 1)
-    const originalQuestion = exerciseData.exercises?.[answer.questionNumber - 1] || 
-                            exerciseData.exercises?.find((q: any) => q.number === answer.questionNumber) || 
-                            {};
+    // Buscar questão original pelo índice
+    const originalQuestion = exerciseData.exercises?.[idx] || {};
     return {
-      // ID único para React key
       id: answer.id || `question-${attemptId}-${idx}`,
-      // Dados da questão original
-      question: originalQuestion.question || answer.questionType, // Mantido para compatibilidade
-      text: originalQuestion.text || originalQuestion.question || answer.questionType, // Enunciado completo
-      type: originalQuestion.type || answer.questionType, // Tipo da questão
-      options: originalQuestion.options || [], // Alternativas (para múltipla escolha)
-      
-      // Respostas do aluno
+      question: originalQuestion.question || answer.questionText,
+      text: originalQuestion.text || originalQuestion.question || answer.questionText,
+      type: originalQuestion.type || "objective",
+      options: originalQuestion.options || (answer.options ? (typeof answer.options === 'string' ? JSON.parse(answer.options as string) : answer.options) : []),
       studentAnswer: answer.studentAnswer,
       correctAnswer: answer.correctAnswer,
       isCorrect: answer.isCorrect,
-      
-      // Feedback e explicações
-      explanation: originalQuestion.explanation || null,
-      pointsAwarded: answer.pointsAwarded,
-      aiFeedback: answer.aiFeedback || null,
-      studyTips: answer.studyTips || null,
-      
-      // Metadados (compatibilidade)
-      questionType: answer.questionType,
+      explanation: answer.explanation || originalQuestion.explanation || null,
+      pointsAwarded: answer.pointsEarned,
+      aiFeedback: answer.feedback || null,
+      studyTips: null,
+      questionType: originalQuestion.type || "objective",
     };
   });
+  
+  const correctCount = answers.filter(a => a.isCorrect).length;
   
   return {
     ...attempt[0],
     exerciseTitle: exercise[0]?.title || "Exercício",
     questions: questionsWithAnswers,
     detailedAnswers: answers,
-    correctCount: attempt[0].correctAnswers,
-    totalQuestions: attempt[0].totalQuestions,
+    correctCount,
+    totalQuestions: answers.length,
     canRetry: exercise[0] ? (attempt[0].attemptNumber < (exercise[0].maxAttempts || 999)) : false,
   };
 }
@@ -5460,25 +5449,17 @@ export async function getAllAnswersForReview(
       conditions.push(eq(studentExercises.moduleId, filters.moduleId));
     }
 
-    if (filters?.questionType) {
-      conditions.push(eq(studentExerciseAnswers.questionType, filters.questionType));
-    }
-
     const results = await db
       .select({
         id: studentExerciseAnswers.id,
         attemptId: studentExerciseAnswers.attemptId,
-        questionNumber: studentExerciseAnswers.questionNumber,
-        questionType: studentExerciseAnswers.questionType,
+        questionText: studentExerciseAnswers.questionText,
         studentAnswer: studentExerciseAnswers.studentAnswer,
         correctAnswer: studentExerciseAnswers.correctAnswer,
         isCorrect: studentExerciseAnswers.isCorrect,
-        pointsAwarded: studentExerciseAnswers.pointsAwarded,
-        aiFeedback: studentExerciseAnswers.aiFeedback,
-        studyTips: studentExerciseAnswers.studyTips,
-        aiScore: studentExerciseAnswers.aiScore,
-        aiConfidence: studentExerciseAnswers.aiConfidence,
-        aiAnalysis: studentExerciseAnswers.aiAnalysis,
+        pointsEarned: studentExerciseAnswers.pointsEarned,
+        feedback: studentExerciseAnswers.feedback,
+        explanation: studentExerciseAnswers.explanation,
         createdAt: studentExerciseAnswers.createdAt,
         exerciseId: studentExerciseAttempts.exerciseId,
         subjectId: studentExercises.subjectId,
@@ -5510,7 +5491,6 @@ export async function getWrongAnswers(
   filters?: {
     subjectId?: number;
     moduleId?: number;
-    questionType?: string;
     limit?: number;
   }
 ) {
@@ -5518,7 +5498,6 @@ export async function getWrongAnswers(
   if (!db) throw new Error("Database not available");
 
   try {
-    // Aplicar filtros opcionais
     const conditions = [
       eq(studentExerciseAttempts.studentId, studentId),
       eq(studentExerciseAnswers.isCorrect, false),
@@ -5532,25 +5511,17 @@ export async function getWrongAnswers(
       conditions.push(eq(studentExercises.moduleId, filters.moduleId));
     }
 
-    if (filters?.questionType) {
-      conditions.push(eq(studentExerciseAnswers.questionType, filters.questionType));
-    }
-
     const results = await db
       .select({
         id: studentExerciseAnswers.id,
         attemptId: studentExerciseAnswers.attemptId,
-        questionNumber: studentExerciseAnswers.questionNumber,
-        questionType: studentExerciseAnswers.questionType,
+        questionText: studentExerciseAnswers.questionText,
         studentAnswer: studentExerciseAnswers.studentAnswer,
         correctAnswer: studentExerciseAnswers.correctAnswer,
         isCorrect: studentExerciseAnswers.isCorrect,
-        pointsAwarded: studentExerciseAnswers.pointsAwarded,
-        aiFeedback: studentExerciseAnswers.aiFeedback,
-        studyTips: studentExerciseAnswers.studyTips,
-        aiScore: studentExerciseAnswers.aiScore,
-        aiConfidence: studentExerciseAnswers.aiConfidence,
-        aiAnalysis: studentExerciseAnswers.aiAnalysis,
+        pointsEarned: studentExerciseAnswers.pointsEarned,
+        feedback: studentExerciseAnswers.feedback,
+        explanation: studentExerciseAnswers.explanation,
         createdAt: studentExerciseAnswers.createdAt,
         exerciseId: studentExerciseAttempts.exerciseId,
         subjectId: studentExercises.subjectId,
@@ -5594,7 +5565,7 @@ export async function analyzeErrorPatterns(studentId: number, subjectId?: number
     // Erros por tipo de questão
     const errorsByType = await db
       .select({
-        questionType: studentExerciseAnswers.questionType,
+        exerciseId: studentExerciseAttempts.exerciseId,
         count: sql<number>`COUNT(*)`.as("count"),
       })
       .from(studentExerciseAnswers)
@@ -5604,7 +5575,7 @@ export async function analyzeErrorPatterns(studentId: number, subjectId?: number
       )
       .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
       .where(and(...conditions))
-      .groupBy(studentExerciseAnswers.questionType);
+      .groupBy(studentExerciseAttempts.exerciseId);
 
     // Erros por módulo
     const errorsByModule = await db
@@ -5692,11 +5663,11 @@ export async function markQuestionAsReviewed(answerId: number) {
 
   try {
     // Adicionar campo 'reviewed' na tabela se ainda não existir
-    // Por enquanto, vamos usar o campo studyTips para indicar que foi revisada
+    // Usar o campo feedback para indicar que foi revisada
     await db
       .update(studentExerciseAnswers)
       .set({
-        studyTips: sql`CONCAT(COALESCE(${studentExerciseAnswers.studyTips}, ''), '\n[REVISADA]')`,
+        feedback: sql`CONCAT(COALESCE(${studentExerciseAnswers.feedback}, ''), '\n[REVISADA]')`,
       })
       .where(eq(studentExerciseAnswers.id, answerId));
 
@@ -5782,36 +5753,33 @@ export async function getReviewStats(studentId: number, subjectId?: number) {
 
 /**
  * Salvar material de estudo detalhado para uma questão
+ * Usa o campo feedback para armazenar o material de estudo como JSON
  */
 export async function saveDetailedStudyMaterial(
   answerId: number,
   material: {
     detailedExplanation: string;
     studyStrategy: string;
-    relatedConcepts: string; // JSON string
-    additionalResources: string; // JSON string
-    practiceExamples: string; // JSON string
-    commonMistakes: string; // JSON string
+    relatedConcepts: string;
+    additionalResources: string;
+    practiceExamples: string;
+    commonMistakes: string;
     timeToMaster: number;
-    memorizationTips: string; // JSON string
+    memorizationTips: string;
   }
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
   try {
+    const feedbackData = JSON.stringify({
+      type: 'study_material',
+      ...material,
+    });
     await db
       .update(studentExerciseAnswers)
       .set({
-        detailedExplanation: material.detailedExplanation,
-        studyStrategy: material.studyStrategy,
-        relatedConcepts: material.relatedConcepts,
-        additionalResources: material.additionalResources,
-        practiceExamples: material.practiceExamples,
-        commonMistakes: material.commonMistakes,
-        timeToMaster: material.timeToMaster,
-        lastReviewedAt: new Date(),
-        reviewCount: sql`${studentExerciseAnswers.reviewCount} + 1`,
+        feedback: feedbackData,
       })
       .where(eq(studentExerciseAnswers.id, answerId));
 
@@ -5824,6 +5792,7 @@ export async function saveDetailedStudyMaterial(
 
 /**
  * Atualizar status de domínio de uma questão
+ * Usa o campo feedback para armazenar o status
  */
 export async function updateMasteryStatus(
   answerId: number,
@@ -5836,8 +5805,7 @@ export async function updateMasteryStatus(
     await db
       .update(studentExerciseAnswers)
       .set({
-        masteryStatus: status,
-        lastReviewedAt: new Date(),
+        feedback: sql`JSON_SET(COALESCE(${studentExerciseAnswers.feedback}, '{}'), '$.masteryStatus', ${status})`,
       })
       .where(eq(studentExerciseAnswers.id, answerId));
 
@@ -7481,9 +7449,43 @@ export async function getEnhancedLearningPath(studentId: number, subjectId: numb
         })
       );
       
+      // Buscar exercícios vinculados ao módulo
+      const moduleExercises = await db.select().from(studentExercises)
+        .where(and(
+          eq(studentExercises.moduleId, module.id),
+          eq(studentExercises.status, 'published'),
+          eq(studentExercises.isActive, true)
+        ));
+      
+      // Buscar tentativas do aluno para cada exercício
+      const exercisesWithAttempts = await Promise.all(
+        moduleExercises.map(async (exercise) => {
+          const attempts = await db.select().from(studentExerciseAttempts)
+            .where(and(
+              eq(studentExerciseAttempts.exerciseId, exercise.id),
+              eq(studentExerciseAttempts.studentId, studentId)
+            ))
+            .orderBy(desc(studentExerciseAttempts.createdAt));
+          
+          const lastAttempt = attempts.length > 0 ? attempts[0] : null;
+          const bestScore = attempts.length > 0 
+            ? Math.max(...attempts.filter(a => a.status === 'completed').map(a => a.score || 0))
+            : 0;
+          
+          return {
+            ...exercise,
+            attempts: attempts.length,
+            lastAttempt,
+            bestScore,
+            canAttempt: exercise.maxAttempts === 0 || attempts.length < (exercise.maxAttempts || 3)
+          };
+        })
+      );
+      
       return {
         ...module,
-        topics: topicsWithProgress
+        topics: topicsWithProgress,
+        exercises: exercisesWithAttempts
       };
     })
   );
@@ -10331,12 +10333,8 @@ export async function getStudentAnsweredQuestions(
   if (filters?.isCorrect !== undefined) {
     conditions.push(eq(studentExerciseAnswers.isCorrect, filters.isCorrect));
   }
-  if (filters?.markedForReview !== undefined) {
-    conditions.push(eq(studentExerciseAnswers.markedForReview, filters.markedForReview));
-  }
-  if (filters?.masteryStatus) {
-    conditions.push(eq(studentExerciseAnswers.masteryStatus, filters.masteryStatus));
-  }
+  // markedForReview e masteryStatus foram removidos do schema
+  // Filtros ignorados por compatibilidade
   
   // Aplicar filtros adicionais se houver
   // (os filtros já foram aplicados na query principal)
@@ -10352,7 +10350,17 @@ export async function getStudentAnsweredQuestions(
   // Enriquecer com dados da questão original
   return filteredResults.map(result => {
     const exerciseData = result.exercise?.exerciseData as any || { exercises: [] };
-    const originalQuestion = exerciseData.exercises?.[result.answer.questionNumber - 1] || {};
+    // Usar índice baseado na posição da resposta
+    const answerIdx = filteredResults.indexOf(result);
+    const originalQuestion = exerciseData.exercises?.[answerIdx] || {};
+    
+    // Tentar parsear feedback como JSON para extrair dados de estudo
+    let parsedFeedback: any = {};
+    try {
+      if (result.answer.feedback && result.answer.feedback.startsWith('{')) {
+        parsedFeedback = JSON.parse(result.answer.feedback);
+      }
+    } catch (e) { /* ignore */ }
     
     return {
       answerId: result.answer.id,
@@ -10360,32 +10368,32 @@ export async function getStudentAnsweredQuestions(
       exerciseId: result.exercise?.id,
       exerciseTitle: result.exercise?.title,
       subjectId: result.exercise?.subjectId,
-      questionNumber: result.answer.questionNumber,
-      questionText: originalQuestion.text || originalQuestion.question || '',
-      questionType: result.answer.questionType,
-      options: originalQuestion.options || [],
+      questionNumber: answerIdx + 1,
+      questionText: result.answer.questionText || originalQuestion.text || originalQuestion.question || '',
+      questionType: originalQuestion.type || 'objective',
+      options: originalQuestion.options || (result.answer.options ? (typeof result.answer.options === 'string' ? JSON.parse(result.answer.options as string) : result.answer.options) : []),
       studentAnswer: result.answer.studentAnswer,
       correctAnswer: result.answer.correctAnswer,
       isCorrect: result.answer.isCorrect,
-      pointsAwarded: result.answer.pointsAwarded,
+      pointsAwarded: result.answer.pointsEarned,
       
       // Feedback e materiais de estudo
-      aiFeedback: result.answer.aiFeedback,
-      studyTips: result.answer.studyTips,
-      detailedExplanation: result.answer.detailedExplanation,
-      studyStrategy: result.answer.studyStrategy,
-      relatedConcepts: result.answer.relatedConcepts,
-      additionalResources: result.answer.additionalResources,
-      practiceExamples: result.answer.practiceExamples,
-      commonMistakes: result.answer.commonMistakes,
+      aiFeedback: result.answer.feedback,
+      studyTips: null,
+      detailedExplanation: parsedFeedback.detailedExplanation || null,
+      studyStrategy: parsedFeedback.studyStrategy || null,
+      relatedConcepts: parsedFeedback.relatedConcepts || null,
+      additionalResources: parsedFeedback.additionalResources || null,
+      practiceExamples: parsedFeedback.practiceExamples || null,
+      commonMistakes: parsedFeedback.commonMistakes || null,
       
       // Status e progresso
-      masteryStatus: result.answer.masteryStatus,
-      difficultyLevel: result.answer.difficultyLevel,
-      timeToMaster: result.answer.timeToMaster,
-      reviewCount: result.answer.reviewCount,
-      lastReviewedAt: result.answer.lastReviewedAt,
-      markedForReview: result.answer.markedForReview,
+      masteryStatus: parsedFeedback.masteryStatus || 'not_started',
+      difficultyLevel: null,
+      timeToMaster: parsedFeedback.timeToMaster || null,
+      reviewCount: 0,
+      lastReviewedAt: null,
+      markedForReview: false,
       
       // Metadados
       createdAt: result.answer.createdAt,
@@ -10401,9 +10409,12 @@ export async function toggleQuestionForReview(answerId: number, markedForReview:
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Usar feedback JSON para armazenar markedForReview
   await db
     .update(studentExerciseAnswers)
-    .set({ markedForReview })
+    .set({ 
+      feedback: sql`JSON_SET(COALESCE(${studentExerciseAnswers.feedback}, '{}'), '$.markedForReview', ${markedForReview})`,
+    })
     .where(eq(studentExerciseAnswers.id, answerId));
   
   return { success: true };
@@ -10422,8 +10433,7 @@ export async function updateQuestionMasteryStatus(
   await db
     .update(studentExerciseAnswers)
     .set({ 
-      masteryStatus,
-      lastReviewedAt: new Date(),
+      feedback: sql`JSON_SET(COALESCE(${studentExerciseAnswers.feedback}, '{}'), '$.masteryStatus', ${masteryStatus})`,
     })
     .where(eq(studentExerciseAnswers.id, answerId));
   
@@ -10437,23 +10447,15 @@ export async function incrementQuestionReviewCount(answerId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const answer = await db
-    .select()
-    .from(studentExerciseAnswers)
-    .where(eq(studentExerciseAnswers.id, answerId))
-    .limit(1);
-  
-  if (!answer[0]) throw new Error("Answer not found");
-  
+  // Usar feedback JSON para armazenar reviewCount
   await db
     .update(studentExerciseAnswers)
     .set({ 
-      reviewCount: (answer[0].reviewCount || 0) + 1,
-      lastReviewedAt: new Date(),
+      feedback: sql`JSON_SET(COALESCE(${studentExerciseAnswers.feedback}, '{}'), '$.reviewCount', COALESCE(JSON_EXTRACT(${studentExerciseAnswers.feedback}, '$.reviewCount'), 0) + 1)`,
     })
     .where(eq(studentExerciseAnswers.id, answerId));
   
-  return { success: true, newCount: (answer[0].reviewCount || 0) + 1 };
+  return { success: true, newCount: 1 };
 }
 
 /**
@@ -10517,11 +10519,11 @@ export async function getStudentNotebookStats(studentId: number, subjectId?: num
     totalQuestions: answers.length,
     correctQuestions: answers.filter(a => a.isCorrect === true).length,
     incorrectQuestions: answers.filter(a => a.isCorrect === false).length,
-    markedForReview: answers.filter(a => a.markedForReview === true).length,
-    mastered: answers.filter(a => a.masteryStatus === 'mastered').length,
-    studying: answers.filter(a => a.masteryStatus === 'studying').length,
-    practicing: answers.filter(a => a.masteryStatus === 'practicing').length,
-    notStarted: answers.filter(a => a.masteryStatus === 'not_started').length,
+    markedForReview: 0,
+    mastered: 0,
+    studying: 0,
+    practicing: 0,
+    notStarted: answers.length,
   };
 }
 
