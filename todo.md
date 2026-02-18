@@ -7151,3 +7151,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Registrar comportamentos automaticamente quando aluno faz exercício ou acessa trilha
 - [x] Garantir que a IA funcione mesmo sem dados de comportamento (usando dados de trilha/exercícios)
 - [x] Testar análise com dados reais na VPS - Deploy v2.5.15 concluído
+
+## 🔧 Melhorias em Metodologias Ativas
+
+- [x] Corrigir botão "Criar Ferramenta" que não dispara onClick
+- [x] Adicionar filtros por categoria para facilitar navegação entre as 32 ferramentas

@@ -46,24 +46,19 @@ export default function ActiveMethodologies() {
   const deleteMutation = trpc.activeMethodologies.delete.useMutation();
 
   const handleCreate = async () => {
-    console.log('handleCreate chamado com formData:', formData);
     try {
-      console.log('Iniciando mutateAsync...');
       // Converter strings vazias em undefined para campos opcionais
       const dataToSend = {
         ...formData,
         tips: formData.tips || undefined,
         logoUrl: formData.logoUrl || undefined,
       };
-      console.log('Dados a enviar:', dataToSend);
       await createMutation.mutateAsync(dataToSend);
-      console.log('Mutation sucesso!');
       toast.success("Metodologia criada com sucesso!");
       setIsCreateOpen(false);
       resetForm();
       refetch();
     } catch (error: any) {
-      console.error('Erro na mutation:', error);
       toast.error("Erro ao criar metodologia: " + error.message);
     }
   };
@@ -131,10 +126,11 @@ export default function ActiveMethodologies() {
     setEditingMethodology(null);
   };
 
-  const filteredMethodologies = methodologies.filter((m) => {
-    const matchesSearch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         m.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || m.category === selectedCategory;
+  // Filtrar metodologias por busca e categoria
+  const filteredMethodologies = methodologies.filter((methodology) => {
+    const matchesSearch = methodology.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         methodology.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || methodology.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -371,17 +367,7 @@ export default function ActiveMethodologies() {
               Cancelar
             </Button>
             <Button 
-              onClick={() => {
-                alert('Botão clicado!');
-                console.log('Botão clicado! formData:', formData);
-                console.log('Validação:', {
-                  name: !!formData.name,
-                  description: !!formData.description,
-                  category: !!formData.category,
-                  url: !!formData.url
-                });
-                handleCreate();
-              }}
+              onClick={handleCreate}
               disabled={!formData.name || !formData.description || !formData.category || !formData.url}
             >
               Criar Ferramenta
