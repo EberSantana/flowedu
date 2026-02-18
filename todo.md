@@ -7133,3 +7133,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar painel admin para visualizar e ajustar limite de cada professor
 - [x] Atualizar UI do professor para mostrar seu uso individual vs seu limite
 - [x] Bloquear upload quando professor atingir seu limite individual
+
+## Bugs Reportados - Exercícios e IA
+- [x] Corrigir exercícios na trilha de aprendizagem que não aparecem para alunos após publicar - CORRIGIDO: sincronizado schema Drizzle com estrutura real do banco (adicionadas colunas topicId, exerciseType, difficulty, isActive, status; removida exigência de availableFrom)
+- [x] Corrigir Análise de Aprendizado com IA que não está funcionando - CORRIGIDO: sincronizado schema das tabelas ai_insights e alerts com banco real (adicionadas colunas userId, description, actionable, confidence, dismissed, generatedAt)

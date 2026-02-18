@@ -4493,7 +4493,6 @@ export async function listExercisesByModule(studentId: number, moduleId: number)
   const conditions = [
     eq(studentExercises.status, "published"),
     eq(studentExercises.moduleId, moduleId),
-    lte(studentExercises.availableFrom, now),
     // Apenas exercícios das disciplinas em que o aluno está matriculado
     inArray(studentExercises.subjectId, enrolledSubjectIds)
   ];
@@ -4522,7 +4521,7 @@ export async function listExercisesByModule(studentId: number, moduleId: number)
         ...exercise,
         attempts: attempts.length,
         lastAttempt: attempts[0] || null,
-        canAttempt: exercise.maxAttempts === 0 || attempts.length < exercise.maxAttempts,
+        canAttempt: !exercise.maxAttempts || exercise.maxAttempts === 0 || attempts.length < (exercise.maxAttempts || 999),
       };
     })
   );
@@ -4554,7 +4553,6 @@ export async function listAvailableExercises(studentId: number, subjectId?: numb
   
   const conditions = [
     eq(studentExercises.status, "published"),
-    lte(studentExercises.availableFrom, now),
     // Apenas exercícios das disciplinas em que o aluno está matriculado
     inArray(studentExercises.subjectId, enrolledSubjectIds)
   ];
@@ -4586,7 +4584,7 @@ export async function listAvailableExercises(studentId: number, subjectId?: numb
         ...exercise,
         attempts: attempts.length,
         lastAttempt: attempts[0] || null,
-        canAttempt: exercise.maxAttempts === 0 || attempts.length < exercise.maxAttempts,
+        canAttempt: !exercise.maxAttempts || exercise.maxAttempts === 0 || attempts.length < (exercise.maxAttempts || 999),
       };
     })
   );
@@ -4618,7 +4616,7 @@ export async function getExerciseDetails(exerciseId: number, studentId: number) 
   const module = await db
     .select()
     .from(learningModules)
-    .where(eq(learningModules.id, exercise[0].moduleId))
+    .where(eq(learningModules.id, exercise[0].moduleId || 0))
     .limit(1);
   
   const attempts = await db
@@ -4645,7 +4643,7 @@ export async function getExerciseDetails(exerciseId: number, studentId: number) 
     attempts,
     currentAttemptId: currentAttempt?.id || null,
     startedAt: currentAttempt?.startedAt || null,
-    canAttempt: exercise[0].maxAttempts === 0 || attempts.length < exercise[0].maxAttempts,
+    canAttempt: !exercise[0].maxAttempts || exercise[0].maxAttempts === 0 || attempts.length < (exercise[0].maxAttempts || 999),
   };
 }
 

@@ -7361,7 +7361,7 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         if (input.subjectId) {
           // Filtrar alertas apenas dos alunos matriculados na disciplina selecionada
           const studentIdsInSubject = new Set(filteredEnrollments.map(e => e.studentId));
-          filteredAlerts = allAlerts.filter(a => studentIdsInSubject.has(a.studentId));
+          filteredAlerts = allAlerts.filter(a => a.studentId && studentIdsInSubject.has(a.studentId));
         }
         const criticalAlerts = filteredAlerts.filter(a => a.severity === 'critical' || a.severity === 'urgent');
         

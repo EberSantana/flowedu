@@ -1152,21 +1152,28 @@ export type InsertStudentSubjectBadge = typeof studentSubjectBadges.$inferInsert
  */
 export const studentExercises = mysqlTable("student_exercises", {
   id: int("id").autoincrement().primaryKey(),
-  moduleId: int("moduleId").notNull(), // Módulo da trilha de aprendizagem
+  moduleId: int("moduleId"), // Módulo da trilha de aprendizagem (pode ser null)
   subjectId: int("subjectId").notNull(), // Disciplina
+  topicId: int("topicId"), // Tópico da trilha (pode ser null)
   teacherId: int("teacherId").notNull(), // Professor que criou
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  exerciseData: json("exerciseData").notNull(), // JSON com as questões geradas
-  totalQuestions: int("totalQuestions").notNull(),
-  totalPoints: int("totalPoints").notNull(),
+  exerciseData: json("exerciseData"), // JSON com as questões geradas
+  totalQuestions: int("totalQuestions").notNull().default(0),
+  totalPoints: int("totalPoints").notNull().default(0),
   passingScore: int("passingScore").default(60).notNull(), // Nota mínima para passar (%)
-  maxAttempts: int("maxAttempts").default(3).notNull(), // Número máximo de tentativas (0 = ilimitado)
+  exerciseType: mysqlEnum("exerciseType", ["multiple_choice", "true_false", "fill_blank", "matching", "ordering", "essay", "short_answer"]).default("multiple_choice").notNull(),
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard", "expert"]).default("medium").notNull(),
+  points: int("points").default(10).notNull(),
   timeLimit: int("timeLimit"), // Tempo limite em minutos (null = sem limite)
+  maxAttempts: int("maxAttempts").default(3), // Número máximo de tentativas
   showAnswersAfter: boolean("showAnswersAfter").default(true).notNull(), // Mostrar gabarito após conclusão
-  availableFrom: timestamp("availableFrom").notNull(),
+  availableFrom: timestamp("availableFrom"),
   availableTo: timestamp("availableTo"),
-  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  tags: json("tags"),
+  metadata: json("metadata"),
+  status: varchar("status", { length: 20 }).default("draft").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -1731,29 +1738,24 @@ export type InsertLearningPattern = typeof learningPatterns.$inferInsert;
  */
 export const aiInsights = mysqlTable("ai_insights", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(), // FK para students
-  userId: int("userId").notNull(), // FK para users (professor)
+  studentId: int("studentId"), // FK para students
+  teacherId: int("teacherId"), // FK para users (professor) - coluna legada
+  userId: int("userId"), // FK para users (professor)
   subjectId: int("subjectId"), // FK para subjects (opcional)
-  insightType: mysqlEnum("insightType", [
-    "recommendation",         // Recomendação
-    "prediction",             // Previsão
-    "alert",                  // Alerta
-    "strength",               // Ponto forte
-    "weakness",               // Ponto fraco
-    "opportunity",            // Oportunidade
-    "risk",                   // Risco
-    "achievement",            // Conquista
-    "trend"                   // Tendência
-  ]).notNull(),
+  insightType: varchar("insightType", { length: 100 }).notNull().default("recommendation"),
   title: varchar("title", { length: 255 }).notNull(), // Título do insight
-  description: text("description").notNull(), // Descrição detalhada
+  description: text("description"), // Descrição detalhada
   actionable: boolean("actionable").default(false).notNull(), // Se requer ação
   actionSuggestion: text("actionSuggestion"), // Sugestão de ação
-  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).default("medium").notNull(),
-  confidence: float("confidence").notNull(), // Confiança da IA (0-1)
+  confidence: float("confidence").notNull().default(0.5), // Confiança da IA (0-1)
   relatedData: json("relatedData"), // Dados relacionados (JSON)
   dismissed: boolean("dismissed").default(false).notNull(), // Se foi dispensado pelo professor
   generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  content: text("content"), // Conteúdo legado
+  priority: varchar("priority", { length: 20 }).notNull().default("medium"),
+  isRead: boolean("isRead").default(false).notNull(),
+  metadata: json("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type AIInsight = typeof aiInsights.$inferSelect;
@@ -1798,22 +1800,10 @@ export type InsertPerformanceMetric = typeof performanceMetrics.$inferInsert;
  */
 export const alerts = mysqlTable("alerts", {
   id: int("id").autoincrement().primaryKey(),
-  studentId: int("studentId").notNull(), // FK para students
-  userId: int("userId").notNull(), // FK para users (professor)
+  userId: int("userId"), // FK para users (professor)
+  studentId: int("studentId"), // FK para students
   subjectId: int("subjectId"), // FK para subjects (opcional)
-  alertType: mysqlEnum("alertType", [
-    "performance_drop",       // Queda de desempenho
-    "low_engagement",         // Baixo engajamento
-    "missed_deadlines",       // Prazos perdidos
-    "struggling",             // Dificuldade
-    "at_risk",                // Em risco
-    "exceptional_progress",   // Progresso excepcional
-    "needs_attention",        // Precisa de atenção
-    "pattern_change",         // Mudança de padrão
-    "milestone_reached",      // Marco alcançado
-    "inactivity"              // Inatividade
-  ]).notNull(),
-  severity: mysqlEnum("severity", ["info", "warning", "urgent", "critical"]).default("info").notNull(),
+  alertType: varchar("alertType", { length: 50 }).notNull().default("needs_attention"),
   title: varchar("title", { length: 255 }).notNull(), // Título do alerta
   message: text("message").notNull(), // Mensagem detalhada
   recommendedAction: text("recommendedAction"), // Ação recomendada
@@ -1823,6 +1813,10 @@ export const alerts = mysqlTable("alerts", {
   resolved: boolean("resolved").default(false).notNull(), // Se foi resolvido
   resolvedAt: timestamp("resolvedAt"), // Quando foi resolvido
   notes: text("notes"), // Notas do professor
+  severity: varchar("severity", { length: 20 }).notNull().default("info"),
+  isRead: boolean("isRead").default(false).notNull(),
+  readAt: timestamp("readAt"),
+  metadata: json("metadata"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
