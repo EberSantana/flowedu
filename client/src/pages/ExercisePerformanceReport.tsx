@@ -38,12 +38,25 @@ import {
   Download,
   Calendar,
   Trash2,
+  Edit,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 export default function ExercisePerformanceReport() {
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
   const [selectedExercise, setSelectedExercise] = useState<number | undefined>();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingExercise, setEditingExercise] = useState<any>(null);
 
   // Buscar disciplinas do professor
   const { data: subjects } = trpc.subjects.list.useQuery();
@@ -64,6 +77,37 @@ export default function ExercisePerformanceReport() {
       toast.error("Erro ao deletar exercício: " + error.message);
     },
   });
+
+  // Mutation para atualizar exercício
+  const updateExerciseMutation = trpc.teacherExercises.update.useMutation({
+    onSuccess: () => {
+      toast.success("Exercício atualizado com sucesso!");
+      setIsEditDialogOpen(false);
+      setEditingExercise(null);
+      refetchExercises();
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao atualizar exercício: " + error.message);
+    },
+  });
+
+  const handleEditExercise = (exercise: any) => {
+    setEditingExercise(exercise);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingExercise) return;
+    updateExerciseMutation.mutate({
+      exerciseId: editingExercise.id,
+      title: editingExercise.title,
+      description: editingExercise.description,
+      passingScore: editingExercise.passingScore,
+      maxAttempts: editingExercise.maxAttempts,
+      timeLimit: editingExercise.timeLimit || null,
+      showAnswersAfter: editingExercise.showAnswersAfter,
+    });
+  };
 
   // Buscar estatísticas gerais
   const { data: stats, isLoading } = trpc.teacherExercises.getStatistics.useQuery(
@@ -202,18 +246,27 @@ export default function ExercisePerformanceReport() {
                           </Badge>
                         </div>
                       </div>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          if (window.confirm(`Tem certeza que deseja deletar o exercício "${exercise.title}"? Esta ação não pode ser desfeita.`)) {
-                            deleteExerciseMutation.mutate({ exerciseId: exercise.id });
-                          }
-                        }}
-                        disabled={deleteExerciseMutation.isPending}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditExercise(exercise)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            if (window.confirm(`Tem certeza que deseja deletar o exercício "${exercise.title}"? Esta ação não pode ser desfeita.`)) {
+                              deleteExerciseMutation.mutate({ exerciseId: exercise.id });
+                            }
+                          }}
+                          disabled={deleteExerciseMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -621,6 +674,99 @@ export default function ExercisePerformanceReport() {
             </>
           )}
         </div>
+
+        {/* Modal de Edição */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Editar Exercício</DialogTitle>
+            </DialogHeader>
+            {editingExercise && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-title">Título</Label>
+                  <Input
+                    id="edit-title"
+                    value={editingExercise.title}
+                    onChange={(e) =>
+                      setEditingExercise({ ...editingExercise, title: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-description">Descrição</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={editingExercise.description || ""}
+                    onChange={(e) =>
+                      setEditingExercise({ ...editingExercise, description: e.target.value })
+                    }
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-passing-score">Nota Mínima (%)</Label>
+                    <Input
+                      id="edit-passing-score"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={editingExercise.passingScore}
+                      onChange={(e) =>
+                        setEditingExercise({
+                          ...editingExercise,
+                          passingScore: parseInt(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-max-attempts">Máx. Tentativas</Label>
+                    <Input
+                      id="edit-max-attempts"
+                      type="number"
+                      min="1"
+                      value={editingExercise.maxAttempts}
+                      onChange={(e) =>
+                        setEditingExercise({
+                          ...editingExercise,
+                          maxAttempts: parseInt(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="edit-time-limit">Tempo Limite (minutos, 0 = sem limite)</Label>
+                  <Input
+                    id="edit-time-limit"
+                    type="number"
+                    min="0"
+                    value={editingExercise.timeLimit || 0}
+                    onChange={(e) =>
+                      setEditingExercise({
+                        ...editingExercise,
+                        timeLimit: parseInt(e.target.value) || null,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSaveEdit}
+                disabled={updateExerciseMutation.isPending}
+              >
+                {updateExerciseMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* CSS para impressão */}
         <style>{`

@@ -5415,6 +5415,39 @@ JSON (descrições MAX 15 chars):
         return exercises;
       }),
 
+    // Obter exercício para edição
+    getForEdit: protectedProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getExerciseForEdit(input.exerciseId, ctx.user.id);
+      }),
+
+    // Atualizar exercício
+    update: protectedProcedure
+      .input(z.object({
+        exerciseId: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        exerciseData: z.any().optional(),
+        totalQuestions: z.number().optional(),
+        totalPoints: z.number().optional(),
+        passingScore: z.number().optional(),
+        exerciseType: z.enum(["multiple_choice", "true_false", "fill_blank", "matching", "ordering", "essay", "short_answer"]).optional(),
+        difficulty: z.enum(["easy", "medium", "hard", "expert"]).optional(),
+        points: z.number().optional(),
+        timeLimit: z.number().nullable().optional(),
+        maxAttempts: z.number().optional(),
+        showAnswersAfter: z.boolean().optional(),
+        availableFrom: z.date().nullable().optional(),
+        availableTo: z.date().nullable().optional(),
+        isActive: z.boolean().optional(),
+        status: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { exerciseId, ...data } = input;
+        return await db.updateStudentExercise(exerciseId, ctx.user.id, data);
+      }),
+
     // Deletar exercício criado pelo professor
     delete: protectedProcedure
       .input(z.object({ exerciseId: z.number() }))

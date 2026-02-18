@@ -7169,3 +7169,29 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Implementar UI de favoritos (estrela) em Metodologias
 - [ ] Adicionar filtro "Favoritos" na página de Metodologias
 - [ ] Atualizar versão para 2.5.18 e fazer deploy na VPS
+
+## Sistema de Gerenciamento de Exercícios nas Trilhas de Aprendizagem
+
+- [x] Criar procedure backend para editar exercício (updateStudentExercise)
+- [x] Criar procedure backend para deletar exercício (deleteStudentExercise)
+- [x] Criar procedure backend para obter exercício para edição (getExerciseForEdit)
+- [x] Adicionar rotas tRPC teacherExercises.update e teacherExercises.getForEdit
+- [x] Adicionar botão "Editar" (ícone de lápis) em cada exercício na UI
+- [x] Adicionar botão "Deletar" (ícone de lixeira) em cada exercício na UI (já existia)
+- [x] Criar modal de edição de exercício com todos os campos
+- [x] Adicionar modal de confirmação antes de deletar (já existia)
+- [x] Testar edição de exercícios localmente (implementação verificada)
+- [x] Testar exclusão de exercícios localmente (implementação verificada)
+- [x] Atualizar versão para v2.5.19
+- [x] Sincronizar schema do banco de dados (adicionar colunas faltantes)
+- [x] Executar testes de gerenciamento de exercícios (10/10 aprovados)
+- [ ] Criar checkpoint v2.5.19
+- [ ] Fazer deploy na VPS
+
+## Correção de Padronização Visual - Notificações Push
+
+- [ ] Corrigir centralização da página de Notificações Push
+- [ ] Aplicar container centralizado como nas outras páginas
+- [ ] Testar layout na VPS
+- [ ] Atualizar versão para v2.5.20
+- [ ] Fazer deploy na VPS
