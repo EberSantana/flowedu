@@ -36,7 +36,6 @@ const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const ActiveMethodologies = lazy(() => import("./pages/ActiveMethodologies"));
 const Tasks = lazy(() => import("./pages/Tasks"));
-const Reports = lazy(() => import("./pages/Reports"));
 const LearningAnalytics = lazy(() => import("./pages/LearningAnalytics").then(m => ({ default: m.LearningAnalytics })));
 const LearningPaths = lazy(() => import("./pages/LearningPaths"));
 const ManageEnrollments = lazy(() => import("./pages/ManageEnrollments"));
@@ -128,7 +127,6 @@ function Router() {
           <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
           <Route path={"/schedule"} component={Schedule} />
           <Route path={"/calendar"} component={Calendar} />
-          <Route path={"/reports"} component={Reports} />
           <Route path={"/learning-analytics"} component={LearningAnalytics} />
           <Route path="/exercise-performance" component={ExercisePerformanceReport} />
           <Route path={"/learning-paths"} component={LearningPaths} />

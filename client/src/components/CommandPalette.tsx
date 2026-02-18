@@ -154,12 +154,12 @@ function CommandPaletteInner() {
     // Relatório de Desempenho
     {
       id: "performance-report",
-      label: "Relatório de Desempenho",
-      description: "Estatísticas e análises",
+      label: "Análise de Aprendizado",
+      description: "Análise de aprendizado com IA",
       icon: <BarChart3 className="w-4 h-4" />,
-      action: () => navigate("/reports"),
-      keywords: ["relatório", "desempenho", "estatísticas", "análise"],
-      category: "Relatórios",
+      action: () => navigate("/learning-analytics"),
+      keywords: ["análise", "aprendizado", "ia", "desempenho"],
+      category: "Análise",
     },
     // Banco de Exercícios
     {

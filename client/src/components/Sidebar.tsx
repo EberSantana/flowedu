@@ -136,14 +136,9 @@ const teacherNavCategories: NavCategory[] = [
   },
   {
     id: "analytics",
-    label: "Análise e Relatórios",
+    label: "Análise e Desempenho",
     icon: <BarChart3 className="h-5 w-5" />,
     items: [
-      {
-        label: "Relatórios",
-        icon: <BarChart3 className="h-5 w-5" />,
-        href: "/reports",
-      },
       {
         label: "Análise de Aprendizado",
         icon: <Brain className="h-5 w-5" />,

@@ -76,10 +76,10 @@ const ONBOARDING_STEPS: Record<string, OnboardingStep[]> = {
       targetElement: "[href='/active-methodologies']",
     },
     {
-      title: "Relatórios e Análises",
-      description: "Gere relatórios detalhados de desempenho, carga horária e estatísticas de suas turmas.",
+      title: "Análise de Aprendizado",
+      description: "Analise o desempenho dos alunos com inteligência artificial e acompanhe o progresso nas trilhas.",
       icon: <BarChart3 className="h-12 w-12 text-green-600" />,
-      targetElement: "[href='/reports']",
+      targetElement: "[href='/learning-analytics']",
     },
   ],
   
@@ -104,9 +104,9 @@ const ONBOARDING_STEPS: Record<string, OnboardingStep[]> = {
     },
     {
       title: "Acompanhe o Engajamento",
-      description: "Monitore a participação dos alunos em projetos e metodologias ativas através de relatórios específicos.",
+      description: "Monitore a participação dos alunos em projetos e metodologias ativas através da análise de aprendizado.",
       icon: <BarChart3 className="h-12 w-12 text-green-600" />,
-      targetElement: "[href='/reports']",
+      targetElement: "[href='/learning-analytics']",
     },
   ],
   
@@ -117,10 +117,10 @@ const ONBOARDING_STEPS: Record<string, OnboardingStep[]> = {
       icon: <BarChart3 className="h-12 w-12 text-blue-600" />,
     },
     {
-      title: "Relatórios Completos",
-      description: "Gere relatórios detalhados de carga horária, desempenho de turmas e estatísticas de pensamento computacional.",
+      title: "Análise com IA",
+      description: "Utilize inteligência artificial para analisar o desempenho dos alunos e gerar insights pedagógicos.",
       icon: <BarChart3 className="h-12 w-12 text-green-600" />,
-      targetElement: "[href='/reports']",
+      targetElement: "[href='/learning-analytics']",
     },
     {
       title: "Grade de Horários Organizada",

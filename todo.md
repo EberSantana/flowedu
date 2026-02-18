@@ -7137,3 +7137,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bugs Reportados - Exercícios e IA
 - [x] Corrigir exercícios na trilha de aprendizagem que não aparecem para alunos após publicar - CORRIGIDO: sincronizado schema Drizzle com estrutura real do banco (adicionadas colunas topicId, exerciseType, difficulty, isActive, status; removida exigência de availableFrom)
 - [x] Corrigir Análise de Aprendizado com IA que não está funcionando - CORRIGIDO: sincronizado schema das tabelas ai_insights e alerts com banco real (adicionadas colunas userId, description, actionable, confidence, dismissed, generatedAt)
+
+## Remoção - Relatórios de Aulas
+- [x] Remover página Reports.tsx do frontend
+- [x] Remover rota /reports do App.tsx
+- [x] Remover link "Relatórios" do Sidebar
+- [x] Remover procedure reports.getStats do router
+- [x] Limpar imports e referências em CommandPalette, QuickActions, ProfileOnboarding e Dashboard
