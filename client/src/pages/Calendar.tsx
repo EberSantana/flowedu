@@ -433,6 +433,15 @@ export default function Calendar() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4">
+          {/* Voltar ao Dashboard */}
+          <button
+            onClick={() => window.location.href = '/'}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium mb-4"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Voltar ao Dashboard
+          </button>
+
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>

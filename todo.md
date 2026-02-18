@@ -7156,3 +7156,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Corrigir botão "Criar Ferramenta" que não dispara onClick
 - [x] Adicionar filtros por categoria para facilitar navegação entre as 32 ferramentas
+
+- [x] Corrigir alinhamento da página Notificações Push (centralizar conteúdo)
+- [x] Adicionar botão "Voltar ao Dashboard" em Calendário/Turnos
+- [x] Padronizar todas as páginas com botão "Voltar ao Dashboard"
+- [x] Remover duplicidades de layout se houver

@@ -176,6 +176,15 @@ export default function Profile() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
         <div className="container max-w-4xl mx-auto">
+          {/* Voltar ao Dashboard */}
+          <button
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium mb-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar ao Dashboard
+          </button>
+
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-slate-800 mb-2">Meu Perfil</h1>
