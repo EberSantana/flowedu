@@ -7190,8 +7190,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Correção de Padronização Visual - Notificações Push
 
-- [ ] Corrigir centralização da página de Notificações Push
-- [ ] Aplicar container centralizado como nas outras páginas
-- [ ] Testar layout na VPS
-- [ ] Atualizar versão para v2.5.20
+- [x] Corrigir centralização da página de Notificações Push
+- [x] Aplicar container centralizado como nas outras páginas (max-w-7xl)
+- [x] Atualizar versão para v2.5.20
+- [ ] Criar checkpoint v2.5.20
 - [ ] Fazer deploy na VPS

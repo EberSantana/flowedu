@@ -222,8 +222,7 @@ export default function NotificationSettings() {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <PageWrapper>
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-3xl px-6 space-y-6">
+        <div className="container mx-auto py-6 px-4 max-w-7xl space-y-6">
           {/* Voltar ao Dashboard */}
           <button
             onClick={() => setLocation("/")}
@@ -622,7 +621,6 @@ export default function NotificationSettings() {
               </div>
             </CardContent>
           </Card>
-          </div>
         </div>
       </PageWrapper>
     </div>
