@@ -7193,5 +7193,32 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir centralização da página de Notificações Push
 - [x] Aplicar container centralizado como nas outras páginas (max-w-7xl)
 - [x] Atualizar versão para v2.5.20
-- [ ] Criar checkpoint v2.5.20
+- [x] Criar checkpoint v2.5.20
+- [x] Fazer deploy na VPS (frontend atualizado)
+
+## Dashboard de Estatísticas de Desempenho dos Alunos
+
+- [x] Criar procedure para calcular média geral dos alunos
+- [x] Criar procedure para calcular taxa de aprovação
+- [x] Criar procedure para listar exercícios mais difíceis (top 5)
+- [x] Criar procedure para listar top 5 alunos com melhor desempenho
+- [ ] Criar rotas tRPC para o dashboard (exerciseStats.getOverview)
+- [ ] Criar página ExerciseStatsDashboard.tsx com 3 cards
+- [ ] Adicionar tabela de exercícios mais difíceis
+- [ ] Adicionar tabela de top alunos
+- [ ] Adicionar rota no menu lateral "Análise e Desempenho"
+- [ ] Testar dashboard localmente
+- [ ] Atualizar versão para v2.6.0
+- [ ] Criar checkpoint v2.6.0
 - [ ] Fazer deploy na VPS
+
+## Refatoração da Página de Notificações Push
+
+- [x] Analisar padrão visual de páginas de referência (ActiveMethodologies, LearningPaths)
+- [x] Refazer layout completo da NotificationSettings.tsx seguindo padrão
+- [x] Aplicar container centralizado (container mx-auto p-6)
+- [x] Padronizar cards e espaçamentos (space-y-6)
+- [x] Criar grid responsivo para tipos de notificação
+- [x] Testar layout localmente (compilou sem erros)
+- [x] Atualizar versão para v2.5.21
+- [x] Fazer deploy na VPS (versão 2.5.21 online)

@@ -11716,3 +11716,100 @@ export async function getExerciseForEdit(exerciseId: number, teacherId: number) 
 
   return exercise;
 }
+
+/**
+ * ========================================
+ * EXERCISE STATISTICS - Dashboard de Desempenho
+ * ========================================
+ */
+
+/**
+ * Obter estatísticas gerais de desempenho dos exercícios
+ */
+export async function getExerciseStatsOverview(teacherId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Média geral e taxa de aprovação
+  const overallStats = await db.execute(sql`
+    SELECT 
+      COALESCE(AVG(sea.score / sea.maxScore * 100), 0) as averageScore,
+      COALESCE(
+        SUM(CASE WHEN (sea.score / sea.maxScore * 100) >= se.passingScore THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        0
+      ) as approvalRate,
+      COUNT(*) as totalAttempts
+    FROM student_exercise_attempts sea
+    INNER JOIN student_exercises se ON sea.exerciseId = se.id
+    WHERE se.teacherId = ${teacherId}
+      AND sea.status = 'completed'
+  `);
+
+  return overallStats[0] || { averageScore: 0, approvalRate: 0, totalAttempts: 0 };
+}
+
+/**
+ * Listar exercícios mais difíceis (menor taxa de aprovação)
+ */
+export async function getHardestExercises(teacherId: number, limit: number = 5) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const hardestExercises = await db.execute(sql`
+    SELECT 
+      se.id,
+      se.title,
+      sub.name as subjectName,
+      COUNT(sea.id) as totalAttempts,
+      COALESCE(AVG(sea.score / sea.maxScore * 100), 0) as averageScore,
+      COALESCE(
+        SUM(CASE WHEN (sea.score / sea.maxScore * 100) >= se.passingScore THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        0
+      ) as approvalRate
+    FROM student_exercises se
+    LEFT JOIN student_exercise_attempts sea ON se.id = sea.exerciseId AND sea.status = 'completed'
+    LEFT JOIN subjects sub ON se.subjectId = sub.id
+    WHERE se.teacherId = ${teacherId}
+      AND se.status = 'published'
+    GROUP BY se.id, se.title, sub.name
+    HAVING COUNT(sea.id) > 0
+    ORDER BY approvalRate ASC
+    LIMIT ${limit}
+  `);
+
+  return hardestExercises[0] || [];
+}
+
+/**
+ * Listar top alunos com melhor desempenho
+ */
+export async function getTopStudents(teacherId: number, limit: number = 5) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const topStudents = await db.execute(sql`
+    SELECT 
+      s.id,
+      s.fullName,
+      s.registrationNumber,
+      c.name as className,
+      COUNT(DISTINCT sea.exerciseId) as completedExercises,
+      COALESCE(AVG(sea.score / sea.maxScore * 100), 0) as averageScore,
+      COALESCE(
+        SUM(CASE WHEN (sea.score / sea.maxScore * 100) >= se.passingScore THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        0
+      ) as approvalRate
+    FROM students s
+    INNER JOIN student_exercise_attempts sea ON s.id = sea.studentId
+    INNER JOIN student_exercises se ON sea.exerciseId = se.id
+    LEFT JOIN classes c ON s.classId = c.id
+    WHERE se.teacherId = ${teacherId}
+      AND sea.status = 'completed'
+    GROUP BY s.id, s.fullName, s.registrationNumber, c.name
+    HAVING COUNT(DISTINCT sea.exerciseId) > 0
+    ORDER BY averageScore DESC
+    LIMIT ${limit}
+  `);
+
+  return topStudents[0] || [];
+}
