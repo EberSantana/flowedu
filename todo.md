@@ -7260,5 +7260,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir botão "Enviar Teste" que não funciona (adicionado tratamento de erro melhorado)
 - [x] Testar todas as funcionalidades localmente (servidor rodando, página carregando corretamente)
 - [x] Atualizar versão para v2.6.1
-- [ ] Criar checkpoint v2.6.1
+- [x] Criar checkpoint v2.6.1 (versão a6147ec2)
+- [ ] Fazer deploy na VPS
+
+## 🐛 Correções Urgentes - v2.7.0
+
+- [x] Investigar problema de timezone nos horários das aulas (sempre adiantados ~50min)
+- [x] Corrigir conversão de timezone nas aulas (ajustado para America/Sao_Paulo GMT-3)
+- [x] Remover Dashboard de Exercícios do menu (não funciona)
+- [x] Remover Notificações Push do menu (não funciona)
+- [x] Testar correções localmente (servidor rodando, menu atualizado)
+- [x] Atualizar versão para v2.7.0
+- [ ] Criar checkpoint v2.7.0
 - [ ] Fazer deploy na VPS

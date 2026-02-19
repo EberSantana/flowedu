@@ -853,16 +853,18 @@ export const appRouter = router({
         db.getCalendarEventsByUser(ctx.user.id),
       ]);
 
+      // Usar timezone do Brasil (GMT-3)
       const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const brazilTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+      const currentTime = `${String(brazilTime.getHours()).padStart(2, '0')}:${String(brazilTime.getMinutes()).padStart(2, '0')}`;
       const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
       
       // Calcular aulas dos próximos 7 dias para garantir que sempre há uma próxima aula
       const upcomingClasses = [];
       
       for (let i = 0; i < 7; i++) {
-        const checkDate = new Date(now);
-        checkDate.setDate(now.getDate() + i);
+        const checkDate = new Date(brazilTime);
+        checkDate.setDate(brazilTime.getDate() + i);
         const dayOfWeek = checkDate.getDay();
         const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
         
@@ -906,7 +908,7 @@ export const appRouter = router({
       });
       
       // Filtrar apenas aulas futuras (após o horário atual)
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayStr = `${brazilTime.getFullYear()}-${String(brazilTime.getMonth() + 1).padStart(2, '0')}-${String(brazilTime.getDate()).padStart(2, '0')}`;
       const futureClasses = upcomingClasses.filter(c => {
         // Se for dia futuro, incluir
         if (c.date > todayStr) return true;
@@ -929,13 +931,15 @@ export const appRouter = router({
         db.getCalendarEventsByUser(ctx.user.id),
       ]);
 
+      // Usar timezone do Brasil (GMT-3)
       const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const brazilTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+      const currentTime = `${String(brazilTime.getHours()).padStart(2, '0')}:${String(brazilTime.getMinutes()).padStart(2, '0')}`;
       const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
       
       // Buscar apenas aulas do dia atual (todas, passadas e futuras)
       const todayClasses = [];
-      const checkDate = new Date(now);
+      const checkDate = new Date(brazilTime);
       const dayOfWeek = checkDate.getDay();
       const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
       
