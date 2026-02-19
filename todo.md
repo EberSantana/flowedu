@@ -7222,3 +7222,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar layout localmente (compilou sem erros)
 - [x] Atualizar versão para v2.5.21
 - [x] Fazer deploy na VPS (versão 2.5.21 online)
+
+## Correções na Página de Notificações Push (v2.5.22)
+
+- [x] Corrigir cor do botão "Notificações Ativas" (agora verde escuro quando ativo)
+- [x] Corrigir funcionalidade dos switches (adicionado feedback de erro)
+- [x] Garantir que estatísticas (badges) apareçam quando disponíveis (já implementado)
+- [x] Testar funcionalidades localmente (build compilou com sucesso)
+- [x] Atualizar versão para v2.5.22
+- [x] Fazer deploy na VPS (versão 2.5.22 online)

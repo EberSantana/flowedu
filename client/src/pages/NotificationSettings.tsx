@@ -178,7 +178,7 @@ export default function NotificationSettings() {
             <Button 
               onClick={handleEnablePush}
               disabled={!pushSupported || pushPermission === "denied" || subscribing || isSubscribed}
-              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+              className={isSubscribed ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"}
             >
               {subscribing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -270,7 +270,13 @@ export default function NotificationSettings() {
                         </div>
                         <Switch
                           checked={isEnabled}
-                          onCheckedChange={(checked) => togglePreference(type.id, checked)}
+                          onCheckedChange={(checked) => {
+                            if (!isSubscribed) {
+                              toast.error("Ative as notificações primeiro");
+                              return;
+                            }
+                            togglePreference(type.id, checked);
+                          }}
                           disabled={!isSubscribed}
                         />
                       </div>
