@@ -11749,6 +11749,41 @@ export async function getExerciseStatsOverview(teacherId: number) {
 }
 
 /**
+ * Obter estatísticas gerais de desempenho dos alunos
+ */
+export async function getOverallStats(teacherId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Buscar todas as tentativas dos exercícios do professor
+  const stats = await db.execute(sql`
+    SELECT 
+      COUNT(DISTINCT sa.id) as totalAttempts,
+      AVG(sa.score) as averageScore,
+      SUM(CASE WHEN sa.score >= se.passingScore THEN 1 ELSE 0 END) as passedCount,
+      COUNT(DISTINCT sa.id) as totalCompleted
+    FROM student_attempts sa
+    INNER JOIN student_exercises se ON sa.exerciseId = se.id
+    WHERE se.teacherId = ${teacherId}
+      AND sa.status = 'completed'
+  `);
+
+  const result = stats[0] as any;
+  const totalAttempts = Number(result.totalAttempts) || 0;
+  const averageScore = Number(result.averageScore) || 0;
+  const passedCount = Number(result.passedCount) || 0;
+  const totalCompleted = Number(result.totalCompleted) || 0;
+
+  const approvalRate = totalCompleted > 0 ? (passedCount / totalCompleted) * 100 : 0;
+
+  return {
+    averageScore: Math.round(averageScore * 10) / 10,
+    approvalRate: Math.round(approvalRate * 10) / 10,
+    totalAttempts,
+  };
+}
+
+/**
  * Listar exercícios mais difíceis (menor taxa de aprovação)
  */
 export async function getHardestExercises(teacherId: number, limit: number = 5) {

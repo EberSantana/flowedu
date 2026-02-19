@@ -145,6 +145,11 @@ const teacherNavCategories: NavCategory[] = [
         href: "/learning-analytics",
       },
       {
+        label: "Dashboard de Exercícios",
+        icon: <BarChart3 className="h-5 w-5" />,
+        href: "/exercise-dashboard",
+      },
+      {
         label: "Desempenho em Exercícios",
         icon: <Target className="h-5 w-5" />,
         href: "/exercise-performance",

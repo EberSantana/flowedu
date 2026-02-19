@@ -5693,6 +5693,27 @@ JSON (descrições MAX 15 chars):
           allStudentsPerformance,
         };
       }),
+
+    // Dashboard de estatísticas de desempenho
+    getDashboardStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const teacherId = ctx.user.id;
+
+        // Buscar estatísticas gerais
+        const overallStats = await db.getOverallStats(teacherId);
+
+        // Buscar exercícios mais difíceis (top 5)
+        const hardestExercises = await db.getHardestExercises(teacherId, 5);
+
+        // Buscar top alunos (top 5)
+        const topStudents = await db.getTopStudents(teacherId, 5);
+
+        return {
+          overallStats,
+          hardestExercises,
+          topStudents,
+        };
+      }),
   }),
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================

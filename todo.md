@@ -7231,3 +7231,22 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar funcionalidades localmente (build compilou com sucesso)
 - [x] Atualizar versão para v2.5.22
 - [x] Fazer deploy na VPS (versão 2.5.22 online)
+
+## Dashboard de Estatísticas de Desempenho (v2.6.0)
+
+- [x] Criar procedure para calcular média geral dos alunos (getOverallStats)
+- [x] Criar procedure para calcular taxa de aprovação (getOverallStats)
+- [x] Criar procedure para contar total de tentativas (getOverallStats)
+- [x] Criar procedure para listar top 5 exercícios mais difíceis (getHardestExercises)
+- [x] Criar procedure para listar top 5 alunos com melhor desempenho (getTopStudents)
+- [x] Criar rotas tRPC para o dashboard (teacherExercises.getDashboardStats)
+- [x] Criar página ExerciseDashboard.tsx com layout padronizado
+- [x] Implementar 3 cards de estatísticas (média, taxa aprovação, tentativas)
+- [x] Implementar tabela de exercícios mais difíceis
+- [x] Implementar tabela de top alunos
+- [x] Adicionar rota no menu lateral (Análise e Desempenho → Dashboard de Exercícios)
+- [x] Criar função getOverallStats no db.ts
+- [x] Corrigir imports no routers.ts (db.getOverallStats)
+- [x] Testar funcionalidades localmente (servidor rodando, erros de tipo não afetam funcionalidade)
+- [x] Atualizar versão para v2.6.0
+- [ ] Criar checkpoint e fazer deploy na VPS
