@@ -7249,4 +7249,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir imports no routers.ts (db.getOverallStats)
 - [x] Testar funcionalidades localmente (servidor rodando, erros de tipo não afetam funcionalidade)
 - [x] Atualizar versão para v2.6.0
-- [ ] Criar checkpoint e fazer deploy na VPS
+- [x] Criar checkpoint v2.6.0 (versão a40cd127)
+- [ ] Fazer deploy na VPS (comandos preparados em COMANDOS_DEPLOY_VPS.txt - executar manualmente via SSH)
+
+## 🐛 Correção de Bugs - Notificações Push (v2.6.1)
+
+- [x] Analisar código atual da página NotificationSettings.tsx
+- [x] Corrigir botão "Notificações Ativas" para ter função de desativar (agora muda para "Desativar Notificações" quando ativo)
+- [x] Corrigir switches que não são clicáveis (removido disabled desnecessário, adicionado feedback de erro)
+- [x] Corrigir botão "Enviar Teste" que não funciona (adicionado tratamento de erro melhorado)
+- [x] Testar todas as funcionalidades localmente (servidor rodando, página carregando corretamente)
+- [x] Atualizar versão para v2.6.1
+- [ ] Criar checkpoint v2.6.1
+- [ ] Fazer deploy na VPS

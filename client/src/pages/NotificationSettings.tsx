@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
-  Bell, BellRing, Smartphone, BarChart3, BookOpen, 
+  Bell, BellRing, BellOff, Smartphone, BarChart3, BookOpen, 
   CalendarDays, ListTodo, Sunrise, Send, Loader2
 } from "lucide-react";
 
@@ -20,15 +20,27 @@ export default function NotificationSettings() {
 
   const { data: vapidKey } = trpc.pushNotifications.getVapidKey.useQuery();
   const { data: prefs, refetch: refetchPrefs } = trpc.pushNotifications.getPreferences.useQuery();
-  const { data: stats } = trpc.pushNotifications.getStats.useQuery();
+  const { data: stats, refetch: refetchStats } = trpc.pushNotifications.getStats.useQuery();
 
   const subscribeMutation = trpc.pushNotifications.subscribe.useMutation({
     onSuccess: () => {
       setIsSubscribed(true);
+      refetchStats();
       toast.success("Notificações push ativadas!");
     },
     onError: (err) => {
       toast.error("Erro ao ativar notificações: " + err.message);
+    },
+  });
+
+  const unsubscribeMutation = trpc.pushNotifications.unsubscribe.useMutation({
+    onSuccess: () => {
+      setIsSubscribed(false);
+      refetchStats();
+      toast.success("Notificações push desativadas!");
+    },
+    onError: (err) => {
+      toast.error("Erro ao desativar notificações: " + err.message);
     },
   });
 
@@ -37,15 +49,21 @@ export default function NotificationSettings() {
       refetchPrefs();
       toast.success("Preferências salvas!");
     },
+    onError: (err) => {
+      toast.error("Erro ao salvar preferências: " + err.message);
+    },
   });
 
   const sendTestMutation = trpc.pushNotifications.sendTest.useMutation({
     onSuccess: (result) => {
       if (result.sent > 0) {
-        toast.success("Notificação de teste enviada!");
+        toast.success(`Notificação de teste enviada para ${result.sent} dispositivo(s)!`);
       } else {
         toast.error("Nenhum dispositivo ativo encontrado");
       }
+    },
+    onError: (err) => {
+      toast.error("Erro ao enviar teste: " + err.message);
     },
   });
 
@@ -102,7 +120,30 @@ export default function NotificationSettings() {
     }
   };
 
+  const handleDisablePush = async () => {
+    setSubscribing(true);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      
+      if (subscription) {
+        await subscription.unsubscribe();
+      }
+      
+      await unsubscribeMutation.mutateAsync();
+    } catch (error: any) {
+      toast.error("Erro ao desativar notificações: " + error.message);
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   const handleSendTest = async () => {
+    if (!isSubscribed) {
+      toast.error("Ative as notificações primeiro");
+      return;
+    }
+
     try {
       await sendTestMutation.mutateAsync();
     } catch (error: any) {
@@ -111,13 +152,18 @@ export default function NotificationSettings() {
   };
 
   const togglePreference = async (key: string, value: boolean) => {
+    if (!isSubscribed) {
+      toast.error("Ative as notificações primeiro para configurar preferências");
+      return;
+    }
+
     try {
       await savePrefsMutation.mutateAsync({
         ...prefs,
         [key]: value,
       });
     } catch (error: any) {
-      toast.error("Erro ao salvar preferência");
+      toast.error("Erro ao salvar preferência: " + error.message);
     }
   };
 
@@ -176,16 +222,18 @@ export default function NotificationSettings() {
               </p>
             </div>
             <Button 
-              onClick={handleEnablePush}
-              disabled={!pushSupported || pushPermission === "denied" || subscribing || isSubscribed}
-              className={isSubscribed ? "bg-green-600 hover:bg-green-700 text-white" : "bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"}
+              onClick={isSubscribed ? handleDisablePush : handleEnablePush}
+              disabled={!pushSupported || pushPermission === "denied" || subscribing}
+              className={isSubscribed ? "bg-red-600 hover:bg-red-700 text-white" : "bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"}
             >
               {subscribing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : isSubscribed ? (
+                <BellOff className="h-4 w-4 mr-2" />
               ) : (
                 <BellRing className="h-4 w-4 mr-2" />
               )}
-              {isSubscribed ? "Notificações Ativas" : "Ativar Notificações"}
+              {isSubscribed ? "Desativar Notificações" : "Ativar Notificações"}
             </Button>
           </div>
 
@@ -224,7 +272,7 @@ export default function NotificationSettings() {
               <div className="mt-4 pt-4 border-t flex gap-3">
                 <Button 
                   onClick={handleSendTest}
-                  disabled={sendTestMutation.isPending}
+                  disabled={sendTestMutation.isPending || !isSubscribed}
                   variant="outline"
                   size="sm"
                 >
@@ -270,14 +318,8 @@ export default function NotificationSettings() {
                         </div>
                         <Switch
                           checked={isEnabled}
-                          onCheckedChange={(checked) => {
-                            if (!isSubscribed) {
-                              toast.error("Ative as notificações primeiro");
-                              return;
-                            }
-                            togglePreference(type.id, checked);
-                          }}
-                          disabled={!isSubscribed}
+                          onCheckedChange={(checked) => togglePreference(type.id, checked)}
+                          disabled={!isSubscribed || savePrefsMutation.isPending}
                         />
                       </div>
                     </div>
