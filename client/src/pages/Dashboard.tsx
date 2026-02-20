@@ -160,7 +160,7 @@ function Dashboard() {
       setQuickActions([
         { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: themeColor, enabled: true },
         { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: themeColor, enabled: true },
-        { id: "analytics", label: "Análise de Aprendizado", icon: "Brain", href: "/learning-analytics", color: themeColor, enabled: true },
+        { id: "analytics", label: "Análise de Aprendizado com IA", icon: "Brain", href: "/learning-analytics", color: themeColor, enabled: true },
         { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: themeColor, enabled: true },
         { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: themeColor, enabled: true },
         { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: themeColor, enabled: true },

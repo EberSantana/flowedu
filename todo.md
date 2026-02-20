@@ -7271,5 +7271,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover Notificações Push do menu (não funciona)
 - [x] Testar correções localmente (servidor rodando, menu atualizado)
 - [x] Atualizar versão para v2.7.0
-- [ ] Criar checkpoint v2.7.0
+- [x] Criar checkpoint v2.7.0 (versão e57021eb)
+- [ ] Fazer deploy na VPS
+
+## 🔧 Atualização v2.7.1
+
+- [x] Localizar botão "Relatórios" nas Ações Rápidas do Dashboard
+- [x] Substituir por "Análise de Aprendizado com IA" (rota /learning-analytics)
+- [x] Atualizar versão para v2.7.1
+- [ ] Criar checkpoint v2.7.1
 - [ ] Fazer deploy na VPS

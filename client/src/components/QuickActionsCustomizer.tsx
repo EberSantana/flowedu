@@ -21,7 +21,7 @@ export interface QuickAction {
 const DEFAULT_ACTIONS: QuickAction[] = [
   { id: 'new-subject', label: 'Nova Disciplina', icon: 'Plus', href: '/subjects', color: 'from-primary to-primary/80', enabled: true, order: 1 },
   { id: 'schedule', label: 'Grade Completa', icon: 'Calendar', href: '/schedule', color: 'from-primary to-primary/80', enabled: true, order: 2 },
-  { id: 'analytics', label: 'Análise de Aprendizado', icon: 'Brain', href: '/learning-analytics', color: 'from-primary to-primary/80', enabled: true, order: 3 },
+  { id: 'analytics', label: 'Análise de Aprendizado com IA', icon: 'Brain', href: '/learning-analytics', color: 'from-primary to-primary/80', enabled: true, order: 3 },
   { id: 'tasks', label: 'Tarefas', icon: 'CheckSquare', href: '/tasks', color: 'from-primary to-primary/80', enabled: true, order: 4 },
   { id: 'announcements', label: 'Avisos', icon: 'Bell', href: '/announcements', color: 'from-primary to-primary/80', enabled: true, order: 5 },
   { id: 'classes', label: 'Turmas', icon: 'Users', href: '/classes', color: 'from-primary to-primary/80', enabled: false, order: 6 },
