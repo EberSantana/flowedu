@@ -49,6 +49,7 @@ const QuestionDetail = lazy(() => import("./pages/QuestionDetail"));
 const ExercisePerformanceReport = lazy(() => import("./pages/ExercisePerformanceReport"));
 const ExerciseDashboard = lazy(() => import("./pages/ExerciseDashboard"));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
+const BackupAdmin = lazy(() => import("./pages/BackupAdmin"));
 
 // Lazy loaded pages - Student Portal
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
@@ -139,6 +140,7 @@ function Router() {
           <Route path={"/notification-settings"} component={NotificationSettings} />
           <Route path={"/admin/users"} component={AdminUsers} />
           <Route path={"/admin/settings"} component={AdminSettings} />
+          <Route path={"/admin/backups"} component={BackupAdmin} />
           <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
           <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
           <Route path={"/learning-paths/:subjectId/module/:moduleId/materials"} component={TopicMaterialsManager} />

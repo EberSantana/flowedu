@@ -18,6 +18,14 @@ import { sendPasswordResetEmail } from "./_core/email";
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
 import * as pushNotif from './push-notifications';
+import { 
+  listBackups, 
+  createBackupRecord, 
+  updateBackupStatus, 
+  deleteBackup, 
+  getBackupSchedule, 
+  upsertBackupSchedule 
+} from './db';
 // Importar pdfjs-dist para extração de texto do PDF
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
@@ -8535,6 +8543,123 @@ Retorne em formato JSON com estrutura:
     getStats: protectedProcedure
       .query(async ({ ctx }) => {
         return await pushNotif.getNotificationStats(ctx.user.id);
+      }),
+  }),
+
+  /**
+   * ============================================
+   * ROTAS DE BACKUP
+   * ============================================
+   */
+  backup: router({
+    // Listar todos os backups
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem listar backups' });
+      }
+      return await listBackups();
+    }),
+
+    // Criar backup manual
+    create: protectedProcedure.mutation(async ({ ctx }) => {
+      // Verificar se usuário é admin
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem criar backups' });
+      }
+
+      const timestamp = Date.now();
+      const filename = `backup_${timestamp}.sql.gz`;
+      const filepath = `/root/flowedu/backups/${filename}`;
+
+      const backupRecord = await createBackupRecord({
+        filename,
+        filepath,
+        filesize: 0,
+        backupType: 'manual',
+        status: 'pending',
+        createdBy: ctx.user.id,
+      });
+
+      // Executar backup em background (não aguardar)
+      const { executeBackup } = await import('./backup-executor');
+      executeBackup(backupRecord.id).catch((error) => {
+        console.error('[Backup] Erro ao executar backup:', error);
+      });
+
+      return { success: true, backupId: backupRecord.id };
+    }),
+
+    // Restaurar backup
+    restore: protectedProcedure
+      .input(z.object({ backupId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem restaurar backups' });
+        }
+
+        await updateBackupStatus(input.backupId, 'restoring');
+        
+        // Executar restauração em background
+        const { executeRestore } = await import('./backup-executor');
+        executeRestore(input.backupId).catch((error) => {
+          console.error('[Backup] Erro ao restaurar backup:', error);
+        });
+
+        return { success: true };
+      }),
+
+    // Deletar backup
+    delete: protectedProcedure
+      .input(z.object({ backupId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem deletar backups' });
+        }
+
+        // Buscar backup para obter filepath
+        const backupsList = await listBackups();
+        const backup = backupsList.find(b => b.id === input.backupId);
+
+        if (backup) {
+          // Deletar arquivo físico
+          const { deleteBackupFile } = await import('./backup-executor');
+          await deleteBackupFile(backup.filepath);
+        }
+
+        // Deletar registro do banco
+        await deleteBackup(input.backupId);
+        return { success: true };
+      }),
+
+    // Obter configuração de agendamento
+    getSchedule: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN' });
+      }
+      return await getBackupSchedule();
+    }),
+
+    // Atualizar configuração de agendamento
+    updateSchedule: protectedProcedure
+      .input(z.object({
+        isEnabled: z.boolean(),
+        frequency: z.enum(['daily', 'weekly', 'monthly']),
+        scheduleTime: z.string(),
+        dayOfWeek: z.number().optional(),
+        dayOfMonth: z.number().optional(),
+        retentionDays: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem configurar agendamento' });
+        }
+
+        await upsertBackupSchedule({
+          ...input,
+          createdBy: ctx.user.id,
+        });
+
+        return { success: true };
       }),
   }),
 });

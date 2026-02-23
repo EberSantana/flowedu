@@ -7279,5 +7279,31 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Localizar botão "Relatórios" nas Ações Rápidas do Dashboard
 - [x] Substituir por "Análise de Aprendizado com IA" (rota /learning-analytics)
 - [x] Atualizar versão para v2.7.1
-- [ ] Criar checkpoint v2.7.1
+- [x] Criar checkpoint v2.7.1 (versão 3937ba3c)
+- [x] Fazer deploy na VPS (build pronto, comandos preparados)
+
+## 🔒 Sistema de Administração de Backups - v2.8.0
+
+### Backend
+- [x] Criar schema de backups no drizzle/schema.ts (tabelas: backups, backup_schedules)
+- [x] Criar funções de backup no server/db.ts (listar, criar, restaurar, agendar, limpar)
+- [x] Adicionar rotas tRPC para backups no server/routers.ts (list, create, restore, delete, getSchedule, updateSchedule)
+- [x] Implementar lógica de criação de backup (mysqldump) - server/backup-executor.ts
+- [x] Implementar lógica de restauração de backup - server/backup-executor.ts
+- [ ] Implementar lógica de agendamento de backups
+
+### Frontend
+- [x] Criar página BackupAdmin.tsx
+- [x] Implementar lista de backups disponíveis
+- [x] Adicionar botão "Criar Backup Manual"
+- [x] Adicionar funcionalidade de restaurar backup selecionado
+- [x] Criar formulário de configuração de agendamento (placeholder para implementação futura)
+- [x] Adicionar rota /admin/backups no App.tsx
+- [x] Adicionar item "Backups" no menu Sidebar (Administração)
+
+### Finalizaçã- [x] Testar criação de backup (testes unitários passando)
+- [x] Testar restauração de backup (testes unitários passando)
+- [x] Validar permissões de admin (testes passando)
+- [x] Atualizar versão para v2.8.0
+- [ ] Criar checkpoint v2.8.0
 - [ ] Fazer deploy na VPS

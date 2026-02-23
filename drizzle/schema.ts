@@ -2477,3 +2477,41 @@ export const systemSettings = mysqlTable("system_settings", {
 });
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type InsertSystemSetting = typeof systemSettings.$inferInsert;
+
+/**
+ * Tabela de backups do sistema
+ */
+export const backups = mysqlTable("backups", {
+  id: int("id").autoincrement().primaryKey(),
+  filename: varchar("filename", { length: 255 }).notNull(),
+  filepath: varchar("filepath", { length: 500 }).notNull(),
+  filesize: int("filesize").notNull(), // Tamanho em bytes (KB)
+  backupType: mysqlEnum("backup_type", ["manual", "scheduled", "automatic"]).default("manual").notNull(),
+  status: mysqlEnum("status", ["pending", "completed", "failed", "restoring"]).default("pending").notNull(),
+  createdBy: int("created_by").notNull(), // ID do usuário que criou
+  errorMessage: text("error_message"), // Mensagem de erro se falhar
+  restoredAt: timestamp("restored_at"), // Data de restauração (se foi restaurado)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type Backup = typeof backups.$inferSelect;
+export type InsertBackup = typeof backups.$inferInsert;
+
+/**
+ * Tabela de configurações de agendamento de backups
+ */
+export const backupSchedules = mysqlTable("backup_schedules", {
+  id: int("id").autoincrement().primaryKey(),
+  isEnabled: boolean("is_enabled").default(false).notNull(),
+  frequency: mysqlEnum("frequency", ["daily", "weekly", "monthly"]).default("daily").notNull(),
+  scheduleTime: varchar("schedule_time", { length: 5 }).default("03:00").notNull(), // Formato HH:MM
+  dayOfWeek: int("day_of_week"), // 0-6 (Domingo-Sábado) para backup semanal
+  dayOfMonth: int("day_of_month"), // 1-31 para backup mensal
+  retentionDays: int("retention_days").default(7).notNull(), // Quantos dias manter backups
+  lastRunAt: timestamp("last_run_at"), // Última execução
+  nextRunAt: timestamp("next_run_at"), // Próxima execução programada
+  createdBy: int("created_by").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type BackupSchedule = typeof backupSchedules.$inferSelect;
+export type InsertBackupSchedule = typeof backupSchedules.$inferInsert;

@@ -148,7 +148,13 @@ import {
   InsertQuestionAnswer,
   systemSettings,
   SystemSetting,
-  InsertSystemSetting,} from "../drizzle/schema";
+  InsertSystemSetting,
+  backups,
+  Backup,
+  InsertBackup,
+  backupSchedules,
+  BackupSchedule,
+  InsertBackupSchedule,} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -11847,4 +11853,140 @@ export async function getTopStudents(teacherId: number, limit: number = 5) {
   `);
 
   return topStudents[0] || [];
+}
+
+/**
+ * ============================================
+ * FUNÇÕES DE BACKUP E RESTAURAÇÃO
+ * ============================================
+ */
+
+/**
+ * Listar todos os backups
+ */
+export async function listBackups() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const backupsList = await db.select().from(backups).orderBy(desc(backups.createdAt));
+  return backupsList;
+}
+
+/**
+ * Criar registro de backup
+ */
+export async function createBackupRecord(data: InsertBackup) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [backup] = await db.insert(backups).values(data).$returningId();
+  return backup;
+}
+
+/**
+ * Atualizar status do backup
+ */
+export async function updateBackupStatus(
+  backupId: number,
+  status: "pending" | "completed" | "failed" | "restoring",
+  errorMessage?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(backups)
+    .set({
+      status,
+      errorMessage: errorMessage || null,
+      updatedAt: new Date(),
+    })
+    .where(eq(backups.id, backupId));
+}
+
+/**
+ * Marcar backup como restaurado
+ */
+export async function markBackupAsRestored(backupId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(backups)
+    .set({
+      restoredAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(backups.id, backupId));
+}
+
+/**
+ * Deletar backup
+ */
+export async function deleteBackup(backupId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(backups).where(eq(backups.id, backupId));
+}
+
+/**
+ * Obter configuração de agendamento de backup
+ */
+export async function getBackupSchedule() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [schedule] = await db.select().from(backupSchedules).limit(1);
+  
+  // Retornar configuração padrão se não existir
+  return schedule || {
+    isEnabled: false,
+    frequency: 'daily' as const,
+    scheduleTime: '03:00',
+    retentionDays: 7,
+  };
+}
+
+/**
+ * Criar ou atualizar configuração de agendamento
+ */
+export async function upsertBackupSchedule(data: Partial<InsertBackupSchedule>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await getBackupSchedule();
+
+  if (existing) {
+    await db
+      .update(backupSchedules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(backupSchedules.id, existing.id));
+    return existing.id;
+  } else {
+    const [schedule] = await db.insert(backupSchedules).values(data as InsertBackupSchedule).$returningId();
+    return schedule.id;
+  }
+}
+
+/**
+ * Limpar backups antigos (baseado em retention_days)
+ */
+export async function cleanOldBackups(retentionDays: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+
+  const oldBackups = await db
+    .select()
+    .from(backups)
+    .where(sql`${backups.createdAt} < ${cutoffDate}`);
+
+  for (const backup of oldBackups) {
+    await deleteBackup(backup.id);
+  }
+
+  return oldBackups.length;
 }

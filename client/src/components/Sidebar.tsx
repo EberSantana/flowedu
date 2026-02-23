@@ -28,6 +28,7 @@ import {
   GraduationCap,
   MessageSquare,
   Settings,
+  Database,
   FolderOpen,
   BellRing
 } from "lucide-react";
@@ -201,6 +202,12 @@ const teacherNavCategories: NavCategory[] = [
         label: "Configurações",
         icon: <Settings className="h-5 w-5" />,
         href: "/admin/settings",
+        adminOnly: true,
+      },
+      {
+        label: "Backups",
+        icon: <Database className="h-5 w-5" />,
+        href: "/admin/backups",
         adminOnly: true,
       },
     ],
