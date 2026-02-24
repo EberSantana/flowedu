@@ -8658,6 +8658,10 @@ Retorne em formato JSON com estrutura:
           ...input,
           createdBy: ctx.user.id,
         });
+        
+        // Atualizar scheduler em tempo real
+        const { updateBackupScheduler } = await import('./backup-scheduler');
+        await updateBackupScheduler();
 
         return { success: true };
       }),

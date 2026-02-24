@@ -227,6 +227,13 @@ async function startServer() {
     }).catch(error => {
       console.warn('[Push] Falha ao inicializar notificações push:', error);
     });
+    
+    // Inicializar agendamento de backups
+    import('../backup-scheduler').then(({ initializeBackupScheduler }) => {
+      initializeBackupScheduler();
+    }).catch(error => {
+      console.warn('[Scheduler] Falha ao inicializar agendamento de backups:', error);
+    });
   });
 }
 

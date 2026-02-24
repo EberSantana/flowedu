@@ -7305,5 +7305,35 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Testar restauração de backup (testes unitários passando)
 - [x] Validar permissões de admin (testes passando)
 - [x] Atualizar versão para v2.8.0
-- [ ] Criar checkpoint v2.8.0
+- [x] Criar checkpoint v2.8.0 (versão b153ba0b)
+- [ ] Fazer deploy na VPS
+
+## ⏰ Agendamento Automático de Backups - v2.9.0
+
+### Backend
+- [x] Instalar pacote node-cron (node-cron@4.2.1 + @types/node-cron@3.0.11)
+- [x] Criar serviço de agendamento (server/backup-scheduler.ts)
+- [x] Implementar lógica de conversão de configuração para expressão cron (buildCronExpression)
+- [x] Integrar scheduler com executor de backup (runScheduledBackup)
+- [x] Adicionar inicialização do scheduler no servidor (server/_core/index.ts)
+
+### Frontend
+- [x] Implementar formulário funcional de configuração de agendamento (BackupAdmin.tsx)
+- [x] Adicionar preview da próxima execução agendada (card "Próxima Execução")
+- [x] Mostrar status do agendamento (ativo/inativo) (switch + card)
+- [x] Adicionar botão para executar backup agora ("Criar Backup")
+
+### Integração
+- [x] Integrar updateSchedule com updateBackupScheduler (routers.ts)
+- [x] Scheduler atualiza automaticamente quando configuração muda
+
+### Testes
+- [x] Testar agendamento diário (backup-scheduler.test.ts)
+- [x] Testar agendamento semanal (backup-scheduler.test.ts)
+- [x] Testar agendamento mensal (backup-scheduler.test.ts)
+- [x] Validar atualização de configuração (todos os testes passaram)
+
+### Finalização
+- [x] Atualizar versão para v2.9.0
+- [ ] Criar checkpoint v2.9.0
 - [ ] Fazer deploy na VPS
