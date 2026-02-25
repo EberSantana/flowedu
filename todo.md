@@ -7335,5 +7335,45 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ### Finalização
 - [x] Atualizar versão para v2.9.0
-- [ ] Criar checkpoint v2.9.0
+- [x] Criar checkpoint v2.9.0 (versão 47fd9848)
 - [ ] Fazer deploy na VPS
+
+## 🖥️ Sistema de Monitoramento de VPS - v3.0.0
+
+### Backend - Schema e API
+- [x] Criar tabela `vps_servers` (id, name, ip, token, created_at)
+- [x] Criar tabela `vps_metrics` (id, server_id, cpu, memory, disk, network, timestamp)
+- [x] Criar tabela `vps_alerts` (id, server_id, type, threshold, is_active)
+- [x] Adicionar funções de banco em server/db.ts (createVPSServer, listVPSServers, insertVPSMetrics, getVPSMetrics, etc.)
+- [x] Criar endpoint POST /api/vps/metrics (recebe métricas do agente) - vps.submitMetrics
+- [x] Criar rotas tRPC para gerenciar servidores e visualizar métricas (listServers, createServer, deleteServer, getMetrics, getLatestMetric, getAlerts, createAlert, deleteAlert)
+- [x] Implementar autenticação por token para o agente (getVPSServerByToken### Agente VPS (Python)
+- [x] Criar script Python vps-agent.py
+- [x] Implementar coleta de métricas de CPU (psutil)
+- [x] Implementar coleta de métricas de memória
+- [x] Implementar coleta de métricas de disco
+- [x] Implementar coleta de métricas de rede
+- [x] Implementar envio de métricas via HTTP POST (formato tRPC)
+- [x] Criar guia de instalação do agente para iniciantes (GUIA_INSTALACAO_AGENTE_VPS.md) Criar script de instalação automática
+
+### Frontend - Dashboard
+- [x] Criar página VPSMonitoring.tsx
+- [x] Implementar gráficos de CPU em tempo real (Chart.js)
+- [x] Implementar gráficos de memória
+- [x] Implementar gráficos de disco
+- [x] Implementar gráficos de rede (cards com bytes sent/recv)
+- [ ] Adicionar filtros de período (1h, 24h, 7d, 30d) - placeholder
+- [x] Mostrar status atual (online/offline)
+- [x] Adicionar formulário para cadastrar novo servidor (dialog)
+
+### Sistema de Alertas
+- [ ] Implementar verificação de thresholds
+- [ ] Enviar notificações quando limites forem ultrapassados
+- [ ] Adicionar configuração de alertas na interface
+
+### Finalização
+- [ ] Testar agente na VPS real
+- [ ] Validar recebimento e armazenamento de métricas
+- [x] Atualizar versão para v3.0.0
+- [ ] Criar checkpoint v3.0.0
+- [ ] Criar guia de instalação do agente

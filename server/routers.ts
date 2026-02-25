@@ -24,7 +24,20 @@ import {
   updateBackupStatus, 
   deleteBackup, 
   getBackupSchedule, 
-  upsertBackupSchedule 
+  upsertBackupSchedule,
+  listVPSServers,
+  createVPSServer,
+  deleteVPSServer,
+  getVPSServerByToken,
+  insertVPSMetrics,
+  getVPSMetrics,
+  getVPSMetricsByPeriod,
+  getLatestVPSMetric,
+  updateVPSServerLastSeen,
+  getVPSAlerts,
+  createVPSAlert,
+  deleteVPSAlert,
+  updateVPSAlertTriggered,
 } from './db';
 // Importar pdfjs-dist para extração de texto do PDF
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
@@ -8662,6 +8675,210 @@ Retorne em formato JSON com estrutura:
         // Atualizar scheduler em tempo real
         const { updateBackupScheduler } = await import('./backup-scheduler');
         await updateBackupScheduler();
+
+        return { success: true };
+      }),
+  }),
+
+  // ==================== VPS MONITORING ====================
+  vps: router({
+    // Listar todos os servidores VPS
+    listServers: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem acessar monitoramento de VPS' });
+      }
+      return await listVPSServers();
+    }),
+
+    // Criar novo servidor VPS
+    createServer: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        ipAddress: z.string().regex(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/, 'IP inválido'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem adicionar servidores' });
+        }
+
+        // Gerar token de autenticação único
+        const crypto = await import('crypto');
+        const authToken = crypto.randomBytes(32).toString('hex');
+
+        const serverId = await createVPSServer({
+          ...input,
+          authToken,
+        });
+
+        return { serverId, authToken };
+      }),
+
+    // Deletar servidor VPS
+    deleteServer: protectedProcedure
+      .input(z.object({ serverId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        await deleteVPSServer(input.serverId);
+        return { success: true };
+      }),
+
+    // Buscar métricas de um servidor
+    getMetrics: protectedProcedure
+      .input(z.object({
+        serverId: z.number(),
+        period: z.enum(['1h', '24h', '7d', '30d']).default('24h'),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        const now = new Date();
+        const startDate = new Date();
+
+        switch (input.period) {
+          case '1h':
+            startDate.setHours(now.getHours() - 1);
+            break;
+          case '24h':
+            startDate.setHours(now.getHours() - 24);
+            break;
+          case '7d':
+            startDate.setDate(now.getDate() - 7);
+            break;
+          case '30d':
+            startDate.setDate(now.getDate() - 30);
+            break;
+        }
+
+        return await getVPSMetricsByPeriod(input.serverId, startDate, now);
+      }),
+
+    // Buscar última métrica de um servidor
+    getLatestMetric: protectedProcedure
+      .input(z.object({ serverId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        return await getLatestVPSMetric(input.serverId);
+      }),
+
+    // Listar alertas de um servidor
+    getAlerts: protectedProcedure
+      .input(z.object({ serverId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        return await getVPSAlerts(input.serverId);
+      }),
+
+    // Criar alerta
+    createAlert: protectedProcedure
+      .input(z.object({
+        serverId: z.number(),
+        metricType: z.enum(['cpu', 'memory', 'disk', 'network']),
+        threshold: z.number().min(0).max(100),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        const alertId = await createVPSAlert({
+          ...input,
+          threshold: input.threshold.toString(),
+        });
+        return { alertId };
+      }),
+
+    // Deletar alerta
+    deleteAlert: protectedProcedure
+      .input(z.object({ alertId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        await deleteVPSAlert(input.alertId);
+        return { success: true };
+      }),
+
+    // Endpoint público para receber métricas do agente (autenticado por token)
+    submitMetrics: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        cpu: z.number(),
+        memoryTotal: z.number(),
+        memoryUsed: z.number(),
+        memoryPercent: z.number(),
+        diskTotal: z.number(),
+        diskUsed: z.number(),
+        diskPercent: z.number(),
+        networkSent: z.number(),
+        networkRecv: z.number(),
+        loadAverage1: z.number().optional(),
+        loadAverage5: z.number().optional(),
+        loadAverage15: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        // Buscar servidor por token
+        const server = await getVPSServerByToken(input.token);
+        if (!server) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Token inválido' });
+        }
+
+        if (!server.isActive) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Servidor desativado' });
+        }
+
+        // Inserir métricas
+        await insertVPSMetrics({
+          serverId: server.id,
+          cpuPercent: input.cpu.toString(),
+          memoryTotal: input.memoryTotal,
+          memoryUsed: input.memoryUsed,
+          memoryPercent: input.memoryPercent.toString(),
+          diskTotal: input.diskTotal,
+          diskUsed: input.diskUsed,
+          diskPercent: input.diskPercent.toString(),
+          networkSent: input.networkSent,
+          networkRecv: input.networkRecv,
+          loadAverage1: input.loadAverage1?.toString(),
+          loadAverage5: input.loadAverage5?.toString(),
+          loadAverage15: input.loadAverage15?.toString(),
+        });
+
+        // Atualizar último acesso
+        await updateVPSServerLastSeen(server.id);
+
+        // Verificar alertas
+        const alerts = await getVPSAlerts(server.id);
+        for (const alert of alerts) {
+          if (!alert.isActive) continue;
+
+          let shouldTrigger = false;
+          const threshold = parseFloat(alert.threshold);
+
+          switch (alert.metricType) {
+            case 'cpu':
+              shouldTrigger = input.cpu > threshold;
+              break;
+            case 'memory':
+              shouldTrigger = input.memoryPercent > threshold;
+              break;
+            case 'disk':
+              shouldTrigger = input.diskPercent > threshold;
+              break;
+          }
+
+          if (shouldTrigger) {
+            await updateVPSAlertTriggered(alert.id);
+            // TODO: Enviar notificação ao administrador
+            console.log(`[VPS Alert] ${server.name} - ${alert.metricType} ultrapassou ${threshold}%`);
+          }
+        }
 
         return { success: true };
       }),

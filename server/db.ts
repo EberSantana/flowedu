@@ -154,7 +154,10 @@ import {
   InsertBackup,
   backupSchedules,
   BackupSchedule,
-  InsertBackupSchedule,} from "../drizzle/schema";
+  InsertBackupSchedule,
+  vpsServers,
+  vpsMetrics,
+  vpsAlerts,} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -11989,4 +11992,217 @@ export async function cleanOldBackups(retentionDays: number) {
   }
 
   return oldBackups.length;
+}
+
+// ============================================================================
+// VPS Monitoring Functions
+// ============================================================================
+
+/**
+ * Criar novo servidor VPS para monitoramento
+ */
+export async function createVPSServer(data: {
+  name: string;
+  ipAddress: string;
+  authToken: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(vpsServers).values(data);
+  return result.insertId;
+}
+
+/**
+ * Listar todos os servidores VPS
+ */
+export async function listVPSServers() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(vpsServers).orderBy(vpsServers.createdAt);
+}
+
+/**
+ * Buscar servidor VPS por ID
+ */
+export async function getVPSServerById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const [server] = await db.select().from(vpsServers).where(eq(vpsServers.id, id));
+  return server;
+}
+
+/**
+ * Buscar servidor VPS por token de autenticação
+ */
+export async function getVPSServerByToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const [server] = await db.select().from(vpsServers).where(eq(vpsServers.authToken, token));
+  return server;
+}
+
+/**
+ * Atualizar último acesso do servidor
+ */
+export async function updateVPSServerLastSeen(serverId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(vpsServers)
+    .set({ lastSeenAt: new Date() })
+    .where(eq(vpsServers.id, serverId));
+}
+
+/**
+ * Deletar servidor VPS
+ */
+export async function deleteVPSServer(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(vpsServers).where(eq(vpsServers.id, id));
+}
+
+/**
+ * Inserir métricas de VPS
+ */
+export async function insertVPSMetrics(data: {
+  serverId: number;
+  cpuPercent: string;
+  memoryTotal: number;
+  memoryUsed: number;
+  memoryPercent: string;
+  diskTotal: number;
+  diskUsed: number;
+  diskPercent: string;
+  networkSent: number;
+  networkRecv: number;
+  loadAverage1?: string;
+  loadAverage5?: string;
+  loadAverage15?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(vpsMetrics).values(data);
+  return result.insertId;
+}
+
+/**
+ * Buscar métricas recentes de um servidor
+ */
+export async function getVPSMetrics(serverId: number, limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select()
+    .from(vpsMetrics)
+    .where(eq(vpsMetrics.serverId, serverId))
+    .orderBy(desc(vpsMetrics.timestamp))
+    .limit(limit);
+}
+
+/**
+ * Buscar métricas de um servidor em um período
+ */
+export async function getVPSMetricsByPeriod(
+  serverId: number,
+  startDate: Date,
+  endDate: Date
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select()
+    .from(vpsMetrics)
+    .where(
+      and(
+        eq(vpsMetrics.serverId, serverId),
+        gte(vpsMetrics.timestamp, startDate),
+        lte(vpsMetrics.timestamp, endDate)
+      )
+    )
+    .orderBy(vpsMetrics.timestamp);
+}
+
+/**
+ * Buscar última métrica de um servidor
+ */
+export async function getLatestVPSMetric(serverId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const [metric] = await db.select()
+    .from(vpsMetrics)
+    .where(eq(vpsMetrics.serverId, serverId))
+    .orderBy(desc(vpsMetrics.timestamp))
+    .limit(1);
+  return metric;
+}
+
+/**
+ * Limpar métricas antigas (manter apenas últimos N dias)
+ */
+export async function cleanOldVPSMetrics(daysToKeep: number = 30) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+  
+  await db.delete(vpsMetrics)
+    .where(lt(vpsMetrics.timestamp, cutoffDate));
+}
+
+/**
+ * Criar alerta de VPS
+ */
+export async function createVPSAlert(data: {
+  serverId: number;
+  metricType: "cpu" | "memory" | "disk" | "network";
+  threshold: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(vpsAlerts).values(data);
+  return result.insertId;
+}
+
+/**
+ * Listar alertas de um servidor
+ */
+export async function getVPSAlerts(serverId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select()
+    .from(vpsAlerts)
+    .where(eq(vpsAlerts.serverId, serverId));
+}
+
+/**
+ * Atualizar último disparo de alerta
+ */
+export async function updateVPSAlertTriggered(alertId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(vpsAlerts)
+    .set({ lastTriggeredAt: new Date() })
+    .where(eq(vpsAlerts.id, alertId));
+}
+
+/**
+ * Deletar alerta de VPS
+ */
+export async function deleteVPSAlert(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(vpsAlerts).where(eq(vpsAlerts.id, id));
 }

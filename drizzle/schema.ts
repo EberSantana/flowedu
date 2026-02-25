@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json, float, double } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, datetime, unique, date, json, float, double, bigint, decimal } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -2515,3 +2515,61 @@ export const backupSchedules = mysqlTable("backup_schedules", {
 });
 export type BackupSchedule = typeof backupSchedules.$inferSelect;
 export type InsertBackupSchedule = typeof backupSchedules.$inferInsert;
+
+/**
+ * Tabela de servidores VPS monitorados
+ */
+export const vpsServers = mysqlTable("vps_servers", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // Nome amigável do servidor
+  ipAddress: varchar("ip_address", { length: 45 }).notNull(), // IPv4 ou IPv6
+  authToken: varchar("auth_token", { length: 64 }).notNull().unique(), // Token para autenticação do agente
+  isActive: boolean("is_active").default(true).notNull(),
+  lastSeenAt: timestamp("last_seen_at"), // Última vez que recebeu métricas
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VPSServer = typeof vpsServers.$inferSelect;
+export type InsertVPSServer = typeof vpsServers.$inferInsert;
+
+/**
+ * Tabela de métricas de VPS
+ */
+export const vpsMetrics = mysqlTable("vps_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  serverId: int("server_id").notNull().references(() => vpsServers.id, { onDelete: "cascade" }),
+  cpuPercent: decimal("cpu_percent", { precision: 5, scale: 2 }).notNull(), // % de uso de CPU
+  memoryTotal: bigint("memory_total", { mode: "number" }).notNull(), // Memória total em bytes
+  memoryUsed: bigint("memory_used", { mode: "number" }).notNull(), // Memória usada em bytes
+  memoryPercent: decimal("memory_percent", { precision: 5, scale: 2 }).notNull(), // % de uso de memória
+  diskTotal: bigint("disk_total", { mode: "number" }).notNull(), // Disco total em bytes
+  diskUsed: bigint("disk_used", { mode: "number" }).notNull(), // Disco usado em bytes
+  diskPercent: decimal("disk_percent", { precision: 5, scale: 2 }).notNull(), // % de uso de disco
+  networkSent: bigint("network_sent", { mode: "number" }).notNull(), // Bytes enviados
+  networkRecv: bigint("network_recv", { mode: "number" }).notNull(), // Bytes recebidos
+  loadAverage1: decimal("load_average_1", { precision: 5, scale: 2 }), // Load average 1 min
+  loadAverage5: decimal("load_average_5", { precision: 5, scale: 2 }), // Load average 5 min
+  loadAverage15: decimal("load_average_15", { precision: 5, scale: 2 }), // Load average 15 min
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export type VPSMetric = typeof vpsMetrics.$inferSelect;
+export type InsertVPSMetric = typeof vpsMetrics.$inferInsert;
+
+/**
+ * Tabela de configurações de alertas de VPS
+ */
+export const vpsAlerts = mysqlTable("vps_alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  serverId: int("server_id").notNull().references(() => vpsServers.id, { onDelete: "cascade" }),
+  metricType: mysqlEnum("metric_type", ["cpu", "memory", "disk", "network"]).notNull(),
+  threshold: decimal("threshold", { precision: 5, scale: 2 }).notNull(), // Limite em %
+  isActive: boolean("is_active").default(true).notNull(),
+  lastTriggeredAt: timestamp("last_triggered_at"), // Última vez que o alerta foi disparado
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VPSAlert = typeof vpsAlerts.$inferSelect;
+export type InsertVPSAlert = typeof vpsAlerts.$inferInsert;

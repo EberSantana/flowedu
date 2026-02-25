@@ -30,7 +30,8 @@ import {
   Settings,
   Database,
   FolderOpen,
-  BellRing
+  BellRing,
+  Server
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -208,6 +209,12 @@ const teacherNavCategories: NavCategory[] = [
         label: "Backups",
         icon: <Database className="h-5 w-5" />,
         href: "/admin/backups",
+        adminOnly: true,
+      },
+      {
+        label: "Monitoramento VPS",
+        icon: <Server className="h-5 w-5" />,
+        href: "/admin/vps-monitoring",
         adminOnly: true,
       },
     ],
