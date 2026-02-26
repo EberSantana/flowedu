@@ -1,22 +1,29 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Download, Trash2, RefreshCw, Settings, Database, Calendar, AlertTriangle, Clock, Save } from "lucide-react";
+import { Download, Trash2, RefreshCw, Settings, Database, Calendar, Clock, Save, ArrowLeft, HardDrive, FileArchive } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { useLocation } from "wouter";
 
 export default function BackupAdmin() {
+  const [, setLocation] = useLocation();
   const { data: backups, isLoading, refetch } = trpc.backup.list.useQuery();
   const { data: schedule, refetch: refetchSchedule } = trpc.backup.getSchedule.useQuery();
   
   // Estado do formulário de agendamento
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [isEnabled, setIsEnabled] = useState(schedule?.isEnabled ?? false);
   const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>(schedule?.frequency ?? 'daily');
   const [scheduleTime, setScheduleTime] = useState(schedule?.scheduleTime ?? '03:00');
@@ -70,6 +77,7 @@ export default function BackupAdmin() {
     onSuccess: () => {
       toast.success("Configuração de agendamento atualizada!");
       refetchSchedule();
+      setIsScheduleDialogOpen(false);
     },
     onError: (error) => {
       toast.error("Erro ao atualizar agendamento: " + error.message);
@@ -78,18 +86,18 @@ export default function BackupAdmin() {
 
   const handleCreateBackup = () => {
     if (confirm("Deseja criar um backup manual agora? O processo pode levar alguns minutos.")) {
-      createMutation.mutate();
+      createMutation.mutate({ description: "Backup manual" });
     }
   };
 
-  const handleRestore = (backupId: number, filename: string) => {
-    if (confirm(`ATENÇÃO: Restaurar o backup "${filename}" irá substituir todos os dados atuais. Esta ação não pode ser desfeita. Deseja continuar?`)) {
+  const handleRestore = (backupId: number) => {
+    if (confirm("ATENÇÃO: Restaurar este backup irá substituir todos os dados atuais. Deseja continuar?")) {
       restoreMutation.mutate({ backupId });
     }
   };
 
-  const handleDelete = (backupId: number, filename: string) => {
-    if (confirm(`Deseja deletar o backup "${filename}"? Esta ação não pode ser desfeita.`)) {
+  const handleDelete = (backupId: number) => {
+    if (confirm("Tem certeza que deseja deletar este backup?")) {
       deleteMutation.mutate({ backupId });
     }
   };
@@ -110,172 +118,105 @@ export default function BackupAdmin() {
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('pt-BR');
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      completed: 'default',
-      pending: 'secondary',
-      failed: 'destructive',
-      restoring: 'outline',
-    };
+  // Calcular estatísticas
+  const totalBackups = backups?.length ?? 0;
+  const totalSize = backups?.reduce((acc, b) => acc + (b.fileSize || 0), 0) ?? 0;
+  const lastBackup = backups && backups.length > 0 ? backups[0] : null;
+
+  // Calcular próxima execução
+  const getNextExecution = () => {
+    if (!schedule || !schedule.isEnabled) return null;
     
-    const labels: Record<string, string> = {
-      completed: 'Concluído',
-      pending: 'Pendente',
-      failed: 'Falhou',
-      restoring: 'Restaurando',
-    };
-
-    return <Badge variant={variants[status] || 'outline'}>{labels[status] || status}</Badge>;
-  };
-  
-  const getNextExecutionPreview = () => {
-    const [hours, minutes] = scheduleTime.split(':');
     const now = new Date();
+    const [hours, minutes] = schedule.scheduleTime.split(':').map(Number);
     const next = new Date(now);
-    next.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    next.setHours(hours, minutes, 0, 0);
     
-    if (next <= now) {
-      next.setDate(next.getDate() + 1);
+    if (schedule.frequency === 'daily') {
+      if (next <= now) next.setDate(next.getDate() + 1);
+    } else if (schedule.frequency === 'weekly') {
+      const targetDay = schedule.dayOfWeek ?? 0;
+      const currentDay = next.getDay();
+      let daysToAdd = targetDay - currentDay;
+      if (daysToAdd <= 0 || (daysToAdd === 0 && next <= now)) daysToAdd += 7;
+      next.setDate(next.getDate() + daysToAdd);
+    } else if (schedule.frequency === 'monthly') {
+      next.setDate(schedule.dayOfMonth ?? 1);
+      if (next <= now) next.setMonth(next.getMonth() + 1);
     }
     
-    if (frequency === 'weekly') {
-      while (next.getDay() !== dayOfWeek) {
-        next.setDate(next.getDate() + 1);
-      }
-    } else if (frequency === 'monthly') {
-      next.setDate(dayOfMonth);
-      if (next <= now) {
-        next.setMonth(next.getMonth() + 1);
-      }
-    }
-    
-    return next.toLocaleString('pt-BR', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return next;
   };
+
+  const nextExecution = getNextExecution();
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <>
       <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Administração de Backups</h1>
-            <p className="text-gray-600 mt-2">Gerencie backups automáticos e manuais do sistema FlowEdu</p>
-          </div>
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="mb-4"
+            onClick={() => setLocation('/dashboard')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Dashboard
+          </Button>
+          
+          <Breadcrumb items={[{ label: "Administração" }, { label: "Backups" }]} />
+          
+          <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Database className="w-8 h-8 text-primary" />
+                Administração de Backups
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Gerencie backups do banco de dados e configure agendamentos automáticos
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="lg">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Configurar Agendamento
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Configurar Agendamento Automático</DialogTitle>
+                    <DialogDescription>
+                      Configure backups automáticos do banco de dados
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6 py-4">
+                    {/* Ativar/Desativar */}
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <Label className="text-base font-semibold">Agendamento Automático</Label>
+                        <p className="text-sm text-muted-foreground">Ativar backups automáticos programados</p>
+                      </div>
+                      <Switch checked={isEnabled} onCheckedChange={setIsEnabled} />
+                    </div>
 
-          {/* Ações Rápidas */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Backup Manual */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5" />
-                  Backup Manual
-                </CardTitle>
-                <CardDescription>Criar backup agora</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={handleCreateBackup}
-                  disabled={createMutation.isPending}
-                  className="w-full"
-                >
-                  {createMutation.isPending ? "Criando..." : "Criar Backup"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Estatísticas */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Estatísticas</CardTitle>
-                <CardDescription>Total de backups</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-blue-600">{backups?.length || 0}</div>
-                <p className="text-sm text-gray-500 mt-1">
-                  {backups?.filter(b => b.status === 'completed').length || 0} concluídos
-                </p>
-              </CardContent>
-            </Card>
-            
-            {/* Preview da Próxima Execução */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Próxima Execução
-                </CardTitle>
-                <CardDescription>
-                  {isEnabled ? "Agendado" : "Desativado"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isEnabled ? (
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {getNextExecutionPreview()}
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    Ative o agendamento abaixo
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Configuração de Agendamento */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Agendamento Automático
-              </CardTitle>
-              <CardDescription>
-                Configure backups automáticos diários, semanais ou mensais
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Ativar/Desativar */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="enabled" className="text-base font-medium">Ativar Agendamento</Label>
-                  <p className="text-sm text-gray-500 mt-1">Backups serão criados automaticamente</p>
-                </div>
-                <Switch
-                  id="enabled"
-                  checked={isEnabled}
-                  onCheckedChange={setIsEnabled}
-                />
-              </div>
-
-              {isEnabled && (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Frequência */}
                     <div className="space-y-2">
-                      <Label htmlFor="frequency">Frequência</Label>
+                      <Label>Frequência</Label>
                       <Select value={frequency} onValueChange={(v: any) => setFrequency(v)}>
-                        <SelectTrigger id="frequency">
-                          <SelectValue placeholder="Selecione a frequência" />
+                        <SelectTrigger>
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="daily">Diário</SelectItem>
@@ -287,22 +228,21 @@ export default function BackupAdmin() {
 
                     {/* Horário */}
                     <div className="space-y-2">
-                      <Label htmlFor="time">Horário</Label>
+                      <Label>Horário</Label>
                       <Input
-                        id="time"
                         type="time"
                         value={scheduleTime}
                         onChange={(e) => setScheduleTime(e.target.value)}
                       />
                     </div>
 
-                    {/* Dia da Semana (apenas para semanal) */}
+                    {/* Dia da Semana (apenas semanal) */}
                     {frequency === 'weekly' && (
                       <div className="space-y-2">
-                        <Label htmlFor="dayOfWeek">Dia da Semana</Label>
+                        <Label>Dia da Semana</Label>
                         <Select value={dayOfWeek.toString()} onValueChange={(v) => setDayOfWeek(parseInt(v))}>
-                          <SelectTrigger id="dayOfWeek">
-                            <SelectValue placeholder="Selecione o dia" />
+                          <SelectTrigger>
+                            <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="0">Domingo</SelectItem>
@@ -317,61 +257,138 @@ export default function BackupAdmin() {
                       </div>
                     )}
 
-                    {/* Dia do Mês (apenas para mensal) */}
+                    {/* Dia do Mês (apenas mensal) */}
                     {frequency === 'monthly' && (
                       <div className="space-y-2">
-                        <Label htmlFor="dayOfMonth">Dia do Mês</Label>
+                        <Label>Dia do Mês</Label>
                         <Input
-                          id="dayOfMonth"
                           type="number"
                           min="1"
-                          max="31"
+                          max="28"
                           value={dayOfMonth}
                           onChange={(e) => setDayOfMonth(parseInt(e.target.value))}
                         />
+                        <p className="text-xs text-muted-foreground">Escolha entre 1 e 28 para evitar problemas com meses curtos</p>
                       </div>
                     )}
 
                     {/* Retenção */}
                     <div className="space-y-2">
-                      <Label htmlFor="retention">Retenção (dias)</Label>
+                      <Label>Retenção (dias)</Label>
                       <Input
-                        id="retention"
                         type="number"
                         min="1"
                         max="365"
                         value={retentionDays}
                         onChange={(e) => setRetentionDays(parseInt(e.target.value))}
                       />
-                      <p className="text-xs text-gray-500">
-                        Backups mais antigos serão deletados automaticamente
-                      </p>
+                      <p className="text-xs text-muted-foreground">Backups mais antigos serão deletados automaticamente</p>
                     </div>
+
+                    {/* Preview da próxima execução */}
+                    {isEnabled && nextExecution && (
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-blue-900">
+                          <Clock className="h-4 w-4" />
+                          <span className="font-semibold">Próxima execução:</span>
+                        </div>
+                        <p className="text-sm text-blue-700 mt-1">
+                          {nextExecution.toLocaleString('pt-BR', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Botão Salvar */}
-                  <div className="pt-4 border-t">
-                    <Button
-                      onClick={handleSaveSchedule}
-                      disabled={updateScheduleMutation.isPending}
-                      className="w-full md:w-auto"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      {updateScheduleMutation.isPending ? "Salvando..." : "Salvar Configuração"}
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
+                      Cancelar
                     </Button>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                    <LoadingButton
+                      onClick={handleSaveSchedule}
+                      loading={updateScheduleMutation.isPending}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Salvar Configuração
+                    </LoadingButton>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              
+              <LoadingButton
+                size="lg"
+                onClick={handleCreateBackup}
+                loading={createMutation.isPending}
+              >
+                <FileArchive className="mr-2 h-4 w-4" />
+                Criar Backup Manual
+              </LoadingButton>
+            </div>
+          </div>
 
-          {/* Lista de Backups */}
+          {/* Cards de Estatísticas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <FileArchive className="h-4 w-4 text-blue-500" />
+                  Total de Backups
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{totalBackups}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Backups disponíveis
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <HardDrive className="h-4 w-4 text-green-500" />
+                  Espaço Utilizado
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{formatFileSize(totalSize)}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Armazenamento total
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-amber-500" />
+                  Último Backup
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg font-bold">
+                  {lastBackup ? formatDate(lastBackup.createdAt) : 'Nenhum'}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {schedule?.isEnabled ? 'Agendamento ativo' : 'Agendamento inativo'}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Tabela de Backups */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Backups Disponíveis</CardTitle>
-                  <CardDescription>Histórico de backups do sistema</CardDescription>
+                  <CardDescription>Lista de todos os backups do banco de dados</CardDescription>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -381,71 +398,68 @@ export default function BackupAdmin() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="text-gray-500 mt-4">Carregando backups...</p>
-                </div>
+                <div className="text-center py-8 text-muted-foreground">Carregando backups...</div>
               ) : backups && backups.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Arquivo</TableHead>
-                        <TableHead>Tamanho</TableHead>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data/Hora</TableHead>
+                      <TableHead>Descrição</TableHead>
+                      <TableHead>Tamanho</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {backups.map((backup: any) => (
+                      <TableRow key={backup.id}>
+                        <TableCell className="font-medium">
+                          {formatDate(backup.createdAt)}
+                        </TableCell>
+                        <TableCell>{backup.description || 'Backup automático'}</TableCell>
+                        <TableCell>{formatFileSize(backup.fileSize || 0)}</TableCell>
+                        <TableCell>
+                          <Badge variant={backup.status === 'completed' ? 'default' : backup.status === 'failed' ? 'destructive' : 'secondary'}>
+                            {backup.status === 'completed' ? 'Concluído' : backup.status === 'failed' ? 'Falhou' : 'Em andamento'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRestore(backup.id)}
+                              disabled={backup.status !== 'completed' || restoreMutation.isPending}
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDelete(backup.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {backups.map((backup) => (
-                        <TableRow key={backup.id}>
-                          <TableCell className="font-medium">{backup.filename}</TableCell>
-                          <TableCell>{formatFileSize(backup.filesize)}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {backup.backupType === 'manual' ? 'Manual' : 'Agendado'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(backup.status)}</TableCell>
-                          <TableCell>{formatDate(backup.createdAt)}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleRestore(backup.id, backup.filename)}
-                                disabled={restoreMutation.isPending || backup.status !== 'completed'}
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDelete(backup.id, backup.filename)}
-                                disabled={deleteMutation.isPending}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                    ))}
+                  </TableBody>
+                </Table>
               ) : (
                 <div className="text-center py-12">
-                  <Database className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg font-medium">Nenhum backup encontrado</p>
-                  <p className="text-gray-400 text-sm mt-2">Crie seu primeiro backup usando o botão acima</p>
+                  <Database className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-lg font-semibold mb-2">Nenhum backup encontrado</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Crie seu primeiro backup ou configure agendamentos automáticos
+                  </p>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+      </PageWrapper>
+    </>
   );
 }
