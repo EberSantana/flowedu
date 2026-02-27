@@ -29,3 +29,4 @@ temp/
 .pm2/
 uploads/
 .cache/
+.github/workflows/
