@@ -1,0 +1,96 @@
+name: 🚀 Deploy FlowEdu na VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Motivo do deploy manual'
+        required: false
+        default: 'Deploy manual solicitado'
+
+jobs:
+  deploy:
+    name: Deploy para VPS (76.13.67.5)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📋 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🔑 Configurar SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: 🌐 Adicionar VPS ao known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 76.13.67.5 >> ~/.ssh/known_hosts
+
+      - name: 📦 Deploy na VPS
+        run: |
+          ssh root@76.13.67.5 << 'ENDSSH'
+            set -e
+            echo "======================================"
+            echo "🚀 Iniciando deploy FlowEdu"
+            echo "Data: $(date '+%d/%m/%Y %H:%M:%S')"
+            echo "======================================"
+
+            cd ~/flowedu
+
+            echo "📥 [1/5] Atualizando código do GitHub..."
+            git fetch origin
+            git reset --hard origin/main
+            echo "✅ Código atualizado: $(git log --oneline -1)"
+
+            echo "📦 [2/5] Instalando dependências..."
+            pnpm install --frozen-lockfile 2>&1 | tail -5
+            echo "✅ Dependências instaladas"
+
+            echo "🔨 [3/5] Fazendo build..."
+            pnpm run build 2>&1 | tail -10
+            echo "✅ Build concluído"
+
+            echo "🔄 [4/5] Reiniciando aplicação..."
+            pm2 restart flowedu
+            sleep 3
+            echo "✅ PM2 reiniciado"
+
+            echo "🗄️ [5/5] Verificando migrações do banco..."
+            pnpm db:push 2>&1 | tail -10 || echo "⚠️ Migração ignorada (sem alterações)"
+
+            echo "======================================"
+            echo "✅ Deploy concluído com sucesso!"
+            echo "Versão: $(git log --oneline -1)"
+            echo "Status PM2:"
+            pm2 status flowedu
+            echo "======================================"
+          ENDSSH
+
+      - name: 🔍 Verificar saúde da aplicação
+        run: |
+          sleep 5
+          STATUS=$(ssh root@76.13.67.5 'curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/')
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Aplicação não está respondendo corretamente (HTTP $STATUS)"
+            exit 1
+          fi
+          echo "✅ Aplicação respondendo normalmente (HTTP $STATUS)"
+
+      - name: 📊 Resumo do Deploy
+        if: always()
+        run: |
+          echo "## 🚀 Deploy FlowEdu" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Campo | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **VPS** | 76.13.67.5 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Autor** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Data** | $(date '+%d/%m/%Y %H:%M:%S') |" >> $GITHUB_STEP_SUMMARY

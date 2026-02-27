@@ -404,8 +404,9 @@ export default function BackupAdmin() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Data/Hora</TableHead>
-                      <TableHead>Descrição</TableHead>
+                      <TableHead>Arquivo</TableHead>
                       <TableHead>Tamanho</TableHead>
+                      <TableHead>Storage</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
@@ -416,28 +417,55 @@ export default function BackupAdmin() {
                         <TableCell className="font-medium">
                           {formatDate(backup.createdAt)}
                         </TableCell>
-                        <TableCell>{backup.description || 'Backup automático'}</TableCell>
-                        <TableCell>{formatFileSize(backup.fileSize || 0)}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground max-w-[160px] truncate" title={backup.filename}>
+                          {backup.filename || 'backup.sql.gz'}
+                        </TableCell>
+                        <TableCell>{formatFileSize(backup.filesize || backup.fileSize || 0)}</TableCell>
+                        <TableCell>
+                          {(backup.storageType === 's3' || backup.storageType === 'both') ? (
+                            <Badge className="bg-blue-600 hover:bg-blue-700 text-white text-xs">
+                              ☁️ S3
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs">
+                              💾 Local
+                            </Badge>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <Badge variant={backup.status === 'completed' ? 'default' : backup.status === 'failed' ? 'destructive' : 'secondary'}>
-                            {backup.status === 'completed' ? 'Concluído' : backup.status === 'failed' ? 'Falhou' : 'Em andamento'}
+                            {backup.status === 'completed' ? 'Concluído' : backup.status === 'failed' ? 'Falhou' : 'Pendente'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-1">
+                            {backup.s3Url && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                asChild
+                                title="Baixar backup do S3"
+                              >
+                                <a href={backup.s3Url} target="_blank" rel="noopener noreferrer">
+                                  <Download className="h-4 w-4" />
+                                </a>
+                              </Button>
+                            )}
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleRestore(backup.id)}
                               disabled={backup.status !== 'completed' || restoreMutation.isPending}
+                              title="Restaurar banco de dados a partir deste backup"
                             >
-                              <Download className="h-4 w-4" />
+                              <RefreshCw className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleDelete(backup.id)}
                               disabled={deleteMutation.isPending}
+                              title="Deletar backup"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

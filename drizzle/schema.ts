@@ -2485,7 +2485,10 @@ export const backups = mysqlTable("backups", {
   id: int("id").autoincrement().primaryKey(),
   filename: varchar("filename", { length: 255 }).notNull(),
   filepath: varchar("filepath", { length: 500 }).notNull(),
-  filesize: int("filesize").notNull(), // Tamanho em bytes (KB)
+  filesize: int("filesize").notNull(), // Tamanho em KB
+  s3Key: varchar("s3_key", { length: 500 }), // Chave do arquivo no S3
+  s3Url: varchar("s3_url", { length: 1000 }), // URL pública do arquivo no S3
+  storageType: mysqlEnum("storage_type", ["local", "s3", "both"]).default("local").notNull(),
   backupType: mysqlEnum("backup_type", ["manual", "scheduled", "automatic"]).default("manual").notNull(),
   status: mysqlEnum("status", ["pending", "completed", "failed", "restoring"]).default("pending").notNull(),
   createdBy: int("created_by").notNull(), // ID do usuário que criou

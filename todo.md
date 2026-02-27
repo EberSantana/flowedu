@@ -7414,3 +7414,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir backup-scheduler.ts - compatibilidade com node-cron v4
 - [x] Instalar react-joyride para GuidedTour.tsx
 - [x] Zero erros TypeScript após todas as correções
+
+## Melhoria: Backup no S3
+- [x] Reescrever backup-executor para salvar no S3 (com fallback local)
+- [x] Atualizar tabela backups para armazenar s3Key e s3Url
+- [x] Atualizar BackupAdmin.tsx para exibir badge S3/Local e botão download
+- [ ] Fazer deploy na VPS com migração SQL dos novos campos
