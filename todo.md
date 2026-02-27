@@ -7385,9 +7385,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar funcionamento após deploy (HTTP 200, PM2 online)
 
 ## GitHub Actions + Migrações + Agente VPS
-- [ ] Criar workflow GitHub Actions para deploy automático na VPS
-- [ ] Configurar SSH key no GitHub Secrets
-- [ ] Testar pipeline de deploy automático
-- [ ] Executar migrações pendentes do banco na VPS (pnpm db:push)
-- [ ] Instalar agente de monitoramento VPS (vps-agent.py)
-- [ ] Verificar coleta de métricas em tempo real
+- [x] Criar workflow GitHub Actions para deploy automático na VPS
+- [x] Configurar SSH key no GitHub Secrets (chave ed25519 adicionada ao authorized_keys)
+- [x] Testar pipeline de deploy automático (workflow publicado no GitHub)
+- [x] Executar migrações pendentes do banco na VPS (5 tabelas criadas: backups, backup_schedules, vps_servers, vps_metrics, vps_alerts)
+- [x] Instalar agente de monitoramento VPS (flowedu-agent.service via systemd)
+- [x] Verificar coleta de métricas em tempo real (3 envios bem-sucedidos confirmados)
