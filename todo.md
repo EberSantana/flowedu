@@ -7391,3 +7391,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Executar migrações pendentes do banco na VPS (5 tabelas criadas: backups, backup_schedules, vps_servers, vps_metrics, vps_alerts)
 - [x] Instalar agente de monitoramento VPS (flowedu-agent.service via systemd)
 - [x] Verificar coleta de métricas em tempo real (3 envios bem-sucedidos confirmados)
+
+## Deploy v3.0.3 na VPS + Fix React duplicado
+- [ ] Deploy v3.0.3 na VPS (git pull + build + pm2 restart)
+- [ ] Corrigir erro de React duplicado (react@19.1.1 vs react@19.2.4)
+- [ ] Verificar funcionamento após correções
