@@ -2,7 +2,7 @@
  * Hook para tratamento padronizado de erros no frontend
  */
 
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback } from "react";
 
@@ -38,7 +38,7 @@ interface ErrorHandlerOptions {
  * Hook para tratamento padronizado de erros
  */
 export function useErrorHandler() {
-  const { toast } = useToast();
+  
 
   /**
    * Extrai mensagem de erro amigável
@@ -84,11 +84,7 @@ export function useErrorHandler() {
 
       // Exibir toast
       if (showToast) {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: message,
-        });
+        toast.error(message);
       }
 
       // Callback customizado
@@ -98,7 +94,7 @@ export function useErrorHandler() {
 
       return message;
     },
-    [toast, getErrorMessage]
+    [getErrorMessage]
   );
 
   /**

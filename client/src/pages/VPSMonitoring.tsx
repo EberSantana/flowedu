@@ -49,11 +49,11 @@ export default function VPSMonitoring() {
   // Queries
   const { data: servers, refetch: refetchServers } = trpc.vps.listServers.useQuery();
   const { data: latestMetric, refetch: refetchMetric } = trpc.vps.getLatestMetric.useQuery(
-    { serverId: selectedServerId! },
+    { serverId: selectedServerId ?? 0 },
     { enabled: !!selectedServerId, refetchInterval: 60000 } // Atualizar a cada 60s
   );
   const { data: historicalMetrics } = trpc.vps.getMetrics.useQuery(
-    { serverId: selectedServerId!, limit: 60 },
+    { serverId: selectedServerId ?? 0, period: '1h' },
     { enabled: !!selectedServerId }
   );
 
@@ -67,7 +67,7 @@ export default function VPSMonitoring() {
       refetchServers();
       
       // Copiar token para clipboard
-      navigator.clipboard.writeText(data.token);
+      navigator.clipboard.writeText(data.authToken);
       toast.info('Token copiado para a área de transferência!');
     },
     onError: (error) => {
@@ -277,7 +277,7 @@ export default function VPSMonitoring() {
                       size="sm"
                       onClick={() => {
                         if (selectedServer) {
-                          navigator.clipboard.writeText(selectedServer.token);
+                          navigator.clipboard.writeText(selectedServer.authToken);
                           toast.success('Token copiado!');
                         }
                       }}
@@ -342,7 +342,7 @@ export default function VPSMonitoring() {
                   <CardContent>
                     <div className="text-3xl font-bold">{parseFloat(latestMetric.memoryPercent).toFixed(1)}%</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {formatBytes(parseInt(latestMetric.memoryUsed))} / {formatBytes(parseInt(latestMetric.memoryTotal))}
+                      {formatBytes(Number(latestMetric.memoryUsed))} / {formatBytes(Number(latestMetric.memoryTotal))}
                     </p>
                   </CardContent>
                 </Card>
@@ -358,7 +358,7 @@ export default function VPSMonitoring() {
                   <CardContent>
                     <div className="text-3xl font-bold">{parseFloat(latestMetric.diskPercent).toFixed(1)}%</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {formatBytes(parseInt(latestMetric.diskUsed))} / {formatBytes(parseInt(latestMetric.diskTotal))}
+                      {formatBytes(Number(latestMetric.diskUsed))} / {formatBytes(Number(latestMetric.diskTotal))}
                     </p>
                   </CardContent>
                 </Card>
@@ -375,11 +375,11 @@ export default function VPSMonitoring() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-green-500" />
-                        <span className="text-sm">{formatBytes(parseInt(latestMetric.networkSent))}/s</span>
+                        <span className="text-sm">{formatBytes(Number(latestMetric.networkSent))}/s</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <TrendingDown className="h-4 w-4 text-blue-500" />
-                        <span className="text-sm">{formatBytes(parseInt(latestMetric.networkRecv))}/s</span>
+                        <span className="text-sm">{formatBytes(Number(latestMetric.networkRecv))}/s</span>
                       </div>
                     </div>
                   </CardContent>

@@ -86,7 +86,7 @@ export default function BackupAdmin() {
 
   const handleCreateBackup = () => {
     if (confirm("Deseja criar um backup manual agora? O processo pode levar alguns minutos.")) {
-      createMutation.mutate({ description: "Backup manual" });
+      createMutation.mutate();
     }
   };
 
@@ -121,13 +121,13 @@ export default function BackupAdmin() {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleString('pt-BR');
   };
 
   // Calcular estatísticas
   const totalBackups = backups?.length ?? 0;
-  const totalSize = backups?.reduce((acc, b) => acc + (b.fileSize || 0), 0) ?? 0;
+  const totalSize = backups?.reduce((acc, b) => acc + (b.filesize || 0), 0) ?? 0;
   const lastBackup = backups && backups.length > 0 ? backups[0] : null;
 
   // Calcular próxima execução

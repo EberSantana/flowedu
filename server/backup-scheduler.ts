@@ -1,9 +1,9 @@
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { getBackupSchedule } from './db';
 import { executeBackup } from './backup-executor';
 import { createBackupRecord } from './db';
 
-let scheduledTask: cron.ScheduledTask | null = null;
+let scheduledTask: ScheduledTask | null = null;
 
 /**
  * Converter configuração de agendamento para expressão cron
@@ -18,19 +18,15 @@ function buildCronExpression(config: {
 
   switch (config.frequency) {
     case 'daily':
-      // Executar todos os dias no horário especificado
       return `${minutes} ${hours} * * *`;
-
-    case 'weekly':
-      // Executar semanalmente no dia da semana especificado
-      const dayOfWeek = config.dayOfWeek ?? 0; // Padrão: Domingo
+    case 'weekly': {
+      const dayOfWeek = config.dayOfWeek ?? 0;
       return `${minutes} ${hours} * * ${dayOfWeek}`;
-
-    case 'monthly':
-      // Executar mensalmente no dia do mês especificado
-      const dayOfMonth = config.dayOfMonth ?? 1; // Padrão: dia 1
+    }
+    case 'monthly': {
+      const dayOfMonth = config.dayOfMonth ?? 1;
       return `${minutes} ${hours} ${dayOfMonth} * *`;
-
+    }
     default:
       throw new Error(`Frequência inválida: ${config.frequency}`);
   }
@@ -41,26 +37,19 @@ function buildCronExpression(config: {
  */
 export function getNextExecution(cronExpression: string): Date | null {
   try {
-    const task = cron.schedule(cronExpression, () => {}, {
-      scheduled: false,
-    });
-    
-    // node-cron não tem método direto para próxima execução
-    // Vamos calcular manualmente baseado na expressão
     const now = new Date();
-    const [minute, hour, dayOfMonth, month, dayOfWeek] = cronExpression.split(' ');
-    
+    const parts = cronExpression.split(' ');
+    const targetMinute = parseInt(parts[0]);
+    const targetHour = parseInt(parts[1]);
+
     const next = new Date(now);
-    const targetHour = parseInt(hour);
-    const targetMinute = parseInt(minute);
-    
     next.setHours(targetHour, targetMinute, 0, 0);
-    
+
     // Se o horário já passou hoje, avançar para amanhã
     if (next <= now) {
       next.setDate(next.getDate() + 1);
     }
-    
+
     return next;
   } catch (error) {
     console.error('[Scheduler] Erro ao calcular próxima execução:', error);
@@ -73,7 +62,7 @@ export function getNextExecution(cronExpression: string): Date | null {
  */
 async function runScheduledBackup() {
   console.log('[Scheduler] Iniciando backup agendado...');
-  
+
   try {
     const timestamp = Date.now();
     const filename = `backup_scheduled_${timestamp}.sql.gz`;
@@ -125,9 +114,8 @@ export async function initializeBackupScheduler() {
       scheduledTask = null;
     }
 
-    // Criar nova tarefa agendada
+    // Criar nova tarefa agendada (node-cron v4: sem 'scheduled' nas options)
     scheduledTask = cron.schedule(cronExpression, runScheduledBackup, {
-      scheduled: true,
       timezone: 'America/Sao_Paulo',
     });
 

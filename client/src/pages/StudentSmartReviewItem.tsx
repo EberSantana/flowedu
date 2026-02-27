@@ -102,7 +102,7 @@ export default function StudentSmartReviewItem() {
 
   // Parsear dados do exercício
   const exerciseData = exercise?.exerciseData ? JSON.parse(exercise.exerciseData as string) : null;
-  const questionNumber = originalAnswer?.questionNumber || 1;
+  const questionNumber = originalAnswer?.id || 1;
   const question = exerciseData?.questions?.[questionNumber - 1];
 
   const handleSubmit = () => {
@@ -157,7 +157,7 @@ export default function StudentSmartReviewItem() {
               Revisão Inteligente
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Questão #{originalAnswer?.questionNumber} - {question?.type === "objective" ? "Múltipla Escolha" : "Questão Aberta"}
+              Questão #{originalAnswer?.id} - {question?.type === "objective" ? "Múltipla Escolha" : "Questão Aberta"}
             </p>
           </div>
 
@@ -286,7 +286,7 @@ export default function StudentSmartReviewItem() {
               </div>
 
               {/* Feedback Original */}
-              {originalAnswer?.aiFeedback && (
+              {originalAnswer?.feedback && (
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
@@ -296,7 +296,7 @@ export default function StudentSmartReviewItem() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {originalAnswer.aiFeedback}
+                      {originalAnswer.feedback}
                     </p>
                   </CardContent>
                 </Card>

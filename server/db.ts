@@ -185,7 +185,7 @@ export async function getDb() {
         queueLimit: 0
       });
       
-      _db = drizzle(_pool);
+      _db = drizzle(_pool) as unknown as ReturnType<typeof drizzle>;
       console.log("[Database] Connected successfully with SSL");
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
@@ -11821,7 +11821,7 @@ export async function getHardestExercises(teacherId: number, limit: number = 5) 
     LIMIT ${limit}
   `);
 
-  return hardestExercises[0] || [];
+  return (hardestExercises[0] as unknown as any[]) || [];
 }
 
 /**
@@ -11855,7 +11855,7 @@ export async function getTopStudents(teacherId: number, limit: number = 5) {
     LIMIT ${limit}
   `);
 
-  return topStudents[0] || [];
+  return (topStudents[0] as unknown as any[]) || [];
 }
 
 /**

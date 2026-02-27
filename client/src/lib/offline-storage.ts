@@ -89,7 +89,7 @@ export async function getPendingActions(): Promise<PendingAction[]> {
     const store = transaction.objectStore(STORE_NAME);
     const index = store.index('synced');
     
-    const request = index.getAll(false);
+    const request = index.getAll(IDBKeyRange.only(0));
     
     request.onsuccess = () => {
       resolve(request.result);

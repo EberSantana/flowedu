@@ -17,23 +17,26 @@ export function registerOAuthRoutes(app: Express) {
     }
 
     try {
-      // Exchange code for JWT
-      const jwt = await sdk.exchangeCodeForJwt(code);
-      
+      // Exchange code for access token
+      const tokenResponse = await sdk.exchangeCodeForToken(code, "");
+
       // Get user info from Manus OAuth
-      const userInfo = await sdk.getUserInfoWithJwt(jwt);
-      
+      const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
+
       console.log('[OAuth] User info received:', userInfo);
 
       // Upsert user in local database
-      const user = await db.upsertUser({
+      await db.upsertUser({
         openId: userInfo.openId,
         name: userInfo.name,
-        email: userInfo.email,
+        email: userInfo.email ?? null,
         loginMethod: "oauth",
       });
 
-      console.log('[OAuth] User upserted:', user.id, user.email);
+      console.log('[OAuth] User upserted:', userInfo.openId);
+
+      // Create session JWT
+      const jwt = await sdk.createSessionToken(userInfo.openId, { name: userInfo.name });
 
       // Set session cookie
       const cookieOptions = getSessionCookieOptions(req);

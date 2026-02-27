@@ -7276,7 +7276,7 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
 
 **DADOS DO ALUNO:**
 - Nome: ${student.fullName}
-- Email: ${student.email || 'Não informado'}
+- Matrícula: ${student.registrationNumber}
 - Disciplina analisada: ${subjectName}
 - Disciplinas matriculadas: ${studentSubjects.map(s => s.subjectName).join(', ') || 'Nenhuma matrícula encontrada'}
 

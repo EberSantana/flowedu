@@ -18,7 +18,8 @@ export default function NotificationSettings() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
 
-  const { data: vapidKey } = trpc.pushNotifications.getVapidKey.useQuery();
+  const { data: vapidKeyData } = trpc.pushNotifications.getVapidKey.useQuery();
+  const vapidKey = vapidKeyData?.key;
   const { data: prefs, refetch: refetchPrefs } = trpc.pushNotifications.getPreferences.useQuery();
   const { data: stats, refetch: refetchStats } = trpc.pushNotifications.getStats.useQuery();
 
@@ -81,7 +82,7 @@ export default function NotificationSettings() {
   }, []);
 
   const handleEnablePush = async () => {
-    if (!pushSupported || !vapidKey) {
+    if (!pushSupported || !vapidKeyData) {
       toast.error("Notificações push não são suportadas neste navegador");
       return;
     }
@@ -110,8 +111,10 @@ export default function NotificationSettings() {
       const subJson = subscription.toJSON();
       await subscribeMutation.mutateAsync({
         endpoint: subJson.endpoint!,
-        p256dh: subJson.keys!.p256dh!,
-        auth: subJson.keys!.auth!,
+        keys: {
+          p256dh: subJson.keys!.p256dh!,
+          auth: subJson.keys!.auth!,
+        },
       });
     } catch (error: any) {
       toast.error("Erro ao ativar notificações: " + error.message);
@@ -130,7 +133,8 @@ export default function NotificationSettings() {
         await subscription.unsubscribe();
       }
       
-      await unsubscribeMutation.mutateAsync();
+      const endpoint = subscription?.endpoint || '';
+      await unsubscribeMutation.mutateAsync({ endpoint });
     } catch (error: any) {
       toast.error("Erro ao desativar notificações: " + error.message);
     } finally {

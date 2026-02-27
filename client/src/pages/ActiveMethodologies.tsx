@@ -232,7 +232,7 @@ export default function ActiveMethodologies() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => toggleFavorite(methodology)}
+                    onClick={() => handleToggleFavorite(methodology.id)}
                     className="shrink-0"
                   >
                     {methodology.isFavorite ? (

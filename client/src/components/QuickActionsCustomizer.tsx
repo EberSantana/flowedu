@@ -14,6 +14,7 @@ export interface QuickAction {
   href: string;
   color: string; // Cor hexadecimal (ex: #10b981 para verde)
   enabled: boolean;
+  order?: number;
 }
 
 // Cores hexadecimais para consistência visual

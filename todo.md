@@ -7396,3 +7396,21 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Deploy v3.0.3 na VPS (git pull + build + pm2 restart)
 - [ ] Corrigir erro de React duplicado (react@19.1.1 vs react@19.2.4)
 - [ ] Verificar funcionamento após correções
+
+## Fix: Sistema de Backup
+- [ ] Diagnosticar erro na criação de backup
+- [ ] Corrigir backup-executor.ts
+- [ ] Testar criação de backup manual
+
+## Fix: Erros TypeScript (v3.0.4)
+- [x] Corrigir useErrorHandler.ts - substituir useToast por sonner
+- [x] Corrigir NotificationSettings.tsx - ajustar subscribeMutation para usar keys object e unsubscribeMutation com endpoint
+- [x] Corrigir VPSMonitoring.tsx - usar ?? 0 ao invés de ! e period ao invés de limit
+- [x] Corrigir ActiveMethodologies.tsx - toggleFavorite -> handleToggleFavorite
+- [x] Corrigir offline-storage.ts - usar IDBKeyRange.only(0) ao invés de false
+- [x] Corrigir oauth.ts - usar exchangeCodeForToken + getUserInfo + createSessionToken
+- [x] Corrigir db.ts - usar unknown cast para drizzle e getHardestExercises/getTopStudents
+- [x] Corrigir backup-executor.ts - reescrito para usar mysql2 nativo sem mysqldump
+- [x] Corrigir backup-scheduler.ts - compatibilidade com node-cron v4
+- [x] Instalar react-joyride para GuidedTour.tsx
+- [x] Zero erros TypeScript após todas as correções
