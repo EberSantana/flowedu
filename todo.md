@@ -7377,3 +7377,17 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Atualizar versão para v3.0.0
 - [ ] Criar checkpoint v3.0.0
 - [ ] Criar guia de instalação do agente
+
+## Deploy v3.0.1 na VPS (76.13.67.5)
+- [x] Explorar métodos alternativos de deploy (webhook, GitHub Actions, script remoto)
+- [x] Criar script de deploy remoto via curl
+- [x] Executar deploy na VPS (37 commits atualizados)
+- [x] Verificar funcionamento após deploy (HTTP 200, PM2 online)
+
+## GitHub Actions + Migrações + Agente VPS
+- [ ] Criar workflow GitHub Actions para deploy automático na VPS
+- [ ] Configurar SSH key no GitHub Secrets
+- [ ] Testar pipeline de deploy automático
+- [ ] Executar migrações pendentes do banco na VPS (pnpm db:push)
+- [ ] Instalar agente de monitoramento VPS (vps-agent.py)
+- [ ] Verificar coleta de métricas em tempo real
