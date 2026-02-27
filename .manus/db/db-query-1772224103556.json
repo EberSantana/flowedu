@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE backups \nADD COLUMN IF NOT EXISTS s3_key VARCHAR(500) NULL,\nADD COLUMN IF NOT EXISTS s3_url VARCHAR(1000) NULL,\nADD COLUMN IF NOT EXISTS storage_type ENUM('local','s3','both') NOT NULL DEFAULT 'local';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \nALTER TABLE backups \nADD COLUMN IF NOT EXISTS s3_key VARCHAR(500) NULL,\nADD COLUMN IF NOT EXISTS s3_url VARCHAR(1000) NULL,\nADD COLUMN IF NOT EXISTS storage_type ENUM('local','s3','both') NOT NULL DEFAULT 'local';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1964
+}

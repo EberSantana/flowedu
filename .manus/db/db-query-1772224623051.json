@@ -1,0 +1,97 @@
+{
+  "query": "SHOW TABLES LIKE 'backup%'; SHOW COLUMNS FROM backups; SHOW COLUMNS FROM backup_schedules;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE 'backup%'; SHOW COLUMNS FROM backups; SHOW COLUMNS FROM backup_schedules;",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "backup_schedules"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "backups"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "Field\tType\tNull\tKey\tDefault\tExtra"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "id\tint(11)\tNO\tPRI\tNULL\tauto_increment"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "filename\tvarchar(255)\tNO\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "filepath\tvarchar(500)\tNO\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "filesize\tint(11)\tNO\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "backup_type\tenum('manual','scheduled','automatic')\tNO\t\tmanual\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "status\tenum('pending','completed','failed','restoring')\tNO\t\tpending\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "created_by\tint(11)\tNO\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "error_message\ttext\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "restored_at\ttimestamp\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "created_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "updated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "s3_key\tvarchar(500)\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "s3_url\tvarchar(1000)\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "storage_type\tenum('local','s3','both')\tNO\t\tlocal\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "Field\tType\tNull\tKey\tDefault\tExtra"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "id\tint(11)\tNO\tPRI\tNULL\tauto_increment"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "is_enabled\ttinyint(1)\tNO\t\t0\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "frequency\tenum('daily','weekly','monthly')\tNO\t\tdaily\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "schedule_time\tvarchar(5)\tNO\t\t03:00\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "day_of_week\tint(11)\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "day_of_month\tint(11)\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "retention_days\tint(11)\tNO\t\t7\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "last_run_at\ttimestamp\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "next_run_at\ttimestamp\tYES\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "created_by\tint(11)\tNO\t\tNULL\t"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)": "updated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (backup%)\nbackup_schedules\nbackups\nField\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nfilename\tvarchar(255)\tNO\t\tNULL\t\nfilepath\tvarchar(500)\tNO\t\tNULL\t\nfilesize\tint(11)\tNO\t\tNULL\t\nbackup_type\tenum('manual','scheduled','automatic')\tNO\t\tmanual\t\nstatus\tenum('pending','completed','failed','restoring')\tNO\t\tpending\t\ncreated_by\tint(11)\tNO\t\tNULL\t\nerror_message\ttext\tYES\t\tNULL\t\nrestored_at\ttimestamp\tYES\t\tNULL\t\ncreated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ns3_key\tvarchar(500)\tYES\t\tNULL\t\ns3_url\tvarchar(1000)\tYES\t\tNULL\t\nstorage_type\tenum('local','s3','both')\tNO\t\tlocal\t\nField\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nis_enabled\ttinyint(1)\tNO\t\t0\t\nfrequency\tenum('daily','weekly','monthly')\tNO\t\tdaily\t\nschedule_time\tvarchar(5)\tNO\t\t03:00\t\nday_of_week\tint(11)\tYES\t\tNULL\t\nday_of_month\tint(11)\tYES\t\tNULL\t\nretention_days\tint(11)\tNO\t\t7\t\nlast_run_at\ttimestamp\tYES\t\tNULL\t\nnext_run_at\ttimestamp\tYES\t\tNULL\t\ncreated_by\tint(11)\tNO\t\tNULL\t\nupdated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 464
+}

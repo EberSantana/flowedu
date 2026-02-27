@@ -9,22 +9,45 @@ import { storagePut } from './storage';
 
 /**
  * Criar conexão MySQL com SSL para TiDB Cloud
+ * Usa o mesmo padrão de parsing do db.ts
  */
-async function createConnection() {
+async function createConnection(): Promise<mysql.Connection> {
   const databaseUrl = process.env.DATABASE_URL || '';
-  const urlMatch = databaseUrl.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/([^?]+)/);
-  if (!urlMatch) throw new Error('DATABASE_URL inválida ou não configurada');
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL não configurada no ambiente');
+  }
 
-  const [, user, password, host, port, database] = urlMatch;
-  return mysql.createConnection({
-    host,
-    port: parseInt(port),
-    user,
-    password,
-    database,
-    ssl: { rejectUnauthorized: true },
-    multipleStatements: true,
-  });
+  console.log(`[Backup] Conectando ao banco... (host: ${databaseUrl.split('@')[1]?.split(':')[0] ?? 'desconhecido'})`);
+
+  try {
+    // Usar URL parsing (mesmo padrão do db.ts)
+    const url = new URL(databaseUrl.replace('mysql://', 'http://'));
+    const conn = await mysql.createConnection({
+      host: url.hostname,
+      port: parseInt(url.port) || 4000,
+      user: decodeURIComponent(url.username),
+      password: decodeURIComponent(url.password),
+      database: url.pathname.slice(1).split('?')[0],
+      ssl: { rejectUnauthorized: true },
+      multipleStatements: true,
+    });
+    console.log('[Backup] Conexão MySQL estabelecida com sucesso');
+    return conn;
+  } catch (urlError) {
+    // Fallback: regex para URLs com caracteres especiais
+    const urlMatch = databaseUrl.match(/mysql:\/\/([^:]+):(.+)@([^:]+):(\d+)\/([^?]+)/);
+    if (!urlMatch) throw new Error(`DATABASE_URL inválida: ${databaseUrl.substring(0, 40)}...`);
+    const [, user, password, host, port, database] = urlMatch;
+    return mysql.createConnection({
+      host,
+      port: parseInt(port),
+      user,
+      password,
+      database,
+      ssl: { rejectUnauthorized: true },
+      multipleStatements: true,
+    });
+  }
 }
 
 /**

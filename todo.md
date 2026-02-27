@@ -7419,4 +7419,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Reescrever backup-executor para salvar no S3 (com fallback local)
 - [x] Atualizar tabela backups para armazenar s3Key e s3Url
 - [x] Atualizar BackupAdmin.tsx para exibir badge S3/Local e botão download
-- [ ] Fazer deploy na VPS com migração SQL dos novos campos
+- [x] Fazer deploy na VPS v3.0.5 com migração SQL dos novos campos (s3_key, s3_url, storage_type)
+
+## Fix: Backup Manual e Agendamento
+- [x] Diagnosticar por que backup manual não executa (DATABASE_URL parsing e feedback)
+- [x] Diagnosticar por que agendamento não mostra feedback (useState vs useEffect)
+- [x] Corrigir BackupAdmin.tsx: useState -> useEffect para sincronizar schedule
+- [x] Corrigir BackupAdmin.tsx: polling automático para atualizar status de backups pendentes
+- [x] Corrigir backup-executor.ts: URL parsing mais robusto com fallback
+- [ ] Fazer deploy na VPS v3.0.6

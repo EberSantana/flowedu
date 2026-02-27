@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
@@ -31,21 +31,36 @@ export default function BackupAdmin() {
   const [dayOfMonth, setDayOfMonth] = useState(schedule?.dayOfMonth ?? 1);
   const [retentionDays, setRetentionDays] = useState(schedule?.retentionDays ?? 7);
   
-  // Atualizar estado quando schedule carregar
-  useState(() => {
+  // Sincronizar estados quando schedule carregar do servidor
+  useEffect(() => {
     if (schedule) {
-      setIsEnabled(schedule.isEnabled);
-      setFrequency(schedule.frequency);
-      setScheduleTime(schedule.scheduleTime);
+      setIsEnabled(schedule.isEnabled ?? false);
+      setFrequency(schedule.frequency ?? 'daily');
+      setScheduleTime(schedule.scheduleTime ?? '03:00');
       setDayOfWeek(schedule.dayOfWeek ?? 0);
       setDayOfMonth(schedule.dayOfMonth ?? 1);
-      setRetentionDays(schedule.retentionDays);
+      setRetentionDays(schedule.retentionDays ?? 7);
     }
-  });
+  }, [schedule]);
+
+  // Polling automático para atualizar status de backups pendentes
+  useEffect(() => {
+    const hasPending = backups?.some(b => b.status === 'pending');
+    if (!hasPending) return;
+    const interval = setInterval(() => refetch(), 5000);
+    return () => clearInterval(interval);
+  }, [backups, refetch]);
   
   const createMutation = trpc.backup.create.useMutation({
-    onSuccess: () => {
-      toast.success("Backup iniciado! Aguarde alguns minutos para conclusão.");
+    onSuccess: (data) => {
+      toast.success(`Backup #${data.backupId} iniciado! A lista será atualizada automaticamente.`);
+      // Polling por 3 minutos para acompanhar o progresso
+      let attempts = 0;
+      const poll = setInterval(() => {
+        refetch();
+        attempts++;
+        if (attempts >= 36) clearInterval(poll);
+      }, 5000);
       refetch();
     },
     onError: (error) => {
