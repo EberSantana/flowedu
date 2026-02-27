@@ -11958,14 +11958,15 @@ export async function upsertBackupSchedule(data: Partial<InsertBackupSchedule>) 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const existing = await getBackupSchedule();
+  // Buscar diretamente do banco (não usar getBackupSchedule que retorna default sem id)
+  const [existingRecord] = await db.select().from(backupSchedules).limit(1);
 
-  if (existing) {
+  if (existingRecord && existingRecord.id) {
     await db
       .update(backupSchedules)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(backupSchedules.id, existing.id));
-    return existing.id;
+      .where(eq(backupSchedules.id, existingRecord.id));
+    return existingRecord.id;
   } else {
     const [schedule] = await db.insert(backupSchedules).values(data as InsertBackupSchedule).$returningId();
     return schedule.id;

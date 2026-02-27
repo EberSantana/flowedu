@@ -7427,4 +7427,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir BackupAdmin.tsx: useState -> useEffect para sincronizar schedule
 - [x] Corrigir BackupAdmin.tsx: polling automático para atualizar status de backups pendentes
 - [x] Corrigir backup-executor.ts: URL parsing mais robusto com fallback
-- [ ] Fazer deploy na VPS v3.0.6
+- [x] Fazer deploy na VPS v3.0.6 (build 26s, PM2 online)
+
+## Fix: Backup Manual e Agendamento (Round 2)
+- [ ] Verificar logs da VPS para identificar erro real
+- [ ] Corrigir problema raiz do backup manual
+- [ ] Corrigir problema do agendamento
+- [ ] Testar e fazer deploy v3.0.7
