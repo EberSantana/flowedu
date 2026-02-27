@@ -7434,3 +7434,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Corrigir problema raiz do backup manual
 - [ ] Corrigir problema do agendamento
 - [ ] Testar e fazer deploy v3.0.7
+
+## Feature: Download de Backup na Listagem
+- [ ] Criar endpoint REST /api/backup/download/:id no servidor
+- [ ] Adicionar botão de download na tabela de backups (BackupAdmin.tsx)
+- [ ] Suporte a download de arquivo local e URL S3
+- [ ] Fazer deploy na VPS

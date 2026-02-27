@@ -454,14 +454,19 @@ export default function BackupAdmin() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
-                            {backup.s3Url && (
+                            {backup.status === 'completed' && (
                               <Button
                                 variant="outline"
                                 size="sm"
                                 asChild
-                                title="Baixar backup do S3"
+                                title={backup.s3Url ? "Baixar backup do S3" : "Baixar backup do servidor"}
                               >
-                                <a href={backup.s3Url} target="_blank" rel="noopener noreferrer">
+                                <a
+                                  href={backup.s3Url || `/api/backup/download/${backup.id}`}
+                                  target={backup.s3Url ? "_blank" : "_self"}
+                                  rel={backup.s3Url ? "noopener noreferrer" : undefined}
+                                  download={!backup.s3Url ? (backup.filename || 'backup.sql.gz') : undefined}
+                                >
                                   <Download className="h-4 w-4" />
                                 </a>
                               </Button>
