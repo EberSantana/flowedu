@@ -7436,7 +7436,16 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Testar e fazer deploy v3.0.7
 
 ## Feature: Download de Backup na Listagem
-- [ ] Criar endpoint REST /api/backup/download/:id no servidor
-- [ ] Adicionar botão de download na tabela de backups (BackupAdmin.tsx)
-- [ ] Suporte a download de arquivo local e URL S3
+- [x] Criar endpoint REST /api/backup/download/:id no servidor
+- [x] Adicionar botão de download na tabela de backups (BackupAdmin.tsx)
+- [x] Suporte a download de arquivo local e URL S3
+- [x] Fazer deploy na VPS v3.0.8 (PM2 online, HTTP 200)
+
+## Feature: Boletim de Atividades da Trilha de Aprendizagem
+- [ ] Analisar schema de trilhas, atividades e progresso dos alunos
+- [ ] Criar procedure tRPC learningPath.getClassReport (notas, média, ranking por turma)
+- [ ] Criar página LearningPathReport.tsx com visualização web
+- [ ] Implementar exportação em PDF do boletim
+- [ ] Registrar rota /learning-path-report no App.tsx
+- [ ] Adicionar link de acesso no módulo de trilhas do professor
 - [ ] Fazer deploy na VPS

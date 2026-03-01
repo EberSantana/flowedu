@@ -3303,8 +3303,23 @@ JSON (descrições MAX 15 chars):
             details: { subjectId: input.subjectId }
           }
         );
-      }),
+       }),
+  }),
 
+  // Boletim de Atividades da Trilha por Turma
+  learningPathReport: router({
+    getClassReport: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        classId: z.number().nullable().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.getLearningPathClassReport(
+          input.subjectId,
+          input.classId ?? null,
+          ctx.user.id
+        );
+      }),
   }),
 
   // Student Portal Routes

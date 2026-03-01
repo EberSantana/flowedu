@@ -31,7 +31,8 @@ import {
   Database,
   FolderOpen,
   BellRing,
-  Server
+  Server,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -150,6 +151,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Desempenho em Exercícios",
         icon: <Target className="h-5 w-5" />,
         href: "/exercise-performance",
+      },
+      {
+        label: "Boletim da Trilha",
+        icon: <FileText className="h-5 w-5" />,
+        href: "/learning-path-report",
       },
     ],
   },

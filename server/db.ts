@@ -12207,3 +12207,176 @@ export async function deleteVPSAlert(id: number) {
   
   await db.delete(vpsAlerts).where(eq(vpsAlerts.id, id));
 }
+
+/**
+ * Boletim de Atividades da Trilha de Aprendizagem por Turma
+ * Retorna notas de cada aluno por exercício, média da turma e ranking
+ */
+export async function getLearningPathClassReport(subjectId: number, classId: number | null, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // 1. Buscar disciplina
+  const subjectRows = await db.select().from(subjects)
+    .where(and(eq(subjects.id, subjectId), eq(subjects.userId, userId)))
+    .limit(1);
+  if (!subjectRows.length) throw new Error("Disciplina não encontrada");
+  const subject = subjectRows[0];
+
+  // 2. Buscar módulos da trilha do professor para essa disciplina
+  const modules = await db.select().from(learningModules)
+    .where(and(eq(learningModules.subjectId, subjectId), eq(learningModules.userId, userId)))
+    .orderBy(asc(learningModules.orderIndex));
+
+  // 3. Buscar exercícios vinculados à trilha (moduleId não nulo)
+  const moduleIds = modules.map(m => m.id);
+  let exercises: typeof studentExercises.$inferSelect[] = [];
+  if (moduleIds.length > 0) {
+    exercises = await db.select().from(studentExercises)
+      .where(and(
+        eq(studentExercises.subjectId, subjectId),
+        eq(studentExercises.teacherId, userId),
+        inArray(studentExercises.moduleId, moduleIds)
+      ))
+      .orderBy(asc(studentExercises.createdAt));
+  }
+
+  // 4. Buscar alunos matriculados (filtrado por turma se informado)
+  let enrolledStudents: { studentId: number; studentName: string; studentRegistration: string; classId: number | null }[] = [];
+  if (classId) {
+    const rows = await db.select({
+      studentId: studentClassEnrollments.studentId,
+      studentName: students.fullName,
+      studentRegistration: students.registrationNumber,
+      classId: studentClassEnrollments.classId,
+    }).from(studentClassEnrollments)
+      .innerJoin(students, eq(studentClassEnrollments.studentId, students.id))
+      .innerJoin(subjectEnrollments, and(
+        eq(subjectEnrollments.studentId, studentClassEnrollments.studentId),
+        eq(subjectEnrollments.subjectId, subjectId)
+      ))
+      .where(and(
+        eq(studentClassEnrollments.classId, classId),
+        eq(studentClassEnrollments.userId, userId)
+      ));
+    enrolledStudents = rows;
+  } else {
+    const rows = await db.select({
+      studentId: subjectEnrollments.studentId,
+      studentName: students.fullName,
+      studentRegistration: students.registrationNumber,
+      classId: sql<number | null>`NULL`,
+    }).from(subjectEnrollments)
+      .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
+      .where(eq(subjectEnrollments.subjectId, subjectId));
+    enrolledStudents = rows;
+  }
+
+  // 5. Buscar todas as tentativas concluídas de uma vez
+  const exerciseIds = exercises.map(e => e.id);
+  let allAttempts: { studentId: number; exerciseId: number; score: number; maxScore: number; completedAt: Date | null }[] = [];
+  if (exerciseIds.length > 0 && enrolledStudents.length > 0) {
+    const studentIds = enrolledStudents.map(s => s.studentId);
+    allAttempts = await db.select({
+      studentId: studentExerciseAttempts.studentId,
+      exerciseId: studentExerciseAttempts.exerciseId,
+      score: studentExerciseAttempts.score,
+      maxScore: studentExerciseAttempts.maxScore,
+      completedAt: studentExerciseAttempts.completedAt,
+    }).from(studentExerciseAttempts)
+      .where(and(
+        inArray(studentExerciseAttempts.exerciseId, exerciseIds),
+        inArray(studentExerciseAttempts.studentId, studentIds),
+        eq(studentExerciseAttempts.status, 'completed')
+      ));
+  }
+
+  // 6. Montar boletim por aluno
+  const studentReports = enrolledStudents.map(student => {
+    const exerciseGrades = exercises.map(exercise => {
+      const attempts = allAttempts.filter(
+        a => a.studentId === student.studentId && a.exerciseId === exercise.id
+      );
+      const bestAttempt = attempts.length > 0
+        ? attempts.reduce((best, a) => a.score > best.score ? a : best)
+        : null;
+      const score = bestAttempt ? bestAttempt.score : null;
+      const maxScore = bestAttempt ? bestAttempt.maxScore : (exercise.totalPoints || 100);
+      const percentage = score !== null && maxScore > 0 ? Math.round((score / maxScore) * 100) : null;
+      return {
+        exerciseId: exercise.id,
+        exerciseTitle: exercise.title,
+        moduleId: exercise.moduleId,
+        score,
+        maxScore,
+        percentage,
+        completedAt: bestAttempt?.completedAt ?? null,
+        attempts: attempts.length,
+      };
+    });
+    const completedGrades = exerciseGrades.filter(g => g.percentage !== null);
+    const avgPercentage = completedGrades.length > 0
+      ? Math.round(completedGrades.reduce((sum, g) => sum + (g.percentage ?? 0), 0) / completedGrades.length)
+      : null;
+    return {
+      studentId: student.studentId,
+      studentName: student.studentName,
+      studentRegistration: student.studentRegistration,
+      classId: student.classId,
+      exerciseGrades,
+      completedExercises: completedGrades.length,
+      totalExercises: exercises.length,
+      avgPercentage,
+    };
+  });
+
+  // 7. Calcular média da turma por exercício
+  const classExerciseAverages = exercises.map(exercise => {
+    const grades = studentReports
+      .map(s => s.exerciseGrades.find(g => g.exerciseId === exercise.id)?.percentage)
+      .filter((p): p is number => p !== null && p !== undefined);
+    const avg = grades.length > 0
+      ? Math.round(grades.reduce((sum, p) => sum + p, 0) / grades.length)
+      : null;
+    return {
+      exerciseId: exercise.id,
+      exerciseTitle: exercise.title,
+      moduleId: exercise.moduleId,
+      classAverage: avg,
+      studentsCompleted: grades.length,
+    };
+  });
+
+  // 8. Ranking por média geral
+  const ranking = studentReports
+    .filter(s => s.avgPercentage !== null)
+    .sort((a, b) => (b.avgPercentage ?? 0) - (a.avgPercentage ?? 0))
+    .map((s, idx) => ({ studentId: s.studentId, rank: idx + 1 }));
+
+  const studentReportsWithRank = studentReports.map(s => ({
+    ...s,
+    rank: ranking.find(r => r.studentId === s.studentId)?.rank ?? null,
+  }));
+
+  const studentsWithAvg = studentReportsWithRank.filter(s => s.avgPercentage !== null);
+  const classOverallAverage = studentsWithAvg.length > 0
+    ? Math.round(studentsWithAvg.reduce((sum, s) => sum + (s.avgPercentage ?? 0), 0) / studentsWithAvg.length)
+    : null;
+
+  return {
+    subject: { id: subject.id, name: subject.name },
+    modules: modules.map(m => ({ id: m.id, title: m.title, orderIndex: m.orderIndex })),
+    exercises: exercises.map(e => ({
+      id: e.id,
+      title: e.title,
+      moduleId: e.moduleId,
+      totalPoints: e.totalPoints,
+      difficulty: e.difficulty,
+    })),
+    students: studentReportsWithRank,
+    classExerciseAverages,
+    classOverallAverage,
+    totalStudents: enrolledStudents.length,
+    generatedAt: new Date(),
+  };
+}
