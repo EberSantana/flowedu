@@ -1,360 +1,330 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import DashboardLayout from "@/components/DashboardLayout";
+import { useLocation } from "wouter";
+import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
+  ArrowLeft,
+  Activity,
   Users,
   GraduationCap,
-  Activity,
-  Clock,
+  UserCheck,
+  RefreshCw,
   TrendingUp,
-  Shield,
 } from "lucide-react";
 
-const PERIOD_OPTIONS = [
-  { label: "Últimos 7 dias", value: 7 },
-  { label: "Últimos 30 dias", value: 30 },
-  { label: "Últimos 90 dias", value: 90 },
-  { label: "Último ano", value: 365 },
-];
-
-function formatDate(dateStr: string) {
-  const [year, month, day] = dateStr.split("-");
-  return `${day}/${month}`;
-}
-
-function formatDateTime(date: Date | string) {
-  const d = new Date(date);
-  return d.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export default function AccessLogsPage() {
+  const [, setLocation] = useLocation();
   const [days, setDays] = useState(30);
+  const [filterType, setFilterType] = useState<"all" | "teacher" | "student">("all");
 
-  const { data, isLoading, error } = trpc.accessLogs.getSummary.useQuery({ days });
+  const { data, isLoading, refetch, isFetching } = trpc.accessLogs.getSummary.useQuery(
+    { days },
+    { refetchOnWindowFocus: false }
+  );
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayEntry = data?.byDay.find((d) => d.date === today);
+  const todayTotal = (todayEntry?.teachers ?? 0) + (todayEntry?.students ?? 0);
+
+  const filteredLogs = (data?.recentLogs ?? []).filter((log) => {
+    if (filterType === "all") return true;
+    return log.userType === filterType;
+  });
+
+  const formatDateTime = (date: Date | string) => {
+    return new Date(date).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
-    <DashboardLayout>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Activity className="w-6 h-6 text-primary" />
-              Log de Acessos
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Monitoramento de acessos de professores e alunos ao sistema
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">Período:</label>
-            <select
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              className="border border-border rounded-md px-3 py-1.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              {PERIOD_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+    <>
+      <Sidebar />
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-4"
+            onClick={() => setLocation("/dashboard")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Dashboard
+          </Button>
 
-        {/* Error state */}
-        {error && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive text-sm">
-            <Shield className="w-4 h-4 inline mr-2" />
-            {error.message === "FORBIDDEN"
-              ? "Acesso restrito. Apenas administradores podem visualizar os logs de acesso."
-              : `Erro ao carregar dados: ${error.message}`}
-          </div>
-        )}
+          {/* Breadcrumb */}
+          <Breadcrumb
+            items={[
+              { label: "Administração" },
+              { label: "Log de Acessos" },
+            ]}
+          />
 
-        {/* Loading */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-            <span className="ml-3 text-muted-foreground">Carregando dados...</span>
-          </div>
-        )}
-
-        {data && (
-          <>
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4">
-                <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
-                  <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total de Acessos</p>
-                  <p className="text-3xl font-bold text-foreground">{data.totalAll}</p>
-                  <p className="text-xs text-muted-foreground">nos últimos {days} dias</p>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4">
-                <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-                  <Users className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Acessos de Professores</p>
-                  <p className="text-3xl font-bold text-foreground">{data.totalTeacher}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {data.totalAll > 0
-                      ? `${Math.round((data.totalTeacher / data.totalAll) * 100)}% do total`
-                      : "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border rounded-xl p-5 flex items-center gap-4">
-                <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
-                  <GraduationCap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Acessos de Alunos</p>
-                  <p className="text-3xl font-bold text-foreground">{data.totalStudent}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {data.totalAll > 0
-                      ? `${Math.round((data.totalStudent / data.totalAll) * 100)}% do total`
-                      : "—"}
-                  </p>
-                </div>
-              </div>
+          {/* Header */}
+          <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <Activity className="w-8 h-8 text-primary" />
+                Log de Acessos
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Monitore os acessos de professores e alunos ao sistema
+              </p>
             </div>
-
-            {/* Chart: Acessos por dia */}
-            <div className="bg-card border border-border rounded-xl p-5">
-              <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-primary" />
-                Acessos por Dia
-              </h2>
-              {data.byDay.length === 0 ? (
-                <div className="text-center text-muted-foreground py-10 text-sm">
-                  Nenhum acesso registrado no período selecionado.
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart
-                    data={data.byDay.map((d) => ({
-                      ...d,
-                      date: formatDate(d.date),
-                    }))}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                      interval={days > 30 ? Math.floor(data.byDay.length / 10) : 0}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                      allowDecimals={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value: number, name: string) => [
-                        value,
-                        name === "teachers" ? "Professores" : "Alunos",
-                      ]}
-                      labelFormatter={(label) => `Data: ${label}`}
-                    />
-                    <Legend
-                      formatter={(value) =>
-                        value === "teachers" ? "Professores" : "Alunos"
-                      }
-                    />
-                    <Bar dataKey="teachers" fill="#22c55e" radius={[3, 3, 0, 0]} />
-                    <Bar dataKey="students" fill="#a855f7" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
+            <div className="flex items-center gap-3">
+              <Select
+                value={days.toString()}
+                onValueChange={(v) => setDays(Number(v))}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">Últimos 7 dias</SelectItem>
+                  <SelectItem value="30">Últimos 30 dias</SelectItem>
+                  <SelectItem value="90">Últimos 90 dias</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isFetching}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
+                Atualizar
+              </Button>
             </div>
+          </div>
 
-            {/* Top Users */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Top Professores */}
-              <div className="bg-card border border-border rounded-xl p-5">
-                <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-green-500" />
-                  Professores com Mais Acessos
-                </h2>
-                {data.topTeachers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-6">
-                    Nenhum acesso de professor registrado.
-                  </p>
+          {/* Cards de Resumo */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total de Acessos
+                </CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{isLoading ? "—" : data?.totalAll ?? 0}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  nos últimos {days} dias
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Professores
+                </CardTitle>
+                <UserCheck className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">
+                  {isLoading ? "—" : data?.totalTeacher ?? 0}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  acessos de professores
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Alunos
+                </CardTitle>
+                <GraduationCap className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {isLoading ? "—" : data?.totalStudent ?? 0}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  acessos de alunos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Acessos Hoje
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-600">
+                  {isLoading ? "—" : todayTotal}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {todayEntry?.teachers ?? 0} prof. · {todayEntry?.students ?? 0} alunos
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Ranking de Usuários */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Top Professores */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <UserCheck className="h-5 w-5 text-blue-500" />
+                  Top Professores
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p className="text-muted-foreground text-sm">Carregando...</p>
+                ) : !data?.topTeachers?.length ? (
+                  <p className="text-muted-foreground text-sm">Nenhum acesso registrado.</p>
                 ) : (
                   <div className="space-y-2">
                     {data.topTeachers.map((t, i) => (
-                      <div key={t.name} className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-muted-foreground w-5 text-right">
-                          {i + 1}.
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-foreground truncate">
-                              {t.name}
-                            </span>
-                            <span className="text-sm font-bold text-green-600 dark:text-green-400 ml-2">
-                              {t.count}
-                            </span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-1.5">
-                            <div
-                              className="bg-green-500 h-1.5 rounded-full"
-                              style={{
-                                width: `${Math.round(
-                                  (t.count / (data.topTeachers[0]?.count || 1)) * 100
-                                )}%`,
-                              }}
-                            />
-                          </div>
+                      <div key={t.name} className="flex items-center justify-between py-1 border-b last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground w-5">
+                            {i + 1}º
+                          </span>
+                          <span className="text-sm font-medium">{t.name}</span>
                         </div>
+                        <Badge variant="secondary">{t.count} acessos</Badge>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Top Alunos */}
-              <div className="bg-card border border-border rounded-xl p-5">
-                <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4 text-purple-500" />
-                  Alunos com Mais Acessos
-                </h2>
-                {data.topStudents.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-6">
-                    Nenhum acesso de aluno registrado.
-                  </p>
+            {/* Top Alunos */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <GraduationCap className="h-5 w-5 text-green-500" />
+                  Top Alunos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p className="text-muted-foreground text-sm">Carregando...</p>
+                ) : !data?.topStudents?.length ? (
+                  <p className="text-muted-foreground text-sm">Nenhum acesso registrado.</p>
                 ) : (
                   <div className="space-y-2">
                     {data.topStudents.map((s, i) => (
-                      <div key={s.name} className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-muted-foreground w-5 text-right">
-                          {i + 1}.
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-foreground truncate">
-                              {s.name}
-                            </span>
-                            <span className="text-sm font-bold text-purple-600 dark:text-purple-400 ml-2">
-                              {s.count}
-                            </span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-1.5">
-                            <div
-                              className="bg-purple-500 h-1.5 rounded-full"
-                              style={{
-                                width: `${Math.round(
-                                  (s.count / (data.topStudents[0]?.count || 1)) * 100
-                                )}%`,
-                              }}
-                            />
-                          </div>
+                      <div key={s.name} className="flex items-center justify-between py-1 border-b last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground w-5">
+                            {i + 1}º
+                          </span>
+                          <span className="text-sm font-medium">{s.name}</span>
                         </div>
+                        <Badge variant="secondary">{s.count} acessos</Badge>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* Recent Logs Table */}
-            <div className="bg-card border border-border rounded-xl p-5">
-              <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-primary" />
-                Acessos Recentes
-              </h2>
-              {data.recentLogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-6">
-                  Nenhum acesso registrado.
+          {/* Tabela de Acessos Recentes */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Users className="h-5 w-5" />
+                  Acessos Recentes
+                </CardTitle>
+                <Select
+                  value={filterType}
+                  onValueChange={(v) => setFilterType(v as "all" | "teacher" | "student")}
+                >
+                  <SelectTrigger className="w-44">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os usuários</SelectItem>
+                    <SelectItem value="teacher">Somente Professores</SelectItem>
+                    <SelectItem value="student">Somente Alunos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <p className="text-muted-foreground text-sm py-4 text-center">Carregando...</p>
+              ) : !filteredLogs.length ? (
+                <p className="text-muted-foreground text-sm py-4 text-center">
+                  Nenhum acesso encontrado para o filtro selecionado.
                 </p>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 px-3 text-muted-foreground font-medium">
-                          Usuário
-                        </th>
-                        <th className="text-left py-2 px-3 text-muted-foreground font-medium">
-                          Tipo
-                        </th>
-                        <th className="text-left py-2 px-3 text-muted-foreground font-medium">
-                          IP
-                        </th>
-                        <th className="text-left py-2 px-3 text-muted-foreground font-medium">
-                          Data/Hora
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.recentLogs.map((log) => (
-                        <tr
-                          key={log.id}
-                          className="border-b border-border/50 hover:bg-muted/30 transition-colors"
-                        >
-                          <td className="py-2 px-3 font-medium text-foreground">
-                            {log.userName || "—"}
-                          </td>
-                          <td className="py-2 px-3">
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>IP</TableHead>
+                        <TableHead>Data / Hora</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredLogs.map((log) => (
+                        <TableRow key={log.id}>
+                          <TableCell>
+                            <Badge
+                              variant={log.userType === "teacher" ? "default" : "secondary"}
+                              className={
                                 log.userType === "teacher"
-                                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                  : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-                              }`}
+                                  ? "bg-blue-100 text-blue-700 border-blue-200"
+                                  : "bg-green-100 text-green-700 border-green-200"
+                              }
                             >
-                              {log.userType === "teacher" ? (
-                                <Users className="w-3 h-3" />
-                              ) : (
-                                <GraduationCap className="w-3 h-3" />
-                              )}
                               {log.userType === "teacher" ? "Professor" : "Aluno"}
-                            </span>
-                          </td>
-                          <td className="py-2 px-3 text-muted-foreground font-mono text-xs">
-                            {log.ipAddress || "—"}
-                          </td>
-                          <td className="py-2 px-3 text-muted-foreground">
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {log.userName ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm font-mono">
+                            {log.ipAddress ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
                             {formatDateTime(log.accessedAt)}
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
               )}
-            </div>
-          </>
-        )}
-      </div>
-    </DashboardLayout>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    </>
   );
 }

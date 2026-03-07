@@ -158,12 +158,6 @@ const teacherNavCategories: NavCategory[] = [
         icon: <FileText className="h-5 w-5" />,
         href: "/learning-path-report",
       },
-      {
-        label: "Log de Acessos",
-        icon: <Activity className="h-5 w-5" />,
-        href: "/access-logs",
-        adminOnly: true,
-      },
     ],
   },
   {
@@ -228,6 +222,12 @@ const teacherNavCategories: NavCategory[] = [
         label: "Monitoramento VPS",
         icon: <Server className="h-5 w-5" />,
         href: "/admin/vps-monitoring",
+        adminOnly: true,
+      },
+      {
+        label: "Log de Acessos",
+        icon: <Activity className="h-5 w-5" />,
+        href: "/access-logs",
         adminOnly: true,
       },
     ],
