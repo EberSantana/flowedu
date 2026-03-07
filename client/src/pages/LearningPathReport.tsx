@@ -437,18 +437,32 @@ function StudentEvolutionModal({
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export default function LearningPathReport() {
-  const [selectedSubjectId, setSelectedSubjectId] = useState<number | undefined>();
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+  // Seletor único: valor = "subjectId:classId"
+  const [selectedCombo, setSelectedCombo] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
-  // Disciplinas que têm trilha de aprendizagem
-  const { data: subjects } = trpc.learningPathReport.getSubjectsForReport.useQuery();
-  // Turmas vinculadas à disciplina selecionada (filtro hierárquico)
-  const { data: classes } = trpc.learningPathReport.getClassesBySubject.useQuery(
-    { subjectId: selectedSubjectId! },
-    { enabled: !!selectedSubjectId }
+  // Combinações únicas disciplina+turma
+  const { data: combinations } = trpc.learningPathReport.getSubjectClassCombinations.useQuery();
+
+  // Extrair subjectId e classId do combo selecionado
+  const selectedSubjectId = selectedCombo
+    ? Number(selectedCombo.split(":")[0])
+    : undefined;
+  const selectedClassId = selectedCombo
+    ? Number(selectedCombo.split(":")[1])
+    : null;
+
+  const selectedCombination = combinations?.find(
+    (c) => `${c.subjectId}:${c.classId}` === selectedCombo
   );
+
+  // Manter compatibilidade com o código de exportação PDF
+  const subjects = combinations
+    ? Array.from(new Map(combinations.map((c) => [c.subjectId, { id: c.subjectId, name: c.subjectName, code: c.subjectCode, color: c.subjectColor }])).values())
+    : [];
+  const classes = combinations?.filter((c) => c.subjectId === selectedSubjectId)
+    .map((c) => ({ id: c.classId, name: c.className, code: c.classCode })) ?? [];
 
   const {
     data: report,
@@ -456,7 +470,7 @@ export default function LearningPathReport() {
     error,
   } = trpc.learningPathReport.getClassReport.useQuery(
     { subjectId: selectedSubjectId!, classId: selectedClassId },
-    { enabled: !!selectedSubjectId }
+    { enabled: !!selectedSubjectId && !!selectedClassId }
   );
 
   // Exportar PDF
@@ -561,7 +575,7 @@ export default function LearningPathReport() {
             </div>
           </div>
 
-          {/* Filtros */}
+          {/* Filtro único: Disciplina — Turma */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
@@ -573,54 +587,44 @@ export default function LearningPathReport() {
               <div className="flex flex-col sm:flex-row gap-4 items-end">
                 <div className="flex-1">
                   <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
-                    Disciplina
+                    Disciplina — Turma
                   </label>
                   <Select
-                    value={selectedSubjectId?.toString() ?? ""}
+                    value={selectedCombo}
                     onValueChange={(v) => {
-                      setSelectedSubjectId(Number(v));
-                      setSelectedClassId(null);
+                      setSelectedCombo(v);
+                      setSelectedStudent(null);
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma disciplina..." />
+                      <SelectValue placeholder="Selecione a disciplina e turma..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {subjects?.map((s) => (
-                        <SelectItem key={s.id} value={s.id.toString()}>
-                          {s.name}
+                      {combinations && combinations.length === 0 && (
+                        <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                          Nenhuma disciplina com trilha e alunos matriculados encontrada.
+                        </div>
+                      )}
+                      {combinations?.map((c) => (
+                        <SelectItem
+                          key={`${c.subjectId}:${c.classId}`}
+                          value={`${c.subjectId}:${c.classId}`}
+                        >
+                          <span className="font-medium">{c.subjectName}</span>
+                          <span className="text-muted-foreground ml-1">— {c.className}{c.classCode ? ` (${c.classCode})` : ""}</span>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="flex-1">
-                  <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
-                    Turma
-                    {selectedSubjectId && classes && classes.length === 0 && (
-                      <span className="ml-2 text-xs text-yellow-600">(nenhuma turma vinculada)</span>
-                    )}
-                  </label>
-                  <Select
-                    value={selectedClassId?.toString() ?? "all"}
-                    onValueChange={(v) =>
-                      setSelectedClassId(v === "all" ? null : Number(v))
-                    }
-                    disabled={!selectedSubjectId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={!selectedSubjectId ? "Selecione uma disciplina primeiro" : "Todas as turmas"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas as turmas</SelectItem>
-                      {classes?.map((c) => (
-                        <SelectItem key={c.id} value={c.id.toString()}>
-                          {c.name} {c.code ? `(${c.code})` : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {selectedCombination && (
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      Disciplina: <span className="font-medium text-foreground">{selectedCombination.subjectName}</span>
+                      {selectedCombination.subjectCode && ` · ${selectedCombination.subjectCode}`}
+                      {" · "}
+                      Turma: <span className="font-medium text-foreground">{selectedCombination.className}</span>
+                      {selectedCombination.classCode && ` (${selectedCombination.classCode})`}
+                    </p>
+                  )}
                 </div>
 
                 <Button
@@ -636,20 +640,13 @@ export default function LearningPathReport() {
           </Card>
 
           {/* Estado inicial */}
-          {!selectedSubjectId && (
+          {!selectedCombo && (
             <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
               <FileText className="h-12 w-12 mb-4 opacity-40" />
-              <p className="text-lg font-medium">Selecione uma disciplina</p>
+              <p className="text-lg font-medium">Selecione a Disciplina e Turma</p>
               <p className="text-sm mt-1 max-w-sm">
-                Escolha a disciplina para ver as turmas vinculadas e o boletim da trilha de aprendizagem.
+                Use o seletor acima para escolher a combinação de disciplina e turma e visualizar o boletim da trilha.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground/70">
-                <span className="px-2 py-1 rounded bg-muted">1. Disciplina</span>
-                <span>→</span>
-                <span className="px-2 py-1 rounded bg-muted">2. Turma</span>
-                <span>→</span>
-                <span className="px-2 py-1 rounded bg-muted">3. Boletim</span>
-              </div>
             </div>
           )}
 

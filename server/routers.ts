@@ -3339,6 +3339,35 @@ JSON (descrições MAX 15 chars):
   // Boletim de Atividades da Trilha por Turma
   learningPathReport: router({
     // Listar disciplinas que têm trilha de aprendizagem (módulos)
+    // Retorna combinações únicas de disciplina+turma para o seletor único no boletim
+    getSubjectClassCombinations: protectedProcedure
+      .query(async ({ ctx }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Buscar combinações únicas de disciplina + turma que têm trilhas
+        const rows = await database
+          .select({
+            subjectId: subjects.id,
+            subjectName: subjects.name,
+            subjectCode: subjects.code,
+            subjectColor: subjects.color,
+            classId: classes.id,
+            className: classes.name,
+            classCode: classes.code,
+          })
+          .from(subjects)
+          .innerJoin(learningModules, eq(learningModules.subjectId, subjects.id))
+          .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, subjects.id))
+          .innerJoin(studentClassEnrollments, eq(studentClassEnrollments.studentId, subjectEnrollments.studentId))
+          .innerJoin(classes, and(
+            eq(classes.id, studentClassEnrollments.classId),
+            eq(classes.userId, ctx.user.id)
+          ))
+          .where(eq(subjects.userId, ctx.user.id))
+          .groupBy(subjects.id, subjects.name, subjects.code, subjects.color, classes.id, classes.name, classes.code)
+          .orderBy(subjects.name, classes.name);
+        return rows;
+      }),
     getSubjectsForReport: protectedProcedure
       .query(async ({ ctx }) => {
         const database = await getDb();
