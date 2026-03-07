@@ -7455,3 +7455,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Ajustar getLearningPathClassReport para buscar alunos apenas via subjectEnrollments
 - [ ] Testar localmente
 - [ ] Deploy na VPS
+
+## Fix: Botão Trilhas de Aprendizagem + Limite Upload
+- [ ] Corrigir botão "Trilhas de Aprendizagem" na disciplina para navegar direto para trilha da disciplina (com subjectId)
+- [ ] Aumentar limite de upload de 75MB para 100MB
+- [ ] Deploy na VPS

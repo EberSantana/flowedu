@@ -3340,78 +3340,42 @@ JSON (descrições MAX 15 chars):
   learningPathReport: router({
     // Listar disciplinas que têm trilha de aprendizagem (módulos)
     // Retorna combinações únicas de disciplina+turma para o seletor único no boletim
-    // Abordagem: disciplinas com trilha CROSS JOIN turmas do professor
-    // + opção "Todas as turmas" (classId=0) para cada disciplina
+    // Abordagem: vincular disciplina à turma pelo código (subjects.code = classes.code)
+    // Cada disciplina já tem um código que corresponde à turma associada
     getSubjectClassCombinations: protectedProcedure
       .query(async ({ ctx }) => {
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         
-        // 1. Buscar disciplinas do professor que têm pelo menos 1 módulo de trilha
-        const subjectsWithPath = await database.execute(sql`
+        // Buscar disciplinas com trilha + turma correspondente pelo código
+        const result = await database.execute(sql`
           SELECT DISTINCT
             s.id AS subjectId,
             s.name AS subjectName,
             s.code AS subjectCode,
-            s.color AS subjectColor
+            s.color AS subjectColor,
+            c.id AS classId,
+            c.name AS className,
+            c.code AS classCode
           FROM subjects s
           INNER JOIN learning_modules lm ON lm.subjectId = s.id
+          LEFT JOIN classes c ON c.code = s.code AND c.userId = s.userId
           WHERE s.userId = ${ctx.user.id}
-          ORDER BY s.name
+          ORDER BY s.name, c.name
         `);
-        const subjectsData = Array.isArray(subjectsWithPath) && Array.isArray(subjectsWithPath[0]) 
-          ? subjectsWithPath[0] as any[] 
-          : subjectsWithPath as any[];
+        const rows = Array.isArray(result) && Array.isArray(result[0]) 
+          ? result[0] as any[] 
+          : result as any[];
         
-        // 2. Buscar turmas do professor
-        const classesResult = await database.execute(sql`
-          SELECT id AS classId, name AS className, code AS classCode
-          FROM classes
-          WHERE userId = ${ctx.user.id}
-          ORDER BY name
-        `);
-        const classesData = Array.isArray(classesResult) && Array.isArray(classesResult[0]) 
-          ? classesResult[0] as any[] 
-          : classesResult as any[];
-        
-        // 3. Montar combinações: cada disciplina com trilha × cada turma
-        // + opção "Todos os alunos" (classId=0) para cada disciplina
-        const combinations: {
-          subjectId: number;
-          subjectName: string;
-          subjectCode: string | null;
-          subjectColor: string | null;
-          classId: number;
-          className: string;
-          classCode: string | null;
-        }[] = [];
-        
-        for (const s of subjectsData) {
-          // Opção "Todos os alunos" primeiro
-          combinations.push({
-            subjectId: s.subjectId as number,
-            subjectName: s.subjectName as string,
-            subjectCode: s.subjectCode as string | null,
-            subjectColor: s.subjectColor as string | null,
-            classId: 0,
-            className: "Todos os alunos",
-            classCode: null,
-          });
-          // Depois cada turma
-          for (const c of classesData) {
-            combinations.push({
-              subjectId: s.subjectId as number,
-              subjectName: s.subjectName as string,
-              subjectCode: s.subjectCode as string | null,
-              subjectColor: s.subjectColor as string | null,
-              classId: c.classId as number,
-              className: c.className as string,
-              classCode: c.classCode as string | null,
-            });
-          }
-        }
-        
-        return combinations;
+        return rows.map((r: any) => ({
+          subjectId: r.subjectId as number,
+          subjectName: r.subjectName as string,
+          subjectCode: r.subjectCode as string | null,
+          subjectColor: r.subjectColor as string | null,
+          classId: (r.classId ?? 0) as number,
+          className: (r.className ?? 'Sem turma vinculada') as string,
+          classCode: (r.classCode ?? null) as string | null,
+        }));
       }),
     getSubjectsForReport: protectedProcedure
       .query(async ({ ctx }) => {

@@ -491,8 +491,8 @@ export default function LearningPathReport() {
       doc.setFont("helvetica", "normal");
       doc.text(`Disciplina: ${report.subject.name}`, 14, 24);
 
-      const classLabel = selectedClassId && selectedClassId > 0
-        ? classes?.find((c) => c.id === selectedClassId)?.name ?? "Turma selecionada"
+      const classLabel = selectedCombination?.classId && selectedCombination.classId > 0
+        ? selectedCombination.className
         : "Todos os alunos";
       doc.text(`Turma: ${classLabel}`, 14, 30);
       doc.text(
@@ -611,13 +611,11 @@ export default function LearningPathReport() {
                           value={`${c.subjectId}:${c.classId}`}
                         >
                           <span className="font-medium">{c.subjectName}</span>
-                          <span className="text-muted-foreground ml-1">
-                            — {c.classId === 0 ? (
-                              <span className="italic">{c.className}</span>
-                            ) : (
-                              <>{c.className}{c.classCode ? ` (${c.classCode})` : ""}</>
-                            )}
-                          </span>
+                          {c.classId > 0 && (
+                            <span className="text-muted-foreground ml-1">
+                              — {c.className}
+                            </span>
+                          )}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -625,13 +623,12 @@ export default function LearningPathReport() {
                   {selectedCombination && (
                     <p className="text-xs text-muted-foreground mt-1.5">
                       Disciplina: <span className="font-medium text-foreground">{selectedCombination.subjectName}</span>
-                      {selectedCombination.subjectCode && ` · ${selectedCombination.subjectCode}`}
-                      {" · "}
-                      {selectedCombination.classId === 0 ? (
-                        <span className="font-medium text-foreground italic">Todos os alunos</span>
-                      ) : (
-                        <>Turma: <span className="font-medium text-foreground">{selectedCombination.className}</span>
-                        {selectedCombination.classCode && ` (${selectedCombination.classCode})`}</>
+                      {selectedCombination.subjectCode && ` (${selectedCombination.subjectCode})`}
+                      {selectedCombination.classId > 0 && (
+                        <>
+                          {" · "}
+                          Turma: <span className="font-medium text-foreground">{selectedCombination.className}</span>
+                        </>
                       )}
                     </p>
                   )}

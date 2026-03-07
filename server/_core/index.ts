@@ -134,8 +134,8 @@ async function startServer() {
   }
   
   // Configure body parser with larger size limit for file uploads
-  // 100MB to accommodate base64 encoding overhead (~33% increase)
-  const uploadLimit = "100mb";
+  // 150MB to accommodate base64 encoding overhead (~33% increase over 100MB file limit)
+  const uploadLimit = "150mb";
   app.use(express.json({ limit: uploadLimit }));
   app.use(express.urlencoded({ limit: uploadLimit, extended: true }));
   
@@ -199,8 +199,8 @@ async function startServer() {
       console.error('[Upload] PayloadTooLargeError:', err.message);
       return res.status(413).json({
         error: 'Arquivo muito grande',
-        message: 'O arquivo excede o limite máximo de 75MB. Por favor, reduza o tamanho do arquivo ou use um serviço de hospedagem externo.',
-        maxSize: '75MB'
+        message: 'O arquivo excede o limite máximo de 100MB. Por favor, reduza o tamanho do arquivo ou use um serviço de hospedagem externo.',
+        maxSize: '100MB'
       });
     }
     next(err);

@@ -2,31 +2,31 @@ import { describe, it, expect } from 'vitest';
 
 describe('Upload Material - Validações', () => {
   // Constantes de configuração
-  const MAX_FILE_SIZE = 75 * 1024 * 1024; // 75MB
-  const EXPRESS_LIMIT = 100 * 1024 * 1024; // 100MB (para acomodar base64)
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+  const EXPRESS_LIMIT = 150 * 1024 * 1024; // 150MB (para acomodar base64)
   
   describe('Limites de Tamanho', () => {
-    it('deve ter limite de arquivo de 75MB', () => {
-      expect(MAX_FILE_SIZE).toBe(75 * 1024 * 1024);
+    it('deve ter limite de arquivo de 100MB', () => {
+      expect(MAX_FILE_SIZE).toBe(100 * 1024 * 1024);
     });
     
-    it('deve ter limite do Express de 100MB para acomodar base64', () => {
-      // Base64 aumenta o tamanho em ~33%, então 75MB * 1.33 ≈ 100MB
+    it('deve ter limite do Express de 150MB para acomodar base64', () => {
+      // Base64 aumenta o tamanho em ~33%, então 100MB * 1.33 ≈ 133MB
       expect(EXPRESS_LIMIT).toBeGreaterThan(MAX_FILE_SIZE * 1.33);
     });
     
-    it('deve rejeitar arquivos maiores que 75MB', () => {
-      const fileSize = 80 * 1024 * 1024; // 80MB
+    it('deve rejeitar arquivos maiores que 100MB', () => {
+      const fileSize = 110 * 1024 * 1024; // 110MB
       expect(fileSize > MAX_FILE_SIZE).toBe(true);
     });
     
-    it('deve aceitar arquivos de até 75MB', () => {
-      const fileSize = 70 * 1024 * 1024; // 70MB
+    it('deve aceitar arquivos de até 100MB', () => {
+      const fileSize = 90 * 1024 * 1024; // 90MB
       expect(fileSize <= MAX_FILE_SIZE).toBe(true);
     });
     
-    it('deve aceitar arquivos de exatamente 75MB', () => {
-      const fileSize = 75 * 1024 * 1024; // 75MB exato
+    it('deve aceitar arquivos de exatamente 100MB', () => {
+      const fileSize = 100 * 1024 * 1024; // 100MB exato
       expect(fileSize <= MAX_FILE_SIZE).toBe(true);
     });
   });
@@ -36,13 +36,13 @@ describe('Upload Material - Validações', () => {
       const originalSize = 50 * 1024 * 1024; // 50MB
       const base64Size = Math.ceil(originalSize * 4 / 3); // Base64 aumenta ~33%
       
-      // Base64 de 50MB deve caber no limite de 100MB do Express
+      // Base64 de 50MB deve caber no limite de 150MB do Express
       expect(base64Size).toBeLessThan(EXPRESS_LIMIT);
     });
     
-    it('deve calcular que 75MB em base64 cabe no limite de 100MB', () => {
-      const originalSize = 75 * 1024 * 1024; // 75MB
-      const base64Size = Math.ceil(originalSize * 4 / 3); // ~100MB
+    it('deve calcular que 100MB em base64 cabe no limite de 150MB', () => {
+      const originalSize = 100 * 1024 * 1024; // 100MB
+      const base64Size = Math.ceil(originalSize * 4 / 3); // ~133MB
       
       expect(base64Size).toBeLessThanOrEqual(EXPRESS_LIMIT);
     });
@@ -144,8 +144,8 @@ describe('Upload Material - Validações', () => {
       expect(formatFileSize(39.9 * 1024 * 1024)).toBe('39.9 MB');
     });
     
-    it('deve formatar 75MB corretamente', () => {
-      expect(formatFileSize(75 * 1024 * 1024)).toBe('75.0 MB');
+    it('deve formatar 100MB corretamente', () => {
+      expect(formatFileSize(100 * 1024 * 1024)).toBe('100.0 MB');
     });
   });
 });

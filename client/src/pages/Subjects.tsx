@@ -548,7 +548,7 @@ export default function Subjects() {
                     <Button
                       variant="default"
                       size="sm"
-                      onClick={() => setLocation('/learning-paths')}
+                      onClick={() => setLocation(`/learning-paths?subject=${subject.id}`)}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                     >
                       <Route className="mr-2 h-3 w-3" />

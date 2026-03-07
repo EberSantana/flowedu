@@ -48,8 +48,11 @@ export default function LearningPaths() {
   const [, setLocation] = useLocation();
   const { data: subjects, isLoading: isLoadingSubjects } =
     trpc.subjects.list.useQuery();
+  // Ler query param ?subject=ID para selecionar disciplina automaticamente
+  const urlParams = new URLSearchParams(window.location.search);
+  const subjectFromUrl = urlParams.get('subject');
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(
-    null
+    subjectFromUrl ? parseInt(subjectFromUrl) : null
   );
   const [expandedModules, setExpandedModules] = useState<Set<number>>(
     new Set()

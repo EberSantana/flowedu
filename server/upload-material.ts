@@ -5,8 +5,8 @@ import multer from 'multer';
 
 const router = Router();
 
-// Limite máximo de arquivo em bytes (75MB)
-const MAX_FILE_SIZE = 75 * 1024 * 1024;
+// Limite máximo de arquivo em bytes (100MB)
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
 // Diretório de uploads local (fallback quando S3 não está disponível)
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads', 'materials');

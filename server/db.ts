@@ -12241,36 +12241,18 @@ export async function getLearningPathClassReport(subjectId: number, classId: num
       .orderBy(asc(studentExercises.createdAt));
   }
 
-  // 4. Buscar alunos matriculados (filtrado por turma se informado)
-  let enrolledStudents: { studentId: number; studentName: string; studentRegistration: string; classId: number | null }[] = [];
-  if (classId) {
-    const rows = await db.select({
-      studentId: studentClassEnrollments.studentId,
-      studentName: students.fullName,
-      studentRegistration: students.registrationNumber,
-      classId: studentClassEnrollments.classId,
-    }).from(studentClassEnrollments)
-      .innerJoin(students, eq(studentClassEnrollments.studentId, students.id))
-      .innerJoin(subjectEnrollments, and(
-        eq(subjectEnrollments.studentId, studentClassEnrollments.studentId),
-        eq(subjectEnrollments.subjectId, subjectId)
-      ))
-      .where(and(
-        eq(studentClassEnrollments.classId, classId),
-        eq(studentClassEnrollments.userId, userId)
-      ));
-    enrolledStudents = rows;
-  } else {
-    const rows = await db.select({
-      studentId: subjectEnrollments.studentId,
-      studentName: students.fullName,
-      studentRegistration: students.registrationNumber,
-      classId: sql<number | null>`NULL`,
-    }).from(subjectEnrollments)
-      .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
-      .where(eq(subjectEnrollments.subjectId, subjectId));
-    enrolledStudents = rows;
-  }
+  // 4. Buscar alunos matriculados na disciplina via subjectEnrollments
+  // A relação disciplina-turma é pelo código (subjects.code = classes.code)
+  // Cada disciplina já representa uma turma específica
+  const rows = await db.select({
+    studentId: subjectEnrollments.studentId,
+    studentName: students.fullName,
+    studentRegistration: students.registrationNumber,
+    classId: sql<number | null>`NULL`,
+  }).from(subjectEnrollments)
+    .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
+    .where(eq(subjectEnrollments.subjectId, subjectId));
+  const enrolledStudents = rows;
 
   // 5. Buscar todas as tentativas concluídas de uma vez
   const exerciseIds = exercises.map(e => e.id);

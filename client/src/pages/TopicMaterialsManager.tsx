@@ -43,9 +43,9 @@ import { toast } from "sonner";
 
 type MaterialType = 'pdf' | 'video' | 'link' | 'document' | 'presentation' | 'other';
 
-// Limite máximo de arquivo em bytes (75MB - deixando margem para base64)
-const MAX_FILE_SIZE = 75 * 1024 * 1024;
-const MAX_FILE_SIZE_MB = 75;
+// Limite máximo de arquivo em bytes (100MB)
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 100;
 
 export default function TopicMaterialsManager() {
   const [, topicParams] = useRoute("/learning-paths/:subjectId/topic/:topicId/materials");
