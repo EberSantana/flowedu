@@ -42,6 +42,11 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      // Força uso de uma única cópia do React em toda a aplicação
+      "react": path.resolve(import.meta.dirname, "node_modules", "react"),
+      "react-dom": path.resolve(import.meta.dirname, "node_modules", "react-dom"),
+      "react/jsx-runtime": path.resolve(import.meta.dirname, "node_modules", "react", "jsx-runtime"),
+      "react/jsx-dev-runtime": path.resolve(import.meta.dirname, "node_modules", "react", "jsx-dev-runtime"),
     },
     // Garante que apenas uma cópia do React seja usada em toda a aplicação
     dedupe: [
@@ -85,7 +90,7 @@ export default defineConfig({
     ],
     exclude: [],
     // Força a reconstrução do cache quando as dependências mudam
-    force: false,
+    force: true,
     // Configurações de esbuild para o pré-bundling
     esbuildOptions: {
       // Garante compatibilidade com JSX
