@@ -480,7 +480,8 @@ export type InsertStudentLearningJournal = typeof studentLearningJournal.$inferI
 export const studentTopicDoubts = mysqlTable("student_topic_doubts", {
   id: int("id").autoincrement().primaryKey(),
   studentId: int("studentId").notNull(),
-  topicId: int("topicId").notNull(),
+  topicId: int("topicId"),
+  subjectId: int("subjectId"),
   professorId: int("professorId").notNull(),
   question: text("question").notNull(),
   context: text("context"), // Contexto adicional da dúvida

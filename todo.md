@@ -7466,3 +7466,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Limitar Dúvidas (IA) para responder APENAS sobre conteúdos das disciplinas do aluno
 - [ ] Limitar Revisão Inteligente às disciplinas matriculadas
 - [ ] Limitar Diário de Aprendizagem às disciplinas matriculadas
+
+## Fix: Menu lateral aluno + Carga horária
+- [ ] Remover "Caderno de Questões" do menu lateral do aluno
+- [ ] Remover "Revisão Inteligente" do menu lateral do aluno
+- [ ] Corrigir carga horária que mostra 60h em vez de 40h (deve seguir a trilha do professor)
+
+## Fix: Página de Dúvidas não funciona + Carga Horária automática
+- [ ] Corrigir botão "Nova Dúvida" na página do aluno (não funciona ao clicar)
+- [ ] Garantir que sistema de dúvidas funcione: aluno envia pergunta escrita → professor responde
+- [ ] Calcular carga horária automaticamente pelos módulos da trilha de aprendizagem
+- [ ] Remover Caderno de Questões e Revisão Inteligente do menu lateral (já feito)

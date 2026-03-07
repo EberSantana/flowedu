@@ -16,8 +16,7 @@ import {
   Menu,
   X,
   MessageCircle,
-  Brain,
-  BookMarked,
+
   BarChart3,
   PenLine
 } from "lucide-react";
@@ -98,14 +97,12 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       items: [
         { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths" },
         { icon: FileText, label: "Exercícios", path: "/student-exercises" },
-        { icon: BookMarked, label: "Caderno de Questões", path: "/student/notebook" },
       ],
     },
     {
       label: "Ferramentas",
       items: [
         { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts" },
-        { icon: Brain, label: "Revisão Inteligente", path: "/student/smart-review" },
         { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
       ],
     },

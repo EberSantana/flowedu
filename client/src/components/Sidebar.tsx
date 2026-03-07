@@ -33,7 +33,8 @@ import {
   BellRing,
   Server,
   FileText,
-  Activity
+  Activity,
+  MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -191,6 +192,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Avisos",
         icon: <Megaphone className="h-5 w-5" />,
         href: "/announcements",
+      },
+      {
+        label: "Dúvidas dos Alunos",
+        icon: <MessageCircle className="h-5 w-5" />,
+        href: "/teacher-doubts",
       },
     ],
   },

@@ -115,7 +115,7 @@ function AIHintsSection({ doubt }: { doubt: any }) {
 
 export default function StudentDoubts() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [selectedProfessorId, setSelectedProfessorId] = useState<number | null>(null);
   const [question, setQuestion] = useState("");
   const [context, setContext] = useState("");
@@ -134,7 +134,7 @@ export default function StudentDoubts() {
       setIsDialogOpen(false);
       setQuestion("");
       setContext("");
-      setSelectedTopicId(null);
+      setSelectedSubjectId(null);
       setSelectedProfessorId(null);
       setIsPrivate(true);
       refetch();
@@ -156,8 +156,8 @@ export default function StudentDoubts() {
   });
 
   const handleSubmit = () => {
-    if (!selectedTopicId) {
-      toast.error("Selecione um tópico");
+    if (!selectedSubjectId) {
+      toast.error("Selecione uma disciplina");
       return;
     }
     if (!selectedProfessorId) {
@@ -170,7 +170,7 @@ export default function StudentDoubts() {
     }
 
     submitDoubtMutation.mutate({
-      topicId: selectedTopicId,
+      subjectId: selectedSubjectId,
       professorId: selectedProfessorId,
       question: question.trim(),
       context: context.trim() || undefined,
@@ -229,10 +229,10 @@ export default function StudentDoubts() {
                     <div>
                       <Label>Disciplina</Label>
                       <Select
-                        value={selectedTopicId?.toString() || ""}
+                        value={selectedSubjectId?.toString() || ""}
                         onValueChange={(value) => {
-                          const enrollment = subjects?.find((s) => s.id === parseInt(value));
-                          setSelectedTopicId(parseInt(value));
+                          const enrollment = subjects?.find((s) => s.subject?.id === parseInt(value));
+                          setSelectedSubjectId(parseInt(value));
                           setSelectedProfessorId(enrollment?.professor?.id || null);
                         }}
                       >
@@ -241,9 +241,11 @@ export default function StudentDoubts() {
                         </SelectTrigger>
                         <SelectContent>
                           {subjects?.map((enrollment) => (
-                            <SelectItem key={enrollment.id} value={enrollment.id.toString()}>
-                              {enrollment.subject?.name} - {enrollment.professor?.name}
-                            </SelectItem>
+                            enrollment.subject ? (
+                              <SelectItem key={enrollment.subject.id} value={enrollment.subject.id.toString()}>
+                                {enrollment.subject.name} - {enrollment.professor?.name}
+                              </SelectItem>
+                            ) : null
                           ))}
                         </SelectContent>
                       </Select>

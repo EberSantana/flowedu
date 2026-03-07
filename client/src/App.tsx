@@ -53,6 +53,7 @@ const BackupAdmin = lazy(() => import("./pages/BackupAdmin"));
 const VPSMonitoring = lazy(() => import("./pages/VPSMonitoring"));
 const LearningPathReport = lazy(() => import("./pages/LearningPathReport"));
 const AccessLogsPage = lazy(() => import("./pages/AccessLogsPage"));
+const TeacherDoubts = lazy(() => import("./pages/TeacherDoubts"));
 
 // Lazy loaded pages - Student Portal
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
@@ -155,6 +156,7 @@ function Router() {
           <Route path={"/:subjectId/enrollments"} component={SubjectEnrollments} />
           <Route path={"/questions"} component={Questions} />
           <Route path={"/questions/:id"} component={QuestionDetail} />
+          <Route path={"/teacher-doubts"} component={TeacherDoubts} />
 
           {/* Student Portal - lazy loaded */}
           <Route path={"/student-dashboard"} component={StudentDashboard} />

@@ -7631,7 +7631,7 @@ export async function submitDoubt(data: InsertStudentTopicDoubt) {
   await createNotification({
     userId: data.professorId,
     title: 'Nova dúvida recebida',
-    message: `Um aluno enviou uma dúvida sobre um tópico`,
+    message: `Um aluno enviou uma dúvida`,
     type: 'new_announcement',
     relatedId: result.insertId
   });
@@ -7642,24 +7642,33 @@ export async function submitDoubt(data: InsertStudentTopicDoubt) {
 /**
  * Buscar dúvidas do aluno
  */
-export async function getStudentDoubts(studentId: number, topicId?: number) {
+export async function getStudentDoubts(studentId: number, subjectId?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  let doubts;
-  
-  if (topicId) {
-    doubts = await db.select().from(studentTopicDoubts)
-      .where(and(
-        eq(studentTopicDoubts.studentId, studentId),
-        eq(studentTopicDoubts.topicId, topicId)
-      ))
-      .orderBy(desc(studentTopicDoubts.createdAt));
-  } else {
-    doubts = await db.select().from(studentTopicDoubts)
-      .where(eq(studentTopicDoubts.studentId, studentId))
-      .orderBy(desc(studentTopicDoubts.createdAt));
+  const conditions = [eq(studentTopicDoubts.studentId, studentId)];
+  if (subjectId) {
+    conditions.push(eq(studentTopicDoubts.subjectId, subjectId));
   }
+  
+  const doubts = await db.select({
+    id: studentTopicDoubts.id,
+    studentId: studentTopicDoubts.studentId,
+    subjectId: studentTopicDoubts.subjectId,
+    professorId: studentTopicDoubts.professorId,
+    question: studentTopicDoubts.question,
+    context: studentTopicDoubts.context,
+    status: studentTopicDoubts.status,
+    answer: studentTopicDoubts.answer,
+    answeredAt: studentTopicDoubts.answeredAt,
+    isPrivate: studentTopicDoubts.isPrivate,
+    createdAt: studentTopicDoubts.createdAt,
+    subjectName: subjects.name,
+  })
+  .from(studentTopicDoubts)
+  .leftJoin(subjects, eq(studentTopicDoubts.subjectId, subjects.id))
+  .where(and(...conditions))
+  .orderBy(desc(studentTopicDoubts.createdAt));
   
   return doubts;
 }
@@ -7696,26 +7705,34 @@ export async function getPendingDoubts(professorId: number, subjectId?: number) 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  let doubts = await db.select({
-    doubt: studentTopicDoubts,
-    topic: learningTopics,
-    module: learningModules,
-    student: students
-  })
-  .from(studentTopicDoubts)
-  .innerJoin(learningTopics, eq(studentTopicDoubts.topicId, learningTopics.id))
-  .innerJoin(learningModules, eq(learningTopics.moduleId, learningModules.id))
-  .innerJoin(students, eq(studentTopicDoubts.studentId, students.id))
-  .where(and(
+  const conditions = [
     eq(studentTopicDoubts.professorId, professorId),
     eq(studentTopicDoubts.status, 'pending')
-  ))
-  .orderBy(desc(studentTopicDoubts.createdAt));
-  
-  // Filtrar por disciplina se especificado
+  ];
   if (subjectId) {
-    doubts = doubts.filter(d => d.module.subjectId === subjectId);
+    conditions.push(eq(studentTopicDoubts.subjectId, subjectId));
   }
+  
+  const doubts = await db.select({
+    id: studentTopicDoubts.id,
+    studentId: studentTopicDoubts.studentId,
+    subjectId: studentTopicDoubts.subjectId,
+    professorId: studentTopicDoubts.professorId,
+    question: studentTopicDoubts.question,
+    context: studentTopicDoubts.context,
+    status: studentTopicDoubts.status,
+    answer: studentTopicDoubts.answer,
+    answeredAt: studentTopicDoubts.answeredAt,
+    isPrivate: studentTopicDoubts.isPrivate,
+    createdAt: studentTopicDoubts.createdAt,
+    studentName: students.fullName,
+    subjectName: subjects.name,
+  })
+  .from(studentTopicDoubts)
+  .innerJoin(students, eq(studentTopicDoubts.studentId, students.id))
+  .leftJoin(subjects, eq(studentTopicDoubts.subjectId, subjects.id))
+  .where(and(...conditions))
+  .orderBy(desc(studentTopicDoubts.createdAt));
   
   return doubts;
 }
@@ -7893,7 +7910,7 @@ export async function getSubjectStatistics(studentId: number, subjectId: number)
       subjectId,
       subjectName: subject.name,
       subjectCode: subject.code,
-      workload: subject.workload || 0,
+      workload: 0,
       totalModules: 0,
       totalTopics: 0,
       completedTopics: 0,
@@ -7923,6 +7940,8 @@ export async function getSubjectStatistics(studentId: number, subjectId: number)
   const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
   const notStartedTopics = topics.length - completedTopics - inProgressTopics;
   const totalHoursEstimated = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+  // Carga horária calculada: soma das horas dos tópicos da trilha, ou fallback para o valor cadastrado
+  const calculatedWorkload = totalHoursEstimated > 0 ? totalHoursEstimated : (subject.workload || 0);
   const progressPercentage = topics.length > 0 
     ? Math.round((completedTopics / topics.length) * 100) 
     : 0;
@@ -7931,7 +7950,7 @@ export async function getSubjectStatistics(studentId: number, subjectId: number)
     subjectId,
     subjectName: subject.name,
     subjectCode: subject.code,
-    workload: subject.workload || 0,
+    workload: calculatedWorkload,
     totalModules: modules.length,
     totalTopics: topics.length,
     completedTopics,

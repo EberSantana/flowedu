@@ -7980,7 +7980,7 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
     // Enviar dúvida
     submitDoubt: studentProcedure
       .input(z.object({
-        topicId: z.number(),
+        subjectId: z.number(),
         professorId: z.number(),
         question: z.string().min(1, "Pergunta é obrigatória"),
         context: z.string().optional(),
@@ -7989,7 +7989,7 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
       .mutation(async ({ ctx, input }) => {
         return db.submitDoubt({
           studentId: ctx.studentSession.studentId,
-          topicId: input.topicId,
+          subjectId: input.subjectId,
           professorId: input.professorId,
           question: input.question,
           context: input.context,
@@ -8000,10 +8000,10 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
     // Buscar minhas dúvidas
     getMyDoubts: studentProcedure
       .input(z.object({
-        topicId: z.number().optional(),
+        subjectId: z.number().optional(),
       }))
       .query(async ({ ctx, input }) => {
-        return db.getStudentDoubts(ctx.studentSession.studentId, input.topicId);
+        return db.getStudentDoubts(ctx.studentSession.studentId, input.subjectId);
       }),
 
     // Deletar dúvida

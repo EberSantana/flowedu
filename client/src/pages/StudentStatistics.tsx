@@ -132,8 +132,8 @@ export default function StudentStatistics() {
 
   const isLoading = loadingSubjects || loadingStats;
 
-  // Calcular totais de horas das disciplinas ativas
-  const totalWorkload = activeSubjects.reduce((sum, e) => sum + (e.subject?.workload || 0), 0);
+  // Carga horária total calculada automaticamente pela soma dos tópicos da trilha
+  const totalWorkload = stats?.totalHoursEstimated || 0;
 
   return (
     <StudentLayout>
@@ -284,7 +284,7 @@ export default function StudentStatistics() {
                         <div className="text-2xl font-bold text-foreground">
                           {totalWorkload}h
                         </div>
-                        <div className="text-sm text-muted-foreground">Carga Horária Total</div>
+                        <div className="text-sm text-muted-foreground">Carga Horária Total (Trilha)</div>
                       </div>
                     </div>
 
