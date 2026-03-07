@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import path from 'path';
 import fs from 'fs';
+import multer from 'multer';
 
 const router = Router();
 
@@ -16,6 +17,32 @@ function ensureUploadsDir() {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   }
 }
+
+// Configurar multer para armazenar em memória (depois enviamos ao S3 ou disco)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: MAX_FILE_SIZE,
+  },
+  fileFilter: (_req, file, cb) => {
+    // Aceitar todos os tipos de arquivo suportados
+    const allowedMimes = [
+      'application/pdf',
+      'video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv', 'video/webm',
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'application/octet-stream',
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/zip', 'application/x-zip-compressed',
+    ];
+    if (allowedMimes.includes(file.mimetype) || file.mimetype.startsWith('video/') || file.mimetype.startsWith('image/') || file.mimetype.startsWith('application/')) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Tipo de arquivo não suportado: ${file.mimetype}`));
+    }
+  },
+});
 
 // Tentar upload via S3, com fallback para armazenamento local
 async function uploadFile(fileKey: string, buffer: Buffer, contentType: string): Promise<{ url: string; key: string }> {
@@ -54,39 +81,58 @@ async function saveLocally(fileKey: string, buffer: Buffer): Promise<{ url: stri
   return { url, key: sanitizedKey };
 }
 
-router.post('/upload-material', async (req, res) => {
+// Endpoint de upload usando multipart/form-data (mais eficiente para arquivos grandes)
+router.post('/upload-material', (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(413).json({
+            error: 'Arquivo muito grande',
+            message: `O arquivo excede o limite máximo de ${MAX_FILE_SIZE / 1024 / 1024}MB. Para arquivos maiores, use um serviço externo (Google Drive, YouTube, etc.)`,
+            maxSize: `${MAX_FILE_SIZE / 1024 / 1024}MB`,
+          });
+        }
+        return res.status(400).json({ error: 'Erro no upload', message: err.message });
+      }
+      return res.status(400).json({ error: 'Erro no upload', message: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
   const startTime = Date.now();
   
   try {
-    const { fileKey, fileData, contentType } = req.body;
-
-    if (!fileKey || !fileData) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // Extract base64 data (remove data:mime;base64, prefix if present)
-    const base64Data = fileData.includes('base64,') 
-      ? fileData.split('base64,')[1] 
-      : fileData;
-
-    // Convert base64 to Buffer
-    const buffer = Buffer.from(base64Data, 'base64');
+    const file = (req as any).file;
     
-    // Validar tamanho do arquivo
-    if (buffer.length > MAX_FILE_SIZE) {
-      console.log(`[Upload] File too large: ${(buffer.length / 1024 / 1024).toFixed(2)}MB (max: ${MAX_FILE_SIZE / 1024 / 1024}MB)`);
-      return res.status(413).json({ 
-        error: 'Arquivo muito grande',
-        message: `O arquivo excede o limite máximo de ${MAX_FILE_SIZE / 1024 / 1024}MB. Por favor, use um serviço de hospedagem externo para arquivos maiores.`,
-        maxSize: `${MAX_FILE_SIZE / 1024 / 1024}MB`,
-        actualSize: `${(buffer.length / 1024 / 1024).toFixed(2)}MB`
-      });
+    if (!file) {
+      // Fallback: tentar ler do body JSON (compatibilidade com versão antiga)
+      const { fileKey: bodyFileKey, fileData, contentType: bodyContentType } = req.body;
+      
+      if (fileData) {
+        const base64Data = fileData.includes('base64,') ? fileData.split('base64,')[1] : fileData;
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        if (buffer.length > MAX_FILE_SIZE) {
+          return res.status(413).json({
+            error: 'Arquivo muito grande',
+            message: `O arquivo excede o limite máximo de ${MAX_FILE_SIZE / 1024 / 1024}MB.`,
+          });
+        }
+        
+        const result = await uploadFile(bodyFileKey, buffer, bodyContentType);
+        return res.json({ url: result.url, key: result.key });
+      }
+      
+      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
     }
 
-    console.log(`[Upload] Processing file: ${fileKey}, Size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB, Type: ${contentType}`);
+    const fileKey = `materials/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    
+    console.log(`[Upload] Processing file: ${fileKey}, Size: ${(file.size / 1024 / 1024).toFixed(2)}MB, Type: ${file.mimetype}`);
 
     // Upload to S3 or local storage
-    const result = await uploadFile(fileKey, buffer, contentType);
+    const result = await uploadFile(fileKey, file.buffer, file.mimetype);
     
     const duration = Date.now() - startTime;
     console.log(`[Upload] Success: ${fileKey} uploaded in ${duration}ms -> ${result.url}`);

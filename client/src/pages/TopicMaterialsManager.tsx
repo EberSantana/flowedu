@@ -246,115 +246,104 @@ export default function TopicMaterialsManager() {
 
     setIsUploading(true);
     setUploadProgress(0);
-    setUploadStatus("Lendo arquivo...");
+    setUploadStatus("Enviando arquivo...");
     setUploadError(null);
 
     try {
-      // Convert file to base64 for upload
-      const reader = new FileReader();
-      
-      reader.onerror = () => {
-        setUploadError("Erro ao ler o arquivo. Tente novamente.");
+      // Usar FormData multipart (mais eficiente para arquivos grandes, sem overhead de base64)
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', selectedFile);
+
+      setUploadProgress(10);
+      setUploadStatus("Enviando para o servidor...");
+
+      try {
+        // Upload com XMLHttpRequest para ter progresso real
+        const url = await new Promise<string>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const progress = Math.round((event.loaded / event.total) * 80) + 10;
+              setUploadProgress(progress);
+              setUploadStatus(`Enviando... ${Math.round((event.loaded / event.total) * 100)}%`);
+            }
+          };
+          
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                resolve(data.url);
+              } catch {
+                reject(new Error('Resposta inválida do servidor'));
+              }
+            } else {
+              try {
+                const errorData = JSON.parse(xhr.responseText);
+                reject(new Error(errorData.message || errorData.error || `Erro no upload (${xhr.status})`));
+              } catch {
+                reject(new Error(`Erro no upload (${xhr.status})`));
+              }
+            }
+          };
+          
+          xhr.onerror = () => reject(new Error('Erro de conexão. Verifique sua internet e tente novamente.'));
+          xhr.ontimeout = () => reject(new Error('O upload excedeu o tempo limite. Tente com um arquivo menor.'));
+          xhr.timeout = 600000; // 10 minutos
+          
+          xhr.open('POST', '/api/upload-material');
+          xhr.send(formDataUpload);
+        });
+
+        setUploadProgress(90);
+        setUploadStatus("Salvando material...");
+
+        // Create material with uploaded URL
+        if (isModuleMode) {
+          await createModuleMaterialMutation.mutateAsync({
+            moduleId,
+            title: formData.title,
+            description: formData.description,
+            type: formData.type,
+            url,
+            fileSize: selectedFile.size,
+            isRequired: formData.isRequired,
+          });
+        } else {
+          await createMaterialMutation.mutateAsync({
+            topicId,
+            title: formData.title,
+            description: formData.description,
+            type: formData.type,
+            url,
+            fileSize: selectedFile.size,
+            isRequired: formData.isRequired,
+          });
+        }
+
+        setUploadProgress(100);
+        setUploadStatus("Concluído!");
+        setIsUploading(false);
+        
+      } catch (uploadError: any) {
+        console.error('Upload error:', uploadError);
+        
+        let errorMessage = "Erro ao fazer upload do arquivo.";
+        
+        if (uploadError.message?.includes('tempo limite') || uploadError.message?.includes('AbortError')) {
+          errorMessage = "O upload excedeu o tempo limite. Tente com um arquivo menor ou verifique sua conexão.";
+        } else if (uploadError.message?.includes('413') || uploadError.message?.includes('muito grande')) {
+          errorMessage = `O arquivo é muito grande. O limite máximo é ${MAX_FILE_SIZE_MB}MB.`;
+        } else if (uploadError.message) {
+          errorMessage = uploadError.message;
+        }
+        
+        setUploadError(errorMessage);
+        toast.error(errorMessage);
         setIsUploading(false);
         setUploadStatus("");
-      };
-      
-      reader.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 30);
-          setUploadProgress(progress);
-          setUploadStatus(`Lendo arquivo... ${progress}%`);
-        }
-      };
-      
-      reader.onload = async (e) => {
-        setUploadProgress(35);
-        setUploadStatus("Preparando upload...");
-
-        const base64Data = e.target?.result as string;
-        const fileKey = `materials/${Date.now()}-${selectedFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-
-        try {
-          setUploadProgress(40);
-          setUploadStatus("Enviando para o servidor...");
-          
-          // Upload to S3 via API with timeout
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutos de timeout
-          
-          const response = await fetch('/api/upload-material', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileKey,
-              fileData: base64Data,
-              contentType: selectedFile.type,
-            }),
-            signal: controller.signal,
-          });
-          
-          clearTimeout(timeoutId);
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
-            throw new Error(errorData.message || errorData.error || `Erro no upload (${response.status})`);
-          }
-
-          setUploadProgress(90);
-          setUploadStatus("Finalizando...");
-
-          const { url } = await response.json();
-          setUploadProgress(95);
-          setUploadStatus("Salvando material...");
-
-          // Create material with uploaded URL
-          if (isModuleMode) {
-            await createModuleMaterialMutation.mutateAsync({
-              moduleId,
-              title: formData.title,
-              description: formData.description,
-              type: formData.type,
-              url,
-              fileSize: selectedFile.size,
-              isRequired: formData.isRequired,
-            });
-          } else {
-            await createMaterialMutation.mutateAsync({
-              topicId,
-              title: formData.title,
-              description: formData.description,
-              type: formData.type,
-              url,
-              fileSize: selectedFile.size,
-              isRequired: formData.isRequired,
-            });
-          }
-
-          setUploadProgress(100);
-          setUploadStatus("Concluído!");
-          setIsUploading(false);
-          
-        } catch (uploadError: any) {
-          console.error('Upload error:', uploadError);
-          
-          let errorMessage = "Erro ao fazer upload do arquivo.";
-          
-          if (uploadError.name === 'AbortError') {
-            errorMessage = "O upload excedeu o tempo limite. Tente com um arquivo menor ou verifique sua conexão.";
-          } else if (uploadError.message.includes('413') || uploadError.message.includes('too large')) {
-            errorMessage = `O arquivo é muito grande. O limite máximo é ${MAX_FILE_SIZE_MB}MB.`;
-          } else if (uploadError.message) {
-            errorMessage = uploadError.message;
-          }
-          
-          setUploadError(errorMessage);
-          toast.error(errorMessage);
-          setIsUploading(false);
-          setUploadStatus("");
-        }
-      };
-
-      reader.readAsDataURL(selectedFile);
+      }
     } catch (error: any) {
       console.error('Upload error:', error);
       setUploadError("Erro inesperado ao processar o arquivo.");
