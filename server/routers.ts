@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks, studentExerciseAnswers, subjects, accessLogs } from "../drizzle/schema";
+import { tasks, studentExerciseAnswers, subjects, accessLogs, classes, studentClassEnrollments, subjectEnrollments, learningModules } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
@@ -3338,6 +3338,53 @@ JSON (descrições MAX 15 chars):
 
   // Boletim de Atividades da Trilha por Turma
   learningPathReport: router({
+    // Listar disciplinas que têm trilha de aprendizagem (módulos)
+    getSubjectsForReport: protectedProcedure
+      .query(async ({ ctx }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Buscar disciplinas que têm pelo menos um módulo de trilha
+        const rows = await database
+          .select({
+            id: subjects.id,
+            name: subjects.name,
+            code: subjects.code,
+            color: subjects.color,
+          })
+          .from(subjects)
+          .innerJoin(learningModules, eq(learningModules.subjectId, subjects.id))
+          .where(eq(subjects.userId, ctx.user.id))
+          .groupBy(subjects.id, subjects.name, subjects.code, subjects.color);
+        return rows;
+      }),
+
+    // Listar turmas que têm alunos matriculados em uma disciplina
+    getClassesBySubject: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Buscar turmas com alunos matriculados nessa disciplina (via studentClassEnrollments + subjectEnrollments)
+        const rows = await database
+          .select({
+            id: classes.id,
+            name: classes.name,
+            code: classes.code,
+          })
+          .from(classes)
+          .innerJoin(studentClassEnrollments, and(
+            eq(studentClassEnrollments.classId, classes.id),
+            eq(studentClassEnrollments.userId, ctx.user.id)
+          ))
+          .innerJoin(subjectEnrollments, and(
+            eq(subjectEnrollments.studentId, studentClassEnrollments.studentId),
+            eq(subjectEnrollments.subjectId, input.subjectId)
+          ))
+          .where(eq(classes.userId, ctx.user.id))
+          .groupBy(classes.id, classes.name, classes.code);
+        return rows;
+      }),
+
     getClassReport: protectedProcedure
       .input(z.object({
         subjectId: z.number(),

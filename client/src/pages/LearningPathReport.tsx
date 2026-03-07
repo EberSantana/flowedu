@@ -442,8 +442,13 @@ export default function LearningPathReport() {
   const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
-  const { data: subjects } = trpc.subjects.list.useQuery();
-  const { data: classes } = trpc.classes.list.useQuery();
+  // Disciplinas que têm trilha de aprendizagem
+  const { data: subjects } = trpc.learningPathReport.getSubjectsForReport.useQuery();
+  // Turmas vinculadas à disciplina selecionada (filtro hierárquico)
+  const { data: classes } = trpc.learningPathReport.getClassesBySubject.useQuery(
+    { subjectId: selectedSubjectId! },
+    { enabled: !!selectedSubjectId }
+  );
 
   const {
     data: report,
@@ -592,22 +597,26 @@ export default function LearningPathReport() {
 
                 <div className="flex-1">
                   <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
-                    Turma (opcional)
+                    Turma
+                    {selectedSubjectId && classes && classes.length === 0 && (
+                      <span className="ml-2 text-xs text-yellow-600">(nenhuma turma vinculada)</span>
+                    )}
                   </label>
                   <Select
                     value={selectedClassId?.toString() ?? "all"}
                     onValueChange={(v) =>
                       setSelectedClassId(v === "all" ? null : Number(v))
                     }
+                    disabled={!selectedSubjectId}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Todas as turmas" />
+                      <SelectValue placeholder={!selectedSubjectId ? "Selecione uma disciplina primeiro" : "Todas as turmas"} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todas as turmas</SelectItem>
                       {classes?.map((c) => (
                         <SelectItem key={c.id} value={c.id.toString()}>
-                          {c.name}
+                          {c.name} {c.code ? `(${c.code})` : ""}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -631,9 +640,16 @@ export default function LearningPathReport() {
             <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
               <FileText className="h-12 w-12 mb-4 opacity-40" />
               <p className="text-lg font-medium">Selecione uma disciplina</p>
-              <p className="text-sm mt-1">
-                Escolha a disciplina acima para visualizar o boletim da trilha.
+              <p className="text-sm mt-1 max-w-sm">
+                Escolha a disciplina para ver as turmas vinculadas e o boletim da trilha de aprendizagem.
               </p>
+              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground/70">
+                <span className="px-2 py-1 rounded bg-muted">1. Disciplina</span>
+                <span>→</span>
+                <span className="px-2 py-1 rounded bg-muted">2. Turma</span>
+                <span>→</span>
+                <span className="px-2 py-1 rounded bg-muted">3. Boletim</span>
+              </div>
             </div>
           )}
 
