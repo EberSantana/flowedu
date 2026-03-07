@@ -3416,6 +3416,37 @@ JSON (descrições MAX 15 chars):
           })),
         };
       }),
+
+    // Mapa de calor: acessos por dia da semana x hora do dia
+    getHeatmap: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(365).default(90),
+        userType: z.enum(['all', 'teacher', 'student']).default('all'),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { gte: gteOp2 } = await import('drizzle-orm');
+        const since2 = new Date();
+        since2.setDate(since2.getDate() - input.days);
+        const allLogs2 = await database
+          .select()
+          .from(accessLogs)
+          .where(gteOp2(accessLogs.accessedAt, since2));
+        const filtered = input.userType === 'all'
+          ? allLogs2
+          : allLogs2.filter(l => l.userType === input.userType);
+        // Matriz: dayOfWeek (0=Dom..6=Sab) x hour (0..23)
+        const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+        for (const log of filtered) {
+          const d = new Date(log.accessedAt);
+          const dow = d.getDay();
+          const hour = d.getHours();
+          matrix[dow][hour]++;
+        }
+        return { matrix, total: filtered.length };
+      }),
   }),
 
   // Student Portal Routes
