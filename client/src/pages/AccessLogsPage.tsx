@@ -24,7 +24,9 @@ import {
   RefreshCw,
   TrendingUp,
   Flame,
+  Download,
 } from "lucide-react";
+import { toast } from "sonner";
 
 // Dias da semana em PT-BR (0=Dom, 1=Seg, ..., 6=Sab)
 const DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -55,6 +57,36 @@ export default function AccessLogsPage() {
   const [filterType, setFilterType] = useState<"all" | "teacher" | "student">("all");
   const [heatmapDays, setHeatmapDays] = useState(90);
   const [heatmapUserType, setHeatmapUserType] = useState<"all" | "teacher" | "student">("all");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const utils = trpc.useUtils();
+
+  const handleExportCSV = async () => {
+    setIsExporting(true);
+    try {
+      const result = await utils.accessLogs.exportCSV.fetch({ days, userType: filterType });
+      if (!result?.csv) {
+        toast.error("Nenhum dado para exportar.");
+        return;
+      }
+      const BOM = "\uFEFF";
+      const blob = new Blob([BOM + result.csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const dateStr = new Date().toISOString().slice(0, 10);
+      link.download = `log-acessos-${dateStr}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(`CSV exportado com ${result.total} registros.`);
+    } catch (e) {
+      toast.error("Erro ao exportar CSV.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const { data, isLoading, refetch, isFetching } = trpc.accessLogs.getSummary.useQuery(
     { days },
@@ -148,6 +180,15 @@ export default function AccessLogsPage() {
                   <SelectItem value="90">Últimos 90 dias</SelectItem>
                 </SelectContent>
               </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                disabled={isExporting}
+              >
+                <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
+                {isExporting ? "Exportando..." : "Exportar CSV"}
+              </Button>
               <Button
                 variant="outline"
                 size="sm"

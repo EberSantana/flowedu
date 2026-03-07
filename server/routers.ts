@@ -6,7 +6,7 @@ import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
 import { tasks, studentExerciseAnswers, subjects, accessLogs, classes, studentClassEnrollments, subjectEnrollments, learningModules } from "../drizzle/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, sql, gte } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
@@ -3494,8 +3494,48 @@ JSON (descrições MAX 15 chars):
         }
         return { matrix, total: filtered.length };
       }),
-  }),
 
+    // Exportar todos os logs em CSV
+    exportCSV: protectedProcedure
+      .input(z.object({
+        days: z.number().default(30),
+        userType: z.enum(['all', 'teacher', 'student']).default('all'),
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const since = new Date();
+        since.setDate(since.getDate() - input.days);
+        const sinceStr = since.toISOString().slice(0, 19).replace('T', ' ');
+        let logs;
+        if (input.userType !== 'all') {
+          logs = await database
+            .select()
+            .from(accessLogs)
+            .where(and(gte(accessLogs.accessedAt, since), eq(accessLogs.userType, input.userType)))
+            .orderBy(accessLogs.accessedAt);
+        } else {
+          logs = await database
+            .select()
+            .from(accessLogs)
+            .where(gte(accessLogs.accessedAt, since))
+            .orderBy(accessLogs.accessedAt);
+        }
+        // Gerar CSV
+        const header = ['Data/Hora', 'Tipo', 'Nome', 'IP', 'ID'];
+        const rows = logs.map(l => [
+          new Date(l.accessedAt).toLocaleString('pt-BR'),
+          l.userType === 'teacher' ? 'Professor' : 'Aluno',
+          l.userName ?? '',
+          l.ipAddress ?? '',
+          String(l.userId ?? ''),
+        ]);
+        const csvLines = [header, ...rows].map(r =>
+          r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+        );
+        return { csv: csvLines.join('\n'), total: logs.length };
+      }),
+  }),
   // Student Portal Routes
   student: router({
     // Verificar sessão de aluno
