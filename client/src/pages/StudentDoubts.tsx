@@ -377,7 +377,9 @@ export default function StudentDoubts() {
                               </Badge>
                             )}
                           </div>
-                          <CardTitle className="text-lg">Dúvida</CardTitle>
+                          <CardTitle className="text-lg">
+                            {doubt.subjectName ? `Dúvida - ${doubt.subjectName}` : "Dúvida"}
+                          </CardTitle>
                           <CardDescription className="mt-1">
                             Enviada em {formatDate(doubt.createdAt)}
                           </CardDescription>

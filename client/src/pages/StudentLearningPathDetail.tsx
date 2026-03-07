@@ -110,7 +110,7 @@ export default function StudentLearningPathDetail() {
     }
   });
 
-  const submitDoubt = trpc.student.submitDoubt.useMutation({
+  const submitDoubt = trpc.studentDoubts.submitDoubt.useMutation({
     onSuccess: () => {
       toast.success("Dúvida enviada ao professor!");
       setDoubtQuestion("");
@@ -235,7 +235,7 @@ export default function StudentLearningPathDetail() {
     }
 
     submitDoubt.mutate({
-      topicId: selectedTopic.id,
+      subjectId: subjectId,
       professorId,
       question: doubtQuestion,
       isPrivate: true

@@ -7477,3 +7477,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Garantir que sistema de dúvidas funcione: aluno envia pergunta escrita → professor responde
 - [ ] Calcular carga horária automaticamente pelos módulos da trilha de aprendizagem
 - [ ] Remover Caderno de Questões e Revisão Inteligente do menu lateral (já feito)
+
+## Fix v3.2.3: Dúvidas
+- [x] Fix: Botão "Enviar Dúvida" não funciona no portal do aluno na VPS - CORRIGIDO: removida procedure duplicada submitDoubt, corrigido StudentLearningPathDetail para usar subjectId
+- [x] Refazer página TeacherDoubts seguindo padrão visual do sistema - CONCLUÍDO: breadcrumb, ícone, cards estatísticas, tabs (Pendentes/Respondidas/Todas), filtro por disciplina, nova procedure getAllDoubts
+- [x] Adicionar procedure getAllTeacherDoubts no db.ts para buscar todas as dúvidas (não só pendentes)
+- [x] Melhorar exibição do card de dúvida do aluno para mostrar nome da disciplina

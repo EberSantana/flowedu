@@ -7699,6 +7699,47 @@ export async function deleteStudentDoubt(doubtId: number, studentId: number) {
 }
 
 /**
+ * Buscar TODAS as dúvidas do professor (pendentes + respondidas)
+ */
+export async function getAllTeacherDoubts(professorId: number, subjectId?: number, status?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const conditions: any[] = [
+    eq(studentTopicDoubts.professorId, professorId),
+  ];
+  if (subjectId) {
+    conditions.push(eq(studentTopicDoubts.subjectId, subjectId));
+  }
+  if (status && status !== 'all') {
+    conditions.push(eq(studentTopicDoubts.status, status as 'pending' | 'answered' | 'resolved'));
+  }
+  
+  const doubts = await db.select({
+    id: studentTopicDoubts.id,
+    studentId: studentTopicDoubts.studentId,
+    subjectId: studentTopicDoubts.subjectId,
+    professorId: studentTopicDoubts.professorId,
+    question: studentTopicDoubts.question,
+    context: studentTopicDoubts.context,
+    status: studentTopicDoubts.status,
+    answer: studentTopicDoubts.answer,
+    answeredAt: studentTopicDoubts.answeredAt,
+    isPrivate: studentTopicDoubts.isPrivate,
+    createdAt: studentTopicDoubts.createdAt,
+    studentName: students.fullName,
+    subjectName: subjects.name,
+  })
+  .from(studentTopicDoubts)
+  .innerJoin(students, eq(studentTopicDoubts.studentId, students.id))
+  .leftJoin(subjects, eq(studentTopicDoubts.subjectId, subjects.id))
+  .where(and(...conditions))
+  .orderBy(desc(studentTopicDoubts.createdAt));
+  
+  return doubts;
+}
+
+/**
  * Buscar dúvidas pendentes para o professor
  */
 export async function getPendingDoubts(professorId: number, subjectId?: number) {

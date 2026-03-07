@@ -3844,35 +3844,7 @@ JSON (descrições MAX 15 chars):
         );
       }),
     
-    // Sistema de Dúvidas
-    submitDoubt: studentProcedure
-      .input(z.object({
-        topicId: z.number(),
-        professorId: z.number(),
-        question: z.string(),
-        context: z.string().optional(),
-        isPrivate: z.boolean().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        return await db.submitDoubt({
-          studentId: ctx.studentSession.studentId,
-          topicId: input.topicId,
-          professorId: input.professorId,
-          question: input.question,
-          context: input.context,
-          isPrivate: input.isPrivate ?? true,
-          status: 'pending',
-        } as any);
-      }),
-    
-    getMyDoubts: studentProcedure
-      .input(z.object({ topicId: z.number().optional() }))
-      .query(async ({ ctx, input }) => {
-        return await db.getStudentDoubts(
-          ctx.studentSession.studentId,
-          input.topicId
-        );
-      }),
+    // Sistema de Dúvidas movido para studentDoubts router
     
     // Estatísticas de Estudo
     getStudyStatistics: studentProcedure
@@ -8013,6 +7985,16 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
       }))
       .mutation(async ({ ctx, input }) => {
         return db.deleteStudentDoubt(input.doubtId, ctx.studentSession.studentId);
+      }),
+
+    // Buscar TODAS as dúvidas do professor (com filtros)
+    getAllDoubts: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+        status: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getAllTeacherDoubts(ctx.user.id, input.subjectId, input.status);
       }),
 
     // Buscar dúvidas pendentes (professor)
