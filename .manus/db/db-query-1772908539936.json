@@ -1,0 +1,160 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME LIMIT 50;",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations"
+    },
+    {
+      "TABLE_NAME": "access_logs"
+    },
+    {
+      "TABLE_NAME": "achievements"
+    },
+    {
+      "TABLE_NAME": "active_methodologies"
+    },
+    {
+      "TABLE_NAME": "activities"
+    },
+    {
+      "TABLE_NAME": "ai_analysis_cache"
+    },
+    {
+      "TABLE_NAME": "ai_insights"
+    },
+    {
+      "TABLE_NAME": "alerts"
+    },
+    {
+      "TABLE_NAME": "announcementReads"
+    },
+    {
+      "TABLE_NAME": "announcements"
+    },
+    {
+      "TABLE_NAME": "assessment_questions"
+    },
+    {
+      "TABLE_NAME": "assessments"
+    },
+    {
+      "TABLE_NAME": "assignment_submissions"
+    },
+    {
+      "TABLE_NAME": "audit_logs"
+    },
+    {
+      "TABLE_NAME": "backup_schedules"
+    },
+    {
+      "TABLE_NAME": "backups"
+    },
+    {
+      "TABLE_NAME": "badges"
+    },
+    {
+      "TABLE_NAME": "belt_history"
+    },
+    {
+      "TABLE_NAME": "belts"
+    },
+    {
+      "TABLE_NAME": "calendar_events"
+    },
+    {
+      "TABLE_NAME": "challenge_rankings"
+    },
+    {
+      "TABLE_NAME": "challenge_submissions"
+    },
+    {
+      "TABLE_NAME": "class_groups"
+    },
+    {
+      "TABLE_NAME": "class_statuses"
+    },
+    {
+      "TABLE_NAME": "classes"
+    },
+    {
+      "TABLE_NAME": "coin_transactions"
+    },
+    {
+      "TABLE_NAME": "collaborative_tools"
+    },
+    {
+      "TABLE_NAME": "computational_thinking_scores"
+    },
+    {
+      "TABLE_NAME": "content_tags"
+    },
+    {
+      "TABLE_NAME": "ct_badges"
+    },
+    {
+      "TABLE_NAME": "ct_exercises"
+    },
+    {
+      "TABLE_NAME": "ct_submissions"
+    },
+    {
+      "TABLE_NAME": "dashboard_preferences"
+    },
+    {
+      "TABLE_NAME": "exercise_tags"
+    },
+    {
+      "TABLE_NAME": "gamificationNotifications"
+    },
+    {
+      "TABLE_NAME": "gamification_notifications"
+    },
+    {
+      "TABLE_NAME": "hidden_achievements"
+    },
+    {
+      "TABLE_NAME": "interactive_projects"
+    },
+    {
+      "TABLE_NAME": "invite_codes"
+    },
+    {
+      "TABLE_NAME": "learning_modules"
+    },
+    {
+      "TABLE_NAME": "learning_patterns"
+    },
+    {
+      "TABLE_NAME": "learning_recommendations"
+    },
+    {
+      "TABLE_NAME": "learning_topics"
+    },
+    {
+      "TABLE_NAME": "level_up_history"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_attempts"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_insights"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_questions"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_study_plans"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_topics"
+    },
+    {
+      "TABLE_NAME": "module_badges"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\n__drizzle_migrations\naccess_logs\nachievements\nactive_methodologies\nactivities\nai_analysis_cache\nai_insights\nalerts\nannouncementReads\nannouncements\nassessment_questions\nassessments\nassignment_submissions\naudit_logs\nbackup_schedules\nbackups\nbadges\nbelt_history\nbelts\ncalendar_events\nchallenge_rankings\nchallenge_submissions\nclass_groups\nclass_statuses\nclasses\ncoin_transactions\ncollaborative_tools\ncomputational_thinking_scores\ncontent_tags\nct_badges\nct_exercises\nct_submissions\ndashboard_preferences\nexercise_tags\ngamificationNotifications\ngamification_notifications\nhidden_achievements\ninteractive_projects\ninvite_codes\nlearning_modules\nlearning_patterns\nlearning_recommendations\nlearning_topics\nlevel_up_history\nmistake_notebook_attempts\nmistake_notebook_insights\nmistake_notebook_questions\nmistake_notebook_study_plans\nmistake_notebook_topics\nmodule_badges\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

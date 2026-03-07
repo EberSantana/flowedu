@@ -3345,28 +3345,35 @@ JSON (descrições MAX 15 chars):
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         // Buscar combinações únicas de disciplina + turma que têm trilhas
-        const rows = await database
-          .select({
-            subjectId: subjects.id,
-            subjectName: subjects.name,
-            subjectCode: subjects.code,
-            subjectColor: subjects.color,
-            classId: classes.id,
-            className: classes.name,
-            classCode: classes.code,
-          })
-          .from(subjects)
-          .innerJoin(learningModules, eq(learningModules.subjectId, subjects.id))
-          .innerJoin(subjectEnrollments, eq(subjectEnrollments.subjectId, subjects.id))
-          .innerJoin(studentClassEnrollments, eq(studentClassEnrollments.studentId, subjectEnrollments.studentId))
-          .innerJoin(classes, and(
-            eq(classes.id, studentClassEnrollments.classId),
-            eq(classes.userId, ctx.user.id)
-          ))
-          .where(eq(subjects.userId, ctx.user.id))
-          .groupBy(subjects.id, subjects.name, subjects.code, subjects.color, classes.id, classes.name, classes.code)
-          .orderBy(subjects.name, classes.name);
-        return rows;
+        // Usa SQL raw para garantir compatibilidade com o nome da tabela subjectEnrollments (camelCase)
+        const rows = await database.execute(sql`
+          SELECT DISTINCT
+            s.id AS subjectId,
+            s.name AS subjectName,
+            s.code AS subjectCode,
+            s.color AS subjectColor,
+            c.id AS classId,
+            c.name AS className,
+            c.code AS classCode
+          FROM subjects s
+          INNER JOIN learning_modules lm ON lm.subjectId = s.id
+          INNER JOIN subjectEnrollments se ON se.subjectId = s.id AND se.userId = ${ctx.user.id}
+          INNER JOIN student_class_enrollments sce ON sce.studentId = se.studentId AND sce.userId = ${ctx.user.id}
+          INNER JOIN classes c ON c.id = sce.classId AND c.userId = ${ctx.user.id}
+          WHERE s.userId = ${ctx.user.id}
+          ORDER BY s.name, c.name
+        `);
+        // Drizzle execute retorna [rows, fields]
+        const data = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+        return (data as any[]).map((r: any) => ({
+          subjectId: r.subjectId as number,
+          subjectName: r.subjectName as string,
+          subjectCode: r.subjectCode as string | null,
+          subjectColor: r.subjectColor as string | null,
+          classId: r.classId as number,
+          className: r.className as string,
+          classCode: r.classCode as string | null,
+        }));
       }),
     getSubjectsForReport: protectedProcedure
       .query(async ({ ctx }) => {
