@@ -320,6 +320,13 @@ export default function Sidebar() {
     enabled: isStudent && !!studentSession, // Só executa se for aluno autenticado
   });
 
+  // Query para dúvidas pendentes não vistas pelo professor
+  const { data: pendingDoubtsData } = trpc.studentDoubts.getPendingDoubtsCount.useQuery(undefined, {
+    refetchInterval: 30000, // Atualiza a cada 30 segundos
+    enabled: !isStudent && !!user, // Só executa se for professor autenticado
+  });
+  const pendingDoubtsCount = pendingDoubtsData?.count ?? 0;
+
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       window.location.href = "/";
@@ -383,12 +390,15 @@ export default function Sidebar() {
     const isActive = location === item.href;
     const isCalendar = item.href === '/calendar';
     const isAnnouncementsMenu = item.label === 'Avisos';
+    const isTeacherDoubts = item.href === '/teacher-doubts';
     
     let notificationCount = 0;
     if (isCalendar && upcomingEvents) {
       notificationCount = upcomingEvents.length;
     } else if (isAnnouncementsMenu && unreadAnnouncementsCount !== undefined) {
       notificationCount = unreadAnnouncementsCount;
+    } else if (isTeacherDoubts) {
+      notificationCount = pendingDoubtsCount;
     }
     
     const linkContent = (
@@ -414,7 +424,7 @@ export default function Sidebar() {
           {item.icon}
         </span>
         {!isCompact && <span className={inCategory ? "text-sm font-medium" : "font-medium"}>{item.label}</span>}
-        {(isCalendar || isAnnouncementsMenu) && notificationCount > 0 && (
+        {(isCalendar || isAnnouncementsMenu || isTeacherDoubts) && notificationCount > 0 && (
           <span className={`
             flex items-center justify-center
             bg-red-500 text-white text-[10px] font-bold rounded-full

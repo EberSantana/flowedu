@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import {
   MessageCircle,
@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   Inbox,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,6 +60,33 @@ export default function TeacherDoubts() {
   } = trpc.studentDoubts.getAllDoubts.useQuery({
     subjectId: selectedSubjectId,
   });
+
+  // Mutation para deletar dúvida (professor)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const deleteDoubtMutation = trpc.studentDoubts.deleteTeacherDoubt.useMutation({
+    onSuccess: () => {
+      toast.success("Dúvida excluída com sucesso!");
+      setConfirmDeleteId(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao excluir: ${error.message}`);
+    },
+  });
+
+  // Mutation para marcar dúvidas como vistas pelo professor
+  const markSeenMutation = trpc.studentDoubts.markDoubtsSeenByProfessor.useMutation();
+  const utils = trpc.useUtils();
+
+  // Ao abrir a página, marcar dúvidas pendentes como vistas (zera o badge)
+  useEffect(() => {
+    markSeenMutation.mutate(undefined, {
+      onSuccess: () => {
+        // Invalidar a query de contagem para atualizar o badge no menu
+        utils.studentDoubts.getPendingDoubtsCount.invalidate();
+      }
+    });
+  }, []);
 
   // Mutation para responder
   const respondMutation = trpc.studentDoubts.respondDoubt.useMutation({
@@ -270,6 +298,47 @@ export default function TeacherDoubts() {
               )}
             </>
           )}
+
+          {/* Botão Deletar */}
+          <div className="border-t pt-3 mt-2">
+            {confirmDeleteId === doubt.id ? (
+              <div className="flex items-center gap-2 justify-end">
+                <span className="text-sm text-muted-foreground">Confirmar exclusão?</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConfirmDeleteId(null)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => deleteDoubtMutation.mutate({ doubtId: doubt.id })}
+                  disabled={deleteDoubtMutation.isPending}
+                >
+                  {deleteDoubtMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Excluir
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-500 hover:text-red-700 hover:bg-red-50 w-full justify-end"
+                onClick={() => setConfirmDeleteId(doubt.id)}
+              >
+                <Trash2 className="w-4 h-4 mr-1" />
+                Excluir Dúvida
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     );

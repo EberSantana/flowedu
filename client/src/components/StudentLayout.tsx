@@ -51,6 +51,16 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     }
   );
 
+  // Buscar contagem de respostas não vistas pelo aluno
+  const { data: unseenAnswersData } = trpc.studentDoubts.getUnseenAnswersCount.useQuery(
+    undefined,
+    {
+      refetchInterval: 30000, // Atualiza a cada 30 segundos
+      enabled: isAuthenticated,
+    }
+  );
+  const unseenAnswersCount = unseenAnswersData?.count ?? 0;
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -102,7 +112,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     {
       label: "Ferramentas",
       items: [
-        { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts" },
+        { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts", badge: unseenAnswersCount },
         { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
       ],
     },

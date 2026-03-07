@@ -6,7 +6,7 @@ import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
 import { tasks, studentExerciseAnswers, subjects, accessLogs, classes, studentClassEnrollments, subjectEnrollments, learningModules } from "../drizzle/schema";
-import { and, eq, sql, gte } from "drizzle-orm";
+import { and, eq, sql, gte, lt } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
@@ -3574,6 +3574,22 @@ JSON (descrições MAX 15 chars):
           r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
         );
         return { csv: csvLines.join('\n'), total: logs.length };
+      }),
+
+    // Limpar registros anteriores a uma data
+    clearLogs: protectedProcedure
+      .input(z.object({
+        beforeDate: z.string(), // ISO date string ex: "2025-01-01"
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem limpar logs' });
+        }
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const cutoff = new Date(input.beforeDate);
+        await database.delete(accessLogs).where(lt(accessLogs.accessedAt, cutoff));
+        return { success: true };
       }),
   }),
   // Student Portal Routes
@@ -8014,6 +8030,39 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
       }))
       .mutation(async ({ ctx, input }) => {
         return db.respondDoubt(input.doubtId, input.answer, ctx.user.id);
+      }),
+
+    // Deletar dúvida (professor)
+    deleteTeacherDoubt: protectedProcedure
+      .input(z.object({
+        doubtId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteTeacherDoubt(input.doubtId, ctx.user.id);
+      }),
+
+    // Contar dúvidas pendentes não vistas pelo professor
+    getPendingDoubtsCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getPendingDoubtsCount(ctx.user.id);
+      }),
+
+    // Marcar dúvidas como vistas pelo professor
+    markDoubtsSeenByProfessor: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return db.markDoubtsSeenByProfessor(ctx.user.id);
+      }),
+
+    // Contar respostas não vistas pelo aluno
+    getUnseenAnswersCount: studentProcedure
+      .query(async ({ ctx }) => {
+        return db.getUnseenAnswersCount(ctx.studentSession.studentId);
+      }),
+
+    // Marcar respostas como vistas pelo aluno
+    markAnswersSeenByStudent: studentProcedure
+      .mutation(async ({ ctx }) => {
+        return db.markAnswersSeenByStudent(ctx.studentSession.studentId);
       }),
 
     // Obter dicas da IA para resolver a dúvida

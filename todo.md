@@ -7485,6 +7485,31 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Melhorar exibição do card de dúvida do aluno para mostrar nome da disciplina
 
 ## Fix v3.2.4: Dúvidas + Devocional
-- [ ] Corrigir bug de envio de dúvidas (botão não funciona na VPS - investigar schema/migration)
-- [ ] Adicionar botão ocultar/mostrar devocional no rodapé
-- [ ] Deploy na VPS
+- [x] Corrigir bug de envio de dúvidas (schema banco alinhado - adicionadas colunas context, isPrivate, answeredAt, professorId na VPS)
+- [x] Adicionar botão ocultar/mostrar devocional no rodapé (preferência salva em localStorage)
+- [x] Deploy na VPS
+
+## Feature v3.2.5: Notificações Visuais de Dúvidas
+- [x] Backend: procedure getPendingDoubtsCount para professor (dúvidas pendentes não vistas)
+- [x] Backend: procedure getUnseenAnswersCount para aluno (respostas não vistas)
+- [x] Backend: campo seenByProfessor e seenByStudent na tabela student_topic_doubts
+- [x] Frontend: badge vermelho no item "Dúvidas dos Alunos" no menu do professor
+- [x] Frontend: badge vermelho no item "Dúvidas" no menu do aluno
+- [x] Frontend: polling automático a cada 30s para atualizar badges
+- [x] TeacherDoubts: marcar dúvidas como vistas ao abrir a página (zera badge)
+- [x] StudentDoubts: marcar respostas como vistas ao abrir a página (zera badge)
+- [x] Backend: procedure deleteTeacherDoubt para professor deletar dúvidas
+- [x] Frontend: botão Excluir Dúvida com confirmação na página TeacherDoubts
+- [x] Build e deploy na VPS (v3.2.5)
+
+## Feature v3.2.5 (continuação): Deletar Dúvida pelo Professor
+- [ ] Backend: procedure deleteTeacherDoubt no router (professor pode deletar qualquer dúvida da sua disciplina)
+- [ ] Backend: função deleteTeacherDoubt no db.ts
+- [ ] Frontend: botão Deletar com confirmação na página TeacherDoubts.tsx
+
+## Feature v3.2.6: Log de Acessos - Exportar + Limpar
+- [ ] Backend: procedure exportAccessLogs (retorna todos os logs em CSV)
+- [ ] Backend: procedure clearAccessLogs (deleta registros anteriores a uma data)
+- [ ] Frontend: botão "Exportar CSV" na página AccessLogs
+- [ ] Frontend: botão "Limpar registros" com seletor de data e confirmação
+- [ ] Build e deploy na VPS

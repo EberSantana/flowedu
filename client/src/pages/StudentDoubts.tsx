@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import StudentLayout from "@/components/StudentLayout";
 import { MessageCircle, Plus, Clock, CheckCircle2, AlertCircle, Send, Sparkles, Loader2, Trash2 } from "lucide-react";
@@ -126,6 +126,19 @@ export default function StudentDoubts() {
 
   // Buscar disciplinas matriculadas
   const { data: subjects } = trpc.student.getEnrolledSubjects.useQuery();
+
+  // Mutation para marcar respostas como vistas pelo aluno
+  const markAnswersSeenMutation = trpc.studentDoubts.markAnswersSeenByStudent.useMutation();
+  const utils = trpc.useUtils();
+
+  // Ao abrir a página, marcar respostas como vistas (zera o badge)
+  useEffect(() => {
+    markAnswersSeenMutation.mutate(undefined, {
+      onSuccess: () => {
+        utils.studentDoubts.getUnseenAnswersCount.invalidate();
+      }
+    });
+  }, []);
 
   // Mutation para enviar dúvida
   const submitDoubtMutation = trpc.studentDoubts.submitDoubt.useMutation({

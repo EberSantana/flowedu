@@ -25,7 +25,19 @@ import {
   TrendingUp,
   Flame,
   Download,
+  Trash2,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 // Dias da semana em PT-BR (0=Dom, 1=Seg, ..., 6=Sab)
@@ -58,8 +70,24 @@ export default function AccessLogsPage() {
   const [heatmapDays, setHeatmapDays] = useState(90);
   const [heatmapUserType, setHeatmapUserType] = useState<"all" | "teacher" | "student">("all");
   const [isExporting, setIsExporting] = useState(false);
+  const [clearBeforeDate, setClearBeforeDate] = useState(() => {
+    // Padrão: 90 dias atrás
+    const d = new Date();
+    d.setDate(d.getDate() - 90);
+    return d.toISOString().slice(0, 10);
+  });
+  const [showClearDialog, setShowClearDialog] = useState(false);
 
   const utils = trpc.useUtils();
+
+  const clearLogsMutation = trpc.accessLogs.clearLogs.useMutation({
+    onSuccess: () => {
+      toast.success("Registros anteriores a " + clearBeforeDate + " foram removidos!");
+      setShowClearDialog(false);
+      refetch();
+    },
+    onError: (e) => toast.error("Erro ao limpar: " + e.message),
+  });
 
   const handleExportCSV = async () => {
     setIsExporting(true);
@@ -189,6 +217,45 @@ export default function AccessLogsPage() {
                 <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
                 {isExporting ? "Exportando..." : "Exportar CSV"}
               </Button>
+              <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Limpar Registros
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Limpar Log de Acessos</DialogTitle>
+                    <DialogDescription>
+                      Todos os registros anteriores à data selecionada serão excluídos permanentemente. Esta ação não pode ser desfeita.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4 space-y-3">
+                    <Label htmlFor="clearDate">Excluir registros anteriores a:</Label>
+                    <Input
+                      id="clearDate"
+                      type="date"
+                      value={clearBeforeDate}
+                      onChange={(e) => setClearBeforeDate(e.target.value)}
+                      max={new Date().toISOString().slice(0, 10)}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Sugestão: manter os últimos 90 dias e limpar o restante.
+                    </p>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowClearDialog(false)}>Cancelar</Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => clearLogsMutation.mutate({ beforeDate: clearBeforeDate })}
+                      disabled={clearLogsMutation.isPending || !clearBeforeDate}
+                    >
+                      {clearLogsMutation.isPending ? "Limpando..." : "Confirmar Limpeza"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
               <Button
                 variant="outline"
                 size="sm"

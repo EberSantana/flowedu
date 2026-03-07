@@ -489,6 +489,8 @@ export const studentTopicDoubts = mysqlTable("student_topic_doubts", {
   answer: text("answer"), // Resposta do professor
   answeredAt: timestamp("answeredAt"),
   isPrivate: boolean("isPrivate").default(true).notNull(), // Dúvida privada ou pública para turma
+  seenByProfessor: boolean("seenByProfessor").default(false).notNull(), // Professor visualizou a dúvida
+  seenByStudent: boolean("seenByStudent").default(false).notNull(), // Aluno visualizou a resposta
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

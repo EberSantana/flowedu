@@ -7699,6 +7699,30 @@ export async function deleteStudentDoubt(doubtId: number, studentId: number) {
 }
 
 /**
+ * Deletar dúvida pelo professor (pode deletar qualquer dúvida direcionada a ele)
+ */
+export async function deleteTeacherDoubt(doubtId: number, professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verificar se a dúvida pertence ao professor
+  const [doubt] = await db.select().from(studentTopicDoubts)
+    .where(and(
+      eq(studentTopicDoubts.id, doubtId),
+      eq(studentTopicDoubts.professorId, professorId)
+    ));
+  
+  if (!doubt) {
+    throw new Error("Dúvida não encontrada ou sem permissão");
+  }
+  
+  await db.delete(studentTopicDoubts)
+    .where(eq(studentTopicDoubts.id, doubtId));
+  
+  return { success: true };
+}
+
+/**
  * Buscar TODAS as dúvidas do professor (pendentes + respondidas)
  */
 export async function getAllTeacherDoubts(professorId: number, subjectId?: number, status?: string) {
@@ -7815,6 +7839,77 @@ export async function respondDoubt(doubtId: number, answer: string, professorId:
     relatedId: doubtId
   });
   
+  return { success: true };
+}
+
+/**
+ * Contar dúvidas pendentes não vistas pelo professor
+ */
+export async function getPendingDoubtsCount(professorId: number): Promise<{ count: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const doubts = await db.select({ id: studentTopicDoubts.id })
+    .from(studentTopicDoubts)
+    .where(and(
+      eq(studentTopicDoubts.professorId, professorId),
+      eq(studentTopicDoubts.status, 'pending'),
+      eq(studentTopicDoubts.seenByProfessor, false)
+    ));
+
+  return { count: doubts.length };
+}
+
+/**
+ * Marcar dúvidas pendentes como vistas pelo professor
+ */
+export async function markDoubtsSeenByProfessor(professorId: number): Promise<{ success: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(studentTopicDoubts)
+    .set({ seenByProfessor: true, updatedAt: new Date() } as any)
+    .where(and(
+      eq(studentTopicDoubts.professorId, professorId),
+      eq(studentTopicDoubts.seenByProfessor, false)
+    ));
+
+  return { success: true };
+}
+
+/**
+ * Contar respostas não vistas pelo aluno
+ */
+export async function getUnseenAnswersCount(studentId: number): Promise<{ count: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const doubts = await db.select({ id: studentTopicDoubts.id })
+    .from(studentTopicDoubts)
+    .where(and(
+      eq(studentTopicDoubts.studentId, studentId),
+      eq(studentTopicDoubts.status, 'answered'),
+      eq(studentTopicDoubts.seenByStudent, false)
+    ));
+
+  return { count: doubts.length };
+}
+
+/**
+ * Marcar respostas como vistas pelo aluno
+ */
+export async function markAnswersSeenByStudent(studentId: number): Promise<{ success: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(studentTopicDoubts)
+    .set({ seenByStudent: true, updatedAt: new Date() } as any)
+    .where(and(
+      eq(studentTopicDoubts.studentId, studentId),
+      eq(studentTopicDoubts.status, 'answered'),
+      eq(studentTopicDoubts.seenByStudent, false)
+    ));
+
   return { success: true };
 }
 
