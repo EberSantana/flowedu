@@ -2576,3 +2576,19 @@ export const vpsAlerts = mysqlTable("vps_alerts", {
 
 export type VPSAlert = typeof vpsAlerts.$inferSelect;
 export type InsertVPSAlert = typeof vpsAlerts.$inferInsert;
+
+/**
+ * Tabela de logs de acesso (professores e alunos)
+ */
+export const accessLogs = mysqlTable("access_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userType: mysqlEnum("userType", ["teacher", "student"]).notNull(), // Tipo de usuário
+  userId: int("userId"), // ID do professor (users.id) — null se aluno
+  studentId: int("studentId"), // ID do aluno (students.id) — null se professor
+  userName: varchar("userName", { length: 255 }), // Nome snapshot para exibição rápida
+  ipAddress: varchar("ipAddress", { length: 64 }), // Endereço IP do acesso
+  userAgent: text("userAgent"), // User-agent do navegador
+  accessedAt: timestamp("accessedAt").defaultNow().notNull(), // Data/hora do acesso
+});
+export type AccessLog = typeof accessLogs.$inferSelect;
+export type InsertAccessLog = typeof accessLogs.$inferInsert;

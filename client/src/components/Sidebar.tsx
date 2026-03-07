@@ -32,7 +32,8 @@ import {
   FolderOpen,
   BellRing,
   Server,
-  FileText
+  FileText,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -156,6 +157,12 @@ const teacherNavCategories: NavCategory[] = [
         label: "Boletim da Trilha",
         icon: <FileText className="h-5 w-5" />,
         href: "/learning-path-report",
+      },
+      {
+        label: "Log de Acessos",
+        icon: <Activity className="h-5 w-5" />,
+        href: "/access-logs",
+        adminOnly: true,
       },
     ],
   },

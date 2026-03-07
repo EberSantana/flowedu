@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks, studentExerciseAnswers, subjects } from "../drizzle/schema";
+import { tasks, studentExerciseAnswers, subjects, accessLogs } from "../drizzle/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
@@ -198,7 +198,23 @@ export const appRouter = router({
             ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
           });
-          
+
+          // Registrar log de acesso do aluno
+          try {
+            const database = await getDb();
+            const ip = (ctx.req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || ctx.req.socket?.remoteAddress || 'desconhecido';
+            await database!.insert(accessLogs).values({
+              userType: 'student',
+              studentId: student.id,
+              userName: student.fullName,
+              ipAddress: ip,
+              userAgent: ctx.req.headers['user-agent'] || null,
+              accessedAt: new Date(),
+            });
+          } catch (_logErr) {
+            // Falha no log não deve impedir o login
+          }
+
           return {
             success: true,
             student: {
@@ -352,7 +368,21 @@ export const appRouter = router({
           ...cookieOptions,
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
         });
-
+        // Registrar log de acesso do professor
+        try {
+          const database = await getDb();
+          const ip = (ctx.req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || ctx.req.socket?.remoteAddress || 'desconhecido';
+          await database!.insert(accessLogs).values({
+            userType: 'teacher',
+            userId: user.id,
+            userName: user.name || user.email || 'Professor',
+            ipAddress: ip,
+            userAgent: ctx.req.headers['user-agent'] || null,
+            accessedAt: new Date(),
+          });
+        } catch (_logErr) {
+          // Falha no log não deve impedir o login
+        }
         return {
           success: true,
           user: {
@@ -361,7 +391,7 @@ export const appRouter = router({
             email: user.email,
             role: user.role,
           },
-        };
+        };;
       }),
 
     // Solicitar recuperação de senha
@@ -3319,6 +3349,72 @@ JSON (descrições MAX 15 chars):
           input.classId ?? null,
           ctx.user.id
         );
+      }),
+  }),
+
+  // Access Logs Routes
+  accessLogs: router({
+    // Resumo geral de acessos (admin only)
+    getSummary: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(365).default(30),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const since = new Date();
+        since.setDate(since.getDate() - input.days);
+        const { gte, eq: eqOp } = await import('drizzle-orm');
+        const allLogs = await database
+          .select()
+          .from(accessLogs)
+          .where(gte(accessLogs.accessedAt, since))
+          .orderBy(sql`accessedAt DESC`);
+        const teacherLogs = allLogs.filter(l => l.userType === 'teacher');
+        const studentLogs = allLogs.filter(l => l.userType === 'student');
+        // Acessos por dia (últimos N dias)
+        const byDay: Record<string, { teachers: number; students: number }> = {};
+        for (const log of allLogs) {
+          const day = log.accessedAt.toISOString().slice(0, 10);
+          if (!byDay[day]) byDay[day] = { teachers: 0, students: 0 };
+          if (log.userType === 'teacher') byDay[day].teachers++;
+          else byDay[day].students++;
+        }
+        // Top usuários
+        const teacherCount: Record<string, number> = {};
+        for (const l of teacherLogs) {
+          const name = l.userName || `Professor #${l.userId}`;
+          teacherCount[name] = (teacherCount[name] || 0) + 1;
+        }
+        const studentCount: Record<string, number> = {};
+        for (const l of studentLogs) {
+          const name = l.userName || `Aluno #${l.studentId}`;
+          studentCount[name] = (studentCount[name] || 0) + 1;
+        }
+        return {
+          totalTeacher: teacherLogs.length,
+          totalStudent: studentLogs.length,
+          totalAll: allLogs.length,
+          byDay: Object.entries(byDay)
+            .map(([date, counts]) => ({ date, ...counts }))
+            .sort((a, b) => a.date.localeCompare(b.date)),
+          topTeachers: Object.entries(teacherCount)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10),
+          topStudents: Object.entries(studentCount)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10),
+          recentLogs: allLogs.slice(0, 50).map(l => ({
+            id: l.id,
+            userType: l.userType,
+            userName: l.userName,
+            ipAddress: l.ipAddress,
+            accessedAt: l.accessedAt,
+          })),
+        };
       }),
   }),
 
