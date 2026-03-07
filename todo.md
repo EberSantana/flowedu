@@ -7483,3 +7483,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Refazer página TeacherDoubts seguindo padrão visual do sistema - CONCLUÍDO: breadcrumb, ícone, cards estatísticas, tabs (Pendentes/Respondidas/Todas), filtro por disciplina, nova procedure getAllDoubts
 - [x] Adicionar procedure getAllTeacherDoubts no db.ts para buscar todas as dúvidas (não só pendentes)
 - [x] Melhorar exibição do card de dúvida do aluno para mostrar nome da disciplina
+
+## Fix v3.2.4: Dúvidas + Devocional
+- [ ] Corrigir bug de envio de dúvidas (botão não funciona na VPS - investigar schema/migration)
+- [ ] Adicionar botão ocultar/mostrar devocional no rodapé
+- [ ] Deploy na VPS

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BookOpen, Info } from "lucide-react";
+import { BookOpen, Info, ChevronDown, ChevronUp, EyeOff, Eye } from "lucide-react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import {
   Tooltip,
@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 // Versículos inspiradores da Bíblia NVI para cada dia do ano
 const DAILY_VERSES = [
@@ -43,6 +44,8 @@ const DAILY_VERSES = [
   { reference: "Salmos 121:1-2", text: "Elevo os meus olhos para os montes; de onde me vem o socorro? O meu socorro vem do Senhor, que fez os céus e a terra." },
 ];
 
+const STORAGE_KEY = "flowedu_devotional_hidden";
+
 // Formata a data do build para exibição
 function formatBuildDate(isoDate: string): string {
   try {
@@ -61,6 +64,7 @@ function formatBuildDate(isoDate: string): string {
 
 export default function BibleFooter() {
   const [verse, setVerse] = useState(DAILY_VERSES[0]);
+  const [isHidden, setIsHidden] = useState(false);
   const { isCompact } = useSidebarContext();
 
   useEffect(() => {
@@ -70,65 +74,105 @@ export default function BibleFooter() {
     const diff = now.getTime() - start.getTime();
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor(diff / oneDay);
-    
-    // Usa o dia do ano para selecionar um versículo, ciclando pela lista
     const verseIndex = dayOfYear % DAILY_VERSES.length;
     setVerse(DAILY_VERSES[verseIndex]);
+
+    // Recuperar preferência salva
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "true") setIsHidden(true);
   }, []);
+
+  const toggleHidden = () => {
+    const newValue = !isHidden;
+    setIsHidden(newValue);
+    localStorage.setItem(STORAGE_KEY, String(newValue));
+  };
 
   const version = __APP_VERSION__;
   const buildDate = formatBuildDate(__BUILD_DATE__);
   const gitHash = __GIT_HASH__;
 
   return (
-    <footer className={`bg-white border-t border-gray-200 py-8 mt-auto transition-all duration-300 ${
-      isCompact ? 'lg:ml-16' : 'lg:ml-64'
-    }`}>
+    <footer
+      className={`bg-white border-t border-gray-200 mt-auto transition-all duration-300 ${
+        isCompact ? "lg:ml-16" : "lg:ml-64"
+      }`}
+    >
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="flex flex-col items-center justify-center space-y-4">
-          {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full">
+        {/* Barra de controle sempre visível */}
+        <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium text-primary">
               Devocional Diário
             </span>
           </div>
-          
-          {/* Verse */}
-          <blockquote className="text-center max-w-2xl">
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              &ldquo;{verse.text}&rdquo;
-            </p>
-            <cite className="block mt-3 text-sm font-medium text-gray-600">
-              — {verse.reference}
-            </cite>
-          </blockquote>
-          
-          {/* Copyright + Versão */}
-          <div className="pt-4 border-t border-gray-100 w-full">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-              <p className="text-xs text-gray-500">
-                FlowEdu - Onde a educação flui © {new Date().getFullYear()}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleHidden}
+            className="text-gray-400 hover:text-gray-600 h-7 px-2 gap-1 text-xs"
+            title={isHidden ? "Mostrar devocional" : "Ocultar devocional"}
+          >
+            {isHidden ? (
+              <>
+                <Eye className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Mostrar</span>
+              </>
+            ) : (
+              <>
+                <EyeOff className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Ocultar</span>
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Conteúdo do devocional — oculto quando isHidden */}
+        {!isHidden && (
+          <div className="pb-6 flex flex-col items-center space-y-4">
+            {/* Verse */}
+            <blockquote className="text-center max-w-2xl">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                &ldquo;{verse.text}&rdquo;
               </p>
-              <span className="hidden sm:inline text-gray-300">|</span>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="inline-flex items-center gap-1 text-xs text-gray-400 cursor-help hover:text-gray-500 transition-colors">
-                      <Info className="h-3 w-3" />
-                      v{version}
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="text-xs">
-                    <div className="space-y-1">
-                      <p><strong>Versão:</strong> {version}</p>
-                      <p><strong>Build:</strong> {buildDate}</p>
-                      <p><strong>Commit:</strong> {gitHash}</p>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+              <cite className="block mt-3 text-sm font-medium text-gray-600">
+                — {verse.reference}
+              </cite>
+            </blockquote>
+          </div>
+        )}
+
+        {/* Copyright + Versão — sempre visível */}
+        <div className="py-3 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+            <p className="text-xs text-gray-500">
+              FlowEdu - Onde a educação flui © {new Date().getFullYear()}
+            </p>
+            <span className="hidden sm:inline text-gray-300">|</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex items-center gap-1 text-xs text-gray-400 cursor-help hover:text-gray-500 transition-colors">
+                    <Info className="h-3 w-3" />
+                    v{version}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <div className="space-y-1">
+                    <p>
+                      <strong>Versão:</strong> {version}
+                    </p>
+                    <p>
+                      <strong>Build:</strong> {buildDate}
+                    </p>
+                    <p>
+                      <strong>Commit:</strong> {gitHash}
+                    </p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>
