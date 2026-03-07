@@ -70,6 +70,14 @@ export default function AccessLogsPage() {
   const [heatmapDays, setHeatmapDays] = useState(90);
   const [heatmapUserType, setHeatmapUserType] = useState<"all" | "teacher" | "student">("all");
   const [isExporting, setIsExporting] = useState(false);
+  // Filtro por período personalizado
+  const [filterMode, setFilterMode] = useState<"days" | "period">("days");
+  const [dateFrom, setDateFrom] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().slice(0, 10);
+  });
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().slice(0, 10));
   const [clearBeforeDate, setClearBeforeDate] = useState(() => {
     // Padrão: 90 dias atrás
     const d = new Date();
@@ -92,7 +100,10 @@ export default function AccessLogsPage() {
   const handleExportCSV = async () => {
     setIsExporting(true);
     try {
-      const result = await utils.accessLogs.exportCSV.fetch({ days, userType: filterType });
+      const exportInput = filterMode === "period"
+        ? { days, userType: filterType, dateFrom, dateTo }
+        : { days, userType: filterType };
+      const result = await utils.accessLogs.exportCSV.fetch(exportInput);
       if (!result?.csv) {
         toast.error("Nenhum dado para exportar.");
         return;
@@ -116,8 +127,12 @@ export default function AccessLogsPage() {
     }
   };
 
+  const queryInput = filterMode === "period"
+    ? { days, dateFrom, dateTo }
+    : { days };
+
   const { data, isLoading, refetch, isFetching } = trpc.accessLogs.getSummary.useQuery(
-    { days },
+    queryInput,
     { refetchOnWindowFocus: false }
   );
 
@@ -194,20 +209,74 @@ export default function AccessLogsPage() {
                 Monitore os acessos de professores e alunos ao sistema
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <Select
-                value={days.toString()}
-                onValueChange={(v) => setDays(Number(v))}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7">Últimos 7 dias</SelectItem>
-                  <SelectItem value="30">Últimos 30 dias</SelectItem>
-                  <SelectItem value="90">Últimos 90 dias</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Alternador de modo de filtro */}
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <button
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                    filterMode === "days"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background text-muted-foreground hover:bg-muted"
+                  }`}
+                  onClick={() => setFilterMode("days")}
+                >
+                  Últimos dias
+                </button>
+                <button
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                    filterMode === "period"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background text-muted-foreground hover:bg-muted"
+                  }`}
+                  onClick={() => setFilterMode("period")}
+                >
+                  Período
+                </button>
+              </div>
+
+              {filterMode === "days" ? (
+                <Select
+                  value={days.toString()}
+                  onValueChange={(v) => setDays(Number(v))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Últimos 7 dias</SelectItem>
+                    <SelectItem value="30">Últimos 30 dias</SelectItem>
+                    <SelectItem value="90">Últimos 90 dias</SelectItem>
+                    <SelectItem value="180">Últimos 180 dias</SelectItem>
+                    <SelectItem value="365">Últimos 365 dias</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <Label htmlFor="dateFrom" className="text-sm text-muted-foreground whitespace-nowrap">De:</Label>
+                    <Input
+                      id="dateFrom"
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      max={dateTo}
+                      className="w-36 h-8 text-sm"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Label htmlFor="dateTo" className="text-sm text-muted-foreground whitespace-nowrap">Até:</Label>
+                    <Input
+                      id="dateTo"
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      min={dateFrom}
+                      max={new Date().toISOString().slice(0, 10)}
+                      className="w-36 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+              )}
               <Button
                 variant="outline"
                 size="sm"

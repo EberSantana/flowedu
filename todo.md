@@ -7513,3 +7513,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Frontend: botão "Exportar CSV" na página AccessLogs
 - [ ] Frontend: botão "Limpar registros" com seletor de data e confirmação
 - [ ] Build e deploy na VPS
+
+## Feature v3.2.7: Filtro de Período no Log de Acessos
+- [ ] Backend: atualizar getSummary para aceitar dateFrom/dateTo além de days
+- [ ] Backend: atualizar exportCSV para aceitar dateFrom/dateTo
+- [ ] Frontend: adicionar seletor "De / Até" com modo de filtro por período
+- [ ] Frontend: alternar entre "últimos X dias" e "período personalizado"
+- [ ] Build e deploy na VPS

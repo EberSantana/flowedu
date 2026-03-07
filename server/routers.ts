@@ -3445,18 +3445,35 @@ JSON (descrições MAX 15 chars):
     getSummary: protectedProcedure
       .input(z.object({
         days: z.number().min(1).max(365).default(30),
+        dateFrom: z.string().optional(), // ISO date string ex: "2025-01-01"
+        dateTo: z.string().optional(),   // ISO date string ex: "2025-01-31"
       }))
       .query(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-        const since = new Date();
-        since.setDate(since.getDate() - input.days);
-        const { gte, eq: eqOp } = await import('drizzle-orm');
+        // Determinar intervalo: período personalizado ou últimos N dias
+        let since: Date;
+        let until: Date | undefined;
+        if (input.dateFrom) {
+          since = new Date(input.dateFrom);
+          since.setHours(0, 0, 0, 0);
+          if (input.dateTo) {
+            until = new Date(input.dateTo);
+            until.setHours(23, 59, 59, 999);
+          }
+        } else {
+          since = new Date();
+          since.setDate(since.getDate() - input.days);
+        }
+        const { gte, lte, and: andOp } = await import('drizzle-orm');
+        const whereClause = until
+          ? andOp(gte(accessLogs.accessedAt, since), lte(accessLogs.accessedAt, until))
+          : gte(accessLogs.accessedAt, since);
         const allLogs = await database
           .select()
           .from(accessLogs)
-          .where(gte(accessLogs.accessedAt, since))
+          .where(whereClause)
           .orderBy(sql`accessedAt DESC`);
         const teacherLogs = allLogs.filter(l => l.userType === 'teacher');
         const studentLogs = allLogs.filter(l => l.userType === 'student');
@@ -3540,25 +3557,41 @@ JSON (descrições MAX 15 chars):
       .input(z.object({
         days: z.number().default(30),
         userType: z.enum(['all', 'teacher', 'student']).default('all'),
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
       }))
       .query(async ({ ctx, input }) => {
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-        const since = new Date();
-        since.setDate(since.getDate() - input.days);
-        const sinceStr = since.toISOString().slice(0, 19).replace('T', ' ');
+        // Determinar intervalo
+        let since: Date;
+        let until: Date | undefined;
+        if (input.dateFrom) {
+          since = new Date(input.dateFrom);
+          since.setHours(0, 0, 0, 0);
+          if (input.dateTo) {
+            until = new Date(input.dateTo);
+            until.setHours(23, 59, 59, 999);
+          }
+        } else {
+          since = new Date();
+          since.setDate(since.getDate() - input.days);
+        }
+        const rangeWhere = until
+          ? and(gte(accessLogs.accessedAt, since), lt(accessLogs.accessedAt, until))
+          : gte(accessLogs.accessedAt, since);
         let logs;
         if (input.userType !== 'all') {
           logs = await database
             .select()
             .from(accessLogs)
-            .where(and(gte(accessLogs.accessedAt, since), eq(accessLogs.userType, input.userType)))
+            .where(and(rangeWhere, eq(accessLogs.userType, input.userType)))
             .orderBy(accessLogs.accessedAt);
         } else {
           logs = await database
             .select()
             .from(accessLogs)
-            .where(gte(accessLogs.accessedAt, since))
+            .where(rangeWhere)
             .orderBy(accessLogs.accessedAt);
         }
         // Gerar CSV
