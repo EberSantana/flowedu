@@ -8041,16 +8041,25 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
         question: z.string(),
         context: z.string().optional(),
         subjectName: z.string().optional(),
+        topicName: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         try {
+          const disciplineName = input.subjectName || "Não especificada";
+          const topicContext = input.topicName ? `Tópico específico: ${input.topicName}` : "";
+          
           const response = await invokeLLM({
             messages: [
               {
                 role: "system",
-                content: `Você é um tutor educacional amigável e paciente. Seu papel é ajudar o aluno a entender o conceito por trás da dúvida, NÃO dar a resposta direta.
+                content: `Você é um tutor educacional especializado EXCLUSIVAMENTE na disciplina "${disciplineName}". Seu papel é ajudar o aluno a entender conceitos desta disciplina, NÃO dar respostas diretas.
 
-Regras:
+REGRA FUNDAMENTAL - RESTRIÇÃO DE ESCOPO:
+- Você SOMENTE pode responder sobre assuntos relacionados à disciplina "${disciplineName}".
+- Se a pergunta do aluno NÃO for sobre a disciplina "${disciplineName}" ou seus tópicos, você DEVE recusar educadamente e orientar o aluno a fazer perguntas sobre a disciplina.
+- Exemplo de recusa: "Essa pergunta não está relacionada à disciplina ${disciplineName}. Por favor, faça perguntas sobre os conteúdos da sua disciplina para que eu possa te ajudar!"
+
+Regras de resposta (quando a pergunta for sobre a disciplina):
 1. Forneça DICAS e SUGESTÕES para guiar o raciocínio do aluno
 2. Use analogias e exemplos do dia a dia quando possível
 3. Divida o problema em passos menores
@@ -8058,7 +8067,7 @@ Regras:
 5. Seja encorajador e positivo
 6. Responda em português brasileiro
 7. Limite sua resposta a 3-4 dicas principais
-8. Se a dúvida for sobre um tópico específico, contextualize com a disciplina
+8. Contextualize com a disciplina e o tópico específico
 
 Formato da resposta:
 - Use emojis para tornar mais amigável
@@ -8067,13 +8076,14 @@ Formato da resposta:
               },
               {
                 role: "user",
-                content: `Disciplina: ${input.subjectName || "Não especificada"}
+                content: `Disciplina: ${disciplineName}
+${topicContext}
 
 Dúvida do aluno: ${input.question}
 
 ${input.context ? `Contexto adicional: ${input.context}` : ""}
 
-Por favor, forneça dicas e sugestões para ajudar o aluno a resolver essa dúvida por conta própria.`
+Se a dúvida for sobre a disciplina ${disciplineName}, forneça dicas e sugestões. Caso contrário, recuse educadamente.`
               }
             ],
           });

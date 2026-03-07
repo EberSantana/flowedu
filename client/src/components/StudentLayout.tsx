@@ -15,7 +15,11 @@ import {
   Map,
   Menu,
   X,
-  ClipboardList
+  MessageCircle,
+  Brain,
+  BookMarked,
+  BarChart3,
+  PenLine
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -23,6 +27,16 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { Palette } from "lucide-react";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { trpc } from "@/lib/trpc";
+
+type MenuSection = {
+  label: string;
+  items: {
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    path: string;
+    badge?: number;
+  }[];
+};
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const { student, loading, logout, isAuthenticated } = useStudentAuth();
@@ -70,13 +84,113 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     );
   }
 
-  const menuItems = [
-    { icon: Home, label: "Início", path: "/student-dashboard", badge: 0 },
-    { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects", badge: 0 },
-    { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths", badge: 0 },
-    { icon: FileText, label: "Exercícios", path: "/student-exercises", badge: 0 },
-    { icon: Bell, label: "Avisos", path: "/student-announcements", badge: unreadAnnouncementsCount || 0 },
+  const menuSections: MenuSection[] = [
+    {
+      label: "Principal",
+      items: [
+        { icon: Home, label: "Início", path: "/student-dashboard" },
+        { icon: BookOpen, label: "Minhas Disciplinas", path: "/student-subjects" },
+        { icon: Bell, label: "Avisos", path: "/student-announcements", badge: unreadAnnouncementsCount || 0 },
+      ],
+    },
+    {
+      label: "Estudos",
+      items: [
+        { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths" },
+        { icon: FileText, label: "Exercícios", path: "/student-exercises" },
+        { icon: BookMarked, label: "Caderno de Questões", path: "/student/notebook" },
+      ],
+    },
+    {
+      label: "Ferramentas",
+      items: [
+        { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts" },
+        { icon: Brain, label: "Revisão Inteligente", path: "/student/smart-review" },
+        { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
+      ],
+    },
+    {
+      label: "Meu Progresso",
+      items: [
+        { icon: BarChart3, label: "Estatísticas", path: "/student/statistics" },
+      ],
+    },
   ];
+
+  const renderNavItems = (items: MenuSection["items"], closeSidebar?: boolean) => (
+    items.map((item) => {
+      const isActive = location === item.path;
+      return (
+        <Link key={item.path} href={item.path}>
+          <button
+            onClick={closeSidebar ? () => setSidebarOpen(false) : undefined}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+              isActive
+                ? "bg-primary text-primary-foreground shadow-lg"
+                : "text-foreground hover:bg-accent hover:text-accent-foreground"
+            }`}
+          >
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm flex-1 text-left">{item.label}</span>
+            {(item.badge ?? 0) > 0 && (
+              <Badge 
+                variant={isActive ? "secondary" : "destructive"}
+                className="h-5 min-w-5 flex items-center justify-center text-xs"
+              >
+                {(item.badge ?? 0) > 99 ? "99+" : item.badge}
+              </Badge>
+            )}
+          </button>
+        </Link>
+      );
+    })
+  );
+
+  const renderSections = (closeSidebar?: boolean) => (
+    menuSections.map((section, idx) => (
+      <div key={section.label} className={idx > 0 ? "pt-3" : ""}>
+        <p className="px-4 mb-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+          {section.label}
+        </p>
+        <div className="space-y-0.5">
+          {renderNavItems(section.items, closeSidebar)}
+        </div>
+      </div>
+    ))
+  );
+
+  const renderBottomActions = (closeSidebar?: boolean) => (
+    <div className="p-4 border-t border-border bg-muted/30 space-y-2">
+      <ThemeSelector
+        trigger={
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-3 h-11"
+          >
+            <Palette className="w-5 h-5" />
+            <span className="text-sm font-medium">Personalizar Tema</span>
+          </Button>
+        }
+      />
+      <Link href="/student-profile">
+        <Button
+          onClick={closeSidebar ? () => setSidebarOpen(false) : undefined}
+          variant="outline"
+          className="w-full justify-start gap-3 h-11"
+        >
+          <User className="w-5 h-5" />
+          <span className="text-sm font-medium">Meu Perfil</span>
+        </Button>
+      </Link>
+      <a
+        href="/api/logout"
+        className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+      >
+        <LogOut className="w-5 h-5" />
+        <span className="text-sm font-medium">Sair</span>
+      </a>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,7 +198,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col z-50">
         <div className="flex flex-col flex-grow bg-card border-r border-border shadow-xl">
           {/* Logo */}
-          <div className="flex items-center gap-3 px-6 py-6 border-b border-border bg-muted">
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-border bg-muted">
             <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
             <div>
               <h1 className="font-bold text-foreground text-xl">Portal do Aluno</h1>
@@ -93,9 +207,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </div>
 
           {/* User Info */}
-          <div className="px-6 py-5 border-b border-border bg-muted/50">
+          <div className="px-6 py-4 border-b border-border bg-muted/50">
             <div className="flex items-center gap-3">
-              <Avatar className="h-14 w-14 border-2 border-border shadow-md">
+              <Avatar className="h-12 w-12 border-2 border-border shadow-md">
                 <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
                   {student?.fullName?.charAt(0).toUpperCase() || "A"}
                 </AvatarFallback>
@@ -111,65 +225,13 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {menuItems.map((item) => {
-              const isActive = location === item.path;
-              return (
-                <Link key={item.path} href={item.path}>
-                  <button
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-lg"
-                        : "text-foreground hover:bg-accent hover:text-accent-foreground"
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm flex-1 text-left">{item.label}</span>
-                    {item.badge > 0 && (
-                      <Badge 
-                        variant={isActive ? "secondary" : "destructive"}
-                        className="h-5 min-w-5 flex items-center justify-center text-xs"
-                      >
-                        {item.badge > 99 ? "99+" : item.badge}
-                      </Badge>
-                    )}
-                  </button>
-                </Link>
-              );
-            })}
+          {/* Navigation Sections */}
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            {renderSections()}
           </nav>
 
           {/* Bottom Actions */}
-          <div className="p-4 border-t border-border bg-muted/30 space-y-2">
-            <ThemeSelector
-              trigger={
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 h-11"
-                >
-                  <Palette className="w-5 h-5" />
-                  <span className="text-sm font-medium">Personalizar Tema</span>
-                </Button>
-              }
-            />
-            <Link href="/student-profile">
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-3 h-11"
-              >
-                <User className="w-5 h-5" />
-                <span className="text-sm font-medium">Meu Perfil</span>
-              </Button>
-            </Link>
-            <a
-              href="/api/logout"
-              className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="text-sm font-medium">Sair</span>
-            </a>
-          </div>
+          {renderBottomActions()}
         </div>
       </aside>
 
@@ -189,7 +251,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       >
         <div className="flex flex-col h-full">
           {/* Logo + Close */}
-          <div className="flex items-center justify-between px-6 py-6 border-b border-border bg-muted">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-muted">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
               <div>
@@ -206,9 +268,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </div>
 
           {/* User Info */}
-          <div className="px-6 py-5 border-b border-border bg-muted/50">
+          <div className="px-6 py-4 border-b border-border bg-muted/50">
             <div className="flex items-center gap-3">
-              <Avatar className="h-14 w-14 border-2 border-border shadow-md">
+              <Avatar className="h-12 w-12 border-2 border-border shadow-md">
                 <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
                   {student?.fullName?.charAt(0).toUpperCase() || "A"}
                 </AvatarFallback>
@@ -224,67 +286,13 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {menuItems.map((item) => {
-              const isActive = location === item.path;
-              return (
-                <Link key={item.path} href={item.path}>
-                  <button
-                    onClick={() => setSidebarOpen(false)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-lg"
-                        : "text-foreground hover:bg-accent hover:text-accent-foreground"
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm flex-1 text-left">{item.label}</span>
-                    {item.badge > 0 && (
-                      <Badge 
-                        variant={isActive ? "secondary" : "destructive"}
-                        className="h-5 min-w-5 flex items-center justify-center text-xs"
-                      >
-                        {item.badge > 99 ? "99+" : item.badge}
-                      </Badge>
-                    )}
-                  </button>
-                </Link>
-              );
-            })}
+          {/* Navigation Sections */}
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            {renderSections(true)}
           </nav>
 
           {/* Bottom Actions */}
-          <div className="p-4 border-t border-border bg-muted/30 space-y-2">
-            <ThemeSelector
-              trigger={
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 h-11"
-                >
-                  <Palette className="w-5 h-5" />
-                  <span className="text-sm font-medium">Personalizar Tema</span>
-                </Button>
-              }
-            />
-            <Link href="/student-profile">
-              <Button
-                onClick={() => setSidebarOpen(false)}
-                variant="outline"
-                className="w-full justify-start gap-3 h-11"
-              >
-                <User className="w-5 h-5" />
-                <span className="text-sm font-medium">Meu Perfil</span>
-              </Button>
-            </Link>
-            <a
-              href="/api/logout"
-              className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="text-sm font-medium">Sair</span>
-            </a>
-          </div>
+          {renderBottomActions(true)}
         </div>
       </aside>
 

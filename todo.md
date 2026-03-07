@@ -7460,3 +7460,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Corrigir botão "Trilhas de Aprendizagem" na disciplina para navegar direto para trilha da disciplina (com subjectId)
 - [ ] Aumentar limite de upload de 75MB para 100MB
 - [ ] Deploy na VPS
+
+## Melhoria: Menu lateral do portal do aluno + Limitação por disciplina
+- [ ] Adicionar itens faltantes ao menu lateral (Caderno, Dúvidas, Revisão, Diário, Estatísticas)
+- [ ] Limitar Dúvidas (IA) para responder APENAS sobre conteúdos das disciplinas do aluno
+- [ ] Limitar Revisão Inteligente às disciplinas matriculadas
+- [ ] Limitar Diário de Aprendizagem às disciplinas matriculadas
