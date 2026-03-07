@@ -7449,3 +7449,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Registrar rota /learning-path-report no App.tsx
 - [ ] Adicionar link de acesso no módulo de trilhas do professor
 - [ ] Fazer deploy na VPS
+
+## Fix: Seletor Disciplina—Turma vazio no Boletim da Trilha
+- [ ] Reescrever getSubjectClassCombinations sem depender de student_class_enrollments (tabela vazia)
+- [ ] Ajustar getLearningPathClassReport para buscar alunos apenas via subjectEnrollments
+- [ ] Testar localmente
+- [ ] Deploy na VPS

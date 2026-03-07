@@ -1,0 +1,30 @@
+{
+  "query": "SELECT 'subjects' AS tbl, COUNT(*) AS cnt FROM subjects\nUNION ALL SELECT 'learning_modules', COUNT(*) FROM learning_modules\nUNION ALL SELECT 'subjectEnrollments', COUNT(*) FROM subjectEnrollments\nUNION ALL SELECT 'student_class_enrollments', COUNT(*) FROM student_class_enrollments\nUNION ALL SELECT 'classes', COUNT(*) FROM classes",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT 'subjects' AS tbl, COUNT(*) AS cnt FROM subjects\nUNION ALL SELECT 'learning_modules', COUNT(*) FROM learning_modules\nUNION ALL SELECT 'subjectEnrollments', COUNT(*) FROM subjectEnrollments\nUNION ALL SELECT 'student_class_enrollments', COUNT(*) FROM student_class_enrollments\nUNION ALL SELECT 'classes', COUNT(*) FROM classes",
+  "rows": [
+    {
+      "tbl": "subjectEnrollments",
+      "cnt": "12"
+    },
+    {
+      "tbl": "subjects",
+      "cnt": "39"
+    },
+    {
+      "tbl": "learning_modules",
+      "cnt": "18"
+    },
+    {
+      "tbl": "student_class_enrollments",
+      "cnt": "0"
+    },
+    {
+      "tbl": "classes",
+      "cnt": "12"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\nsubjectEnrollments\t12\nsubjects\t39\nlearning_modules\t18\nstudent_class_enrollments\t0\nclasses\t12\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

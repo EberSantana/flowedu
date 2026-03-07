@@ -470,7 +470,7 @@ export default function LearningPathReport() {
     error,
   } = trpc.learningPathReport.getClassReport.useQuery(
     { subjectId: selectedSubjectId!, classId: selectedClassId },
-    { enabled: !!selectedSubjectId && !!selectedClassId }
+    { enabled: !!selectedSubjectId && selectedClassId !== null }
   );
 
   // Exportar PDF
@@ -491,9 +491,9 @@ export default function LearningPathReport() {
       doc.setFont("helvetica", "normal");
       doc.text(`Disciplina: ${report.subject.name}`, 14, 24);
 
-      const classLabel = selectedClassId
+      const classLabel = selectedClassId && selectedClassId > 0
         ? classes?.find((c) => c.id === selectedClassId)?.name ?? "Turma selecionada"
-        : "Todas as turmas";
+        : "Todos os alunos";
       doc.text(`Turma: ${classLabel}`, 14, 30);
       doc.text(
         `Gerado em: ${new Date(report.generatedAt).toLocaleString("pt-BR")}`,
@@ -602,7 +602,7 @@ export default function LearningPathReport() {
                     <SelectContent>
                       {combinations && combinations.length === 0 && (
                         <div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                          Nenhuma disciplina com trilha e alunos matriculados encontrada.
+                          Nenhuma disciplina com trilha de aprendizagem encontrada.
                         </div>
                       )}
                       {combinations?.map((c) => (
@@ -611,7 +611,13 @@ export default function LearningPathReport() {
                           value={`${c.subjectId}:${c.classId}`}
                         >
                           <span className="font-medium">{c.subjectName}</span>
-                          <span className="text-muted-foreground ml-1">— {c.className}{c.classCode ? ` (${c.classCode})` : ""}</span>
+                          <span className="text-muted-foreground ml-1">
+                            — {c.classId === 0 ? (
+                              <span className="italic">{c.className}</span>
+                            ) : (
+                              <>{c.className}{c.classCode ? ` (${c.classCode})` : ""}</>
+                            )}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -621,8 +627,12 @@ export default function LearningPathReport() {
                       Disciplina: <span className="font-medium text-foreground">{selectedCombination.subjectName}</span>
                       {selectedCombination.subjectCode && ` · ${selectedCombination.subjectCode}`}
                       {" · "}
-                      Turma: <span className="font-medium text-foreground">{selectedCombination.className}</span>
-                      {selectedCombination.classCode && ` (${selectedCombination.classCode})`}
+                      {selectedCombination.classId === 0 ? (
+                        <span className="font-medium text-foreground italic">Todos os alunos</span>
+                      ) : (
+                        <>Turma: <span className="font-medium text-foreground">{selectedCombination.className}</span>
+                        {selectedCombination.classCode && ` (${selectedCombination.classCode})`}</>
+                      )}
                     </p>
                   )}
                 </div>
