@@ -51,12 +51,16 @@ export default defineConfig({
     // Garante que apenas uma cópia do React seja usada em toda a aplicação
     dedupe: [
       'react', 
-      'react-dom', 
+      'react-dom',
+      'react-dom/client',
+      'react-dom/server',
       'react/jsx-runtime', 
       'react/jsx-dev-runtime',
       '@tanstack/react-query',
       '@trpc/react-query',
     ],
+    // Evita que symlinks do pnpm criem caminhos distintos no esbuild
+    preserveSymlinks: false,
   },
   envDir: path.resolve(import.meta.dirname),
   root: path.resolve(import.meta.dirname, "client"),
@@ -81,7 +85,8 @@ export default defineConfig({
     // Pré-bundling de dependências críticas para evitar problemas de cache
     include: [
       'react', 
-      'react-dom', 
+      'react-dom',
+      'react-dom/client',
       'react/jsx-runtime',
       'react/jsx-dev-runtime',
       '@trpc/client', 
@@ -97,10 +102,25 @@ export default defineConfig({
       jsx: 'automatic',
       // Target moderno para melhor performance
       target: 'esnext',
+      // Força todos os pacotes a resolver react do mesmo caminho
+      plugins: [
+        {
+          name: 'force-single-react',
+          setup(build: any) {
+            const reactPath = path.resolve(import.meta.dirname, 'node_modules', 'react');
+            const reactDomPath = path.resolve(import.meta.dirname, 'node_modules', 'react-dom');
+            build.onResolve({ filter: /^react$/ }, () => ({ path: reactPath + '/index.js' }));
+            build.onResolve({ filter: /^react-dom$/ }, () => ({ path: reactDomPath + '/index.js' }));
+            build.onResolve({ filter: /^react-dom\/client$/ }, () => ({ path: reactDomPath + '/client.js' }));
+            build.onResolve({ filter: /^react\/jsx-runtime$/ }, () => ({ path: reactPath + '/jsx-runtime.js' }));
+            build.onResolve({ filter: /^react\/jsx-dev-runtime$/ }, () => ({ path: reactPath + '/jsx-dev-runtime.js' }));
+          },
+        },
+      ],
     },
   },
-  // Configuração do cache do Vite
-  cacheDir: 'node_modules/.vite',
+  // Configuração do cache do Vite - caminho absoluto para evitar criação em client/node_modules
+  cacheDir: path.resolve(import.meta.dirname, 'node_modules/.vite'),
   server: {
     host: true,
     hmr: {
