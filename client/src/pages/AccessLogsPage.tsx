@@ -81,8 +81,9 @@ export default function AccessLogsPage() {
     return d.toISOString().slice(0, 10);
   });
   const [dateTo, setDateTo] = useState(() => new Date().toISOString().slice(0, 10));
-  // Logs por turma
+  // Logs por turma e disciplina
   const [selectedClassId, setSelectedClassId] = useState<number | undefined>(undefined);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | undefined>(undefined);
   const [expandedClasses, setExpandedClasses] = useState<Set<number>>(new Set());
 
   const toggleClassExpand = (classId: number) => {
@@ -156,11 +157,12 @@ export default function AccessLogsPage() {
     { refetchOnWindowFocus: false }
   );
 
-  // Queries para logs por turma
+  // Queries para logs por turma e disciplina
   const { data: classList } = trpc.accessLogs.getClassList.useQuery(undefined, { refetchOnWindowFocus: false });
+  const { data: subjectList } = trpc.accessLogs.getSubjectList.useQuery(undefined, { refetchOnWindowFocus: false });
   const classByClassInput = filterMode === "period"
-    ? { days, dateFrom, dateTo, classId: selectedClassId }
-    : { days, classId: selectedClassId };
+    ? { days, dateFrom, dateTo, classId: selectedClassId, subjectId: selectedSubjectId }
+    : { days, classId: selectedClassId, subjectId: selectedSubjectId };
   const { data: classLogsData, isLoading: classLogsLoading } = trpc.accessLogs.getLogsByClass.useQuery(
     classByClassInput,
     { refetchOnWindowFocus: false }
@@ -712,12 +714,28 @@ export default function AccessLogsPage() {
                     Visualize o engajamento de cada turma no período selecionado
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    value={selectedSubjectId ? selectedSubjectId.toString() : "all"}
+                    onValueChange={(v) => setSelectedSubjectId(v === "all" ? undefined : Number(v))}
+                  >
+                    <SelectTrigger className="w-52">
+                      <SelectValue placeholder="Todas as disciplinas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas as disciplinas</SelectItem>
+                      {subjectList?.map((sub) => (
+                        <SelectItem key={sub.id} value={sub.id.toString()}>
+                          {sub.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Select
                     value={selectedClassId ? selectedClassId.toString() : "all"}
                     onValueChange={(v) => setSelectedClassId(v === "all" ? undefined : Number(v))}
                   >
-                    <SelectTrigger className="w-52">
+                    <SelectTrigger className="w-44">
                       <SelectValue placeholder="Todas as turmas" />
                     </SelectTrigger>
                     <SelectContent>
