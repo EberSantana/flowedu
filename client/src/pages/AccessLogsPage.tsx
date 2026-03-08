@@ -29,6 +29,7 @@ import {
   Users,
   ChevronDown,
   ChevronRight,
+  CalendarIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -39,8 +40,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 
 // Dias da semana em PT-BR (0=Dom, 1=Seg, ..., 6=Sab)
@@ -108,7 +112,8 @@ export default function AccessLogsPage() {
     onSuccess: () => {
       toast.success("Registros anteriores a " + clearBeforeDate + " foram removidos!");
       setShowClearDialog(false);
-      refetch();
+      utils.accessLogs.getSummary.invalidate();
+      utils.accessLogs.getLogsByClass.invalidate();
     },
     onError: (e) => toast.error("Erro ao limpar: " + e.message),
   });
@@ -304,29 +309,44 @@ export default function AccessLogsPage() {
                 </Select>
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <Label htmlFor="dateFrom" className="text-sm text-muted-foreground whitespace-nowrap">De:</Label>
-                    <Input
-                      id="dateFrom"
-                      type="date"
-                      value={dateFrom}
-                      onChange={(e) => setDateFrom(e.target.value)}
-                      max={dateTo}
-                      className="w-36 h-8 text-sm"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Label htmlFor="dateTo" className="text-sm text-muted-foreground whitespace-nowrap">Até:</Label>
-                    <Input
-                      id="dateTo"
-                      type="date"
-                      value={dateTo}
-                      onChange={(e) => setDateTo(e.target.value)}
-                      min={dateFrom}
-                      max={new Date().toISOString().slice(0, 10)}
-                      className="w-36 h-8 text-sm"
-                    />
-                  </div>
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">De:</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-36 justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateFrom ? format(new Date(dateFrom + 'T00:00:00'), 'dd/MM/yyyy') : 'Selecionar'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateFrom ? new Date(dateFrom + 'T00:00:00') : undefined}
+                        onSelect={(d) => d && setDateFrom(d.toISOString().slice(0, 10))}
+                        disabled={(d) => d > new Date()}
+                        locale={ptBR}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">Até:</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-36 justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateTo ? format(new Date(dateTo + 'T00:00:00'), 'dd/MM/yyyy') : 'Selecionar'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateTo ? new Date(dateTo + 'T00:00:00') : undefined}
+                        onSelect={(d) => d && setDateTo(d.toISOString().slice(0, 10))}
+                        disabled={(d) => d > new Date() || (dateFrom ? d < new Date(dateFrom + 'T00:00:00') : false)}
+                        locale={ptBR}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
               <Button
@@ -353,14 +373,25 @@ export default function AccessLogsPage() {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="py-4 space-y-3">
-                    <Label htmlFor="clearDate">Excluir registros anteriores a:</Label>
-                    <Input
-                      id="clearDate"
-                      type="date"
-                      value={clearBeforeDate}
-                      onChange={(e) => setClearBeforeDate(e.target.value)}
-                      max={new Date().toISOString().slice(0, 10)}
-                    />
+                    <Label>Excluir registros anteriores a:</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start text-left font-normal">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {clearBeforeDate ? format(new Date(clearBeforeDate + 'T00:00:00'), 'dd/MM/yyyy') : 'Selecionar data'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={clearBeforeDate ? new Date(clearBeforeDate + 'T00:00:00') : undefined}
+                          onSelect={(d) => d && setClearBeforeDate(d.toISOString().slice(0, 10))}
+                          disabled={(d) => d > new Date()}
+                          locale={ptBR}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <p className="text-sm text-muted-foreground">
                       Sugestão: manter os últimos 90 dias e limpar o restante.
                     </p>
@@ -394,20 +425,20 @@ export default function AccessLogsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total de Acessos
+                  Usuários Ativos
                 </CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{isLoading ? "—" : data?.totalAll ?? 0}</div>
-                <p className="text-xs text-muted-foreground mt-1">nos últimos {days} dias</p>
+                <p className="text-xs text-muted-foreground mt-1">usuários únicos no período</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Professores
+                  Professores Ativos
                 </CardTitle>
                 <UserCheck className="h-4 w-4 text-blue-500" />
               </CardHeader>
@@ -415,14 +446,14 @@ export default function AccessLogsPage() {
                 <div className="text-2xl font-bold text-blue-600">
                   {isLoading ? "—" : data?.totalTeacher ?? 0}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">acessos de professores</p>
+                <p className="text-xs text-muted-foreground mt-1">professores únicos no período</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Alunos
+                  Alunos Ativos
                 </CardTitle>
                 <GraduationCap className="h-4 w-4 text-green-500" />
               </CardHeader>
@@ -430,7 +461,7 @@ export default function AccessLogsPage() {
                 <div className="text-2xl font-bold text-green-600">
                   {isLoading ? "—" : data?.totalStudent ?? 0}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">acessos de alunos</p>
+                <p className="text-xs text-muted-foreground mt-1">alunos únicos no período</p>
               </CardContent>
             </Card>
 

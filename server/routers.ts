@@ -3449,7 +3449,6 @@ JSON (descrições MAX 15 chars):
         dateTo: z.string().optional(),   // ISO date string ex: "2025-01-31"
       }))
       .query(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         // Determinar intervalo: período personalizado ou últimos N dias
@@ -3477,38 +3476,67 @@ JSON (descrições MAX 15 chars):
           .orderBy(sql`accessedAt DESC`);
         const teacherLogs = allLogs.filter(l => l.userType === 'teacher');
         const studentLogs = allLogs.filter(l => l.userType === 'student');
-        // Acessos por dia (últimos N dias)
+
+        // Contar por USUÁRIO ÚNICO POR DIA (não cada clique)
+        // Professor: chave = userId + dia; Aluno: chave = studentId + dia
+        const teacherUniqueDays = new Set(
+          teacherLogs.map(l => `${l.userId}::${l.accessedAt.toISOString().slice(0, 10)}`)
+        );
+        const studentUniqueDays = new Set(
+          studentLogs.map(l => `${l.studentId ?? l.userId}::${l.accessedAt.toISOString().slice(0, 10)}`)
+        );
+
+        // Acessos por dia (contando usuários únicos por dia)
         const byDay: Record<string, { teachers: number; students: number }> = {};
-        for (const log of allLogs) {
-          const day = log.accessedAt.toISOString().slice(0, 10);
+        Array.from(teacherUniqueDays).forEach(key => {
+          const day = key.split('::')[1];
           if (!byDay[day]) byDay[day] = { teachers: 0, students: 0 };
-          if (log.userType === 'teacher') byDay[day].teachers++;
-          else byDay[day].students++;
-        }
-        // Top usuários
-        const teacherCount: Record<string, number> = {};
+          byDay[day].teachers++;
+        });
+        Array.from(studentUniqueDays).forEach(key => {
+          const day = key.split('::')[1];
+          if (!byDay[day]) byDay[day] = { teachers: 0, students: 0 };
+          byDay[day].students++;
+        });
+
+        // Contagem total: usuários únicos no período (não cliques)
+        const uniqueTeachers = new Set(teacherLogs.map(l => l.userId)).size;
+        const uniqueStudents = new Set(studentLogs.map(l => l.studentId ?? l.userId)).size;
+
+        // Top usuários (por número de dias únicos de acesso)
+        const teacherDayCount: Record<string, number> = {};
         for (const l of teacherLogs) {
           const name = l.userName || `Professor #${l.userId}`;
-          teacherCount[name] = (teacherCount[name] || 0) + 1;
+          const key = `${l.userId}::${l.accessedAt.toISOString().slice(0, 10)}`;
+          if (!teacherDayCount[name]) teacherDayCount[name] = 0;
+          // Conta apenas dias únicos por professor
         }
-        const studentCount: Record<string, number> = {};
+        const teacherDaySet: Record<string, Set<string>> = {};
+        for (const l of teacherLogs) {
+          const name = l.userName || `Professor #${l.userId}`;
+          if (!teacherDaySet[name]) teacherDaySet[name] = new Set();
+          teacherDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
+        }
+        const studentDaySet: Record<string, Set<string>> = {};
         for (const l of studentLogs) {
           const name = l.userName || `Aluno #${l.studentId}`;
-          studentCount[name] = (studentCount[name] || 0) + 1;
+          if (!studentDaySet[name]) studentDaySet[name] = new Set();
+          studentDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
         }
+
         return {
-          totalTeacher: teacherLogs.length,
-          totalStudent: studentLogs.length,
-          totalAll: allLogs.length,
+          totalTeacher: uniqueTeachers,
+          totalStudent: uniqueStudents,
+          totalAll: uniqueTeachers + uniqueStudents,
           byDay: Object.entries(byDay)
             .map(([date, counts]) => ({ date, ...counts }))
             .sort((a, b) => a.date.localeCompare(b.date)),
-          topTeachers: Object.entries(teacherCount)
-            .map(([name, count]) => ({ name, count }))
+          topTeachers: Object.entries(teacherDaySet)
+            .map(([name, days]) => ({ name, count: days.size }))
             .sort((a, b) => b.count - a.count)
             .slice(0, 10),
-          topStudents: Object.entries(studentCount)
-            .map(([name, count]) => ({ name, count }))
+          topStudents: Object.entries(studentDaySet)
+            .map(([name, days]) => ({ name, count: days.size }))
             .sort((a, b) => b.count - a.count)
             .slice(0, 10),
           recentLogs: allLogs.slice(0, 50).map(l => ({
