@@ -3524,10 +3524,59 @@ JSON (descrições MAX 15 chars):
           studentDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
         }
 
+        // Acessos hoje em BRT (UTC-3)
+        const nowUtc = new Date();
+        const nowBrt = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
+        const todayBrt = nowBrt.toISOString().slice(0, 10); // YYYY-MM-DD em BRT
+        const todayTeachers = new Set(
+          teacherLogs
+            .filter(l => {
+              const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
+              return brt.toISOString().slice(0, 10) === todayBrt;
+            })
+            .map(l => l.userId)
+        ).size;
+        const todayStudents = new Set(
+          studentLogs
+            .filter(l => {
+              const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
+              return brt.toISOString().slice(0, 10) === todayBrt;
+            })
+            .map(l => l.studentId ?? l.userId)
+        ).size;
+
+        // Função para parsear User-Agent
+        const parseUA = (ua: string | null | undefined): { browser: string; os: string } => {
+          if (!ua) return { browser: 'Desconhecido', os: 'Desconhecido' };
+          let browser = 'Outro';
+          let os = 'Outro';
+          // Navegador
+          if (ua.includes('Edg/') || ua.includes('Edge/')) browser = 'Microsoft Edge';
+          else if (ua.includes('OPR/') || ua.includes('Opera/')) browser = 'Opera';
+          else if (ua.includes('Chrome/') && !ua.includes('Chromium/')) browser = 'Google Chrome';
+          else if (ua.includes('Chromium/')) browser = 'Chromium';
+          else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
+          else if (ua.includes('Safari/') && !ua.includes('Chrome/')) browser = 'Safari';
+          else if (ua.includes('MSIE') || ua.includes('Trident/')) browser = 'Internet Explorer';
+          // Sistema Operacional
+          if (ua.includes('Windows NT 10.0')) os = 'Windows 10/11';
+          else if (ua.includes('Windows NT 6.3')) os = 'Windows 8.1';
+          else if (ua.includes('Windows NT 6.1')) os = 'Windows 7';
+          else if (ua.includes('Windows')) os = 'Windows';
+          else if (ua.includes('Android')) os = 'Android';
+          else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+          else if (ua.includes('Mac OS X')) os = 'macOS';
+          else if (ua.includes('Linux')) os = 'Linux';
+          return { browser, os };
+        };
+
         return {
           totalTeacher: uniqueTeachers,
           totalStudent: uniqueStudents,
           totalAll: uniqueTeachers + uniqueStudents,
+          todayTeachers,
+          todayStudents,
+          todayTotal: todayTeachers + todayStudents,
           byDay: Object.entries(byDay)
             .map(([date, counts]) => ({ date, ...counts }))
             .sort((a, b) => a.date.localeCompare(b.date)),
@@ -3539,13 +3588,19 @@ JSON (descrições MAX 15 chars):
             .map(([name, days]) => ({ name, count: days.size }))
             .sort((a, b) => b.count - a.count)
             .slice(0, 10),
-          recentLogs: allLogs.slice(0, 50).map(l => ({
-            id: l.id,
-            userType: l.userType,
-            userName: l.userName,
-            ipAddress: l.ipAddress,
-            accessedAt: l.accessedAt,
-          })),
+          recentLogs: allLogs.slice(0, 100).map(l => {
+            const { browser, os } = parseUA(l.userAgent);
+            return {
+              id: l.id,
+              userType: l.userType,
+              userName: l.userName,
+              ipAddress: l.ipAddress,
+              userAgent: l.userAgent,
+              browser,
+              os,
+              accessedAt: l.accessedAt,
+            };
+          }),
         };
       }),
 
@@ -3570,11 +3625,14 @@ JSON (descrições MAX 15 chars):
           ? allLogs2
           : allLogs2.filter(l => l.userType === input.userType);
         // Matriz: dayOfWeek (0=Dom..6=Sab) x hour (0..23)
+        // Converter UTC -> BRT (UTC-3) antes de calcular dia e hora
+        const BRT_OFFSET_MS = -3 * 60 * 60 * 1000;
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of filtered) {
-          const d = new Date(log.accessedAt);
-          const dow = d.getDay();
-          const hour = d.getHours();
+          const utcMs = new Date(log.accessedAt).getTime();
+          const brtDate = new Date(utcMs + BRT_OFFSET_MS);
+          const dow = brtDate.getUTCDay();   // dia da semana em BRT
+          const hour = brtDate.getUTCHours(); // hora em BRT
           matrix[dow][hour]++;
         }
         return { matrix, total: filtered.length };
@@ -3622,15 +3680,43 @@ JSON (descrições MAX 15 chars):
             .where(rangeWhere)
             .orderBy(accessLogs.accessedAt);
         }
-        // Gerar CSV
-        const header = ['Data/Hora', 'Tipo', 'Nome', 'IP', 'ID'];
-        const rows = logs.map(l => [
-          new Date(l.accessedAt).toLocaleString('pt-BR'),
-          l.userType === 'teacher' ? 'Professor' : 'Aluno',
-          l.userName ?? '',
-          l.ipAddress ?? '',
-          String(l.userId ?? ''),
-        ]);
+        // Função para parsear User-Agent (reutilizada no CSV)
+        const parseUAcsv = (ua: string | null | undefined): { browser: string; os: string } => {
+          if (!ua) return { browser: 'Desconhecido', os: 'Desconhecido' };
+          let browser = 'Outro', os = 'Outro';
+          if (ua.includes('Edg/') || ua.includes('Edge/')) browser = 'Microsoft Edge';
+          else if (ua.includes('OPR/') || ua.includes('Opera/')) browser = 'Opera';
+          else if (ua.includes('Chrome/') && !ua.includes('Chromium/')) browser = 'Google Chrome';
+          else if (ua.includes('Chromium/')) browser = 'Chromium';
+          else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
+          else if (ua.includes('Safari/') && !ua.includes('Chrome/')) browser = 'Safari';
+          else if (ua.includes('MSIE') || ua.includes('Trident/')) browser = 'Internet Explorer';
+          if (ua.includes('Windows NT 10.0')) os = 'Windows 10/11';
+          else if (ua.includes('Windows NT 6.3')) os = 'Windows 8.1';
+          else if (ua.includes('Windows NT 6.1')) os = 'Windows 7';
+          else if (ua.includes('Windows')) os = 'Windows';
+          else if (ua.includes('Android')) os = 'Android';
+          else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+          else if (ua.includes('Mac OS X')) os = 'macOS';
+          else if (ua.includes('Linux')) os = 'Linux';
+          return { browser, os };
+        };
+        // Gerar CSV com Navegador e Sistema Operacional
+        const header = ['Data/Hora (BRT)', 'Tipo', 'Nome', 'IP', 'Navegador', 'Sistema Operacional', 'User-Agent', 'ID'];
+        const rows = logs.map(l => {
+          const brtDate = new Date(new Date(l.accessedAt).getTime() - 3 * 60 * 60 * 1000);
+          const { browser, os } = parseUAcsv(l.userAgent);
+          return [
+            brtDate.toLocaleString('pt-BR', { timeZone: 'UTC' }),
+            l.userType === 'teacher' ? 'Professor' : 'Aluno',
+            l.userName ?? '',
+            l.ipAddress ?? '',
+            browser,
+            os,
+            l.userAgent ?? '',
+            String(l.userId ?? ''),
+          ];
+        });
         const csvLines = [header, ...rows].map(r =>
           r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
         );
@@ -3690,6 +3776,7 @@ JSON (descrições MAX 15 chars):
             studentId: subjectEnrollments.studentId,
             studentName: studentsTable.fullName,
             subjectId: subjectEnrollments.subjectId,
+            subjectName: subjects.name,
           })
           .from(subjectEnrollments)
           .innerJoin(scheduledClasses, andOp(
@@ -3697,6 +3784,7 @@ JSON (descrições MAX 15 chars):
             eq(scheduledClasses.userId, teacherId)
           ))
           .innerJoin(classes, eq(classes.id, scheduledClasses.classId))
+          .innerJoin(subjects, eq(subjects.id, subjectEnrollments.subjectId))
           .leftJoin(studentsTable, eq(studentsTable.id, subjectEnrollments.studentId))
           .where(eq(subjectEnrollments.userId, teacherId));
 
@@ -3717,15 +3805,21 @@ JSON (descrições MAX 15 chars):
           : uniqueEnrollments;
 
         // Mapear studentId -> turmas e classId -> todos os alunos matriculados
-        const studentToClasses: Record<number, { classId: number; className: string; classCode: string }[]> = {};
+        const studentToClasses: Record<number, { classId: number; className: string; classCode: string; subjectName?: string }[]> = {};
         const classAllStudents: Record<number, { id: number; name: string }[]> = {};
+        // Mapear classId -> subjectName (primeira disciplina vinculada)
+        const classSubjectMap: Record<number, string> = {};
         for (const row of filteredEnrollments) {
           if (!row.studentId) continue;
           if (!studentToClasses[row.studentId]) studentToClasses[row.studentId] = [];
           // Evitar duplicar turma para o mesmo aluno
           const alreadyHasClass = studentToClasses[row.studentId].some(c => c.classId === row.classId);
           if (!alreadyHasClass) {
-            studentToClasses[row.studentId].push({ classId: row.classId, className: row.className, classCode: row.classCode });
+            studentToClasses[row.studentId].push({ classId: row.classId, className: row.className, classCode: row.classCode, subjectName: row.subjectName ?? undefined });
+          }
+          // Registrar disciplina vinculada à turma
+          if (!classSubjectMap[row.classId] && row.subjectName) {
+            classSubjectMap[row.classId] = row.subjectName;
           }
           if (!classAllStudents[row.classId]) classAllStudents[row.classId] = [];
           const alreadyInClass = classAllStudents[row.classId].some(s => s.id === row.studentId);
@@ -3739,6 +3833,7 @@ JSON (descrições MAX 15 chars):
           classId: number;
           className: string;
           classCode: string;
+          subjectName?: string;
           totalAccesses: number;
           uniqueStudents: Set<number>;
           students: Record<number, { name: string; count: number; lastAccess: Date }>;
@@ -3760,6 +3855,7 @@ JSON (descrições MAX 15 chars):
                 classId: cls.classId,
                 className: cls.className,
                 classCode: cls.classCode,
+                subjectName: classSubjectMap[cls.classId],
                 totalAccesses: 0,
                 uniqueStudents: new Set(),
                 students: {},
@@ -3787,6 +3883,7 @@ JSON (descrições MAX 15 chars):
             classId: cs.classId,
             className: cs.className,
             classCode: cs.classCode,
+            subjectName: cs.subjectName,
             totalAccesses: cs.totalAccesses,
             uniqueStudents: cs.uniqueStudents.size,
             totalEnrolled: allInClass.length,
@@ -3805,6 +3902,7 @@ JSON (descrições MAX 15 chars):
               classId: cls.classId,
               className: cls.className,
               classCode: cls.classCode,
+              subjectName: classSubjectMap[cls.classId],
               totalAccesses: 0,
               uniqueStudents: 0,
               totalEnrolled: allInClass.length,
@@ -3832,15 +3930,34 @@ JSON (descrições MAX 15 chars):
       return classRows;
     }),
 
-    // Lista de disciplinas do professor logado para seletor de filtro
+    // Lista de disciplinas do professor logado com turma vinculada via scheduled_classes
     getSubjectList: protectedProcedure.query(async ({ ctx }) => {
       const database = await getDb();
       if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-      return database
-        .select({ id: subjects.id, name: subjects.name, code: subjects.code })
+      const teacherId = ctx.user.id;
+      const { scheduledClasses } = await import('../drizzle/schema');
+      // Buscar disciplinas com a turma vinculada
+      const rows = await database
+        .select({
+          id: subjects.id,
+          name: subjects.name,
+          code: subjects.code,
+          classId: scheduledClasses.classId,
+          className: classes.name,
+          classCode: classes.code,
+        })
         .from(subjects)
-        .where(eq(subjects.userId, ctx.user.id))
+        .leftJoin(scheduledClasses, and(eq(scheduledClasses.subjectId, subjects.id), eq(scheduledClasses.userId, teacherId)))
+        .leftJoin(classes, eq(classes.id, scheduledClasses.classId))
+        .where(eq(subjects.userId, teacherId))
         .orderBy(subjects.name);
+      // Remover duplicatas por disciplina (pegar primeira turma vinculada)
+      const seen = new Set<number>();
+      return rows.filter(r => {
+        if (seen.has(r.id)) return false;
+        seen.add(r.id);
+        return true;
+      });
     }),
 
     // Exportar CSV de uma turma específica

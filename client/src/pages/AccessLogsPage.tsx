@@ -47,9 +47,10 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 
-// Dias da semana em PT-BR (0=Dom, 1=Seg, ..., 6=Sab)
+// Dias da semana em PT-BR (0=Dom, 1=Seg, ..., 6=Sáb)
 const DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-// Horas do dia agrupadas de 2 em 2 para melhor visualização
+const DAYS_FULL = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+// Horas do dia (0..23)
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 function getHeatColor(value: number, max: number): string {
@@ -198,9 +199,8 @@ export default function AccessLogsPage() {
     }
   }, [classCSVData, exportingClassId, classLogsData]);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const todayEntry = data?.byDay.find((d) => d.date === today);
-  const todayTotal = (todayEntry?.teachers ?? 0) + (todayEntry?.students ?? 0);
+  // Usar todayTeachers/todayStudents do backend (já calculado em BRT)
+  const todayTotal = data?.todayTotal ?? 0;
 
   const filteredLogs = (data?.recentLogs ?? []).filter((log) => {
     if (filterType === "all") return true;
@@ -477,7 +477,7 @@ export default function AccessLogsPage() {
                   {isLoading ? "—" : todayTotal}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {todayEntry?.teachers ?? 0} prof. · {todayEntry?.students ?? 0} alunos
+                  {data?.todayTeachers ?? 0} prof. · {data?.todayStudents ?? 0} alunos
                 </p>
               </CardContent>
             </Card>
@@ -493,7 +493,7 @@ export default function AccessLogsPage() {
                     Mapa de Calor — Acessos por Dia e Horário
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Identifique os momentos de maior engajamento para planejar comunicados
+                    Identifique os momentos de maior engajamento para planejar comunicados • Horários em BRT (UTC−3)
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -540,8 +540,8 @@ export default function AccessLogsPage() {
                     <div className="mb-4 flex items-center gap-2 text-sm text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
                       <Flame className="h-4 w-4 text-orange-500 shrink-0" />
                       <span>
-                        <strong>Pico de acessos:</strong> {DAYS[peakDay]}feira às {peakHour}h–{peakHour + 1}h
-                        com <strong>{peakVal} acessos</strong> — melhor momento para enviar comunicados!
+                        <strong>Pico de acessos:</strong> {DAYS_FULL[peakDay]} às {peakHour}h–{peakHour + 1}h (BRT)
+                        com <strong>{peakVal} {peakVal === 1 ? 'acesso' : 'acessos'}</strong> — melhor momento para enviar comunicados!
                       </span>
                     </div>
                   )}
@@ -573,7 +573,7 @@ export default function AccessLogsPage() {
                             return (
                               <div
                                 key={h}
-                                title={`${day} ${h}h: ${val} acesso${val !== 1 ? "s" : ""}`}
+                                title={`${DAYS_FULL[d]} às ${h}h–${h+1}h (BRT): ${val} ${val !== 1 ? 'acessos' : 'acesso'}`}
                                 className={`flex-1 h-7 mx-px rounded-sm flex items-center justify-center cursor-default transition-opacity hover:opacity-80 ${getHeatColor(val, maxValue)}`}
                               >
                                 {val > 0 && (
@@ -696,10 +696,12 @@ export default function AccessLogsPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Tipo</TableHead>
+                        <TableHead className="w-24">Tipo</TableHead>
                         <TableHead>Nome</TableHead>
-                        <TableHead>IP</TableHead>
-                        <TableHead>Data / Hora</TableHead>
+                        <TableHead className="w-32">Navegador</TableHead>
+                        <TableHead className="w-32">Sistema</TableHead>
+                        <TableHead className="w-36">IP</TableHead>
+                        <TableHead className="w-36">Data / Hora (BRT)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -718,7 +720,20 @@ export default function AccessLogsPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="font-medium">{log.userName ?? "—"}</TableCell>
-                          <TableCell className="text-muted-foreground text-sm font-mono">
+                          <TableCell className="text-sm">
+                            <span className="inline-flex items-center gap-1">
+                              {(log as any).browser === 'Google Chrome' && <span title="Chrome">🟢</span>}
+                              {(log as any).browser === 'Mozilla Firefox' && <span title="Firefox">🟠</span>}
+                              {(log as any).browser === 'Microsoft Edge' && <span title="Edge">🔵</span>}
+                              {(log as any).browser === 'Safari' && <span title="Safari">🟡</span>}
+                              {(log as any).browser === 'Opera' && <span title="Opera">🔴</span>}
+                              <span className="text-muted-foreground">{(log as any).browser ?? '—'}</span>
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {(log as any).os ?? '—'}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm font-mono text-xs">
                             {log.ipAddress ?? "—"}
                           </TableCell>
                           <TableCell className="text-muted-foreground text-sm">
@@ -750,14 +765,16 @@ export default function AccessLogsPage() {
                     value={selectedSubjectId ? selectedSubjectId.toString() : "all"}
                     onValueChange={(v) => setSelectedSubjectId(v === "all" ? undefined : Number(v))}
                   >
-                    <SelectTrigger className="w-52">
+                    <SelectTrigger className="w-72">
                       <SelectValue placeholder="Todas as disciplinas" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todas as disciplinas</SelectItem>
                       {subjectList?.map((sub) => (
                         <SelectItem key={sub.id} value={sub.id.toString()}>
-                          {sub.name}
+                          {(sub as any).className
+                            ? `${sub.name} – ${(sub as any).className}`
+                            : sub.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -766,14 +783,14 @@ export default function AccessLogsPage() {
                     value={selectedClassId ? selectedClassId.toString() : "all"}
                     onValueChange={(v) => setSelectedClassId(v === "all" ? undefined : Number(v))}
                   >
-                    <SelectTrigger className="w-44">
+                    <SelectTrigger className="w-52">
                       <SelectValue placeholder="Todas as turmas" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todas as turmas</SelectItem>
                       {classList?.map((cls) => (
                         <SelectItem key={cls.id} value={cls.id.toString()}>
-                          {cls.name} ({cls.code})
+                          Turma {cls.code}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -800,8 +817,9 @@ export default function AccessLogsPage() {
                           const maxAccesses = Math.max(...classLogsData.classes.map(c => c.totalAccesses), 1);
                           return classLogsData.classes.map((cls) => (
                             <div key={cls.classId} className="flex items-center gap-3">
-                              <div className="w-36 text-xs text-right text-muted-foreground truncate" title={cls.className}>
-                                {cls.className}
+                              <div className="w-48 text-xs text-right text-muted-foreground truncate"
+                                title={(cls as any).subjectName ? `${(cls as any).subjectName} – ${cls.className}` : cls.className}>
+                                {(cls as any).subjectName ? `${(cls as any).subjectName} – ${cls.className}` : cls.className}
                               </div>
                               <div className="flex-1 bg-muted rounded-full h-5 overflow-hidden">
                                 <div
@@ -846,8 +864,21 @@ export default function AccessLogsPage() {
                           className="col-span-4 text-left"
                           onClick={() => toggleClassExpand(cls.classId)}
                         >
-                          <div className="font-medium text-sm">{cls.className}</div>
-                          <div className="text-xs text-muted-foreground">{cls.classCode}</div>
+                          {(cls as any).subjectName ? (
+                            <>
+                              <div className="font-medium text-sm">
+                                <span className="text-purple-700">{(cls as any).subjectName}</span>
+                                <span className="text-muted-foreground mx-1">–</span>
+                                <span>{cls.className}</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">Cód. {cls.classCode}</div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="font-medium text-sm">{cls.className}</div>
+                              <div className="text-xs text-muted-foreground">{cls.classCode}</div>
+                            </>
+                          )}
                         </button>
                         <div className="col-span-2 flex items-center justify-center">
                           <Badge variant="secondary" className="bg-purple-100 text-purple-700">
