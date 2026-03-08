@@ -3609,6 +3609,132 @@ JSON (descrições MAX 15 chars):
         return { csv: csvLines.join('\n'), total: logs.length };
       }),
 
+    // Acessos agrupados por turma
+    getLogsByClass: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(365).default(30),
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+        classId: z.number().optional(), // filtrar por turma específica
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { gte: gteOp, lte: lteOp, and: andOp, isNotNull } = await import('drizzle-orm');
+        // Determinar intervalo
+        let since: Date;
+        let until: Date | undefined;
+        if (input.dateFrom) {
+          since = new Date(input.dateFrom);
+          since.setHours(0, 0, 0, 0);
+          if (input.dateTo) {
+            until = new Date(input.dateTo);
+            until.setHours(23, 59, 59, 999);
+          }
+        } else {
+          since = new Date();
+          since.setDate(since.getDate() - input.days);
+        }
+        const rangeWhere = until
+          ? andOp(gteOp(accessLogs.accessedAt, since), lteOp(accessLogs.accessedAt, until))
+          : gteOp(accessLogs.accessedAt, since);
+
+        // Buscar todos os logs de alunos no período
+        const studentLogs = await database
+          .select()
+          .from(accessLogs)
+          .where(andOp(rangeWhere, eq(accessLogs.userType, 'student')))
+          .orderBy(sql`accessedAt DESC`);
+
+        // Buscar todas as turmas com seus alunos matriculados
+        const allClasses = await database
+          .select({
+            classId: classes.id,
+            className: classes.name,
+            classCode: classes.code,
+            studentId: studentClassEnrollments.studentId,
+          })
+          .from(classes)
+          .leftJoin(studentClassEnrollments, eq(studentClassEnrollments.classId, classes.id));
+
+        // Mapear studentId -> turmas
+        const studentToClasses: Record<number, { classId: number; className: string; classCode: string }[]> = {};
+        for (const row of allClasses) {
+          if (row.studentId) {
+            if (!studentToClasses[row.studentId]) studentToClasses[row.studentId] = [];
+            studentToClasses[row.studentId].push({ classId: row.classId, className: row.className, classCode: row.classCode });
+          }
+        }
+
+        // Agrupar logs por turma
+        const classSummary: Record<number, {
+          classId: number;
+          className: string;
+          classCode: string;
+          totalAccesses: number;
+          uniqueStudents: Set<number>;
+          students: Record<number, { name: string; count: number; lastAccess: Date }>;
+          byDay: Record<string, number>;
+        }> = {};
+
+        // Logs sem turma
+        let noClassCount = 0;
+
+        for (const log of studentLogs) {
+          if (!log.studentId) { noClassCount++; continue; }
+          const logClasses = studentToClasses[log.studentId] || [];
+          if (logClasses.length === 0) { noClassCount++; continue; }
+
+          for (const cls of logClasses) {
+            // Filtro por turma específica
+            if (input.classId && cls.classId !== input.classId) continue;
+
+            if (!classSummary[cls.classId]) {
+              classSummary[cls.classId] = {
+                classId: cls.classId,
+                className: cls.className,
+                classCode: cls.classCode,
+                totalAccesses: 0,
+                uniqueStudents: new Set(),
+                students: {},
+                byDay: {},
+              };
+            }
+            const cs = classSummary[cls.classId];
+            cs.totalAccesses++;
+            cs.uniqueStudents.add(log.studentId);
+            const sName = log.userName || `Aluno #${log.studentId}`;
+            if (!cs.students[log.studentId]) cs.students[log.studentId] = { name: sName, count: 0, lastAccess: log.accessedAt };
+            cs.students[log.studentId].count++;
+            if (log.accessedAt > cs.students[log.studentId].lastAccess) cs.students[log.studentId].lastAccess = log.accessedAt;
+            const day = log.accessedAt.toISOString().slice(0, 10);
+            cs.byDay[day] = (cs.byDay[day] || 0) + 1;
+          }
+        }
+
+        // Serializar resultado
+        const result = Object.values(classSummary).map(cs => ({
+          classId: cs.classId,
+          className: cs.className,
+          classCode: cs.classCode,
+          totalAccesses: cs.totalAccesses,
+          uniqueStudents: cs.uniqueStudents.size,
+          students: Object.values(cs.students).sort((a, b) => b.count - a.count),
+          byDay: Object.entries(cs.byDay).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date)),
+        })).sort((a, b) => b.totalAccesses - a.totalAccesses);
+
+        return { classes: result, noClassCount, total: studentLogs.length };
+      }),
+
+    // Lista de turmas para seletor de filtro
+    getClassList: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+      const database = await getDb();
+      if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      return database.select({ id: classes.id, name: classes.name, code: classes.code }).from(classes).orderBy(classes.name);
+    }),
+
     // Limpar registros anteriores a uma data
     clearLogs: protectedProcedure
       .input(z.object({

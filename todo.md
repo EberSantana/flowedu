@@ -7520,3 +7520,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Frontend: adicionar seletor "De / Até" com modo de filtro por período
 - [ ] Frontend: alternar entre "últimos X dias" e "período personalizado"
 - [ ] Build e deploy na VPS
+
+## Feature v3.2.8: Log de Acessos por Turma
+- [ ] Backend: procedure getLogsByClass (acessos agrupados por turma + filtro por turma)
+- [ ] Backend: procedure getClassList (lista de turmas para o seletor)
+- [ ] Frontend: nova aba "Por Turma" no Log de Acessos
+- [ ] Frontend: seletor de turma para filtrar acessos de uma turma específica
+- [ ] Frontend: tabela com total de acessos por turma + detalhamento de alunos
+- [ ] Build e deploy na VPS

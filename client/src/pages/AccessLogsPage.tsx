@@ -26,6 +26,9 @@ import {
   Flame,
   Download,
   Trash2,
+  Users,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import {
   Dialog,
@@ -78,6 +81,18 @@ export default function AccessLogsPage() {
     return d.toISOString().slice(0, 10);
   });
   const [dateTo, setDateTo] = useState(() => new Date().toISOString().slice(0, 10));
+  // Logs por turma
+  const [selectedClassId, setSelectedClassId] = useState<number | undefined>(undefined);
+  const [expandedClasses, setExpandedClasses] = useState<Set<number>>(new Set());
+
+  const toggleClassExpand = (classId: number) => {
+    setExpandedClasses(prev => {
+      const next = new Set(prev);
+      if (next.has(classId)) next.delete(classId);
+      else next.add(classId);
+      return next;
+    });
+  };
   const [clearBeforeDate, setClearBeforeDate] = useState(() => {
     // Padrão: 90 dias atrás
     const d = new Date();
@@ -138,6 +153,16 @@ export default function AccessLogsPage() {
 
   const { data: heatmapData, isLoading: heatmapLoading } = trpc.accessLogs.getHeatmap.useQuery(
     { days: heatmapDays, userType: heatmapUserType },
+    { refetchOnWindowFocus: false }
+  );
+
+  // Queries para logs por turma
+  const { data: classList } = trpc.accessLogs.getClassList.useQuery(undefined, { refetchOnWindowFocus: false });
+  const classByClassInput = filterMode === "period"
+    ? { days, dateFrom, dateTo, classId: selectedClassId }
+    : { days, classId: selectedClassId };
+  const { data: classLogsData, isLoading: classLogsLoading } = trpc.accessLogs.getLogsByClass.useQuery(
+    classByClassInput,
     { refetchOnWindowFocus: false }
   );
 
@@ -649,6 +674,125 @@ export default function AccessLogsPage() {
               )}
             </CardContent>
           </Card>
+          {/* ===== ACESSOS POR TURMA ===== */}
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Users className="h-5 w-5 text-purple-500" />
+                    Acessos por Turma
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Visualize o engajamento de cada turma no período selecionado
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={selectedClassId ? selectedClassId.toString() : "all"}
+                    onValueChange={(v) => setSelectedClassId(v === "all" ? undefined : Number(v))}
+                  >
+                    <SelectTrigger className="w-52">
+                      <SelectValue placeholder="Todas as turmas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas as turmas</SelectItem>
+                      {classList?.map((cls) => (
+                        <SelectItem key={cls.id} value={cls.id.toString()}>
+                          {cls.name} ({cls.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {classLogsLoading ? (
+                <p className="text-muted-foreground text-sm py-4 text-center">Carregando...</p>
+              ) : !classLogsData?.classes?.length ? (
+                <div className="py-8 text-center">
+                  <Users className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+                  <p className="text-muted-foreground text-sm">Nenhum acesso de aluno com turma cadastrada no período.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {/* Cabeçalho */}
+                  <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground border-b">
+                    <div className="col-span-1"></div>
+                    <div className="col-span-5">Turma</div>
+                    <div className="col-span-2 text-center">Total Acessos</div>
+                    <div className="col-span-2 text-center">Alunos Ativos</div>
+                    <div className="col-span-2 text-center">Média/Aluno</div>
+                  </div>
+                  {classLogsData.classes.map((cls) => (
+                    <div key={cls.classId} className="rounded-lg border overflow-hidden">
+                      {/* Linha da turma */}
+                      <button
+                        className="w-full grid grid-cols-12 gap-2 px-3 py-3 hover:bg-muted/50 transition-colors text-left"
+                        onClick={() => toggleClassExpand(cls.classId)}
+                      >
+                        <div className="col-span-1 flex items-center">
+                          {expandedClasses.has(cls.classId)
+                            ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                            : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                        </div>
+                        <div className="col-span-5">
+                          <div className="font-medium text-sm">{cls.className}</div>
+                          <div className="text-xs text-muted-foreground">{cls.classCode}</div>
+                        </div>
+                        <div className="col-span-2 text-center">
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                            {cls.totalAccesses}
+                          </Badge>
+                        </div>
+                        <div className="col-span-2 text-center">
+                          <span className="text-sm font-medium text-green-600">{cls.uniqueStudents}</span>
+                        </div>
+                        <div className="col-span-2 text-center">
+                          <span className="text-sm text-muted-foreground">
+                            {cls.uniqueStudents > 0 ? (cls.totalAccesses / cls.uniqueStudents).toFixed(1) : "0"}
+                          </span>
+                        </div>
+                      </button>
+                      {/* Detalhamento de alunos */}
+                      {expandedClasses.has(cls.classId) && (
+                        <div className="border-t bg-muted/20 px-4 py-3">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">Alunos da turma no período:</p>
+                          <div className="space-y-1">
+                            {cls.students.length === 0 ? (
+                              <p className="text-xs text-muted-foreground">Nenhum acesso registrado.</p>
+                            ) : (
+                              cls.students.map((s, i) => (
+                                <div key={i} className="flex items-center justify-between py-1 border-b last:border-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground w-5">{i + 1}º</span>
+                                    <span className="text-sm">{s.name}</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs text-muted-foreground">
+                                      Último: {new Date(s.lastAccess).toLocaleDateString('pt-BR')}
+                                    </span>
+                                    <Badge variant="outline" className="text-xs">{s.count} acessos</Badge>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {classLogsData.noClassCount > 0 && (
+                    <p className="text-xs text-muted-foreground pt-2 text-center">
+                      + {classLogsData.noClassCount} acesso(s) de alunos sem turma cadastrada
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
         </div>
       </PageWrapper>
     </>
