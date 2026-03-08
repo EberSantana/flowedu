@@ -7528,3 +7528,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Frontend: seletor de turma para filtrar acessos de uma turma específica
 - [ ] Frontend: tabela com total de acessos por turma + detalhamento de alunos
 - [ ] Build e deploy na VPS
+
+## Feature v3.2.9: Log de Acessos - Melhorias por Turma
+- [ ] Backend: getLogsByClass retornar alunos sem acesso (matriculados mas sem log no período)
+- [ ] Backend: nova procedure exportClassCSV para exportar CSV de uma turma específica
+- [ ] Frontend: gráfico de barras comparativo entre turmas (Chart.js)
+- [ ] Frontend: seção "Alunos sem acesso" expandível em cada turma
+- [ ] Frontend: botão "Exportar CSV" por turma
+- [ ] Build e deploy na VPS

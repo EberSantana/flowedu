@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
@@ -165,6 +165,31 @@ export default function AccessLogsPage() {
     classByClassInput,
     { refetchOnWindowFocus: false }
   );
+  // Estado para exportar CSV por turma
+  const [exportingClassId, setExportingClassId] = useState<number | null>(null);
+  const exportClassInput = exportingClassId
+    ? (filterMode === "period" ? { classId: exportingClassId, days, dateFrom, dateTo } : { classId: exportingClassId, days })
+    : { classId: 0, days };
+  const { data: classCSVData } = trpc.accessLogs.exportClassCSV.useQuery(
+    exportClassInput,
+    { enabled: exportingClassId !== null, refetchOnWindowFocus: false }
+  );
+  // Efeito para baixar CSV quando dados chegarem
+  const prevExportingClassId = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (exportingClassId && classCSVData && exportingClassId !== prevExportingClassId.current) {
+      prevExportingClassId.current = exportingClassId;
+      const cls = classLogsData?.classes.find(c => c.classId === exportingClassId);
+      const clsName = cls?.className || `turma-${exportingClassId}`;
+      const blob = new Blob(['\uFEFF' + classCSVData.csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `acessos-${clsName.replace(/[^a-z0-9]/gi, '-')}.csv`;
+      a.click(); URL.revokeObjectURL(url);
+      setExportingClassId(null);
+      prevExportingClassId.current = null;
+    }
+  }, [classCSVData, exportingClassId, classLogsData]);
 
   const today = new Date().toISOString().slice(0, 10);
   const todayEntry = data?.byDay.find((d) => d.date === today);
@@ -716,69 +741,135 @@ export default function AccessLogsPage() {
                   <p className="text-muted-foreground text-sm">Nenhum acesso de aluno com turma cadastrada no período.</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {/* Cabeçalho */}
+                <div className="space-y-4">
+                  {/* Gráfico comparativo entre turmas */}
+                  {!selectedClassId && classLogsData.classes.length > 1 && (
+                    <div className="mb-2">
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">Comparativo de Acessos por Turma</p>
+                      <div className="space-y-2">
+                        {(() => {
+                          const maxAccesses = Math.max(...classLogsData.classes.map(c => c.totalAccesses), 1);
+                          return classLogsData.classes.map((cls) => (
+                            <div key={cls.classId} className="flex items-center gap-3">
+                              <div className="w-36 text-xs text-right text-muted-foreground truncate" title={cls.className}>
+                                {cls.className}
+                              </div>
+                              <div className="flex-1 bg-muted rounded-full h-5 overflow-hidden">
+                                <div
+                                  className="h-full bg-purple-500 rounded-full flex items-center justify-end pr-2"
+                                  style={{ width: `${Math.max((cls.totalAccesses / maxAccesses) * 100, 2)}%` }}
+                                >
+                                  <span className="text-xs text-white font-medium">{cls.totalAccesses}</span>
+                                </div>
+                              </div>
+                              <div className="w-20 text-xs text-muted-foreground text-right">
+                                {cls.uniqueStudents}/{cls.totalEnrolled ?? '?'} alunos
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cabeçalho da tabela */}
                   <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground border-b">
                     <div className="col-span-1"></div>
-                    <div className="col-span-5">Turma</div>
+                    <div className="col-span-4">Turma</div>
                     <div className="col-span-2 text-center">Total Acessos</div>
-                    <div className="col-span-2 text-center">Alunos Ativos</div>
-                    <div className="col-span-2 text-center">Média/Aluno</div>
+                    <div className="col-span-2 text-center">Ativos/Total</div>
+                    <div className="col-span-1 text-center">Média</div>
+                    <div className="col-span-2 text-center">CSV</div>
                   </div>
                   {classLogsData.classes.map((cls) => (
                     <div key={cls.classId} className="rounded-lg border overflow-hidden">
                       {/* Linha da turma */}
-                      <button
-                        className="w-full grid grid-cols-12 gap-2 px-3 py-3 hover:bg-muted/50 transition-colors text-left"
-                        onClick={() => toggleClassExpand(cls.classId)}
-                      >
-                        <div className="col-span-1 flex items-center">
+                      <div className="grid grid-cols-12 gap-2 px-3 py-3 hover:bg-muted/50">
+                        <button
+                          className="col-span-1 flex items-center"
+                          onClick={() => toggleClassExpand(cls.classId)}
+                        >
                           {expandedClasses.has(cls.classId)
                             ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
                             : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                        </div>
-                        <div className="col-span-5">
+                        </button>
+                        <button
+                          className="col-span-4 text-left"
+                          onClick={() => toggleClassExpand(cls.classId)}
+                        >
                           <div className="font-medium text-sm">{cls.className}</div>
                           <div className="text-xs text-muted-foreground">{cls.classCode}</div>
-                        </div>
-                        <div className="col-span-2 text-center">
+                        </button>
+                        <div className="col-span-2 flex items-center justify-center">
                           <Badge variant="secondary" className="bg-purple-100 text-purple-700">
                             {cls.totalAccesses}
                           </Badge>
                         </div>
-                        <div className="col-span-2 text-center">
-                          <span className="text-sm font-medium text-green-600">{cls.uniqueStudents}</span>
+                        <div className="col-span-2 flex items-center justify-center">
+                          <span className="text-sm">
+                            <span className="font-medium text-green-600">{cls.uniqueStudents}</span>
+                            <span className="text-muted-foreground">/{cls.totalEnrolled ?? '?'}</span>
+                          </span>
                         </div>
-                        <div className="col-span-2 text-center">
+                        <div className="col-span-1 flex items-center justify-center">
                           <span className="text-sm text-muted-foreground">
                             {cls.uniqueStudents > 0 ? (cls.totalAccesses / cls.uniqueStudents).toFixed(1) : "0"}
                           </span>
                         </div>
-                      </button>
+                        <div className="col-span-2 flex items-center justify-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => setExportingClassId(cls.classId)}
+                            disabled={exportingClassId === cls.classId}
+                          >
+                            <Download className="h-3 w-3 mr-1" />
+                            {exportingClassId === cls.classId ? "..." : "CSV"}
+                          </Button>
+                        </div>
+                      </div>
                       {/* Detalhamento de alunos */}
                       {expandedClasses.has(cls.classId) && (
-                        <div className="border-t bg-muted/20 px-4 py-3">
-                          <p className="text-xs font-semibold text-muted-foreground mb-2">Alunos da turma no período:</p>
-                          <div className="space-y-1">
-                            {cls.students.length === 0 ? (
-                              <p className="text-xs text-muted-foreground">Nenhum acesso registrado.</p>
-                            ) : (
-                              cls.students.map((s, i) => (
-                                <div key={i} className="flex items-center justify-between py-1 border-b last:border-0">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground w-5">{i + 1}º</span>
-                                    <span className="text-sm">{s.name}</span>
+                        <div className="border-t bg-muted/20 px-4 py-3 space-y-3">
+                          {/* Alunos com acesso */}
+                          {cls.students.length > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-green-700 mb-2">✓ Alunos com acesso ({cls.students.length})</p>
+                              <div className="space-y-1">
+                                {cls.students.map((s, i) => (
+                                  <div key={i} className="flex items-center justify-between py-1 border-b last:border-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs text-muted-foreground w-5">{i + 1}º</span>
+                                      <span className="text-sm">{s.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-xs text-muted-foreground">
+                                        Último: {new Date(s.lastAccess).toLocaleDateString('pt-BR')}
+                                      </span>
+                                      <Badge variant="outline" className="text-xs">{s.count} acessos</Badge>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-xs text-muted-foreground">
-                                      Último: {new Date(s.lastAccess).toLocaleDateString('pt-BR')}
-                                    </span>
-                                    <Badge variant="outline" className="text-xs">{s.count} acessos</Badge>
-                                  </div>
-                                </div>
-                              ))
-                            )}
-                          </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {/* Alunos sem acesso */}
+                          {cls.studentsWithoutAccess && cls.studentsWithoutAccess.length > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-red-600 mb-2">✗ Sem acesso no período ({cls.studentsWithoutAccess.length})</p>
+                              <div className="flex flex-wrap gap-1">
+                                {cls.studentsWithoutAccess.map((name, i) => (
+                                  <Badge key={i} variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
+                                    {name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {cls.students.length === 0 && (!cls.studentsWithoutAccess || cls.studentsWithoutAccess.length === 0) && (
+                            <p className="text-xs text-muted-foreground">Nenhum aluno matriculado.</p>
+                          )}
                         </div>
                       )}
                     </div>

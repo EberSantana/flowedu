@@ -3647,23 +3647,29 @@ JSON (descrições MAX 15 chars):
           .where(andOp(rangeWhere, eq(accessLogs.userType, 'student')))
           .orderBy(sql`accessedAt DESC`);
 
-        // Buscar todas as turmas com seus alunos matriculados
-        const allClasses = await database
+        // Buscar todas as turmas com seus alunos matriculados (incluindo nome do aluno)
+        const { students: studentsTable } = await import('../drizzle/schema');
+        const allEnrollments = await database
           .select({
             classId: classes.id,
             className: classes.name,
             classCode: classes.code,
             studentId: studentClassEnrollments.studentId,
+            studentName: studentsTable.fullName,
           })
           .from(classes)
-          .leftJoin(studentClassEnrollments, eq(studentClassEnrollments.classId, classes.id));
+          .leftJoin(studentClassEnrollments, eq(studentClassEnrollments.classId, classes.id))
+          .leftJoin(studentsTable, eq(studentsTable.id, studentClassEnrollments.studentId));
 
-        // Mapear studentId -> turmas
+        // Mapear studentId -> turmas e classId -> todos os alunos matriculados
         const studentToClasses: Record<number, { classId: number; className: string; classCode: string }[]> = {};
-        for (const row of allClasses) {
+        const classAllStudents: Record<number, { id: number; name: string }[]> = {};
+        for (const row of allEnrollments) {
           if (row.studentId) {
             if (!studentToClasses[row.studentId]) studentToClasses[row.studentId] = [];
             studentToClasses[row.studentId].push({ classId: row.classId, className: row.className, classCode: row.classCode });
+            if (!classAllStudents[row.classId]) classAllStudents[row.classId] = [];
+            classAllStudents[row.classId].push({ id: row.studentId, name: row.studentName || `Aluno #${row.studentId}` });
           }
         }
 
@@ -3713,16 +3719,42 @@ JSON (descrições MAX 15 chars):
           }
         }
 
-        // Serializar resultado
-        const result = Object.values(classSummary).map(cs => ({
-          classId: cs.classId,
-          className: cs.className,
-          classCode: cs.classCode,
-          totalAccesses: cs.totalAccesses,
-          uniqueStudents: cs.uniqueStudents.size,
-          students: Object.values(cs.students).sort((a, b) => b.count - a.count),
-          byDay: Object.entries(cs.byDay).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date)),
-        })).sort((a, b) => b.totalAccesses - a.totalAccesses);
+        // Serializar resultado incluindo alunos sem acesso
+        const result = Object.values(classSummary).map(cs => {
+          const studentsWithAccess = new Set(Object.keys(cs.students).map(Number));
+          const allInClass = classAllStudents[cs.classId] || [];
+          const studentsWithoutAccess = allInClass.filter(s => !studentsWithAccess.has(s.id));
+          return {
+            classId: cs.classId,
+            className: cs.className,
+            classCode: cs.classCode,
+            totalAccesses: cs.totalAccesses,
+            uniqueStudents: cs.uniqueStudents.size,
+            totalEnrolled: allInClass.length,
+            students: Object.values(cs.students).sort((a, b) => b.count - a.count),
+            studentsWithoutAccess: studentsWithoutAccess.map(s => s.name),
+            byDay: Object.entries(cs.byDay).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date)),
+          };
+        }).sort((a, b) => b.totalAccesses - a.totalAccesses);
+
+        // Incluir turmas sem nenhum acesso mas com filtro de classId
+        if (input.classId && !classSummary[input.classId]) {
+          const cls = allEnrollments.find(e => e.classId === input.classId);
+          if (cls) {
+            const allInClass = classAllStudents[input.classId] || [];
+            result.push({
+              classId: cls.classId,
+              className: cls.className,
+              classCode: cls.classCode,
+              totalAccesses: 0,
+              uniqueStudents: 0,
+              totalEnrolled: allInClass.length,
+              students: [],
+              studentsWithoutAccess: allInClass.map(s => s.name),
+              byDay: [],
+            });
+          }
+        }
 
         return { classes: result, noClassCount, total: studentLogs.length };
       }),
@@ -3734,6 +3766,77 @@ JSON (descrições MAX 15 chars):
       if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
       return database.select({ id: classes.id, name: classes.name, code: classes.code }).from(classes).orderBy(classes.name);
     }),
+
+    // Exportar CSV de uma turma específica
+    exportClassCSV: protectedProcedure
+      .input(z.object({
+        classId: z.number(),
+        days: z.number().min(1).max(365).default(30),
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { gte: gteOp, lte: lteOp, and: andOp } = await import('drizzle-orm');
+        let since: Date;
+        let until: Date | undefined;
+        if (input.dateFrom) {
+          since = new Date(input.dateFrom); since.setHours(0,0,0,0);
+          if (input.dateTo) { until = new Date(input.dateTo); until.setHours(23,59,59,999); }
+        } else {
+          since = new Date(); since.setDate(since.getDate() - input.days);
+        }
+        const rangeWhere = until
+          ? andOp(gteOp(accessLogs.accessedAt, since), lteOp(accessLogs.accessedAt, until))
+          : gteOp(accessLogs.accessedAt, since);
+
+        const { students: studentsTable } = await import('../drizzle/schema');
+        // Buscar alunos matriculados na turma
+        const enrolled = await database
+          .select({ studentId: studentClassEnrollments.studentId, studentName: studentsTable.fullName })
+          .from(studentClassEnrollments)
+          .leftJoin(studentsTable, eq(studentsTable.id, studentClassEnrollments.studentId))
+          .where(eq(studentClassEnrollments.classId, input.classId));
+
+        // Buscar logs dos alunos da turma no período
+        const enrolledIds = enrolled.map(e => e.studentId).filter(Boolean) as number[];
+        const logs = enrolledIds.length > 0
+          ? await database.select().from(accessLogs)
+              .where(andOp(rangeWhere, eq(accessLogs.userType, 'student')))
+              .orderBy(sql`accessedAt DESC`)
+          : [];
+
+        // Filtrar apenas logs dos alunos da turma
+        const enrolledSet = new Set(enrolledIds);
+        const classLogs = logs.filter(l => l.studentId && enrolledSet.has(l.studentId));
+
+        // Montar mapa de contagem por aluno
+        const studentMap: Record<number, { name: string; count: number; lastAccess: Date | null }> = {};
+        for (const e of enrolled) {
+          if (e.studentId) studentMap[e.studentId] = { name: e.studentName || `Aluno #${e.studentId}`, count: 0, lastAccess: null };
+        }
+        for (const log of classLogs) {
+          if (log.studentId && studentMap[log.studentId]) {
+            studentMap[log.studentId].count++;
+            if (!studentMap[log.studentId].lastAccess || log.accessedAt > studentMap[log.studentId].lastAccess!) {
+              studentMap[log.studentId].lastAccess = log.accessedAt;
+            }
+          }
+        }
+
+        // Gerar CSV
+        const header = ['Aluno', 'Total de Acessos', 'Último Acesso', 'Status'];
+        const rows = Object.values(studentMap).sort((a, b) => b.count - a.count).map(s => [
+          s.name,
+          s.count.toString(),
+          s.lastAccess ? s.lastAccess.toLocaleDateString('pt-BR') : 'Sem acesso',
+          s.count === 0 ? 'Sem acesso' : 'Ativo',
+        ]);
+        const csvLines = [header, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','));
+        return { csv: csvLines.join('\n'), total: enrolled.length, withAccess: Object.values(studentMap).filter(s => s.count > 0).length };
+      }),
 
     // Limpar registros anteriores a uma data
     clearLogs: protectedProcedure
