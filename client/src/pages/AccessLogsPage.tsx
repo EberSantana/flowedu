@@ -762,28 +762,10 @@ export default function AccessLogsPage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Select
-                    value={selectedSubjectId ? selectedSubjectId.toString() : "all"}
-                    onValueChange={(v) => setSelectedSubjectId(v === "all" ? undefined : Number(v))}
+                    value={selectedClassId ? selectedClassId.toString() : "all"}
+                    onValueChange={(v) => { setSelectedClassId(v === "all" ? undefined : Number(v)); setSelectedSubjectId(undefined); }}
                   >
                     <SelectTrigger className="w-72">
-                      <SelectValue placeholder="Todas as disciplinas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas as disciplinas</SelectItem>
-                      {subjectList?.map((sub) => (
-                        <SelectItem key={sub.id} value={sub.id.toString()}>
-                          {(sub as any).className
-                            ? `${sub.name} – ${(sub as any).className}`
-                            : sub.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={selectedClassId ? selectedClassId.toString() : "all"}
-                    onValueChange={(v) => setSelectedClassId(v === "all" ? undefined : Number(v))}
-                  >
-                    <SelectTrigger className="w-52">
                       <SelectValue placeholder="Todas as turmas" />
                     </SelectTrigger>
                     <SelectContent>
