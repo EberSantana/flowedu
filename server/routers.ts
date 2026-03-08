@@ -3648,24 +3648,11 @@ JSON (descrições MAX 15 chars):
           .where(andOp(rangeWhere, eq(accessLogs.userType, 'student')))
           .orderBy(sql`accessedAt DESC`);
 
-        // Buscar todas as turmas com seus alunos matriculados (incluindo nome do aluno)
-        // Filtrar apenas turmas que têm alunos matriculados em disciplinas do professor logado
-        const { students: studentsTable, subjectEnrollments, subjects } = await import('../drizzle/schema');
+        const { students: studentsTable, scheduledClasses } = await import('../drizzle/schema');
 
-        // Buscar IDs de alunos matriculados em disciplinas do professor logado
-        const teacherSubjectEnrollments = await database
-          .select({ studentId: subjectEnrollments.studentId, subjectId: subjectEnrollments.subjectId, subjectName: subjects.name })
-          .from(subjectEnrollments)
-          .innerJoin(subjects, eq(subjects.id, subjectEnrollments.subjectId))
-          .where(eq(subjects.userId, teacherId));
-
-        // Filtrar por disciplina específica se fornecida
-        const relevantEnrollments = input.subjectId
-          ? teacherSubjectEnrollments.filter(e => e.subjectId === input.subjectId)
-          : teacherSubjectEnrollments;
-        const teacherStudentIds = new Set(relevantEnrollments.map(e => e.studentId));
-
-        const allEnrollments = await database
+        // Buscar turmas do professor via studentClassEnrollments.userId = teacherId
+        // e opcionalmente filtrar por disciplina via scheduledClasses
+        let classQuery = database
           .select({
             classId: classes.id,
             className: classes.name,
@@ -3673,12 +3660,28 @@ JSON (descrições MAX 15 chars):
             studentId: studentClassEnrollments.studentId,
             studentName: studentsTable.fullName,
           })
-          .from(classes)
-          .leftJoin(studentClassEnrollments, eq(studentClassEnrollments.classId, classes.id))
-          .leftJoin(studentsTable, eq(studentsTable.id, studentClassEnrollments.studentId));
+          .from(studentClassEnrollments)
+          .innerJoin(classes, eq(classes.id, studentClassEnrollments.classId))
+          .leftJoin(studentsTable, eq(studentsTable.id, studentClassEnrollments.studentId))
+          .where(eq(studentClassEnrollments.userId, teacherId));
 
-        // Filtrar apenas alunos do professor logado
-        const filteredEnrollments = allEnrollments.filter(e => !e.studentId || teacherStudentIds.has(e.studentId));
+        const allEnrollments = await classQuery;
+
+        // Se filtro por disciplina: pegar apenas turmas vinculadas à disciplina via scheduledClasses
+        let allowedClassIds: Set<number> | null = null;
+        if (input.subjectId) {
+          const scRows = await database
+            .select({ classId: scheduledClasses.classId })
+            .from(scheduledClasses)
+            .where(andOp(eq(scheduledClasses.subjectId, input.subjectId), eq(scheduledClasses.userId, teacherId)));
+          allowedClassIds = new Set(scRows.map(r => r.classId));
+        }
+
+        const filteredEnrollments = allowedClassIds
+          ? allEnrollments.filter(e => allowedClassIds!.has(e.classId))
+          : allEnrollments;
+
+        const teacherStudentIds = new Set(filteredEnrollments.filter(e => e.studentId).map(e => e.studentId!));
 
         // Mapear studentId -> turmas e classId -> todos os alunos matriculados (apenas do professor)
         const studentToClasses: Record<number, { classId: number; className: string; classCode: string }[]> = {};
@@ -3779,27 +3782,17 @@ JSON (descrições MAX 15 chars):
         return { classes: result, noClassCount, total: studentLogs.length };
       }),
 
-    // Lista de turmas para seletor de filtro (apenas turmas com alunos do professor logado)
+    // Lista de turmas para seletor de filtro (apenas turmas do professor logado)
     getClassList: protectedProcedure.query(async ({ ctx }) => {
       const database = await getDb();
       if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
       const teacherId = ctx.user.id;
-      const { subjectEnrollments, subjects } = await import('../drizzle/schema');
-      // Buscar IDs de alunos do professor
-      const teacherEnrollments = await database
-        .select({ studentId: subjectEnrollments.studentId })
-        .from(subjectEnrollments)
-        .innerJoin(subjects, eq(subjects.id, subjectEnrollments.subjectId))
-        .where(eq(subjects.userId, teacherId));
-      const rawIds = teacherEnrollments.map(e => e.studentId);
-      const teacherStudentIds = rawIds.filter((id, idx) => rawIds.indexOf(id) === idx);
-      if (teacherStudentIds.length === 0) return [];
-      // Buscar turmas que têm esses alunos
+      // Buscar turmas onde o professor é responsável (userId na matrícula de turma)
       const classRows = await database
         .select({ id: classes.id, name: classes.name, code: classes.code })
-        .from(classes)
-        .innerJoin(studentClassEnrollments, eq(studentClassEnrollments.classId, classes.id))
-        .where(sql`${studentClassEnrollments.studentId} IN (${sql.join(teacherStudentIds.map(id => sql`${id}`), sql`, `)})`)
+        .from(studentClassEnrollments)
+        .innerJoin(classes, eq(classes.id, studentClassEnrollments.classId))
+        .where(eq(studentClassEnrollments.userId, teacherId))
         .groupBy(classes.id, classes.name, classes.code)
         .orderBy(classes.name);
       return classRows;

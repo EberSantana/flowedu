@@ -7536,3 +7536,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Frontend: seção "Alunos sem acesso" expandível em cada turma
 - [ ] Frontend: botão "Exportar CSV" por turma
 - [ ] Build e deploy na VPS
+
+## Fix v3.3.2: Log de Acessos - Contagem e UI
+- [ ] Corrigir contagem de acessos: contar por usuário único por dia (não cada clique)
+- [ ] Corrigir botão Limpar Registros que não funciona
+- [ ] Corrigir calendário de seleção de período com comportamento estranho
+- [ ] Corrigir query Acessos por Turma (usar studentClassEnrollments.userId)
+- [ ] Build e deploy na VPS
