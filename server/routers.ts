@@ -3643,14 +3643,14 @@ JSON (descrições MAX 15 chars):
         days: z.number().min(1).max(365).default(30),
         dateFrom: z.string().optional(),
         dateTo: z.string().optional(),
-        classId: z.number().optional(), // filtrar por turma específica
-        subjectId: z.number().optional(), // filtrar por disciplina específica
+        classId: z.number().optional(),
+        subjectId: z.number().optional(),
       }))
       .query(async ({ ctx, input }) => {
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         const teacherId = ctx.user.id;
-        const { gte: gteOp, lte: lteOp, and: andOp, isNotNull } = await import('drizzle-orm');
+        const { gte: gteOp, lte: lteOp, and: andOp } = await import('drizzle-orm');
         // Determinar intervalo
         let since: Date;
         let until: Date | undefined;
@@ -3676,51 +3676,61 @@ JSON (descrições MAX 15 chars):
           .where(andOp(rangeWhere, eq(accessLogs.userType, 'student')))
           .orderBy(sql`accessedAt DESC`);
 
-        const { students: studentsTable, scheduledClasses } = await import('../drizzle/schema');
+        const { students: studentsTable, scheduledClasses, subjectEnrollments } = await import('../drizzle/schema');
 
-        // Buscar turmas do professor via studentClassEnrollments.userId = teacherId
-        // e opcionalmente filtrar por disciplina via scheduledClasses
-        let classQuery = database
+        // Relação correta: subjectEnrollments -> scheduled_classes -> classes
+        // subjectEnrollments.studentId + subjectEnrollments.subjectId
+        // scheduled_classes.subjectId = subjectEnrollments.subjectId AND scheduled_classes.userId = teacherId
+        // classes.id = scheduled_classes.classId
+        let enrollQuery = database
           .select({
             classId: classes.id,
             className: classes.name,
             classCode: classes.code,
-            studentId: studentClassEnrollments.studentId,
+            studentId: subjectEnrollments.studentId,
             studentName: studentsTable.fullName,
+            subjectId: subjectEnrollments.subjectId,
           })
-          .from(studentClassEnrollments)
-          .innerJoin(classes, eq(classes.id, studentClassEnrollments.classId))
-          .leftJoin(studentsTable, eq(studentsTable.id, studentClassEnrollments.studentId))
-          .where(eq(studentClassEnrollments.userId, teacherId));
+          .from(subjectEnrollments)
+          .innerJoin(scheduledClasses, andOp(
+            eq(scheduledClasses.subjectId, subjectEnrollments.subjectId),
+            eq(scheduledClasses.userId, teacherId)
+          ))
+          .innerJoin(classes, eq(classes.id, scheduledClasses.classId))
+          .leftJoin(studentsTable, eq(studentsTable.id, subjectEnrollments.studentId))
+          .where(eq(subjectEnrollments.userId, teacherId));
 
-        const allEnrollments = await classQuery;
+        const allEnrollments = await enrollQuery;
 
-        // Se filtro por disciplina: pegar apenas turmas vinculadas à disciplina via scheduledClasses
-        let allowedClassIds: Set<number> | null = null;
-        if (input.subjectId) {
-          const scRows = await database
-            .select({ classId: scheduledClasses.classId })
-            .from(scheduledClasses)
-            .where(andOp(eq(scheduledClasses.subjectId, input.subjectId), eq(scheduledClasses.userId, teacherId)));
-          allowedClassIds = new Set(scRows.map(r => r.classId));
-        }
+        // Remover duplicatas (scheduled_classes pode ter múltiplos registros por disciplina)
+        const seenKeys = new Set<string>();
+        const uniqueEnrollments = allEnrollments.filter(e => {
+          const key = `${e.studentId}::${e.classId}`;
+          if (seenKeys.has(key)) return false;
+          seenKeys.add(key);
+          return true;
+        });
 
-        const filteredEnrollments = allowedClassIds
-          ? allEnrollments.filter(e => allowedClassIds!.has(e.classId))
-          : allEnrollments;
+        // Filtrar por disciplina se solicitado
+        const filteredEnrollments = input.subjectId
+          ? uniqueEnrollments.filter(e => e.subjectId === input.subjectId)
+          : uniqueEnrollments;
 
-        const teacherStudentIds = new Set(filteredEnrollments.filter(e => e.studentId).map(e => e.studentId!));
-
-        // Mapear studentId -> turmas e classId -> todos os alunos matriculados (apenas do professor)
+        // Mapear studentId -> turmas e classId -> todos os alunos matriculados
         const studentToClasses: Record<number, { classId: number; className: string; classCode: string }[]> = {};
         const classAllStudents: Record<number, { id: number; name: string }[]> = {};
         for (const row of filteredEnrollments) {
-          if (row.studentId && teacherStudentIds.has(row.studentId)) {
-            if (!studentToClasses[row.studentId]) studentToClasses[row.studentId] = [];
+          if (!row.studentId) continue;
+          if (!studentToClasses[row.studentId]) studentToClasses[row.studentId] = [];
+          // Evitar duplicar turma para o mesmo aluno
+          const alreadyHasClass = studentToClasses[row.studentId].some(c => c.classId === row.classId);
+          if (!alreadyHasClass) {
             studentToClasses[row.studentId].push({ classId: row.classId, className: row.className, classCode: row.classCode });
-            if (!classAllStudents[row.classId]) classAllStudents[row.classId] = [];
-            const already = classAllStudents[row.classId].find(s => s.id === row.studentId);
-            if (!already) classAllStudents[row.classId].push({ id: row.studentId, name: row.studentName || `Aluno #${row.studentId}` });
+          }
+          if (!classAllStudents[row.classId]) classAllStudents[row.classId] = [];
+          const alreadyInClass = classAllStudents[row.classId].some(s => s.id === row.studentId);
+          if (!alreadyInClass) {
+            classAllStudents[row.classId].push({ id: row.studentId, name: row.studentName || `Aluno #${row.studentId}` });
           }
         }
 
@@ -3735,7 +3745,6 @@ JSON (descrições MAX 15 chars):
           byDay: Record<string, number>;
         }> = {};
 
-        // Logs sem turma
         let noClassCount = 0;
 
         for (const log of studentLogs) {
@@ -3744,7 +3753,6 @@ JSON (descrições MAX 15 chars):
           if (logClasses.length === 0) { noClassCount++; continue; }
 
           for (const cls of logClasses) {
-            // Filtro por turma específica
             if (input.classId && cls.classId !== input.classId) continue;
 
             if (!classSummary[cls.classId]) {
@@ -3788,9 +3796,9 @@ JSON (descrições MAX 15 chars):
           };
         }).sort((a, b) => b.totalAccesses - a.totalAccesses);
 
-        // Incluir turmas sem nenhum acesso mas com filtro de classId
+        // Incluir turma sem acesso quando filtro de classId especificado
         if (input.classId && !classSummary[input.classId]) {
-          const cls = allEnrollments.find(e => e.classId === input.classId);
+          const cls = filteredEnrollments.find(e => e.classId === input.classId);
           if (cls) {
             const allInClass = classAllStudents[input.classId] || [];
             result.push({
@@ -3811,17 +3819,15 @@ JSON (descrições MAX 15 chars):
       }),
 
     // Lista de turmas para seletor de filtro (apenas turmas do professor logado)
+    // Usa classes.userId = teacherId (relação direta: cada turma tem um professor dono)
     getClassList: protectedProcedure.query(async ({ ctx }) => {
       const database = await getDb();
       if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
       const teacherId = ctx.user.id;
-      // Buscar turmas onde o professor é responsável (userId na matrícula de turma)
       const classRows = await database
         .select({ id: classes.id, name: classes.name, code: classes.code })
-        .from(studentClassEnrollments)
-        .innerJoin(classes, eq(classes.id, studentClassEnrollments.classId))
-        .where(eq(studentClassEnrollments.userId, teacherId))
-        .groupBy(classes.id, classes.name, classes.code)
+        .from(classes)
+        .where(eq(classes.userId, teacherId))
         .orderBy(classes.name);
       return classRows;
     }),
@@ -3861,13 +3867,27 @@ JSON (descrições MAX 15 chars):
           ? andOp(gteOp(accessLogs.accessedAt, since), lteOp(accessLogs.accessedAt, until))
           : gteOp(accessLogs.accessedAt, since);
 
-        const { students: studentsTable } = await import('../drizzle/schema');
-        // Buscar alunos matriculados na turma
-        const enrolled = await database
-          .select({ studentId: studentClassEnrollments.studentId, studentName: studentsTable.fullName })
-          .from(studentClassEnrollments)
-          .leftJoin(studentsTable, eq(studentsTable.id, studentClassEnrollments.studentId))
-          .where(eq(studentClassEnrollments.classId, input.classId));
+        const { students: studentsTable, scheduledClasses, subjectEnrollments } = await import('../drizzle/schema');
+        const { and: andOp2 } = await import('drizzle-orm');
+        const teacherId = ctx.user.id;
+        // Buscar alunos matriculados na turma via subjectEnrollments -> scheduled_classes -> classes
+        const enrolledRaw = await database
+          .select({ studentId: subjectEnrollments.studentId, studentName: studentsTable.fullName })
+          .from(subjectEnrollments)
+          .innerJoin(scheduledClasses, andOp2(
+            eq(scheduledClasses.subjectId, subjectEnrollments.subjectId),
+            eq(scheduledClasses.userId, teacherId)
+          ))
+          .innerJoin(classes, eq(classes.id, scheduledClasses.classId))
+          .leftJoin(studentsTable, eq(studentsTable.id, subjectEnrollments.studentId))
+          .where(andOp2(eq(subjectEnrollments.userId, teacherId), eq(classes.id, input.classId)));
+        // Remover duplicatas
+        const seenIds = new Set<number>();
+        const enrolled = enrolledRaw.filter(e => {
+          if (!e.studentId || seenIds.has(e.studentId)) return false;
+          seenIds.add(e.studentId);
+          return true;
+        });
 
         // Buscar logs dos alunos da turma no período
         const enrolledIds = enrolled.map(e => e.studentId).filter(Boolean) as number[];

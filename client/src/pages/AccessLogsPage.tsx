@@ -112,8 +112,8 @@ export default function AccessLogsPage() {
     onSuccess: () => {
       toast.success("Registros anteriores a " + clearBeforeDate + " foram removidos!");
       setShowClearDialog(false);
-      utils.accessLogs.getSummary.invalidate();
-      utils.accessLogs.getLogsByClass.invalidate();
+      // Invalida TODAS as queries do router accessLogs de uma vez
+      utils.accessLogs.invalidate();
     },
     onError: (e) => toast.error("Erro ao limpar: " + e.message),
   });
