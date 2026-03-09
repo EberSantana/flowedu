@@ -2595,3 +2595,20 @@ export const accessLogs = mysqlTable("access_logs", {
 });
 export type AccessLog = typeof accessLogs.$inferSelect;
 export type InsertAccessLog = typeof accessLogs.$inferInsert;
+
+// Tabela de arquivos históricos de logs de acesso
+// Armazena os CSVs gerados antes de uma limpeza para consulta futura
+export const accessLogArchives = mysqlTable("access_log_archives", {
+  id: int("id").autoincrement().primaryKey(),
+  teacherId: int("teacherId").notNull(), // Professor que gerou o arquivo
+  fileName: varchar("fileName", { length: 255 }).notNull(), // Nome do arquivo CSV
+  fileUrl: text("fileUrl").notNull(), // URL do arquivo no S3
+  fileKey: varchar("fileKey", { length: 500 }).notNull(), // Chave S3 para referência
+  recordCount: int("recordCount").notNull().default(0), // Quantidade de registros no arquivo
+  periodStart: timestamp("periodStart"), // Data mais antiga dos registros arquivados
+  periodEnd: timestamp("periodEnd"), // Data mais recente dos registros arquivados
+  fileSizeBytes: int("fileSizeBytes").default(0), // Tamanho do arquivo em bytes
+  createdAt: timestamp("createdAt").defaultNow().notNull(), // Quando o arquivo foi criado
+});
+export type AccessLogArchive = typeof accessLogArchives.$inferSelect;
+export type InsertAccessLogArchive = typeof accessLogArchives.$inferInsert;

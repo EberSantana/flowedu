@@ -5,8 +5,8 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks, studentExerciseAnswers, subjects, accessLogs, classes, studentClassEnrollments, subjectEnrollments, learningModules } from "../drizzle/schema";
-import { and, eq, sql, gte, lt } from "drizzle-orm";
+import { tasks, studentExerciseAnswers, subjects, accessLogs, accessLogArchives, classes, studentClassEnrollments, subjectEnrollments, learningModules } from "../drizzle/schema";
+import { and, eq, sql, gte, lt, lte, desc, inArray, ne, or, isNull, isNotNull, between } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
 import { ENV } from "./_core/env";
@@ -4047,13 +4047,130 @@ JSON (descrições MAX 15 chars):
     // Limpar registros anteriores a uma data
     clearLogs: protectedProcedure
       .input(z.object({
-        beforeDate: z.string(), // ISO date string ex: "2025-01-01"
+        beforeDate: z.string().optional(), // ISO date string ex: "2025-01-01" — inclui o dia selecionado
+        clearAll: z.boolean().optional(),  // true = apaga TODOS os registros
       }))
       .mutation(async ({ ctx, input }) => {
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-        const cutoff = new Date(input.beforeDate);
-        await database.delete(accessLogs).where(lt(accessLogs.accessedAt, cutoff));
+
+        let deletedCount = 0;
+
+        if (input.clearAll) {
+          // Contar antes de deletar
+          const countResult = await database.select({ count: sql<number>`COUNT(*)` }).from(accessLogs);
+          deletedCount = Number(countResult[0]?.count ?? 0);
+          await database.delete(accessLogs);
+        } else if (input.beforeDate) {
+          // Incluir o dia selecionado: apaga até o final do dia (23:59:59)
+          const cutoff = new Date(input.beforeDate + 'T23:59:59.999Z');
+          const countResult = await database.select({ count: sql<number>`COUNT(*)` })
+            .from(accessLogs)
+            .where(lte(accessLogs.accessedAt, cutoff));
+          deletedCount = Number(countResult[0]?.count ?? 0);
+          await database.delete(accessLogs).where(lte(accessLogs.accessedAt, cutoff));
+        } else {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Informe uma data ou use a opção Limpar Tudo' });
+        }
+
+        return { success: true, deletedCount };
+      }),
+
+    // Arquivar logs em CSV no S3 antes de limpar (salva histórico para análise futura)
+    archiveLogs: protectedProcedure
+      .input(z.object({
+        label: z.string().optional(), // Nome descritivo do arquivo (ex: "Março 2026")
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+
+        // Buscar todos os registros do professor
+        const logs = await database.select().from(accessLogs)
+          .where(eq(accessLogs.userId, teacherId))
+          .orderBy(desc(accessLogs.accessedAt));
+
+        if (logs.length === 0) {
+          return { success: false, message: 'Nenhum registro para arquivar.' };
+        }
+
+        // Gerar CSV
+        const BRT_OFFSET = -3 * 60 * 60 * 1000;
+        const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (BRT)';
+        const csvRows = logs.map(log => {
+          const ua = log.userAgent || '';
+          let browser = 'Desconhecido';
+          if (ua.includes('Edg/')) browser = 'Microsoft Edge';
+          else if (ua.includes('Chrome/') && !ua.includes('Chromium')) browser = 'Google Chrome';
+          else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
+          else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari';
+          else if (ua.includes('OPR/') || ua.includes('Opera/')) browser = 'Opera';
+          let os = 'Desconhecido';
+          if (ua.includes('Windows NT 10.0')) os = 'Windows 10/11';
+          else if (ua.includes('Windows NT 6.1')) os = 'Windows 7';
+          else if (ua.includes('Android')) os = 'Android';
+          else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+          else if (ua.includes('Mac OS X')) os = 'macOS';
+          else if (ua.includes('Linux')) os = 'Linux';
+          const brtDate = new Date(new Date(log.accessedAt).getTime() + BRT_OFFSET);
+          const dateStr = brtDate.toISOString().replace('T', ' ').slice(0, 19);
+          return [
+            log.id,
+            log.userType === 'teacher' ? 'Professor' : 'Aluno',
+            `"${(log.userName || '').replace(/"/g, '""')}"`,
+            log.ipAddress || '',
+            browser,
+            os,
+            dateStr,
+          ].join(',');
+        });
+        const csvContent = [csvHeader, ...csvRows].join('\n');
+
+        // Upload para S3
+        const { storagePut } = await import('./storage');
+        const label = input.label || `logs-${new Date().toISOString().slice(0, 10)}`;
+        const fileName = `${label.replace(/[^a-zA-Z0-9-]/g, '_')}_${Date.now()}.csv`;
+        const fileKey = `access-log-archives/teacher-${teacherId}/${fileName}`;
+        const csvBuffer = Buffer.from(csvContent, 'utf-8');
+        const { url } = await storagePut(fileKey, csvBuffer, 'text/csv');
+
+        // Salvar registro na tabela
+        const periodStart = logs[logs.length - 1]?.accessedAt;
+        const periodEnd = logs[0]?.accessedAt;
+        await database.insert(accessLogArchives).values({
+          teacherId,
+          fileName,
+          fileUrl: url,
+          fileKey,
+          recordCount: logs.length,
+          periodStart: periodStart ? new Date(periodStart) : null,
+          periodEnd: periodEnd ? new Date(periodEnd) : null,
+          fileSizeBytes: csvBuffer.length,
+        });
+
+        return { success: true, fileName, url, recordCount: logs.length };
+      }),
+
+    // Listar arquivos históricos de logs
+    listArchives: protectedProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) return [];
+      const archives = await database.select().from(accessLogArchives)
+        .where(eq(accessLogArchives.teacherId, ctx.user.id))
+        .orderBy(desc(accessLogArchives.createdAt))
+        .limit(50);
+      return archives;
+    }),
+
+    // Deletar um arquivo histórico
+    deleteArchive: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        await database.delete(accessLogArchives)
+          .where(and(eq(accessLogArchives.id, input.id), eq(accessLogArchives.teacherId, ctx.user.id)));
         return { success: true };
       }),
   }),

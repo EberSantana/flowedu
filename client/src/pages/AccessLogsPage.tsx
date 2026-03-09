@@ -30,6 +30,9 @@ import {
   ChevronDown,
   ChevronRight,
   CalendarIcon,
+  Archive,
+  FileText,
+  ExternalLink,
 } from "lucide-react";
 import {
   Dialog,
@@ -106,13 +109,45 @@ export default function AccessLogsPage() {
     return d.toISOString().slice(0, 10);
   });
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const [archiveLabel, setArchiveLabel] = useState("");
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false);
 
   const utils = trpc.useUtils();
 
-  const clearLogsMutation = trpc.accessLogs.clearLogs.useMutation({
+  const archiveLogsMutation = trpc.accessLogs.archiveLogs.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(`${data.recordCount} registros arquivados com sucesso! Arquivo: ${data.fileName}`);
+        setShowArchiveDialog(false);
+        setArchiveLabel("");
+        utils.accessLogs.listArchives.invalidate();
+      } else {
+        toast.info((data as any).message || 'Nenhum registro para arquivar.');
+      }
+    },
+    onError: (e) => toast.error("Erro ao arquivar: " + e.message),
+  });
+
+  const deleteArchiveMutation = trpc.accessLogs.deleteArchive.useMutation({
     onSuccess: () => {
-      toast.success("Registros anteriores a " + clearBeforeDate + " foram removidos!");
+      toast.success("Arquivo removido.");
+      utils.accessLogs.listArchives.invalidate();
+    },
+    onError: (e) => toast.error("Erro ao remover arquivo: " + e.message),
+  });
+
+  const { data: archivesData } = trpc.accessLogs.listArchives.useQuery();
+
+  const clearLogsMutation = trpc.accessLogs.clearLogs.useMutation({
+    onSuccess: (data) => {
+      const count = data.deletedCount ?? 0;
+      if (count === 0) {
+        toast.info("Nenhum registro encontrado para o período selecionado.");
+      } else {
+        toast.success(`${count} registro${count !== 1 ? 's' : ''} removido${count !== 1 ? 's' : ''} com sucesso!`);
+      }
       setShowClearDialog(false);
+      setClearBeforeDate("");
       // Invalida TODAS as queries do router accessLogs de uma vez
       utils.accessLogs.invalidate();
     },
@@ -369,41 +404,56 @@ export default function AccessLogsPage() {
                   <DialogHeader>
                     <DialogTitle>Limpar Log de Acessos</DialogTitle>
                     <DialogDescription>
-                      Todos os registros anteriores à data selecionada serão excluídos permanentemente. Esta ação não pode ser desfeita.
+                      Escolha uma data para excluir registros <strong>até aquele dia</strong> (inclusive), ou use "Limpar Tudo" para remover todos os registros. Esta ação não pode ser desfeita.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="py-4 space-y-3">
-                    <Label>Excluir registros anteriores a:</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal">
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {clearBeforeDate ? format(new Date(clearBeforeDate + 'T00:00:00'), 'dd/MM/yyyy') : 'Selecionar data'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={clearBeforeDate ? new Date(clearBeforeDate + 'T00:00:00') : undefined}
-                          onSelect={(d) => d && setClearBeforeDate(d.toISOString().slice(0, 10))}
-                          disabled={(d) => d > new Date()}
-                          locale={ptBR}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <p className="text-sm text-muted-foreground">
-                      Sugestão: manter os últimos 90 dias e limpar o restante.
-                    </p>
+                  <div className="py-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label>Excluir registros até a data (inclusive):</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {clearBeforeDate ? format(new Date(clearBeforeDate + 'T00:00:00'), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'Selecionar data'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={clearBeforeDate ? new Date(clearBeforeDate + 'T00:00:00') : undefined}
+                            onSelect={(d) => d && setClearBeforeDate(d.toISOString().slice(0, 10))}
+                            disabled={(d) => d > new Date()}
+                            locale={ptBR}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <p className="text-xs text-muted-foreground">
+                        💡 Dica: para manter os últimos 90 dias, selecione {format(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), "dd/MM/yyyy")} como data de corte.
+                      </p>
+                    </div>
+                    <div className="border-t pt-3">
+                      <p className="text-sm font-medium text-red-600 mb-2">Zona de perigo</p>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => clearLogsMutation.mutate({ clearAll: true })}
+                        disabled={clearLogsMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {clearLogsMutation.isPending ? "Limpando..." : "Limpar TODOS os registros"}
+                      </Button>
+                    </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowClearDialog(false)}>Cancelar</Button>
+                    <Button variant="outline" onClick={() => { setShowClearDialog(false); setClearBeforeDate(""); }}>Cancelar</Button>
                     <Button
                       variant="destructive"
                       onClick={() => clearLogsMutation.mutate({ beforeDate: clearBeforeDate })}
                       disabled={clearLogsMutation.isPending || !clearBeforeDate}
                     >
-                      {clearLogsMutation.isPending ? "Limpando..." : "Confirmar Limpeza"}
+                      {clearLogsMutation.isPending ? "Limpando..." : "Confirmar por Data"}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -941,6 +991,110 @@ export default function AccessLogsPage() {
                       + {classLogsData.noClassCount} acesso(s) de alunos sem turma cadastrada
                     </p>
                   )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Seção de Histórico de Arquivos */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Archive className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-base">Histórico de Arquivos</CardTitle>
+                </div>
+                <Dialog open={showArchiveDialog} onOpenChange={setShowArchiveDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
+                      <Archive className="h-4 w-4 mr-2" />
+                      Arquivar Logs Atuais
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Arquivar Log de Acessos</DialogTitle>
+                      <DialogDescription>
+                        Salva todos os registros atuais em um arquivo CSV no servidor para consulta futura. Os registros <strong>não serão deletados</strong> — use "Limpar Registros" para isso.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-3">
+                      <Label>Nome descritivo do arquivo (opcional):</Label>
+                      <input
+                        type="text"
+                        className="w-full border rounded px-3 py-2 text-sm"
+                        placeholder="Ex: Março 2026, Semestre 1..."
+                        value={archiveLabel}
+                        onChange={(e) => setArchiveLabel(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        O arquivo será salvo com todos os registros atuais (navegador, SO, IP, data/hora em BRT).
+                      </p>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowArchiveDialog(false)}>Cancelar</Button>
+                      <Button
+                        onClick={() => archiveLogsMutation.mutate({ label: archiveLabel || undefined })}
+                        disabled={archiveLogsMutation.isPending}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {archiveLogsMutation.isPending ? "Arquivando..." : "Confirmar Arquivo"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Arquivos CSV gerados anteriormente para análise histórica</p>
+            </CardHeader>
+            <CardContent>
+              {!archivesData || archivesData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">Nenhum arquivo arquivado ainda.</p>
+                  <p className="text-xs mt-1">Use "Arquivar Logs Atuais" para salvar um snapshot dos registros.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {archivesData.map((archive) => (
+                    <div key={archive.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">{archive.fileName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {archive.recordCount} registros
+                            {archive.periodStart && archive.periodEnd && (
+                              <> &bull; {new Date(archive.periodStart).toLocaleDateString('pt-BR')} a {new Date(archive.periodEnd).toLocaleDateString('pt-BR')}</>
+                            )}
+                            {archive.fileSizeBytes && archive.fileSizeBytes > 0 && (
+                              <> &bull; {(archive.fileSizeBytes / 1024).toFixed(1)} KB</>
+                            )}
+                          </p>
+                          <p className="text-xs text-muted-foreground">Criado em {new Date(archive.createdAt).toLocaleString('pt-BR')}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 text-xs"
+                          onClick={() => window.open(archive.fileUrl, '_blank')}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Baixar
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => deleteArchiveMutation.mutate({ id: archive.id })}
+                          disabled={deleteArchiveMutation.isPending}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
