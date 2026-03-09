@@ -111,6 +111,8 @@ export default function AccessLogsPage() {
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [archiveLabel, setArchiveLabel] = useState("");
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
+  const [archiveBeforeDelete, setArchiveBeforeDelete] = useState(true); // padrão: arquivar antes de limpar
+  const [clearArchiveLabel, setClearArchiveLabel] = useState("");       // nome do arquivo gerado na limpeza
 
   const utils = trpc.useUtils();
 
@@ -144,10 +146,15 @@ export default function AccessLogsPage() {
       if (count === 0) {
         toast.info("Nenhum registro encontrado para o período selecionado.");
       } else {
+          const archiveInfo = (data as any).archiveResult;
+        if (archiveInfo) {
+          toast.success(`💾 ${archiveInfo.recordCount} registros arquivados em "${archiveInfo.fileName}"`);
+        }
         toast.success(`${count} registro${count !== 1 ? 's' : ''} removido${count !== 1 ? 's' : ''} com sucesso!`);
       }
       setShowClearDialog(false);
       setClearBeforeDate("");
+      setClearArchiveLabel("");
       // Invalida TODAS as queries do router accessLogs de uma vez
       utils.accessLogs.invalidate();
     },
@@ -404,10 +411,37 @@ export default function AccessLogsPage() {
                   <DialogHeader>
                     <DialogTitle>Limpar Log de Acessos</DialogTitle>
                     <DialogDescription>
-                      Escolha uma data para excluir registros <strong>até aquele dia</strong> (inclusive), ou use "Limpar Tudo" para remover todos os registros. Esta ação não pode ser desfeita.
+                      Escolha uma data para excluir registros <strong>até aquele dia</strong> (inclusive), ou use "Limpar Tudo" para remover todos. Recomendamos arquivar antes de deletar.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="py-4 space-y-4">
+                    {/* Arquivamento automático antes de deletar */}
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="archiveBeforeDelete"
+                          checked={archiveBeforeDelete}
+                          onChange={(e) => setArchiveBeforeDelete(e.target.checked)}
+                          className="h-4 w-4 rounded border-gray-300 accent-amber-600"
+                        />
+                        <label htmlFor="archiveBeforeDelete" className="text-sm font-medium text-amber-800 cursor-pointer">
+                          💾 Arquivar automaticamente antes de deletar
+                        </label>
+                      </div>
+                      {archiveBeforeDelete && (
+                        <div className="space-y-1 pl-6">
+                          <p className="text-xs text-amber-700">Os registros serão salvos em CSV no servidor antes da exclusão.</p>
+                          <input
+                            type="text"
+                            placeholder="Nome do arquivo (ex: Março 2026)"
+                            value={clearArchiveLabel}
+                            onChange={(e) => setClearArchiveLabel(e.target.value)}
+                            className="w-full text-sm border border-amber-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
+                          />
+                        </div>
+                      )}
+                    </div>
                     <div className="space-y-2">
                       <Label>Excluir registros até a data (inclusive):</Label>
                       <Popover>
@@ -438,11 +472,15 @@ export default function AccessLogsPage() {
                         variant="destructive"
                         size="sm"
                         className="w-full"
-                        onClick={() => clearLogsMutation.mutate({ clearAll: true })}
+                        onClick={() => clearLogsMutation.mutate({
+                          clearAll: true,
+                          archiveBeforeDelete,
+                          archiveLabel: clearArchiveLabel || undefined,
+                        })}
                         disabled={clearLogsMutation.isPending}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        {clearLogsMutation.isPending ? "Limpando..." : "Limpar TODOS os registros"}
+                        {clearLogsMutation.isPending ? (archiveBeforeDelete ? "Arquivando e limpando..." : "Limpando...") : "Limpar TODOS os registros"}
                       </Button>
                     </div>
                   </div>
@@ -450,10 +488,16 @@ export default function AccessLogsPage() {
                     <Button variant="outline" onClick={() => { setShowClearDialog(false); setClearBeforeDate(""); }}>Cancelar</Button>
                     <Button
                       variant="destructive"
-                      onClick={() => clearLogsMutation.mutate({ beforeDate: clearBeforeDate })}
+                      onClick={() => clearLogsMutation.mutate({
+                        beforeDate: clearBeforeDate,
+                        archiveBeforeDelete,
+                        archiveLabel: clearArchiveLabel || undefined,
+                      })}
                       disabled={clearLogsMutation.isPending || !clearBeforeDate}
                     >
-                      {clearLogsMutation.isPending ? "Limpando..." : "Confirmar por Data"}
+                      {clearLogsMutation.isPending
+                        ? (archiveBeforeDelete ? "Arquivando e limpando..." : "Limpando...")
+                        : (archiveBeforeDelete ? "💾 Arquivar e Limpar" : "Confirmar por Data")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

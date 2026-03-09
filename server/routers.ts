@@ -4047,33 +4047,89 @@ JSON (descrições MAX 15 chars):
     // Limpar registros anteriores a uma data
     clearLogs: protectedProcedure
       .input(z.object({
-        beforeDate: z.string().optional(), // ISO date string ex: "2025-01-01" — inclui o dia selecionado
-        clearAll: z.boolean().optional(),  // true = apaga TODOS os registros
+        beforeDate: z.string().optional(),          // ISO date string ex: "2025-01-01" — inclui o dia selecionado
+        clearAll: z.boolean().optional(),            // true = apaga TODOS os registros
+        archiveBeforeDelete: z.boolean().optional(), // true = arquiva CSV no S3 antes de deletar
+        archiveLabel: z.string().optional(),         // Nome descritivo do arquivo (ex: "Março 2026")
       }))
       .mutation(async ({ ctx, input }) => {
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+        let archiveResult: { fileName: string; url: string; recordCount: number } | null = null;
 
+        // --- ARQUIVAMENTO AUTOMÁTICO ANTES DE DELETAR ---
+        if (input.archiveBeforeDelete) {
+          let logsToArchive: any[];
+          if (input.clearAll) {
+            logsToArchive = await database.select().from(accessLogs).orderBy(desc(accessLogs.accessedAt));
+          } else if (input.beforeDate) {
+            const cutoff = new Date(input.beforeDate + 'T23:59:59.999Z');
+            logsToArchive = await database.select().from(accessLogs)
+              .where(lte(accessLogs.accessedAt, cutoff)).orderBy(desc(accessLogs.accessedAt));
+          } else {
+            logsToArchive = [];
+          }
+          if (logsToArchive.length > 0) {
+            const BRT_OFFSET = -3 * 60 * 60 * 1000;
+            const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (BRT)';
+            const csvRows = logsToArchive.map((log: any) => {
+              const ua = log.userAgent || '';
+              let browser = 'Desconhecido';
+              if (ua.includes('Edg/')) browser = 'Microsoft Edge';
+              else if (ua.includes('Chrome/') && !ua.includes('Chromium')) browser = 'Google Chrome';
+              else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
+              else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari';
+              else if (ua.includes('OPR/') || ua.includes('Opera/')) browser = 'Opera';
+              let os = 'Desconhecido';
+              if (ua.includes('Windows NT 10.0')) os = 'Windows 10/11';
+              else if (ua.includes('Windows NT 6.1')) os = 'Windows 7';
+              else if (ua.includes('Android')) os = 'Android';
+              else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+              else if (ua.includes('Mac OS X')) os = 'macOS';
+              else if (ua.includes('Linux')) os = 'Linux';
+              const brtDate = new Date(new Date(log.accessedAt).getTime() + BRT_OFFSET);
+              const dateStr = brtDate.toISOString().replace('T', ' ').slice(0, 19);
+              return [log.id, log.userType === 'teacher' ? 'Professor' : 'Aluno',
+                `"${(log.userName || '').replace(/"/g, '""')}"`,
+                log.ipAddress || '', browser, os, dateStr].join(',');
+            });
+            const csvContent = [csvHeader, ...csvRows].join('\n');
+            const { storagePut } = await import('./storage');
+            const label = input.archiveLabel || `logs-${new Date().toISOString().slice(0, 10)}`;
+            const fileName = `${label.replace(/[^a-zA-Z0-9-]/g, '_')}_${Date.now()}.csv`;
+            const fileKey = `access-log-archives/teacher-${teacherId}/${fileName}`;
+            const csvBuffer = Buffer.from(csvContent, 'utf-8');
+            const { url } = await storagePut(fileKey, csvBuffer, 'text/csv');
+            const periodStart = logsToArchive[logsToArchive.length - 1]?.accessedAt;
+            const periodEnd = logsToArchive[0]?.accessedAt;
+            await database.insert(accessLogArchives).values({
+              teacherId, fileName, fileUrl: url, fileKey,
+              recordCount: logsToArchive.length,
+              periodStart: periodStart ? new Date(periodStart) : null,
+              periodEnd: periodEnd ? new Date(periodEnd) : null,
+              fileSizeBytes: csvBuffer.length,
+            });
+            archiveResult = { fileName, url, recordCount: logsToArchive.length };
+          }
+        }
+
+        // --- DELEÇÃO ---
         let deletedCount = 0;
-
         if (input.clearAll) {
-          // Contar antes de deletar
           const countResult = await database.select({ count: sql<number>`COUNT(*)` }).from(accessLogs);
           deletedCount = Number(countResult[0]?.count ?? 0);
           await database.delete(accessLogs);
         } else if (input.beforeDate) {
-          // Incluir o dia selecionado: apaga até o final do dia (23:59:59)
           const cutoff = new Date(input.beforeDate + 'T23:59:59.999Z');
           const countResult = await database.select({ count: sql<number>`COUNT(*)` })
-            .from(accessLogs)
-            .where(lte(accessLogs.accessedAt, cutoff));
+            .from(accessLogs).where(lte(accessLogs.accessedAt, cutoff));
           deletedCount = Number(countResult[0]?.count ?? 0);
           await database.delete(accessLogs).where(lte(accessLogs.accessedAt, cutoff));
         } else {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'Informe uma data ou use a opção Limpar Tudo' });
         }
-
-        return { success: true, deletedCount };
+        return { success: true, deletedCount, archiveResult };
       }),
 
     // Arquivar logs em CSV no S3 antes de limpar (salva histórico para análise futura)
