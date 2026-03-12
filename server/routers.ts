@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks, studentExerciseAnswers, subjects, accessLogs, accessLogArchives, classes, studentClassEnrollments, subjectEnrollments, learningModules } from "../drizzle/schema";
+import { tasks, studentExerciseAnswers, subjects, accessLogs, accessLogArchives, classes, studentClassEnrollments, subjectEnrollments, learningModules, students } from "../drizzle/schema";
 import { and, eq, sql, gte, lt, lte, desc, inArray, ne, or, isNull, isNotNull, between } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
@@ -3836,7 +3836,7 @@ JSON (descrições MAX 15 chars):
           subjectName?: string;
           totalAccesses: number;
           uniqueStudents: Set<number>;
-          students: Record<number, { name: string; count: number; lastAccess: Date }>;
+          students: Record<number, { studentId: number; name: string; count: number; lastAccess: Date }>;
           byDay: Record<string, number>;
         }> = {};
 
