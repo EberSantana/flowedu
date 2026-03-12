@@ -2591,6 +2591,9 @@ export const accessLogs = mysqlTable("access_logs", {
   userName: varchar("userName", { length: 255 }), // Nome snapshot para exibição rápida
   ipAddress: varchar("ipAddress", { length: 64 }), // Endereço IP do acesso
   userAgent: text("userAgent"), // User-agent do navegador
+  browser: varchar("browser", { length: 100 }), // Navegador identificado (Chrome, Firefox, etc.)
+  os: varchar("os", { length: 100 }), // Sistema operacional identificado
+  teacherId: int("teacherId"), // ID do professor dono do registro
   accessedAt: timestamp("accessedAt").defaultNow().notNull(), // Data/hora do acesso
 });
 export type AccessLog = typeof accessLogs.$inferSelect;

@@ -3866,7 +3866,7 @@ JSON (descrições MAX 15 chars):
             cs.totalAccesses++;
             cs.uniqueStudents.add(log.studentId);
             const sName = log.userName || `Aluno #${log.studentId}`;
-            if (!cs.students[log.studentId]) cs.students[log.studentId] = { name: sName, count: 0, lastAccess: log.accessedAt };
+            if (!cs.students[log.studentId]) cs.students[log.studentId] = { studentId: log.studentId, name: sName, count: 0, lastAccess: log.accessedAt };
             cs.students[log.studentId].count++;
             if (log.accessedAt > cs.students[log.studentId].lastAccess) cs.students[log.studentId].lastAccess = log.accessedAt;
             const day = log.accessedAt.toISOString().slice(0, 10);
@@ -3887,7 +3887,7 @@ JSON (descrições MAX 15 chars):
             totalAccesses: cs.totalAccesses,
             uniqueStudents: cs.uniqueStudents.size,
             totalEnrolled: allInClass.length,
-            students: Object.values(cs.students).sort((a, b) => b.count - a.count),
+            students: Object.values(cs.students).sort((a: any, b: any) => b.count - a.count),
             studentsWithoutAccess: studentsWithoutAccess.map(s => s.name),
             byDay: Object.entries(cs.byDay).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date)),
           };
@@ -4220,6 +4220,63 @@ JSON (descrições MAX 15 chars):
     }),
 
     // Deletar um arquivo histórico
+    // Histórico de acessos de um aluno específico
+    getStudentAccessHistory: protectedProcedure
+      .input(z.object({
+        studentId: z.number(),
+        days: z.number().optional().default(30),
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+        const BRT_OFFSET = -3 * 60 * 60 * 1000;
+        const cutoff = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
+        // Buscar nome do aluno
+        const studentRows = await database
+          .select({ id: students.id, name: students.fullName, registrationNumber: students.registrationNumber })
+          .from(students)
+          .where(and(eq(students.id, input.studentId), eq(students.userId, teacherId)))
+          .limit(1);
+        if (!studentRows.length) throw new TRPCError({ code: 'NOT_FOUND', message: 'Aluno não encontrado' });
+        const student = studentRows[0];
+        // Buscar logs de acesso
+        const logs = await database
+          .select({
+            id: accessLogs.id,
+            accessedAt: accessLogs.accessedAt,
+            userAgent: accessLogs.userAgent,
+            browser: accessLogs.browser,
+            os: accessLogs.os,
+          })
+          .from(accessLogs)
+          .where(and(
+            eq(accessLogs.studentId, input.studentId),
+            eq(accessLogs.teacherId, teacherId),
+            gte(accessLogs.accessedAt, cutoff),
+          ))
+          .orderBy(desc(accessLogs.accessedAt))
+          .limit(200);
+        return {
+          student: {
+            id: student.id,
+            name: student.name,
+            registrationNumber: student.registrationNumber,
+          },
+          logs: logs.map(l => {
+            const brtDate = new Date(new Date(l.accessedAt).getTime() + BRT_OFFSET);
+            return {
+              id: l.id,
+              accessedAt: l.accessedAt,
+              accessedAtBRT: brtDate.toISOString(),
+              browser: l.browser || 'Desconhecido',
+              os: l.os || 'Desconhecido',
+              userAgent: l.userAgent || '',
+            };
+          }),
+          totalAccesses: logs.length,
+        };
+      }),
     deleteArchive: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {

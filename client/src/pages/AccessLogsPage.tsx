@@ -44,6 +44,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Monitor, Smartphone, Globe } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -113,6 +115,9 @@ export default function AccessLogsPage() {
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const [archiveBeforeDelete, setArchiveBeforeDelete] = useState(true); // padrão: arquivar antes de limpar
   const [clearArchiveLabel, setClearArchiveLabel] = useState("");       // nome do arquivo gerado na limpeza
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+  const [selectedStudentName, setSelectedStudentName] = useState<string>("");
+  const [historyDays, setHistoryDays] = useState(30);
 
   const utils = trpc.useUtils();
 
@@ -139,6 +144,12 @@ export default function AccessLogsPage() {
   });
 
   const { data: archivesData } = trpc.accessLogs.listArchives.useQuery();
+
+  // Histórico individual do aluno
+  const { data: studentHistoryData, isLoading: studentHistoryLoading } = trpc.accessLogs.getStudentAccessHistory.useQuery(
+    { studentId: selectedStudentId!, days: historyDays },
+    { enabled: selectedStudentId !== null, refetchOnWindowFocus: false }
+  );
 
   const clearLogsMutation = trpc.accessLogs.clearLogs.useMutation({
     onSuccess: (data) => {
@@ -997,7 +1008,16 @@ export default function AccessLogsPage() {
                                   <div key={i} className="flex items-center justify-between py-1 border-b last:border-0">
                                     <div className="flex items-center gap-2">
                                       <span className="text-xs text-muted-foreground w-5">{i + 1}º</span>
-                                      <span className="text-sm">{s.name}</span>
+                                      <button
+                                        className="text-sm text-left hover:text-primary hover:underline cursor-pointer transition-colors font-medium"
+                                        onClick={() => {
+                                          setSelectedStudentId((s as any).studentId ?? null);
+                                          setSelectedStudentName(s.name);
+                                        }}
+                                        title="Clique para ver histórico completo de acessos"
+                                      >
+                                        {s.name}
+                                      </button>
                                     </div>
                                     <div className="flex items-center gap-3">
                                       <span className="text-xs text-muted-foreground">
@@ -1146,6 +1166,92 @@ export default function AccessLogsPage() {
 
         </div>
       </PageWrapper>
+
+      {/* Sheet lateral: Histórico individual do aluno */}
+      <Sheet open={selectedStudentId !== null} onOpenChange={(open) => { if (!open) setSelectedStudentId(null); }}>
+        <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Histórico de Acessos
+            </SheetTitle>
+            <SheetDescription>
+              {selectedStudentName && <span className="font-semibold text-foreground">{selectedStudentName}</span>}
+            </SheetDescription>
+          </SheetHeader>
+
+          {/* Filtro de período */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-sm text-muted-foreground">Período:</span>
+            <Select value={String(historyDays)} onValueChange={(v) => setHistoryDays(Number(v))}>
+              <SelectTrigger className="w-32 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">7 dias</SelectItem>
+                <SelectItem value="15">15 dias</SelectItem>
+                <SelectItem value="30">30 dias</SelectItem>
+                <SelectItem value="60">60 dias</SelectItem>
+                <SelectItem value="90">90 dias</SelectItem>
+              </SelectContent>
+            </Select>
+            {studentHistoryData && (
+              <Badge variant="secondary" className="text-xs">
+                {studentHistoryData.totalAccesses} acesso{studentHistoryData.totalAccesses !== 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
+
+          {studentHistoryLoading && (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {!studentHistoryLoading && studentHistoryData && studentHistoryData.logs.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <Activity className="h-10 w-10 mx-auto mb-3 opacity-30" />
+              <p className="text-sm">Nenhum acesso registrado nos últimos {historyDays} dias.</p>
+            </div>
+          )}
+
+          {!studentHistoryLoading && studentHistoryData && studentHistoryData.logs.length > 0 && (
+            <div className="space-y-2">
+              {studentHistoryData.logs.map((log) => {
+                const brtDate = new Date(log.accessedAtBRT);
+                const dateStr = brtDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeStr = brtDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const isDesktop = /Windows|Mac|Linux/.test(log.os);
+                const isMobile = /Android|iOS/.test(log.os);
+                return (
+                  <div key={log.id} className="flex items-start justify-between py-2 px-3 rounded-lg border bg-muted/20 hover:bg-muted/40 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        {isDesktop ? (
+                          <Monitor className="h-4 w-4 text-blue-500" />
+                        ) : isMobile ? (
+                          <Smartphone className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Globe className="h-4 w-4 text-gray-400" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{dateStr} às {timeStr} <span className="text-xs text-muted-foreground">(BRT)</span></p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {log.browser !== 'Desconhecido' ? log.browser : ''}
+                          {log.browser !== 'Desconhecido' && log.os !== 'Desconhecido' ? ' • ' : ''}
+                          {log.os !== 'Desconhecido' ? log.os : ''}
+                          {log.browser === 'Desconhecido' && log.os === 'Desconhecido' ? 'Dispositivo desconhecido' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
