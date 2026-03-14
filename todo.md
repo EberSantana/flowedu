@@ -7543,3 +7543,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Corrigir calendário de seleção de período com comportamento estranho
 - [ ] Corrigir query Acessos por Turma (usar studentClassEnrollments.userId)
 - [ ] Build e deploy na VPS
+
+## Correções de Log de Acessos (Mar 2026)
+- [ ] Migração automática no deploy (script de startup que adiciona colunas faltantes)
+- [ ] Corrigir horas no mapa de calor (fuso BRT UTC-3)
+- [ ] Corrigir contagem de "Acessos Hoje" para bater com registros reais

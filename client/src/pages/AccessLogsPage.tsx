@@ -254,6 +254,10 @@ export default function AccessLogsPage() {
 
   // Usar todayTeachers/todayStudents do backend (já calculado em BRT)
   const todayTotal = data?.todayTotal ?? 0;
+  // Total de acessos (cliques) hoje - sem deduplicação
+  const todayTotalAccesses = data?.todayTotalAccesses ?? 0;
+  const todayTeacherAccesses = data?.todayTeacherAccesses ?? 0;
+  const todayStudentAccesses = data?.todayStudentAccesses ?? 0;
 
   const filteredLogs = (data?.recentLogs ?? []).filter((log) => {
     if (filterType === "all") return true;
@@ -579,10 +583,13 @@ export default function AccessLogsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-600">
-                  {isLoading ? "—" : todayTotal}
+                  {isLoading ? "—" : todayTotalAccesses}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {data?.todayTeachers ?? 0} prof. · {data?.todayStudents ?? 0} alunos
+                  {todayTeacherAccesses} acessos prof. · {todayStudentAccesses} acessos alunos
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {data?.todayTeachers ?? 0} prof. únicos · {data?.todayStudents ?? 0} alunos únicos
                 </p>
               </CardContent>
             </Card>

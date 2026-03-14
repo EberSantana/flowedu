@@ -3524,26 +3524,24 @@ JSON (descrições MAX 15 chars):
           studentDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
         }
 
-        // Acessos hoje em BRT (UTC-3)
+        // Acessos hoje em BRT (UTC-3): subtrair 3h do UTC para obter hora local brasileira
         const nowUtc = new Date();
         const nowBrt = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
         const todayBrt = nowBrt.toISOString().slice(0, 10); // YYYY-MM-DD em BRT
-        const todayTeachers = new Set(
-          teacherLogs
-            .filter(l => {
-              const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
-              return brt.toISOString().slice(0, 10) === todayBrt;
-            })
-            .map(l => l.userId)
-        ).size;
-        const todayStudents = new Set(
-          studentLogs
-            .filter(l => {
-              const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
-              return brt.toISOString().slice(0, 10) === todayBrt;
-            })
-            .map(l => l.studentId ?? l.userId)
-        ).size;
+        const todayTeacherLogs = teacherLogs.filter(l => {
+          const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
+          return brt.toISOString().slice(0, 10) === todayBrt;
+        });
+        const todayStudentLogs = studentLogs.filter(l => {
+          const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
+          return brt.toISOString().slice(0, 10) === todayBrt;
+        });
+        // Usuários únicos hoje
+        const todayTeachers = new Set(todayTeacherLogs.map(l => l.userId)).size;
+        const todayStudents = new Set(todayStudentLogs.map(l => l.studentId ?? l.userId)).size;
+        // Total de acessos (cliques) hoje - sem deduplicação
+        const todayTeacherAccesses = todayTeacherLogs.length;
+        const todayStudentAccesses = todayStudentLogs.length;
 
         // Função para parsear User-Agent
         const parseUA = (ua: string | null | undefined): { browser: string; os: string } => {
@@ -3577,6 +3575,9 @@ JSON (descrições MAX 15 chars):
           todayTeachers,
           todayStudents,
           todayTotal: todayTeachers + todayStudents,
+          todayTeacherAccesses,
+          todayStudentAccesses,
+          todayTotalAccesses: todayTeacherAccesses + todayStudentAccesses,
           byDay: Object.entries(byDay)
             .map(([date, counts]) => ({ date, ...counts }))
             .sort((a, b) => a.date.localeCompare(b.date)),
@@ -3625,12 +3626,12 @@ JSON (descrições MAX 15 chars):
           ? allLogs2
           : allLogs2.filter(l => l.userType === input.userType);
         // Matriz: dayOfWeek (0=Dom..6=Sab) x hour (0..23)
-        // Converter UTC -> BRT (UTC-3) antes de calcular dia e hora
-        const BRT_OFFSET_MS = -3 * 60 * 60 * 1000;
+        // Converter UTC -> BRT (UTC-3): subtrair 3h do timestamp UTC
+        const BRT_OFFSET_MS = 3 * 60 * 60 * 1000; // 3 horas em ms
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of filtered) {
           const utcMs = new Date(log.accessedAt).getTime();
-          const brtDate = new Date(utcMs + BRT_OFFSET_MS);
+          const brtDate = new Date(utcMs - BRT_OFFSET_MS); // UTC - 3h = BRT
           const dow = brtDate.getUTCDay();   // dia da semana em BRT
           const hour = brtDate.getUTCHours(); // hora em BRT
           matrix[dow][hour]++;

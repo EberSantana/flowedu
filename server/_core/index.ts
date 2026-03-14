@@ -220,6 +220,14 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
+  // Executar migrações automáticas antes de iniciar o servidor
+  try {
+    const { runAutoMigrations } = await import('../migrate');
+    await runAutoMigrations();
+  } catch (err) {
+    console.warn('[Migrate] Falha ao executar migrações automáticas:', err);
+  }
+
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
     
