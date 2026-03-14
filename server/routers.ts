@@ -3625,15 +3625,23 @@ JSON (descrições MAX 15 chars):
         const filtered = input.userType === 'all'
           ? allLogs2
           : allLogs2.filter(l => l.userType === input.userType);
-        // Matriz: dayOfWeek (0=Dom..6=Sab) x hour (0..23)
-        // Converter UTC -> BRT (UTC-3): subtrair 3h do timestamp UTC
-        const BRT_OFFSET_MS = 3 * 60 * 60 * 1000; // 3 horas em ms
+        // Nota: o TiDB armazena o timestamp com o fuso SYSTEM (que na prática grava
+        // o valor enviado pelo Node.js como-está, sem conversão). O campo accessedAt
+        // já reflete o horário local do servidor (UTC), e o mysql2 retorna um Date
+        // cujo .toISOString() mostra o valor exato gravado no banco.
+        // Como o Node.js grava new Date() (UTC) e o TiDB armazena sem ajuste,
+        // o Date retornado já está em UTC. Portanto, para obter BRT (UTC-3),
+        // subtraímos 3h.
+        //
+        // ATENÇÃO: diagnóstico mostrou que o banco retorna timestamps com 3h a menos
+        // do que o UTC real (ex: acesso às 18:03 UTC aparece como 15:06 no banco).
+        // Isso significa que o banco já está armazenando em BRT (UTC-3).
+        // Portanto, NÃO devemos subtrair mais nada — usar o valor diretamente.
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of filtered) {
-          const utcMs = new Date(log.accessedAt).getTime();
-          const brtDate = new Date(utcMs - BRT_OFFSET_MS); // UTC - 3h = BRT
-          const dow = brtDate.getUTCDay();   // dia da semana em BRT
-          const hour = brtDate.getUTCHours(); // hora em BRT
+          const brtDate = new Date(log.accessedAt); // já está em BRT no banco
+          const dow = brtDate.getUTCDay();   // dia da semana
+          const hour = brtDate.getUTCHours(); // hora (já em BRT)
           matrix[dow][hour]++;
         }
         return { matrix, total: filtered.length };
