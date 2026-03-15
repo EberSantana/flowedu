@@ -7564,3 +7564,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar seletor de templates na página de Enviar E-mail com preview visual
 - [x] Permitir personalização dos templates antes do envio (campos entre [colchetes])
 - [x] Deploy na VPS v3.6.0 (IP: 76.13.67.5, PM2 online, HTTP 200)
+
+## 🔴 Bug Crítico - Login
+- [ ] Diagnosticar problema de login (sistema não está logando)
+- [ ] Corrigir autenticação no Manus e na VPS

@@ -1,0 +1,170 @@
+{
+  "query": "SELECT id, email, name, role, approvalStatus, loginMethod FROM users LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, role, approvalStatus, loginMethod FROM users LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "eberss@gmail.com",
+      "name": "Eber da Silva de Santana",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "loginMethod": "email"
+    },
+    {
+      "id": "600002",
+      "email": "fagundesjuliane@yahoo.com.br",
+      "name": "Juliane Kel Fagundes Silva",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3480001",
+      "email": "demo@flowedu.app",
+      "name": "Professor Demo",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3510008",
+      "email": "temp-deactivate@test.com",
+      "name": "Temp Deactivate User",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "test"
+    },
+    {
+      "id": "3510009",
+      "email": "temp-reactivate@test.com",
+      "name": "Temp Reactivate User",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "test"
+    },
+    {
+      "id": "3510010",
+      "email": "preserve@test.com",
+      "name": "Preserve Data User",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "test"
+    },
+    {
+      "id": "3510018",
+      "email": "test-pc@example.com",
+      "name": "Test PC User",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3510023",
+      "email": "prof-sidebar-1771290342886@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3510046",
+      "email": "prof-sidebar-1771290395099@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3510069",
+      "email": "prof-sidebar-1771292866991@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3510092",
+      "email": "prof-sidebar-1771292916825@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540023",
+      "email": "prof-sidebar-1771334020928@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540046",
+      "email": "prof-sidebar-1771335238385@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540069",
+      "email": "prof-sidebar-1771337266055@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540092",
+      "email": "prof-sidebar-1771339563069@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540115",
+      "email": "prof-sidebar-1771340440326@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540138",
+      "email": "prof-sidebar-1771346554225@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540161",
+      "email": "prof-sidebar-1771350453965@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3540184",
+      "email": "prof-sidebar-1771350482358@teste.com",
+      "name": "Professor Teste Sidebar",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    },
+    {
+      "id": "3570002",
+      "email": "student-1772917692475@example.com",
+      "name": "Aluno Teste",
+      "role": "user",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tapprovalStatus\tloginMethod\n1\teberss@gmail.com\tEber da Silva de Santana\tadmin\tapproved\temail\n600002\tfagundesjuliane@yahoo.com.br\tJuliane Kel Fagundes Silva\tuser\tapproved\tNULL\n3480001\tdemo@flowedu.app\tProfessor Demo\tadmin\tapproved\tNULL\n3510008\ttemp-deactivate@test.com\tTemp Deactivate User\tuser\tapproved\ttest\n3510009\ttemp-reactivate@test.com\tTemp Reactivate User\tuser\tapproved\ttest\n3510010\tpreserve@test.com\tPreserve Data User\tuser\tapproved\ttest\n3510018\ttest-pc@example.com\tTest PC User\tuser\tapproved\tNULL\n3510023\tprof-sidebar-1771290342886@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3510046\tprof-sidebar-1771290395099@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3510069\tprof-sidebar-1771292866991@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3510092\tprof-sidebar-1771292916825@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540023\tprof-sidebar-1771334020928@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540046\tprof-sidebar-1771335238385@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540069\tprof-sidebar-1771337266055@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540092\tprof-sidebar-1771339563069@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540115\tprof-sidebar-1771340440326@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540138\tprof-sidebar-1771346554225@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540161\tprof-sidebar-1771350453965@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3540184\tprof-sidebar-1771350482358@teste.com\tProfessor Teste Sidebar\tuser\tapproved\tNULL\n3570002\tstudent-1772917692475@example.com\tAluno Teste\tuser\tapproved\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 99
+}

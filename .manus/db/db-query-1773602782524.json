@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, email, name, role, approvalStatus, loginMethod, passwordHash IS NOT NULL as hasPassword FROM users WHERE email LIKE '%flowedu%' OR email LIKE '%eber%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, email, name, role, approvalStatus, loginMethod, passwordHash IS NOT NULL as hasPassword FROM users WHERE email LIKE '%flowedu%' OR email LIKE '%eber%';",
+  "rows": [
+    {
+      "id": "1",
+      "email": "eberss@gmail.com",
+      "name": "Eber da Silva de Santana",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "loginMethod": "email",
+      "hasPassword": "1"
+    },
+    {
+      "id": "3480001",
+      "email": "demo@flowedu.app",
+      "name": "Professor Demo",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "loginMethod": "NULL",
+      "hasPassword": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tapprovalStatus\tloginMethod\thasPassword\n1\teberss@gmail.com\tEber da Silva de Santana\tadmin\tapproved\temail\t1\n3480001\tdemo@flowedu.app\tProfessor Demo\tadmin\tapproved\tNULL\t1\n",
+  "stderr": "",
+  "execution_time_ms": 153
+}

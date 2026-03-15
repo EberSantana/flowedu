@@ -1,7 +1,7 @@
 // Service Worker para PWA - FlowEdu
 // A versão é controlada automaticamente pelo sistema de deploy
 // Quando o sw.js muda (nova versão injetada), o browser detecta e atualiza automaticamente
-const CACHE_VERSION = '__SW_VERSION__'; // Substituído automaticamente no build
+const CACHE_VERSION = '__SW_VERSION__' !== '__SW_VERSION__' ? '__SW_VERSION__' : Date.now().toString(); // Versão dinâmica em dev
 const CACHE_NAME = `flowedu-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `flowedu-runtime-${CACHE_VERSION}`;
 
@@ -81,6 +81,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request).catch(() => caches.match(request))
     );
+    return;
+  }
+  
+  // NUNCA cachear módulos dinâmicos do Vite (.tsx, .ts, .jsx, .js com @fs ou src/)
+  if (url.pathname.includes('/src/') || url.pathname.endsWith('.tsx') || url.pathname.endsWith('.ts') || url.pathname.includes('@fs') || url.pathname.includes('@vite') || url.pathname.includes('node_modules')) {
+    event.respondWith(fetch(request));
     return;
   }
   
