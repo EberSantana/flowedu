@@ -2379,6 +2379,11 @@ Diretrizes OBRIGATÓRIAS:
           }
         }
         
+        // Salvar workload correto na disciplina (caso tenha sido alterado pelo professor)
+        if (input.workload && input.workload !== subject?.workload) {
+          await db.updateSubject(input.subjectId, ctx.user.id, { workload: totalWorkload });
+        }
+
         // Create modules and topics in database
         for (const [moduleIndex, module] of result.modules.entries()) {
           const createdModule = await db.createLearningModule({
