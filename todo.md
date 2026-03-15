@@ -7548,3 +7548,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Migração automática no deploy (script de startup que adiciona colunas faltantes)
 - [ ] Corrigir horas no mapa de calor (fuso BRT UTC-3)
 - [ ] Corrigir contagem de "Acessos Hoje" para bater com registros reais
+
+
+## Verificação de Erros - Módulo de Administração
+- [x] Verificar erros TypeScript no backend do módulo de administração - OK (0 erros)
+- [x] Verificar erros TypeScript no frontend do módulo de administração - OK (0 erros)
+- [x] Verificar erros no email-router.ts (backend) - OK (procedures funcionando)
+- [x] Verificar erros nas páginas EmailConfig.tsx e EmailSend.tsx (frontend) - OK
+- [x] Verificar logs do servidor para erros em runtime - OK
+- [x] Testar todas as páginas de admin no browser - OK (todas carregando)
+- [x] Corrigir todos os erros encontrados - CORRIGIDO: duplicação React 19.1.1 vs 19.2.4 (pnpm overrides)
