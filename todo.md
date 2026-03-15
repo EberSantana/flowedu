@@ -7558,3 +7558,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Verificar logs do servidor para erros em runtime - OK
 - [x] Testar todas as páginas de admin no browser - OK (todas carregando)
 - [x] Corrigir todos os erros encontrados - CORRIGIDO: duplicação React 19.1.1 vs 19.2.4 (pnpm overrides)
+
+## Templates de E-mail Pré-definidos
+- [x] Criar templates HTML de e-mail (aviso de prova, lembrete de entrega, comunicado geral, boas-vindas, resultado de avaliação, cancelamento de aula)
+- [x] Adicionar seletor de templates na página de Enviar E-mail com preview visual
+- [x] Permitir personalização dos templates antes do envio (campos entre [colchetes])
+- [x] Deploy na VPS v3.6.0 (IP: 76.13.67.5, PM2 online, HTTP 200)
