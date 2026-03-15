@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/Sidebar";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ import {
   Eye,
   EyeOff,
   Info,
+  Settings,
 } from "lucide-react";
 
 // Presets de servidores SMTP comuns
@@ -69,7 +70,6 @@ const SMTP_PRESETS = [
 
 export default function EmailConfig() {
   const { user } = useAuth();
-  const [, setLocation] = useLocation();
 
   // Estado do formulário
   const [smtpHost, setSmtpHost] = useState("");
@@ -200,65 +200,74 @@ export default function EmailConfig() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen">
+      <>
         <Sidebar />
-        <PageWrapper>
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <PageWrapper className="min-h-screen bg-background">
+          <div className="container mx-auto py-6 px-4">
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            </div>
           </div>
         </PageWrapper>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <>
       <Sidebar />
-      <PageWrapper>
-        <div className="max-w-3xl mx-auto py-6 px-4">
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
-            <Button variant="ghost" size="icon" onClick={() => setLocation("/admin")}>
-              <ArrowLeft className="w-4 h-4" />
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Dashboard
             </Button>
-            <div className="flex items-center gap-2">
-              <Mail className="w-6 h-6 text-blue-600" />
+          </Link>
+
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Configuração de E-mail</h1>
-                <p className="text-sm text-gray-500">Configure seu servidor SMTP para envio de e-mails institucionais</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+                  <Settings className="w-8 h-8 text-primary" />
+                  Configuração de E-mail
+                </h1>
+                <p className="text-gray-600">Configure seu servidor SMTP para envio de e-mails institucionais</p>
               </div>
+              {config && (
+                <div className="flex items-center gap-2">
+                  {getStatusBadge()}
+                  {config.lastTestedAt && (
+                    <span className="text-xs text-gray-400">
+                      Testado em {new Date(config.lastTestedAt).toLocaleString("pt-BR")}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
-            {config && (
-              <div className="ml-auto flex items-center gap-2">
-                {getStatusBadge()}
-                {config.lastTestedAt && (
-                  <span className="text-xs text-gray-400">
-                    Testado em {new Date(config.lastTestedAt).toLocaleString("pt-BR")}
-                  </span>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Aviso informativo */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800">
-              <p className="font-medium mb-1">Como funciona?</p>
-              <p>Configure aqui as credenciais do seu servidor SMTP institucional (Gmail, Outlook, servidor próprio, etc.). Após salvar, use o botão "Testar" para confirmar que o envio está funcionando. Depois, acesse <strong>Enviar E-mail</strong> para enviar mensagens para grupos de alunos.</p>
-            </div>
-          </div>
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="p-4 flex gap-3">
+              <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium mb-1">Como funciona?</p>
+                <p>Configure aqui as credenciais do seu servidor SMTP institucional (Gmail, Outlook, servidor próprio, etc.). Após salvar, use o botão "Testar" para confirmar que o envio está funcionando. Depois, acesse <strong>Enviar E-mail</strong> para enviar mensagens para grupos de alunos.</p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Presets */}
           <Card className="mb-6">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Server className="w-4 h-4" />
-                Atalhos de Configuração
-              </CardTitle>
-              <CardDescription>Clique para preencher automaticamente as configurações do servidor</CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-1">
+                <Server className="w-5 h-5 text-gray-700" />
+                <h2 className="text-lg font-semibold text-gray-900">Atalhos de Configuração</h2>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">Clique para preencher automaticamente as configurações do servidor</p>
               <div className="flex flex-wrap gap-2">
                 {SMTP_PRESETS.map((preset) => (
                   <Button
@@ -266,7 +275,6 @@ export default function EmailConfig() {
                     variant="outline"
                     size="sm"
                     onClick={() => handlePreset(preset)}
-                    className="text-xs"
                   >
                     {preset.name}
                   </Button>
@@ -277,202 +285,210 @@ export default function EmailConfig() {
 
           {/* Formulário SMTP */}
           <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                Configurações do Servidor SMTP
-              </CardTitle>
-              <CardDescription>Dados de conexão com o servidor de e-mail</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2 space-y-1.5">
-                  <Label htmlFor="smtpHost">Servidor SMTP (Host)</Label>
-                  <Input
-                    id="smtpHost"
-                    placeholder="ex: smtp.gmail.com"
-                    value={smtpHost}
-                    onChange={(e) => setSmtpHost(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="smtpPort">Porta</Label>
-                  <Input
-                    id="smtpPort"
-                    type="number"
-                    placeholder="587"
-                    value={smtpPort}
-                    onChange={(e) => setSmtpPort(Number(e.target.value))}
-                  />
-                </div>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield className="w-5 h-5 text-gray-700" />
+                <h2 className="text-lg font-semibold text-gray-900">Configurações do Servidor SMTP</h2>
               </div>
+              <p className="text-sm text-gray-500 mb-6">Dados de conexão com o servidor de e-mail</p>
 
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Switch
-                  id="smtpSecure"
-                  checked={smtpSecure}
-                  onCheckedChange={setSmtpSecure}
-                />
-                <div>
-                  <Label htmlFor="smtpSecure" className="cursor-pointer font-medium">
-                    Conexão SSL/TLS (porta 465)
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2 space-y-1.5">
+                    <Label htmlFor="smtpHost">Servidor SMTP (Host)</Label>
+                    <Input
+                      id="smtpHost"
+                      placeholder="ex: smtp.gmail.com"
+                      value={smtpHost}
+                      onChange={(e) => setSmtpHost(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="smtpPort">Porta</Label>
+                    <Input
+                      id="smtpPort"
+                      type="number"
+                      placeholder="587"
+                      value={smtpPort}
+                      onChange={(e) => setSmtpPort(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Switch
+                    id="smtpSecure"
+                    checked={smtpSecure}
+                    onCheckedChange={setSmtpSecure}
+                  />
+                  <div>
+                    <Label htmlFor="smtpSecure" className="cursor-pointer font-medium">
+                      Conexão SSL/TLS (porta 465)
+                    </Label>
+                    <p className="text-xs text-gray-500">
+                      Desativado = STARTTLS (porta 587, recomendado). Ativado = SSL direto (porta 465).
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="smtpUser">Usuário SMTP (seu e-mail)</Label>
+                  <Input
+                    id="smtpUser"
+                    type="email"
+                    placeholder="seu.email@instituicao.edu.br"
+                    value={smtpUser}
+                    onChange={(e) => setSmtpUser(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="smtpPassword">
+                    Senha SMTP
+                    {config?.hasPassword && (
+                      <span className="ml-2 text-xs text-green-600 font-normal">(senha salva — deixe em branco para manter)</span>
+                    )}
                   </Label>
-                  <p className="text-xs text-gray-500">
-                    Desativado = STARTTLS (porta 587, recomendado). Ativado = SSL direto (porta 465).
+                  <div className="relative">
+                    <Input
+                      id="smtpPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={config?.hasPassword ? "••••••••" : "Senha do e-mail ou senha de app"}
+                      value={smtpPassword}
+                      onChange={(e) => setSmtpPassword(e.target.value)}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-amber-600">
+                    ⚠️ Para Gmail: use uma "Senha de App" (não a senha da conta). Acesse myaccount.google.com → Segurança → Senhas de app.
                   </p>
                 </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-1.5">
-                <Label htmlFor="smtpUser">Usuário SMTP (seu e-mail)</Label>
-                <Input
-                  id="smtpUser"
-                  type="email"
-                  placeholder="seu.email@instituicao.edu.br"
-                  value={smtpUser}
-                  onChange={(e) => setSmtpUser(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="smtpPassword">
-                  Senha SMTP
-                  {config?.hasPassword && (
-                    <span className="ml-2 text-xs text-green-600 font-normal">(senha salva — deixe em branco para manter)</span>
-                  )}
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="smtpPassword"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={config?.hasPassword ? "••••••••" : "Senha do e-mail ou senha de app"}
-                    value={smtpPassword}
-                    onChange={(e) => setSmtpPassword(e.target.value)}
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                <p className="text-xs text-amber-600">
-                  ⚠️ Para Gmail: use uma "Senha de App" (não a senha da conta). Acesse myaccount.google.com → Segurança → Senhas de app.
-                </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Remetente */}
           <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Dados do Remetente
-              </CardTitle>
-              <CardDescription>Como seus e-mails aparecerão para os destinatários</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="fromName">Nome do Remetente</Label>
-                  <Input
-                    id="fromName"
-                    placeholder="ex: Prof. João Silva"
-                    value={fromName}
-                    onChange={(e) => setFromName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="fromEmail">E-mail do Remetente</Label>
-                  <Input
-                    id="fromEmail"
-                    type="email"
-                    placeholder="seu.email@instituicao.edu.br"
-                    value={fromEmail}
-                    onChange={(e) => setFromEmail(e.target.value)}
-                  />
-                </div>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-1">
+                <Mail className="w-5 h-5 text-gray-700" />
+                <h2 className="text-lg font-semibold text-gray-900">Dados do Remetente</h2>
               </div>
+              <p className="text-sm text-gray-500 mb-6">Como seus e-mails aparecerão para os destinatários</p>
 
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Switch
-                  id="isActive"
-                  checked={isActive}
-                  onCheckedChange={setIsActive}
-                />
-                <Label htmlFor="isActive" className="cursor-pointer">
-                  Configuração ativa (permite envio de e-mails)
-                </Label>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fromName">Nome do Remetente</Label>
+                    <Input
+                      id="fromName"
+                      placeholder="ex: Prof. João Silva"
+                      value={fromName}
+                      onChange={(e) => setFromName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fromEmail">E-mail do Remetente</Label>
+                    <Input
+                      id="fromEmail"
+                      type="email"
+                      placeholder="seu.email@instituicao.edu.br"
+                      value={fromEmail}
+                      onChange={(e) => setFromEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Switch
+                    id="isActive"
+                    checked={isActive}
+                    onCheckedChange={setIsActive}
+                  />
+                  <Label htmlFor="isActive" className="cursor-pointer">
+                    Configuração ativa (permite envio de e-mails)
+                  </Label>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Ações */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              {config && (
-                <Button
-                  variant="outline"
-                  className="text-red-600 border-red-200 hover:bg-red-50"
-                  onClick={() => {
-                    if (confirm("Remover configuração de e-mail?")) {
-                      deleteConfigMutation.mutate();
-                    }
-                  }}
-                  disabled={deleteConfigMutation.isPending}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Remover Configuração
-                </Button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={handleSave}
-                disabled={saveConfigMutation.isPending}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {saveConfigMutation.isPending ? "Salvando..." : "Salvar"}
-              </Button>
-
-              {config && (
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="E-mail para teste"
-                    type="email"
-                    value={testEmail}
-                    onChange={(e) => setTestEmail(e.target.value)}
-                    className="w-56"
-                  />
-                  <Button
-                    onClick={handleTest}
-                    disabled={testConfigMutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <TestTube className="w-4 h-4 mr-2" />
-                    {testConfigMutation.isPending ? "Testando..." : "Testar Envio"}
-                  </Button>
+                  {config && (
+                    <Button
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => {
+                        if (confirm("Remover configuração de e-mail?")) {
+                          deleteConfigMutation.mutate();
+                        }
+                      }}
+                      disabled={deleteConfigMutation.isPending}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Remover Configuração
+                    </Button>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                  <Button
+                    size="lg"
+                    onClick={handleSave}
+                    disabled={saveConfigMutation.isPending}
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {saveConfigMutation.isPending ? "Salvando..." : "Salvar Configuração"}
+                  </Button>
+
+                  {config && (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        placeholder="E-mail para teste"
+                        type="email"
+                        value={testEmail}
+                        onChange={(e) => setTestEmail(e.target.value)}
+                        className="w-56"
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={handleTest}
+                        disabled={testConfigMutation.isPending}
+                      >
+                        <TestTube className="w-4 h-4 mr-2" />
+                        {testConfigMutation.isPending ? "Testando..." : "Testar Envio"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Erro do último teste */}
           {config?.lastTestStatus === "failed" && config.lastTestError && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm font-medium text-red-800 mb-1">Erro no último teste:</p>
-              <p className="text-xs text-red-700 font-mono">{config.lastTestError}</p>
-            </div>
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-red-800 mb-1">Erro no último teste:</p>
+                <p className="text-xs text-red-700 font-mono">{config.lastTestError}</p>
+              </CardContent>
+            </Card>
           )}
         </div>
       </PageWrapper>
-    </div>
+    </>
   );
 }

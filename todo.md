@@ -7568,3 +7568,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## 🔴 Bug Crítico - Login
 - [ ] Diagnosticar problema de login (sistema não está logando)
 - [ ] Corrigir autenticação no Manus e na VPS
+
+## Ajuste de Layout e UX - Páginas de E-mail
+- [ ] Ajustar EmailConfig.tsx para seguir padrão visual do sistema (fundo cinza, cards brancos, botões azuis, link voltar)
+- [ ] Ajustar EmailSend.tsx para seguir padrão visual do sistema (fundo cinza, cards brancos, botões azuis, link voltar)
+- [ ] Deploy na VPS com layout atualizado
