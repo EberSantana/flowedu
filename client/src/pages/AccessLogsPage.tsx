@@ -33,6 +33,9 @@ import {
   Archive,
   FileText,
   ExternalLink,
+  AlertTriangle,
+  Moon,
+  Laptop,
 } from "lucide-react";
 import {
   Dialog,
@@ -82,6 +85,10 @@ export default function AccessLogsPage() {
   const [filterType, setFilterType] = useState<"all" | "teacher" | "student">("all");
   const [heatmapDays, setHeatmapDays] = useState(90);
   const [heatmapUserType, setHeatmapUserType] = useState<"all" | "teacher" | "student">("all");
+  const [heatmapClassId, setHeatmapClassId] = useState<number | undefined>(undefined); // filtro por turma no mapa de calor
+  const [heatmapCompare, setHeatmapCompare] = useState(false); // modo comparativo de períodos
+  const [compareDays1, setCompareDays1] = useState(30); // período 1
+  const [compareDays2, setCompareDays2] = useState(60); // período 2 (mais antigo)
   const [isExporting, setIsExporting] = useState(false);
   // Filtro por período personalizado
   const [filterMode, setFilterMode] = useState<"days" | "period">("days");
@@ -213,7 +220,45 @@ export default function AccessLogsPage() {
 
   const { data: heatmapData, isLoading: heatmapLoading } = trpc.accessLogs.getHeatmap.useQuery(
     { days: heatmapDays, userType: heatmapUserType },
+    { refetchOnWindowFocus: false, enabled: !heatmapClassId }
+  );
+  // Mapa de calor filtrado por turma
+  const { data: heatmapClassData, isLoading: heatmapClassLoading } = trpc.accessLogs.getHeatmapByClass.useQuery(
+    { days: heatmapDays, classId: heatmapClassId },
+    { refetchOnWindowFocus: false, enabled: !!heatmapClassId }
+  );
+  // Dados efetivos do mapa de calor (turma ou geral)
+  const activeHeatmapData = heatmapClassId ? heatmapClassData : heatmapData;
+  const activeHeatmapLoading = heatmapClassId ? heatmapClassLoading : heatmapLoading;
+
+  // Alertas de acesso suspeito
+  const [suspiciousDays, setSuspiciousDays] = useState(30);
+  const [nightStart, setNightStart] = useState(22);
+  const [nightEnd, setNightEnd] = useState(6);
+  const { data: suspiciousData, isLoading: suspiciousLoading } = trpc.accessLogs.getSuspiciousAccess.useQuery(
+    { days: suspiciousDays, nightStart, nightEnd },
     { refetchOnWindowFocus: false }
+  );
+
+  // Comparativo de períodos
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareDaysA, setCompareDaysA] = useState(7);
+  const [compareDaysB, setCompareDaysB] = useState(7);
+  const [compareDateFromA, setCompareDateFromA] = useState<Date | undefined>(undefined);
+  const [compareDateToA, setCompareDateToA] = useState<Date | undefined>(undefined);
+  const [compareDateFromB, setCompareDateFromB] = useState<Date | undefined>(undefined);
+  const [compareDateToB, setCompareDateToB] = useState<Date | undefined>(undefined);
+  const compareInput = {
+    daysA: compareDaysA,
+    daysB: compareDaysB,
+    dateFromA: compareDateFromA ? format(compareDateFromA, 'yyyy-MM-dd') : undefined,
+    dateToA: compareDateToA ? format(compareDateToA, 'yyyy-MM-dd') : undefined,
+    dateFromB: compareDateFromB ? format(compareDateFromB, 'yyyy-MM-dd') : undefined,
+    dateToB: compareDateToB ? format(compareDateToB, 'yyyy-MM-dd') : undefined,
+  };
+  const { data: compareData, isLoading: compareLoading } = trpc.accessLogs.getHeatmapCompare.useQuery(
+    compareInput,
+    { enabled: showCompare, refetchOnWindowFocus: false }
   );
 
   // Queries para logs por turma e disciplina
@@ -265,7 +310,7 @@ export default function AccessLogsPage() {
   });
 
   // Calcular o valor máximo da matriz para normalizar as cores
-  const matrix = heatmapData?.matrix ?? [];
+  const matrix = activeHeatmapData?.matrix ?? [];
   const maxValue = matrix.length > 0
     ? Math.max(...matrix.flatMap((row) => row))
     : 0;
@@ -611,20 +656,41 @@ export default function AccessLogsPage() {
                     Identifique os momentos de maior engajamento para planejar comunicados • Horários em BRT (UTC−3)
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Seletor de turma no mapa de calor */}
                   <Select
-                    value={heatmapUserType}
-                    onValueChange={(v) => setHeatmapUserType(v as "all" | "teacher" | "student")}
+                    value={heatmapClassId ? heatmapClassId.toString() : 'all'}
+                    onValueChange={(v) => {
+                      setHeatmapClassId(v === 'all' ? undefined : Number(v));
+                      if (v !== 'all') setHeatmapUserType('all'); // turma = alunos apenas
+                    }}
                   >
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
+                    <SelectTrigger className="w-44">
+                      <SelectValue placeholder="Todas as turmas" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="teacher">Professores</SelectItem>
-                      <SelectItem value="student">Alunos</SelectItem>
+                      <SelectItem value="all">Todas as turmas</SelectItem>
+                      {classList?.map((c: { id: number; name: string; code: string }) => (
+                        <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  {/* Seletor de tipo (desabilitado quando filtrado por turma) */}
+                  {!heatmapClassId && (
+                    <Select
+                      value={heatmapUserType}
+                      onValueChange={(v) => setHeatmapUserType(v as "all" | "teacher" | "student")}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="teacher">Professores</SelectItem>
+                        <SelectItem value="student">Alunos</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                   <Select
                     value={heatmapDays.toString()}
                     onValueChange={(v) => setHeatmapDays(Number(v))}
@@ -642,9 +708,9 @@ export default function AccessLogsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {heatmapLoading ? (
+              {activeHeatmapLoading ? (
                 <p className="text-muted-foreground text-sm py-4 text-center">Carregando mapa de calor...</p>
-              ) : !heatmapData || heatmapData.total === 0 ? (
+              ) : !activeHeatmapData || activeHeatmapData.total === 0 ? (
                 <p className="text-muted-foreground text-sm py-4 text-center">
                   Nenhum acesso registrado no período selecionado.
                 </p>
@@ -711,6 +777,236 @@ export default function AccessLogsPage() {
                         <span className="text-xs text-muted-foreground">Mais</span>
                       </div>
                     </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ===== COMPARATIVO DE PERÍODOS ===== */}
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <TrendingUp className="h-5 w-5 text-indigo-500" />
+                  Comparativo de Períodos
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCompare(!showCompare)}
+                >
+                  {showCompare ? 'Ocultar' : 'Comparar períodos'}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Compare dois períodos para visualizar mudanças no padrão de acesso dos alunos
+              </p>
+            </CardHeader>
+            {showCompare && (
+              <CardContent>
+                {/* Seletores de período */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  {/* Período A */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-blue-600">Período A (base)</p>
+                    <div className="flex gap-2">
+                      <Select value={compareDaysA.toString()} onValueChange={(v) => { setCompareDaysA(Number(v)); setCompareDateFromA(undefined); setCompareDateToA(undefined); }}>
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="7">Últimos 7 dias</SelectItem>
+                          <SelectItem value="14">Últimos 14 dias</SelectItem>
+                          <SelectItem value="30">Últimos 30 dias</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {compareData?.labelA || `Últimos ${compareDaysA} dias`}
+                    </p>
+                  </div>
+                  {/* Período B */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-orange-600">Período B (comparação)</p>
+                    <div className="flex gap-2">
+                      <Select value={compareDaysB.toString()} onValueChange={(v) => { setCompareDaysB(Number(v)); setCompareDateFromB(undefined); setCompareDateToB(undefined); }}>
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="7">Últimos 7 dias</SelectItem>
+                          <SelectItem value="14">Últimos 14 dias</SelectItem>
+                          <SelectItem value="30">Últimos 30 dias</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {compareData?.labelB || `Últimos ${compareDaysB} dias`}
+                    </p>
+                  </div>
+                </div>
+
+                {compareLoading ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">Carregando comparativo...</p>
+                ) : !compareData ? null : (
+                  <>
+                    {/* Resumo de totais */}
+                    <div className="flex gap-4 mb-5">
+                      <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                        <p className="text-xs text-blue-600 font-medium mb-1">Período A</p>
+                        <p className="text-2xl font-bold text-blue-700">{compareData.totalA}</p>
+                        <p className="text-xs text-blue-500">acessos</p>
+                      </div>
+                      <div className="flex items-center justify-center px-2">
+                        {compareData.totalB > compareData.totalA ? (
+                          <div className="flex flex-col items-center">
+                            <TrendingUp className="h-6 w-6 text-green-500" />
+                            <span className="text-xs text-green-600 font-semibold">+{compareData.totalB - compareData.totalA}</span>
+                          </div>
+                        ) : compareData.totalB < compareData.totalA ? (
+                          <div className="flex flex-col items-center">
+                            <TrendingUp className="h-6 w-6 text-red-400 rotate-180" />
+                            <span className="text-xs text-red-500 font-semibold">{compareData.totalB - compareData.totalA}</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">=</span>
+                        )}
+                      </div>
+                      <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+                        <p className="text-xs text-orange-600 font-medium mb-1">Período B</p>
+                        <p className="text-2xl font-bold text-orange-700">{compareData.totalB}</p>
+                        <p className="text-xs text-orange-500">acessos</p>
+                      </div>
+                    </div>
+
+                    {/* Mapas de calor lado a lado */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {[{ matrix: compareData.matrixA, label: compareData.labelA, colorClass: 'bg-blue-400', emptyClass: 'bg-blue-50' }, { matrix: compareData.matrixB, label: compareData.labelB, colorClass: 'bg-orange-400', emptyClass: 'bg-orange-50' }].map((period, pi) => {
+                        const maxVal = Math.max(...period.matrix.flat(), 1);
+                        return (
+                          <div key={pi}>
+                            <p className="text-xs font-semibold mb-2 " style={{ color: pi === 0 ? '#2563eb' : '#ea580c' }}>
+                              {pi === 0 ? 'Período A' : 'Período B'}: {period.label}
+                            </p>
+                            <div className="overflow-x-auto">
+                              <div className="flex mb-1 ml-10">
+                                {HOURS.map(h => (
+                                  <div key={h} className="flex-1 text-center" style={{ minWidth: 12 }}>
+                                    {h % 6 === 0 && <span className="text-[8px] text-muted-foreground">{h}h</span>}
+                                  </div>
+                                ))}
+                              </div>
+                              {DAYS.map((day, d) => (
+                                <div key={d} className="flex items-center mb-0.5">
+                                  <div className="w-10 shrink-0 text-[10px] font-medium text-muted-foreground text-right pr-2">{day}</div>
+                                  {HOURS.map(h => {
+                                    const val = period.matrix[d]?.[h] ?? 0;
+                                    const ratio = val / maxVal;
+                                    const opacity = val === 0 ? 0.08 : 0.2 + ratio * 0.8;
+                                    return (
+                                      <div
+                                        key={h}
+                                        title={`${DAYS_FULL[d]} ${h}h: ${val} acessos`}
+                                        className={`flex-1 h-5 mx-px rounded-sm ${val === 0 ? period.emptyClass : period.colorClass}`}
+                                        style={{ opacity }}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            )}
+          </Card>
+
+          {/* ===== ALERTAS DE ACESSO SUSPEITO ===== */}
+          <Card className="mb-6 border-amber-200">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    Alertas de Acesso Suspeito
+                    {suspiciousData && suspiciousData.total > 0 && (
+                      <Badge variant="destructive" className="ml-1">{suspiciousData.total}</Badge>
+                    )}
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Acessos fora do horário habitual ({nightStart}h–00h–{nightEnd}h) ou de dispositivo nunca visto antes
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select value={suspiciousDays.toString()} onValueChange={(v) => setSuspiciousDays(Number(v))}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="7">7 dias</SelectItem>
+                      <SelectItem value="30">30 dias</SelectItem>
+                      <SelectItem value="90">90 dias</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {suspiciousLoading ? (
+                <p className="text-muted-foreground text-sm py-4 text-center">Verificando acessos...</p>
+              ) : !suspiciousData || suspiciousData.total === 0 ? (
+                <div className="flex items-center gap-3 py-4 text-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <UserCheck className="h-4 w-4 text-green-600" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Nenhum acesso suspeito detectado nos últimos {suspiciousDays} dias.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Resumo */}
+                  <div className="flex gap-4 mb-4">
+                    {suspiciousData.nightAccesses > 0 && (
+                      <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                        <Moon className="h-4 w-4 text-amber-500" />
+                        <span className="text-sm font-medium">{suspiciousData.nightAccesses} acessos noturnos</span>
+                      </div>
+                    )}
+                    {suspiciousData.newDeviceAccesses > 0 && (
+                      <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                        <Laptop className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm font-medium">{suspiciousData.newDeviceAccesses} dispositivos novos</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* Lista de alertas */}
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {suspiciousData.alerts.map((alert) => {
+                      const d = new Date(alert.accessedAt);
+                      const dateStr = `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()} ${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;
+                      return (
+                        <div key={alert.id} className="flex items-start justify-between py-2 border-b last:border-0 gap-3">
+                          <div className="flex items-start gap-2 min-w-0">
+                            <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium truncate">{alert.studentName}</p>
+                              <p className="text-xs text-muted-foreground">{dateStr} • {alert.browser} / {alert.os}</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1 shrink-0">
+                            {alert.reason.map((r, i) => (
+                              <Badge key={i} variant="outline" className="text-xs border-amber-300 text-amber-700 whitespace-nowrap">
+                                {r}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </>
               )}

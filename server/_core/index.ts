@@ -245,6 +245,13 @@ async function startServer() {
     }).catch(error => {
       console.warn('[Scheduler] Falha ao inicializar agendamento de backups:', error);
     });
+
+    // Inicializar relatório semanal automático
+    import('../weekly-report').then(({ startWeeklyReportJob }) => {
+      startWeeklyReportJob();
+    }).catch(error => {
+      console.warn('[WeeklyReport] Falha ao inicializar relatório semanal:', error);
+    });
   });
 }
 

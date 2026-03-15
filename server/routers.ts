@@ -3652,6 +3652,158 @@ JSON (descrições MAX 15 chars):
         return { matrix, total: filtered.length };
       }),
 
+    // Mapa de calor filtrado por turma
+    getHeatmapByClass: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(365).default(90),
+        classId: z.number().optional(), // undefined = todas as turmas
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+        const { gte: gteOp3, and: andOp3 } = await import('drizzle-orm');
+        const since3 = new Date();
+        since3.setDate(since3.getDate() - input.days);
+
+        // Buscar alunos da turma selecionada (se classId fornecido)
+        let studentIds: number[] | undefined;
+        if (input.classId) {
+          const { studentClassEnrollments: sce } = await import('../drizzle/schema');
+          const enrollRows = await database
+            .select({ studentId: sce.studentId })
+            .from(sce)
+            .where(eq(sce.classId, input.classId));
+          studentIds = enrollRows.map(r => r.studentId);
+          if (studentIds.length === 0) return { matrix: Array.from({ length: 7 }, () => Array(24).fill(0)), total: 0, className: '' };
+        }
+
+        // Buscar nome da turma
+        let className = 'Todas as turmas';
+        if (input.classId) {
+          const classRow = await database.select({ name: classes.name }).from(classes).where(eq(classes.id, input.classId)).limit(1);
+          className = classRow[0]?.name ?? `Turma ${input.classId}`;
+        }
+
+        // Buscar logs de alunos no período, filtrados pela turma se necessário
+        let logsQuery = database
+          .select({ accessedAt: accessLogs.accessedAt })
+          .from(accessLogs)
+          .where(andOp3(
+            gteOp3(accessLogs.accessedAt, since3),
+            eq(accessLogs.userType, 'student'),
+            eq(accessLogs.teacherId, teacherId),
+          ));
+
+        const allStudentLogs = await logsQuery;
+
+        // Filtrar por alunos da turma se necessário
+        const filteredLogs = studentIds
+          ? allStudentLogs.filter(l => {
+              // Precisamos do studentId — buscar novamente com studentId
+              return true; // placeholder, será substituído abaixo
+            })
+          : allStudentLogs;
+
+        // Se filtro por turma, buscar com studentId
+        let finalLogs: { accessedAt: Date }[];
+        if (studentIds && studentIds.length > 0) {
+          const logsWithStudentId = await database
+            .select({ accessedAt: accessLogs.accessedAt, studentId: accessLogs.studentId })
+            .from(accessLogs)
+            .where(andOp3(
+              gteOp3(accessLogs.accessedAt, since3),
+              eq(accessLogs.userType, 'student'),
+              eq(accessLogs.teacherId, teacherId),
+            ));
+          finalLogs = logsWithStudentId.filter(l => l.studentId !== null && studentIds!.includes(l.studentId!));
+        } else {
+          finalLogs = allStudentLogs;
+        }
+
+        const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+        for (const log of finalLogs) {
+          const d = new Date(log.accessedAt);
+          const dow = d.getUTCDay();
+          const hour = d.getUTCHours();
+          matrix[dow][hour]++;
+        }
+        return { matrix, total: finalLogs.length, className };
+      }),
+
+    // Comparativo de dois períodos no mapa de calor
+    getHeatmapCompare: protectedProcedure
+      .input(z.object({
+        // Período A
+        daysA: z.number().min(1).max(365).default(7),
+        dateFromA: z.string().optional(),
+        dateToA: z.string().optional(),
+        // Período B
+        daysB: z.number().min(1).max(365).default(7),
+        dateFromB: z.string().optional(),
+        dateToB: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+
+        const buildRange = (days: number, dateFrom?: string, dateTo?: string) => {
+          if (dateFrom) {
+            const from = new Date(dateFrom);
+            from.setUTCHours(0, 0, 0, 0);
+            const to = dateTo ? new Date(dateTo) : new Date(from);
+            to.setUTCHours(23, 59, 59, 999);
+            return { from, to };
+          }
+          const to = new Date();
+          const from = new Date();
+          from.setDate(from.getDate() - days);
+          return { from, to };
+        };
+
+        const rangeA = buildRange(input.daysA, input.dateFromA, input.dateToA);
+        const rangeB = buildRange(input.daysB, input.dateFromB, input.dateToB);
+
+        const fetchMatrix = async (from: Date, to: Date) => {
+          const logs = await database
+            .select({ accessedAt: accessLogs.accessedAt })
+            .from(accessLogs)
+            .where(and(
+              eq(accessLogs.userType, 'student'),
+              eq(accessLogs.teacherId, teacherId),
+              gte(accessLogs.accessedAt, from),
+              lte(accessLogs.accessedAt, to),
+            ));
+          const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+          for (const log of logs) {
+            const d = new Date(log.accessedAt);
+            matrix[d.getUTCDay()][d.getUTCHours()]++;
+          }
+          return { matrix, total: logs.length };
+        };
+
+        const [resultA, resultB] = await Promise.all([
+          fetchMatrix(rangeA.from, rangeA.to),
+          fetchMatrix(rangeB.from, rangeB.to),
+        ]);
+
+        // Calcular delta: positivo = mais acessos no período B, negativo = menos
+        const delta: number[][] = Array.from({ length: 7 }, (_, d) =>
+          Array.from({ length: 24 }, (_, h) => resultB.matrix[d][h] - resultA.matrix[d][h])
+        );
+
+        return {
+          matrixA: resultA.matrix,
+          matrixB: resultB.matrix,
+          delta,
+          totalA: resultA.total,
+          totalB: resultB.total,
+          labelA: input.dateFromA ? `${input.dateFromA}${input.dateToA ? ' a ' + input.dateToA : ''}` : `Últimos ${input.daysA} dias`,
+          labelB: input.dateFromB ? `${input.dateFromB}${input.dateToB ? ' a ' + input.dateToB : ''}` : `Últimos ${input.daysB} dias`,
+        };
+      }),
+
     // Exportar todos os logs em CSV
     exportCSV: protectedProcedure
       .input(z.object({
@@ -4298,6 +4450,119 @@ JSON (descrições MAX 15 chars):
         await database.delete(accessLogArchives)
           .where(and(eq(accessLogArchives.id, input.id), eq(accessLogArchives.teacherId, ctx.user.id)));
         return { success: true };
+      }),
+
+    // Acessos suspeitos: fora do horário habitual (22h-6h) ou dispositivo nunca visto antes
+    getSuspiciousAccess: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(90).default(30),
+        nightStart: z.number().min(0).max(23).default(22), // hora de início do período noturno
+        nightEnd: z.number().min(0).max(23).default(6),   // hora de fim do período noturno
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+        const cutoff = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
+
+        // Buscar todos os logs de alunos no período
+        const allLogs = await database
+          .select({
+            id: accessLogs.id,
+            studentId: accessLogs.studentId,
+            userName: accessLogs.userName,
+            accessedAt: accessLogs.accessedAt,
+            browser: accessLogs.browser,
+            os: accessLogs.os,
+            userAgent: accessLogs.userAgent,
+          })
+          .from(accessLogs)
+          .where(and(
+            eq(accessLogs.userType, 'student'),
+            eq(accessLogs.teacherId, teacherId),
+            gte(accessLogs.accessedAt, cutoff),
+          ))
+          .orderBy(desc(accessLogs.accessedAt));
+
+        // Construir perfil de dispositivos por aluno (histórico antes do período atual)
+        // Para detectar dispositivo novo, comparamos com logs mais antigos
+        const deviceProfileByStudent: Record<number, Set<string>> = {};
+        const historicCutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 90 dias de histórico
+        const historicLogs = await database
+          .select({ studentId: accessLogs.studentId, browser: accessLogs.browser, os: accessLogs.os })
+          .from(accessLogs)
+          .where(and(
+            eq(accessLogs.userType, 'student'),
+            eq(accessLogs.teacherId, teacherId),
+            gte(accessLogs.accessedAt, historicCutoff),
+          ));
+        for (const log of historicLogs) {
+          if (!log.studentId) continue;
+          if (!deviceProfileByStudent[log.studentId]) deviceProfileByStudent[log.studentId] = new Set();
+          const deviceKey = `${log.browser ?? 'Desconhecido'}|${log.os ?? 'Desconhecido'}`;
+          deviceProfileByStudent[log.studentId].add(deviceKey);
+        }
+
+        // Identificar acessos suspeitos
+        const suspicious: Array<{
+          id: number;
+          studentId: number | null;
+          studentName: string;
+          accessedAt: Date;
+          hour: number;
+          browser: string;
+          os: string;
+          reason: string[];
+        }> = [];
+
+        // Rastrear dispositivos já vistos no período atual (para não alertar duas vezes)
+        const newDeviceAlerted: Record<number, Set<string>> = {};
+
+        for (const log of allLogs) {
+          const reasons: string[] = [];
+          const d = new Date(log.accessedAt);
+          const hour = d.getUTCHours(); // banco já está em BRT
+
+          // Verificar acesso noturno
+          const isNight = input.nightStart > input.nightEnd
+            ? hour >= input.nightStart || hour < input.nightEnd
+            : hour >= input.nightStart && hour < input.nightEnd;
+          if (isNight) reasons.push(`Acesso às ${hour}h (horário noturno)`);
+
+          // Verificar dispositivo novo
+          if (log.studentId) {
+            const deviceKey = `${log.browser ?? 'Desconhecido'}|${log.os ?? 'Desconhecido'}`;
+            if (!newDeviceAlerted[log.studentId]) newDeviceAlerted[log.studentId] = new Set();
+            // Dispositivo novo = não estava no histórico de 90 dias E ainda não alertado
+            const historicBeforePeriod = historicLogs
+              .filter(h => h.studentId === log.studentId)
+              .some(h => `${h.browser ?? 'Desconhecido'}|${h.os ?? 'Desconhecido'}` === deviceKey);
+            if (!historicBeforePeriod && !newDeviceAlerted[log.studentId].has(deviceKey)) {
+              reasons.push(`Dispositivo novo: ${log.browser ?? 'Desconhecido'} / ${log.os ?? 'Desconhecido'}`);
+              newDeviceAlerted[log.studentId].add(deviceKey);
+            }
+          }
+
+          if (reasons.length > 0) {
+            suspicious.push({
+              id: log.id,
+              studentId: log.studentId,
+              studentName: log.userName ?? 'Aluno desconhecido',
+              accessedAt: log.accessedAt,
+              hour,
+              browser: log.browser ?? 'Desconhecido',
+              os: log.os ?? 'Desconhecido',
+              reason: reasons,
+            });
+          }
+        }
+
+        return {
+          alerts: suspicious.slice(0, 100), // limitar a 100 alertas
+          total: suspicious.length,
+          nightAccesses: suspicious.filter(s => s.reason.some(r => r.includes('noturno'))).length,
+          newDeviceAccesses: suspicious.filter(s => s.reason.some(r => r.includes('Dispositivo novo'))).length,
+        };
       }),
   }),
   // Student Portal Routes
