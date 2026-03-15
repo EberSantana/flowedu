@@ -65,27 +65,31 @@ export default function StudentExerciseResults() {
     );
   }
 
-  const scorePercentage = results.score;
+  // score no banco é 0-100; exibir na escala 0-10
+  const scorePercentage = results.score; // 0-100 (usado para Progress bar)
+  const grade = results.score / 10; // 0-10 (exibição ao aluno)
   const correctCount = results.correctCount;
   const totalQuestions = results.totalQuestions;
   const incorrectCount = totalQuestions - correctCount;
+  // Valor de cada questão na escala 10
+  const pointsPerQuestion = totalQuestions > 0 ? (10 / totalQuestions) : 0;
 
-  // Determinar cor e mensagem baseado na pontuação
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return "text-green-600";
-    if (score >= 70) return "text-blue-600";
-    if (score >= 50) return "text-yellow-600";
+  // Determinar cor e mensagem baseado na nota (escala 0-10)
+  const getScoreColor = (g: number) => {
+    if (g >= 9) return "text-green-600";
+    if (g >= 7) return "text-blue-600";
+    if (g >= 5) return "text-yellow-600";
     return "text-red-600";
   };
 
-  const getScoreBadge = (score: number) => {
-    if (score >= 90) return { label: "Excelente!", color: "bg-green-500" };
-    if (score >= 70) return { label: "Bom trabalho!", color: "bg-blue-500" };
-    if (score >= 50) return { label: "Pode melhorar", color: "bg-yellow-500" };
+  const getScoreBadge = (g: number) => {
+    if (g >= 9) return { label: "Excelente!", color: "bg-green-500" };
+    if (g >= 7) return { label: "Bom trabalho!", color: "bg-blue-500" };
+    if (g >= 5) return { label: "Pode melhorar", color: "bg-yellow-500" };
     return { label: "Precisa estudar mais", color: "bg-red-500" };
   };
 
-  const scoreBadge = getScoreBadge(scorePercentage);
+  const scoreBadge = getScoreBadge(grade);
 
   return (
     <StudentLayout>
@@ -96,16 +100,17 @@ export default function StudentExerciseResults() {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <CardTitle className="text-3xl mb-2 flex items-center gap-3">
-                  <Trophy className={`w-8 h-8 ${getScoreColor(scorePercentage)}`} />
+                  <Trophy className={`w-8 h-8 ${getScoreColor(grade)}`} />
                   {results.exerciseTitle}
                 </CardTitle>
                 <div className="flex items-center gap-3 mt-3">
                   <Badge className={`${scoreBadge.color} text-white px-4 py-1 text-base`}>
                     {scoreBadge.label}
                   </Badge>
-                  <span className={`text-4xl font-bold ${getScoreColor(scorePercentage)}`}>
-                    {scorePercentage.toFixed(1)}%
+                  <span className={`text-4xl font-bold ${getScoreColor(grade)}`}>
+                    {grade.toFixed(1)}
                   </span>
+                  <span className="text-lg text-muted-foreground font-normal">/ 10</span>
                 </div>
               </div>
             </div>
@@ -135,11 +140,11 @@ export default function StudentExerciseResults() {
               </div>
             </div>
 
-            <div className="mb-4">
+              <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-700">Progresso</span>
+                <span className="text-sm font-semibold text-gray-700">Desempenho</span>
                 <span className="text-sm text-gray-600">
-                  {correctCount} de {totalQuestions} questões corretas
+                  {correctCount} de {totalQuestions} questões corretas · {pointsPerQuestion.toFixed(2)} pts/questão
                 </span>
               </div>
               <Progress value={scorePercentage} className="h-3" />

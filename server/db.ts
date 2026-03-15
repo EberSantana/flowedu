@@ -7961,6 +7961,12 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
     };
   }
   
+  // Buscar disciplinas para obter workload oficial
+  const subjectsData = await db.select({ id: subjects.id, workload: subjects.workload })
+    .from(subjects)
+    .where(inArray(subjects.id, subjectIds));
+  const totalOfficialWorkload = subjectsData.reduce((sum, s) => sum + (s.workload || 0), 0);
+
   // Buscar todos os módulos das disciplinas matriculadas
   const modules = await db.select().from(learningModules)
     .where(inArray(learningModules.subjectId, subjectIds));
@@ -8004,7 +8010,9 @@ export async function getStudyStatistics(studentId: number, subjectId?: number) 
   const completedTopics = progress.filter(p => p.status === 'completed').length;
   const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
   const notStartedTopics = topics.length - completedTopics - inProgressTopics;
-  const totalHoursEstimated = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+  const totalHoursEstimatedFromTopics = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
+  // Usar carga horária oficial das disciplinas; fallback para soma dos tópicos se não houver workload cadastrado
+  const totalHoursEstimated = totalOfficialWorkload > 0 ? totalOfficialWorkload : totalHoursEstimatedFromTopics;
   
   return {
     totalTopics: topics.length,
@@ -8076,8 +8084,9 @@ export async function getSubjectStatistics(studentId: number, subjectId: number)
   const inProgressTopics = progress.filter(p => p.status === 'in_progress').length;
   const notStartedTopics = topics.length - completedTopics - inProgressTopics;
   const totalHoursEstimated = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
-  // Carga horária calculada: soma das horas dos tópicos da trilha, ou fallback para o valor cadastrado
-  const calculatedWorkload = totalHoursEstimated > 0 ? totalHoursEstimated : (subject.workload || 0);
+  // Carga horária oficial: sempre usa o valor cadastrado pelo professor na ementa.
+  // totalHoursEstimated é a soma das horas estimadas dos tópicos da trilha (pode divergir por arredondamentos da IA).
+  const calculatedWorkload = subject.workload || totalHoursEstimated;
   const progressPercentage = topics.length > 0 
     ? Math.round((completedTopics / topics.length) * 100) 
     : 0;

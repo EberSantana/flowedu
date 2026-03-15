@@ -55,19 +55,20 @@ export default function StudentExercises() {
     }
 
     if (exercise.lastAttempt?.status === "completed") {
-      const score = exercise.lastAttempt.score;
+      const score = exercise.lastAttempt.score; // 0-100
+      const grade = (score / 10).toFixed(1); // 0-10
       if (score >= exercise.passingScore) {
         return (
           <Badge className="gap-1.5 px-3 py-1.5 text-sm font-semibold bg-success hover:bg-success/90">
             <CheckCircle2 className="w-4 h-4" />
-            Aprovado ({score}%)
+            Aprovado ({grade})
           </Badge>
         );
       } else {
         return (
           <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-semibold">
             <AlertCircle className="w-4 h-4" />
-            Reprovado ({score}%)
+            Reprovado ({grade})
           </Badge>
         );
       }
@@ -291,8 +292,8 @@ export default function StudentExercises() {
                           <Target className="w-5 h-5 text-success" />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900 text-lg">{exercise.passingScore}%</p>
-                          <p className="text-xs text-gray-600">nota mínima para aprovação</p>
+                          <p className="font-bold text-gray-900 text-lg">{(exercise.passingScore / 10).toFixed(1)}</p>
+                          <p className="text-xs text-gray-600">nota mínima (escala 0–10)</p>
                         </div>
                       </div>
                     </div>

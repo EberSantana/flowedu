@@ -331,7 +331,8 @@ export default function ExercisePerformanceReport() {
                       <div>
                         <p className="text-sm text-gray-600">Média de Acertos</p>
                         <p className="text-3xl font-bold text-gray-900">
-                          {stats.averageScore.toFixed(1)}%
+                          {(stats.averageScore / 10).toFixed(1)}
+                          <span className="text-base font-normal text-gray-500 ml-1">/ 10</span>
                         </p>
                       </div>
                       <Target className="w-10 h-10 text-purple-500" />
@@ -432,8 +433,8 @@ export default function ExercisePerformanceReport() {
                         <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e5e7eb" />
                         <XAxis 
                           type="number" 
-                          domain={[0, 100]} 
-                          tickFormatter={(value) => `${value}%`}
+                          domain={[0, 10]} 
+                          tickFormatter={(value) => `${value}`}
                           axisLine={false}
                           tickLine={false}
                           tick={{ fill: '#6b7280', fontSize: 12 }}
@@ -453,7 +454,7 @@ export default function ExercisePerformanceReport() {
                             borderRadius: '8px',
                             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                           }}
-                          formatter={(value: any) => [`${value.toFixed(1)}%`, 'Média']}
+                          formatter={(value: any) => [`${(value / 10).toFixed(1)}`, 'Média (0–10)']}
                           labelStyle={{ fontWeight: 'bold', color: '#374151' }}
                         />
                         <Bar 
@@ -516,7 +517,7 @@ export default function ExercisePerformanceReport() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5 text-red-600" />
-                    Alunos com Dificuldades (Média &lt; 60%)
+                    Alunos com Dificuldades (Nota &lt; 6,0)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -561,7 +562,7 @@ export default function ExercisePerformanceReport() {
                                       : "bg-yellow-500"
                                   } text-white`}
                                 >
-                                  {student.averageScore.toFixed(1)}%
+                                  {(student.averageScore / 10).toFixed(1)}
                                 </Badge>
                               </td>
                               <td className="py-3 px-4 text-center">
@@ -586,9 +587,9 @@ export default function ExercisePerformanceReport() {
                     <div className="text-center py-8 text-gray-500">
                       <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-green-500" />
                       <p className="font-medium">Nenhum aluno com dificuldades!</p>
-                      <p className="text-sm mt-1">
-                        Todos os alunos estão com desempenho satisfatório (&gt;= 60%)
-                      </p>
+                    <p className="text-sm mt-1">
+                      Todos os alunos estão com desempenho satisfatório (≥ 6,0)
+                    </p>
                     </div>
                   )}
                 </CardContent>
@@ -648,7 +649,7 @@ export default function ExercisePerformanceReport() {
                                       : "bg-red-500"
                                   } text-white`}
                                 >
-                                  {student.averageScore.toFixed(1)}%
+                                  {(student.averageScore / 10).toFixed(1)}
                                 </Badge>
                               </td>
                               <td className="py-3 px-4 text-center">
@@ -706,17 +707,18 @@ export default function ExercisePerformanceReport() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="edit-passing-score">Nota Mínima (%)</Label>
+                    <Label htmlFor="edit-passing-score">Nota Mínima (escala 0–10)</Label>
                     <Input
                       id="edit-passing-score"
                       type="number"
                       min="0"
-                      max="100"
-                      value={editingExercise.passingScore}
+                      max="10"
+                      step="0.5"
+                      value={(editingExercise.passingScore / 10).toFixed(1)}
                       onChange={(e) =>
                         setEditingExercise({
                           ...editingExercise,
-                          passingScore: parseInt(e.target.value),
+                          passingScore: Math.round(parseFloat(e.target.value) * 10),
                         })
                       }
                     />
