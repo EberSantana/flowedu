@@ -8,7 +8,7 @@ import { TRPCError } from "@trpc/server";
 import { getDb } from "./db";
 import { emailConfigs, emailCampaigns, classes, subjects, students, studentClassEnrollments, subjectEnrollments } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
-import nodemailer from "nodemailer";
+// nodemailer é importado dinamicamente para não ser incluído no bundle do cliente
 
 // ==================== HELPERS ====================
 
@@ -37,16 +37,17 @@ function decryptPassword(encrypted: string): string {
 }
 
 /**
- * Criar transporter nodemailer a partir da configuração
+ * Criar transporter nodemailer a partir da configuração (import dinâmico)
  */
-function createTransporter(config: {
+async function createTransporter(config: {
   smtpHost: string;
   smtpPort: number;
   smtpSecure: boolean;
   smtpUser: string;
   smtpPassword: string;
 }) {
-  return nodemailer.createTransport({
+  const nodemailer = await import("nodemailer");
+  return nodemailer.default.createTransport({
     host: config.smtpHost,
     port: config.smtpPort,
     secure: config.smtpSecure,
@@ -199,7 +200,7 @@ export const emailRouter = router({
       const config = configs[0];
 
       try {
-        const transporter = createTransporter(config);
+        const transporter = await createTransporter(config);
 
         // Verificar conexão
         await transporter.verify();
@@ -451,7 +452,7 @@ export const emailRouter = router({
       const campaignId = campaign.id;
 
       // Enviar e-mails
-      const transporter = createTransporter(config);
+      const transporter = await createTransporter(config);
       let sentCount = 0;
       let failedCount = 0;
       const errors: { email: string; error: string }[] = [];

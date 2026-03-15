@@ -93,7 +93,7 @@ export default defineConfig({
       '@trpc/react-query',
       '@tanstack/react-query',
     ],
-    exclude: [],
+    exclude: ['nodemailer'],
     // Força a reconstrução do cache quando as dependências mudam
     force: true,
     // Configurações de esbuild para o pré-bundling
