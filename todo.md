@@ -7573,3 +7573,27 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Ajustar EmailConfig.tsx para seguir padrão visual do sistema (fundo cinza, cards brancos, botões azuis, link voltar)
 - [ ] Ajustar EmailSend.tsx para seguir padrão visual do sistema (fundo cinza, cards brancos, botões azuis, link voltar)
 - [ ] Deploy na VPS com layout atualizado
+
+## Perfil do Aluno - Campos Adicionais (Inclusivo e Profissional)
+- [ ] Adicionar campo de e-mail ao perfil do aluno
+- [ ] Adicionar campo de data de nascimento (dia/mês/ano) ao perfil do aluno
+- [ ] Adicionar campo de gênero com opções inclusivas (Masculino, Feminino, Não-binário, Personalizar, Prefiro não informar)
+- [ ] Adicionar campo de pronome de tratamento (Ele/Dele, Ela/Dela, Elu/Delu, Prefiro não informar)
+- [ ] Atualizar schema do banco de dados com novos campos
+- [ ] Atualizar procedures tRPC para salvar/buscar novos campos
+- [ ] Atualizar frontend do perfil do aluno
+- [ ] Deploy na VPS com novos campos
+
+## Campos Demográficos no Perfil do Aluno (v3.6.3)
+
+- [x] Adicionar campos email, birthDate, gender, genderCustom, pronoun ao schema da tabela students
+- [x] Adicionar campos de avatar HD-2D ao schema (hd2dCharacterId, hd2dUnlockedCharacters, avatarGender, avatarSkinTone, avatarKimonoColor, avatarHairStyle, avatarHairColor, avatarKimonoStyle, avatarHeadAccessory, avatarExpression, avatarPose, specialKimono, avatarAccessories)
+- [x] Executar migração SQL para adicionar colunas no banco de dados
+- [x] Atualizar input schemas das procedures createStudent e updateStudent no routers.ts
+- [x] Atualizar formulário Students.tsx com campos de e-mail, data de nascimento, gênero e pronome
+- [x] Adicionar opções inclusivas de gênero (Masculino, Feminino, Não-binário, Personalizar, Prefiro não informar)
+- [x] Adicionar opções de pronome (Ele/Dele, Ela/Dela, Elu/Delu, Prefiro não informar)
+- [x] Atualizar StudentProfile.tsx para exibir novos campos (e-mail, nascimento, pronome)
+- [x] Corrigir todos os erros TypeScript (0 erros)
+- [x] Build de produção concluído com sucesso
+- [ ] Deploy na VPS (76.13.67.5)

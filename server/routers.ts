@@ -5308,6 +5308,11 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
       .input(z.object({
         registrationNumber: z.string().min(1, "Matrícula é obrigatória"),
         fullName: z.string().min(3, "Nome completo é obrigatório"),
+        email: z.string().email("E-mail inválido").optional().or(z.literal('')),
+        birthDate: z.string().optional().or(z.literal('')),
+        gender: z.enum(["masculino", "feminino", "nao_binario", "personalizar", "prefiro_nao_informar"]).optional(),
+        genderCustom: z.string().max(100).optional().or(z.literal('')),
+        pronoun: z.enum(["ele_dele", "ela_dela", "elu_delu", "prefiro_nao_informar"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return await db.createStudent({
@@ -5336,6 +5341,11 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         id: z.number(),
         registrationNumber: z.string().optional(),
         fullName: z.string().optional(),
+        email: z.string().email("E-mail inválido").optional().or(z.literal('')).or(z.null()),
+        birthDate: z.string().optional().or(z.literal('')).or(z.null()),
+        gender: z.enum(["masculino", "feminino", "nao_binario", "personalizar", "prefiro_nao_informar"]).optional(),
+        genderCustom: z.string().max(100).optional().or(z.literal('')).or(z.null()),
+        pronoun: z.enum(["ele_dele", "ela_dela", "elu_delu", "prefiro_nao_informar"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;

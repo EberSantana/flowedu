@@ -593,21 +593,25 @@ export const students = mysqlTable("students", {
   userId: int("userId").notNull(), // Professor responsável
   registrationNumber: varchar("registrationNumber", { length: 50 }).notNull(), // Matrícula do aluno
   fullName: varchar("fullName", { length: 255 }).notNull(), // Nome completo do aluno
-  // Campos de customização do avatar de karatê
-  avatarGender: mysqlEnum("avatarGender", ["male", "female"]).default("male").notNull(), // Gênero do avatar (male, female)
-  avatarSkinTone: varchar("avatarSkinTone", { length: 20 }).default("light"), // Tom de pele (light, medium, tan, dark, darker, darkest)
-  avatarKimonoColor: varchar("avatarKimonoColor", { length: 20 }).default("white"), // Cor do kimono (white, blue, red, black)
-  avatarHairStyle: varchar("avatarHairStyle", { length: 20 }).default("short"), // Estilo de cabelo (short, medium, long, bald, ponytail, mohawk)
-  avatarHairColor: varchar("avatarHairColor", { length: 20 }).default("black"), // Cor do cabelo (black, brown, blonde, red, colorful)
-  avatarKimonoStyle: varchar("avatarKimonoStyle", { length: 20 }).default("traditional"), // Estilo do kimono (traditional, modern, competition)
-  avatarHeadAccessory: varchar("avatarHeadAccessory", { length: 20 }).default("none"), // Acessório de cabeça (none, bandana, headband, cap, glasses)
-  avatarExpression: varchar("avatarExpression", { length: 20 }).default("neutral"), // Expressão facial (neutral, happy, determined, focused, victorious)
-  avatarPose: varchar("avatarPose", { length: 20 }).default("standing"), // Pose (standing, fighting, punch, kick)
-  specialKimono: varchar("specialKimono", { length: 30 }).default("none"), // Kimono especial desbloqueável (none, golden, silver, patterned_dragon, patterned_tiger, patterned_sakura)
-  avatarAccessories: text("avatarAccessories"), // JSON com acessórios desbloqueados
-  // Campos HD-2D (Octopath Traveler II Style)
-  hd2dCharacterId: int("hd2dCharacterId").default(1).notNull(), // ID do personagem HD-2D (1-8)
+  email: varchar("email", { length: 255 }), // E-mail do aluno
+  birthDate: varchar("birthDate", { length: 10 }), // Data de nascimento (YYYY-MM-DD)
+  gender: mysqlEnum("gender", ["masculino", "feminino", "nao_binario", "personalizar", "prefiro_nao_informar"]).default("prefiro_nao_informar"), // Gênero
+  genderCustom: varchar("genderCustom", { length: 100 }), // Gênero personalizado (quando gender = 'personalizar')
+  pronoun: mysqlEnum("pronoun", ["ele_dele", "ela_dela", "elu_delu", "prefiro_nao_informar"]).default("prefiro_nao_informar"), // Pronome de tratamento
+  // Campos de avatar HD-2D (gamificação)
+  hd2dCharacterId: int("hd2dCharacterId").default(1),
   hd2dUnlockedCharacters: text("hd2dUnlockedCharacters"), // JSON array de IDs desbloqueados
+  avatarGender: varchar("avatarGender", { length: 20 }).default("male"),
+  avatarSkinTone: varchar("avatarSkinTone", { length: 30 }).default("light"),
+  avatarKimonoColor: varchar("avatarKimonoColor", { length: 30 }).default("white"),
+  avatarHairStyle: varchar("avatarHairStyle", { length: 30 }).default("short"),
+  avatarHairColor: varchar("avatarHairColor", { length: 30 }).default("black"),
+  avatarKimonoStyle: varchar("avatarKimonoStyle", { length: 30 }).default("traditional"),
+  avatarHeadAccessory: varchar("avatarHeadAccessory", { length: 30 }).default("none"),
+  avatarExpression: varchar("avatarExpression", { length: 30 }).default("neutral"),
+  avatarPose: varchar("avatarPose", { length: 30 }).default("standing"),
+  specialKimono: varchar("specialKimono", { length: 30 }).default("none"),
+  avatarAccessories: varchar("avatarAccessories", { length: 255 }).default("none"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

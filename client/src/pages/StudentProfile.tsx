@@ -2,7 +2,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, Calendar, TrendingUp, BookOpen, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, Calendar, TrendingUp, BookOpen, CheckCircle, XCircle, AlertCircle, Mail, Heart } from "lucide-react";
 import { toast } from "sonner";
 import DashboardLayout from "../components/DashboardLayout";
 import { Line } from 'react-chartjs-2';
@@ -161,6 +161,35 @@ export default function StudentProfile() {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {student.email && (
+                <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+                  <Mail className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="text-sm text-gray-600">E-mail</p>
+                    <p className="font-semibold text-blue-700 text-sm break-all">{student.email}</p>
+                  </div>
+                </div>
+              )}
+              {student.birthDate && (
+                <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg">
+                  <Calendar className="h-5 w-5 text-orange-600" />
+                  <div>
+                    <p className="text-sm text-gray-600">Data de Nascimento</p>
+                    <p className="font-semibold">{student.birthDate.split('-').reverse().join('/')}</p>
+                  </div>
+                </div>
+              )}
+              {student.pronoun && student.pronoun !== 'prefiro_nao_informar' && (
+                <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
+                  <Heart className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <p className="text-sm text-gray-600">Pronome</p>
+                    <p className="font-semibold">
+                      {student.pronoun === 'ele_dele' ? 'Ele/Dele' : student.pronoun === 'ela_dela' ? 'Ela/Dela' : student.pronoun === 'elu_delu' ? 'Elu/Delu' : student.pronoun}
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                 <Calendar className="h-5 w-5 text-gray-600" />
                 <div>

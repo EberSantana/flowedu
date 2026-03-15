@@ -8,8 +8,9 @@ import { SkeletonTable } from '../components/ui/skeleton-card';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Label } from '../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Search, UserPlus, Download, FileText, Eye } from 'lucide-react';
+import { Pencil, Trash2, Search, UserPlus, Download, FileText, Eye, Mail, Calendar, User } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import PageWrapper from '../components/PageWrapper';
 
@@ -17,8 +18,62 @@ type Student = {
   id: number;
   registrationNumber: string;
   fullName: string;
+  email?: string | null;
+  birthDate?: string | null;
+  gender?: string | null;
+  genderCustom?: string | null;
+  pronoun?: string | null;
   createdAt: Date;
 };
+
+const GENDER_OPTIONS = [
+  { value: 'masculino', label: 'Masculino' },
+  { value: 'feminino', label: 'Feminino' },
+  { value: 'nao_binario', label: 'Não-binário' },
+  { value: 'personalizar', label: 'Personalizar' },
+  { value: 'prefiro_nao_informar', label: 'Prefiro não informar' },
+];
+
+const PRONOUN_OPTIONS = [
+  { value: 'ele_dele', label: 'Ele/Dele' },
+  { value: 'ela_dela', label: 'Ela/Dela' },
+  { value: 'elu_delu', label: 'Elu/Delu' },
+  { value: 'prefiro_nao_informar', label: 'Prefiro não informar' },
+];
+
+const MONTHS = [
+  { value: '01', label: 'Janeiro' },
+  { value: '02', label: 'Fevereiro' },
+  { value: '03', label: 'Março' },
+  { value: '04', label: 'Abril' },
+  { value: '05', label: 'Maio' },
+  { value: '06', label: 'Junho' },
+  { value: '07', label: 'Julho' },
+  { value: '08', label: 'Agosto' },
+  { value: '09', label: 'Setembro' },
+  { value: '10', label: 'Outubro' },
+  { value: '11', label: 'Novembro' },
+  { value: '12', label: 'Dezembro' },
+];
+
+function getGenderLabel(gender?: string | null) {
+  if (!gender) return '-';
+  const opt = GENDER_OPTIONS.find(o => o.value === gender);
+  return opt ? opt.label : gender;
+}
+
+function getPronounLabel(pronoun?: string | null) {
+  if (!pronoun) return '-';
+  const opt = PRONOUN_OPTIONS.find(o => o.value === pronoun);
+  return opt ? opt.label : pronoun;
+}
+
+function formatBirthDate(birthDate?: string | null) {
+  if (!birthDate) return '-';
+  const parts = birthDate.split('-');
+  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return birthDate;
+}
 
 export default function Students() {
   const utils = trpc.useUtils();
@@ -29,6 +84,13 @@ export default function Students() {
   const [formData, setFormData] = useState({
     registrationNumber: '',
     fullName: '',
+    email: '',
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
+    gender: 'prefiro_nao_informar',
+    genderCustom: '',
+    pronoun: 'prefiro_nao_informar',
   });
 
   const { data: students = [], isLoading } = trpc.students.list.useQuery();
@@ -40,7 +102,7 @@ export default function Students() {
       resetForm();
     },
     onError: (error: any) => {
-      toast.error('Erro ao cadastrar aluno' + error.message);
+      toast.error('Erro ao cadastrar aluno: ' + error.message);
     },
   });
 
@@ -51,7 +113,7 @@ export default function Students() {
       resetForm();
     },
     onError: (error: any) => {
-      toast.error('Erro ao atualizar aluno' + error.message);
+      toast.error('Erro ao atualizar aluno: ' + error.message);
     },
   });
 
@@ -61,25 +123,52 @@ export default function Students() {
       utils.students.list.invalidate();
     },
     onError: (error: any) => {
-      toast.error('Erro ao excluir aluno' + error.message);
+      toast.error('Erro ao excluir aluno: ' + error.message);
     },
   });
+
+  const buildBirthDate = () => {
+    if (formData.birthDay && formData.birthMonth && formData.birthYear) {
+      const day = formData.birthDay.padStart(2, '0');
+      return `${formData.birthYear}-${formData.birthMonth}-${day}`;
+    }
+    return '';
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const birthDate = buildBirthDate();
+    const payload = {
+      registrationNumber: formData.registrationNumber,
+      fullName: formData.fullName,
+      email: formData.email || undefined,
+      birthDate: birthDate || undefined,
+      gender: formData.gender as any,
+      genderCustom: formData.gender === 'personalizar' ? formData.genderCustom : undefined,
+      pronoun: formData.pronoun as any,
+    };
+
     if (editingId) {
-      updateMutation.mutate({ id: editingId, ...formData });
+      updateMutation.mutate({ id: editingId, ...payload });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(payload);
     }
   };
 
   const handleEdit = (student: Student) => {
+    const parts = student.birthDate ? student.birthDate.split('-') : ['', '', ''];
     setEditingId(student.id);
     setFormData({
       registrationNumber: student.registrationNumber,
       fullName: student.fullName,
+      email: student.email || '',
+      birthYear: parts[0] || '',
+      birthMonth: parts[1] || '',
+      birthDay: parts[2] || '',
+      gender: student.gender || 'prefiro_nao_informar',
+      genderCustom: student.genderCustom || '',
+      pronoun: student.pronoun || 'prefiro_nao_informar',
     });
     setShowForm(true);
   };
@@ -91,14 +180,25 @@ export default function Students() {
   };
 
   const resetForm = () => {
-    setFormData({ registrationNumber: '', fullName: '' });
+    setFormData({
+      registrationNumber: '',
+      fullName: '',
+      email: '',
+      birthDay: '',
+      birthMonth: '',
+      birthYear: '',
+      gender: 'prefiro_nao_informar',
+      genderCustom: '',
+      pronoun: 'prefiro_nao_informar',
+    });
     setEditingId(null);
     setShowForm(false);
   };
 
   const filteredStudents = students.filter((student: Student) =>
     student.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+    student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (student.email && student.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const exportDOCXMutation = trpc.students.exportDOCX.useQuery(undefined, {
@@ -164,7 +264,7 @@ export default function Students() {
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <Input
-              placeholder="Buscar por matrícula ou nome..."
+              placeholder="Buscar por matrícula, nome ou e-mail..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -207,30 +307,165 @@ export default function Students() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="registrationNumber">Matrícula *</Label>
-                    <Input
-                      id="registrationNumber"
-                      value={formData.registrationNumber}
-                      onChange={(e) => setFormData({ ...formData, registrationNumber: e.target.value })}
-                      placeholder="Ex: 2024001"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="fullName">Nome Completo *</Label>
-                    <Input
-                      id="fullName"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      placeholder="Ex: João da Silva Santos"
-                      required
-                    />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Seção 1: Dados Básicos */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Dados Básicos
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="registrationNumber">Matrícula *</Label>
+                      <Input
+                        id="registrationNumber"
+                        value={formData.registrationNumber}
+                        onChange={(e) => setFormData({ ...formData, registrationNumber: e.target.value })}
+                        placeholder="Ex: 2024001"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="fullName">Nome Completo *</Label>
+                      <Input
+                        id="fullName"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder="Ex: João da Silva Santos"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+
+                {/* Seção 2: Contato */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Contato
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="email">E-mail</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="Ex: aluno@email.com"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Utilizado para comunicações e envio de materiais</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Seção 3: Data de Nascimento */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Data de Nascimento
+                  </h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label htmlFor="birthDay">Dia</Label>
+                      <Input
+                        id="birthDay"
+                        type="number"
+                        min="1"
+                        max="31"
+                        value={formData.birthDay}
+                        onChange={(e) => setFormData({ ...formData, birthDay: e.target.value })}
+                        placeholder="Dia"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="birthMonth">Mês</Label>
+                      <Select
+                        value={formData.birthMonth}
+                        onValueChange={(val) => setFormData({ ...formData, birthMonth: val })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Mês" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {MONTHS.map(m => (
+                            <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="birthYear">Ano</Label>
+                      <Input
+                        id="birthYear"
+                        type="number"
+                        min="1950"
+                        max={new Date().getFullYear()}
+                        value={formData.birthYear}
+                        onChange={(e) => setFormData({ ...formData, birthYear: e.target.value })}
+                        placeholder="Ano"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Seção 4: Informações de Identidade */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Informações Pessoais</h3>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Essas informações são opcionais e tratadas com total respeito e confidencialidade. 
+                    Utilizamos para personalizar a comunicação e promover um ambiente inclusivo.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="gender">Gênero</Label>
+                      <Select
+                        value={formData.gender}
+                        onValueChange={(val) => setFormData({ ...formData, gender: val })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {GENDER_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {formData.gender === 'personalizar' && (
+                      <div>
+                        <Label htmlFor="genderCustom">Qual é seu gênero?</Label>
+                        <Input
+                          id="genderCustom"
+                          value={formData.genderCustom}
+                          onChange={(e) => setFormData({ ...formData, genderCustom: e.target.value })}
+                          placeholder="Como você se identifica?"
+                        />
+                      </div>
+                    )}
+
+                    <div>
+                      <Label htmlFor="pronoun">Pode me tratar como</Label>
+                      <Select
+                        value={formData.pronoun}
+                        onValueChange={(val) => setFormData({ ...formData, pronoun: val })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PRONOUN_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
                   <LoadingButton 
                     type="submit" 
                     loading={createMutation.isPending || updateMutation.isPending}
@@ -275,16 +510,22 @@ export default function Students() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Matrícula
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Nome Completo
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data de Cadastro
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                        E-mail
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                        Nascimento
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                        Pronome
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Ações
                       </th>
                     </tr>
@@ -292,16 +533,22 @@ export default function Students() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredStudents.map((student: Student) => (
                       <tr key={student.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {student.registrationNumber}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                           {student.fullName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(student.createdAt).toLocaleDateString('pt-BR')}
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                          {student.email || <span className="text-gray-300">-</span>}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                          {formatBirthDate(student.birthDate)}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                          {getPronounLabel(student.pronoun)}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link href={`/students/${student.id}`}>
                             <Button
                               variant="ghost"
@@ -315,7 +562,7 @@ export default function Students() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(student)}
-                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 ml-2"
+                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 ml-1"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -323,7 +570,7 @@ export default function Students() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDelete(student.id)}
-                            className="text-red-600 hover:text-red-800 hover:bg-red-50 ml-2"
+                            className="text-red-600 hover:text-red-800 hover:bg-red-50 ml-1"
                             disabled={deleteMutation.isPending}
                           >
                             <Trash2 className="h-4 w-4" />
