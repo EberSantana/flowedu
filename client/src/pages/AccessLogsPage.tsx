@@ -128,6 +128,39 @@ export default function AccessLogsPage() {
 
   const utils = trpc.useUtils();
 
+  // Análise acadêmica com IA
+  const [academicDays, setAcademicDays] = useState(90);
+  const [academicFocus, setAcademicFocus] = useState<'engagement' | 'behavior' | 'technology' | 'full'>('full');
+  const [showAcademicPanel, setShowAcademicPanel] = useState(false);
+  const [aiInsights, setAiInsights] = useState<string | null>(null);
+  const [aiDataContext, setAiDataContext] = useState<string | null>(null);
+  const [aiGeneratedAt, setAiGeneratedAt] = useState<string | null>(null);
+  const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+
+  const { data: engagementData, isLoading: engagementLoading, refetch: refetchEngagement } = trpc.accessLogs.getEngagementMetrics.useQuery(
+    { days: academicDays },
+    { enabled: showAcademicPanel, refetchOnWindowFocus: false }
+  );
+
+  const academicInsightsMutation = trpc.accessLogs.getAcademicInsights.useMutation({
+    onSuccess: (data) => {
+      setAiInsights(typeof data.insights === 'string' ? data.insights : String(data.insights));
+      setAiDataContext(typeof data.dataContext === 'string' ? data.dataContext : String(data.dataContext));
+      setAiGeneratedAt(data.generatedAt);
+      setIsGeneratingInsights(false);
+    },
+    onError: (e) => {
+      toast.error('Erro ao gerar insights: ' + e.message);
+      setIsGeneratingInsights(false);
+    },
+  });
+
+  const handleGenerateInsights = () => {
+    setIsGeneratingInsights(true);
+    setAiInsights(null);
+    academicInsightsMutation.mutate({ days: academicDays, focus: academicFocus });
+  };
+
   const archiveLogsMutation = trpc.accessLogs.archiveLogs.useMutation({
     onSuccess: (data) => {
       if (data.success) {
@@ -1468,6 +1501,255 @@ export default function AccessLogsPage() {
                 </div>
               )}
             </CardContent>
+          </Card>
+
+          {/* ===== PAINEL DE ANÁLISE ACADÊMICA COM IA ===== */}
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <GraduationCap className="h-5 w-5 text-indigo-500" />
+                    Análise Acadêmica com IA
+                    <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-700">Para Artigo Científico</Badge>
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Métricas de engajamento, comportamento digital e insights gerados por IA para embasar pesquisa acadêmica
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAcademicPanel(!showAcademicPanel)}
+                  className="shrink-0"
+                >
+                  {showAcademicPanel ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+                  {showAcademicPanel ? 'Recolher' : 'Expandir Painel'}
+                </Button>
+              </div>
+            </CardHeader>
+            {showAcademicPanel && (
+              <CardContent className="space-y-6">
+                {/* Controles */}
+                <div className="flex flex-wrap items-center gap-3 pb-4 border-b">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Período:</span>
+                    <Select value={String(academicDays)} onValueChange={(v) => { setAcademicDays(Number(v)); setAiInsights(null); }}>
+                      <SelectTrigger className="w-28 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 dias</SelectItem>
+                        <SelectItem value="60">60 dias</SelectItem>
+                        <SelectItem value="90">90 dias</SelectItem>
+                        <SelectItem value="180">6 meses</SelectItem>
+                        <SelectItem value="365">1 ano</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Foco da IA:</span>
+                    <Select value={academicFocus} onValueChange={(v: any) => setAcademicFocus(v)}>
+                      <SelectTrigger className="w-44 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="full">Análise Completa</SelectItem>
+                        <SelectItem value="engagement">Engajamento</SelectItem>
+                        <SelectItem value="behavior">Comportamento Digital</SelectItem>
+                        <SelectItem value="technology">Perfil Tecnológico</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleGenerateInsights}
+                    disabled={isGeneratingInsights}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white h-8 px-4 text-xs"
+                  >
+                    {isGeneratingInsights ? (
+                      <><RefreshCw className="h-3 w-3 mr-1 animate-spin" />Gerando Insights...</>
+                    ) : (
+                      <><TrendingUp className="h-3 w-3 mr-1" />Gerar Insights com IA</>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Métricas de Engajamento */}
+                {engagementLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                    <span className="ml-2 text-sm text-muted-foreground">Calculando métricas...</span>
+                  </div>
+                ) : engagementData ? (
+                  <div className="space-y-6">
+                    {/* Cards de métricas principais */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="p-3 rounded-lg border bg-indigo-50 dark:bg-indigo-950/20">
+                        <p className="text-xs text-muted-foreground">Total de Acessos</p>
+                        <p className="text-2xl font-bold text-indigo-600">{engagementData.totalLogs}</p>
+                        <p className="text-xs text-muted-foreground">{academicDays} dias</p>
+                      </div>
+                      <div className="p-3 rounded-lg border bg-green-50 dark:bg-green-950/20">
+                        <p className="text-xs text-muted-foreground">Taxa de Retorno</p>
+                        <p className="text-2xl font-bold text-green-600">{engagementData.returnRate}%</p>
+                        <p className="text-xs text-muted-foreground">{engagementData.returningStudents}/{engagementData.totalStudents} alunos</p>
+                      </div>
+                      <div className="p-3 rounded-lg border bg-orange-50 dark:bg-orange-950/20">
+                        <p className="text-xs text-muted-foreground">Consistência</p>
+                        <p className="text-2xl font-bold text-orange-600">{engagementData.consistencyRate}%</p>
+                        <p className="text-xs text-muted-foreground">{engagementData.consistentStudents} alunos regulares</p>
+                      </div>
+                      <div className="p-3 rounded-lg border bg-purple-50 dark:bg-purple-950/20">
+                        <p className="text-xs text-muted-foreground">Média Semanal</p>
+                        <p className="text-2xl font-bold text-purple-600">{engagementData.avgAccessesPerStudentPerWeek}</p>
+                        <p className="text-xs text-muted-foreground">acessos/aluno/semana</p>
+                      </div>
+                    </div>
+
+                    {/* Pico de acesso */}
+                    <div className="p-3 rounded-lg border bg-muted/30">
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">PICO DE ACESSO</p>
+                      <p className="text-sm">
+                        <span className="font-medium">{engagementData.peakDay}</span> às{' '}
+                        <span className="font-medium">{engagementData.peakHour}h</span>
+                        <span className="text-muted-foreground text-xs ml-2">(horário BRT)</span>
+                      </p>
+                    </div>
+
+                    {/* Distribuição por dia da semana */}
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">DISTRIBUIÇÃO POR DIA DA SEMANA</p>
+                      <div className="space-y-1.5">
+                        {engagementData.byDayOfWeek.map(({ day, count }) => {
+                          const maxDay = Math.max(...engagementData.byDayOfWeek.map(d => d.count), 1);
+                          return (
+                            <div key={day} className="flex items-center gap-2">
+                              <div className="w-20 text-xs text-right text-muted-foreground">{day}</div>
+                              <div className="flex-1 bg-muted rounded h-4 overflow-hidden">
+                                <div
+                                  className="h-full bg-indigo-400 rounded flex items-center justify-end pr-1"
+                                  style={{ width: `${Math.max((count / maxDay) * 100, count > 0 ? 2 : 0)}%` }}
+                                >
+                                  {count > 0 && <span className="text-xs text-white font-medium">{count}</span>}
+                                </div>
+                              </div>
+                              {count === 0 && <span className="text-xs text-muted-foreground">0</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Distribuição por dispositivo e navegador */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">DISPOSITIVOS</p>
+                        <div className="space-y-1.5">
+                          {engagementData.deviceDistribution.slice(0, 6).map(({ device, count, pct }) => (
+                            <div key={device} className="flex items-center gap-2">
+                              <div className="flex-1 text-xs truncate">{device}</div>
+                              <div className="w-24 bg-muted rounded h-3 overflow-hidden">
+                                <div className="h-full bg-blue-400 rounded" style={{ width: `${pct}%` }} />
+                              </div>
+                              <div className="w-10 text-xs text-right text-muted-foreground">{pct}%</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">NAVEGADORES</p>
+                        <div className="space-y-1.5">
+                          {engagementData.browserDistribution.slice(0, 6).map(({ browser, count, pct }) => (
+                            <div key={browser} className="flex items-center gap-2">
+                              <div className="flex-1 text-xs truncate">{browser}</div>
+                              <div className="w-24 bg-muted rounded h-3 overflow-hidden">
+                                <div className="h-full bg-green-400 rounded" style={{ width: `${pct}%` }} />
+                              </div>
+                              <div className="w-10 text-xs text-right text-muted-foreground">{pct}%</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tendência semanal */}
+                    {engagementData.weeklyTrend.length > 1 && (
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">TENDÊNCIA SEMANAL DE ACESSOS</p>
+                        <div className="flex items-end gap-1 h-20">
+                          {engagementData.weeklyTrend.map(({ week, count }) => {
+                            const maxW = Math.max(...engagementData.weeklyTrend.map(w => w.count), 1);
+                            const heightPct = Math.max((count / maxW) * 100, 2);
+                            return (
+                              <div key={week} className="flex-1 flex flex-col items-center gap-0.5" title={`${week}: ${count} acessos`}>
+                                <div
+                                  className="w-full bg-indigo-400 rounded-t"
+                                  style={{ height: `${heightPct}%` }}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                          <span>{engagementData.weeklyTrend[0]?.week}</span>
+                          <span>{engagementData.weeklyTrend[engagementData.weeklyTrend.length - 1]?.week}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+
+                {/* Insights da IA */}
+                {(aiInsights || isGeneratingInsights) && (
+                  <div className="border rounded-lg p-4 bg-indigo-50/50 dark:bg-indigo-950/10">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4" />
+                        Insights Acadêmicos (IA)
+                      </p>
+                      {aiGeneratedAt && (
+                        <span className="text-xs text-muted-foreground">
+                          Gerado em {new Date(aiGeneratedAt).toLocaleString('pt-BR')}
+                        </span>
+                      )}
+                    </div>
+                    {isGeneratingInsights ? (
+                      <div className="flex items-center gap-2 py-4">
+                        <RefreshCw className="h-4 w-4 animate-spin text-indigo-500" />
+                        <span className="text-sm text-muted-foreground">A IA está analisando os dados e gerando insights acadêmicos... (pode levar 15-30 segundos)</span>
+                      </div>
+                    ) : aiInsights ? (
+                      <div className="prose prose-sm max-w-none dark:prose-invert">
+                        <pre className="whitespace-pre-wrap text-sm font-sans leading-relaxed text-foreground">{aiInsights}</pre>
+                      </div>
+                    ) : null}
+                    {aiInsights && (
+                      <div className="mt-4 pt-3 border-t">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={() => {
+                            const content = `DADOS COLETADOS:\n${aiDataContext}\n\nINSIGHTS ACADÊMICOS:\n${aiInsights}`;
+                            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `insights-academicos-${new Date().toISOString().slice(0, 10)}.txt`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          Baixar Insights (.txt)
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            )}
           </Card>
 
         </div>

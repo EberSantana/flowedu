@@ -4564,6 +4564,218 @@ JSON (descrições MAX 15 chars):
           newDeviceAccesses: suspicious.filter(s => s.reason.some(r => r.includes('Dispositivo novo'))).length,
         };
       }),
+
+    // Métricas de engajamento acadêmico para artigo científico
+    getEngagementMetrics: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(365).default(90),
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+        const cutoff = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
+
+        // Buscar todos os logs de alunos no período
+        const logs = await database
+          .select()
+          .from(accessLogs)
+          .where(and(
+            eq(accessLogs.userType, 'student'),
+            eq(accessLogs.teacherId, teacherId),
+            gte(accessLogs.accessedAt, cutoff),
+          ))
+          .orderBy(desc(accessLogs.accessedAt));
+
+        // Taxa de retorno: alunos que acessaram em mais de 1 semana distinta
+        const studentWeeks: Record<number, Set<string>> = {};
+        for (const log of logs) {
+          if (!log.studentId) continue;
+          const d = log.accessedAt;
+          const week = `${d.getUTCFullYear()}-W${Math.ceil(d.getUTCDate() / 7)}`;
+          if (!studentWeeks[log.studentId]) studentWeeks[log.studentId] = new Set();
+          studentWeeks[log.studentId].add(week);
+        }
+        const totalStudents = Object.keys(studentWeeks).length;
+        const returningStudents = Object.values(studentWeeks).filter(w => w.size > 1).length;
+        const returnRate = totalStudents > 0 ? Math.round((returningStudents / totalStudents) * 100) : 0;
+
+        // Frequência média de acesso por aluno (acessos por semana)
+        const studentAccessCount: Record<number, number> = {};
+        for (const log of logs) {
+          if (!log.studentId) continue;
+          studentAccessCount[log.studentId] = (studentAccessCount[log.studentId] ?? 0) + 1;
+        }
+        const weeksInPeriod = Math.max(1, Math.ceil(input.days / 7));
+        const avgAccessesPerStudentPerWeek = totalStudents > 0
+          ? Math.round((Object.values(studentAccessCount).reduce((a, b) => a + b, 0) / totalStudents / weeksInPeriod) * 10) / 10
+          : 0;
+
+        // Distribuição por dia da semana (0=Dom, 1=Seg, ..., 6=Sáb)
+        const byDayOfWeek = [0, 0, 0, 0, 0, 0, 0];
+        for (const log of logs) {
+          byDayOfWeek[log.accessedAt.getUTCDay()]++;
+        }
+
+        // Distribuição por hora do dia (0-23)
+        const byHour = Array(24).fill(0);
+        for (const log of logs) {
+          byHour[log.accessedAt.getUTCHours()]++;
+        }
+
+        // Pico de acesso (dia e hora mais comuns)
+        const peakDayIndex = byDayOfWeek.indexOf(Math.max(...byDayOfWeek));
+        const peakHour = byHour.indexOf(Math.max(...byHour));
+        const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
+        // Consistência: alunos que acessaram em pelo menos 75% das semanas do período
+        const consistentStudents = Object.values(studentWeeks).filter(w => w.size >= weeksInPeriod * 0.75).length;
+        const consistencyRate = totalStudents > 0 ? Math.round((consistentStudents / totalStudents) * 100) : 0;
+
+        // Distribuição por dispositivo
+        const deviceDist: Record<string, number> = {};
+        for (const log of logs) {
+          const device = log.os ?? 'Desconhecido';
+          deviceDist[device] = (deviceDist[device] ?? 0) + 1;
+        }
+
+        // Distribuição por navegador
+        const browserDist: Record<string, number> = {};
+        for (const log of logs) {
+          const browser = log.browser ?? 'Desconhecido';
+          browserDist[browser] = (browserDist[browser] ?? 0) + 1;
+        }
+
+        // Tendência semanal: acessos por semana
+        const weeklyTrend: Record<string, number> = {};
+        for (const log of logs) {
+          const d = log.accessedAt;
+          const year = d.getUTCFullYear();
+          const weekNum = Math.ceil((d.getUTCDate() + new Date(year, d.getUTCMonth(), 1).getDay()) / 7);
+          const weekKey = `${year}-S${String(weekNum).padStart(2, '0')}`;
+          weeklyTrend[weekKey] = (weeklyTrend[weekKey] ?? 0) + 1;
+        }
+
+        return {
+          totalLogs: logs.length,
+          totalStudents,
+          returningStudents,
+          returnRate,
+          consistentStudents,
+          consistencyRate,
+          avgAccessesPerStudentPerWeek,
+          peakDay: dayNames[peakDayIndex],
+          peakHour,
+          byDayOfWeek: byDayOfWeek.map((count, i) => ({ day: dayNames[i], count })),
+          byHour: byHour.map((count, h) => ({ hour: h, count })),
+          deviceDistribution: Object.entries(deviceDist)
+            .map(([device, count]) => ({ device, count, pct: Math.round(count / logs.length * 100) }))
+            .sort((a, b) => b.count - a.count),
+          browserDistribution: Object.entries(browserDist)
+            .map(([browser, count]) => ({ browser, count, pct: Math.round(count / logs.length * 100) }))
+            .sort((a, b) => b.count - a.count),
+          weeklyTrend: Object.entries(weeklyTrend)
+            .map(([week, count]) => ({ week, count }))
+            .sort((a, b) => a.week.localeCompare(b.week)),
+        };
+      }),
+
+    // Análise acadêmica com IA para apoiar escrita de artigo científico
+    getAcademicInsights: protectedProcedure
+      .input(z.object({
+        days: z.number().min(1).max(365).default(90),
+        focus: z.enum(['engagement', 'behavior', 'technology', 'full']).default('full'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const teacherId = ctx.user.id;
+        const cutoff = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
+
+        // Coletar métricas resumidas para enviar à IA
+        const logs = await database
+          .select()
+          .from(accessLogs)
+          .where(and(
+            eq(accessLogs.userType, 'student'),
+            eq(accessLogs.teacherId, teacherId),
+            gte(accessLogs.accessedAt, cutoff),
+          ));
+
+        const totalStudents = new Set(logs.map(l => l.studentId).filter(Boolean)).size;
+        const byDayOfWeek = [0, 0, 0, 0, 0, 0, 0];
+        const byHour = Array(24).fill(0);
+        const deviceDist: Record<string, number> = {};
+        const browserDist: Record<string, number> = {};
+        const studentWeeks: Record<number, Set<string>> = {};
+
+        for (const log of logs) {
+          byDayOfWeek[log.accessedAt.getUTCDay()]++;
+          byHour[log.accessedAt.getUTCHours()]++;
+          const device = log.os ?? 'Desconhecido';
+          deviceDist[device] = (deviceDist[device] ?? 0) + 1;
+          const browser = log.browser ?? 'Desconhecido';
+          browserDist[browser] = (browserDist[browser] ?? 0) + 1;
+          if (log.studentId) {
+            const d = log.accessedAt;
+            const week = `${d.getUTCFullYear()}-W${Math.ceil(d.getUTCDate() / 7)}`;
+            if (!studentWeeks[log.studentId]) studentWeeks[log.studentId] = new Set();
+            studentWeeks[log.studentId].add(week);
+          }
+        }
+
+        const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const peakDayIndex = byDayOfWeek.indexOf(Math.max(...byDayOfWeek));
+        const peakHour = byHour.indexOf(Math.max(...byHour));
+        const returningStudents = Object.values(studentWeeks).filter(w => w.size > 1).length;
+        const returnRate = totalStudents > 0 ? Math.round((returningStudents / totalStudents) * 100) : 0;
+        const nightAccesses = logs.filter(l => { const h = l.accessedAt.getUTCHours(); return h >= 22 || h < 6; }).length;
+        const nightPct = logs.length > 0 ? Math.round((nightAccesses / logs.length) * 100) : 0;
+        const topDevice = Object.entries(deviceDist).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'Desconhecido';
+        const topBrowser = Object.entries(browserDist).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'Desconhecido';
+
+        const dataContext = `
+Dados coletados do sistema FlowEdu no período de ${input.days} dias:
+- Total de acessos de alunos: ${logs.length}
+- Total de alunos únicos: ${totalStudents}
+- Taxa de retorno (alunos que acessaram em mais de 1 semana): ${returnRate}%
+- Dia da semana com mais acessos: ${dayNames[peakDayIndex]} (${byDayOfWeek[peakDayIndex]} acessos)
+- Horário de pico: ${peakHour}h (${byHour[peakHour]} acessos)
+- Acessos no horário noturno (22h-6h): ${nightAccesses} (${nightPct}%)
+- Dispositivo mais usado: ${topDevice}
+- Navegador mais usado: ${topBrowser}
+- Distribuição por dia da semana: ${dayNames.map((d, i) => `${d}: ${byDayOfWeek[i]}`).join(', ')}
+- Distribuição por dispositivo: ${Object.entries(deviceDist).map(([d, c]) => `${d}: ${c}`).join(', ')}
+`;
+
+        const focusPrompt = {
+          engagement: 'Foque na análise de engajamento e frequência de acesso dos alunos.',
+          behavior: 'Foque nos padrões comportamentais: horários, consistência, acessos noturnos.',
+          technology: 'Foque no perfil tecnológico: dispositivos, navegadores e implicações para design.',
+          full: 'Faça uma análise completa cobrindo engajamento, comportamento e tecnologia.',
+        }[input.focus];
+
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `Você é um especialista em Tecnologia Educacional e Análise de Dados Acadêmicos. 
+Sua tarefa é analisar dados de acesso de um sistema educacional digital e gerar insights acadêmicos 
+que possam embasar um artigo científico sobre o uso de tecnologia e IA na educação. 
+Responda em português brasileiro, com linguagem acadêmica, citando implicações pedagógicas, 
+possíveis hipóteses de pesquisa e sugestões de análise qualitativa. 
+Estruture sua resposta em seções: Observações, Hipóteses, Implicações Pedagógicas e Sugestões para o Artigo.`,
+            },
+            {
+              role: 'user',
+              content: `${dataContext}\n\n${focusPrompt}\n\nGere insights acadêmicos detalhados para apoiar a escrita de um artigo científico sobre como educadores podem usar sistemas tecnológicos com auxílio de IA para melhorar o desenvolvimento de alunos e professores.`,
+            },
+          ],
+        });
+
+        const content = response?.choices?.[0]?.message?.content ?? 'Não foi possível gerar insights no momento.';
+        return { insights: content, dataContext, generatedAt: new Date().toISOString() };
+      }),
   }),
   // Student Portal Routes
   student: router({

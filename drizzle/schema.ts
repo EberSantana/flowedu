@@ -2595,6 +2595,8 @@ export const accessLogs = mysqlTable("access_logs", {
   os: varchar("os", { length: 100 }), // Sistema operacional identificado
   teacherId: int("teacherId"), // ID do professor dono do registro
   accessedAt: timestamp("accessedAt").defaultNow().notNull(), // Data/hora do acesso
+  pageVisited: varchar("pageVisited", { length: 100 }), // Página/recurso acessado (ex: 'trilha', 'exercicios', 'avisos')
+  sessionDurationSec: int("sessionDurationSec"), // Duração da sessão em segundos (atualizado ao sair)
 });
 export type AccessLog = typeof accessLogs.$inferSelect;
 export type InsertAccessLog = typeof accessLogs.$inferInsert;

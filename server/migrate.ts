@@ -102,6 +102,10 @@ export async function runAutoMigrations(): Promise<void> {
   // ── access_log_archives: coluna teacherId ──────────────────────────────────────────────
   results.push(await addColumnIfMissing('access_log_archives', 'teacherId', 'INT NULL'));
 
+  // ── access_logs: colunas para análise acadêmica (v3.5.3) ──────────────────────────────────
+  results.push(await addColumnIfMissing('access_logs', 'pageVisited', 'VARCHAR(100) NULL'));
+  results.push(await addColumnIfMissing('access_logs', 'sessionDurationSec', 'INT NULL'));
+
   // ── Resumo ──────────────────────────────────────────────────────────────────
   const applied = results.filter(r => r.status === 'applied').length;
   const skipped = results.filter(r => r.status === 'skipped').length;
