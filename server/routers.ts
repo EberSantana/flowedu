@@ -43,6 +43,24 @@ import {
 // Importar pdfjs-dist para extração de texto do PDF
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
+/**
+ * Converte um Date (UTC ou qualquer) para o horário de Manaus (UTC-4).
+ * Retorna um novo Date cujos métodos getUTC*() refletem a hora local de Manaus.
+ * Manaus NÃO tem horário de verão — sempre UTC-4.
+ */
+function toManaus(date: Date): Date {
+  return new Date(date.getTime() - 4 * 60 * 60 * 1000);
+}
+
+/**
+ * Formata um Date UTC para string legível em horário de Manaus.
+ * Ex: "2026-03-15 14:30:00"
+ */
+function formatManaus(date: Date): string {
+  const m = toManaus(date);
+  return m.toISOString().replace('T', ' ').slice(0, 19);
+}
+
 // Função auxiliar para nomear páginas do PDF por mês
 function getMesNome(pageNum: number): string {
   // O calendário acadêmico geralmente tem 2-3 meses por página
@@ -3530,22 +3548,18 @@ JSON (descrições MAX 15 chars):
           studentDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
         }
 
-        // Acessos hoje em BRT (UTC-3): subtrair 3h do UTC para obter hora local brasileira
-        // Banco TiDB já armazena em BRT — comparar diretamente sem subtrair 3h
-        // "hoje" em BRT = data UTC do servidor menos 3h (para saber qual dia é no Brasil agora)
-        const nowUtc = new Date();
-        const nowBrt = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
-        const todayBrt = nowBrt.toISOString().slice(0, 10); // YYYY-MM-DD em BRT (hora atual do Brasil)
+        // Acessos hoje em Manaus (UTC-4)
+        const nowManaus = toManaus(new Date());
+        const todayManaus = nowManaus.toISOString().slice(0, 10); // YYYY-MM-DD em Manaus
         const todayTeacherLogs = teacherLogs.filter(l => {
-          // accessedAt já está em BRT no banco — usar getUTCFullYear/Month/Date diretamente
-          const d = l.accessedAt;
+          const d = toManaus(new Date(l.accessedAt));
           const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
-          return dateStr === todayBrt;
+          return dateStr === todayManaus;
         });
         const todayStudentLogs = studentLogs.filter(l => {
-          const d = l.accessedAt;
+          const d = toManaus(new Date(l.accessedAt));
           const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
-          return dateStr === todayBrt;
+          return dateStr === todayManaus;
         });
         // Usuários únicos hoje
         const todayTeachers = new Set(todayTeacherLogs.map(l => l.userId)).size;
@@ -3636,23 +3650,12 @@ JSON (descrições MAX 15 chars):
         const filtered = input.userType === 'all'
           ? allLogs2
           : allLogs2.filter(l => l.userType === input.userType);
-        // Nota: o TiDB armazena o timestamp com o fuso SYSTEM (que na prática grava
-        // o valor enviado pelo Node.js como-está, sem conversão). O campo accessedAt
-        // já reflete o horário local do servidor (UTC), e o mysql2 retorna um Date
-        // cujo .toISOString() mostra o valor exato gravado no banco.
-        // Como o Node.js grava new Date() (UTC) e o TiDB armazena sem ajuste,
-        // o Date retornado já está em UTC. Portanto, para obter BRT (UTC-3),
-        // subtraímos 3h.
-        //
-        // ATENÇÃO: diagnóstico mostrou que o banco retorna timestamps com 3h a menos
-        // do que o UTC real (ex: acesso às 18:03 UTC aparece como 15:06 no banco).
-        // Isso significa que o banco já está armazenando em BRT (UTC-3).
-        // Portanto, NÃO devemos subtrair mais nada — usar o valor diretamente.
+        // Converter UTC para horário de Manaus (UTC-4) — solução definitiva
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of filtered) {
-          const brtDate = new Date(log.accessedAt); // já está em BRT no banco
-          const dow = brtDate.getUTCDay();   // dia da semana
-          const hour = brtDate.getUTCHours(); // hora (já em BRT)
+          const manausDate = toManaus(new Date(log.accessedAt));
+          const dow = manausDate.getUTCDay();
+          const hour = manausDate.getUTCHours();
           matrix[dow][hour]++;
         }
         return { matrix, total: filtered.length };
@@ -3729,9 +3732,9 @@ JSON (descrições MAX 15 chars):
 
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of finalLogs) {
-          const d = new Date(log.accessedAt);
-          const dow = d.getUTCDay();
-          const hour = d.getUTCHours();
+          const manausDate = toManaus(new Date(log.accessedAt));
+          const dow = manausDate.getUTCDay();
+          const hour = manausDate.getUTCHours();
           matrix[dow][hour]++;
         }
         return { matrix, total: finalLogs.length, className };
@@ -3783,8 +3786,8 @@ JSON (descrições MAX 15 chars):
             ));
           const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
           for (const log of logs) {
-            const d = new Date(log.accessedAt);
-            matrix[d.getUTCDay()][d.getUTCHours()]++;
+            const manausDate = toManaus(new Date(log.accessedAt));
+            matrix[manausDate.getUTCDay()][manausDate.getUTCHours()]++;
           }
           return { matrix, total: logs.length };
         };
@@ -3874,12 +3877,12 @@ JSON (descrições MAX 15 chars):
           return { browser, os };
         };
         // Gerar CSV com Navegador e Sistema Operacional
-        const header = ['Data/Hora (BRT)', 'Tipo', 'Nome', 'IP', 'Navegador', 'Sistema Operacional', 'User-Agent', 'ID'];
+        const header = ['Data/Hora (Manaus)', 'Tipo', 'Nome', 'IP', 'Navegador', 'Sistema Operacional', 'User-Agent', 'ID'];
         const rows = logs.map(l => {
-          const brtDate = new Date(new Date(l.accessedAt).getTime() - 3 * 60 * 60 * 1000);
+          const manausDate = toManaus(new Date(l.accessedAt));
           const { browser, os } = parseUAcsv(l.userAgent);
           return [
-            brtDate.toLocaleString('pt-BR', { timeZone: 'UTC' }),
+            manausDate.toLocaleString('pt-BR', { timeZone: 'UTC' }),
             l.userType === 'teacher' ? 'Professor' : 'Aluno',
             l.userName ?? '',
             l.ipAddress ?? '',
@@ -4243,8 +4246,8 @@ JSON (descrições MAX 15 chars):
             logsToArchive = [];
           }
           if (logsToArchive.length > 0) {
-            // Banco TiDB já armazena em BRT — não aplicar conversão de fuso
-            const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (BRT)';
+            // Converter para horário de Manaus (UTC-4)
+            const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (Manaus)';
             const csvRows = logsToArchive.map((log: any) => {
               const ua = log.userAgent || '';
               let browser = 'Desconhecido';
@@ -4260,8 +4263,8 @@ JSON (descrições MAX 15 chars):
               else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
               else if (ua.includes('Mac OS X')) os = 'macOS';
               else if (ua.includes('Linux')) os = 'Linux';
-              const brtDate = new Date(log.accessedAt); // já está em BRT no banco
-              const dateStr = brtDate.toISOString().replace('T', ' ').slice(0, 19);
+              const manausDate = toManaus(new Date(log.accessedAt));
+              const dateStr = manausDate.toISOString().replace('T', ' ').slice(0, 19);
               return [log.id, log.userType === 'teacher' ? 'Professor' : 'Aluno',
                 `"${(log.userName || '').replace(/"/g, '""')}"`,
                 log.ipAddress || '', browser, os, dateStr].join(',');
@@ -4323,8 +4326,8 @@ JSON (descrições MAX 15 chars):
           return { success: false, message: 'Nenhum registro para arquivar.' };
         }
 
-        // Gerar CSV — banco TiDB já armazena em BRT, não aplicar conversão
-        const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (BRT)';
+        // Converter para horário de Manaus (UTC-4)
+        const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (Manaus)';
         const csvRows = logs.map(log => {
           const ua = log.userAgent || '';
           let browser = 'Desconhecido';
@@ -4340,8 +4343,8 @@ JSON (descrições MAX 15 chars):
           else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
           else if (ua.includes('Mac OS X')) os = 'macOS';
           else if (ua.includes('Linux')) os = 'Linux';
-          const brtDate = new Date(log.accessedAt); // já está em BRT no banco
-          const dateStr = brtDate.toISOString().replace('T', ' ').slice(0, 19);
+          const manausDate = toManaus(new Date(log.accessedAt));
+          const dateStr = manausDate.toISOString().replace('T', ' ').slice(0, 19);
           return [
             log.id,
             log.userType === 'teacher' ? 'Professor' : 'Aluno',
@@ -4401,7 +4404,7 @@ JSON (descrições MAX 15 chars):
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         const teacherId = ctx.user.id;
-        // Banco TiDB já armazena em BRT — não aplicar conversão de fuso
+        // Converter para horário de Manaus (UTC-4)
         const cutoff = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
         // Buscar nome do aluno
         const studentRows = await database
@@ -4435,11 +4438,11 @@ JSON (descrições MAX 15 chars):
             registrationNumber: student.registrationNumber,
           },
           logs: logs.map(l => {
-            const brtDate = new Date(l.accessedAt); // já está em BRT no banco
+            const manausDate = toManaus(new Date(l.accessedAt));
             return {
               id: l.id,
               accessedAt: l.accessedAt,
-              accessedAtBRT: brtDate.toISOString(),
+              accessedAtBRT: manausDate.toISOString(),
               browser: l.browser || 'Desconhecido',
               os: l.os || 'Desconhecido',
               userAgent: l.userAgent || '',
@@ -4526,8 +4529,8 @@ JSON (descrições MAX 15 chars):
 
         for (const log of allLogs) {
           const reasons: string[] = [];
-          const d = new Date(log.accessedAt);
-          const hour = d.getUTCHours(); // banco já está em BRT
+          const d = toManaus(new Date(log.accessedAt));
+          const hour = d.getUTCHours(); // convertido para Manaus (UTC-4)
 
           // Verificar acesso noturno
           const isNight = input.nightStart > input.nightEnd

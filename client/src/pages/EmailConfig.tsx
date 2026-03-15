@@ -149,12 +149,31 @@ export default function EmailConfig() {
   };
 
   const handleSave = () => {
-    if (!smtpHost) return toast.error("Informe o servidor SMTP");
-    if (!smtpUser) return toast.error("Informe o usuário SMTP");
-    if (!config && !smtpPassword) return toast.error("Informe a senha SMTP");
-    if (!fromEmail) return toast.error("Informe o e-mail remetente");
-    if (!fromName) return toast.error("Informe o nome remetente");
+    console.log("[EmailConfig] handleSave chamado", { smtpHost, smtpUser, smtpPassword: smtpPassword ? "***" : "(vazio)", fromEmail, fromName });
+    
+    if (!smtpHost) {
+      toast.error("Informe o servidor SMTP");
+      return;
+    }
+    if (!smtpUser) {
+      toast.error("Informe o usuário SMTP");
+      return;
+    }
+    if (!config && !smtpPassword) {
+      toast.error("Informe a senha SMTP");
+      return;
+    }
+    if (!fromEmail) {
+      toast.error("Informe o e-mail remetente");
+      return;
+    }
+    if (!fromName) {
+      toast.error("Informe o nome remetente");
+      return;
+    }
 
+    toast.info("Salvando configuração...");
+    
     saveConfigMutation.mutate({
       smtpHost,
       smtpPort,

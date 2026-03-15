@@ -1,0 +1,82 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'students' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'students' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "COLUMN_NAME": "registrationNumber"
+    },
+    {
+      "COLUMN_NAME": "fullName"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "COLUMN_NAME": "updatedAt"
+    },
+    {
+      "COLUMN_NAME": "avatarSkinTone"
+    },
+    {
+      "COLUMN_NAME": "avatarKimonoColor"
+    },
+    {
+      "COLUMN_NAME": "avatarHairStyle"
+    },
+    {
+      "COLUMN_NAME": "avatarAccessories"
+    },
+    {
+      "COLUMN_NAME": "avatarHairColor"
+    },
+    {
+      "COLUMN_NAME": "avatarKimonoStyle"
+    },
+    {
+      "COLUMN_NAME": "avatarHeadAccessory"
+    },
+    {
+      "COLUMN_NAME": "avatarExpression"
+    },
+    {
+      "COLUMN_NAME": "avatarPose"
+    },
+    {
+      "COLUMN_NAME": "specialKimono"
+    },
+    {
+      "COLUMN_NAME": "avatarGender"
+    },
+    {
+      "COLUMN_NAME": "hd2dCharacterId"
+    },
+    {
+      "COLUMN_NAME": "hd2dUnlockedCharacters"
+    },
+    {
+      "COLUMN_NAME": "email"
+    },
+    {
+      "COLUMN_NAME": "birthDate"
+    },
+    {
+      "COLUMN_NAME": "gender"
+    },
+    {
+      "COLUMN_NAME": "genderCustom"
+    },
+    {
+      "COLUMN_NAME": "pronoun"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\nuserId\nregistrationNumber\nfullName\ncreatedAt\nupdatedAt\navatarSkinTone\navatarKimonoColor\navatarHairStyle\navatarAccessories\navatarHairColor\navatarKimonoStyle\navatarHeadAccessory\navatarExpression\navatarPose\nspecialKimono\navatarGender\nhd2dCharacterId\nhd2dUnlockedCharacters\nemail\nbirthDate\ngender\ngenderCustom\npronoun\n",
+  "stderr": "",
+  "execution_time_ms": 69
+}

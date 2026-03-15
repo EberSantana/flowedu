@@ -261,17 +261,16 @@ export async function sendWeeklyReports() {
 }
 
 /**
- * Inicia o job de relatório semanal (toda segunda-feira às 8h BRT)
- * Como o servidor está em UTC e o banco em BRT (UTC-3),
- * 8h BRT = 11h UTC → cron: '0 11 * * 1'
+ * Inicia o job de relatório semanal (toda segunda-feira às 8h Manaus)
+ * Manaus = UTC-4, portanto 8h Manaus = 12h UTC → cron: '0 12 * * 1'
  */
 export function startWeeklyReportJob() {
   if (weeklyReportTask) {
     weeklyReportTask.stop();
   }
 
-  // Toda segunda-feira às 11h UTC (= 8h BRT)
-  weeklyReportTask = cron.schedule('0 11 * * 1', async () => {
+  // Toda segunda-feira às 12h UTC (= 8h Manaus UTC-4)
+  weeklyReportTask = cron.schedule('0 12 * * 1', async () => {
     console.log('[WeeklyReport] Iniciando envio de relatórios semanais...');
     try {
       await sendWeeklyReports();
@@ -280,7 +279,7 @@ export function startWeeklyReportJob() {
     }
   }, { timezone: 'UTC' });
 
-  console.log('[WeeklyReport] Job de relatório semanal iniciado (toda segunda-feira às 8h BRT)');
+  console.log('[WeeklyReport] Job de relatório semanal iniciado (toda segunda-feira às 8h Manaus)');
 }
 
 export function stopWeeklyReportJob() {

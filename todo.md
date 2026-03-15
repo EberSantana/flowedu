@@ -7597,3 +7597,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir todos os erros TypeScript (0 erros)
 - [x] Build de produção concluído com sucesso
 - [ ] Deploy na VPS (76.13.67.5)
+
+## Bug: Configuração de E-mail não salva (v3.6.3)
+
+- [ ] Diagnosticar por que a configuração SMTP não salva ao clicar em salvar
+- [ ] Corrigir o problema no frontend/backend
+- [ ] Orientar sobre Senha de App do Gmail (necessária para SMTP)
+- [ ] Testar e fazer deploy na VPS
+- [ ] Bug: Botão Salvar na Config de E-mail não faz nada na VPS - precisa rebuild e deploy
+
+## Bug: Mapa de Calor — Horário 3h à frente
+- [x] Corrigir cálculo do Mapa de Calor de acessos para usar fuso horário de Manaus (UTC-4) em vez de UTC
+- [x] Bug: Colunas novas (email, birthDate, gender, pronoun, avatar, hd2d) faltando na tabela students na VPS - RESOLVIDO: colunas já existiam, deploy atualizado

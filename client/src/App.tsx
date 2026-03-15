@@ -8,6 +8,7 @@ import BibleFooter from "./components/BibleFooter";
 import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
 import { CommandPalette } from "./components/CommandPalette";
+import { Toaster } from "@/components/ui/sonner";
 
 // Páginas críticas carregadas imediatamente (login/portal)
 import PortalChoice from "./pages/PortalChoice";
@@ -214,6 +215,7 @@ function App() {
         <SidebarProvider>
           <TooltipProvider>
             <Router />
+            <Toaster position="top-right" richColors closeButton />
           </TooltipProvider>
         </SidebarProvider>
       </ThemeProvider>

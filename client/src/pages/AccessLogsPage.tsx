@@ -356,9 +356,8 @@ export default function AccessLogsPage() {
     });
   });
 
-  // O banco TiDB armazena timestamps em BRT (UTC-3) mas o objeto Date JS trata como UTC.
-  // Para exibir corretamente, lemos os componentes UTC do Date (que já são BRT no banco)
-  // e formatamos manualmente, sem aplicar conversão de fuso do navegador.
+  // O backend já converte os timestamps para Manaus (UTC-4).
+  // Os componentes UTC do Date refletem o horário de Manaus.
   const formatDateTime = (date: Date | string) => {
     const d = new Date(date);
     const day = String(d.getUTCDate()).padStart(2, '0');
@@ -686,7 +685,7 @@ export default function AccessLogsPage() {
                     Mapa de Calor — Acessos por Dia e Horário
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Identifique os momentos de maior engajamento para planejar comunicados • Horários em BRT (UTC−3)
+                    Identifique os momentos de maior engajamento para planejar comunicados • Horário de Manaus (UTC−4)
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -754,7 +753,7 @@ export default function AccessLogsPage() {
                     <div className="mb-4 flex items-center gap-2 text-sm text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
                       <Flame className="h-4 w-4 text-orange-500 shrink-0" />
                       <span>
-                        <strong>Pico de acessos:</strong> {DAYS_FULL[peakDay]} às {peakHour}h–{peakHour + 1}h (BRT)
+                        <strong>Pico de acessos:</strong> {DAYS_FULL[peakDay]} às {peakHour}h–{peakHour + 1}h (Manaus)
                         com <strong>{peakVal} {peakVal === 1 ? 'acesso' : 'acessos'}</strong> — melhor momento para enviar comunicados!
                       </span>
                     </div>
@@ -787,7 +786,7 @@ export default function AccessLogsPage() {
                             return (
                               <div
                                 key={h}
-                                title={`${DAYS_FULL[d]} às ${h}h–${h+1}h (BRT): ${val} ${val !== 1 ? 'acessos' : 'acesso'}`}
+                                title={`${DAYS_FULL[d]} às ${h}h–${h+1}h (Manaus): ${val} ${val !== 1 ? 'acessos' : 'acesso'}`}
                                 className={`flex-1 h-7 mx-px rounded-sm flex items-center justify-center cursor-default transition-opacity hover:opacity-80 ${getHeatColor(val, maxValue)}`}
                               >
                                 {val > 0 && (
@@ -1145,7 +1144,7 @@ export default function AccessLogsPage() {
                         <TableHead className="w-32">Navegador</TableHead>
                         <TableHead className="w-32">Sistema</TableHead>
                         <TableHead className="w-36">IP</TableHead>
-                        <TableHead className="w-36">Data / Hora (BRT)</TableHead>
+                        <TableHead className="w-36">Data / Hora (Manaus)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1431,7 +1430,7 @@ export default function AccessLogsPage() {
                         onChange={(e) => setArchiveLabel(e.target.value)}
                       />
                       <p className="text-xs text-muted-foreground">
-                        O arquivo será salvo com todos os registros atuais (navegador, SO, IP, data/hora em BRT).
+                        O arquivo será salvo com todos os registros atuais (navegador, SO, IP, data/hora Manaus).
                       </p>
                     </div>
                     <DialogFooter>
@@ -1613,7 +1612,7 @@ export default function AccessLogsPage() {
                       <p className="text-sm">
                         <span className="font-medium">{engagementData.peakDay}</span> às{' '}
                         <span className="font-medium">{engagementData.peakHour}h</span>
-                        <span className="text-muted-foreground text-xs ml-2">(horário BRT)</span>
+                        <span className="text-muted-foreground text-xs ml-2">(horário Manaus)</span>
                       </p>
                     </div>
 
@@ -1806,7 +1805,7 @@ export default function AccessLogsPage() {
           {!studentHistoryLoading && studentHistoryData && studentHistoryData.logs.length > 0 && (
             <div className="space-y-2">
               {studentHistoryData.logs.map((log) => {
-                // accessedAtBRT já vem em BRT do backend — usar getUTC* para não aplicar fuso do navegador
+                // accessedAtBRT já vem em Manaus (UTC-4) do backend — usar getUTC* para não aplicar fuso do navegador
                 const brtDate = new Date(log.accessedAtBRT);
                 const day = String(brtDate.getUTCDate()).padStart(2, '0');
                 const mon = String(brtDate.getUTCMonth() + 1).padStart(2, '0');
@@ -1830,7 +1829,7 @@ export default function AccessLogsPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{dateStr} às {timeStr} <span className="text-xs text-muted-foreground">(BRT)</span></p>
+                        <p className="text-sm font-medium">{dateStr} às {timeStr} <span className="text-xs text-muted-foreground">(Manaus)</span></p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {log.browser !== 'Desconhecido' ? log.browser : ''}
                           {log.browser !== 'Desconhecido' && log.os !== 'Desconhecido' ? ' • ' : ''}
