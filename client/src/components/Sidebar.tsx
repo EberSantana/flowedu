@@ -34,7 +34,9 @@ import {
   Server,
   FileText,
   Activity,
-  MessageCircle
+  MessageCircle,
+  Mail,
+  Send
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -234,6 +236,18 @@ const teacherNavCategories: NavCategory[] = [
         label: "Log de Acessos",
         icon: <Activity className="h-5 w-5" />,
         href: "/access-logs",
+        adminOnly: true,
+      },
+      {
+        label: "Config. de E-mail",
+        icon: <Mail className="h-5 w-5" />,
+        href: "/admin/email-config",
+        adminOnly: true,
+      },
+      {
+        label: "Enviar E-mail",
+        icon: <Send className="h-5 w-5" />,
+        href: "/admin/email-send",
         adminOnly: true,
       },
     ],

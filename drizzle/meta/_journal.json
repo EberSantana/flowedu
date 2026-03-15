@@ -365,6 +365,13 @@
       "when": 1741258800000,
       "tag": "0051_access_logs",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "5",
+      "when": 1773595971737,
+      "tag": "0052_email_system",
+      "breakpoints": true
     }
   ]
 }

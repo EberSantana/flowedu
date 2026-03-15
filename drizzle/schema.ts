@@ -2617,3 +2617,52 @@ export const accessLogArchives = mysqlTable("access_log_archives", {
 });
 export type AccessLogArchive = typeof accessLogArchives.$inferSelect;
 export type InsertAccessLogArchive = typeof accessLogArchives.$inferInsert;
+
+/**
+ * Tabela de configurações de e-mail por professor
+ * Armazena as configurações SMTP institucionais para envio de e-mails
+ */
+export const emailConfigs = mysqlTable("email_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Professor dono da configuração
+  smtpHost: varchar("smtp_host", { length: 255 }).notNull(),
+  smtpPort: int("smtp_port").notNull().default(587),
+  smtpSecure: boolean("smtp_secure").notNull().default(false),
+  smtpUser: varchar("smtp_user", { length: 320 }).notNull(),
+  smtpPassword: text("smtp_password").notNull(),
+  fromEmail: varchar("from_email", { length: 320 }).notNull(),
+  fromName: varchar("from_name", { length: 255 }).notNull().default("FlowEdu"),
+  isActive: boolean("is_active").notNull().default(true),
+  lastTestedAt: timestamp("last_tested_at"),
+  lastTestStatus: varchar("last_test_status", { length: 20 }).default("untested"),
+  lastTestError: text("last_test_error"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type EmailConfig = typeof emailConfigs.$inferSelect;
+export type InsertEmailConfig = typeof emailConfigs.$inferInsert;
+
+/**
+ * Tabela de campanhas de e-mail (histórico de envios)
+ */
+export const emailCampaigns = mysqlTable("email_campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  emailConfigId: int("email_config_id"),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  bodyHtml: text("body_html").notNull(),
+  bodyText: text("body_text"),
+  recipientType: mysqlEnum("recipient_type", ["class", "subject", "manual", "all"]).notNull(),
+  recipientGroupId: int("recipient_group_id"),
+  recipientGroupName: varchar("recipient_group_name", { length: 255 }),
+  recipientEmails: text("recipient_emails").notNull(),
+  totalRecipients: int("total_recipients").notNull().default(0),
+  status: mysqlEnum("status", ["pending", "sending", "completed", "failed", "partial"]).notNull().default("pending"),
+  sentCount: int("sent_count").notNull().default(0),
+  failedCount: int("failed_count").notNull().default(0),
+  errorLog: text("error_log"),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type EmailCampaign = typeof emailCampaigns.$inferSelect;
+export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;

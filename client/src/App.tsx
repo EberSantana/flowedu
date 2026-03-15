@@ -34,6 +34,8 @@ const Calendar = lazy(() => import("./pages/Calendar"));
 const Profile = lazy(() => import("./pages/Profile"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
+const EmailConfig = lazy(() => import("./pages/EmailConfig"));
+const EmailSend = lazy(() => import("./pages/EmailSend"));
 const ActiveMethodologies = lazy(() => import("./pages/ActiveMethodologies"));
 const Tasks = lazy(() => import("./pages/Tasks"));
 const LearningAnalytics = lazy(() => import("./pages/LearningAnalytics").then(m => ({ default: m.LearningAnalytics })));
@@ -149,6 +151,8 @@ function Router() {
           <Route path={"/admin/settings"} component={AdminSettings} />
           <Route path={"/admin/backups"} component={BackupAdmin} />
           <Route path={"/admin/vps-monitoring"} component={VPSMonitoring} />
+          <Route path={"/admin/email-config"} component={EmailConfig} />
+          <Route path={"/admin/email-send"} component={EmailSend} />
           <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
           <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
           <Route path={"/learning-paths/:subjectId/module/:moduleId/materials"} component={TopicMaterialsManager} />

@@ -14,7 +14,8 @@ import { sdk } from "./_core/sdk";
 import { createSessionToken as createStandaloneSession } from "./_core/auth-standalone";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
-import { sendPasswordResetEmail } from "./_core/email";
+import { sendPasswordResetEmail } from './_core/email';
+import { emailRouter } from './email-router';
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
 import * as pushNotif from './push-notifications';
@@ -10285,6 +10286,8 @@ Retorne em formato JSON com estrutura:
       }),
   }),
 
+  // ==================== E-MAIL INSTITUCIONAL ====================
+  email: emailRouter,
   // ==================== VPS MONITORING ====================
   vps: router({
     // Listar todos os servidores VPS
