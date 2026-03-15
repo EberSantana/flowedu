@@ -4807,6 +4807,41 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
       ctx.res.clearCookie(STUDENT_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true };
     }),
+
+    // Obter perfil completo do aluno (com campos demográficos)
+    getMyProfile: studentProcedure.query(async ({ ctx }) => {
+      const dbInstance = await db.getDb();
+      if (!dbInstance) throw new Error('Database not available');
+      const result = await dbInstance.select().from(students)
+        .where(eq(students.id, ctx.studentSession.studentId))
+        .limit(1);
+      if (!result[0]) throw new TRPCError({ code: 'NOT_FOUND', message: 'Aluno não encontrado' });
+      return result[0];
+    }),
+
+    // Atualizar perfil do aluno (campos demográficos)
+    updateMyProfile: studentProcedure
+      .input(z.object({
+        email: z.string().email('E-mail inválido').optional().or(z.literal('')),
+        birthDate: z.string().optional(),
+        gender: z.enum(['masculino', 'feminino', 'nao_binario', 'personalizar', 'prefiro_nao_informar']).optional(),
+        genderCustom: z.string().max(100).optional(),
+        pronoun: z.enum(['ele_dele', 'ela_dela', 'elu_delu', 'prefiro_nao_informar']).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error('Database not available');
+        await dbInstance.update(students)
+          .set({
+            email: input.email || null,
+            birthDate: input.birthDate || null,
+            gender: input.gender,
+            genderCustom: input.genderCustom || null,
+            pronoun: input.pronoun,
+          })
+          .where(eq(students.id, ctx.studentSession.studentId));
+        return { success: true };
+      }),
     
     // Obter detalhes de uma disciplina específica para o aluno
     getSubjectDetails: studentProcedure

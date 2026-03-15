@@ -7609,3 +7609,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Mapa de Calor — Horário 3h à frente
 - [x] Corrigir cálculo do Mapa de Calor de acessos para usar fuso horário de Manaus (UTC-4) em vez de UTC
 - [x] Bug: Colunas novas (email, birthDate, gender, pronoun, avatar, hd2d) faltando na tabela students na VPS - RESOLVIDO: colunas já existiam, deploy atualizado
+- [x] Bug: Campos de e-mail, data de nascimento, gênero e pronome não aparecem no Meu Perfil do aluno - RESOLVIDO
