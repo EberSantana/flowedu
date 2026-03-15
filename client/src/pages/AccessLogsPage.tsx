@@ -278,14 +278,17 @@ export default function AccessLogsPage() {
     });
   });
 
+  // O banco TiDB armazena timestamps em BRT (UTC-3) mas o objeto Date JS trata como UTC.
+  // Para exibir corretamente, lemos os componentes UTC do Date (que já são BRT no banco)
+  // e formatamos manualmente, sem aplicar conversão de fuso do navegador.
   const formatDateTime = (date: Date | string) => {
-    return new Date(date).toLocaleString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const d = new Date(date);
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const year = d.getUTCFullYear();
+    const hour = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hour}:${min}`;
   };
 
   return (
@@ -1225,9 +1228,15 @@ export default function AccessLogsPage() {
           {!studentHistoryLoading && studentHistoryData && studentHistoryData.logs.length > 0 && (
             <div className="space-y-2">
               {studentHistoryData.logs.map((log) => {
+                // accessedAtBRT já vem em BRT do backend — usar getUTC* para não aplicar fuso do navegador
                 const brtDate = new Date(log.accessedAtBRT);
-                const dateStr = brtDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                const timeStr = brtDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const day = String(brtDate.getUTCDate()).padStart(2, '0');
+                const mon = String(brtDate.getUTCMonth() + 1).padStart(2, '0');
+                const yr = brtDate.getUTCFullYear();
+                const hr = String(brtDate.getUTCHours()).padStart(2, '0');
+                const mn = String(brtDate.getUTCMinutes()).padStart(2, '0');
+                const dateStr = `${day}/${mon}/${yr}`;
+                const timeStr = `${hr}:${mn}`;
                 const isDesktop = /Windows|Mac|Linux/.test(log.os);
                 const isMobile = /Android|iOS/.test(log.os);
                 return (

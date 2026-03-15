@@ -3525,16 +3525,21 @@ JSON (descrições MAX 15 chars):
         }
 
         // Acessos hoje em BRT (UTC-3): subtrair 3h do UTC para obter hora local brasileira
+        // Banco TiDB já armazena em BRT — comparar diretamente sem subtrair 3h
+        // "hoje" em BRT = data UTC do servidor menos 3h (para saber qual dia é no Brasil agora)
         const nowUtc = new Date();
         const nowBrt = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
-        const todayBrt = nowBrt.toISOString().slice(0, 10); // YYYY-MM-DD em BRT
+        const todayBrt = nowBrt.toISOString().slice(0, 10); // YYYY-MM-DD em BRT (hora atual do Brasil)
         const todayTeacherLogs = teacherLogs.filter(l => {
-          const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
-          return brt.toISOString().slice(0, 10) === todayBrt;
+          // accessedAt já está em BRT no banco — usar getUTCFullYear/Month/Date diretamente
+          const d = l.accessedAt;
+          const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+          return dateStr === todayBrt;
         });
         const todayStudentLogs = studentLogs.filter(l => {
-          const brt = new Date(l.accessedAt.getTime() - 3 * 60 * 60 * 1000);
-          return brt.toISOString().slice(0, 10) === todayBrt;
+          const d = l.accessedAt;
+          const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+          return dateStr === todayBrt;
         });
         // Usuários únicos hoje
         const todayTeachers = new Set(todayTeacherLogs.map(l => l.userId)).size;
@@ -4080,7 +4085,7 @@ JSON (descrições MAX 15 chars):
             logsToArchive = [];
           }
           if (logsToArchive.length > 0) {
-            const BRT_OFFSET = -3 * 60 * 60 * 1000;
+            // Banco TiDB já armazena em BRT — não aplicar conversão de fuso
             const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (BRT)';
             const csvRows = logsToArchive.map((log: any) => {
               const ua = log.userAgent || '';
@@ -4097,7 +4102,7 @@ JSON (descrições MAX 15 chars):
               else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
               else if (ua.includes('Mac OS X')) os = 'macOS';
               else if (ua.includes('Linux')) os = 'Linux';
-              const brtDate = new Date(new Date(log.accessedAt).getTime() + BRT_OFFSET);
+              const brtDate = new Date(log.accessedAt); // já está em BRT no banco
               const dateStr = brtDate.toISOString().replace('T', ' ').slice(0, 19);
               return [log.id, log.userType === 'teacher' ? 'Professor' : 'Aluno',
                 `"${(log.userName || '').replace(/"/g, '""')}"`,
@@ -4160,8 +4165,7 @@ JSON (descrições MAX 15 chars):
           return { success: false, message: 'Nenhum registro para arquivar.' };
         }
 
-        // Gerar CSV
-        const BRT_OFFSET = -3 * 60 * 60 * 1000;
+        // Gerar CSV — banco TiDB já armazena em BRT, não aplicar conversão
         const csvHeader = 'ID,Tipo,Nome,IP,Navegador,Sistema,Data/Hora (BRT)';
         const csvRows = logs.map(log => {
           const ua = log.userAgent || '';
@@ -4178,7 +4182,7 @@ JSON (descrições MAX 15 chars):
           else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
           else if (ua.includes('Mac OS X')) os = 'macOS';
           else if (ua.includes('Linux')) os = 'Linux';
-          const brtDate = new Date(new Date(log.accessedAt).getTime() + BRT_OFFSET);
+          const brtDate = new Date(log.accessedAt); // já está em BRT no banco
           const dateStr = brtDate.toISOString().replace('T', ' ').slice(0, 19);
           return [
             log.id,
@@ -4239,7 +4243,7 @@ JSON (descrições MAX 15 chars):
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         const teacherId = ctx.user.id;
-        const BRT_OFFSET = -3 * 60 * 60 * 1000;
+        // Banco TiDB já armazena em BRT — não aplicar conversão de fuso
         const cutoff = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
         // Buscar nome do aluno
         const studentRows = await database
@@ -4273,7 +4277,7 @@ JSON (descrições MAX 15 chars):
             registrationNumber: student.registrationNumber,
           },
           logs: logs.map(l => {
-            const brtDate = new Date(new Date(l.accessedAt).getTime() + BRT_OFFSET);
+            const brtDate = new Date(l.accessedAt); // já está em BRT no banco
             return {
               id: l.id,
               accessedAt: l.accessedAt,
