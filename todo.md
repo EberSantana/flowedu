@@ -7610,3 +7610,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir cálculo do Mapa de Calor de acessos para usar fuso horário de Manaus (UTC-4) em vez de UTC
 - [x] Bug: Colunas novas (email, birthDate, gender, pronoun, avatar, hd2d) faltando na tabela students na VPS - RESOLVIDO: colunas já existiam, deploy atualizado
 - [x] Bug: Campos de e-mail, data de nascimento, gênero e pronome não aparecem no Meu Perfil do aluno - RESOLVIDO
+- [x] Bug: "No procedure found on path student.updateMyProfile" na VPS — RESOLVIDO: rebuild do backend e deploy feito
+- [x] Bug: Envio de e-mail para alunos usa matrícula@aluno.edu.br em vez do e-mail real cadastrado no perfil - RESOLVIDO

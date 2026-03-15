@@ -318,6 +318,7 @@ export const emailRouter = router({
           studentId: students.id,
           name: students.fullName,
           registration: students.registrationNumber,
+          email: students.email,
         })
         .from(studentClassEnrollments)
         .innerJoin(students, eq(studentClassEnrollments.studentId, students.id))
@@ -357,6 +358,7 @@ export const emailRouter = router({
           studentId: students.id,
           name: students.fullName,
           registration: students.registrationNumber,
+          email: students.email,
         })
         .from(subjectEnrollments)
         .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
@@ -381,6 +383,7 @@ export const emailRouter = router({
         id: students.id,
         name: students.fullName,
         registration: students.registrationNumber,
+        email: students.email,
       })
       .from(students)
       .where(eq(students.userId, ctx.user.id));

@@ -460,6 +460,7 @@ export default function EmailSend() {
       studentId: s.studentId ?? s.id,
       name: s.name,
       registration: s.registration,
+      email: s.email ?? null,
     }));
 
   const currentStudents =
@@ -504,12 +505,18 @@ export default function EmailSend() {
       return manualRecipients.filter((r) => r.name && r.email);
     }
     if (!currentStudents) return [];
-    return currentStudents
-      .filter((s) => selectedStudentIds.has(s.studentId))
-      .map((s) => ({
-        name: s.name,
-        email: s.registration + "@aluno.edu.br",
-      }));
+    const selected = currentStudents.filter((s) => selectedStudentIds.has(s.studentId));
+    const withEmail = selected.filter((s) => s.email);
+    const withoutEmail = selected.filter((s) => !s.email);
+    if (withoutEmail.length > 0) {
+      toast.warning(
+        `${withoutEmail.length} aluno(s) sem e-mail cadastrado serão ignorados: ${withoutEmail.map((s) => s.name).join(", ")}`
+      );
+    }
+    return withEmail.map((s) => ({
+      name: s.name,
+      email: s.email!,
+    }));
   };
 
   // Aplicar template
@@ -927,16 +934,25 @@ export default function EmailSend() {
                               currentStudents.map((student) => (
                                 <label
                                   key={student.studentId}
-                                  className="flex items-center gap-2 p-2 hover:bg-gray-50 cursor-pointer"
+                                  className={`flex items-center gap-2 p-2 cursor-pointer ${
+                                    student.email ? "hover:bg-gray-50" : "opacity-50 bg-gray-50"
+                                  }`}
+                                  title={student.email ? `E-mail: ${student.email}` : "Aluno sem e-mail cadastrado"}
                                 >
                                   <Checkbox
                                     checked={selectedStudentIds.has(student.studentId)}
                                     onCheckedChange={() => toggleStudent(student.studentId)}
+                                    disabled={!student.email}
                                   />
-                                  <div className="min-w-0">
+                                  <div className="min-w-0 flex-1">
                                     <p className="text-sm font-medium truncate">{student.name}</p>
                                     <p className="text-xs text-gray-400">{student.registration}</p>
                                   </div>
+                                  {student.email ? (
+                                    <span className="text-xs text-green-600 shrink-0" title={student.email}>✓ e-mail</span>
+                                  ) : (
+                                    <span className="text-xs text-red-400 shrink-0">sem e-mail</span>
+                                  )}
                                 </label>
                               ))
                             )}
