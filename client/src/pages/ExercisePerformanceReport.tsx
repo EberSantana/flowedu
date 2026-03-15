@@ -237,10 +237,15 @@ export default function ExercisePerformanceReport() {
                         {exercise.description && (
                           <p className="text-sm text-gray-600 mt-1">{exercise.description}</p>
                         )}
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2 mt-2 flex-wrap">
                           <Badge variant="outline" className="text-xs">
                             {exercise.totalQuestions} questões
                           </Badge>
+                          {exercise.totalQuestions > 0 && (
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              cada questão vale {(10 / exercise.totalQuestions).toFixed(exercise.totalQuestions % 10 === 0 ? 0 : 2)} ponto{10 / exercise.totalQuestions !== 1 ? 's' : ''}
+                            </Badge>
+                          )}
                           <Badge variant="outline" className="text-xs">
                             {exercise.status === "published" ? "Publicado" : "Rascunho"}
                           </Badge>

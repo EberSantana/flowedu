@@ -77,6 +77,7 @@ const StudentLearningJournal = lazy(() => import("./pages/StudentLearningJournal
 const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
+const StudentGradeBook = lazy(() => import("./pages/StudentGradeBook"));
 // MistakeNotebook removido - funcionalidade consolidada em StudentSmartReview
 
 // Lazy loaded pages - Help/Ajuda
@@ -180,6 +181,7 @@ function Router() {
           <Route path={"/student/doubts"} component={StudentDoubts} />
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
+          <Route path={"/student/grade-book"} component={StudentGradeBook} />
           {/* MistakeNotebook removido - usar /student/smart-review */}
 
           {/* Help/Ajuda - lazy loaded */}

@@ -270,6 +270,13 @@ export default function StudentExercises() {
                         <div>
                           <p className="font-bold text-gray-900 text-lg">{exercise.totalQuestions}</p>
                           <p className="text-xs text-gray-600">questões</p>
+                          {exercise.totalQuestions > 0 && (
+                            <p className="text-xs text-blue-600 font-medium mt-0.5">
+                              {(10 / exercise.totalQuestions) % 1 === 0
+                                ? `${10 / exercise.totalQuestions} pt cada`
+                                : `${(10 / exercise.totalQuestions).toFixed(2)} pt cada`}
+                            </p>
+                          )}
                         </div>
                       </div>
 

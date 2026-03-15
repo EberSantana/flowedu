@@ -16,9 +16,9 @@ import {
   Menu,
   X,
   MessageCircle,
-
   BarChart3,
-  PenLine
+  PenLine,
+  ClipboardList
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -120,6 +120,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       label: "Meu Progresso",
       items: [
         { icon: BarChart3, label: "Estatísticas", path: "/student/statistics" },
+        { icon: ClipboardList, label: "Boletim", path: "/student/grade-book" },
       ],
     },
   ];

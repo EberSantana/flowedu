@@ -6806,6 +6806,111 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           attempts: attemptsWithResponses
         };
       }),
+
+    // Boletim do aluno: histórico de notas por disciplina
+    getGradeBook: studentProcedure
+      .query(async ({ ctx }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error("Database not available");
+
+        const { studentExercises, studentExerciseAttempts, subjects, subjectEnrollments } = await import("../drizzle/schema");
+
+        // Buscar matrículas do aluno
+        const enrollments = await db.getStudentEnrollments(ctx.studentSession.studentId);
+        const subjectIds = enrollments.map((e: any) => e.subjectId);
+
+        if (subjectIds.length === 0) return [];
+
+        // Buscar todas as tentativas do aluno com dados do exercício e disciplina
+        const attempts = await dbInstance
+          .select({
+            attemptId: studentExerciseAttempts.id,
+            exerciseId: studentExercises.id,
+            exerciseTitle: studentExercises.title,
+            subjectId: studentExercises.subjectId,
+            subjectName: subjects.name,
+            score: studentExerciseAttempts.score,
+            passingScore: studentExercises.passingScore,
+            totalQuestions: studentExercises.totalQuestions,
+            completedAt: studentExerciseAttempts.completedAt,
+            status: studentExerciseAttempts.status,
+          })
+          .from(studentExerciseAttempts)
+          .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+          .innerJoin(subjects, eq(studentExercises.subjectId, subjects.id))
+          .where(
+            and(
+              eq(studentExerciseAttempts.studentId, ctx.studentSession.studentId),
+              eq(studentExerciseAttempts.status, "completed"),
+              inArray(studentExercises.subjectId, subjectIds)
+            )
+          )
+          .orderBy(desc(studentExerciseAttempts.completedAt));
+
+        // Agrupar por disciplina
+        const bySubject: Record<number, {
+          subjectId: number;
+          subjectName: string;
+          grades: Array<{
+            attemptId: number;
+            exerciseId: number;
+            exerciseTitle: string;
+            grade: number;
+            passingGrade: number;
+            totalQuestions: number;
+            pointsPerQuestion: number;
+            approved: boolean;
+            completedAt: Date | null;
+          }>;
+          average: number;
+          totalAttempts: number;
+          approvedCount: number;
+        }> = {};
+
+        for (const a of attempts) {
+          if (!bySubject[a.subjectId]) {
+            bySubject[a.subjectId] = {
+              subjectId: a.subjectId,
+              subjectName: a.subjectName,
+              grades: [],
+              average: 0,
+              totalAttempts: 0,
+              approvedCount: 0,
+            };
+          }
+          const grade = parseFloat(((a.score ?? 0) / 10).toFixed(2));
+          const passingGrade = parseFloat(((a.passingScore ?? 60) / 10).toFixed(1));
+          const approved = (a.score ?? 0) >= (a.passingScore ?? 60);
+          const pointsPerQuestion = a.totalQuestions > 0
+            ? parseFloat((10 / a.totalQuestions).toFixed(2))
+            : 0;
+
+          bySubject[a.subjectId].grades.push({
+            attemptId: a.attemptId,
+            exerciseId: a.exerciseId,
+            exerciseTitle: a.exerciseTitle,
+            grade,
+            passingGrade,
+            totalQuestions: a.totalQuestions,
+            pointsPerQuestion,
+            approved,
+            completedAt: a.completedAt,
+          });
+          bySubject[a.subjectId].totalAttempts++;
+          if (approved) bySubject[a.subjectId].approvedCount++;
+        }
+
+        // Calcular média por disciplina
+        for (const s of Object.values(bySubject)) {
+          if (s.grades.length > 0) {
+            s.average = parseFloat(
+              (s.grades.reduce((sum, g) => sum + g.grade, 0) / s.grades.length).toFixed(2)
+            );
+          }
+        }
+
+        return Object.values(bySubject).sort((a, b) => a.subjectName.localeCompare(b.subjectName));
+      }),
   }),
 
   // Rotas do professor para gerenciar exercícios

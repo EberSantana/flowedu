@@ -228,6 +228,13 @@ export default function StudentExerciseAttempt() {
                   <Badge variant="outline">
                     {exercise.questions.length} questões
                   </Badge>
+                  {exercise.questions.length > 0 && (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      {(10 / exercise.questions.length) % 1 === 0
+                        ? `${10 / exercise.questions.length} pt por questão`
+                        : `${(10 / exercise.questions.length).toFixed(2)} pt por questão`}
+                    </Badge>
+                  )}
                   {exercise.maxAttempts && (
                     <Badge variant="outline">
                       Tentativa {exercise.attempts.length + 1} de {exercise.maxAttempts}
