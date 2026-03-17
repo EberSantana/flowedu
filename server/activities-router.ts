@@ -355,21 +355,21 @@ export const activitiesRouter = router({
       // Se não tem nenhuma matrícula, retornar vazio
       if (subjectIds.length === 0 && classIds.length === 0) return [];
 
-      // Buscar atividades publicadas para as disciplinas/turmas do aluno
-      const activityRows = await db
-        .select()
-        .from(activities)
-        .where(
-          and(
-            eq(activities.status, "published"),
-            sql`(
-              (${activities.subjectId} IS NULL AND ${activities.classId} IS NULL)
-              OR (${activities.subjectId} IN (${sql.join(subjectIds.length > 0 ? subjectIds.map(id => sql`${id}`) : [sql`NULL`], sql`, `)}))
-              OR (${activities.classId} IN (${sql.join(classIds.length > 0 ? classIds.map(id => sql`${id}`) : [sql`NULL`], sql`, `)}))
-            )`
-          )
-        )
-        .orderBy(desc(activities.createdAt));
+      // Buscar atividades publicadas para as disciplinas/turmas do aluno (com nome da disciplina e turma)
+      const activityResult = await db.execute(
+        sql`SELECT a.*, s.name AS subjectName, c.name AS className
+            FROM activities a
+            LEFT JOIN subjects s ON a.subjectId = s.id
+            LEFT JOIN classes c ON a.classId = c.id
+            WHERE a.status = 'published'
+              AND (
+                (a.subjectId IS NULL AND a.classId IS NULL)
+                OR (a.subjectId IN (${sql.join(subjectIds.length > 0 ? subjectIds.map(id => sql`${id}`) : [sql`NULL`], sql`, `)}))
+                OR (a.classId IN (${sql.join(classIds.length > 0 ? classIds.map(id => sql`${id}`) : [sql`NULL`], sql`, `)}))
+              )
+            ORDER BY a.createdAt DESC`
+      ) as any[];
+      const activityRows = (activityResult[0] || []) as any[];
 
       // Buscar submissões do aluno
       const activityIds = activityRows.map((a: any) => a.id as number);
@@ -385,8 +385,10 @@ export const activitiesRouter = router({
       return activityRows.map((a: any) => ({
         ...a,
         maxScore: Number(a.maxScore),
+        subjectName: a.subjectName || null,
+        className: a.className || null,
         mySubmission: mySubmissions[a.id]
-          ? { ...mySubmissions[(a as any).id], score: mySubmissions[(a as any).id].score ? Number(mySubmissions[(a as any).id].score) : null }
+          ? { ...mySubmissions[a.id], score: mySubmissions[a.id].score ? Number(mySubmissions[a.id].score) : null }
           : null,
       }));
     }),
