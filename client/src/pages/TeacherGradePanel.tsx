@@ -42,22 +42,19 @@ function gradeBg(grade: number): string {
 }
 
 export default function TeacherGradePanel() {
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
-  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  const [selectedCombo, setSelectedCombo] = useState<string>(""); // "subjectId-classId"
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
 
-  // Buscar turmas do professor
-  const { data: classesList } = trpc.classes.list.useQuery();
+  // Buscar combinações Disciplina — Turma do professor
+  const { data: combinations } = trpc.activities.getSubjectClassCombinations.useQuery();
 
-  // Buscar disciplinas da turma selecionada (via scheduled_classes)
-  const { data: classSubjects, isLoading: loadingSubjects } = trpc.activities.getSubjectsByClass.useQuery(
-    { classId: selectedClassId! },
-    { enabled: !!selectedClassId }
-  );
+  // Extrair classId e subjectId da combinação selecionada
+  const selectedClassId = selectedCombo ? Number(selectedCombo.split("-")[1]) : null;
+  const selectedSubjectId = selectedCombo ? Number(selectedCombo.split("-")[0]) : null;
 
-  // Buscar notas da turma selecionada
+  // Buscar notas da turma/disciplina selecionada
   const { data: gradesData, isLoading: loadingGrades } = trpc.activities.getGradesByClass.useQuery(
     { classId: selectedClassId!, subjectId: selectedSubjectId ?? undefined },
     { enabled: !!selectedClassId }
@@ -103,10 +100,9 @@ export default function TeacherGradePanel() {
       toast.error("Nenhum dado para exportar");
       return;
     }
-    const className = classesList?.find((c) => c.id === selectedClassId)?.name ?? "turma";
-    const subjectName = selectedSubjectId
-      ? classSubjects?.find((s) => s.subjectId === selectedSubjectId)?.subjectName ?? ""
-      : "todas_disciplinas";
+    const combo = combinations?.find(c => `${c.subjectId}-${c.classId}` === selectedCombo);
+    const className = combo?.className ?? "turma";
+    const subjectName = combo?.subjectName ?? "disciplina";
 
     const headers = [
       "Matrícula",
@@ -171,7 +167,7 @@ export default function TeacherGradePanel() {
                 </p>
               </div>
             </div>
-            {selectedClassId && filteredGrades && filteredGrades.length > 0 && (
+            {selectedCombo && filteredGrades && filteredGrades.length > 0 && (
               <Button onClick={exportCSV} variant="outline" className="gap-2">
                 <Download className="w-4 h-4" />
                 Exportar CSV
@@ -182,55 +178,22 @@ export default function TeacherGradePanel() {
           {/* Filtros */}
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Selecionar Turma */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Selecionar Disciplina — Turma */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Turma</label>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Disciplina — Turma</label>
                   <select
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={selectedClassId ?? ""}
+                    value={selectedCombo}
                     onChange={(e) => {
-                      const val = e.target.value ? Number(e.target.value) : null;
-                      setSelectedClassId(val);
-                      setSelectedSubjectId(null);
+                      setSelectedCombo(e.target.value);
                       setSearchTerm("");
                     }}
                   >
-                    <option value="">Selecione uma turma...</option>
-                    {classesList?.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Selecionar Disciplina */}
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Disciplina (opcional)
-                  </label>
-                  <select
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={selectedSubjectId ?? ""}
-                    onChange={(e) => {
-                      const val = e.target.value ? Number(e.target.value) : null;
-                      setSelectedSubjectId(val);
-                    }}
-                    disabled={!selectedClassId || loadingSubjects}
-                  >
-                    <option value="">
-                      {!selectedClassId
-                        ? "Selecione uma turma primeiro"
-                        : loadingSubjects
-                        ? "Carregando disciplinas..."
-                        : classSubjects && classSubjects.length === 0
-                        ? "Nenhuma disciplina nesta turma"
-                        : "Todas as disciplinas"}
-                    </option>
-                    {classSubjects?.map((s) => (
-                      <option key={s.subjectId} value={s.subjectId}>
-                        {s.subjectName}
+                    <option value="">Selecione uma disciplina e turma...</option>
+                    {combinations?.map((c) => (
+                      <option key={`${c.subjectId}-${c.classId}`} value={`${c.subjectId}-${c.classId}`}>
+                        {c.subjectName}  —  Turma {c.className}
                       </option>
                     ))}
                   </select>
@@ -246,6 +209,7 @@ export default function TeacherGradePanel() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-9"
+                      disabled={!selectedCombo}
                     />
                   </div>
                 </div>
@@ -254,13 +218,13 @@ export default function TeacherGradePanel() {
           </Card>
 
           {/* Conteúdo */}
-          {!selectedClassId ? (
+          {!selectedCombo ? (
             <Card>
               <CardContent className="py-16 text-center">
                 <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-medium text-foreground">Selecione uma turma</p>
+                <p className="text-lg font-medium text-foreground">Selecione uma disciplina e turma</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Escolha uma turma no filtro acima para visualizar as notas dos alunos.
+                  Escolha uma combinação de disciplina e turma no filtro acima para visualizar as notas dos alunos.
                 </p>
               </CardContent>
             </Card>

@@ -426,6 +426,28 @@ export const activitiesRouter = router({
       return result;
     }),
 
+  // Buscar todas as combinações Disciplina — Turma do professor (via scheduled_classes)
+  getSubjectClassCombinations: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+
+      const result = await db
+        .selectDistinct({
+          subjectId: scheduledClasses.subjectId,
+          subjectName: subjects.name,
+          classId: scheduledClasses.classId,
+          className: classes.name,
+        })
+        .from(scheduledClasses)
+        .innerJoin(subjects, eq(scheduledClasses.subjectId, subjects.id))
+        .innerJoin(classes, eq(scheduledClasses.classId, classes.id))
+        .where(eq(scheduledClasses.userId, ctx.user.id))
+        .orderBy(subjects.name, classes.name);
+
+      return result;
+    }),
+
   // Buscar alunos de uma turma com notas consolidadas (exercícios + atividades)
   getGradesByClass: protectedProcedure
     .input(z.object({
