@@ -7634,3 +7634,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Bug: Botão "Criar Atividade" não funciona
 - [ ] Reescrever ActivitiesPage.tsx seguindo o padrão visual do FlowEdu
 - [ ] Reescrever StudentActivitiesPage.tsx seguindo o padrão visual do FlowEdu
+
+- [x] Fix: Erro ao criar atividade - INSERT falha no banco de dados (activities table) - tabela tinha estrutura antiga incompatível, recriada com estrutura correta
