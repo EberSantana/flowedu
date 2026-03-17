@@ -16,6 +16,7 @@ import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "./_core/llm";
 import { sendPasswordResetEmail } from './_core/email';
 import { emailRouter } from './email-router';
+import { activitiesRouter } from './activities-router';
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
 import * as pushNotif from './push-notifications';
@@ -10336,6 +10337,8 @@ Retorne em formato JSON com estrutura:
 
   // ==================== E-MAIL INSTITUCIONAL ====================
   email: emailRouter,
+  // ==================== ATIVIDADES EM SALA ====================
+  activities: activitiesRouter,
   // ==================== VPS MONITORING ====================
   vps: router({
     // Listar todos os servidores VPS

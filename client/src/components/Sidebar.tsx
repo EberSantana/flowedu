@@ -36,7 +36,8 @@ import {
   Activity,
   MessageCircle,
   Mail,
-  Send
+  Send,
+  ClipboardList
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -121,6 +122,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Turnos",
         icon: <Clock className="h-5 w-5" />,
         href: "/shifts",
+      },
+      {
+        label: "Atividades em Sala",
+        icon: <ClipboardList className="h-5 w-5" />,
+        href: "/activities",
       },
     ],
   },

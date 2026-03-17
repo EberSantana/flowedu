@@ -7612,3 +7612,20 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Bug: Campos de e-mail, data de nascimento, gênero e pronome não aparecem no Meu Perfil do aluno - RESOLVIDO
 - [x] Bug: "No procedure found on path student.updateMyProfile" na VPS — RESOLVIDO: rebuild do backend e deploy feito
 - [x] Bug: Envio de e-mail para alunos usa matrícula@aluno.edu.br em vez do e-mail real cadastrado no perfil - RESOLVIDO
+
+## Módulo de Atividades em Sala de Aula
+- [ ] Schema: tabelas `activities` e `activity_submissions` no banco
+- [ ] Backend: procedures createActivity, listActivities, submitActivity, gradeSubmission
+- [ ] Upload de arquivos (PDF, Word, PPT) para S3
+- [ ] Página do professor: criar/editar atividades, ver submissões, dar nota e feedback
+- [ ] Página do aluno: ver atividades da disciplina, submeter arquivo, ver nota/feedback
+- [ ] Integrar no menu do professor e do aluno
+- [ ] Build e deploy na VPS
+
+## Módulo de Atividades em Sala de Aula (v3.8.0)
+- [x] Criar tabelas activities e activity_submissions no banco
+- [x] Criar procedures no backend (create, list, getSubmissions, gradeSubmission, getUploadUrl)
+- [x] Criar página do professor: criar/gerenciar atividades e avaliar submissões (ActivitiesPage.tsx)
+- [x] Criar página do aluno: ver atividades e submeter arquivos PDF/Word/PPT (StudentActivitiesPage.tsx)
+- [x] Adicionar menu "Atividades em Sala" no sidebar do professor e aluno
+- [x] Build e deploy na VPS

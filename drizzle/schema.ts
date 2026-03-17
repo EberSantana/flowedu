@@ -2670,3 +2670,48 @@ export const emailCampaigns = mysqlTable("email_campaigns", {
 });
 export type EmailCampaign = typeof emailCampaigns.$inferSelect;
 export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;
+
+/**
+ * Tabela de atividades criadas pelo professor
+ */
+export const activities = mysqlTable("activities", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Professor que criou
+  subjectId: int("subjectId"), // Disciplina (null = todas as turmas do professor)
+  classId: int("classId"), // Turma específica (null = todas)
+  title: varchar("title", { length: 255 }).notNull(), // Título da atividade
+  description: text("description"), // Enunciado/descrição da atividade
+  dueDate: timestamp("dueDate"), // Prazo de entrega
+  maxScore: decimal("maxScore", { precision: 5, scale: 2 }).default("10.00"), // Nota máxima
+  allowedFormats: varchar("allowedFormats", { length: 100 }).default("pdf,doc,docx,ppt,pptx"), // Formatos permitidos
+  maxFileSizeMB: int("maxFileSizeMB").default(20), // Tamanho máximo do arquivo em MB
+  status: mysqlEnum("status", ["draft", "published", "closed"]).default("published").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type Activity = typeof activities.$inferSelect;
+export type InsertActivity = typeof activities.$inferInsert;
+
+/**
+ * Tabela de submissões de atividades pelos alunos
+ */
+export const activitySubmissions = mysqlTable("activity_submissions", {
+  id: int("id").autoincrement().primaryKey(),
+  activityId: int("activityId").notNull(), // Atividade referenciada
+  studentId: int("studentId").notNull(), // Aluno que submeteu
+  fileUrl: text("fileUrl").notNull(), // URL do arquivo no S3
+  fileKey: varchar("fileKey", { length: 500 }).notNull(), // Chave S3
+  fileName: varchar("fileName", { length: 255 }).notNull(), // Nome original do arquivo
+  fileMimeType: varchar("fileMimeType", { length: 100 }), // Tipo MIME do arquivo
+  fileSizeBytes: int("fileSizeBytes").default(0), // Tamanho do arquivo
+  comment: text("comment"), // Comentário do aluno ao submeter
+  status: mysqlEnum("status", ["submitted", "graded", "returned"]).default("submitted").notNull(),
+  score: decimal("score", { precision: 5, scale: 2 }), // Nota dada pelo professor
+  feedback: text("feedback"), // Feedback/comentário do professor
+  gradedAt: timestamp("gradedAt"), // Quando foi avaliado
+  gradedBy: int("gradedBy"), // ID do professor que avaliou
+  submittedAt: timestamp("submittedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type ActivitySubmission = typeof activitySubmissions.$inferSelect;
+export type InsertActivitySubmission = typeof activitySubmissions.$inferInsert;

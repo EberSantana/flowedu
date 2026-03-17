@@ -37,6 +37,7 @@ const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const EmailConfig = lazy(() => import("./pages/EmailConfig"));
 const EmailSend = lazy(() => import("./pages/EmailSend"));
+const ActivitiesPage = lazy(() => import("./pages/ActivitiesPage"));
 const ActiveMethodologies = lazy(() => import("./pages/ActiveMethodologies"));
 const Tasks = lazy(() => import("./pages/Tasks"));
 const LearningAnalytics = lazy(() => import("./pages/LearningAnalytics").then(m => ({ default: m.LearningAnalytics })));
@@ -81,6 +82,7 @@ const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
 const StudentGradeBook = lazy(() => import("./pages/StudentGradeBook"));
+const StudentActivitiesPage = lazy(() => import("./pages/StudentActivitiesPage"));
 // MistakeNotebook removido - funcionalidade consolidada em StudentSmartReview
 
 // Lazy loaded pages - Help/Ajuda
@@ -154,6 +156,7 @@ function Router() {
           <Route path={"/admin/vps-monitoring"} component={VPSMonitoring} />
           <Route path={"/admin/email-config"} component={EmailConfig} />
           <Route path={"/admin/email-send"} component={EmailSend} />
+          <Route path={"/activities"} component={ActivitiesPage} />
           <Route path={"/subjects/:subjectId/enrollments"} component={ManageEnrollments} />
           <Route path={"/learning-paths/:subjectId/topic/:topicId/materials"} component={TopicMaterialsManager} />
           <Route path={"/learning-paths/:subjectId/module/:moduleId/materials"} component={TopicMaterialsManager} />
@@ -187,6 +190,7 @@ function Router() {
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
           <Route path={"/student/grade-book"} component={StudentGradeBook} />
+          <Route path={"/student/activities"} component={StudentActivitiesPage} />
           {/* MistakeNotebook removido - usar /student/smart-review */}
 
           {/* Help/Ajuda - lazy loaded */}

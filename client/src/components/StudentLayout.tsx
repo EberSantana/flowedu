@@ -117,6 +117,12 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       ],
     },
     {
+      label: "Atividades",
+      items: [
+        { icon: FileText, label: "Minhas Atividades", path: "/student/activities" },
+      ],
+    },
+    {
       label: "Meu Progresso",
       items: [
         { icon: BarChart3, label: "Estatísticas", path: "/student/statistics" },
