@@ -48,9 +48,14 @@ export default function TeacherGradePanel() {
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [showReport, setShowReport] = useState(false);
 
-  // Buscar turmas e disciplinas do professor
+  // Buscar turmas do professor
   const { data: classesList } = trpc.classes.list.useQuery();
-  const { data: subjectsList } = trpc.subjects.list.useQuery();
+
+  // Buscar disciplinas da turma selecionada (via scheduled_classes)
+  const { data: classSubjects, isLoading: loadingSubjects } = trpc.activities.getSubjectsByClass.useQuery(
+    { classId: selectedClassId! },
+    { enabled: !!selectedClassId }
+  );
 
   // Buscar notas da turma selecionada
   const { data: gradesData, isLoading: loadingGrades } = trpc.activities.getGradesByClass.useQuery(
@@ -100,7 +105,7 @@ export default function TeacherGradePanel() {
     }
     const className = classesList?.find((c) => c.id === selectedClassId)?.name ?? "turma";
     const subjectName = selectedSubjectId
-      ? subjectsList?.find((s) => s.id === selectedSubjectId)?.name ?? ""
+      ? classSubjects?.find((s) => s.subjectId === selectedSubjectId)?.subjectName ?? ""
       : "todas_disciplinas";
 
     const headers = [
@@ -187,6 +192,7 @@ export default function TeacherGradePanel() {
                     onChange={(e) => {
                       const val = e.target.value ? Number(e.target.value) : null;
                       setSelectedClassId(val);
+                      setSelectedSubjectId(null);
                       setSearchTerm("");
                     }}
                   >
@@ -211,11 +217,20 @@ export default function TeacherGradePanel() {
                       const val = e.target.value ? Number(e.target.value) : null;
                       setSelectedSubjectId(val);
                     }}
+                    disabled={!selectedClassId || loadingSubjects}
                   >
-                    <option value="">Todas as disciplinas</option>
-                    {subjectsList?.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
+                    <option value="">
+                      {!selectedClassId
+                        ? "Selecione uma turma primeiro"
+                        : loadingSubjects
+                        ? "Carregando disciplinas..."
+                        : classSubjects && classSubjects.length === 0
+                        ? "Nenhuma disciplina nesta turma"
+                        : "Todas as disciplinas"}
+                    </option>
+                    {classSubjects?.map((s) => (
+                      <option key={s.subjectId} value={s.subjectId}>
+                        {s.subjectName}
                       </option>
                     ))}
                   </select>

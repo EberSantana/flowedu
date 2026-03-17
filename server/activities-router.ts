@@ -401,6 +401,31 @@ export const activitiesRouter = router({
 
   // ─── PAINEL DE NOTAS DO PROFESSOR ──────────────────────────────────────────
 
+  // Buscar disciplinas de uma turma (via scheduled_classes)
+  getSubjectsByClass: protectedProcedure
+    .input(z.object({ classId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+
+      const result = await db
+        .selectDistinct({
+          subjectId: scheduledClasses.subjectId,
+          subjectName: subjects.name,
+        })
+        .from(scheduledClasses)
+        .innerJoin(subjects, eq(scheduledClasses.subjectId, subjects.id))
+        .where(
+          and(
+            eq(scheduledClasses.classId, input.classId),
+            eq(scheduledClasses.userId, ctx.user.id)
+          )
+        )
+        .orderBy(subjects.name);
+
+      return result;
+    }),
+
   // Buscar alunos de uma turma com notas consolidadas (exercícios + atividades)
   getGradesByClass: protectedProcedure
     .input(z.object({

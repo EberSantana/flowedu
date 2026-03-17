@@ -7646,3 +7646,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Relatório Individual do Aluno - professor clica no nome do aluno e vê boletim completo
 - [x] Exportar planilha de notas - botão para exportar notas da turma em Excel/CSV
 - [x] Fix: Painel de Notas do professor não mostra as notas dos alunos - corrigido: usava student_class_enrollments (vazia) ao invés de subjectEnrollments via scheduled_classes
+- [x] Painel de Notas: turma obrigatória, disciplina carregada dinamicamente baseada nas aulas agendadas (scheduled_classes) da turma selecionada
