@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
 import { getDb, createNotification } from "./db";
-import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts } from "../drizzle/schema";
+import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts, scheduledClasses } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -411,22 +411,47 @@ export const activitiesRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
-      // Buscar alunos matriculados na turma
-      const enrolledStudents = await db
+      // Buscar disciplinas da turma selecionada (via scheduled_classes)
+      const classSubjects = await db
+        .selectDistinct({ subjectId: scheduledClasses.subjectId })
+        .from(scheduledClasses)
+        .where(
+          and(
+            eq(scheduledClasses.classId, input.classId),
+            eq(scheduledClasses.userId, ctx.user.id)
+          )
+        );
+
+      const subjectIds = input.subjectId
+        ? [input.subjectId]
+        : classSubjects.map(s => s.subjectId);
+
+      if (subjectIds.length === 0) return [];
+
+      // Buscar alunos matriculados nas disciplinas da turma (via subjectEnrollments)
+      const enrolledStudentsRaw = await db
         .select({
-          studentId: studentClassEnrollments.studentId,
+          studentId: subjectEnrollments.studentId,
           studentName: students.fullName,
           registrationNumber: students.registrationNumber,
         })
-        .from(studentClassEnrollments)
-        .innerJoin(students, eq(studentClassEnrollments.studentId, students.id))
+        .from(subjectEnrollments)
+        .innerJoin(students, eq(subjectEnrollments.studentId, students.id))
         .where(
           and(
-            eq(studentClassEnrollments.classId, input.classId),
-            eq(studentClassEnrollments.userId, ctx.user.id)
+            inArray(subjectEnrollments.subjectId, subjectIds),
+            eq(subjectEnrollments.userId, ctx.user.id)
           )
         )
         .orderBy(students.fullName);
+
+      // Remover duplicatas (aluno pode estar em múltiplas disciplinas da mesma turma)
+      const seen = new Set<number>();
+      const enrolledStudents = enrolledStudentsRaw.filter(s => {
+        if (seen.has(s.studentId)) return false;
+        seen.add(s.studentId);
+        return true;
+      });
 
       if (enrolledStudents.length === 0) return [];
 
