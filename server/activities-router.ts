@@ -336,16 +336,24 @@ export const activitiesRouter = router({
         .where(eq(students.userId, ctx.user.id));
       if (!student) return [];
 
-      // Buscar matrículas do aluno para saber suas disciplinas/turmas
-      const enrollments = await db.execute(
-        sql`SELECT DISTINCT e.subjectId, e.classId FROM enrollments e WHERE e.studentId = ${student.id} AND e.status = 'active'`
+      // Buscar matrículas do aluno para saber suas disciplinas (subjectEnrollments)
+      const enrollResult = await db.execute(
+        sql`SELECT DISTINCT se.subjectId FROM subjectEnrollments se WHERE se.studentId = ${student.id} AND se.status = 'active'`
       ) as any[];
 
-      const rows = enrollments[0] as Array<{ subjectId: number; classId: number }>;
-      if (!rows || rows.length === 0) return [];
+      const seRows = enrollResult[0] as Array<{ subjectId: number }>;
+      
+      // Também buscar turmas do aluno (student_class_enrollments)
+      const classResult = await db.execute(
+        sql`SELECT DISTINCT sce.classId FROM student_class_enrollments sce WHERE sce.studentId = ${student.id}`
+      ) as any[];
+      const sceRows = classResult[0] as Array<{ classId: number }>;
 
-      const subjectIds = Array.from(new Set(rows.map((r: any) => r.subjectId).filter(Boolean))) as number[];
-      const classIds = Array.from(new Set(rows.map((r: any) => r.classId).filter(Boolean))) as number[];
+      const subjectIds = Array.from(new Set((seRows || []).map((r: any) => r.subjectId).filter(Boolean))) as number[];
+      const classIds = Array.from(new Set((sceRows || []).map((r: any) => r.classId).filter(Boolean))) as number[];
+
+      // Se não tem nenhuma matrícula, retornar vazio
+      if (subjectIds.length === 0 && classIds.length === 0) return [];
 
       // Buscar atividades publicadas para as disciplinas/turmas do aluno
       const activityRows = await db

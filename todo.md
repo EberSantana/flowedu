@@ -7636,3 +7636,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Reescrever StudentActivitiesPage.tsx seguindo o padrão visual do FlowEdu
 
 - [x] Fix: Erro ao criar atividade - INSERT falha no banco de dados (activities table) - tabela tinha estrutura antiga incompatível, recriada com estrutura correta
+- [x] Fix: Atividades criadas pelo professor não aparecem no módulo do aluno - corrigido: consulta usava tabela 'enrollments' que não existe, alterado para 'subjectEnrollments' + 'student_class_enrollments'
