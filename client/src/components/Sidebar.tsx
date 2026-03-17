@@ -167,6 +167,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <FileText className="h-5 w-5" />,
         href: "/learning-path-report",
       },
+      {
+        label: "Painel de Notas",
+        icon: <ClipboardList className="h-5 w-5" />,
+        href: "/teacher-grades",
+      },
     ],
   },
   {

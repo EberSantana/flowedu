@@ -7642,3 +7642,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Fix: Erro ao enviar atividade pelo aluno - Storage proxy credentials missing na VPS - adicionadas BUILT_IN_FORGE_API_URL e BUILT_IN_FORGE_API_KEY ao .env da VPS
 - [x] Notificação ao professor quando um aluno enviar uma atividade
 - [x] Integrar notas de atividades em sala no boletim do aluno - seção/coluna com notas avaliadas pelo professor
+- [x] Painel de Notas por Turma - professor seleciona turma/disciplina e vê tabela com todos os alunos e suas notas
+- [x] Relatório Individual do Aluno - professor clica no nome do aluno e vê boletim completo
+- [x] Exportar planilha de notas - botão para exportar notas da turma em Excel/CSV

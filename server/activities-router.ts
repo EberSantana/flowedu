@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
 import { getDb, createNotification } from "./db";
-import { activities, activitySubmissions, students, subjects, classes } from "../drizzle/schema";
+import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -397,5 +397,244 @@ export const activitiesRouter = router({
           ? { ...mySubmissions[a.id], score: mySubmissions[a.id].score ? Number(mySubmissions[a.id].score) : null }
           : null,
       }));
+    }),
+
+  // ─── PAINEL DE NOTAS DO PROFESSOR ──────────────────────────────────────────
+
+  // Buscar alunos de uma turma com notas consolidadas (exercícios + atividades)
+  getGradesByClass: protectedProcedure
+    .input(z.object({
+      classId: z.number(),
+      subjectId: z.number().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+
+      // Buscar alunos matriculados na turma
+      const enrolledStudents = await db
+        .select({
+          studentId: studentClassEnrollments.studentId,
+          studentName: students.fullName,
+          registrationNumber: students.registrationNumber,
+        })
+        .from(studentClassEnrollments)
+        .innerJoin(students, eq(studentClassEnrollments.studentId, students.id))
+        .where(
+          and(
+            eq(studentClassEnrollments.classId, input.classId),
+            eq(studentClassEnrollments.userId, ctx.user.id)
+          )
+        )
+        .orderBy(students.fullName);
+
+      if (enrolledStudents.length === 0) return [];
+
+      const studentIds = enrolledStudents.map(s => s.studentId);
+
+      // Buscar notas de EXERCÍCIOS ONLINE
+      const exerciseGrades = await db
+        .select({
+          studentId: studentExerciseAttempts.studentId,
+          exerciseId: studentExercises.id,
+          exerciseTitle: studentExercises.title,
+          subjectId: studentExercises.subjectId,
+          score: studentExerciseAttempts.score,
+          passingScore: studentExercises.passingScore,
+          status: studentExerciseAttempts.status,
+          completedAt: studentExerciseAttempts.completedAt,
+        })
+        .from(studentExerciseAttempts)
+        .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+        .where(
+          and(
+            inArray(studentExerciseAttempts.studentId, studentIds),
+            eq(studentExerciseAttempts.status, 'completed'),
+            ...(input.subjectId ? [eq(studentExercises.subjectId, input.subjectId)] : [])
+          )
+        );
+
+      // Buscar notas de ATIVIDADES EM SALA
+      const activityGrades = await db
+        .select({
+          studentId: activitySubmissions.studentId,
+          activityId: activities.id,
+          activityTitle: activities.title,
+          subjectId: activities.subjectId,
+          score: activitySubmissions.score,
+          maxScore: activities.maxScore,
+          feedback: activitySubmissions.feedback,
+          status: activitySubmissions.status,
+          gradedAt: activitySubmissions.gradedAt,
+        })
+        .from(activitySubmissions)
+        .innerJoin(activities, eq(activitySubmissions.activityId, activities.id))
+        .where(
+          and(
+            inArray(activitySubmissions.studentId, studentIds),
+            eq(activitySubmissions.status, 'graded'),
+            eq(activities.userId, ctx.user.id),
+            ...(input.subjectId ? [eq(activities.subjectId, input.subjectId)] : [])
+          )
+        );
+
+      // Montar resultado por aluno
+      return enrolledStudents.map(student => {
+        // Exercícios do aluno
+        const studentExGrades = exerciseGrades.filter(g => g.studentId === student.studentId);
+        const exerciseAvg = studentExGrades.length > 0
+          ? studentExGrades.reduce((sum, g) => sum + ((g.score ?? 0) / 10), 0) / studentExGrades.length
+          : null;
+
+        // Atividades do aluno
+        const studentActGrades = activityGrades.filter(g => g.studentId === student.studentId);
+        const activityAvg = studentActGrades.length > 0
+          ? studentActGrades.reduce((sum, g) => {
+              const score = parseFloat(String(g.score ?? 0));
+              const maxScore = parseFloat(String(g.maxScore ?? 10));
+              return sum + (maxScore > 0 ? (score / maxScore) * 10 : 0);
+            }, 0) / studentActGrades.length
+          : null;
+
+        // Média geral
+        const allGrades: number[] = [];
+        if (exerciseAvg !== null) allGrades.push(exerciseAvg);
+        if (activityAvg !== null) allGrades.push(activityAvg);
+        const overallAvg = allGrades.length > 0
+          ? allGrades.reduce((a, b) => a + b, 0) / allGrades.length
+          : null;
+
+        return {
+          studentId: student.studentId,
+          studentName: student.studentName,
+          registrationNumber: student.registrationNumber,
+          exerciseCount: studentExGrades.length,
+          exerciseAverage: exerciseAvg !== null ? parseFloat(exerciseAvg.toFixed(2)) : null,
+          activityCount: studentActGrades.length,
+          activityAverage: activityAvg !== null ? parseFloat(activityAvg.toFixed(2)) : null,
+          overallAverage: overallAvg !== null ? parseFloat(overallAvg.toFixed(2)) : null,
+          exercises: studentExGrades.map(g => ({
+            exerciseId: g.exerciseId,
+            title: g.exerciseTitle,
+            grade: parseFloat(((g.score ?? 0) / 10).toFixed(2)),
+            passingGrade: parseFloat(((g.passingScore ?? 60) / 10).toFixed(1)),
+            approved: (g.score ?? 0) >= (g.passingScore ?? 60),
+            completedAt: g.completedAt,
+          })),
+          activities: studentActGrades.map(g => ({
+            activityId: g.activityId,
+            title: g.activityTitle,
+            score: parseFloat(String(g.score ?? 0)),
+            maxScore: parseFloat(String(g.maxScore ?? 10)),
+            grade10: parseFloat(String(g.maxScore ?? 10)) > 0
+              ? parseFloat(((parseFloat(String(g.score ?? 0)) / parseFloat(String(g.maxScore ?? 10))) * 10).toFixed(2))
+              : 0,
+            feedback: g.feedback,
+            gradedAt: g.gradedAt,
+          })),
+        };
+      });
+    }),
+
+  // Buscar relatório individual detalhado de um aluno
+  getStudentReport: protectedProcedure
+    .input(z.object({
+      studentId: z.number(),
+      subjectId: z.number().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+
+      // Buscar dados do aluno
+      const [student] = await db
+        .select()
+        .from(students)
+        .where(and(eq(students.id, input.studentId), eq(students.userId, ctx.user.id)))
+        .limit(1);
+
+      if (!student) throw new TRPCError({ code: 'NOT_FOUND', message: 'Aluno não encontrado' });
+
+      // Buscar exercícios
+      const exerciseResults = await db
+        .select({
+          exerciseId: studentExercises.id,
+          exerciseTitle: studentExercises.title,
+          subjectId: studentExercises.subjectId,
+          subjectName: subjects.name,
+          score: studentExerciseAttempts.score,
+          passingScore: studentExercises.passingScore,
+          totalQuestions: studentExercises.totalQuestions,
+          completedAt: studentExerciseAttempts.completedAt,
+        })
+        .from(studentExerciseAttempts)
+        .innerJoin(studentExercises, eq(studentExerciseAttempts.exerciseId, studentExercises.id))
+        .innerJoin(subjects, eq(studentExercises.subjectId, subjects.id))
+        .where(
+          and(
+            eq(studentExerciseAttempts.studentId, input.studentId),
+            eq(studentExerciseAttempts.status, 'completed'),
+            ...(input.subjectId ? [eq(studentExercises.subjectId, input.subjectId)] : [])
+          )
+        )
+        .orderBy(desc(studentExerciseAttempts.completedAt));
+
+      // Buscar atividades em sala
+      const activityResults = await db
+        .select({
+          activityId: activities.id,
+          activityTitle: activities.title,
+          subjectId: activities.subjectId,
+          subjectName: subjects.name,
+          score: activitySubmissions.score,
+          maxScore: activities.maxScore,
+          feedback: activitySubmissions.feedback,
+          gradedAt: activitySubmissions.gradedAt,
+          submittedAt: activitySubmissions.submittedAt,
+        })
+        .from(activitySubmissions)
+        .innerJoin(activities, eq(activitySubmissions.activityId, activities.id))
+        .innerJoin(subjects, eq(activities.subjectId, subjects.id))
+        .where(
+          and(
+            eq(activitySubmissions.studentId, input.studentId),
+            eq(activitySubmissions.status, 'graded'),
+            eq(activities.userId, ctx.user.id),
+            ...(input.subjectId ? [eq(activities.subjectId, input.subjectId)] : [])
+          )
+        )
+        .orderBy(desc(activitySubmissions.gradedAt));
+
+      return {
+        student: {
+          id: student.id,
+          name: student.fullName,
+          registrationNumber: student.registrationNumber,
+          email: student.email,
+        },
+        exercises: exerciseResults.map(e => ({
+          exerciseId: e.exerciseId,
+          title: e.exerciseTitle,
+          subjectName: e.subjectName,
+          grade: parseFloat(((e.score ?? 0) / 10).toFixed(2)),
+          passingGrade: parseFloat(((e.passingScore ?? 60) / 10).toFixed(1)),
+          totalQuestions: e.totalQuestions,
+          approved: (e.score ?? 0) >= (e.passingScore ?? 60),
+          completedAt: e.completedAt,
+        })),
+        activities: activityResults.map(a => ({
+          activityId: a.activityId,
+          title: a.activityTitle,
+          subjectName: a.subjectName,
+          score: parseFloat(String(a.score ?? 0)),
+          maxScore: parseFloat(String(a.maxScore ?? 10)),
+          grade10: parseFloat(String(a.maxScore ?? 10)) > 0
+            ? parseFloat(((parseFloat(String(a.score ?? 0)) / parseFloat(String(a.maxScore ?? 10))) * 10).toFixed(2))
+            : 0,
+          feedback: a.feedback,
+          gradedAt: a.gradedAt,
+          submittedAt: a.submittedAt,
+        })),
+      };
     }),
 });
