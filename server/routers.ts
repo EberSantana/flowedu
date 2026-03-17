@@ -6966,6 +6966,104 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
 
         return Object.values(bySubject).sort((a, b) => a.subjectName.localeCompare(b.subjectName));
       }),
+
+    // Buscar notas de atividades em sala (avaliadas pelo professor)
+    getActivityGrades: studentProcedure
+      .query(async ({ ctx }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error("Database not available");
+
+        const { activities, activitySubmissions, subjects } = await import("../drizzle/schema");
+
+        // Buscar todas as submissões avaliadas do aluno com dados da atividade e disciplina
+        const gradedSubmissions = await dbInstance
+          .select({
+            submissionId: activitySubmissions.id,
+            activityId: activities.id,
+            activityTitle: activities.title,
+            subjectId: activities.subjectId,
+            subjectName: subjects.name,
+            maxScore: activities.maxScore,
+            score: activitySubmissions.score,
+            feedback: activitySubmissions.feedback,
+            status: activitySubmissions.status,
+            gradedAt: activitySubmissions.gradedAt,
+            submittedAt: activitySubmissions.submittedAt,
+          })
+          .from(activitySubmissions)
+          .innerJoin(activities, eq(activitySubmissions.activityId, activities.id))
+          .innerJoin(subjects, eq(activities.subjectId, subjects.id))
+          .where(
+            and(
+              eq(activitySubmissions.studentId, ctx.studentSession.studentId),
+              eq(activitySubmissions.status, "graded")
+            )
+          )
+          .orderBy(desc(activitySubmissions.gradedAt));
+
+        // Agrupar por disciplina
+        const bySubject: Record<number, {
+          subjectId: number;
+          subjectName: string;
+          grades: Array<{
+            submissionId: number;
+            activityId: number;
+            activityTitle: string;
+            score: number;
+            maxScore: number;
+            grade10: number; // Nota convertida para escala 0-10
+            feedback: string | null;
+            gradedAt: Date | null;
+            submittedAt: Date | null;
+          }>;
+          average: number;
+          totalGraded: number;
+          approvedCount: number;
+        }> = {};
+
+        for (const s of gradedSubmissions) {
+          const subId = s.subjectId ?? 0;
+          if (!bySubject[subId]) {
+            bySubject[subId] = {
+              subjectId: subId,
+              subjectName: s.subjectName ?? "Sem disciplina",
+              grades: [],
+              average: 0,
+              totalGraded: 0,
+              approvedCount: 0,
+            };
+          }
+          const scoreNum = parseFloat(String(s.score ?? 0));
+          const maxScoreNum = parseFloat(String(s.maxScore ?? 10));
+          const grade10 = maxScoreNum > 0 ? parseFloat(((scoreNum / maxScoreNum) * 10).toFixed(2)) : 0;
+          const approved = grade10 >= 6;
+
+          bySubject[subId].grades.push({
+            submissionId: s.submissionId,
+            activityId: s.activityId,
+            activityTitle: s.activityTitle,
+            score: scoreNum,
+            maxScore: maxScoreNum,
+            grade10,
+            feedback: s.feedback,
+            gradedAt: s.gradedAt,
+            submittedAt: s.submittedAt,
+          });
+          bySubject[subId].totalGraded++;
+          if (approved) bySubject[subId].approvedCount++;
+        }
+
+        // Calcular média por disciplina
+        for (const sub of Object.values(bySubject)) {
+          if (sub.grades.length > 0) {
+            sub.average = parseFloat(
+              (sub.grades.reduce((sum, g) => sum + g.grade10, 0) / sub.grades.length).toFixed(2)
+            );
+          }
+        }
+
+        return Object.values(bySubject).sort((a, b) => a.subjectName.localeCompare(b.subjectName));
+      }),
   }),
 
   // Rotas do professor para gerenciar exercícios
