@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
+import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
 import { getDb } from "./db";
 import { activities, activitySubmissions, students, subjects, classes } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
@@ -229,7 +229,7 @@ export const activitiesRouter = router({
     }),
 
   // ── Upload de arquivo para S3 (professor ou aluno) ──────────────────────
-  getUploadUrl: protectedProcedure
+    getUploadUrl: studentProcedure
     .input(z.object({
       fileName: z.string(),
       mimeType: z.string(),
@@ -237,7 +237,6 @@ export const activitiesRouter = router({
       fileBase64: z.string(), // arquivo em base64
       activityId: z.number(),
       comment: z.string().optional(),
-      studentId: z.number().optional(), // se professor submeter por aluno
     }))
     .mutation(async ({ ctx, input }) => {
       const db = (await getDb())!;
@@ -248,7 +247,6 @@ export const activitiesRouter = router({
           message: "Formato de arquivo não permitido. Use PDF, Word ou PowerPoint.",
         });
       }
-
       // Validar tamanho (20MB)
       if (input.fileSizeBytes > 20 * 1024 * 1024) {
         throw new TRPCError({
@@ -256,25 +254,14 @@ export const activitiesRouter = router({
           message: "Arquivo muito grande. O limite é 20MB.",
         });
       }
-
       // Verificar que a atividade existe
       const [activity] = await db
         .select()
         .from(activities)
         .where(eq(activities.id, input.activityId));
       if (!activity) throw new TRPCError({ code: "NOT_FOUND", message: "Atividade não encontrada" });
-
-      // Determinar studentId
-      let studentId = input.studentId;
-      if (!studentId) {
-        // É o aluno logando — buscar pelo userId
-        const [student] = await db
-          .select({ id: students.id })
-          .from(students)
-          .where(eq(students.userId, ctx.user.id));
-        if (!student) throw new TRPCError({ code: "NOT_FOUND", message: "Aluno não encontrado" });
-        studentId = student.id;
-      }
+      // Usar studentId da sessão de aluno
+      const studentId = ctx.studentSession.studentId;
 
       // Upload para S3
       const ext = ALLOWED_MIME_TYPES[input.mimeType];
@@ -326,15 +313,12 @@ export const activitiesRouter = router({
     }),
 
   // ── Aluno: listar atividades da sua disciplina ──────────────────────────
-  listForStudent: protectedProcedure
+  listForStudent: studentProcedure
     .query(async ({ ctx }) => {
       const db = (await getDb())!;
-      // Buscar o aluno pelo userId
-      const [student] = await db
-        .select({ id: students.id })
-        .from(students)
-        .where(eq(students.userId, ctx.user.id));
-      if (!student) return [];
+      // Usar studentId da sessão de aluno diretamente
+      const studentId = ctx.studentSession.studentId;
+      const student = { id: studentId };
 
       // Buscar matrículas do aluno para saber suas disciplinas (subjectEnrollments)
       const enrollResult = await db.execute(
