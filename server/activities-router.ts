@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
-import { getDb } from "./db";
+import { getDb, createNotification } from "./db";
 import { activities, activitySubmissions, students, subjects, classes } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
@@ -295,6 +295,17 @@ export const activitiesRouter = router({
             submittedAt: new Date(),
           })
           .where(eq(activitySubmissions.id, existing.id));
+        // Notificar professor sobre reenvio
+        try {
+          await createNotification({
+            userId: activity.userId,
+            type: 'new_assignment',
+            title: 'Atividade Reenviada',
+            message: `O aluno ${ctx.studentSession.fullName} reenviou a atividade "${activity.title}".`,
+            link: '/atividades-em-sala',
+            relatedId: input.activityId,
+          });
+        } catch (e) { /* notificação não deve bloquear envio */ }
         return { success: true, submissionId: existing.id, fileUrl: url };
       } else {
         const [result] = await db.insert(activitySubmissions).values({
@@ -308,6 +319,17 @@ export const activitiesRouter = router({
           comment: input.comment,
           status: "submitted",
         });
+        // Notificar professor sobre novo envio
+        try {
+          await createNotification({
+            userId: activity.userId,
+            type: 'new_assignment',
+            title: 'Nova Submissão de Atividade',
+            message: `O aluno ${ctx.studentSession.fullName} enviou a atividade "${activity.title}".`,
+            link: '/atividades-em-sala',
+            relatedId: input.activityId,
+          });
+        } catch (e) { /* notificação não deve bloquear envio */ }
         return { success: true, submissionId: (result as any).insertId, fileUrl: url };
       }
     }),

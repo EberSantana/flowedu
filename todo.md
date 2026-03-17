@@ -7639,3 +7639,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Fix: Atividades criadas pelo professor não aparecem no módulo do aluno - corrigido: consulta usava tabela 'enrollments' que não existe, alterado para 'subjectEnrollments' + 'student_class_enrollments'
 - [x] Adicionar nome da disciplina/turma nos cards de atividades do aluno para facilitar identificação
 - [x] Fix: Atividades em Sala criadas pelo professor ainda não aparecem em Minhas Atividades do aluno - corrigido: procedures usavam protectedProcedure (OAuth) ao invés de studentProcedure (sessão do aluno)
+- [x] Fix: Erro ao enviar atividade pelo aluno - Storage proxy credentials missing na VPS - adicionadas BUILT_IN_FORGE_API_URL e BUILT_IN_FORGE_API_KEY ao .env da VPS
+- [x] Notificação ao professor quando um aluno enviar uma atividade
