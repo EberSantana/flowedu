@@ -7629,3 +7629,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar página do aluno: ver atividades e submeter arquivos PDF/Word/PPT (StudentActivitiesPage.tsx)
 - [x] Adicionar menu "Atividades em Sala" no sidebar do professor e aluno
 - [x] Build e deploy na VPS
+- [x] Bug: Menu "Atividades" não aparece no portal do professor nem no portal do aluno na VPS - RESOLVIDO: deploy limpo feito
+- [ ] Bug: Layout da página Atividades em Sala não segue o padrão visual do FlowEdu (cards em grid, breadcrumb, botões coloridos)
+- [ ] Bug: Botão "Criar Atividade" não funciona
+- [ ] Reescrever ActivitiesPage.tsx seguindo o padrão visual do FlowEdu
+- [ ] Reescrever StudentActivitiesPage.tsx seguindo o padrão visual do FlowEdu

@@ -2,10 +2,13 @@ import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Upload, FileText, Clock, CheckCircle, Star, AlertCircle, Download, X } from "lucide-react";
+import { Upload, FileText, Clock, CheckCircle, Star, AlertCircle, Download, X, ClipboardList, Calendar } from "lucide-react";
+import StudentLayout from "@/components/StudentLayout";
 
 type Activity = {
   id: number;
@@ -61,6 +64,7 @@ export default function StudentActivitiesPage() {
       setSelectedFile(null);
       setComment("");
       setSelectedActivity(null);
+      setUploading(false);
     },
     onError: (e: any) => {
       setUploading(false);
@@ -79,10 +83,9 @@ export default function StudentActivitiesPage() {
 
     setUploading(true);
     try {
-      // Converter arquivo para base64
       const buffer = await selectedFile.arrayBuffer();
       const bytes = new Uint8Array(buffer);
-      let binary = '';
+      let binary = "";
       for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
       const base64 = btoa(binary);
 
@@ -125,37 +128,10 @@ export default function StudentActivitiesPage() {
     return new Date(dueDate) < new Date();
   }
 
-  function getStatusBadge(activity: Activity) {
-    if (activity.mySubmission?.status === "graded") {
-      return (
-        <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
-          <CheckCircle className="w-3 h-3" />
-          Avaliado — {activity.mySubmission.score}/{activity.maxScore}
-        </span>
-      );
-    }
-    if (activity.mySubmission?.status === "submitted") {
-      return (
-        <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
-          <Clock className="w-3 h-3" />
-          Enviado — aguardando avaliação
-        </span>
-      );
-    }
-    if (activity.status === "closed" || isPastDue(activity.dueDate)) {
-      return (
-        <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">
-          <AlertCircle className="w-3 h-3" />
-          Prazo encerrado
-        </span>
-      );
-    }
-    return (
-      <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">
-        <Clock className="w-3 h-3" />
-        Pendente
-      </span>
-    );
+  function formatDate(date: string | Date | null) {
+    if (!date) return "Sem prazo";
+    const d = new Date(date);
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
   }
 
   const canSubmit = (activity: Activity) =>
@@ -163,110 +139,200 @@ export default function StudentActivitiesPage() {
     !isPastDue(activity.dueDate) &&
     activity.mySubmission?.status !== "graded";
 
+  const getStatusInfo = (activity: Activity) => {
+    if (activity.mySubmission?.status === "graded") {
+      return { icon: CheckCircle, label: `Avaliado - ${activity.mySubmission.score}/${activity.maxScore}`, color: "bg-emerald-100 text-emerald-700 border-emerald-200" };
+    }
+    if (activity.mySubmission?.status === "submitted") {
+      return { icon: Clock, label: "Enviado - Aguardando avaliação", color: "bg-blue-100 text-blue-700 border-blue-200" };
+    }
+    if (activity.status === "closed" || isPastDue(activity.dueDate)) {
+      return { icon: AlertCircle, label: "Prazo encerrado", color: "bg-red-100 text-red-700 border-red-200" };
+    }
+    return { icon: Clock, label: "Pendente", color: "bg-amber-100 text-amber-700 border-amber-200" };
+  };
+
+  // Contadores
+  const pendingCount = (activities as Activity[]).filter(a => !a.mySubmission && a.status === "published" && !isPastDue(a.dueDate)).length;
+  const submittedCount = (activities as Activity[]).filter(a => a.mySubmission?.status === "submitted").length;
+  const gradedCount = (activities as Activity[]).filter(a => a.mySubmission?.status === "graded").length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">Minhas Atividades</h1>
-          <p className="text-blue-300 text-sm mt-1">Visualize e entregue suas atividades</p>
-        </div>
-
-        {isLoading ? (
-          <div className="text-center py-12 text-blue-300">Carregando atividades...</div>
-        ) : activities.length === 0 ? (
-          <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
-            <FileText className="w-12 h-12 text-blue-400/40 mx-auto mb-3" />
-            <p className="text-blue-200 font-medium">Nenhuma atividade disponível</p>
-            <p className="text-blue-400 text-sm mt-1">Seu professor ainda não publicou atividades</p>
+    <StudentLayout>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-6 px-4 max-w-5xl">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <ClipboardList className="w-8 h-8 text-primary" />
+              Minhas Atividades
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Visualize e entregue suas atividades
+            </p>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {(activities as Activity[]).map((activity) => (
-              <div
-                key={activity.id}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 hover:bg-white/15 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-white text-lg">{activity.title}</h3>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {activity.subjectName && (
-                        <span className="text-xs text-blue-300 bg-blue-900/40 px-2 py-0.5 rounded-full">
-                          {activity.subjectName}
-                        </span>
-                      )}
-                      {activity.className && (
-                        <span className="text-xs text-blue-300 bg-blue-900/40 px-2 py-0.5 rounded-full">
-                          {activity.className}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {getStatusBadge(activity)}
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <Card className="bg-amber-50 border-amber-200">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-amber-600" />
                 </div>
-
-                {activity.description && (
-                  <p className="text-blue-200 text-sm mb-3 leading-relaxed">{activity.description}</p>
-                )}
-
-                <div className="flex flex-wrap gap-4 text-xs text-blue-300 mb-4">
-                  <span className="flex items-center gap-1">
-                    <Star className="w-3 h-3" />
-                    Nota máxima: {activity.maxScore}
-                  </span>
-                  {activity.dueDate && (
-                    <span className={`flex items-center gap-1 ${isPastDue(activity.dueDate) ? "text-red-400" : ""}`}>
-                      <Clock className="w-3 h-3" />
-                      Prazo: {new Date(activity.dueDate).toLocaleString("pt-BR")}
-                    </span>
-                  )}
+                <div>
+                  <p className="text-2xl font-bold text-amber-700">{pendingCount}</p>
+                  <p className="text-sm text-amber-600">Pendentes</p>
                 </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-blue-700">{submittedCount}</p>
+                  <p className="text-sm text-blue-600">Enviadas</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-emerald-50 border-emerald-200">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-emerald-700">{gradedCount}</p>
+                  <p className="text-sm text-emerald-600">Avaliadas</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-                {/* Submissão existente */}
-                {activity.mySubmission && (
-                  <div className={`rounded-xl p-3 mb-3 ${
-                    activity.mySubmission.status === "graded"
-                      ? "bg-green-900/30 border border-green-500/30"
-                      : "bg-blue-900/30 border border-blue-500/30"
-                  }`}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <FileText className="w-4 h-4 text-blue-300" />
-                      <a
-                        href={activity.mySubmission.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-300 hover:text-white text-sm flex items-center gap-1"
-                      >
-                        {activity.mySubmission.fileName}
-                        <Download className="w-3 h-3" />
-                      </a>
-                      <span className="text-blue-400 text-xs">
-                        ({formatFileSize(activity.mySubmission.fileSizeBytes)})
-                      </span>
-                    </div>
-                    {activity.mySubmission.feedback && (
-                      <div className="mt-2 text-sm text-green-300 bg-green-900/20 rounded-lg p-2">
-                        <span className="font-medium">Feedback do professor:</span> {activity.mySubmission.feedback}
+          {/* Activities List */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="bg-white shadow-md animate-pulse">
+                  <CardHeader className="pb-3"><div className="h-6 bg-gray-200 rounded w-3/4" /><div className="h-4 bg-gray-100 rounded w-1/2 mt-2" /></CardHeader>
+                  <CardContent><div className="h-20 bg-gray-100 rounded" /></CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (activities as Activity[]).length === 0 ? (
+            <Card className="bg-white border-dashed border-2 border-gray-300">
+              <CardContent className="py-16 text-center">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 font-medium">Nenhuma atividade disponível</p>
+                <p className="text-gray-400 text-sm mt-1">Seu professor ainda não publicou atividades</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              {(activities as Activity[]).map((activity) => {
+                const statusInfo = getStatusInfo(activity);
+                const StatusIcon = statusInfo.icon;
+                const overdue = isPastDue(activity.dueDate);
+
+                return (
+                  <Card key={activity.id} className="bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-lg text-gray-900 flex-1 min-w-0 truncate">{activity.title}</h3>
+                        <Badge className={`flex-shrink-0 text-xs ${statusInfo.color}`}>
+                          <StatusIcon className="w-3 h-3 mr-1" />
+                          {statusInfo.label.split(" - ")[0]}
+                        </Badge>
                       </div>
-                    )}
-                  </div>
-                )}
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {activity.subjectName && (
+                          <Badge variant="outline" className="text-xs">{activity.subjectName}</Badge>
+                        )}
+                        {activity.className && (
+                          <Badge variant="outline" className="text-xs">{activity.className}</Badge>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex flex-col flex-1 gap-3">
+                      {activity.description && (
+                        <p className="text-sm text-gray-600 line-clamp-2">{activity.description}</p>
+                      )}
 
-                {/* Botão de ação */}
-                {canSubmit(activity) && (
-                  <Button
-                    onClick={() => { setSelectedActivity(activity); setShowSubmit(true); }}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white gap-2"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {activity.mySubmission ? "Reenviar Atividade" : "Enviar Atividade"}
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {activity.dueDate ? (
+                            <span className={overdue ? "text-red-600 font-medium" : ""}>
+                              {formatDate(activity.dueDate)}
+                              {overdue && " (Vencida)"}
+                            </span>
+                          ) : "Sem prazo"}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Star className="w-3.5 h-3.5" />
+                          Nota máx: {activity.maxScore}
+                        </span>
+                      </div>
+
+                      {/* Submissão existente */}
+                      {activity.mySubmission && (
+                        <div className={`rounded-lg p-3 text-sm ${
+                          activity.mySubmission.status === "graded"
+                            ? "bg-emerald-50 border border-emerald-200"
+                            : "bg-blue-50 border border-blue-200"
+                        }`}>
+                          <a
+                            href={activity.mySubmission.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:underline font-medium"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            {activity.mySubmission.fileName}
+                          </a>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formatFileSize(activity.mySubmission.fileSizeBytes)} - Enviado em {formatDate(activity.mySubmission.submittedAt)}
+                          </p>
+                          {activity.mySubmission.status === "graded" && (
+                            <>
+                              <p className="font-semibold text-emerald-700 mt-2">
+                                Nota: {activity.mySubmission.score}/{activity.maxScore}
+                              </p>
+                              {activity.mySubmission.feedback && (
+                                <p className="text-gray-600 mt-1 italic">
+                                  Feedback: {activity.mySubmission.feedback}
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Action Button */}
+                      <div className="mt-auto pt-3">
+                        {canSubmit(activity) ? (
+                          <Button
+                            onClick={() => { setSelectedActivity(activity); setShowSubmit(true); }}
+                            className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white"
+                            size="sm"
+                          >
+                            <Upload className="mr-2 h-3 w-3" />
+                            {activity.mySubmission ? "Reenviar Atividade" : "Enviar Atividade"}
+                          </Button>
+                        ) : activity.mySubmission?.status === "graded" ? (
+                          <div className="text-center text-sm text-emerald-600 font-medium py-1">
+                            <CheckCircle className="w-4 h-4 inline mr-1" />
+                            Atividade avaliada
+                          </div>
+                        ) : null}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal: Enviar Atividade */}
@@ -276,12 +342,12 @@ export default function StudentActivitiesPage() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Enviar Atividade</DialogTitle>
+            <DialogDescription>{selectedActivity?.title}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-              <p className="font-medium text-gray-800">{selectedActivity?.title}</p>
-              <p className="text-xs mt-1 text-gray-500">
-                Formatos aceitos: <strong>PDF, Word (.doc/.docx), PowerPoint (.ppt/.pptx)</strong> — máximo 16MB
+              <p className="text-xs text-gray-500">
+                Formatos aceitos: <strong>PDF, Word (.doc/.docx), PowerPoint (.ppt/.pptx)</strong> - máximo 16MB
               </p>
             </div>
 
@@ -351,6 +417,6 @@ export default function StudentActivitiesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </StudentLayout>
   );
 }
