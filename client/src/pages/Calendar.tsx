@@ -25,6 +25,8 @@ const EVENT_TYPES = {
   commemorative: { label: "Data Comemorativa", color: "bg-amber-500", dotColor: "#f59e0b" },
   school_event: { label: "Evento Escolar", color: "bg-blue-500", dotColor: "#3b82f6" },
   personal: { label: "Observação Pessoal", color: "bg-purple-500", dotColor: "#8b5cf6" },
+  activity: { label: "Atividade em Sala", color: "bg-emerald-500", dotColor: "#10b981" },
+  scheduled_class: { label: "Aula Agendada", color: "bg-teal-500", dotColor: "#14b8a6" },
 };
 
 export default function Calendar() {
@@ -38,7 +40,7 @@ export default function Calendar() {
     title: "",
     description: "",
     eventDate: "",
-    eventType: "personal" as keyof typeof EVENT_TYPES,
+    eventType: "personal" as "personal" | "holiday" | "commemorative" | "school_event",
     isRecurring: 0,
     color: "#8b5cf6",
   });
@@ -62,6 +64,7 @@ export default function Calendar() {
   const [eventsToDelete, setEventsToDelete] = useState<any[]>([]);
 
   const { data: events, isLoading } = trpc.calendar.listByYear.useQuery({ year: selectedYear });
+  const { data: calendarActivities } = trpc.activities.getCalendarActivities.useQuery({ year: selectedYear, month: selectedMonth });
   const utils = trpc.useUtils();
 
   const createMutation = trpc.calendar.create.useMutation({
@@ -165,29 +168,98 @@ export default function Calendar() {
   };
 
   const monthEvents = useMemo(() => {
-    if (!events) return [];
-    return events.filter((event: any) => {
-      const { year, month } = parseDateStr(event.eventDate);
-      return month === selectedMonth && year === selectedYear;
-    }).sort((a: any, b: any) => a.eventDate.localeCompare(b.eventDate));
-  }, [events, selectedMonth, selectedYear]);
+    const allEvents: any[] = [];
+    
+    // Eventos do calendário
+    if (events) {
+      events.filter((event: any) => {
+        const { year, month } = parseDateStr(event.eventDate);
+        return month === selectedMonth && year === selectedYear;
+      }).forEach(e => allEvents.push(e));
+    }
+    
+    // Atividades em sala
+    if (calendarActivities?.activities) {
+      calendarActivities.activities.forEach((act: any) => {
+        const dueDate = new Date(act.dueDate);
+        allEvents.push({
+          id: `act-${act.id}`,
+          title: act.title,
+          description: `${act.subjectName || ''} — ${act.className || ''}`,
+          eventType: 'activity',
+          eventDate: `${dueDate.getFullYear()}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`,
+          _isActivity: true,
+        });
+      });
+    }
+    
+    // Aulas agendadas
+    if (calendarActivities?.scheduledClasses) {
+      calendarActivities.scheduledClasses.forEach((sc: any) => {
+        allEvents.push({
+          id: `sc-${sc.id}-${sc.date}`,
+          title: `${sc.subjectName} — ${sc.className}`,
+          description: `${sc.startTime} - ${sc.endTime}`,
+          eventType: 'scheduled_class',
+          eventDate: sc.date,
+          _isScheduledClass: true,
+        });
+      });
+    }
+    
+    return allEvents.sort((a: any, b: any) => a.eventDate.localeCompare(b.eventDate));
+  }, [events, calendarActivities, selectedMonth, selectedYear]);
 
-  // Eventos por dia
+  // Eventos por dia (inclui eventos do calendário + atividades + aulas agendadas)
   const eventsByDay = useMemo(() => {
     const map = new Map<string, any[]>();
-    if (!events) return map;
     
-    events.forEach((event: any) => {
-      const { year, month, day } = parseDateStr(event.eventDate);
-      const key = `${year}-${month}-${day}`;
-      if (!map.has(key)) {
-        map.set(key, []);
-      }
-      map.get(key)!.push(event);
-    });
+    // Eventos do calendário
+    if (events) {
+      events.forEach((event: any) => {
+        const { year, month, day } = parseDateStr(event.eventDate);
+        const key = `${year}-${month}-${day}`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(event);
+      });
+    }
+    
+    // Atividades em sala (prazo de entrega)
+    if (calendarActivities?.activities) {
+      calendarActivities.activities.forEach((act: any) => {
+        const dueDate = new Date(act.dueDate);
+        const key = `${dueDate.getFullYear()}-${dueDate.getMonth()}-${dueDate.getDate()}`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push({
+          id: `act-${act.id}`,
+          title: act.title,
+          description: `${act.subjectName || ''} — ${act.className || ''}`,
+          eventType: 'activity',
+          eventDate: `${dueDate.getFullYear()}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`,
+          _isActivity: true,
+        });
+      });
+    }
+    
+    // Aulas agendadas
+    if (calendarActivities?.scheduledClasses) {
+      calendarActivities.scheduledClasses.forEach((sc: any) => {
+        const { year, month, day } = parseDateStr(sc.date);
+        const key = `${year}-${month - 1}-${day}`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push({
+          id: `sc-${sc.id}-${sc.date}`,
+          title: `${sc.subjectName} — ${sc.className}`,
+          description: `${sc.startTime} - ${sc.endTime}`,
+          eventType: 'scheduled_class',
+          eventDate: sc.date,
+          _isScheduledClass: true,
+        });
+      });
+    }
     
     return map;
-  }, [events]);
+  }, [events, calendarActivities]);
 
   const resetForm = () => {
     setFormData({
@@ -630,7 +702,8 @@ export default function Calendar() {
                     <div className="space-y-3">
                       {monthEvents.map((event: any) => {
                         const { day: evDay, month: evMonth } = parseDateStr(event.eventDate);
-                        const eventType = EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES];
+                        const eventType = EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES] || { label: event.eventType, color: 'bg-gray-500', dotColor: '#6b7280' };
+                        const isReadOnly = event._isActivity || event._isScheduledClass;
                         
                         return (
                           <div
@@ -655,24 +728,26 @@ export default function Calendar() {
                                   </p>
                                 )}
                               </div>
-                              <div className="flex flex-col gap-1">
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => handleEdit(event)}
-                                  className="h-7 w-7"
-                                >
-                                  <Pencil className="w-3.5 h-3.5 text-primary" />
-                                </Button>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => handleDelete(event.id)}
-                                  className="h-7 w-7"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                                </Button>
-                              </div>
+                              {!isReadOnly && (
+                                <div className="flex flex-col gap-1">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleEdit(event)}
+                                    className="h-7 w-7"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5 text-primary" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleDelete(event.id)}
+                                    className="h-7 w-7"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         );

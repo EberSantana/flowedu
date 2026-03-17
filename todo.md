@@ -7648,3 +7648,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Fix: Painel de Notas do professor não mostra as notas dos alunos - corrigido: usava student_class_enrollments (vazia) ao invés de subjectEnrollments via scheduled_classes
 - [x] Painel de Notas: turma obrigatória, disciplina carregada dinamicamente baseada nas aulas agendadas (scheduled_classes) da turma selecionada
 - [x] Painel de Notas: substituir filtros separados por dropdown único 'Disciplina — Turma' atrelado via scheduled_classes
+- [x] Calendário de Atividades do professor - visualização mensal com datas de entrega, aulas agendadas e prazos importantes
