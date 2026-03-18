@@ -7651,3 +7651,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Calendário de Atividades do professor - visualização mensal com datas de entrega, aulas agendadas e prazos importantes
 - [x] Fix: FlowEdu na VPS não está abrindo - corrigido: assets antigos na VPS, usou rsync --delete para limpar e enviar todos os novos
 - [x] Remover integração de atividades em sala e aulas agendadas do calendário (redundante)
+- [x] BUG: Disciplinas/atividades ainda aparecem no calendário após remoção da integração - corrigido: era cache do browser/VPS, deploy com rsync --delete e nginx reload resolveu
+- [ ] Atividades em Sala: exibir indicador de submissões dos alunos (quantos enviaram / total matriculados, lista de quem enviou e quem não enviou)
+- [x] Notificar professor quando aluno enviar Atividade em Sala - CORRIGIDO: sino de notificações estava importado mas não renderizado no Sidebar; adicionado ao cabeçalho ao lado do logo FlowEdu

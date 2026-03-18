@@ -578,9 +578,12 @@ export default function Sidebar() {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-center gap-3 mb-4 w-full">
-                  <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
-                  <h1 className="text-2xl font-bold text-foreground">FlowEdu</h1>
+                <div className="flex items-center justify-between mb-4 w-full">
+                  <div className="flex items-center gap-3">
+                    <img src="/logo.png" alt="FlowEdu" className="h-14 w-14" />
+                    <h1 className="text-2xl font-bold text-foreground">FlowEdu</h1>
+                  </div>
+                  <NotificationBell />
                 </div>
                 <button
                   onClick={() => {

@@ -1,0 +1,9 @@
+{
+  "query": "SELECT as2.id, as2.activityId, as2.studentId, as2.status, as2.submittedAt, a.title as activityTitle, a.userId as professorId FROM activity_submissions as2 JOIN activities a ON a.id = as2.activityId ORDER BY as2.submittedAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT as2.id, as2.activityId, as2.studentId, as2.status, as2.submittedAt, a.title as activityTitle, a.userId as professorId FROM activity_submissions as2 JOIN activities a ON a.id = as2.activityId ORDER BY as2.submittedAt DESC LIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 56
+}

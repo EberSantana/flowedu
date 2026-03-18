@@ -1,0 +1,22 @@
+{
+  "query": "SHOW TABLES LIKE '%submission%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE '%submission%';",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%submission%)": "activity_submissions"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%submission%)": "assignment_submissions"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%submission%)": "challenge_submissions"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%submission%)": "ct_submissions"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%submission%)\nactivity_submissions\nassignment_submissions\nchallenge_submissions\nct_submissions\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

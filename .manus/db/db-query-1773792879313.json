@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, title, eventType, eventDate FROM calendar_events WHERE eventType = 'personal' ORDER BY eventDate DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, title, eventType, eventDate FROM calendar_events WHERE eventType = 'personal' ORDER BY eventDate DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "360013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "240013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "330013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "240028",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "210013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "150013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "270028",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "240043",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "28",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "13",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "180013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "90013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "60028",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "43",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "270013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "90028",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "120013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "60043",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "60013",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    },
+    {
+      "id": "360028",
+      "title": "Nota Pessoal 3",
+      "eventType": "personal",
+      "eventDate": "2024-11-01"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\teventType\teventDate\n360013\tNota Pessoal 3\tpersonal\t2024-11-01\n240013\tNota Pessoal 3\tpersonal\t2024-11-01\n330013\tNota Pessoal 3\tpersonal\t2024-11-01\n240028\tNota Pessoal 3\tpersonal\t2024-11-01\n210013\tNota Pessoal 3\tpersonal\t2024-11-01\n150013\tNota Pessoal 3\tpersonal\t2024-11-01\n270028\tNota Pessoal 3\tpersonal\t2024-11-01\n240043\tNota Pessoal 3\tpersonal\t2024-11-01\n28\tNota Pessoal 3\tpersonal\t2024-11-01\n13\tNota Pessoal 3\tpersonal\t2024-11-01\n180013\tNota Pessoal 3\tpersonal\t2024-11-01\n90013\tNota Pessoal 3\tpersonal\t2024-11-01\n60028\tNota Pessoal 3\tpersonal\t2024-11-01\n43\tNota Pessoal 3\tpersonal\t2024-11-01\n270013\tNota Pessoal 3\tpersonal\t2024-11-01\n90028\tNota Pessoal 3\tpersonal\t2024-11-01\n120013\tNota Pessoal 3\tpersonal\t2024-11-01\n60043\tNota Pessoal 3\tpersonal\t2024-11-01\n60013\tNota Pessoal 3\tpersonal\t2024-11-01\n360028\tNota Pessoal 3\tpersonal\t2024-11-01\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}
