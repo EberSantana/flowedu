@@ -10750,17 +10750,22 @@ export async function createAssessment(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  const classIdValue = (data.classId && data.classId > 0) ? data.classId : null;
+  const durationValue = (data.duration && data.duration > 0) ? data.duration : null;
+  const passingScoreValue = (data.passingScore && data.passingScore > 0) ? data.passingScore : 60;
+  const totalPointsValue = (data.totalPoints && data.totalPoints > 0) ? data.totalPoints : 100;
+
   const result = await db.execute(sql`
     INSERT INTO assessments (
       teacherId, subjectId, classId, title, description, assessmentType,
       totalQuestions, totalPoints, passingScore, duration, generalInstructions,
       applicationDate, availableFrom, availableTo, status
     ) VALUES (
-      ${data.teacherId}, ${data.subjectId}, ${data.classId || null}, ${data.title}, 
-      ${data.description || null}, ${data.assessmentType || 'prova'},
-      ${data.totalQuestions}, ${data.totalPoints || 100}, ${data.passingScore || 60},
-      ${data.duration || null}, ${data.generalInstructions || null},
-      ${data.applicationDate || null}, ${data.availableFrom || null}, ${data.availableTo || null}, 'draft'
+      ${data.teacherId}, ${data.subjectId}, ${classIdValue}, ${data.title}, 
+      ${data.description ?? null}, ${data.assessmentType ?? 'prova'},
+      ${data.totalQuestions}, ${totalPointsValue}, ${passingScoreValue},
+      ${durationValue}, ${data.generalInstructions ?? null},
+      ${data.applicationDate ?? null}, ${data.availableFrom ?? null}, ${data.availableTo ?? null}, 'draft'
     )
   `);
   
