@@ -749,6 +749,29 @@ export const activitiesRouter = router({
         )
         .orderBy(desc(activitySubmissions.gradedAt));
 
+      // Buscar notas de PROVAS (assessment_attempts) do aluno
+      const dbConn = await getDb();
+      let assessmentResults: any[] = [];
+      if (dbConn) {
+        const subjectFilter = input.subjectId ? sql`AND a.subjectId = ${input.subjectId}` : sql``;
+        const result = await dbConn.execute(
+          sql`SELECT aa.id as attemptId, aa.score, aa.percentage, aa.passed,
+                     aa.totalCorrect, aa.totalWrong, aa.submittedAt,
+                     a.id as assessmentId, a.title as assessmentTitle,
+                     a.totalPoints, a.passingScore, a.assessmentType,
+                     s.name as subjectName
+              FROM assessment_attempts aa
+              JOIN assessments a ON a.id = aa.assessmentId
+              JOIN subjects s ON s.id = a.subjectId
+              WHERE aa.studentId = ${input.studentId}
+                AND aa.status = 'submitted'
+                AND a.teacherId = ${ctx.user.id}
+                ${subjectFilter}
+              ORDER BY aa.submittedAt DESC`
+        ) as any[];
+        assessmentResults = (result[0] as any[]) || [];
+      }
+
       return {
         student: {
           id: student.id,
@@ -779,6 +802,20 @@ export const activitiesRouter = router({
           gradedAt: a.gradedAt,
           submittedAt: a.submittedAt,
          })),
+        assessments: assessmentResults.map((g: any) => ({
+          assessmentId: g.assessmentId,
+          title: g.assessmentTitle,
+          subjectName: g.subjectName,
+          score: parseFloat(String(g.score ?? 0)),
+          totalPoints: parseFloat(String(g.totalPoints ?? 10)),
+          grade10: parseFloat(String(g.totalPoints ?? 10)) > 0
+            ? parseFloat(((parseFloat(String(g.score ?? 0)) / parseFloat(String(g.totalPoints ?? 10))) * 10).toFixed(2))
+            : 0,
+          percentage: parseFloat(String(g.percentage ?? 0)),
+          passed: !!g.passed,
+          assessmentType: g.assessmentType,
+          submittedAt: g.submittedAt,
+        })),
       };
     }),
 

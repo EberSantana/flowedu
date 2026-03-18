@@ -7676,3 +7676,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Corrigir métricas de desempenho (≥7=Bom, 5-6.9=Regular, <5=Atenção)
 - [ ] Padronizar layout do Painel de Notas (clique no aluno → evolução individual)
 - [ ] Padronizar layout de Exercícios Disponíveis no portal do aluno
+
+## Bugs VPS - Módulos não funcionando (v4.9.0)
+- [ ] Atividade de Sala não funciona na VPS
+- [ ] Boletim não funciona na VPS
+- [ ] Provas não funcionam na VPS
+- [ ] Painel de Notas não funciona na VPS
+- [ ] Banco de Provas não funciona na VPS
+- [ ] Enviar E-mail não funciona na VPS
+- [ ] Config. de E-mail não funciona na VPS
