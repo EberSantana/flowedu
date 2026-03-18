@@ -791,47 +791,55 @@ export default function ExamGeneratorModal({
               </Button>
             </>
           ) : (
-            <div className="flex items-center justify-between w-full gap-4">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="show-answers"
-                  checked={showAnswers}
-                  onCheckedChange={(checked) => setShowAnswers(checked as boolean)}
-                />
-                <Label htmlFor="show-answers" className="text-sm font-medium">
-                  Mostrar gabarito
-                </Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
-                  <Download className="h-4 w-4 mr-2" />
-                  Word
-                </Button>
-                <Button variant="outline" onClick={handleCopy}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copiar
-                </Button>
-                {savedAssessmentId ? (
-                  <Button disabled className="bg-green-600 text-white">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Publicada para Alunos ✓
+            <div className="flex flex-col w-full gap-3">
+              {!savedAssessmentId && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-3 py-2 text-sm text-amber-800">
+                  <span className="text-lg">⚠️</span>
+                  <span><strong>Prova gerada mas não publicada!</strong> Clique em <strong>"Publicar para Alunos"</strong> para que ela apareça no portal do aluno.</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between w-full gap-4">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="show-answers"
+                    checked={showAnswers}
+                    onCheckedChange={(checked) => setShowAnswers(checked as boolean)}
+                  />
+                  <Label htmlFor="show-answers" className="text-sm font-medium">
+                    Mostrar gabarito
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                    <Download className="h-4 w-4 mr-2" />
+                    Word
                   </Button>
-                ) : (
-                  <Button
-                    onClick={handleSaveAndPublish}
-                    disabled={isSaving}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    {isSaving ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</>
-                    ) : (
-                      <><BookOpen className="h-4 w-4 mr-2" />Publicar para Alunos</>
-                    )}
+                  <Button variant="outline" onClick={handleCopy}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copiar
                   </Button>
-                )}
-                <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
-                  Fechar
-                </Button>
+                  {savedAssessmentId ? (
+                    <Button disabled className="bg-green-600 text-white">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Publicada para Alunos ✓
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSaveAndPublish}
+                      disabled={isSaving}
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 shadow-md"
+                    >
+                      {isSaving ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</>
+                      ) : (
+                        <><BookOpen className="h-4 w-4 mr-2" />📤 Publicar para Alunos</>
+                      )}
+                    </Button>
+                  )}
+                  <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
+                    Fechar
+                  </Button>
+                </div>
               </div>
             </div>
           )}

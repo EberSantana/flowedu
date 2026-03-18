@@ -7659,3 +7659,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Exportar lista de submissões em Excel: quem enviou e quem não enviou, com nome, matrícula e data
 - [x] Identificar alunos que acessaram sem turma cadastrada: exibir nome/código na tela de logs de acesso
 - [x] BUG: Provas criadas pelo professor não aparecem para o aluno na Trilhas de Aprendizagem - CORRIGIDO: generateExam não salvava no banco; adicionado botão 'Publicar para Alunos' no ExamGeneratorModal e seção de provas na StudentLearningPathDetail
+- [x] BUG: Botão "Criar Prova" na Trilha de Aprendizagem não gera prova no portal do aluno - CORRIGIDO: professor não sabia que precisava clicar em "Publicar para Alunos"; adicionado banner de aviso amarelo e botão mais destacado
