@@ -10905,7 +10905,7 @@ export async function addAssessmentQuestion(data: {
       ${data.optionA || null}, ${data.optionB || null}, ${data.optionC || null},
       ${data.optionD || null}, ${data.optionE || null},
       ${data.correctAnswer}, ${data.answerExplanation || null}, ${data.specificInstructions || null},
-      ${data.points || 10}, ${data.partialCredit || false}, ${data.skill || null}, ${data.difficulty || 'medium'}
+      ${data.points || 10}, ${data.partialCredit ? 1 : 0}, ${data.skill || null}, ${data.difficulty || 'medium'}
     )
   `);
   
