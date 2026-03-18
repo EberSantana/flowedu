@@ -3780,7 +3780,7 @@ JSON (descrições MAX 15 chars):
 
         // Verificar tentativa
         const attemptResult = await dbConn.execute(
-          sql`SELECT aa.*, a.totalPoints, a.passingScore, a.assessmentId
+          sql`SELECT aa.*, a.totalPoints, a.passingScore, aa.assessmentId
               FROM assessment_attempts aa
               JOIN assessments a ON a.id = aa.assessmentId
               WHERE aa.id = ${input.attemptId} AND aa.studentId = ${studentId} AND aa.status = 'in_progress'

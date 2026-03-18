@@ -247,29 +247,61 @@ function StudentEvolutionModal({
         <div className="px-6 py-5 space-y-5">
           {/* Cards de estatísticas */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Média do Aluno</p>
-              <p className={`text-xl font-bold ${getGradeColor(pctToGrade(student.avgPercentage))}`}>
+            {/* Média do Aluno */}
+            <div className={`rounded-xl p-4 text-center border-2 ${
+              pctToGrade(student.avgPercentage) !== null && pctToGrade(student.avgPercentage)! >= 7
+                ? 'border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-700'
+                : pctToGrade(student.avgPercentage) !== null && pctToGrade(student.avgPercentage)! >= 5
+                ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-700'
+                : student.avgPercentage !== null
+                ? 'border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-700'
+                : 'border-border bg-muted/30'
+            }`}>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Média do Aluno</p>
+              <p className={`text-2xl font-bold ${getGradeColor(pctToGrade(student.avgPercentage))}`}>
                 {student.avgPercentage !== null ? pctToGrade(student.avgPercentage)!.toFixed(1) : "—"}
               </p>
+              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Melhor Nota</p>
-              <p className={`text-xl font-bold ${getGradeColor(maxGrade10 ?? null)}`}>
+            {/* Melhor Nota */}
+            <div className={`rounded-xl p-4 text-center border-2 ${
+              maxGrade10 !== null && maxGrade10 >= 7
+                ? 'border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-700'
+                : maxGrade10 !== null && maxGrade10 >= 5
+                ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-700'
+                : maxGrade10 !== null
+                ? 'border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-700'
+                : 'border-border bg-muted/30'
+            }`}>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Melhor Nota</p>
+              <p className={`text-2xl font-bold ${getGradeColor(maxGrade10 ?? null)}`}>
                 {maxGrade10 !== null ? maxGrade10.toFixed(1) : "—"}
               </p>
+              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Pior Nota</p>
-              <p className={`text-xl font-bold ${getGradeColor(minGrade10 ?? null)}`}>
+            {/* Pior Nota */}
+            <div className={`rounded-xl p-4 text-center border-2 ${
+              minGrade10 !== null && minGrade10 >= 7
+                ? 'border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-700'
+                : minGrade10 !== null && minGrade10 >= 5
+                ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-700'
+                : minGrade10 !== null
+                ? 'border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-700'
+                : 'border-border bg-muted/30'
+            }`}>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Pior Nota</p>
+              <p className={`text-2xl font-bold ${getGradeColor(minGrade10 ?? null)}`}>
                 {minGrade10 !== null ? minGrade10.toFixed(1) : "—"}
               </p>
+              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Concluídas</p>
-              <p className="text-xl font-bold text-foreground">
+            {/* Concluídas */}
+            <div className="rounded-xl p-4 text-center border-2 border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-700">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Concluídas</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {completedCount}/{exercises.length}
               </p>
+              <p className="text-xs text-muted-foreground mt-0.5">atividades</p>
             </div>
           </div>
 
@@ -397,55 +429,61 @@ function StudentEvolutionModal({
           )}
 
           {/* Tabela detalhada */}
-          <div className="border rounded-lg overflow-hidden">
+          <div className="border rounded-xl overflow-hidden shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-muted/60 text-left">
-                  <th className="px-3 py-2 font-semibold text-xs text-muted-foreground">
+                <tr className="bg-primary/5 border-b border-border">
+                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-left">
                     Atividade
                   </th>
-                  <th className="px-3 py-2 font-semibold text-xs text-muted-foreground">
+                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-left">
                     Módulo
                   </th>
-                  <th className="px-3 py-2 font-semibold text-xs text-muted-foreground text-center">
-                    Nota
+                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-center">
+                    Nota (0–10)
                   </th>
-                  <th className="px-3 py-2 font-semibold text-xs text-muted-foreground text-center">
+                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-center">
                     Média Turma
                   </th>
-                  <th className="px-3 py-2 font-semibold text-xs text-muted-foreground text-center">
+                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-center">
                     Tentativas
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border">
                 {chartData.map((row, i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+                  <tr key={i} className="hover:bg-muted/30 transition-colors">
                     <td
-                      className="px-3 py-2 font-medium max-w-[200px] truncate"
+                      className="px-4 py-3 font-medium max-w-[200px] truncate"
                       title={row.fullName}
                     >
                       {row.fullName}
                     </td>
-                    <td className="px-3 py-2 text-muted-foreground text-xs max-w-[130px] truncate">
-                      {row.modulo}
+                    <td className="px-4 py-3 text-muted-foreground text-xs max-w-[130px] truncate">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
+                        {row.modulo}
+                      </span>
                     </td>
-                    <td className="px-3 py-2 text-center">
+                    <td className="px-4 py-3 text-center">
                       {row.aluno !== null ? (
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getGradeBg(row.aluno)} ${getGradeColor(row.aluno)}`}>
+                        <span className={`inline-flex items-center justify-center w-14 py-1 rounded-lg text-sm font-bold ${getGradeBg(row.aluno)} ${getGradeColor(row.aluno)}`}>
                           {row.aluno.toFixed(1)}
                         </span>
                       ) : <span className="text-muted-foreground text-sm">—</span>}
                     </td>
-                    <td className="px-3 py-2 text-center">
+                    <td className="px-4 py-3 text-center">
                       {row.turma !== null ? (
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getGradeBg(row.turma)} ${getGradeColor(row.turma)}`}>
+                        <span className={`inline-flex items-center justify-center w-14 py-1 rounded-lg text-sm font-bold ${getGradeBg(row.turma)} ${getGradeColor(row.turma)}`}>
                           {row.turma.toFixed(1)}
                         </span>
                       ) : <span className="text-muted-foreground text-sm">—</span>}
                     </td>
-                    <td className="px-3 py-2 text-center text-muted-foreground">
-                      {row.tentativas > 0 ? `${row.tentativas}x` : "—"}
+                    <td className="px-4 py-3 text-center">
+                      {row.tentativas > 0 ? (
+                        <span className="inline-flex items-center justify-center w-10 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+                          {row.tentativas}x
+                        </span>
+                      ) : <span className="text-muted-foreground text-sm">—</span>}
                     </td>
                   </tr>
                 ))}
@@ -703,54 +741,69 @@ export default function LearningPathReport() {
             <div ref={printRef} className="space-y-6">
               {/* Cards de resumo */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <Card>
+                <Card className="border-l-4 border-l-blue-400">
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-center gap-3">
-                      <Users className="h-8 w-8 text-blue-500 flex-shrink-0" />
+                      <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                        <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Alunos</p>
+                        <p className="text-xs text-muted-foreground font-medium">Total de Alunos</p>
                         <p className="text-2xl font-bold">{report.totalStudents}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-l-4 border-l-purple-400">
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-center gap-3">
-                      <BookOpen className="h-8 w-8 text-purple-500 flex-shrink-0" />
+                      <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                        <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                      </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Atividades</p>
+                        <p className="text-xs text-muted-foreground font-medium">Atividades</p>
                         <p className="text-2xl font-bold">{report.exercises.length}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className={`border-l-4 ${
+                  pctToGrade(report.classOverallAverage) !== null && pctToGrade(report.classOverallAverage)! >= 7
+                    ? 'border-l-green-400'
+                    : pctToGrade(report.classOverallAverage) !== null && pctToGrade(report.classOverallAverage)! >= 5
+                    ? 'border-l-yellow-400'
+                    : report.classOverallAverage !== null
+                    ? 'border-l-red-400'
+                    : 'border-l-gray-300'
+                }`}>
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-center gap-3">
-                      <BarChart3 className="h-8 w-8 text-green-500 flex-shrink-0" />
+                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
+                        <BarChart3 className="h-6 w-6 text-green-600 dark:text-green-400" />
+                      </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Média Geral</p>
-                        <p
-                          className={`text-2xl font-bold ${getGradeColor(pctToGrade(report.classOverallAverage))}`}
-                        >
+                        <p className="text-xs text-muted-foreground font-medium">Média Geral da Turma</p>
+                        <p className={`text-2xl font-bold ${getGradeColor(pctToGrade(report.classOverallAverage))}`}>
                           {report.classOverallAverage !== null
                             ? pctToGrade(report.classOverallAverage)!.toFixed(1)
                             : "—"}
                         </p>
+                        <p className="text-xs text-muted-foreground">escala 0–10</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-l-4 border-l-emerald-400">
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-8 w-8 text-emerald-500 flex-shrink-0" />
+                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                        <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                      </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Módulos</p>
+                        <p className="text-xs text-muted-foreground font-medium">Módulos</p>
                         <p className="text-2xl font-bold">{report.modules.length}</p>
                       </div>
                     </div>
@@ -793,35 +846,39 @@ export default function LearningPathReport() {
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-muted/50">
-                            <TableHead className="w-8 text-center">#</TableHead>
-                            <TableHead className="min-w-[160px]">Aluno</TableHead>
-                            <TableHead className="min-w-[100px]">Matrícula</TableHead>
+                          <TableRow className="bg-primary/5 border-b-2 border-primary/20">
+                            <TableHead className="w-8 text-center text-muted-foreground">#</TableHead>
+                            <TableHead className="min-w-[180px] font-semibold">Aluno</TableHead>
+                            <TableHead className="min-w-[110px] font-semibold">Matrícula</TableHead>
                             {report.exercises.map((ex) => (
                               <TableHead
                                 key={ex.id}
                                 className="text-center min-w-[90px] max-w-[120px]"
                                 title={ex.title}
                               >
-                                <span className="block truncate text-xs">{ex.title}</span>
+                                <span className="block truncate text-xs font-semibold">{ex.title}</span>
+                                <span className="block text-[10px] text-muted-foreground font-normal">0–10</span>
                               </TableHead>
                             ))}
-                            <TableHead className="text-center font-semibold min-w-[80px]">
+                            <TableHead className="text-center font-bold min-w-[80px] text-primary">
                               Média
+                              <span className="block text-[10px] text-muted-foreground font-normal">0–10</span>
                             </TableHead>
-                            <TableHead className="text-center min-w-[70px]">
+                            <TableHead className="text-center min-w-[70px] font-semibold">
                               Ranking
                             </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {report.students.map((student, idx) => (
-                            <TableRow key={student.studentId} className="hover:bg-muted/30">
-                              <TableCell className="text-center text-muted-foreground text-sm">
-                                {idx + 1}
+                            <TableRow key={student.studentId} className="hover:bg-muted/20 transition-colors">
+                              <TableCell className="text-center text-muted-foreground text-sm py-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-medium">
+                                  {idx + 1}
+                                </span>
                               </TableCell>
                               {/* Nome clicável */}
-                              <TableCell>
+                              <TableCell className="py-3">
                                 <button
                                   onClick={() => setSelectedStudent(student)}
                                   className="font-medium text-primary hover:underline text-left flex items-center gap-1.5 group"
@@ -831,15 +888,15 @@ export default function LearningPathReport() {
                                   <TrendingUp className="h-3.5 w-3.5 opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0" />
                                 </button>
                               </TableCell>
-                              <TableCell className="text-muted-foreground text-sm">
+                              <TableCell className="text-muted-foreground text-sm py-3 font-mono">
                                 {student.studentRegistration}
                               </TableCell>
                               {report.exercises.map((ex) => {
                                 const grade = student.exerciseGrades.find(
                                   (g) => g.exerciseId === ex.id
                                 );
-                      return (
-                                  <TableCell key={ex.id} className="text-center">
+                                return (
+                                  <TableCell key={ex.id} className="text-center py-3">
                                     <GradeBadge pct={grade?.percentage ?? null} />
                                     {grade && grade.attempts > 0 && (
                                       <div className="text-xs text-muted-foreground mt-0.5">
@@ -848,35 +905,36 @@ export default function LearningPathReport() {
                                     )}
                                   </TableCell>
                                 );
-                              })
-                            }
-                              <TableCell className="text-center">
+                              })}
+                              <TableCell className="text-center py-3">
                                 <GradeBadge pct={student.avgPercentage} />
-                              </TableCell>            <TableCell className="text-center">
+                              </TableCell>
+                              <TableCell className="text-center py-3">
                                 <RankBadge rank={student.rank} />
                               </TableCell>
                             </TableRow>
                           ))}
 
                           {/* Linha de média da turma */}
-                          <TableRow className="bg-blue-50 dark:bg-blue-950/30 font-semibold border-t-2 border-blue-200 dark:border-blue-800">
-                            <TableCell />
-                            <TableCell className="text-blue-700 dark:text-blue-300 font-bold">
+                          <TableRow className="bg-primary/5 font-semibold border-t-2 border-primary/20">
+                            <TableCell className="py-3" />
+                            <TableCell className="text-primary font-bold py-3 flex items-center gap-2">
+                              <BarChart3 className="h-4 w-4" />
                               Média da Turma
                             </TableCell>
-                            <TableCell />
+                            <TableCell className="py-3" />
                             {report.classExerciseAverages.map((avg) => (
-                              <TableCell key={avg.exerciseId} className="text-center">
+                              <TableCell key={avg.exerciseId} className="text-center py-3">
                                 <GradeBadge pct={avg.classAverage} />
                                 <div className="text-xs text-muted-foreground mt-0.5">
                                   {avg.studentsCompleted}/{report.totalStudents}
                                 </div>
                               </TableCell>
                             ))}
-                            <TableCell className="text-center">
+                            <TableCell className="text-center py-3">
                               <GradeBadge pct={report.classOverallAverage} />
                             </TableCell>
-                            <TableCell />
+                            <TableCell className="py-3" />
                           </TableRow>
                         </TableBody>
                       </Table>
