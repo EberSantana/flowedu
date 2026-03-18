@@ -159,19 +159,22 @@ export default function AssessmentsManager() {
     return <Badge className="bg-yellow-100 text-yellow-700 text-xs">Médio</Badge>;
   };
 
+  const totalPublished = assessments?.filter((a: any) => a.status === 'published').length ?? 0;
+  const totalDraft = assessments?.filter((a: any) => a.status !== 'published').length ?? 0;
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar />
       <PageWrapper>
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-5">
           {/* Cabeçalho */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <ClipboardList className="h-7 w-7 text-blue-600" />
+              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <ClipboardList className="h-6 w-6 text-blue-600" />
                 Banco de Provas e Exercícios
               </h1>
-              <p className="text-gray-500 mt-1">Gerencie todas as suas provas e exercícios publicados</p>
+              <p className="text-gray-500 text-sm mt-0.5">Gerencie todas as suas provas e exercícios publicados</p>
             </div>
             {/* Filtro por disciplina */}
             <div className="flex items-center gap-2">
@@ -187,6 +190,37 @@ export default function AssessmentsManager() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          {/* Estatísticas rápidas */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <ClipboardList className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{assessments?.length ?? 0}</p>
+                <p className="text-xs text-gray-500">Total de Provas</p>
+              </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{totalPublished}</p>
+                <p className="text-xs text-gray-500">Publicadas</p>
+              </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                <Clock className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{totalDraft}</p>
+                <p className="text-xs text-gray-500">Rascunhos</p>
+              </div>
             </div>
           </div>
 

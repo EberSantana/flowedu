@@ -627,34 +627,34 @@ export default function ExamGeneratorModal({
             </div>
 
             {/* Conteúdo Principal */}
-            <ScrollArea className="flex-1 pr-6 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
-              <div id="exam-content" className="space-y-12 py-6 px-2">
+            <ScrollArea className="flex-1 pr-4 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll">
+              <div id="exam-content" className="space-y-6 py-3 px-1">
                 {/* Cabeçalho da Prova */}
-                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 mb-8 border border-purple-100">
-                  <h2 className="text-xl font-bold text-center text-gray-800 mb-4">{generatedExam.title}</h2>
-                  <div className="bg-white/80 rounded-lg p-4 text-sm text-gray-600 leading-relaxed">
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 mb-4 border border-purple-100">
+                  <h2 className="text-base font-bold text-center text-gray-800 mb-3">{generatedExam.title}</h2>
+                  <div className="bg-white/80 rounded-lg p-3 text-xs text-gray-600 leading-relaxed">
                     {generatedExam.instructions}
                   </div>
-                  <div className="mt-4 flex justify-center">
-                    <span className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                  <div className="mt-3 flex justify-center">
+                    <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       Total de Pontos: {generatedExam.totalPoints}
                     </span>
                   </div>
                 </div>
 
                 {/* Questões */}
-                <div className="space-y-10">
+                <div className="space-y-5">
                   {generatedExam.questions.map((question, idx) => (
-                    <div key={question.number} id={`question-${idx}`} className="scroll-mt-4">
+                    <div key={question.number} id={`question-${idx}`} className="scroll-mt-2">
                       {/* Header da Questão */}
-                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 mb-8 border-l-4 border-purple-500 shadow-sm">
+                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-3 mb-3 border-l-4 border-purple-500">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-bold text-gray-900">Questão {question.number}</h3>
-                          <div className="flex gap-3">
-                            <span className="text-sm bg-blue-500 text-white px-3 py-1 rounded-lg font-semibold shadow-sm">
+                          <h3 className="text-sm font-bold text-gray-900">Questão {question.number}</h3>
+                          <div className="flex gap-2">
+                            <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded font-semibold">
                               {question.points} pts
                             </span>
-                            <span className="text-sm bg-purple-500 text-white px-3 py-1 rounded-lg font-semibold shadow-sm">
+                            <span className="text-xs bg-purple-500 text-white px-2 py-0.5 rounded font-semibold">
                               {question.type === "objective" ? "Objetiva" : 
                                question.type === "subjective" ? "Subjetiva" : "Estudo de Caso"}
                             </span>
@@ -664,25 +664,25 @@ export default function ExamGeneratorModal({
 
                       {/* Contexto do Caso (se houver) */}
                       {question.caseContext && (
-                        <div className="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg mb-6">
-                          <div className="flex items-start gap-3">
-                            <Briefcase className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-lg mb-3">
+                          <div className="flex items-start gap-2">
+                            <Briefcase className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                             <div>
-                              <h4 className="text-sm font-semibold text-blue-900 mb-2 uppercase tracking-wide">Estudo de Caso</h4>
-                              <p className="text-base text-gray-800 leading-relaxed italic">{question.caseContext}</p>
+                              <h4 className="text-xs font-semibold text-blue-900 mb-1 uppercase tracking-wide">Estudo de Caso</h4>
+                              <p className="text-sm text-gray-800 leading-relaxed italic">{question.caseContext}</p>
                             </div>
                           </div>
                         </div>
                       )}
 
                       {/* Enunciado da Questão */}
-                      <div className="bg-white border-2 border-gray-300 rounded-xl p-8 mb-8 shadow-md">
-                        <p className="text-base text-gray-900 leading-relaxed font-medium">{question.question}</p>
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm">
+                        <p className="text-sm text-gray-900 leading-relaxed">{question.question}</p>
                       </div>
 
                       {/* Alternativas (Questões Objetivas) */}
                       {question.options && (
-                        <div className="space-y-4 mb-6">
+                        <div className="space-y-2 mb-3">
                           {question.options.map((option, idx) => {
                             const letter = String.fromCharCode(65 + idx); // A, B, C, D
                             const isCorrect = showAnswers && option.startsWith(question.correctAnswer || "");
@@ -690,22 +690,22 @@ export default function ExamGeneratorModal({
                             return (
                               <div 
                                 key={idx} 
-                                className={`flex items-start gap-4 p-5 rounded-lg border-2 transition-all ${
+                                className={`flex items-start gap-3 p-2.5 rounded-lg border transition-all ${
                                   isCorrect 
-                                    ? "bg-green-50 border-green-400 shadow-md" 
-                                    : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                                    ? "bg-green-50 border-green-400" 
+                                    : "bg-gray-50 border-gray-200"
                                 }`}
                               >
-                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                                   isCorrect 
                                     ? "bg-green-500 text-white" 
                                     : "bg-gray-300 text-gray-700"
                                 }`}>
                                   {letter}
                                 </div>
-                                <p className={`text-base leading-relaxed flex-1 ${
+                                <p className={`text-sm leading-relaxed flex-1 ${
                                   isCorrect 
-                                    ? "text-green-900 font-bold" 
+                                    ? "text-green-900 font-semibold" 
                                     : "text-gray-900"
                                 }`}>
                                   {option.replace(/^[A-E]\)\s*/, '')}
@@ -718,15 +718,15 @@ export default function ExamGeneratorModal({
 
                       {/* Sub-questões (Estudo de Caso) */}
                       {question.caseQuestions && (
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
-                          <h4 className="text-base font-semibold text-gray-700 mb-4">Responda:</h4>
-                          <div className="space-y-4">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">
+                          <h4 className="text-xs font-semibold text-gray-700 mb-2">Responda:</h4>
+                          <div className="space-y-2">
                             {question.caseQuestions.map((cq, idx) => (
-                              <div key={idx} className="flex items-start gap-3">
-                                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold">
+                              <div key={idx} className="flex items-start gap-2">
+                                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs font-bold">
                                   {String.fromCharCode(97 + idx)}
                                 </span>
-                                <p className="text-base text-gray-900 leading-relaxed flex-1">{cq}</p>
+                                <p className="text-sm text-gray-900 leading-relaxed flex-1">{cq}</p>
                               </div>
                             ))}
                           </div>
@@ -735,24 +735,20 @@ export default function ExamGeneratorModal({
 
                       {/* Gabarito e Justificativa */}
                       {showAnswers && (question.correctAnswer || question.expectedAnswer) && (
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-6 space-y-4">
+                        <div className="bg-green-50 border border-green-300 rounded-lg p-3 space-y-2">
                           {question.correctAnswer && (
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <CheckSquare className="h-5 w-5 text-green-600" />
-                                <h4 className="text-base font-bold text-green-900 uppercase tracking-wide">Resposta Correta</h4>
-                              </div>
-                              <p className="text-xl text-green-800 font-bold pl-7">{question.correctAnswer}</p>
+                            <div className="flex items-center gap-2">
+                              <CheckSquare className="h-4 w-4 text-green-600 flex-shrink-0" />
+                              <span className="text-xs font-bold text-green-900 uppercase">Resposta:</span>
+                              <span className="text-sm text-green-800 font-bold">{question.correctAnswer}</span>
                             </div>
                           )}
                           {question.expectedAnswer && (
-                            <div className="pt-3 border-t border-green-200">
-                              <div className="flex items-start gap-2 mb-2">
-                                <MessageSquare className="h-5 w-5 text-green-600 flex-shrink-0 mt-1" />
-                                <div className="flex-1">
-                                  <h4 className="text-base font-bold text-green-900 uppercase tracking-wide mb-2">Justificativa</h4>
-                                  <p className="text-lg text-gray-800 leading-relaxed">{question.expectedAnswer}</p>
-                                </div>
+                            <div className="flex items-start gap-2 pt-2 border-t border-green-200">
+                              <MessageSquare className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                              <div className="flex-1">
+                                <span className="text-xs font-bold text-green-900 uppercase">Justificativa: </span>
+                                <span className="text-sm text-gray-800 leading-relaxed">{question.expectedAnswer}</span>
                               </div>
                             </div>
                           )}
@@ -766,77 +762,73 @@ export default function ExamGeneratorModal({
           </div>
         )}
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4">
+        <DialogFooter className="flex-shrink-0 border-t pt-3">
           {!generatedExam ? (
-            <>
-              <Button variant="outline" onClick={handleClose}>
+            <div className="flex items-center gap-2 justify-end w-full">
+              <Button variant="outline" size="sm" onClick={handleClose}>
                 Cancelar
               </Button>
               <Button
+                size="sm"
                 onClick={handleGenerate}
                 disabled={generateExamMutation.isPending || modules.length === 0}
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 {generateExamMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Gerando...
-                  </>
+                  <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Gerando...</>
                 ) : (
-                  <>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Gerar Prova
-                  </>
+                  <><FileText className="h-3.5 w-3.5 mr-1.5" />Gerar Prova</>
                 )}
               </Button>
-            </>
+            </div>
           ) : (
-            <div className="flex flex-col w-full gap-3">
+            <div className="flex flex-col w-full gap-2">
               {!savedAssessmentId && (
-                <div className="flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-3 py-2 text-sm text-amber-800">
-                  <span className="text-lg">⚠️</span>
+                <div className="flex items-start gap-2 bg-amber-50 border border-amber-300 rounded-lg px-3 py-2 text-xs text-amber-800">
+                  <span>⚠️</span>
                   <span><strong>Prova gerada mas não publicada!</strong> Clique em <strong>"Publicar para Alunos"</strong> para que ela apareça no portal do aluno.</span>
                 </div>
               )}
-              <div className="flex items-center justify-between w-full gap-4">
+              <div className="flex items-center justify-between w-full gap-2 flex-wrap">
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="show-answers"
                     checked={showAnswers}
                     onCheckedChange={(checked) => setShowAnswers(checked as boolean)}
                   />
-                  <Label htmlFor="show-answers" className="text-sm font-medium">
+                  <Label htmlFor="show-answers" className="text-xs font-medium whitespace-nowrap">
                     Mostrar gabarito
                   </Label>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
-                    <Download className="h-4 w-4 mr-2" />
+                <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                  <Button size="sm" variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 text-xs h-8 px-2.5">
+                    <Download className="h-3.5 w-3.5 mr-1" />
                     Word
                   </Button>
-                  <Button variant="outline" onClick={handleCopy}>
-                    <Copy className="h-4 w-4 mr-2" />
+                  <Button size="sm" variant="outline" onClick={handleCopy} className="text-xs h-8 px-2.5">
+                    <Copy className="h-3.5 w-3.5 mr-1" />
                     Copiar
                   </Button>
                   {savedAssessmentId ? (
-                    <Button disabled className="bg-green-600 text-white">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Publicada para Alunos ✓
+                    <Button size="sm" disabled className="bg-green-600 text-white text-xs h-8 px-2.5">
+                      <BookOpen className="h-3.5 w-3.5 mr-1" />
+                      Publicada ✓
                     </Button>
                   ) : (
                     <Button
+                      size="sm"
                       onClick={handleSaveAndPublish}
                       disabled={isSaving}
-                      className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 shadow-md"
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs h-8 px-2.5"
                     >
                       {isSaving ? (
-                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</>
+                        <><Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />Salvando...</>
                       ) : (
-                        <><BookOpen className="h-4 w-4 mr-2" />📤 Publicar para Alunos</>
+                        <><BookOpen className="h-3.5 w-3.5 mr-1" />Publicar para Alunos</>
                       )}
                     </Button>
                   )}
-                  <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
+                  <Button size="sm" variant="outline" onClick={handleClose} className="text-xs h-8 px-2.5">
                     Fechar
                   </Button>
                 </div>
