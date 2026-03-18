@@ -3673,7 +3673,7 @@ JSON (descrições MAX 15 chars):
 
         // Verificar que a prova está publicada e o aluno tem acesso
         const checkResult = await dbConn.execute(
-          sql`SELECT a.id, a.title, a.totalQuestions, a.totalPoints, a.passingScore, a.duration
+          sql`SELECT a.id, a.title, a.totalQuestions, a.totalPoints, a.passingScore, a.duration, a.maxAttempts
               FROM assessments a
               JOIN subjectEnrollments se ON se.subjectId = a.subjectId
               WHERE a.id = ${input.assessmentId}
@@ -3686,20 +3686,27 @@ JSON (descrições MAX 15 chars):
         if (checkRows.length === 0) {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
         }
+        const assessmentInfo = checkRows[0];
+        const maxAttempts = (assessmentInfo.maxAttempts as number) ?? 1;
 
-        // Verificar se já existe tentativa em andamento
-        const existingResult = await dbConn.execute(
+        // Verificar tentativas já realizadas
+        const attemptsCountResult = await dbConn.execute(
           sql`SELECT id, status FROM assessment_attempts
               WHERE assessmentId = ${input.assessmentId} AND studentId = ${studentId}
-              ORDER BY createdAt DESC LIMIT 1`
+              ORDER BY createdAt DESC`
         ) as any[];
-        const existing = ((existingResult[0] as any[]) || [])[0];
+        const allAttempts = (attemptsCountResult[0] as any[]) || [];
 
-        if (existing && existing.status === 'in_progress') {
-          return { attemptId: existing.id as number, isNew: false };
+        // Retomar tentativa em andamento
+        const inProgress = allAttempts.find((a: any) => a.status === 'in_progress');
+        if (inProgress) {
+          return { attemptId: inProgress.id as number, isNew: false };
         }
-        if (existing && existing.status === 'submitted') {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Você já realizou esta prova.' });
+
+        // Verificar limite de tentativas
+        const submittedCount = allAttempts.filter((a: any) => a.status === 'submitted' || a.status === 'graded').length;
+        if (submittedCount >= maxAttempts) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: `Você já utilizou todas as ${maxAttempts} tentativa(s) permitida(s) para esta prova.` });
         }
 
         // Criar nova tentativa

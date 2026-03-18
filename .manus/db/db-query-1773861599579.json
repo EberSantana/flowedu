@@ -1,0 +1,85 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE() \nAND TABLE_NAME IN (\n  'access_log_archives', 'access_logs', 'activities', 'activity_submissions',\n  'assessment_answers', 'assessment_attempts', 'assessment_questions', 'assessments',\n  'backup_schedules', 'backups', 'dashboard_preferences', 'email_campaigns', 'email_configs',\n  'mistake_notebook_attempts', 'mistake_notebook_insights', 'mistake_notebook_questions',\n  'mistake_notebook_study_plans', 'mistake_notebook_topics', 'notification_preferences',\n  'push_notification_log', 'push_subscriptions', 'question_type_instructions',\n  'system_settings', 'vps_alerts', 'vps_metrics', 'vps_servers'\n)\nORDER BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT TABLE_NAME FROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE() \nAND TABLE_NAME IN (\n  'access_log_archives', 'access_logs', 'activities', 'activity_submissions',\n  'assessment_answers', 'assessment_attempts', 'assessment_questions', 'assessments',\n  'backup_schedules', 'backups', 'dashboard_preferences', 'email_campaigns', 'email_configs',\n  'mistake_notebook_attempts', 'mistake_notebook_insights', 'mistake_notebook_questions',\n  'mistake_notebook_study_plans', 'mistake_notebook_topics', 'notification_preferences',\n  'push_notification_log', 'push_subscriptions', 'question_type_instructions',\n  'system_settings', 'vps_alerts', 'vps_metrics', 'vps_servers'\n)\nORDER BY TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "access_logs"
+    },
+    {
+      "TABLE_NAME": "activities"
+    },
+    {
+      "TABLE_NAME": "activity_submissions"
+    },
+    {
+      "TABLE_NAME": "assessment_answers"
+    },
+    {
+      "TABLE_NAME": "assessment_attempts"
+    },
+    {
+      "TABLE_NAME": "assessment_questions"
+    },
+    {
+      "TABLE_NAME": "assessments"
+    },
+    {
+      "TABLE_NAME": "backup_schedules"
+    },
+    {
+      "TABLE_NAME": "backups"
+    },
+    {
+      "TABLE_NAME": "dashboard_preferences"
+    },
+    {
+      "TABLE_NAME": "email_campaigns"
+    },
+    {
+      "TABLE_NAME": "email_configs"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_attempts"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_insights"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_questions"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_study_plans"
+    },
+    {
+      "TABLE_NAME": "mistake_notebook_topics"
+    },
+    {
+      "TABLE_NAME": "notification_preferences"
+    },
+    {
+      "TABLE_NAME": "push_notification_log"
+    },
+    {
+      "TABLE_NAME": "push_subscriptions"
+    },
+    {
+      "TABLE_NAME": "question_type_instructions"
+    },
+    {
+      "TABLE_NAME": "system_settings"
+    },
+    {
+      "TABLE_NAME": "vps_alerts"
+    },
+    {
+      "TABLE_NAME": "vps_metrics"
+    },
+    {
+      "TABLE_NAME": "vps_servers"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\naccess_logs\nactivities\nactivity_submissions\nassessment_answers\nassessment_attempts\nassessment_questions\nassessments\nbackup_schedules\nbackups\ndashboard_preferences\nemail_campaigns\nemail_configs\nmistake_notebook_attempts\nmistake_notebook_insights\nmistake_notebook_questions\nmistake_notebook_study_plans\nmistake_notebook_topics\nnotification_preferences\npush_notification_log\npush_subscriptions\nquestion_type_instructions\nsystem_settings\nvps_alerts\nvps_metrics\nvps_servers\n",
+  "stderr": "",
+  "execution_time_ms": 345
+}
