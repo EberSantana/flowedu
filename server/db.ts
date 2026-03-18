@@ -10753,23 +10753,31 @@ export async function createAssessment(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const insertData: InsertAssessment = {
+  const insertData: any = {
     teacherId: data.teacherId,
     subjectId: data.subjectId,
-    classId: (data.classId && Number(data.classId) > 0) ? Number(data.classId) : null,
     title: data.title,
-    description: data.description ?? null,
-    assessmentType: data.assessmentType ?? 'prova',
+    description: data.description || null,
+    assessmentType: data.assessmentType || 'prova',
     totalQuestions: data.totalQuestions,
     totalPoints: (data.totalPoints && data.totalPoints > 0) ? data.totalPoints : 10,
     passingScore: (data.passingScore && data.passingScore > 0) ? data.passingScore : 60,
-    duration: (data.duration && data.duration > 0) ? data.duration : null,
-    generalInstructions: data.generalInstructions ?? null,
-    applicationDate: data.applicationDate ?? null,
-    availableFrom: data.availableFrom ?? null,
-    availableTo: data.availableTo ?? null,
+    generalInstructions: data.generalInstructions || null,
     status: 'draft',
   };
+  
+  // Só incluir classId se tiver valor válido > 0, senão omitir para o banco usar NULL default
+  if (data.classId && Number(data.classId) > 0) {
+    insertData.classId = Number(data.classId);
+  }
+  // Só incluir duration se tiver valor válido
+  if (data.duration && data.duration > 0) {
+    insertData.duration = data.duration;
+  }
+  // Só incluir datas se tiverem valor
+  if (data.applicationDate) insertData.applicationDate = data.applicationDate;
+  if (data.availableFrom) insertData.availableFrom = data.availableFrom;
+  if (data.availableTo) insertData.availableTo = data.availableTo;
 
   const result = await db.insert(assessments).values(insertData);
   return result;

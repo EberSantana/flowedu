@@ -7667,3 +7667,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] BUG PERSISTENTE: classId ainda chega como string vazia no INSERT INTO assessments - CORRIGIDO DEFINITIVAMENTE: reescrito createAssessment para usar Drizzle ORM insert() em vez de SQL raw, com InsertAssessment type e null explícito
 - [x] BUG: classId ainda string vazia na VPS - CORRIGIDO: deploy completo com Drizzle ORM insert() feito na v4.8.0
 - [x] Pontuação automática por questão: 10 questões = 1,0 cada (total 10); 20 questões = 0,5 cada (total 10) - CORRIGIDO no prompt da IA e no db.ts
+- [x] BUG CRÍTICO: classId string vazia persiste mesmo com Drizzle ORM insert() - CORRIGIDO: omitir classId do objeto insert quando não tem valor válido, deixando o banco usar NULL default
