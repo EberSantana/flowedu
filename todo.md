@@ -7655,3 +7655,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Atividades em Sala: exibir indicador de submissões dos alunos (quantos enviaram / total matriculados, lista de quem enviou e quem não enviou)
 - [x] Notificar professor quando aluno enviar Atividade em Sala - CORRIGIDO: sino de notificações estava importado mas não renderizado no Sidebar; adicionado ao cabeçalho ao lado do logo FlowEdu
 - [x] Contador de submissões nos cards de atividade: exibir "X/Y enviaram" diretamente no card
+- [x] Destaque visual de prazo vencido: borda/fundo vermelho/amarelo nos cards com prazo vencido e alunos pendentes
+- [x] Exportar lista de submissões em Excel: quem enviou e quem não enviou, com nome, matrícula e data

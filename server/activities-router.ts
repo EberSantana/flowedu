@@ -744,8 +744,107 @@ export const activitiesRouter = router({
           feedback: a.feedback,
           gradedAt: a.gradedAt,
           submittedAt: a.submittedAt,
-        })),
+         })),
       };
     }),
 
+  // ── Professor: exportar lista de submissões de uma atividade ──────────────────────
+  exportSubmissions: protectedProcedure
+    .input(z.object({ activityId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = (await getDb())!;
+      // Verificar que a atividade pertence ao professor
+      const [activity] = await db
+        .select()
+        .from(activities)
+        .where(and(eq(activities.id, input.activityId), eq(activities.userId, ctx.user.id)));
+      if (!activity) throw new TRPCError({ code: 'NOT_FOUND', message: 'Atividade não encontrada' });
+
+      // Buscar todas as submissões
+      const subs = await db
+        .select({
+          studentId: activitySubmissions.studentId,
+          studentName: students.fullName,
+          studentRegistration: students.registrationNumber,
+          submittedAt: activitySubmissions.submittedAt,
+          score: activitySubmissions.score,
+          feedback: activitySubmissions.feedback,
+          status: activitySubmissions.status,
+        })
+        .from(activitySubmissions)
+        .leftJoin(students, eq(activitySubmissions.studentId, students.id))
+        .where(eq(activitySubmissions.activityId, input.activityId))
+        .orderBy(students.fullName);
+
+      const submittedIds = new Set(subs.map(s => s.studentId));
+
+      // Buscar todos os alunos matriculados na turma ou disciplina da atividade
+      let enrolledStudents: Array<{ studentId: number; studentName: string | null; studentRegistration: string | null }> = [];
+
+      if (activity.classId) {
+        // Buscar alunos via student_class_enrollments
+        const classStudents = await db
+          .select({
+            studentId: studentClassEnrollments.studentId,
+            studentName: students.fullName,
+            studentRegistration: students.registrationNumber,
+          })
+          .from(studentClassEnrollments)
+          .leftJoin(students, eq(studentClassEnrollments.studentId, students.id))
+          .where(eq(studentClassEnrollments.classId, activity.classId))
+          .orderBy(students.fullName);
+        enrolledStudents = classStudents;
+      } else if (activity.subjectId) {
+        // Buscar alunos via subjectEnrollments
+        const subjectStudents = await db
+          .select({
+            studentId: subjectEnrollments.studentId,
+            studentName: students.fullName,
+            studentRegistration: students.registrationNumber,
+          })
+          .from(subjectEnrollments)
+          .leftJoin(students, eq(subjectEnrollments.studentId, students.id))
+          .where(and(
+            eq(subjectEnrollments.subjectId, activity.subjectId),
+            eq(subjectEnrollments.status, 'active'),
+          ))
+          .orderBy(students.fullName);
+        enrolledStudents = subjectStudents;
+      }
+
+      // Montar lista completa: enviaram + não enviaram
+      const submissionMap = new Map(subs.map(s => [s.studentId, s]));
+
+      const rows = enrolledStudents.map(e => {
+        const sub = submissionMap.get(e.studentId);
+        return {
+          nome: e.studentName || `Aluno #${e.studentId}`,
+          matricula: e.studentRegistration || '',
+          status: sub ? 'Enviou' : 'Não enviou',
+          dataEnvio: sub?.submittedAt ? new Date(sub.submittedAt).toLocaleString('pt-BR') : '',
+          nota: sub?.score !== null && sub?.score !== undefined ? String(sub.score) : '',
+          feedback: sub?.feedback || '',
+        };
+      });
+
+      // Adicionar alunos que enviaram mas não estão na lista de matriculados
+      subs.forEach(s => {
+        if (!enrolledStudents.find(e => e.studentId === s.studentId)) {
+          rows.push({
+            nome: s.studentName || `Aluno #${s.studentId}`,
+            matricula: s.studentRegistration || '',
+            status: 'Enviou',
+            dataEnvio: s.submittedAt ? new Date(s.submittedAt).toLocaleString('pt-BR') : '',
+            nota: s.score !== null && s.score !== undefined ? String(s.score) : '',
+            feedback: s.feedback || '',
+          });
+        }
+      });
+
+      return {
+        activityTitle: activity.title,
+        maxScore: Number(activity.maxScore),
+        rows,
+      };
+    }),
 });

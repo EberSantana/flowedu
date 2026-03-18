@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -28,6 +28,7 @@ export default function ActivitiesPage() {
   const [editingActivity, setEditingActivity] = useState<any>(null);
   const [viewingSubmissions, setViewingSubmissions] = useState<any>(null);
   const [gradingSubmission, setGradingSubmission] = useState<any>(null);
+  const [exportingActivity, setExportingActivity] = useState<any>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -195,6 +196,35 @@ export default function ActivitiesPage() {
     return new Date(date) < new Date();
   };
 
+  // Export query
+  const { data: exportData, isFetching: isFetchingExport } = trpc.activities.exportSubmissions.useQuery(
+    { activityId: exportingActivity?.id ?? 0 },
+    { enabled: !!exportingActivity }
+  );
+
+  const handleExportExcel = (activity: any) => {
+    setExportingActivity(activity);
+  };
+
+  // useEffect to generate and download Excel when data arrives
+  useEffect(() => {
+    if (!exportData || !exportingActivity || isFetchingExport) return;
+    import('xlsx').then((XLSX) => {
+      const rows = (exportData as any).rows;
+      const wsData = [
+        ['Nome do Aluno', 'Matrícula', 'Status', 'Data de Envio', 'Nota', 'Feedback'],
+        ...rows.map((r: any) => [r.nome, r.matricula, r.status, r.dataEnvio, r.nota, r.feedback]),
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = [{ wch: 35 }, { wch: 15 }, { wch: 12 }, { wch: 20 }, { wch: 8 }, { wch: 40 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Submissões');
+      XLSX.writeFile(wb, `submissoes-${(exportData as any).activityTitle.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`);
+      toast.success('Excel exportado com sucesso!');
+    }).catch(() => toast.error('Erro ao gerar Excel'));
+    setExportingActivity(null);
+  }, [exportData, exportingActivity, isFetchingExport]);
+
   const isDialogOpen = isCreateOpen || !!editingActivity;
 
   return (
@@ -298,8 +328,19 @@ export default function ActivitiesPage() {
                 const subjectColor = getSubjectColor(activity.subjectId);
                 const overdue = isOverdue(activity.dueDate);
 
+                // Prazo vencido com alunos pendentes
+                const totalStudents = (activity as any).totalStudents ?? 0;
+                const pendingStudents = totalStudents - (activity.submissionCount ?? 0);
+                const overdueWithPending = overdue && pendingStudents > 0;
+
                 return (
-                  <Card key={activity.id} className="bg-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full">
+                  <Card key={activity.id} className={`shadow-md hover:shadow-lg transition-all duration-200 flex flex-col h-full ${
+                    overdueWithPending
+                      ? 'bg-red-50 border-2 border-red-300'
+                      : overdue
+                      ? 'bg-amber-50 border border-amber-200'
+                      : 'bg-white'
+                  }`}>
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -347,6 +388,13 @@ export default function ActivitiesPage() {
                         </Badge>
                       </div>
 
+                      {/* Alerta de prazo vencido com pendentes */}
+                      {overdueWithPending && (
+                        <div className="flex items-center gap-1.5 text-xs text-red-700 bg-red-100 rounded px-2 py-1">
+                          <span className="font-semibold">⚠️ {pendingStudents} aluno{pendingStudents !== 1 ? 's' : ''} ainda não enviou!</span>
+                        </div>
+                      )}
+
                       {/* Action Buttons - Padrão FlowEdu */}
                       <div className="flex flex-col gap-2 mt-auto pt-3">
                         <Button
@@ -360,6 +408,18 @@ export default function ActivitiesPage() {
                         </Button>
 
                         <div className="flex gap-2">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleExportExcel(activity)}
+                            disabled={exportingActivity?.id === activity.id && isFetchingExport}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3"
+                            title="Exportar lista de submissões em Excel"
+                          >
+                            {exportingActivity?.id === activity.id && isFetchingExport
+                              ? <span className="animate-spin">&#8987;</span>
+                              : <Download className="h-3 w-3" />}
+                          </Button>
                           <Button
                             variant="default"
                             size="sm"
