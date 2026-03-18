@@ -94,6 +94,11 @@ export default function StudentLearningPathDetail() {
     { enabled: subjectId > 0 && professorId > 0 }
   );
 
+  const { data: assessments } = trpc.learningPath.getStudentAssessments.useQuery(
+    { subjectId },
+    { enabled: subjectId > 0 }
+  );
+
   // Mutations
   const updateProgress = trpc.student.updateTopicProgressEnhanced.useMutation({
     onSuccess: () => {
@@ -412,6 +417,55 @@ export default function StudentLearningPathDetail() {
             );
           })}
         </div>
+
+        {/* Seção de Provas Publicadas */}
+        {assessments && assessments.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span className="text-2xl">📝</span> Provas e Avaliações
+            </h2>
+            <div className="space-y-3">
+              {assessments.map((assessment: any) => (
+                <Card key={assessment.id} className="border-l-4 border-l-purple-500">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{assessment.title}</h3>
+                        {assessment.description && (
+                          <p className="text-sm text-gray-600 mt-1">{assessment.description}</p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <span>📋</span> {assessment.totalQuestions} questões
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span>🏆</span> {assessment.totalPoints} pontos
+                          </span>
+                          {assessment.duration && (
+                            <span className="flex items-center gap-1">
+                              <span>⏱️</span> {assessment.duration} min
+                            </span>
+                          )}
+                          {assessment.applicationDate && (
+                            <span className="flex items-center gap-1">
+                              <span>📅</span> {new Date(assessment.applicationDate).toLocaleDateString('pt-BR')}
+                            </span>
+                          )}
+                        </div>
+                        {assessment.generalInstructions && (
+                          <p className="text-xs text-gray-500 mt-2 italic">{assessment.generalInstructions}</p>
+                        )}
+                      </div>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 whitespace-nowrap">
+                        Publicada
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Modal de Detalhes do Tópico */}
         {selectedTopic && (

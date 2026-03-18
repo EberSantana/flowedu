@@ -7658,3 +7658,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Destaque visual de prazo vencido: borda/fundo vermelho/amarelo nos cards com prazo vencido e alunos pendentes
 - [x] Exportar lista de submissões em Excel: quem enviou e quem não enviou, com nome, matrícula e data
 - [x] Identificar alunos que acessaram sem turma cadastrada: exibir nome/código na tela de logs de acesso
+- [x] BUG: Provas criadas pelo professor não aparecem para o aluno na Trilhas de Aprendizagem - CORRIGIDO: generateExam não salvava no banco; adicionado botão 'Publicar para Alunos' no ExamGeneratorModal e seção de provas na StudentLearningPathDetail

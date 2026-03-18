@@ -24,6 +24,7 @@ import {
   Download,
   Printer,
   Copy,
+  BookOpen,
 } from "lucide-react";
 
 interface ExamGeneratorModalProps {
@@ -69,6 +70,45 @@ export default function ExamGeneratorModal({
   const [selectedModules, setSelectedModules] = useState<number[]>([]);
   const [generatedExam, setGeneratedExam] = useState<GeneratedExam | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedAssessmentId, setSavedAssessmentId] = useState<number | null>(null);
+
+  const saveAssessmentMutation = trpc.learningPath.saveAssessment.useMutation({
+    onSuccess: (data) => {
+      setSavedAssessmentId(data.assessmentId);
+      toast.success('Prova salva e publicada para os alunos!');
+      setIsSaving(false);
+    },
+    onError: (error) => {
+      toast.error('Erro ao salvar prova: ' + error.message);
+      setIsSaving(false);
+    },
+  });
+
+  const handleSaveAndPublish = () => {
+    if (!generatedExam) return;
+    setIsSaving(true);
+    saveAssessmentMutation.mutate({
+      subjectId,
+      title: generatedExam.title,
+      instructions: generatedExam.instructions,
+      totalPoints: generatedExam.totalPoints,
+      status: 'published',
+      questions: generatedExam.questions.map((q) => ({
+        number: q.number,
+        type: q.type,
+        points: q.points,
+        difficulty: q.difficulty,
+        module: q.module,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer || 'N/A',
+        expectedAnswer: q.expectedAnswer,
+        caseContext: q.caseContext,
+        caseQuestions: q.caseQuestions,
+      })),
+    });
+  };
 
   const generateExamMutation = trpc.learningPath.generateExam.useMutation({
     onSuccess: (data) => {
@@ -771,6 +811,24 @@ export default function ExamGeneratorModal({
                   <Copy className="h-4 w-4 mr-2" />
                   Copiar
                 </Button>
+                {savedAssessmentId ? (
+                  <Button disabled className="bg-green-600 text-white">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Publicada para Alunos ✓
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSaveAndPublish}
+                    disabled={isSaving}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {isSaving ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Salvando...</>
+                    ) : (
+                      <><BookOpen className="h-4 w-4 mr-2" />Publicar para Alunos</>
+                    )}
+                  </Button>
+                )}
                 <Button onClick={handleClose} className="bg-gray-600 hover:bg-gray-700 text-white">
                   Fechar
                 </Button>

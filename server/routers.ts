@@ -3359,8 +3359,105 @@ JSON (descrições MAX 15 chars):
           }
         );
        }),
-  }),
 
+    // Salvar prova gerada pela IA no banco de dados e publicar para alunos
+    saveAssessment: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        classId: z.number().optional(),
+        title: z.string(),
+        instructions: z.string().optional(),
+        totalPoints: z.number().default(100),
+        duration: z.number().optional(),
+        applicationDate: z.string().optional(),
+        availableFrom: z.string().optional(),
+        availableTo: z.string().optional(),
+        status: z.enum(['draft', 'published']).default('published'),
+        questions: z.array(z.object({
+          number: z.number(),
+          type: z.string(),
+          points: z.number(),
+          difficulty: z.string(),
+          module: z.string().optional(),
+          question: z.string(),
+          options: z.array(z.string()).optional(),
+          correctAnswer: z.string(),
+          expectedAnswer: z.string().optional(),
+          caseContext: z.string().optional(),
+          caseQuestions: z.array(z.string()).optional(),
+        }))
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Criar a avaliação
+        const result = await db.createAssessment({
+          teacherId: ctx.user.id,
+          subjectId: input.subjectId,
+          classId: input.classId,
+          title: input.title,
+          description: input.instructions,
+          assessmentType: 'prova',
+          totalQuestions: input.questions.length,
+          totalPoints: input.totalPoints,
+          passingScore: 60,
+          duration: input.duration,
+          generalInstructions: input.instructions,
+          applicationDate: input.applicationDate ? new Date(input.applicationDate) : undefined,
+          availableFrom: input.availableFrom ? new Date(input.availableFrom) : undefined,
+          availableTo: input.availableTo ? new Date(input.availableTo) : undefined,
+        });
+        const assessmentId = (result as any)[0]?.insertId || (result as any).insertId;
+        if (!assessmentId) throw new Error('Erro ao criar avaliação');
+        
+        // Publicar imediatamente se solicitado
+        if (input.status === 'published') {
+          await db.updateAssessment(assessmentId, ctx.user.id, { status: 'published' });
+        }
+        
+        // Salvar as questões
+        for (const q of input.questions) {
+          const options = q.options || [];
+          await db.addAssessmentQuestion({
+            assessmentId,
+            questionNumber: q.number,
+            questionType: q.type === 'objective' ? 'multiple_choice' : q.type === 'subjective' ? 'essay' : 'essay',
+            statement: q.question,
+            context: q.caseContext,
+            optionA: options[0],
+            optionB: options[1],
+            optionC: options[2],
+            optionD: options[3],
+            correctAnswer: q.correctAnswer,
+            answerExplanation: q.expectedAnswer,
+            points: q.points,
+            difficulty: (q.difficulty === 'easy' || q.difficulty === 'medium' || q.difficulty === 'hard') ? q.difficulty : 'medium',
+          });
+        }
+        
+        return { assessmentId, status: input.status };
+      }),
+
+    // Listar provas publicadas para o aluno ver na trilha
+    getStudentAssessments: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        const result = await dbConn.execute(sql`
+          SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
+                 a.totalPoints, a.passingScore, a.duration, a.generalInstructions,
+                 a.applicationDate, a.availableFrom, a.availableTo, a.status,
+                 a.createdAt, u.name as teacherName
+          FROM assessments a
+          JOIN users u ON a.teacherId = u.id
+          WHERE a.subjectId = ${input.subjectId}
+            AND a.status = 'published'
+          ORDER BY a.createdAt DESC
+        `);
+        return (result[0] as unknown) as any[];
+      }),
+  }),
   // Boletim de Atividades da Trilha por Turma
   learningPathReport: router({
     // Listar disciplinas que têm trilha de aprendizagem (módulos)
