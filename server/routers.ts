@@ -3466,6 +3466,38 @@ JSON (descrições MAX 15 chars):
         return (result[0] as unknown) as any[];
       }),
 
+    // Listar TODAS as provas publicadas para o aluno (sem filtro de disciplina)
+    getAllStudentAssessments: studentProcedure
+      .query(async ({ ctx }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        const studentId = ctx.studentSession.studentId;
+
+        // Buscar disciplinas do aluno
+        const enrollResult = await dbConn.execute(
+          sql`SELECT DISTINCT subjectId FROM subjectEnrollments WHERE studentId = ${studentId} AND status = 'active'`
+        ) as any[];
+        const subjectIds = ((enrollResult[0] as any[]) || []).map((r: any) => r.subjectId).filter(Boolean) as number[];
+
+        if (subjectIds.length === 0) return [];
+
+        // Buscar provas publicadas para as disciplinas do aluno
+        const placeholders = subjectIds.map(() => '?').join(',');
+        const result = await dbConn.execute(
+          sql`SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
+                     a.totalPoints, a.passingScore, a.duration, a.generalInstructions,
+                     a.applicationDate, a.availableFrom, a.availableTo, a.status,
+                     a.createdAt, u.name as teacherName, s.name as subjectName
+              FROM assessments a
+              JOIN users u ON a.teacherId = u.id
+              LEFT JOIN subjects s ON a.subjectId = s.id
+              WHERE a.subjectId IN (${sql.join(subjectIds.map(id => sql`${id}`), sql`, `)})
+                AND a.status = 'published'
+              ORDER BY a.createdAt DESC`
+        ) as any[];
+        return (result[0] as unknown) as any[];
+      }),
+
     // Listar todas as provas do professor (para gestão)
     getTeacherAssessments: protectedProcedure
       .input(z.object({ subjectId: z.number().optional() }))
@@ -3540,7 +3572,7 @@ JSON (descrições MAX 15 chars):
               } else {
                 studentQuery = dbConn.execute(sql`
                   SELECT DISTINCT s.id as studentId FROM students s
-                  JOIN subject_enrollments se ON se.studentId = s.id
+                  JOIN subjectEnrollments se ON se.studentId = s.id
                   WHERE se.subjectId = ${assessment.subjectId} AND se.status = 'active'
                 `);
               }

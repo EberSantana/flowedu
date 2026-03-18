@@ -18,7 +18,8 @@ import {
   MessageCircle,
   BarChart3,
   PenLine,
-  ClipboardList
+  ClipboardList,
+  ClipboardCheck
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -117,8 +118,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       ],
     },
     {
-      label: "Atividades",
+      label: "Avaliações",
       items: [
+        { icon: ClipboardCheck, label: "Provas", path: "/student/assessments" },
         { icon: FileText, label: "Minhas Atividades", path: "/student/activities" },
       ],
     },

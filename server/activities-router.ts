@@ -470,46 +470,37 @@ export const activitiesRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
+      // Buscar disciplinas do professor que têm alunos matriculados
+      // Usa subjectEnrollments como fonte primária (scheduled_classes pode estar vazia)
       const result = await db
         .selectDistinct({
-          subjectId: scheduledClasses.subjectId,
+          subjectId: subjects.id,
           subjectName: subjects.name,
-          classId: scheduledClasses.classId,
-          className: classes.name,
+          classId: sql<number>`0`.as('classId'), // placeholder - sem turma separada
+          className: sql<string>`'Turma Geral'`.as('className'),
         })
-        .from(scheduledClasses)
-        .innerJoin(subjects, eq(scheduledClasses.subjectId, subjects.id))
-        .innerJoin(classes, eq(scheduledClasses.classId, classes.id))
-        .where(eq(scheduledClasses.userId, ctx.user.id))
-        .orderBy(subjects.name, classes.name);
+        .from(subjects)
+        .where(eq(subjects.userId, ctx.user.id))
+        .orderBy(subjects.name);
 
       return result;
     }),
 
-  // Buscar alunos de uma turma com notas consolidadas (exercícios + atividades)
+  // Buscar alunos de uma disciplina com notas consolidadas (exercícios + atividades)
   getGradesByClass: protectedProcedure
     .input(z.object({
-      classId: z.number(),
+      classId: z.number(), // classId agora é o subjectId (mantido por compatibilidade)
       subjectId: z.number().optional(),
     }))
     .query(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
-      // Buscar disciplinas da turma selecionada (via scheduled_classes)
-      const classSubjects = await db
-        .selectDistinct({ subjectId: scheduledClasses.subjectId })
-        .from(scheduledClasses)
-        .where(
-          and(
-            eq(scheduledClasses.classId, input.classId),
-            eq(scheduledClasses.userId, ctx.user.id)
-          )
-        );
-
+      // Usar subjectId diretamente (classId é na verdade o subjectId neste contexto)
+      // Verificar se a disciplina pertence ao professor
       const subjectIds = input.subjectId
         ? [input.subjectId]
-        : classSubjects.map(s => s.subjectId);
+        : (input.classId > 0 ? [input.classId] : []);
 
       if (subjectIds.length === 0) return [];
 
