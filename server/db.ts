@@ -157,7 +157,10 @@ import {
   InsertBackupSchedule,
   vpsServers,
   vpsMetrics,
-  vpsAlerts,} from "../drizzle/schema";
+  vpsAlerts,
+  assessments,
+  assessmentQuestions,
+  InsertAssessment,} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -10750,25 +10753,25 @@ export async function createAssessment(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const classIdValue = (data.classId && data.classId > 0) ? data.classId : null;
-  const durationValue = (data.duration && data.duration > 0) ? data.duration : null;
-  const passingScoreValue = (data.passingScore && data.passingScore > 0) ? data.passingScore : 60;
-  const totalPointsValue = (data.totalPoints && data.totalPoints > 0) ? data.totalPoints : 100;
+  const insertData: InsertAssessment = {
+    teacherId: data.teacherId,
+    subjectId: data.subjectId,
+    classId: (data.classId && Number(data.classId) > 0) ? Number(data.classId) : null,
+    title: data.title,
+    description: data.description ?? null,
+    assessmentType: data.assessmentType ?? 'prova',
+    totalQuestions: data.totalQuestions,
+    totalPoints: (data.totalPoints && data.totalPoints > 0) ? data.totalPoints : 100,
+    passingScore: (data.passingScore && data.passingScore > 0) ? data.passingScore : 60,
+    duration: (data.duration && data.duration > 0) ? data.duration : null,
+    generalInstructions: data.generalInstructions ?? null,
+    applicationDate: data.applicationDate ?? null,
+    availableFrom: data.availableFrom ?? null,
+    availableTo: data.availableTo ?? null,
+    status: 'draft',
+  };
 
-  const result = await db.execute(sql`
-    INSERT INTO assessments (
-      teacherId, subjectId, classId, title, description, assessmentType,
-      totalQuestions, totalPoints, passingScore, duration, generalInstructions,
-      applicationDate, availableFrom, availableTo, status
-    ) VALUES (
-      ${data.teacherId}, ${data.subjectId}, ${classIdValue}, ${data.title}, 
-      ${data.description ?? null}, ${data.assessmentType ?? 'prova'},
-      ${data.totalQuestions}, ${totalPointsValue}, ${passingScoreValue},
-      ${durationValue}, ${data.generalInstructions ?? null},
-      ${data.applicationDate ?? null}, ${data.availableFrom ?? null}, ${data.availableTo ?? null}, 'draft'
-    )
-  `);
-  
+  const result = await db.insert(assessments).values(insertData);
   return result;
 }
 

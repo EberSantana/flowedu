@@ -7664,3 +7664,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Criar página de gestão de provas publicadas no módulo professor (listar, editar, deletar, despublicar)
 - [x] Criar página de gestão de exercícios no módulo professor (listar, editar, deletar)
 - [x] Adicionar links de navegação no Sidebar para as novas páginas de gestão
+- [x] BUG PERSISTENTE: classId ainda chega como string vazia no INSERT INTO assessments - CORRIGIDO DEFINITIVAMENTE: reescrito createAssessment para usar Drizzle ORM insert() em vez de SQL raw, com InsertAssessment type e null explícito
