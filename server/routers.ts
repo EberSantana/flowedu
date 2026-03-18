@@ -3481,16 +3481,18 @@ JSON (descrições MAX 15 chars):
 
         if (subjectIds.length === 0) return [];
 
-        // Buscar provas publicadas para as disciplinas do aluno
-        const placeholders = subjectIds.map(() => '?').join(',');
+        // Buscar provas publicadas para as disciplinas do aluno (com status da tentativa)
         const result = await dbConn.execute(
           sql`SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
                      a.totalPoints, a.passingScore, a.duration, a.generalInstructions,
                      a.applicationDate, a.availableFrom, a.availableTo, a.status,
-                     a.createdAt, u.name as teacherName, s.name as subjectName
+                     a.createdAt, u.name as teacherName, s.name as subjectName,
+                     aa.status as attemptStatus, aa.score as attemptScore, aa.percentage as attemptPercentage,
+                     aa.passed as attemptPassed, aa.id as attemptId
               FROM assessments a
               JOIN users u ON a.teacherId = u.id
               LEFT JOIN subjects s ON a.subjectId = s.id
+              LEFT JOIN assessment_attempts aa ON aa.assessmentId = a.id AND aa.studentId = ${studentId}
               WHERE a.subjectId IN (${sql.join(subjectIds.map(id => sql`${id}`), sql`, `)})
                 AND a.status = 'published'
               ORDER BY a.createdAt DESC`
@@ -3636,6 +3638,300 @@ JSON (descrições MAX 15 chars):
           }
         }
         return { success: true };
+      }),
+
+    // ==================== TENTATIVAS DE PROVA ONLINE ====================
+
+    // Iniciar ou retomar uma tentativa de prova
+    startAssessmentAttempt: studentProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const studentId = ctx.studentSession.studentId;
+
+        // Verificar que a prova está publicada e o aluno tem acesso
+        const checkResult = await dbConn.execute(
+          sql`SELECT a.id, a.title, a.totalQuestions, a.totalPoints, a.passingScore, a.duration
+              FROM assessments a
+              JOIN subjectEnrollments se ON se.subjectId = a.subjectId
+              WHERE a.id = ${input.assessmentId}
+                AND a.status = 'published'
+                AND se.studentId = ${studentId}
+                AND se.status = 'active'
+              LIMIT 1`
+        ) as any[];
+        const checkRows = (checkResult[0] as any[]) || [];
+        if (checkRows.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
+        }
+
+        // Verificar se já existe tentativa em andamento
+        const existingResult = await dbConn.execute(
+          sql`SELECT id, status FROM assessment_attempts
+              WHERE assessmentId = ${input.assessmentId} AND studentId = ${studentId}
+              ORDER BY createdAt DESC LIMIT 1`
+        ) as any[];
+        const existing = ((existingResult[0] as any[]) || [])[0];
+
+        if (existing && existing.status === 'in_progress') {
+          return { attemptId: existing.id as number, isNew: false };
+        }
+        if (existing && existing.status === 'submitted') {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Você já realizou esta prova.' });
+        }
+
+        // Criar nova tentativa
+        const insertResult = await dbConn.execute(
+          sql`INSERT INTO assessment_attempts (assessmentId, studentId, status, startedAt, createdAt, updatedAt)
+              VALUES (${input.assessmentId}, ${studentId}, 'in_progress', NOW(), NOW(), NOW())`
+        ) as any;
+        const attemptId = (insertResult[0] as any)?.insertId as number;
+        return { attemptId, isNew: true };
+      }),
+
+    // Buscar tentativa em andamento com respostas já salvas
+    getAttemptProgress: studentProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const studentId = ctx.studentSession.studentId;
+
+        const attemptResult = await dbConn.execute(
+          sql`SELECT * FROM assessment_attempts WHERE id = ${input.attemptId} AND studentId = ${studentId} LIMIT 1`
+        ) as any[];
+        const attempt = ((attemptResult[0] as any[]) || [])[0];
+        if (!attempt) throw new TRPCError({ code: 'NOT_FOUND' });
+
+        const answersResult = await dbConn.execute(
+          sql`SELECT questionId, selectedAnswer FROM assessment_answers WHERE attemptId = ${input.attemptId}`
+        ) as any[];
+        const answers = (answersResult[0] as any[]) || [];
+
+        const savedAnswers: Record<number, string> = {};
+        for (const a of answers) {
+          savedAnswers[a.questionId as number] = a.selectedAnswer as string;
+        }
+        return { attempt, savedAnswers };
+      }),
+
+    // Salvar resposta individual (auto-save)
+    saveAssessmentAnswer: studentProcedure
+      .input(z.object({
+        attemptId: z.number(),
+        questionId: z.number(),
+        questionNumber: z.number(),
+        selectedAnswer: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const studentId = ctx.studentSession.studentId;
+
+        // Verificar que a tentativa pertence ao aluno e está em andamento
+        const check = await dbConn.execute(
+          sql`SELECT id FROM assessment_attempts WHERE id = ${input.attemptId} AND studentId = ${studentId} AND status = 'in_progress' LIMIT 1`
+        ) as any[];
+        if (((check[0] as any[]) || []).length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        // Upsert da resposta
+        await dbConn.execute(
+          sql`INSERT INTO assessment_answers (attemptId, questionId, questionNumber, selectedAnswer, isCorrect, pointsEarned, createdAt)
+              VALUES (${input.attemptId}, ${input.questionId}, ${input.questionNumber}, ${input.selectedAnswer}, 0, 0, NOW())
+              ON DUPLICATE KEY UPDATE selectedAnswer = ${input.selectedAnswer}`
+        );
+        return { success: true };
+      }),
+
+    // Submeter prova (correção automática)
+    submitAssessment: studentProcedure
+      .input(z.object({
+        attemptId: z.number(),
+        timeSpentSeconds: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const studentId = ctx.studentSession.studentId;
+
+        // Verificar tentativa
+        const attemptResult = await dbConn.execute(
+          sql`SELECT aa.*, a.totalPoints, a.passingScore, a.assessmentId
+              FROM assessment_attempts aa
+              JOIN assessments a ON a.id = aa.assessmentId
+              WHERE aa.id = ${input.attemptId} AND aa.studentId = ${studentId} AND aa.status = 'in_progress'
+              LIMIT 1`
+        ) as any[];
+        const attempt = ((attemptResult[0] as any[]) || [])[0];
+        if (!attempt) throw new TRPCError({ code: 'NOT_FOUND', message: 'Tentativa não encontrada' });
+
+        const assessmentId = attempt.assessmentId as number;
+        const totalPoints = attempt.totalPoints as number;
+        const passingScore = attempt.passingScore as number;
+
+        // Buscar questões com gabarito
+        const questionsResult = await dbConn.execute(
+          sql`SELECT id, questionNumber, correctAnswer, points FROM assessment_questions
+              WHERE assessmentId = ${assessmentId} ORDER BY questionNumber ASC`
+        ) as any[];
+        const questions = (questionsResult[0] as any[]) || [];
+
+        // Buscar respostas do aluno
+        const answersResult = await dbConn.execute(
+          sql`SELECT questionId, selectedAnswer FROM assessment_answers WHERE attemptId = ${input.attemptId}`
+        ) as any[];
+        const studentAnswers = (answersResult[0] as any[]) || [];
+        const answerMap: Record<number, string> = {};
+        for (const a of studentAnswers) answerMap[a.questionId as number] = a.selectedAnswer as string;
+
+        // Corrigir cada questão
+        let totalCorrect = 0;
+        let totalWrong = 0;
+        let scoreEarned = 0;
+
+        for (const q of questions) {
+          const studentAns = (answerMap[q.id as number] || '').trim().toUpperCase();
+          const correctAns = (q.correctAnswer as string || '').trim().toUpperCase();
+          const isCorrect = studentAns === correctAns && studentAns !== '';
+          const pts = isCorrect ? (q.points as number) : 0;
+          if (isCorrect) totalCorrect++;
+          else totalWrong++;
+          scoreEarned += pts;
+
+          // Atualizar resposta com resultado
+          await dbConn.execute(
+            sql`UPDATE assessment_answers SET isCorrect = ${isCorrect ? 1 : 0}, pointsEarned = ${pts}
+                WHERE attemptId = ${input.attemptId} AND questionId = ${q.id}`
+          );
+        }
+
+        const percentage = totalPoints > 0 ? (scoreEarned / totalPoints) * 100 : 0;
+        const passed = percentage >= passingScore;
+
+        // Atualizar tentativa como submetida
+        await dbConn.execute(
+          sql`UPDATE assessment_attempts
+              SET status = 'submitted', totalCorrect = ${totalCorrect}, totalWrong = ${totalWrong},
+                  score = ${scoreEarned}, percentage = ${percentage}, passed = ${passed ? 1 : 0},
+                  submittedAt = NOW(), timeSpentSeconds = ${input.timeSpentSeconds || 0}, updatedAt = NOW()
+              WHERE id = ${input.attemptId}`
+        );
+
+        return {
+          totalCorrect,
+          totalWrong,
+          score: scoreEarned,
+          percentage: Math.round(percentage * 10) / 10,
+          passed,
+          totalPoints,
+          passingScore,
+        };
+      }),
+
+    // Buscar resultado de uma tentativa submetida
+    getAssessmentResult: studentProcedure
+      .input(z.object({ attemptId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const studentId = ctx.studentSession.studentId;
+
+        const attemptResult = await dbConn.execute(
+          sql`SELECT aa.*, a.title, a.totalPoints, a.passingScore, a.totalQuestions
+              FROM assessment_attempts aa
+              JOIN assessments a ON a.id = aa.assessmentId
+              WHERE aa.id = ${input.attemptId} AND aa.studentId = ${studentId}
+              LIMIT 1`
+        ) as any[];
+        const attempt = ((attemptResult[0] as any[]) || [])[0];
+        if (!attempt) throw new TRPCError({ code: 'NOT_FOUND' });
+
+        // Buscar respostas com gabarito
+        const answersResult = await dbConn.execute(
+          sql`SELECT aans.questionId, aans.selectedAnswer, aans.isCorrect, aans.pointsEarned,
+                     aq.questionNumber, aq.statement, aq.correctAnswer, aq.answerExplanation,
+                     aq.optionA, aq.optionB, aq.optionC, aq.optionD, aq.optionE
+              FROM assessment_answers aans
+              JOIN assessment_questions aq ON aq.id = aans.questionId
+              WHERE aans.attemptId = ${input.attemptId}
+              ORDER BY aq.questionNumber ASC`
+        ) as any[];
+        const answers = (answersResult[0] as any[]) || [];
+
+        return { attempt, answers };
+      }),
+
+    // Buscar notas de provas do aluno (para boletim)
+    getStudentAssessmentGrades: studentProcedure
+      .query(async ({ ctx }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        const studentId = ctx.studentSession.studentId;
+
+        const result = await dbConn.execute(
+          sql`SELECT aa.id as attemptId, aa.score, aa.percentage, aa.passed,
+                     aa.totalCorrect, aa.totalWrong, aa.submittedAt,
+                     a.title, a.totalPoints, a.passingScore, a.assessmentType,
+                     s.name as subjectName, s.color as subjectColor
+              FROM assessment_attempts aa
+              JOIN assessments a ON a.id = aa.assessmentId
+              JOIN subjects s ON s.id = a.subjectId
+              WHERE aa.studentId = ${studentId} AND aa.status = 'submitted'
+              ORDER BY aa.submittedAt DESC`
+        ) as any[];
+        return (result[0] as any[]) || [];
+      }),
+
+    // Buscar notas de provas dos alunos (para boletim do professor)
+    getAssessmentGradesBySubject: protectedProcedure
+      .input(z.object({ subjectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+
+        const result = await dbConn.execute(
+          sql`SELECT st.id as studentId, st.name as studentName,
+                     a.id as assessmentId, a.title as assessmentTitle, a.totalPoints,
+                     aa.score, aa.percentage, aa.passed, aa.submittedAt
+              FROM students st
+              JOIN subjectEnrollments se ON se.studentId = st.id
+              JOIN assessments a ON a.subjectId = se.subjectId
+              LEFT JOIN assessment_attempts aa ON aa.assessmentId = a.id AND aa.studentId = st.id AND aa.status = 'submitted'
+              WHERE se.subjectId = ${input.subjectId}
+                AND a.teacherId = ${ctx.user.id}
+                AND se.status = 'active'
+              ORDER BY st.name, a.title`
+        ) as any[];
+        return (result[0] as any[]) || [];
+      }),
+
+    // Buscar histórico de provas do aluno (para o professor ver)
+    getStudentAssessmentHistory: protectedProcedure
+      .input(z.object({ studentId: z.number(), subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+
+        const subjectFilter = input.subjectId
+          ? sql`AND a.subjectId = ${input.subjectId}`
+          : sql``;
+
+        const result = await dbConn.execute(
+          sql`SELECT aa.id as attemptId, aa.score, aa.percentage, aa.passed,
+                     aa.totalCorrect, aa.totalWrong, aa.submittedAt,
+                     a.title, a.totalPoints, a.passingScore, a.assessmentType
+              FROM assessment_attempts aa
+              JOIN assessments a ON a.id = aa.assessmentId
+              WHERE aa.studentId = ${input.studentId}
+                AND aa.status = 'submitted'
+                AND a.teacherId = ${ctx.user.id}
+                ${subjectFilter}
+              ORDER BY aa.submittedAt DESC`
+        ) as any[];
+        return (result[0] as any[]) || [];
       }),
 
     // Buscar questões de uma prova (para visualização)

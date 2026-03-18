@@ -579,6 +579,24 @@ export const activitiesRouter = router({
           )
         );
 
+      // Buscar notas de PROVAS (assessment_attempts)
+      const dbConn = await getDb();
+      let assessmentGradesRaw: any[] = [];
+      if (dbConn && studentIds.length > 0) {
+        const subjectFilter = input.subjectId ? input.subjectId : (input.classId > 0 ? input.classId : null);
+        const result = await dbConn.execute(
+          sql`SELECT aa.studentId, aa.score, aa.percentage, aa.passed, aa.submittedAt,
+                     a.title as assessmentTitle, a.totalPoints, a.id as assessmentId, a.subjectId
+              FROM assessment_attempts aa
+              JOIN assessments a ON aa.assessmentId = a.id
+              WHERE aa.studentId IN (${sql.join(studentIds.map(id => sql`${id}`), sql`, `)})
+                AND aa.status = 'submitted'
+                ${subjectFilter ? sql`AND a.subjectId = ${subjectFilter}` : sql``}
+              ORDER BY aa.submittedAt DESC`
+        ) as any[];
+        assessmentGradesRaw = (result[0] as any[]) || [];
+      }
+
       // Montar resultado por aluno
       return enrolledStudents.map(student => {
         // Exercícios do aluno
@@ -597,10 +615,21 @@ export const activitiesRouter = router({
             }, 0) / studentActGrades.length
           : null;
 
+        // Notas de provas do aluno
+        const studentAssessGrades = assessmentGradesRaw.filter((g: any) => g.studentId === student.studentId);
+        const assessmentAvg = studentAssessGrades.length > 0
+          ? studentAssessGrades.reduce((sum: number, g: any) => {
+              const totalPoints = parseFloat(String(g.totalPoints ?? 10));
+              const score = parseFloat(String(g.score ?? 0));
+              return sum + (totalPoints > 0 ? (score / totalPoints) * 10 : 0);
+            }, 0) / studentAssessGrades.length
+          : null;
+
         // Média geral
         const allGrades: number[] = [];
         if (exerciseAvg !== null) allGrades.push(exerciseAvg);
         if (activityAvg !== null) allGrades.push(activityAvg);
+        if (assessmentAvg !== null) allGrades.push(assessmentAvg);
         const overallAvg = allGrades.length > 0
           ? allGrades.reduce((a, b) => a + b, 0) / allGrades.length
           : null;
@@ -613,6 +642,8 @@ export const activitiesRouter = router({
           exerciseAverage: exerciseAvg !== null ? parseFloat(exerciseAvg.toFixed(2)) : null,
           activityCount: studentActGrades.length,
           activityAverage: activityAvg !== null ? parseFloat(activityAvg.toFixed(2)) : null,
+          assessmentCount: studentAssessGrades.length,
+          assessmentAverage: assessmentAvg !== null ? parseFloat(assessmentAvg.toFixed(2)) : null,
           overallAverage: overallAvg !== null ? parseFloat(overallAvg.toFixed(2)) : null,
           exercises: studentExGrades.map(g => ({
             exerciseId: g.exerciseId,
@@ -632,6 +663,18 @@ export const activitiesRouter = router({
               : 0,
             feedback: g.feedback,
             gradedAt: g.gradedAt,
+          })),
+          assessments: studentAssessGrades.map((g: any) => ({
+            assessmentId: g.assessmentId,
+            title: g.assessmentTitle,
+            score: parseFloat(String(g.score ?? 0)),
+            totalPoints: parseFloat(String(g.totalPoints ?? 10)),
+            grade10: parseFloat(String(g.totalPoints ?? 10)) > 0
+              ? parseFloat(((parseFloat(String(g.score ?? 0)) / parseFloat(String(g.totalPoints ?? 10))) * 10).toFixed(2))
+              : 0,
+            percentage: parseFloat(String(g.percentage ?? 0)),
+            passed: !!g.passed,
+            submittedAt: g.submittedAt,
           })),
         };
       });

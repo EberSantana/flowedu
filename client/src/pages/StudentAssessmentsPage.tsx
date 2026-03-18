@@ -21,12 +21,16 @@ import {
   ChevronUp,
   CheckCircle2,
   FileText,
+  Play,
+  Trophy,
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
+import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function StudentAssessmentsPage() {
+  const [, navigate] = useLocation();
   const [viewQuestionsId, setViewQuestionsId] = useState<number | null>(null);
   const [viewQuestionsTitle, setViewQuestionsTitle] = useState<string>("");
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
@@ -170,11 +174,11 @@ export default function StudentAssessmentsPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-primary border-primary/30 hover:bg-primary/10"
+                        className="text-muted-foreground hover:text-foreground"
                         onClick={() => {
                           setViewQuestionsId(assessment.id);
                           setViewQuestionsTitle(assessment.title);
@@ -184,6 +188,21 @@ export default function StudentAssessmentsPage() {
                         <FileText className="h-4 w-4 mr-1" />
                         Ver Questões
                       </Button>
+                      {assessment.attemptStatus === 'submitted' ? (
+                        <Badge className="bg-green-100 text-green-700 border-green-300 gap-1">
+                          <Trophy className="h-3 w-3" />
+                          Realizada
+                        </Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                          onClick={() => navigate(`/student/exam/${assessment.id}`)}
+                        >
+                          <Play className="h-4 w-4 mr-1" />
+                          Realizar Prova
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>

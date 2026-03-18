@@ -2719,3 +2719,57 @@ export const activitySubmissions = mysqlTable("activity_submissions", {
 });
 export type ActivitySubmission = typeof activitySubmissions.$inferSelect;
 export type InsertActivitySubmission = typeof activitySubmissions.$inferInsert;
+
+/**
+ * Tentativas de Prova Online pelo Aluno
+ * Registra cada vez que um aluno inicia/submete uma prova online
+ */
+export const assessmentAttempts = mysqlTable("assessment_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  assessmentId: int("assessmentId").notNull(), // FK para assessments
+  studentId: int("studentId").notNull(), // FK para students
+
+  // Status da tentativa
+  status: mysqlEnum("status", ["in_progress", "submitted", "graded"]).default("in_progress").notNull(),
+
+  // Pontuação
+  totalCorrect: int("totalCorrect").default(0).notNull(), // Número de acertos
+  totalWrong: int("totalWrong").default(0).notNull(), // Número de erros
+  score: float("score").default(0).notNull(), // Nota final (0-totalPoints)
+  percentage: float("percentage").default(0).notNull(), // Percentual de acerto (0-100)
+  passed: boolean("passed").default(false).notNull(), // Aprovado ou não
+
+  // Tempo
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  submittedAt: timestamp("submittedAt"), // Quando o aluno submeteu
+  timeSpentSeconds: int("timeSpentSeconds").default(0), // Tempo gasto em segundos
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AssessmentAttempt = typeof assessmentAttempts.$inferSelect;
+export type InsertAssessmentAttempt = typeof assessmentAttempts.$inferInsert;
+
+/**
+ * Respostas do Aluno por Questão
+ * Cada linha = resposta do aluno para uma questão em uma tentativa
+ */
+export const assessmentAnswers = mysqlTable("assessment_answers", {
+  id: int("id").autoincrement().primaryKey(),
+  attemptId: int("attemptId").notNull(), // FK para assessment_attempts
+  questionId: int("questionId").notNull(), // FK para assessment_questions
+  questionNumber: int("questionNumber").notNull(),
+
+  // Resposta do aluno
+  selectedAnswer: varchar("selectedAnswer", { length: 500 }), // A, B, C, D, E ou texto
+
+  // Resultado
+  isCorrect: boolean("isCorrect").default(false).notNull(),
+  pointsEarned: float("pointsEarned").default(0).notNull(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AssessmentAnswer = typeof assessmentAnswers.$inferSelect;
+export type InsertAssessmentAnswer = typeof assessmentAnswers.$inferInsert;

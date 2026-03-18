@@ -26,6 +26,7 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
+  GraduationCap,
 } from "lucide-react";
 
 function gradeColor(grade: number | null): string {
@@ -111,17 +112,21 @@ export default function TeacherGradePanel() {
       "Média Exercícios",
       "Atividades em Sala (qtd)",
       "Média Atividades",
+      "Provas (qtd)",
+      "Média Provas",
       "Média Geral",
       "Situação",
     ];
 
-    const rows = filteredGrades.map((s) => [
+    const rows = filteredGrades.map((s: any) => [
       s.registrationNumber ?? "",
       s.studentName,
       s.exerciseCount,
       s.exerciseAverage !== null ? s.exerciseAverage.toFixed(2) : "—",
       s.activityCount,
       s.activityAverage !== null ? s.activityAverage.toFixed(2) : "—",
+      s.assessmentCount ?? 0,
+      s.assessmentAverage !== null ? s.assessmentAverage?.toFixed(2) : "—",
       s.overallAverage !== null ? s.overallAverage.toFixed(2) : "—",
       s.overallAverage !== null ? (s.overallAverage >= 6 ? "Aprovado" : "Em recuperação") : "Sem notas",
     ]);
@@ -319,6 +324,12 @@ export default function TeacherGradePanel() {
                               Atividades
                             </div>
                           </th>
+                          <th className="text-center py-3 px-2 font-semibold text-muted-foreground">
+                            <div className="flex items-center justify-center gap-1">
+                              <GraduationCap className="w-3.5 h-3.5" />
+                              Provas
+                            </div>
+                          </th>
                           <th className="text-center py-3 px-2 font-semibold text-muted-foreground">Média Geral</th>
                           <th className="text-center py-3 px-2 font-semibold text-muted-foreground">Situação</th>
                           <th className="text-center py-3 px-2 font-semibold text-muted-foreground">Ações</th>
@@ -353,6 +364,20 @@ export default function TeacherGradePanel() {
                                   </span>
                                   <span className="text-xs text-muted-foreground ml-1">
                                     ({student.activityCount})
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-2 text-center">
+                              {(student as any).assessmentAverage !== null && (student as any).assessmentAverage !== undefined ? (
+                                <div>
+                                  <span className={`font-bold ${gradeColor((student as any).assessmentAverage)}`}>
+                                    {(student as any).assessmentAverage.toFixed(1)}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground ml-1">
+                                    ({(student as any).assessmentCount ?? 0})
                                   </span>
                                 </div>
                               ) : (
@@ -494,12 +519,15 @@ export default function TeacherGradePanel() {
                 </div>
 
                 <Tabs defaultValue="exercises">
-                  <TabsList className="grid w-full grid-cols-2">
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="exercises">
-                      Exercícios Online ({studentReport.exercises.length})
+                      Exercícios ({studentReport.exercises.length})
                     </TabsTrigger>
                     <TabsTrigger value="activities">
-                      Atividades em Sala ({studentReport.activities.length})
+                      Atividades ({studentReport.activities.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="assessments">
+                      Provas ({(studentReport as any).assessments?.length ?? 0})
                     </TabsTrigger>
                   </TabsList>
 
@@ -565,9 +593,6 @@ export default function TeacherGradePanel() {
                               )}
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-foreground truncate">{a.title}</p>
-                                {a.subjectName && (
-                                  <p className="text-xs text-muted-foreground">{a.subjectName}</p>
-                                )}
                               </div>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
@@ -591,6 +616,49 @@ export default function TeacherGradePanel() {
                               <span>{a.feedback}</span>
                             </div>
                           )}
+                        </div>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  {/* Provas */}
+                  <TabsContent value="assessments" className="space-y-2 mt-4">
+                    {((studentReport as any).assessments?.length ?? 0) === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">
+                        Nenhuma prova realizada.
+                      </p>
+                    ) : (
+                      (studentReport as any).assessments.map((a: any, i: number) => (
+                        <div
+                          key={i}
+                          className={`p-3 rounded-lg border ${gradeBg(a.grade10)}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              {a.passed ? (
+                                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                              ) : (
+                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                              )}
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{a.title}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0">
+                              <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                {a.score}/{a.totalPoints} pts
+                              </Badge>
+                              <span className={`text-sm font-bold ${gradeColor(a.grade10)}`}>
+                                {a.grade10.toFixed(1)}
+                              </span>
+                              {a.submittedAt && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(a.submittedAt).toLocaleDateString("pt-BR")}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       ))
                     )}
