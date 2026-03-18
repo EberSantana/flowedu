@@ -1,0 +1,25 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE() \nAND TABLE_NAME IN (\n  'question_type_instructions', 'system_settings', 'vps_alerts', 'vps_metrics', \n  'vps_servers', 'access_log_archives'\n)\nORDER BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT TABLE_NAME FROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE() \nAND TABLE_NAME IN (\n  'question_type_instructions', 'system_settings', 'vps_alerts', 'vps_metrics', \n  'vps_servers', 'access_log_archives'\n)\nORDER BY TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "question_type_instructions"
+    },
+    {
+      "TABLE_NAME": "system_settings"
+    },
+    {
+      "TABLE_NAME": "vps_alerts"
+    },
+    {
+      "TABLE_NAME": "vps_metrics"
+    },
+    {
+      "TABLE_NAME": "vps_servers"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\nquestion_type_instructions\nsystem_settings\nvps_alerts\nvps_metrics\nvps_servers\n",
+  "stderr": "",
+  "execution_time_ms": 388
+}

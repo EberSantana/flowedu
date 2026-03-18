@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `access_log_archives` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `teacherId` int NOT NULL,\n  `fileName` varchar(255) NOT NULL,\n  `fileUrl` text NOT NULL,\n  `fileKey` varchar(500) NOT NULL,\n  `recordCount` int NOT NULL DEFAULT 0,\n  `periodStart` timestamp NULL,\n  `periodEnd` timestamp NULL,\n  `fileSizeBytes` int DEFAULT 0,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute CREATE TABLE IF NOT EXISTS `access_log_archives` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `teacherId` int NOT NULL,\n  `fileName` varchar(255) NOT NULL,\n  `fileUrl` text NOT NULL,\n  `fileKey` varchar(500) NOT NULL,\n  `recordCount` int NOT NULL DEFAULT 0,\n  `periodStart` timestamp NULL,\n  `periodEnd` timestamp NULL,\n  `fileSizeBytes` int DEFAULT 0,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 436
+}
