@@ -1389,9 +1389,30 @@ export default function AccessLogsPage() {
                     </div>
                   ))}
                   {classLogsData.noClassCount > 0 && (
-                    <p className="text-xs text-muted-foreground pt-2 text-center">
-                      + {classLogsData.noClassCount} acesso(s) de alunos sem turma cadastrada
-                    </p>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-1.5 mt-2 w-full hover:bg-amber-100 transition-colors cursor-pointer">
+                          ⚠️ {classLogsData.noClassCount} acesso(s) de alunos <strong>sem turma cadastrada</strong> — clique para ver quem são
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-3" align="center">
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-gray-800">Alunos sem turma cadastrada</p>
+                          <p className="text-xs text-muted-foreground">Esses alunos acessaram o sistema mas não estão matriculados em nenhuma turma.</p>
+                          <div className="divide-y max-h-60 overflow-y-auto">
+                            {((classLogsData as any).noClassStudents || []).map((s: any, i: number) => (
+                              <div key={i} className="py-1.5 flex items-center justify-between gap-2">
+                                <span className="text-sm font-medium text-gray-700 truncate">{s.name}</span>
+                                <span className="text-xs text-muted-foreground whitespace-nowrap">{s.accessCount}x</span>
+                              </div>
+                            ))}
+                            {((classLogsData as any).noClassStudents || []).length === 0 && (
+                              <p className="text-xs text-muted-foreground py-2">Nenhum detalhe disponível.</p>
+                            )}
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </div>
               )}

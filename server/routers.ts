@@ -4017,11 +4017,24 @@ JSON (descrições MAX 15 chars):
         }> = {};
 
         let noClassCount = 0;
+        const noClassStudents: Map<number, { studentId: number; name: string; lastAccess: Date; accessCount: number }> = new Map();
 
         for (const log of studentLogs) {
-          if (!log.studentId) { noClassCount++; continue; }
+          if (!log.studentId) {
+            noClassCount++;
+            const existing = noClassStudents.get(-1);
+            if (!existing) noClassStudents.set(-1, { studentId: -1, name: log.userName || 'Desconhecido', lastAccess: log.accessedAt, accessCount: 1 });
+            else { existing.accessCount++; if (log.accessedAt > existing.lastAccess) existing.lastAccess = log.accessedAt; }
+            continue;
+          }
           const logClasses = studentToClasses[log.studentId] || [];
-          if (logClasses.length === 0) { noClassCount++; continue; }
+          if (logClasses.length === 0) {
+            noClassCount++;
+            const existing = noClassStudents.get(log.studentId);
+            if (!existing) noClassStudents.set(log.studentId, { studentId: log.studentId, name: log.userName || `Aluno #${log.studentId}`, lastAccess: log.accessedAt, accessCount: 1 });
+            else { existing.accessCount++; if (log.accessedAt > existing.lastAccess) existing.lastAccess = log.accessedAt; }
+            continue;
+          }
 
           for (const cls of logClasses) {
             if (input.classId && cls.classId !== input.classId) continue;
@@ -4089,7 +4102,12 @@ JSON (descrições MAX 15 chars):
           }
         }
 
-        return { classes: result, noClassCount, total: studentLogs.length };
+        return {
+          classes: result,
+          noClassCount,
+          noClassStudents: Array.from(noClassStudents.values()).sort((a, b) => b.accessCount - a.accessCount),
+          total: studentLogs.length,
+        };
       }),
 
     // Lista de turmas para seletor de filtro (apenas turmas do professor logado)

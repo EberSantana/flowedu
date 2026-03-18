@@ -7657,3 +7657,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Contador de submissões nos cards de atividade: exibir "X/Y enviaram" diretamente no card
 - [x] Destaque visual de prazo vencido: borda/fundo vermelho/amarelo nos cards com prazo vencido e alunos pendentes
 - [x] Exportar lista de submissões em Excel: quem enviou e quem não enviou, com nome, matrícula e data
+- [x] Identificar alunos que acessaram sem turma cadastrada: exibir nome/código na tela de logs de acesso
