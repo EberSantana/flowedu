@@ -10761,7 +10761,7 @@ export async function createAssessment(data: {
     description: data.description ?? null,
     assessmentType: data.assessmentType ?? 'prova',
     totalQuestions: data.totalQuestions,
-    totalPoints: (data.totalPoints && data.totalPoints > 0) ? data.totalPoints : 100,
+    totalPoints: (data.totalPoints && data.totalPoints > 0) ? data.totalPoints : 10,
     passingScore: (data.passingScore && data.passingScore > 0) ? data.passingScore : 60,
     duration: (data.duration && data.duration > 0) ? data.duration : null,
     generalInstructions: data.generalInstructions ?? null,

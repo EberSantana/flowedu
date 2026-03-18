@@ -2692,16 +2692,24 @@ IMPORTANTE:
 - SEMPRE inclua "correctAnswer" com a resposta correta (para objetivas: a letra da alternativa; para subjetivas/casos: deixe como "N/A")
 - SEMPRE inclua "expectedAnswer" com a justificativa detalhada ou resposta esperada (OBRIGATÓRIO para TODAS as questões)
 
+REGRA DE PONTUAÇÃO OBRIGATÓRIA:
+- O total da prova é SEMPRE 10 pontos
+- Pontos por questão = 10 / número de questões
+- Exemplo: 10 questões → cada uma vale 1,0 ponto
+- Exemplo: 20 questões → cada uma vale 0,5 ponto
+- Exemplo: 5 questões → cada uma vale 2,0 pontos
+- Use exatamente esse cálculo: ${(10 / input.questionCount).toFixed(2)} pontos por questão
+
 Retorne um JSON com a estrutura:
 {
   "title": "Título da Prova",
   "instructions": "Instruções gerais",
-  "totalPoints": 100,
+  "totalPoints": 10,
   "questions": [
     {
       "number": 1,
       "type": "objective|subjective|case_study",
-      "points": 10,
+      "points": ${(10 / input.questionCount).toFixed(2)},
       "difficulty": "easy|medium|hard",
       "module": "Nome do módulo relacionado",
       "question": "Texto da questão",
