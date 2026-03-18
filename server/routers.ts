@@ -3457,6 +3457,63 @@ JSON (descrições MAX 15 chars):
         `);
         return (result[0] as unknown) as any[];
       }),
+
+    // Listar todas as provas do professor (para gestão)
+    getTeacherAssessments: protectedProcedure
+      .input(z.object({ subjectId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        const subjectFilter = input.subjectId
+          ? sql`AND a.subjectId = ${input.subjectId}`
+          : sql``;
+        const result = await dbConn.execute(sql`
+          SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
+                 a.totalPoints, a.passingScore, a.duration, a.status,
+                 a.applicationDate, a.createdAt,
+                 s.name as subjectName, s.color as subjectColor,
+                 c.name as className
+          FROM assessments a
+          LEFT JOIN subjects s ON a.subjectId = s.id
+          LEFT JOIN classes c ON a.classId = c.id
+          WHERE a.teacherId = ${ctx.user.id}
+          ${subjectFilter}
+          ORDER BY a.createdAt DESC
+        `);
+        return (result[0] as unknown) as any[];
+      }),
+
+    // Deletar prova do professor
+    deleteAssessment: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Verificar propriedade
+        const check = await dbConn.execute(sql`
+          SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id}
+        `);
+        const rows = (check[0] as unknown) as any[];
+        if (!rows || rows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
+        // Deletar questões relacionadas
+        await dbConn.execute(sql`DELETE FROM assessment_questions WHERE assessmentId = ${input.assessmentId}`);
+        // Deletar prova
+        await dbConn.execute(sql`DELETE FROM assessments WHERE id = ${input.assessmentId}`);
+        return { success: true };
+      }),
+
+    // Alterar status da prova (publicar/despublicar)
+    toggleAssessmentStatus: protectedProcedure
+      .input(z.object({ assessmentId: z.number(), status: z.enum(['draft', 'published']) }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        await dbConn.execute(sql`
+          UPDATE assessments SET status = ${input.status}
+          WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id}
+        `);
+        return { success: true };
+      }),
   }),
   // Boletim de Atividades da Trilha por Turma
   learningPathReport: router({

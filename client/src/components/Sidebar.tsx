@@ -189,6 +189,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <Lightbulb className="h-5 w-5" />,
         href: "/active-methodologies",
       },
+      {
+        label: "Banco de Provas e Exercícios",
+        icon: <ClipboardList className="h-5 w-5" />,
+        href: "/assessments-manager",
+      },
     ],
   },
   {

@@ -56,6 +56,7 @@ const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
 const BackupAdmin = lazy(() => import("./pages/BackupAdmin"));
 const VPSMonitoring = lazy(() => import("./pages/VPSMonitoring"));
 const LearningPathReport = lazy(() => import("./pages/LearningPathReport"));
+const AssessmentsManager = lazy(() => import("./pages/AssessmentsManager"));
 const AccessLogsPage = lazy(() => import("./pages/AccessLogsPage"));
 const TeacherDoubts = lazy(() => import("./pages/TeacherDoubts"));
 const TeacherGradePanel = lazy(() => import("./pages/TeacherGradePanel"));
@@ -168,6 +169,7 @@ function Router() {
           <Route path={"/questions/:id"} component={QuestionDetail} />
           <Route path={"/teacher-doubts"} component={TeacherDoubts} />
           <Route path={"/teacher-grades"} component={TeacherGradePanel} />
+          <Route path={"/assessments-manager"} component={AssessmentsManager} />
 
           {/* Student Portal - lazy loaded */}
           <Route path={"/student-dashboard"} component={StudentDashboard} />

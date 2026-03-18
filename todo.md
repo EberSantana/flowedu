@@ -7661,6 +7661,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] BUG: Provas criadas pelo professor não aparecem para o aluno na Trilhas de Aprendizagem - CORRIGIDO: generateExam não salvava no banco; adicionado botão 'Publicar para Alunos' no ExamGeneratorModal e seção de provas na StudentLearningPathDetail
 - [x] BUG: Botão "Criar Prova" na Trilha de Aprendizagem não gera prova no portal do aluno - CORRIGIDO: professor não sabia que precisava clicar em "Publicar para Alunos"; adicionado banner de aviso amarelo e botão mais destacado
 - [x] BUG: Erro ao salvar prova - classId sendo enviado como string vazia em vez de null no INSERT INTO assessments - CORRIGIDO: usar ?? null e validar classId > 0 antes de inserir
-- [ ] Criar página de gestão de provas publicadas no módulo professor (listar, editar, deletar, despublicar)
-- [ ] Criar página de gestão de exercícios no módulo professor (listar, editar, deletar)
-- [ ] Adicionar links de navegação no Sidebar para as novas páginas de gestão
+- [x] Criar página de gestão de provas publicadas no módulo professor (listar, editar, deletar, despublicar)
+- [x] Criar página de gestão de exercícios no módulo professor (listar, editar, deletar)
+- [x] Adicionar links de navegação no Sidebar para as novas páginas de gestão
