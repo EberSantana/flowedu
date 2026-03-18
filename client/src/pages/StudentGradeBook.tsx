@@ -16,6 +16,7 @@ import {
   Calendar,
   FileText,
   MessageSquare,
+  GraduationCap,
 } from "lucide-react";
 
 function gradeColor(grade: number, passingGrade: number): string {
@@ -33,6 +34,7 @@ function gradeBg(grade: number, passingGrade: number): string {
 export default function StudentGradeBook() {
   const { data: gradeBook, isLoading: loadingExercises } = trpc.studentExercises.getGradeBook.useQuery();
   const { data: activityGrades, isLoading: loadingActivities } = trpc.studentExercises.getActivityGrades.useQuery();
+  const { data: assessmentGrades, isLoading: loadingAssessments } = trpc.learningPath.getStudentAssessmentGrades.useQuery();
   const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState("all");
 
@@ -64,15 +66,31 @@ export default function StudentGradeBook() {
       ? (activityGrades.reduce((s, sub) => s + sub.average, 0) / activityGrades.length).toFixed(2)
       : "—";
 
+  // Provas
+  const totalAssessments = assessmentGrades?.length ?? 0;
+  const totalAssessmentPassed = assessmentGrades?.filter((a: any) => !!a.passed).length ?? 0;
+  const assessmentAverage =
+    assessmentGrades && assessmentGrades.length > 0
+      ? (assessmentGrades.reduce((s: number, a: any) => {
+          const totalPoints = parseFloat(String(a.totalPoints ?? 10));
+          const score = parseFloat(String(a.score ?? 0));
+          return s + (totalPoints > 0 ? (score / totalPoints) * 10 : 0);
+        }, 0) / assessmentGrades.length).toFixed(2)
+      : "—";
+
   // Média geral combinada
   const allAverages: number[] = [];
   if (gradeBook) gradeBook.forEach((s) => { if (s.totalAttempts > 0) allAverages.push(s.average); });
   if (activityGrades) activityGrades.forEach((s) => { if (s.totalGraded > 0) allAverages.push(s.average); });
+  if (assessmentGrades && assessmentGrades.length > 0) {
+    const avg = parseFloat(assessmentAverage);
+    if (!isNaN(avg)) allAverages.push(avg);
+  }
   const overallAverage = allAverages.length > 0
     ? (allAverages.reduce((a, b) => a + b, 0) / allAverages.length).toFixed(2)
     : "—";
 
-  const isLoading = loadingExercises || loadingActivities;
+  const isLoading = loadingExercises || loadingActivities || loadingAssessments;
 
   return (
     <StudentLayout>
@@ -120,8 +138,8 @@ export default function StudentGradeBook() {
                 <Award className="w-8 h-8 text-green-500" />
                 <div>
                   <p className="text-2xl font-bold text-foreground">
-                    {totalExerciseAttempts + totalActivityGraded > 0
-                      ? Math.round(((totalExerciseApproved + totalActivityApproved) / (totalExerciseAttempts + totalActivityGraded)) * 100)
+                    {totalExerciseAttempts + totalActivityGraded + totalAssessments > 0
+                      ? Math.round(((totalExerciseApproved + totalActivityApproved + totalAssessmentPassed) / (totalExerciseAttempts + totalActivityGraded + totalAssessments)) * 100)
                       : 0}%
                   </p>
                   <p className="text-xs text-muted-foreground">aprovação</p>
@@ -135,7 +153,7 @@ export default function StudentGradeBook() {
                 <FileText className="w-8 h-8 text-orange-500" />
                 <div>
                   <p className="text-2xl font-bold text-foreground">
-                    {totalExerciseAttempts + totalActivityGraded}
+                    {totalExerciseAttempts + totalActivityGraded + totalAssessments}
                   </p>
                   <p className="text-xs text-muted-foreground">avaliações</p>
                 </div>
@@ -146,10 +164,13 @@ export default function StudentGradeBook() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="all">Todas as Notas</TabsTrigger>
-            <TabsTrigger value="exercises">Exercícios Online</TabsTrigger>
-            <TabsTrigger value="activities">Atividades em Sala</TabsTrigger>
+            <TabsTrigger value="exercises">Exercícios</TabsTrigger>
+            <TabsTrigger value="activities">Atividades</TabsTrigger>
+            <TabsTrigger value="assessments">
+              Provas {totalAssessments > 0 ? `(${totalAssessments})` : ""}
+            </TabsTrigger>
           </TabsList>
 
           {/* Conteúdo */}
@@ -203,13 +224,26 @@ export default function StudentGradeBook() {
                   </div>
                 )}
 
-                {(!gradeBook || gradeBook.length === 0) && (!activityGrades || activityGrades.length === 0) && (
+                {/* Provas */}
+                {assessmentGrades && assessmentGrades.length > 0 && (
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-purple-600" />
+                      Provas
+                    </h2>
+                    <div className="space-y-3">
+                      <AssessmentList assessments={assessmentGrades} />
+                    </div>
+                  </div>
+                )}
+
+                {(!gradeBook || gradeBook.length === 0) && (!activityGrades || activityGrades.length === 0) && (!assessmentGrades || assessmentGrades.length === 0) && (
                   <Card>
                     <CardContent className="py-16 text-center">
                       <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-lg font-medium text-foreground">Nenhuma nota registrada</p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Complete exercícios ou envie atividades para ver suas notas aqui.
+                        Complete exercícios, envie atividades ou realize provas para ver suas notas aqui.
                       </p>
                     </CardContent>
                   </Card>
@@ -263,11 +297,122 @@ export default function StudentGradeBook() {
                   </Card>
                 )}
               </TabsContent>
+
+              {/* Tab: Provas */}
+              <TabsContent value="assessments" className="space-y-4 mt-6">
+                {assessmentGrades && assessmentGrades.length > 0 ? (
+                  <>
+                    {/* Resumo de provas */}
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <Card>
+                        <CardContent className="pt-3 pb-3 text-center">
+                          <p className="text-2xl font-bold text-foreground">{totalAssessments}</p>
+                          <p className="text-xs text-muted-foreground">provas realizadas</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-3 pb-3 text-center">
+                          <p className={`text-2xl font-bold ${parseFloat(assessmentAverage) >= 6 ? "text-green-700" : "text-red-700"}`}>
+                            {assessmentAverage}
+                          </p>
+                          <p className="text-xs text-muted-foreground">média geral</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-3 pb-3 text-center">
+                          <p className="text-2xl font-bold text-green-700">{totalAssessmentPassed}</p>
+                          <p className="text-xs text-muted-foreground">aprovadas</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    <AssessmentList assessments={assessmentGrades} />
+                  </>
+                ) : (
+                  <Card>
+                    <CardContent className="py-16 text-center">
+                      <GraduationCap className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-lg font-medium text-foreground">Nenhuma prova realizada</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Realize provas disponibilizadas pelo professor para ver suas notas aqui.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
             </>
           )}
         </Tabs>
       </div>
     </StudentLayout>
+  );
+}
+
+// ─── Componente: Lista de provas ─────────────────────────────────────────────
+
+function AssessmentList({ assessments }: { assessments: any[] }) {
+  return (
+    <div className="space-y-3">
+      {assessments.map((a: any, i: number) => {
+        const totalPoints = parseFloat(String(a.totalPoints ?? 10));
+        const score = parseFloat(String(a.score ?? 0));
+        const grade10 = totalPoints > 0 ? parseFloat(((score / totalPoints) * 10).toFixed(1)) : 0;
+        const passed = !!a.passed;
+        const passingGrade = a.passingScore ? parseFloat(String(a.passingScore)) / 10 : 6;
+
+        return (
+          <div
+            key={a.attemptId ?? i}
+            className={`p-4 rounded-lg border ${gradeBg(grade10, passingGrade)}`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                {passed ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{a.title}</p>
+                  {a.subjectName && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{a.subjectName}</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                  {score}/{totalPoints} pts
+                </Badge>
+                <div className="text-right">
+                  <p className={`text-lg font-bold ${gradeColor(grade10, passingGrade)}`}>
+                    {grade10.toFixed(1)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">de 10,0</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-current/10">
+              <Badge
+                variant="outline"
+                className={passed
+                  ? "bg-green-50 text-green-700 border-green-200 text-xs"
+                  : "bg-red-50 text-red-700 border-red-200 text-xs"}
+              >
+                {passed ? "Aprovado" : "Reprovado"}
+              </Badge>
+              {a.submittedAt && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {(() => {
+                    const d = new Date(a.submittedAt);
+                    return `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${d.getUTCFullYear()}`;
+                  })()}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

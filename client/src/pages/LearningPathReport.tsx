@@ -151,7 +151,7 @@ function CustomTooltip({ active, payload, label }: any) {
             <span className="text-muted-foreground">{entry.name}</span>
           </span>
           <span className="font-bold" style={{ color: entry.color }}>
-            {entry.value !== null && entry.value !== undefined ? pctToGrade(entry.value)!.toFixed(1) : "—"}
+            {entry.value !== null && entry.value !== undefined ? Number(entry.value).toFixed(1) : "—"}
           </span>
         </div>
       ))}
