@@ -173,7 +173,7 @@ export default function StudentLearningPaths() {
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">
                   Nenhuma disciplina encontrada
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   Você ainda não está matriculado em nenhuma disciplina com trilha de aprendizagem.
                 </p>
               </CardContent>

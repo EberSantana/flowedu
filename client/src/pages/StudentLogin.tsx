@@ -96,10 +96,10 @@ export default function StudentLogin() {
             <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <GraduationCap className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Portal do Aluno
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Entre com sua matrícula e senha
             </p>
           </div>

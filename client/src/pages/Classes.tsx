@@ -107,7 +107,7 @@ export default function Classes() {
           <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Turmas" }]} />
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Users className="w-8 h-8 text-primary" />
                 Gerenciar Turmas
               </h1>

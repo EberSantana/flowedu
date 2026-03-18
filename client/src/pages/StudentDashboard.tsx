@@ -113,7 +113,7 @@ export default function StudentDashboard() {
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       Nenhuma disciplina ativa
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-muted-foreground">
                       Entre em contato com seu professor para se matricular
                     </p>
                   </CardContent>
@@ -207,7 +207,7 @@ export default function StudentDashboard() {
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">Disciplinas Concluídas</h3>
-                        <p className="text-gray-600">
+                        <p className="text-muted-foreground">
                           Você completou <span className="font-bold text-success">{completedSubjects.length}</span> disciplina{completedSubjects.length !== 1 ? 's' : ''}
                         </p>
                       </div>

@@ -261,7 +261,7 @@ export default function StudentLearningPathDetail() {
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Trilha de Aprendizagem</h1>
+              <h1 className="text-3xl font-bold text-foreground">Trilha de Aprendizagem</h1>
               <p className="text-gray-600 mt-1">
                 {completedTopics} de {totalTopics} tópicos concluídos
               </p>

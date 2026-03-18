@@ -74,7 +74,7 @@ export default function NotFound() {
         </div>
 
         {/* Help text */}
-        <p className="text-gray-500 text-sm mt-12">
+        <p className="text-muted-foreground text-sm mt-12">
           Se você acredita que isso é um erro, entre em contato com o suporte.
         </p>
       </div>

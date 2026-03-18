@@ -249,11 +249,11 @@ export default function EmailConfig() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-foreground mb-1 flex items-center gap-3">
                   <Settings className="w-8 h-8 text-primary" />
                   Configuração de E-mail
                 </h1>
-                <p className="text-gray-600">Configure seu servidor SMTP para envio de e-mails institucionais</p>
+                <p className="text-muted-foreground">Configure seu servidor SMTP para envio de e-mails institucionais</p>
               </div>
               {config && (
                 <div className="flex items-center gap-2">

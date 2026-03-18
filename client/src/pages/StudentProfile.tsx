@@ -138,7 +138,7 @@ export default function StudentProfile() {
               Voltar
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Perfil do Aluno</h1>
+              <h1 className="text-3xl font-bold text-foreground">Perfil do Aluno</h1>
               <p className="text-gray-600 mt-1">Visualize informações detalhadas e histórico de frequência</p>
             </div>
           </div>

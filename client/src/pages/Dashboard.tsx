@@ -415,7 +415,7 @@ function Dashboard() {
     <>
       {/* ProfileOnboarding removido - perfil único tradicional */}
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gray-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
           <div className="mb-8 flex items-start justify-between">
@@ -431,7 +431,7 @@ function Dashboard() {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-foreground">
                   {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
                 </h1>
                 <p className="text-gray-600 mt-1">

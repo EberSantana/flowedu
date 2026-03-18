@@ -181,7 +181,7 @@ export default function StudentSubjectView() {
                 ← Voltar ao Portal
               </Button>
             </Link>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
               Trilha de Aprendizagem
             </h1>
             <p className="text-lg text-gray-600">

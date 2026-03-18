@@ -258,11 +258,11 @@ export default function Tasks() {
           
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-foreground mb-1 flex items-center gap-3">
               <CheckSquare className="w-8 h-8 text-primary" />
               Gerenciar Tarefas
             </h1>
-            <p className="text-gray-600">Organize e acompanhe suas tarefas e atividades</p>
+            <p className="text-muted-foreground">Organize e acompanhe suas tarefas e atividades</p>
           </div>
           
           {/* Ações e Filtros */}

@@ -108,7 +108,7 @@ export default function Shifts() {
           <Breadcrumb items={[{ label: "Planejamento" }, { label: "Turnos" }]} />
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Clock className="w-8 h-8 text-primary" />
                 Configurar Turnos
               </h1>

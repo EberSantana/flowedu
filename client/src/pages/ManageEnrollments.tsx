@@ -156,7 +156,7 @@ export default function ManageEnrollments() {
             </Link>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-foreground mb-2">
                   Gerenciar Matrículas
                 </h1>
                 <p className="text-gray-600 flex items-center gap-2">
@@ -253,7 +253,7 @@ export default function ManageEnrollments() {
               ) : filteredEnrollments.length === 0 ? (
                 <div className="text-center py-8">
                   <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-600">Nenhum aluno encontrado com "{searchQuery}"</p>
+                  <p className="text-muted-foreground">Nenhum aluno encontrado com "{searchQuery}"</p>
                 </div>
               ) : (
                 <div className="space-y-3">

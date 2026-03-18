@@ -116,11 +116,11 @@ export function Announcements() {
           
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-foreground mb-1 flex items-center gap-3">
               <Megaphone className="w-8 h-8 text-primary" />
               Avisos
             </h1>
-            <p className="text-gray-600">Poste anúncios importantes para seus alunos</p>
+            <p className="text-muted-foreground">Poste anúncios importantes para seus alunos</p>
           </div>
 
           {/* Botão Novo Aviso */}
@@ -290,7 +290,7 @@ export function Announcements() {
             ) : (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <Megaphone className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">Nenhum aviso criado ainda</p>
+                <p className="text-muted-foreground">Nenhum aviso criado ainda</p>
                 <p className="text-sm text-gray-400 mt-1">
                   Clique em "Novo Aviso" para começar
                 </p>

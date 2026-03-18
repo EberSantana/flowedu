@@ -128,12 +128,12 @@ export default function ExercisePerformanceReport() {
     return (
       <>
         <Sidebar />
-        <PageWrapper className="min-h-screen bg-gray-50">
+        <PageWrapper className="min-h-screen bg-background">
           <div className="container mx-auto py-6 px-4">
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Carregando relatório...</p>
+                <p className="text-muted-foreground">Carregando relatório...</p>
               </div>
             </div>
           </div>
@@ -145,12 +145,12 @@ export default function ExercisePerformanceReport() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gray-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Relatório de Desempenho</h1>
+              <h1 className="text-3xl font-bold text-foreground">Relatório de Desempenho</h1>
               <p className="text-gray-600 mt-1">
                 Análise detalhada do desempenho dos alunos em exercícios
               </p>

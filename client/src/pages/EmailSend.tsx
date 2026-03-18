@@ -613,11 +613,11 @@ export default function EmailSend() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-foreground mb-1 flex items-center gap-3">
                   <Send className="w-8 h-8 text-primary" />
                   Enviar E-mail
                 </h1>
-                <p className="text-gray-600">Envie mensagens para grupos de alunos</p>
+                <p className="text-muted-foreground">Envie mensagens para grupos de alunos</p>
               </div>
               <div className="flex items-center gap-2">
                 {!emailConfig ? (

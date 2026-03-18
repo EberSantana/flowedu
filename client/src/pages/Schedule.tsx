@@ -573,7 +573,7 @@ export default function Schedule() {
               </Button>
             </Link>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Calendar className="w-8 h-8 text-primary" />
                 Grade de Horários
               </h1>
@@ -625,7 +625,7 @@ export default function Schedule() {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                   <Calendar className="w-8 h-8 text-primary" />
                   Grade de Horários
                 </h1>

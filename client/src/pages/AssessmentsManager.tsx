@@ -46,6 +46,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -163,22 +164,20 @@ export default function AssessmentsManager() {
   const totalDraft = assessments?.filter((a: any) => a.status !== 'published').length ?? 0;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <>
       <Sidebar />
-      <PageWrapper>
-        <div className="p-6 space-y-5">
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-8 px-4">
+          <Breadcrumb items={[{ label: "Recursos Pedagógicos" }, { label: "Banco de Provas e Exercícios" }]} />
           {/* Cabeçalho */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <ClipboardList className="h-6 w-6 text-blue-600" />
-                Banco de Provas e Exercícios
-              </h1>
-              <p className="text-gray-500 text-sm mt-0.5">Gerencie todas as suas provas e exercícios publicados</p>
+              <h1 className="text-3xl font-bold mb-2">Banco de Provas e Exercícios</h1>
+              <p className="text-muted-foreground">Gerencie todas as suas provas e exercícios publicados</p>
             </div>
             {/* Filtro por disciplina */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-400" />
+            <div className="flex items-center gap-2 shrink-0">
+              <Filter className="h-4 w-4 text-muted-foreground" />
               <Select value={subjectFilter} onValueChange={setSubjectFilter}>
                 <SelectTrigger className="w-52">
                   <SelectValue placeholder="Filtrar por disciplina" />
@@ -563,6 +562,6 @@ export default function AssessmentsManager() {
           </DialogContent>
         </Dialog>
       </PageWrapper>
-    </div>
+    </>
   );
 }

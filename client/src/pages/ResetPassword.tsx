@@ -104,7 +104,7 @@ export default function ResetPassword() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-12 h-12 text-primary animate-spin" />
-              <p className="text-gray-600">Validando link de recuperação...</p>
+              <p className="text-muted-foreground">Validando link de recuperação...</p>
             </div>
           </CardContent>
         </Card>

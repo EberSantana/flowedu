@@ -102,8 +102,8 @@ export default function StudentProfilePage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Meu Perfil</h1>
-          <p className="text-gray-600">Informações da sua conta de aluno</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Meu Perfil</h1>
+          <p className="text-muted-foreground">Informações da sua conta de aluno</p>
         </div>
         {!editing && (
           <Button

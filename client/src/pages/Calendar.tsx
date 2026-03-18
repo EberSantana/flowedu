@@ -442,7 +442,7 @@ export default function Calendar() {
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <CalendarDays className="w-8 h-8 text-primary" />
                 Calendário
               </h1>
@@ -605,7 +605,7 @@ export default function Calendar() {
                   ) : monthEvents.length === 0 ? (
                     <div className="text-center py-8">
                       <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 text-sm">Nenhum evento este mês</p>
+                      <p className="text-muted-foreground text-sm">Nenhum evento este mês</p>
                       <Button
                         size="sm"
                         variant="outline"
@@ -783,7 +783,7 @@ export default function Calendar() {
                 {isProcessing && (
                   <div className="text-center py-8">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-success mb-4"></div>
-                    <p className="text-gray-600">Processando PDF e extraindo eventos...</p>
+                    <p className="text-muted-foreground">Processando PDF e extraindo eventos...</p>
                     <p className="text-sm text-gray-500 mt-2">Isso pode levar alguns segundos</p>
                   </div>
                 )}

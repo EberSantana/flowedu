@@ -3498,6 +3498,41 @@ JSON (descrições MAX 15 chars):
         return (result[0] as unknown) as any[];
       }),
 
+    // Aluno busca questões de uma prova publicada
+    getStudentAssessmentQuestions: studentProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        const studentId = ctx.studentSession.studentId;
+
+        // Verificar que a prova está publicada e o aluno tem acesso (via subjectEnrollments)
+        const checkResult = await dbConn.execute(
+          sql`SELECT a.id FROM assessments a
+              JOIN subjectEnrollments se ON se.subjectId = a.subjectId
+              WHERE a.id = ${input.assessmentId}
+                AND a.status = 'published'
+                AND se.studentId = ${studentId}
+                AND se.status = 'active'
+              LIMIT 1`
+        ) as any[];
+        const checkRows = (checkResult[0] as any[]) || [];
+        if (checkRows.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
+        }
+
+        // Buscar questões
+        const result = await dbConn.execute(
+          sql`SELECT id, questionNumber, questionType, statement, context,
+                     optionA, optionB, optionC, optionD, optionE,
+                     correctAnswer, answerExplanation, points, difficulty
+              FROM assessment_questions
+              WHERE assessmentId = ${input.assessmentId}
+              ORDER BY questionNumber ASC`
+        ) as any[];
+        return (result[0] as unknown) as any[];
+      }),
+
     // Listar todas as provas do professor (para gestão)
     getTeacherAssessments: protectedProcedure
       .input(z.object({ subjectId: z.number().optional() }))

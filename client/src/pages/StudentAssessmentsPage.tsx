@@ -34,7 +34,7 @@ export default function StudentAssessmentsPage() {
   const { data: assessments = [], isLoading } = trpc.learningPath.getAllStudentAssessments.useQuery();
 
   const { data: assessmentQuestions, isLoading: loadingQuestions } =
-    trpc.learningPath.getAssessmentQuestions.useQuery(
+    trpc.learningPath.getStudentAssessmentQuestions.useQuery(
       { assessmentId: viewQuestionsId! },
       { enabled: viewQuestionsId !== null }
     );

@@ -145,12 +145,12 @@ export default function AdminInvites() {
   return (
     <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-gray-50">
+      <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Convites e Aprovações</h1>
-            <p className="text-gray-600">Gerencie códigos de convite e aprove novos professores</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Convites e Aprovações</h1>
+            <p className="text-muted-foreground">Gerencie códigos de convite e aprove novos professores</p>
           </div>
 
           <Tabs defaultValue="invites" className="space-y-6">

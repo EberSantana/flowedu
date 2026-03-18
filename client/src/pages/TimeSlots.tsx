@@ -125,8 +125,8 @@ export default function TimeSlots() {
                 <Clock className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-gray-900">{shift.name}</h1>
-                <p className="text-gray-600">Gerenciar horários do turno</p>
+                <h1 className="text-4xl font-bold text-foreground">{shift.name}</h1>
+                <p className="text-muted-foreground">Gerenciar horários do turno</p>
               </div>
             </div>
           </div>

@@ -349,7 +349,7 @@ export default function Subjects() {
           <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Disciplinas" }]} />
           <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <BookOpen className="w-8 h-8 text-primary" />
                 Gerenciar Disciplinas
               </h1>

@@ -73,7 +73,7 @@ export default function StudentSubjectDetails() {
         <div className="container mx-auto py-8 px-4">
           <Card>
             <CardContent className="py-8 text-center">
-              <p className="text-gray-500">Disciplina não encontrada</p>
+              <p className="text-muted-foreground">Disciplina não encontrada</p>
               <Link href="/student-dashboard">
                 <Button className="mt-4">
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -397,7 +397,7 @@ function ExercisesTab({
         <CardContent>
           <div className="text-center py-8">
             <Trophy className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Nenhum exercício disponível no momento</p>
+            <p className="text-muted-foreground">Nenhum exercício disponível no momento</p>
           </div>
         </CardContent>
       </Card>
@@ -473,7 +473,7 @@ function ComputationalThinkingTab({ subjectId }: { subjectId: number }) {
       <Card className="shadow-md">
         <CardContent className="py-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando seu perfil de PC...</p>
+          <p className="text-muted-foreground">Carregando seu perfil de PC...</p>
         </CardContent>
       </Card>
     );

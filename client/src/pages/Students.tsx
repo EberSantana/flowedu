@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Pencil, Trash2, Search, UserPlus, Download, FileText, Eye, Mail, Calendar, User } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import PageWrapper from '../components/PageWrapper';
+import { Breadcrumb } from '@/components/Breadcrumb';
 
 type Student = {
   id: number;
@@ -253,10 +254,12 @@ export default function Students() {
 
   return (
     <DashboardLayout>
-      <PageWrapper>
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Gerenciar Matrículas</h1>
-          <p className="text-gray-600">Cadastre e gerencie os alunos matriculados</p>
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-8 px-4">
+        <Breadcrumb items={[{ label: "Gestão Acadêmica" }, { label: "Matrículas" }]} />
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Gerenciar Matrículas</h1>
+          <p className="text-muted-foreground">Cadastre e gerencie os alunos matriculados</p>
         </div>
 
         {/* Barra de Ações */}
@@ -584,6 +587,7 @@ export default function Students() {
             )}
           </CardContent>
         </Card>
+        </div>
       </PageWrapper>
     </DashboardLayout>
   );
