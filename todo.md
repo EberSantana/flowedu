@@ -7654,3 +7654,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] BUG: Disciplinas/atividades ainda aparecem no calendário após remoção da integração - corrigido: era cache do browser/VPS, deploy com rsync --delete e nginx reload resolveu
 - [ ] Atividades em Sala: exibir indicador de submissões dos alunos (quantos enviaram / total matriculados, lista de quem enviou e quem não enviou)
 - [x] Notificar professor quando aluno enviar Atividade em Sala - CORRIGIDO: sino de notificações estava importado mas não renderizado no Sidebar; adicionado ao cabeçalho ao lado do logo FlowEdu
+- [x] Contador de submissões nos cards de atividade: exibir "X/Y enviaram" diretamente no card

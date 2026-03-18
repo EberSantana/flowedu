@@ -310,9 +310,13 @@ export default function ActivitiesPage() {
                             {className_ && <p className="text-sm text-gray-500">Turma: {className_}</p>}
                           </div>
                         </div>
-                        <Badge className="bg-orange-100 text-orange-700 border-orange-200 flex-shrink-0">
+                        <Badge className={`flex-shrink-0 ${
+                          (activity.submissionCount ?? 0) > 0
+                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                            : 'bg-orange-100 text-orange-700 border-orange-200'
+                        }`}>
                           <Users className="w-3 h-3 mr-1" />
-                          {activity.submissionCount ?? 0}
+                          {activity.submissionCount ?? 0}{(activity as any).totalStudents > 0 ? `/${(activity as any).totalStudents}` : ''} enviaram
                         </Badge>
                       </div>
                     </CardHeader>
@@ -352,7 +356,7 @@ export default function ActivitiesPage() {
                           className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white"
                         >
                           <FileText className="mr-2 h-3 w-3" />
-                          {activity.submissionCount ?? 0} Submissão(ões) - Ver Detalhes
+                          Ver Submissões ({activity.submissionCount ?? 0}{(activity as any).totalStudents > 0 ? `/${(activity as any).totalStudents}` : ''})
                         </Button>
 
                         <div className="flex gap-2">

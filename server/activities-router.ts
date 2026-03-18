@@ -97,10 +97,48 @@ export const activitiesRouter = router({
         counts.forEach(c => { submissionCounts[c.activityId] = Number(c.count); });
       }
 
+      // Para cada atividade, contar total de alunos matriculados (via turma ou disciplina)
+      const classIds = Array.from(new Set(rows.map(r => r.classId).filter(Boolean) as number[]));
+      const subjectIds = Array.from(new Set(rows.map(r => r.subjectId).filter(Boolean) as number[]));
+      let classStudentCounts: Record<number, number> = {};
+      let subjectStudentCounts: Record<number, number> = {};
+
+      if (classIds.length > 0) {
+        const classCounts = await db
+          .select({
+            classId: studentClassEnrollments.classId,
+            count: sql<number>`count(*)`,
+          })
+          .from(studentClassEnrollments)
+          .where(inArray(studentClassEnrollments.classId, classIds))
+          .groupBy(studentClassEnrollments.classId);
+        classCounts.forEach(c => { classStudentCounts[c.classId] = Number(c.count); });
+      }
+
+      if (subjectIds.length > 0) {
+        const subjectCounts = await db
+          .select({
+            subjectId: subjectEnrollments.subjectId,
+            count: sql<number>`count(*)`,
+          })
+          .from(subjectEnrollments)
+          .where(and(
+            inArray(subjectEnrollments.subjectId, subjectIds),
+            eq(subjectEnrollments.status, 'active'),
+          ))
+          .groupBy(subjectEnrollments.subjectId);
+        subjectCounts.forEach(c => { subjectStudentCounts[c.subjectId] = Number(c.count); });
+      }
+
       return rows.map(r => ({
         ...r,
         maxScore: Number(r.maxScore),
         submissionCount: submissionCounts[r.id] ?? 0,
+        totalStudents: r.classId
+          ? (classStudentCounts[r.classId] ?? 0)
+          : r.subjectId
+          ? (subjectStudentCounts[r.subjectId] ?? 0)
+          : 0,
       }));
     }),
 
