@@ -3772,9 +3772,11 @@ JSON (descrições MAX 15 chars):
         const totalPoints = attempt.totalPoints as number;
         const passingScore = attempt.passingScore as number;
 
-        // Buscar questões com gabarito
+        // Buscar questões com gabarito completo (para gabarito comentado)
         const questionsResult = await dbConn.execute(
-          sql`SELECT id, questionNumber, correctAnswer, points FROM assessment_questions
+          sql`SELECT id, questionNumber, correctAnswer, points, statement, questionText,
+                     optionA, optionB, optionC, optionD, optionE, answerExplanation, difficulty
+              FROM assessment_questions
               WHERE assessmentId = ${assessmentId} ORDER BY questionNumber ASC`
         ) as any[];
         const questions = (questionsResult[0] as any[]) || [];
@@ -3820,6 +3822,29 @@ JSON (descrições MAX 15 chars):
               WHERE id = ${input.attemptId}`
         );
 
+        // Montar gabarito comentado
+        const reviewQuestions = questions.map((q: any) => {
+          const studentAns = (answerMap[q.id as number] || '').trim().toUpperCase();
+          const correctAns = (q.correctAnswer as string || '').trim().toUpperCase();
+          const isCorrect = studentAns === correctAns && studentAns !== '';
+          return {
+            id: q.id,
+            questionNumber: q.questionNumber,
+            statement: q.statement || q.questionText || '',
+            optionA: q.optionA,
+            optionB: q.optionB,
+            optionC: q.optionC,
+            optionD: q.optionD,
+            optionE: q.optionE,
+            correctAnswer: correctAns,
+            studentAnswer: studentAns,
+            isCorrect,
+            explanation: q.answerExplanation || null,
+            difficulty: q.difficulty,
+            points: q.points,
+          };
+        });
+
         return {
           totalCorrect,
           totalWrong,
@@ -3828,6 +3853,7 @@ JSON (descrições MAX 15 chars):
           passed,
           totalPoints,
           passingScore,
+          reviewQuestions,
         };
       }),
 

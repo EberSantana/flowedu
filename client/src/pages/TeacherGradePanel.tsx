@@ -31,15 +31,29 @@ import {
 
 function gradeColor(grade: number | null): string {
   if (grade === null) return "text-muted-foreground";
-  if (grade >= 6) return "text-green-700";
-  if (grade >= 4.2) return "text-yellow-700";
+  if (grade >= 7) return "text-green-700";
+  if (grade >= 5) return "text-yellow-700";
   return "text-red-700";
 }
 
 function gradeBg(grade: number): string {
-  if (grade >= 6) return "bg-green-50 border-green-200";
-  if (grade >= 4.2) return "bg-yellow-50 border-yellow-200";
+  if (grade >= 7) return "bg-green-50 border-green-200";
+  if (grade >= 5) return "bg-yellow-50 border-yellow-200";
   return "bg-red-50 border-red-200";
+}
+
+function gradeLabel(grade: number | null): string {
+  if (grade === null) return "Sem notas";
+  if (grade >= 7) return "Bom desempenho";
+  if (grade >= 5) return "Desempenho regular";
+  return "Atenção necessária";
+}
+
+function gradeLabelColor(grade: number | null): string {
+  if (grade === null) return "text-muted-foreground border-muted";
+  if (grade >= 7) return "bg-green-50 text-green-700 border-green-200";
+  if (grade >= 5) return "bg-yellow-50 text-yellow-700 border-yellow-200";
+  return "bg-red-50 text-red-700 border-red-200";
 }
 
 export default function TeacherGradePanel() {
@@ -86,7 +100,7 @@ export default function TeacherGradePanel() {
     const avg = withGrades.length > 0
       ? withGrades.reduce((sum, s) => sum + (s.overallAverage ?? 0), 0) / withGrades.length
       : null;
-    const approved = withGrades.filter((s) => (s.overallAverage ?? 0) >= 6).length;
+    const approved = withGrades.filter((s) => (s.overallAverage ?? 0) >= 7).length;
     return {
       total: gradesData.length,
       avgOverall: avg !== null ? parseFloat(avg.toFixed(2)) : null,
@@ -128,7 +142,7 @@ export default function TeacherGradePanel() {
       s.assessmentCount ?? 0,
       s.assessmentAverage !== null ? s.assessmentAverage?.toFixed(2) : "—",
       s.overallAverage !== null ? s.overallAverage.toFixed(2) : "—",
-      s.overallAverage !== null ? (s.overallAverage >= 6 ? "Aprovado" : "Em recuperação") : "Sem notas",
+      s.overallAverage !== null ? gradeLabel(s.overallAverage) : "Sem notas",
     ]);
 
     const csvContent =
@@ -390,22 +404,12 @@ export default function TeacherGradePanel() {
                               </span>
                             </td>
                             <td className="py-3 px-2 text-center">
-                              {student.overallAverage !== null ? (
-                                <Badge
+                              <Badge
                                   variant="outline"
-                                  className={
-                                    student.overallAverage >= 6
-                                      ? "bg-green-50 text-green-700 border-green-200"
-                                      : "bg-red-50 text-red-700 border-red-200"
-                                  }
+                                  className={gradeLabelColor(student.overallAverage)}
                                 >
-                                  {student.overallAverage >= 6 ? "Aprovado" : "Recuperação"}
+                                  {gradeLabel(student.overallAverage)}
                                 </Badge>
-                              ) : (
-                                <Badge variant="outline" className="text-muted-foreground">
-                                  Sem notas
-                                </Badge>
-                              )}
                             </td>
                             <td className="py-3 px-2 text-center">
                               <Button

@@ -25,6 +25,8 @@ import {
   BookOpen,
   Trophy,
   XCircle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
 import { toast } from "sonner";
@@ -41,6 +43,8 @@ export default function StudentExamPage() {
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [showReview, setShowReview] = useState(false);
+  const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isStarting, setIsStarting] = useState(false);
   const [started, setStarted] = useState(false);
@@ -144,71 +148,172 @@ export default function StudentExamPage() {
   // ======= TELA DE RESULTADO =======
   if (submitted && result) {
     const passed = result.passed;
+    const reviewQuestions: any[] = result.reviewQuestions || [];
     return (
       <StudentLayout>
-        <div className="p-6 max-w-2xl mx-auto">
-          <div className="text-center space-y-6">
-            <div className={`w-24 h-24 rounded-full mx-auto flex items-center justify-center ${passed ? "bg-green-100" : "bg-red-100"}`}>
-              {passed ? (
-                <Trophy className="h-12 w-12 text-green-600" />
-              ) : (
-                <XCircle className="h-12 w-12 text-red-500" />
-              )}
-            </div>
+        <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6">
+          {/* Card de resultado */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 ${passed ? "bg-green-100" : "bg-red-100"}`}>
+                  {passed ? (
+                    <Trophy className="h-8 w-8 text-green-600" />
+                  ) : (
+                    <XCircle className="h-8 w-8 text-red-500" />
+                  )}
+                </div>
+                <div className="text-center sm:text-left">
+                  <h1 className="text-xl font-bold text-foreground">
+                    {passed ? "Parabéns! Você foi aprovado!" : "Prova concluída"}
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-0.5">{assessment?.title}</p>
+                </div>
+              </div>
 
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                {passed ? "Parabéns! Você foi aprovado!" : "Prova concluída"}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {assessment?.title}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-4 text-center">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+                <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-foreground">{result.score?.toFixed(1)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Nota</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
+                  <p className="text-xs text-muted-foreground mt-0.5">Nota</p>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-foreground">{result.percentage?.toFixed(0)}%</p>
-                  <p className="text-xs text-muted-foreground mt-1">Acertos</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
+                  <p className="text-xs text-muted-foreground mt-0.5">Aproveitamento</p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-green-600">{result.totalCorrect}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Corretas</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
+                  <p className="text-xs text-muted-foreground mt-0.5">Corretas</p>
+                </div>
+                <div className="bg-red-50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-red-500">{result.totalWrong}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Erradas</p>
-                </CardContent>
-              </Card>
-            </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">Erradas</p>
+                </div>
+              </div>
 
-            <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground">
-              <p>Nota mínima para aprovação: <strong>{result.passingScore}%</strong></p>
-              <p>Tempo utilizado: <strong>{formatTime(timeElapsed)}</strong></p>
-            </div>
+              <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground bg-muted/30 rounded-lg px-4 py-2">
+                <span>Nota mínima: <strong>{result.passingScore}%</strong></span>
+                <span>Tempo: <strong>{formatTime(timeElapsed)}</strong></span>
+              </div>
 
-            <div className={`rounded-lg p-4 ${passed ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}>
-              <p className={`font-semibold ${passed ? "text-green-700" : "text-red-600"}`}>
+              <div className={`mt-4 rounded-lg p-3 text-sm font-medium ${passed ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-600"}`}>
                 {passed
                   ? "✓ Aprovado — sua nota foi registrada no boletim."
                   : "✗ Não aprovado — sua nota foi registrada no boletim."}
-              </p>
-            </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Button onClick={() => navigate("/student/assessments")} className="w-full sm:w-auto">
-              Voltar para Provas
-            </Button>
-          </div>
+          {/* Gabarito Comentado */}
+          {reviewQuestions.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Gabarito Comentado</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowReview(!showReview)}
+                >
+                  {showReview ? (
+                    <><ChevronUp className="h-4 w-4 mr-1" /> Ocultar</>
+                  ) : (
+                    <><ChevronDown className="h-4 w-4 mr-1" /> Ver Gabarito</>
+                  )}
+                </Button>
+              </div>
+
+              {showReview && (
+                <div className="space-y-3">
+                  {reviewQuestions.map((q: any, idx: number) => {
+                    const isExpanded = expandedQuestion === idx;
+                    const options: { label: string; text: string }[] = [];
+                    if (q.optionA) options.push({ label: "A", text: q.optionA });
+                    if (q.optionB) options.push({ label: "B", text: q.optionB });
+                    if (q.optionC) options.push({ label: "C", text: q.optionC });
+                    if (q.optionD) options.push({ label: "D", text: q.optionD });
+                    if (q.optionE) options.push({ label: "E", text: q.optionE });
+
+                    return (
+                      <Card key={q.id} className={`border-l-4 ${q.isCorrect ? "border-l-green-500" : "border-l-red-400"}`}>
+                        <CardContent className="p-4">
+                          <button
+                            className="w-full text-left"
+                            onClick={() => setExpandedQuestion(isExpanded ? null : idx)}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-start gap-2">
+                                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${q.isCorrect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                                  {q.questionNumber || idx + 1}
+                                </span>
+                                <p className="text-sm font-medium text-foreground leading-relaxed line-clamp-2">
+                                  {q.statement}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {q.isCorrect ? (
+                                  <Badge className="bg-green-100 text-green-700 border-0 text-xs">Correta</Badge>
+                                ) : (
+                                  <Badge className="bg-red-100 text-red-600 border-0 text-xs">Errada</Badge>
+                                )}
+                                {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                              </div>
+                            </div>
+                          </button>
+
+                          {isExpanded && (
+                            <div className="mt-3 space-y-2 pt-3 border-t border-border">
+                              {/* Alternativas */}
+                              {options.map((opt) => {
+                                const isCorrectOpt = opt.label === q.correctAnswer;
+                                const isStudentOpt = opt.label === q.studentAnswer;
+                                let cls = "border-border bg-muted/20";
+                                if (isCorrectOpt) cls = "border-green-400 bg-green-50";
+                                else if (isStudentOpt && !isCorrectOpt) cls = "border-red-400 bg-red-50";
+                                return (
+                                  <div key={opt.label} className={`flex items-start gap-2 rounded-lg border p-2.5 ${cls}`}>
+                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                                      isCorrectOpt ? "bg-green-500 text-white" :
+                                      isStudentOpt && !isCorrectOpt ? "bg-red-400 text-white" :
+                                      "bg-muted text-muted-foreground"
+                                    }`}>
+                                      {opt.label}
+                                    </span>
+                                    <span className="text-sm text-foreground leading-relaxed">{opt.text}</span>
+                                    {isCorrectOpt && <CheckCircle2 className="h-4 w-4 text-green-600 ml-auto shrink-0" />}
+                                    {isStudentOpt && !isCorrectOpt && <XCircle className="h-4 w-4 text-red-500 ml-auto shrink-0" />}
+                                  </div>
+                                );
+                              })}
+
+                              {/* Resposta do aluno vs gabarito */}
+                              {!q.isCorrect && (
+                                <div className="text-xs text-muted-foreground bg-muted/30 rounded p-2">
+                                  Sua resposta: <strong className="text-red-600">{q.studentAnswer || "Não respondida"}</strong>
+                                  {" → "}
+                                  Gabarito: <strong className="text-green-600">{q.correctAnswer}</strong>
+                                </div>
+                              )}
+
+                              {/* Explicação */}
+                              {q.explanation && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-blue-700 mb-1">Explicação</p>
+                                  <p className="text-sm text-blue-800 leading-relaxed">{q.explanation}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          <Button onClick={() => navigate("/student/assessments")} className="w-full sm:w-auto">
+            Voltar para Provas
+          </Button>
         </div>
       </StudentLayout>
     );

@@ -7669,3 +7669,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Pontuação automática por questão: 10 questões = 1,0 cada (total 10); 20 questões = 0,5 cada (total 10) - CORRIGIDO no prompt da IA e no db.ts
 - [x] BUG CRÍTICO: classId string vazia persiste mesmo com Drizzle ORM insert() - CORRIGIDO: omitir classId do objeto insert quando não tem valor válido, deixando o banco usar NULL default
 - [ ] BUG: INSERT INTO assessments ainda falha mesmo com classId como default - investigar constraint da tabela no banco
+
+## v4.9.6 - Gabarito, Tentativas e Padronização
+- [ ] Gabarito comentado pós-prova (aluno vê respostas corretas + explicações após submeter)
+- [ ] Limite de tentativas configurável no Banco de Provas
+- [ ] Corrigir métricas de desempenho (≥7=Bom, 5-6.9=Regular, <5=Atenção)
+- [ ] Padronizar layout do Painel de Notas (clique no aluno → evolução individual)
+- [ ] Padronizar layout de Exercícios Disponíveis no portal do aluno

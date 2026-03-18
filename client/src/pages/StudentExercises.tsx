@@ -125,229 +125,162 @@ export default function StudentExercises() {
 
   return (
     <StudentLayout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
-          <div className="container mx-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                <FileText className="h-8 w-8" />
-              </div>
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
-                <p className="text-orange-100 mt-1">
-                  Pratique e aprimore seus conhecimentos
-                </p>
-              </div>
-              <Button
-                onClick={handleRefresh}
-                disabled={isFetching}
-                variant="secondary"
-                className="bg-white/90 hover:bg-white text-black border-white/50"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-                {isFetching ? 'Atualizando...' : 'Atualizar'}
-              </Button>
-            </div>
-          </div>
-        </div>
-
+      <div className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4 max-w-7xl">
-          {/* Barra de Busca e Filtros */}
-          <div className="mb-8 space-y-4">
-            {/* Busca */}
-            <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Buscar exercícios..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 text-base border-border focus:border-primary focus:ring-primary"
-            />
-            </div>
-
-            {/* Filtro por Disciplina */}
-          {enrollments && enrollments.length > 0 && (
+          {/* Cabeçalho */}
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Filter className="w-5 h-5 text-gray-600" />
-                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Filtrar por Disciplina
-                </h2>
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <Button
-                  variant={selectedSubject === undefined ? "default" : "outline"}
-                  onClick={() => setSelectedSubject(undefined)}
-                  className="h-11 px-5 font-medium"
-                >
-                  Todas as Disciplinas
-                </Button>
-                {enrollments.map((enrollment: any) => (
-                  <Button
-                    key={enrollment.subject.id}
-                    variant={selectedSubject === enrollment.subject.id ? "default" : "outline"}
-                    onClick={() => setSelectedSubject(enrollment.subject.id)}
-                    className="h-11 px-5 font-medium"
-                  >
-                    {enrollment.subject.name}
-                  </Button>
-                ))}
-              </div>
+              <h1 className="text-3xl font-bold text-foreground">Exercícios Disponíveis</h1>
+              <p className="text-muted-foreground mt-1">Pratique e aprimore seus conhecimentos</p>
             </div>
-          )}
+            <Button
+              onClick={handleRefresh}
+              disabled={isFetching}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+              {isFetching ? 'Atualizando...' : 'Atualizar'}
+            </Button>
           </div>
-
-          {/* Contador de Resultados */}
-          {searchQuery && (
-          <div className="mb-6">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{filteredExercises.length}</span> exercício(s) encontrado(s)
-            </p>
-          </div>
-          )}
-
-          {/* Lista de Exercícios */}
-          {filteredExercises && filteredExercises.length === 0 ? (
-          <Card className="border-2 border-dashed border-gray-300">
-            <CardContent className="py-20 text-center">
-              <div className="mx-auto w-28 h-28 bg-gradient-to-br from-muted to-muted/50 rounded-full flex items-center justify-center mb-8 shadow-inner">
-                <BookOpen className="w-14 h-14 text-gray-400" />
+          {/* Barra de Busca e Filtros */}
+          <div className="mb-6 space-y-4">
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="relative flex-1 min-w-[200px] max-w-sm">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Buscar exercícios..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9 text-sm"
+                />
               </div>
-              <h3 className="text-3xl font-bold mb-4 text-gray-900">
-                Nenhum exercício disponível
-              </h3>
-              <p className="text-gray-600 text-lg max-w-md mx-auto mb-8">
+              {enrollments && enrollments.length > 0 && (
+                <div className="flex gap-2 flex-wrap">
+                  <Button
+                    variant={selectedSubject === undefined ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedSubject(undefined)}
+                  >
+                    Todas
+                  </Button>
+                  {enrollments.map((enrollment: any) => (
+                    <Button
+                      key={enrollment.subject.id}
+                      variant={selectedSubject === enrollment.subject.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedSubject(enrollment.subject.id)}
+                    >
+                      {enrollment.subject.name}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mb-4">
+              <span className="font-semibold text-foreground">{filteredExercises.length}</span> exercício(s) encontrado(s)
+            </p>
+          )}
+
+          {filteredExercises && filteredExercises.length === 0 ? (
+          <Card>
+            <CardContent className="py-16 text-center">
+              <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-lg font-medium text-foreground">Nenhum exercício disponível</p>
+              <p className="text-sm text-muted-foreground mt-1">
                 {searchQuery 
-                  ? "Nenhum exercício corresponde à sua busca. Tente outros termos."
-                  : "Aguarde seu professor publicar novos exercícios para esta disciplina."}
+                  ? "Nenhum exercício corresponde à sua busca."
+                  : "Aguarde seu professor publicar novos exercícios."}
               </p>
               {enrollments && enrollments.length === 0 && (
-                <div className="mt-8 p-6 bg-yellow-50 border-2 border-yellow-200 rounded-xl max-w-lg mx-auto">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <AlertCircle className="w-6 h-6 text-yellow-600" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-yellow-900 mb-2 text-lg">Atenção</p>
-                      <p className="text-sm text-yellow-800">
-                        Você não está matriculado em nenhuma disciplina. Entre em contato com seu professor para se matricular.
-                      </p>
-                    </div>
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md mx-auto">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-yellow-800 text-left">
+                      Você não está matriculado em nenhuma disciplina. Entre em contato com seu professor.
+                    </p>
                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredExercises.map((exercise: any) => (
               <Card 
                 key={exercise.id} 
-                className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 flex flex-col group"
+                className="hover:shadow-md transition-all duration-200 flex flex-col"
               >
                 <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <CardTitle className="text-xl font-bold text-gray-900 leading-tight flex-1">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <CardTitle className="text-base font-semibold text-foreground leading-tight flex-1">
                       {exercise.title}
                     </CardTitle>
                     {getStatusBadge(exercise)}
                   </div>
-                  <CardDescription className="text-base text-gray-600 line-clamp-3 min-h-[4.5rem]">
+                  <CardDescription className="text-sm text-muted-foreground line-clamp-2">
                     {exercise.description || "Sem descrição"}
                   </CardDescription>
                 </CardHeader>
                 
                 <CardContent className="flex-1 flex flex-col">
-                  <div className="space-y-4 flex-1">
-                    {/* Grid de Informações */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-3 text-sm bg-primary/10 p-4 rounded-xl border border-primary/20">
-                        <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-lg">{exercise.totalQuestions}</p>
-                          <p className="text-xs text-gray-600">questões</p>
-                          {exercise.totalQuestions > 0 && (
-                            <p className="text-xs text-blue-600 font-medium mt-0.5">
-                              {(10 / exercise.totalQuestions) % 1 === 0
-                                ? `${10 / exercise.totalQuestions} pt cada`
-                                : `${(10 / exercise.totalQuestions).toFixed(2)} pt cada`}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      
-
+                  <div className="space-y-3 flex-1">
+                    {/* Informações compactas */}
+                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="w-3.5 h-3.5" />
+                        {exercise.totalQuestions} questões
+                      </span>
                       {exercise.timeLimit && (
-                        <div className="flex items-center gap-3 text-sm bg-orange-50 p-4 rounded-xl border border-orange-100 col-span-2">
-                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Clock className="w-5 h-5 text-orange-600" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 text-lg">{exercise.timeLimit} minutos</p>
-                            <p className="text-xs text-gray-600">tempo limite</p>
-                          </div>
-                        </div>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {exercise.timeLimit} min
+                        </span>
                       )}
-
-                      <div className="flex items-center gap-3 text-sm bg-success/10 p-4 rounded-xl border border-success/20 col-span-2">
-                        <div className="w-10 h-10 bg-success/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Target className="w-5 h-5 text-success" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-900 text-lg">{(exercise.passingScore / 10).toFixed(1)}</p>
-                          <p className="text-xs text-gray-600">nota mínima (escala 0–10)</p>
-                        </div>
-                      </div>
+                      <span className="flex items-center gap-1">
+                        <Target className="w-3.5 h-3.5" />
+                        Mínimo: {(exercise.passingScore / 10).toFixed(1)}
+                      </span>
                     </div>
 
                     {/* Tentativas */}
-                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Award className="w-5 h-5 text-purple-600" />
-                          <span className="text-sm font-semibold text-gray-900">Tentativas</span>
-                        </div>
-                        <span className="text-sm font-bold text-purple-700">
-                          {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
-                        </span>
-                      </div>
-                      {exercise.maxAttempts > 0 && (
-                        <div className="w-full bg-purple-200 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${(exercise.attempts / exercise.maxAttempts) * 100}%` }}
-                          />
-                        </div>
-                      )}
-                      {exercise.canAttempt && exercise.maxAttempts > 0 && (
-                        <p className="text-xs text-purple-700 mt-2 font-medium">
-                          {exercise.maxAttempts - exercise.attempts} tentativa(s) restante(s)
-                        </p>
-                      )}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <Award className="w-3.5 h-3.5" />
+                        Tentativas:
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {exercise.attempts} / {exercise.maxAttempts === 0 ? "∞" : exercise.maxAttempts}
+                      </span>
                     </div>
+                    {exercise.maxAttempts > 0 && (
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div 
+                          className="bg-primary h-1.5 rounded-full"
+                          style={{ width: `${Math.min((exercise.attempts / exercise.maxAttempts) * 100, 100)}%` }}
+                        />
+                      </div>
+                    )}
 
-                    {/* Data de Disponibilidade */}
                     {exercise.availableFrom && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500 p-3 bg-gray-50 rounded-lg">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          Disponível desde {new Date(exercise.availableFrom).toLocaleDateString('pt-BR')}
-                        </span>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar className="w-3 h-3" />
+                        Disponível desde {new Date(exercise.availableFrom).toLocaleDateString('pt-BR')}
                       </div>
                     )}
                   </div>
 
                   {/* Botões de Ação */}
-                  <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
+                  <div className="mt-4 pt-3 border-t space-y-2">
                     <Button
                       onClick={() => handleStartExercise(exercise.id)}
                       disabled={!exercise.canAttempt && exercise.attempts >= exercise.maxAttempts}
-                      className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg group-hover:shadow-xl transition-all"
+                      className="w-full"
+                      size="sm"
                     >
                       {exercise.lastAttempt?.status === "in_progress" 
                         ? "Continuar Exercício" 
@@ -355,13 +288,12 @@ export default function StudentExercises() {
                         ? "Tentar Novamente"
                         : "Iniciar Exercício"}
                     </Button>
-                    
-                    {/* Botão de Revisão - só aparece se houver tentativas */}
                     {exercise.attempts > 0 && (
                       <Button
                         onClick={() => setLocation(`/student-exercises/${exercise.id}/review`)}
-                        variant="default"
-                        className="w-full h-11 text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white transition-all"
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         Revisar Questões
