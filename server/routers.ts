@@ -3547,7 +3547,7 @@ JSON (descrições MAX 15 chars):
         const result = await dbConn.execute(sql`
           SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
                  a.totalPoints, a.passingScore, a.duration, a.status,
-                 a.applicationDate, a.createdAt,
+                 a.applicationDate, a.createdAt, a.maxAttempts,
                  s.name as subjectName, s.color as subjectColor,
                  c.name as className
           FROM assessments a
@@ -3637,6 +3637,27 @@ JSON (descrições MAX 15 chars):
             console.error('[toggleAssessmentStatus] Erro ao notificar alunos:', e);
           }
         }
+        return { success: true };
+      }),
+
+    // Atualizar número máximo de tentativas de uma prova
+    updateAssessmentMaxAttempts: protectedProcedure
+      .input(z.object({
+        assessmentId: z.number(),
+        maxAttempts: z.number().min(1).max(99).nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Verificar propriedade
+        const check = await dbConn.execute(
+          sql`SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        const rows = (check[0] as any[]) || [];
+        if (rows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
+        await dbConn.execute(
+          sql`UPDATE assessments SET maxAttempts = ${input.maxAttempts} WHERE id = ${input.assessmentId}`
+        );
         return { success: true };
       }),
 

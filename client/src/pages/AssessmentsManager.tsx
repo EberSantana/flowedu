@@ -30,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   ClipboardList,
   BookOpen,
@@ -45,6 +46,7 @@ import {
   ListOrdered,
   ChevronDown,
   ChevronUp,
+  RefreshCw,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { toast } from "sonner";
@@ -58,6 +60,8 @@ export default function AssessmentsManager() {
   const [viewQuestionsId, setViewQuestionsId] = useState<number | null>(null);
   const [viewQuestionsTitle, setViewQuestionsTitle] = useState<string>("");
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
+  const [editMaxAttemptsId, setEditMaxAttemptsId] = useState<number | null>(null);
+  const [editMaxAttemptsValue, setEditMaxAttemptsValue] = useState<string>("1");
 
   const utils = trpc.useUtils();
 
@@ -106,6 +110,16 @@ export default function AssessmentsManager() {
       toast.error("Erro ao excluir exercício: " + err.message);
       setDeleteTarget(null);
     },
+  });
+
+  // Mutation para atualizar maxAttempts
+  const updateMaxAttemptsMutation = trpc.learningPath.updateAssessmentMaxAttempts.useMutation({
+    onSuccess: () => {
+      toast.success("Número máximo de tentativas atualizado!");
+      utils.learningPath.getTeacherAssessments.invalidate();
+      setEditMaxAttemptsId(null);
+    },
+    onError: (err) => toast.error("Erro: " + err.message),
   });
 
   // Mutation para alterar status da prova
@@ -285,6 +299,55 @@ export default function AssessmentsManager() {
                                 <span className="flex items-center gap-1 text-blue-600">
                                   Aplicação: {formatDate(assessment.applicationDate)}
                                 </span>
+                              )}
+                              {/* Tentativas máximas */}
+                              {editMaxAttemptsId === assessment.id ? (
+                                <span className="flex items-center gap-1">
+                                  <RefreshCw className="h-3.5 w-3.5 text-purple-500" />
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    max={99}
+                                    value={editMaxAttemptsValue}
+                                    onChange={(e) => setEditMaxAttemptsValue(e.target.value)}
+                                    className="h-6 w-16 text-xs px-1 py-0"
+                                    autoFocus
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        const val = parseInt(editMaxAttemptsValue);
+                                        if (!isNaN(val) && val >= 1) {
+                                          updateMaxAttemptsMutation.mutate({ assessmentId: assessment.id, maxAttempts: val });
+                                        }
+                                      }
+                                      if (e.key === "Escape") setEditMaxAttemptsId(null);
+                                    }}
+                                  />
+                                  <button
+                                    className="text-xs text-green-700 font-semibold hover:underline"
+                                    onClick={() => {
+                                      const val = parseInt(editMaxAttemptsValue);
+                                      if (!isNaN(val) && val >= 1) {
+                                        updateMaxAttemptsMutation.mutate({ assessmentId: assessment.id, maxAttempts: val });
+                                      }
+                                    }}
+                                  >OK</button>
+                                  <button
+                                    className="text-xs text-gray-400 hover:underline"
+                                    onClick={() => setEditMaxAttemptsId(null)}
+                                  >Cancelar</button>
+                                </span>
+                              ) : (
+                                <button
+                                  className="flex items-center gap-1 text-purple-600 hover:text-purple-800 hover:underline"
+                                  onClick={() => {
+                                    setEditMaxAttemptsId(assessment.id);
+                                    setEditMaxAttemptsValue(String(assessment.maxAttempts ?? 1));
+                                  }}
+                                  title="Clique para editar o número máximo de tentativas"
+                                >
+                                  <RefreshCw className="h-3.5 w-3.5" />
+                                  {assessment.maxAttempts ?? 1} tentativa{(assessment.maxAttempts ?? 1) !== 1 ? "s" : ""} máx.
+                                </button>
                               )}
                             </div>
                           </div>

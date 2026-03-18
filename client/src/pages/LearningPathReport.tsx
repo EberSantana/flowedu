@@ -87,29 +87,43 @@ type ClassAvg = {
 
 // ─── Helpers de cor ──────────────────────────────────────────────────────────
 
-function getPercentageColor(pct: number | null): string {
-  if (pct === null) return "text-muted-foreground";
-  if (pct >= 70) return "text-green-600 dark:text-green-400";
-  if (pct >= 50) return "text-yellow-600 dark:text-yellow-400";
+// Converte porcentagem (0-100) para nota (0-10)
+function pctToGrade(pct: number | null): number | null {
+  if (pct === null) return null;
+  return parseFloat((pct / 10).toFixed(1));
+}
+
+// Cores baseadas em escala 0-10 (≥7 = verde, 5-6.9 = amarelo, <5 = vermelho)
+function getGradeColor(grade: number | null): string {
+  if (grade === null) return "text-muted-foreground";
+  if (grade >= 7) return "text-green-600 dark:text-green-400";
+  if (grade >= 5) return "text-yellow-600 dark:text-yellow-400";
   return "text-red-600 dark:text-red-400";
 }
 
-function getPercentageBg(pct: number | null): string {
-  if (pct === null) return "bg-muted";
-  if (pct >= 70) return "bg-green-100 dark:bg-green-900/30";
-  if (pct >= 50) return "bg-yellow-100 dark:bg-yellow-900/30";
+function getGradeBg(grade: number | null): string {
+  if (grade === null) return "bg-muted";
+  if (grade >= 7) return "bg-green-100 dark:bg-green-900/30";
+  if (grade >= 5) return "bg-yellow-100 dark:bg-yellow-900/30";
   return "bg-red-100 dark:bg-red-900/30";
 }
 
-function PercentageBadge({ pct }: { pct: number | null }) {
+
+function GradeBadge({ pct }: { pct: number | null }) {
   if (pct === null) return <span className="text-muted-foreground text-sm">—</span>;
+  const grade = pctToGrade(pct)!;
   return (
     <span
-      className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getPercentageBg(pct)} ${getPercentageColor(pct)}`}
+      className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getGradeBg(grade)} ${getGradeColor(grade)}`}
     >
-      {pct}%
+      {grade.toFixed(1)}
     </span>
   );
+}
+
+// Alias para compatibilidade
+function PercentageBadge({ pct }: { pct: number | null }) {
+  return <GradeBadge pct={pct} />;
 }
 
 function RankBadge({ rank }: { rank: number | null }) {
@@ -137,7 +151,7 @@ function CustomTooltip({ active, payload, label }: any) {
             <span className="text-muted-foreground">{entry.name}</span>
           </span>
           <span className="font-bold" style={{ color: entry.color }}>
-            {entry.value !== null && entry.value !== undefined ? `${entry.value}%` : "—"}
+            {entry.value !== null && entry.value !== undefined ? pctToGrade(entry.value)!.toFixed(1) : "—"}
           </span>
         </div>
       ))}
@@ -176,8 +190,8 @@ function StudentEvolutionModal({
       name: shortTitle,
       fullName: ex.title,
       modulo: ex.moduleId ? `Módulo ${ex.moduleId}` : "—",
-      aluno: grade?.percentage ?? null,
-      turma: classAvg?.classAverage ?? null,
+      aluno: grade?.percentage !== null && grade?.percentage !== undefined ? pctToGrade(grade.percentage) : null,
+      turma: classAvg?.classAverage !== null && classAvg?.classAverage !== undefined ? pctToGrade(classAvg.classAverage) : null,
       tentativas: grade?.attempts ?? 0,
     };
   });
@@ -189,6 +203,8 @@ function StudentEvolutionModal({
 
   const maxGrade = gradesWithValue.length > 0 ? Math.max(...gradesWithValue) : null;
   const minGrade = gradesWithValue.length > 0 ? Math.min(...gradesWithValue) : null;
+  const maxGrade10 = pctToGrade(maxGrade);
+  const minGrade10 = pctToGrade(minGrade);
   const completedCount = gradesWithValue.length;
 
   // Tendência (última - primeira nota com valor)
@@ -233,20 +249,20 @@ function StudentEvolutionModal({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-muted/50 rounded-lg p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Média do Aluno</p>
-              <p className={`text-xl font-bold ${getPercentageColor(student.avgPercentage)}`}>
-                {student.avgPercentage !== null ? `${student.avgPercentage}%` : "—"}
+              <p className={`text-xl font-bold ${getGradeColor(pctToGrade(student.avgPercentage))}`}>
+                {student.avgPercentage !== null ? pctToGrade(student.avgPercentage)!.toFixed(1) : "—"}
               </p>
             </div>
             <div className="bg-muted/50 rounded-lg p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Melhor Nota</p>
-              <p className={`text-xl font-bold ${getPercentageColor(maxGrade ?? null)}`}>
-                {maxGrade !== null ? `${maxGrade}%` : "—"}
+              <p className={`text-xl font-bold ${getGradeColor(maxGrade10 ?? null)}`}>
+                {maxGrade10 !== null ? maxGrade10.toFixed(1) : "—"}
               </p>
             </div>
             <div className="bg-muted/50 rounded-lg p-3 text-center">
               <p className="text-xs text-muted-foreground mb-1">Pior Nota</p>
-              <p className={`text-xl font-bold ${getPercentageColor(minGrade ?? null)}`}>
-                {minGrade !== null ? `${minGrade}%` : "—"}
+              <p className={`text-xl font-bold ${getGradeColor(minGrade10 ?? null)}`}>
+                {minGrade10 !== null ? minGrade10.toFixed(1) : "—"}
               </p>
             </div>
             <div className="bg-muted/50 rounded-lg p-3 text-center">
@@ -277,9 +293,9 @@ function StudentEvolutionModal({
               )}
               <span>
                 {trend > 0
-                  ? `Tendência de melhora: +${trend} p.p. da primeira à última atividade`
+                  ? `Tendência de melhora: +${(trend / 10).toFixed(1)} pontos da primeira à última atividade`
                   : trend < 0
-                  ? `Tendência de queda: ${trend} p.p. da primeira à última atividade`
+                  ? `Tendência de queda: ${(trend / 10).toFixed(1)} pontos da primeira à última atividade`
                   : "Desempenho estável ao longo das atividades"}
               </span>
             </div>
@@ -305,7 +321,7 @@ function StudentEvolutionModal({
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="inline-block w-6 h-px border-t border-dashed border-gray-400" />
-                  Referência 70%
+                  Referência 7,0
                 </span>
               </div>
 
@@ -334,18 +350,18 @@ function StudentEvolutionModal({
                     height={60}
                   />
                   <YAxis
-                    domain={[0, 100]}
-                    tickFormatter={(v) => `${v}%`}
+                    domain={[0, 10]}
+                    tickFormatter={(v) => v.toFixed(1)}
                     tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                     width={40}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <ReferenceLine
-                    y={70}
+                    y={7}
                     stroke="#9ca3af"
                     strokeDasharray="5 3"
                     label={{
-                      value: "70%",
+                      value: "7,0",
                       position: "insideTopRight",
                       fontSize: 10,
                       fill: "#9ca3af",
@@ -415,10 +431,18 @@ function StudentEvolutionModal({
                       {row.modulo}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <PercentageBadge pct={row.aluno} />
+                      {row.aluno !== null ? (
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getGradeBg(row.aluno)} ${getGradeColor(row.aluno)}`}>
+                          {row.aluno.toFixed(1)}
+                        </span>
+                      ) : <span className="text-muted-foreground text-sm">—</span>}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <PercentageBadge pct={row.turma} />
+                      {row.turma !== null ? (
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getGradeBg(row.turma)} ${getGradeColor(row.turma)}`}>
+                          {row.turma.toFixed(1)}
+                        </span>
+                      ) : <span className="text-muted-foreground text-sm">—</span>}
                     </td>
                     <td className="px-3 py-2 text-center text-muted-foreground">
                       {row.tentativas > 0 ? `${row.tentativas}x` : "—"}
@@ -507,8 +531,9 @@ export default function LearningPathReport() {
       const body = report.students.map((student, idx) => {
         const grades = report.exercises.map((ex) => {
           const grade = student.exerciseGrades.find((g) => g.exerciseId === ex.id);
-          return grade?.percentage !== null && grade?.percentage !== undefined
-            ? `${grade.percentage}%`
+          const pct = grade?.percentage;
+          return pct !== null && pct !== undefined
+            ? pctToGrade(pct)!.toFixed(1)
             : "—";
         });
         return [
@@ -516,7 +541,7 @@ export default function LearningPathReport() {
           student.studentName,
           student.studentRegistration,
           ...grades,
-          student.avgPercentage !== null ? `${student.avgPercentage}%` : "—",
+          student.avgPercentage !== null ? pctToGrade(student.avgPercentage)!.toFixed(1) : "—",
           student.rank !== null ? `${student.rank}º` : "—",
         ];
       });
@@ -526,9 +551,9 @@ export default function LearningPathReport() {
         "Média da Turma",
         "",
         ...report.classExerciseAverages.map((a) =>
-          a.classAverage !== null ? `${a.classAverage}%` : "—"
+          a.classAverage !== null ? pctToGrade(a.classAverage)!.toFixed(1) : "—"
         ),
-        report.classOverallAverage !== null ? `${report.classOverallAverage}%` : "—",
+        report.classOverallAverage !== null ? pctToGrade(report.classOverallAverage)!.toFixed(1) : "—",
         "",
       ];
 
@@ -709,10 +734,10 @@ export default function LearningPathReport() {
                       <div>
                         <p className="text-xs text-muted-foreground">Média Geral</p>
                         <p
-                          className={`text-2xl font-bold ${getPercentageColor(report.classOverallAverage)}`}
+                          className={`text-2xl font-bold ${getGradeColor(pctToGrade(report.classOverallAverage))}`}
                         >
                           {report.classOverallAverage !== null
-                            ? `${report.classOverallAverage}%`
+                            ? pctToGrade(report.classOverallAverage)!.toFixed(1)
                             : "—"}
                         </p>
                       </div>
@@ -813,9 +838,9 @@ export default function LearningPathReport() {
                                 const grade = student.exerciseGrades.find(
                                   (g) => g.exerciseId === ex.id
                                 );
-                                return (
+                      return (
                                   <TableCell key={ex.id} className="text-center">
-                                    <PercentageBadge pct={grade?.percentage ?? null} />
+                                    <GradeBadge pct={grade?.percentage ?? null} />
                                     {grade && grade.attempts > 0 && (
                                       <div className="text-xs text-muted-foreground mt-0.5">
                                         {grade.attempts}x
@@ -823,11 +848,11 @@ export default function LearningPathReport() {
                                     )}
                                   </TableCell>
                                 );
-                              })}
+                              })
+                            }
                               <TableCell className="text-center">
-                                <PercentageBadge pct={student.avgPercentage} />
-                              </TableCell>
-                              <TableCell className="text-center">
+                                <GradeBadge pct={student.avgPercentage} />
+                              </TableCell>            <TableCell className="text-center">
                                 <RankBadge rank={student.rank} />
                               </TableCell>
                             </TableRow>
@@ -842,14 +867,14 @@ export default function LearningPathReport() {
                             <TableCell />
                             {report.classExerciseAverages.map((avg) => (
                               <TableCell key={avg.exerciseId} className="text-center">
-                                <PercentageBadge pct={avg.classAverage} />
+                                <GradeBadge pct={avg.classAverage} />
                                 <div className="text-xs text-muted-foreground mt-0.5">
                                   {avg.studentsCompleted}/{report.totalStudents}
                                 </div>
                               </TableCell>
                             ))}
                             <TableCell className="text-center">
-                              <PercentageBadge pct={report.classOverallAverage} />
+                              <GradeBadge pct={report.classOverallAverage} />
                             </TableCell>
                             <TableCell />
                           </TableRow>
@@ -864,15 +889,15 @@ export default function LearningPathReport() {
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                   <span className="inline-block w-3 h-3 rounded bg-green-100 dark:bg-green-900/30 border border-green-300" />
-                  <span>≥ 70% — Bom desempenho</span>
+                          <span>≥ 7,0 — Bom desempenho</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="inline-block w-3 h-3 rounded bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300" />
-                  <span>50–69% — Desempenho regular</span>
+                  <span>5,0–6,9 — Desempenho regular</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="inline-block w-3 h-3 rounded bg-red-100 dark:bg-red-900/30 border border-red-300" />
-                  <span>&lt; 50% — Atenção necessária</span>
+                  <span>&lt; 5,0 — Atenção necessária</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <TrendingUp className="h-3.5 w-3.5" />

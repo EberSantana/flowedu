@@ -2127,6 +2127,9 @@ export const assessments = mysqlTable("assessments", {
   availableFrom: timestamp("availableFrom"),
   availableTo: timestamp("availableTo"),
   
+  // Tentativas
+  maxAttempts: int("maxAttempts").default(1), // Número máximo de tentativas (null = ilimitado)
+  
   // Status
   status: mysqlEnum("status", ["draft", "published", "applied", "corrected", "archived"]).default("draft").notNull(),
   
