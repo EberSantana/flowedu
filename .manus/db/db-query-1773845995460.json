@@ -1,0 +1,35 @@
+{
+  "query": "SHOW CREATE TABLE assessments;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW CREATE TABLE assessments;",
+  "rows": [
+    {
+      "Table": "assessments",
+      "Create Table": "CREATE TABLE `assessments` ("
+    }
+  ],
+  "messages": [
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `teacherId` int NOT NULL,",
+    "  `subjectId` int NOT NULL,",
+    "  `classId` int DEFAULT NULL,",
+    "  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `assessmentType` enum('prova','simulado','avaliacao_parcial','avaliacao_final','recuperacao','diagnostica') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'prova',",
+    "  `totalQuestions` int NOT NULL,",
+    "  `totalPoints` int NOT NULL DEFAULT '100',",
+    "  `passingScore` int NOT NULL DEFAULT '60',",
+    "  `duration` int DEFAULT NULL,",
+    "  `generalInstructions` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `applicationDate` timestamp NULL DEFAULT NULL,",
+    "  `availableFrom` timestamp NULL DEFAULT NULL,",
+    "  `availableTo` timestamp NULL DEFAULT NULL,",
+    "  `status` enum('draft','published','applied','corrected','archived') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\nassessments\tCREATE TABLE `assessments` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `teacherId` int NOT NULL,\n  `subjectId` int NOT NULL,\n  `classId` int DEFAULT NULL,\n  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `assessmentType` enum('prova','simulado','avaliacao_parcial','avaliacao_final','recuperacao','diagnostica') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'prova',\n  `totalQuestions` int NOT NULL,\n  `totalPoints` int NOT NULL DEFAULT '100',\n  `passingScore` int NOT NULL DEFAULT '60',\n  `duration` int DEFAULT NULL,\n  `generalInstructions` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `applicationDate` timestamp NULL DEFAULT NULL,\n  `availableFrom` timestamp NULL DEFAULT NULL,\n  `availableTo` timestamp NULL DEFAULT NULL,\n  `status` enum('draft','published','applied','corrected','archived') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 1053
+}

@@ -3520,7 +3520,76 @@ JSON (descrições MAX 15 chars):
           UPDATE assessments SET status = ${input.status}
           WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id}
         `);
+        // Se publicando, notificar alunos matriculados na disciplina
+        if (input.status === 'published') {
+          try {
+            const assessmentRows = await dbConn.execute(sql`
+              SELECT a.title, a.subjectId, a.classId FROM assessments a
+              WHERE a.id = ${input.assessmentId} AND a.teacherId = ${ctx.user.id}
+            `);
+            const assessment = ((assessmentRows[0] as unknown) as any[])[0];
+            if (assessment) {
+              // Buscar alunos da disciplina/turma
+              let studentQuery;
+              if (assessment.classId) {
+                studentQuery = dbConn.execute(sql`
+                  SELECT DISTINCT s.id as studentId FROM students s
+                  JOIN student_class_enrollments sce ON sce.studentId = s.id
+                  WHERE sce.classId = ${assessment.classId} AND sce.status = 'active'
+                `);
+              } else {
+                studentQuery = dbConn.execute(sql`
+                  SELECT DISTINCT s.id as studentId FROM students s
+                  JOIN subject_enrollments se ON se.studentId = s.id
+                  WHERE se.subjectId = ${assessment.subjectId} AND se.status = 'active'
+                `);
+              }
+              const studentRows = await studentQuery;
+              const students = ((studentRows[0] as unknown) as any[]) || [];
+              // Criar notificação para cada aluno
+              for (const student of students) {
+                await dbConn.execute(sql`
+                  INSERT INTO notifications (userId, type, title, message, relatedId, relatedType, isRead, createdAt)
+                  VALUES (
+                    ${student.studentId},
+                    'assessment_published',
+                    'Nova prova disponível',
+                    ${`A prova "${assessment.title}" foi publicada e está disponível para você.`},
+                    ${input.assessmentId},
+                    'assessment',
+                    0,
+                    NOW()
+                  )
+                `);
+              }
+            }
+          } catch(e) {
+            // Não bloquear a publicação se a notificação falhar
+            console.error('[toggleAssessmentStatus] Erro ao notificar alunos:', e);
+          }
+        }
         return { success: true };
+      }),
+
+    // Buscar questões de uma prova (para visualização)
+    getAssessmentQuestions: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        // Verificar que o professor é dono da prova
+        const check = await dbConn.execute(sql`
+          SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id}
+        `);
+        const rows = (check[0] as unknown) as any[];
+        if (!rows || rows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
+        // Buscar questões
+        const result = await dbConn.execute(sql`
+          SELECT * FROM assessment_questions
+          WHERE assessmentId = ${input.assessmentId}
+          ORDER BY questionNumber ASC
+        `);
+        return (result[0] as unknown) as any[];
       }),
   }),
   // Boletim de Atividades da Trilha por Turma

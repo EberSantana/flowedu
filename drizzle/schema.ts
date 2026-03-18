@@ -566,18 +566,22 @@ export const notifications = mysqlTable("notifications", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(), // ID do aluno que receberá a notificação
   type: mysqlEnum("type", [
-    "new_material",      // Novo material adicionado
-    "new_assignment",    // Nova atividade criada
-    "new_announcement",  // Novo aviso postado
-    "assignment_due",    // Prazo de atividade próximo
-    "feedback_received", // Feedback do professor recebido
-    "grade_received",    // Nota recebida
-    "comment_received",  // Comentário do professor
+    "new_material",          // Novo material adicionado
+    "new_assignment",        // Nova atividade criada
+    "new_announcement",      // Novo aviso postado
+    "assignment_due",        // Prazo de atividade próximo
+    "feedback_received",     // Feedback do professor recebido
+    "grade_received",        // Nota recebida
+    "comment_received",      // Comentário do professor
+    "assessment_published",  // Nova prova publicada
+    "activity_submission",   // Aluno enviou atividade
+    "new_activity",          // Nova atividade criada
   ]).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
   link: varchar("link", { length: 500 }), // Link para o recurso relacionado
   relatedId: int("relatedId"), // ID do recurso relacionado (material, atividade, etc)
+  relatedType: varchar("relatedType", { length: 50 }), // Tipo do recurso relacionado
   isRead: boolean("isRead").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

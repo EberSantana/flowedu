@@ -25,6 +25,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   ClipboardList,
   BookOpen,
   Trash2,
@@ -36,6 +42,9 @@ import {
   CheckCircle2,
   Clock,
   Hash,
+  ListOrdered,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -45,6 +54,9 @@ export default function AssessmentsManager() {
   const { user } = useAuth();
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string; type: "assessment" | "exercise" } | null>(null);
+  const [viewQuestionsId, setViewQuestionsId] = useState<number | null>(null);
+  const [viewQuestionsTitle, setViewQuestionsTitle] = useState<string>("");
+  const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -61,6 +73,12 @@ export default function AssessmentsManager() {
   const { data: exercises, isLoading: loadingExercises } = trpc.teacherExercises.list.useQuery(
     { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
     { enabled: !!user }
+  );
+
+  // Buscar questões da prova selecionada
+  const { data: assessmentQuestions, isLoading: loadingQuestions } = trpc.learningPath.getAssessmentQuestions.useQuery(
+    { assessmentId: viewQuestionsId! },
+    { enabled: viewQuestionsId !== null }
   );
 
   // Mutation para deletar prova
@@ -92,7 +110,7 @@ export default function AssessmentsManager() {
   // Mutation para alterar status da prova
   const toggleStatusMutation = trpc.learningPath.toggleAssessmentStatus.useMutation({
     onSuccess: (_, vars) => {
-      toast.success(vars.status === "published" ? "Prova publicada!" : "Prova despublicada!");
+      toast.success(vars.status === "published" ? "Prova publicada! Alunos foram notificados." : "Prova despublicada!");
       utils.learningPath.getTeacherAssessments.invalidate();
     },
     onError: (err) => toast.error("Erro: " + err.message),
@@ -121,6 +139,24 @@ export default function AssessmentsManager() {
       return <Badge className="bg-green-100 text-green-800 border-green-200"><CheckCircle2 className="h-3 w-3 mr-1" />Publicada</Badge>;
     }
     return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200"><Clock className="h-3 w-3 mr-1" />Rascunho</Badge>;
+  };
+
+  const getQuestionTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      multiple_choice: "Múltipla Escolha",
+      true_false: "V ou F",
+      essay: "Dissertativa",
+      short_answer: "Resposta Curta",
+      fill_blank: "Lacunas",
+      matching: "Associação",
+    };
+    return labels[type] || type;
+  };
+
+  const getDifficultyBadge = (difficulty: string) => {
+    if (difficulty === "easy") return <Badge className="bg-green-100 text-green-700 text-xs">Fácil</Badge>;
+    if (difficulty === "hard") return <Badge className="bg-red-100 text-red-700 text-xs">Difícil</Badge>;
+    return <Badge className="bg-yellow-100 text-yellow-700 text-xs">Médio</Badge>;
   };
 
   return (
@@ -219,7 +255,21 @@ export default function AssessmentsManager() {
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                            {/* Botão Ver Questões */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                              onClick={() => {
+                                setViewQuestionsId(assessment.id);
+                                setViewQuestionsTitle(assessment.title);
+                                setExpandedQuestion(null);
+                              }}
+                            >
+                              <ListOrdered className="h-4 w-4 mr-1" />
+                              Ver Questões
+                            </Button>
                             {assessment.status === "published" ? (
                               <Button
                                 variant="outline"
@@ -354,6 +404,130 @@ export default function AssessmentsManager() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Modal de Visualização de Questões */}
+        <Dialog open={viewQuestionsId !== null} onOpenChange={(open) => !open && setViewQuestionsId(null)}>
+          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <ListOrdered className="h-5 w-5 text-blue-600" />
+                Questões: {viewQuestionsTitle}
+              </DialogTitle>
+            </DialogHeader>
+
+            {loadingQuestions ? (
+              <div className="text-center py-8 text-gray-400">Carregando questões...</div>
+            ) : !assessmentQuestions || assessmentQuestions.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <AlertCircle className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p>Nenhuma questão encontrada para esta prova.</p>
+              </div>
+            ) : (
+              <div className="space-y-3 mt-2">
+                <p className="text-sm text-gray-500">{assessmentQuestions.length} questão(ões) no total</p>
+                {assessmentQuestions.map((q: any, idx: number) => {
+                  const isExpanded = expandedQuestion === idx;
+                  const statement = q.statement || q.questionText || "";
+                  const options = [];
+                  if (q.optionA) options.push({ label: "A", text: q.optionA });
+                  if (q.optionB) options.push({ label: "B", text: q.optionB });
+                  if (q.optionC) options.push({ label: "C", text: q.optionC });
+                  if (q.optionD) options.push({ label: "D", text: q.optionD });
+                  if (q.optionE) options.push({ label: "E", text: q.optionE });
+                  // Fallback: parse options JSON if available
+                  let parsedOptions: { label: string; text: string }[] = options;
+                  if (options.length === 0 && q.options) {
+                    try {
+                      const parsed = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+                      if (Array.isArray(parsed)) {
+                        parsedOptions = parsed.map((o: string, i: number) => ({
+                          label: String.fromCharCode(65 + i),
+                          text: o,
+                        }));
+                      }
+                    } catch {}
+                  }
+
+                  return (
+                    <Card key={q.id || idx} className="border border-gray-200">
+                      <CardContent className="p-0">
+                        <button
+                          className="w-full text-left p-4 flex items-start justify-between gap-3 hover:bg-gray-50 transition-colors"
+                          onClick={() => setExpandedQuestion(isExpanded ? null : idx)}
+                        >
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-sm font-bold flex items-center justify-center">
+                              {q.questionNumber || idx + 1}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 line-clamp-2">{statement}</p>
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                <span className="text-xs text-gray-400">{getQuestionTypeLabel(q.questionType || "multiple_choice")}</span>
+                                {getDifficultyBadge(q.difficulty || "medium")}
+                                <span className="text-xs text-gray-400">{q.points || 1} pt(s)</span>
+                              </div>
+                            </div>
+                          </div>
+                          {isExpanded ? (
+                            <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0 mt-1" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0 mt-1" />
+                          )}
+                        </button>
+
+                        {isExpanded && (
+                          <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
+                            {/* Contexto */}
+                            {q.context && (
+                              <div className="bg-blue-50 rounded p-3 text-sm text-blue-800">
+                                <strong>Contexto:</strong> {q.context}
+                              </div>
+                            )}
+                            {/* Alternativas */}
+                            {parsedOptions.length > 0 && (
+                              <div className="space-y-1.5">
+                                {parsedOptions.map((opt) => (
+                                  <div
+                                    key={opt.label}
+                                    className={`flex items-start gap-2 p-2 rounded text-sm ${
+                                      q.correctAnswer === opt.label
+                                        ? "bg-green-50 border border-green-200 text-green-800"
+                                        : "bg-gray-50 text-gray-700"
+                                    }`}
+                                  >
+                                    <span className={`font-bold flex-shrink-0 ${q.correctAnswer === opt.label ? "text-green-700" : "text-gray-500"}`}>
+                                      {opt.label})
+                                    </span>
+                                    <span>{opt.text}</span>
+                                    {q.correctAnswer === opt.label && (
+                                      <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 ml-auto" />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {/* Gabarito para questões sem alternativas */}
+                            {parsedOptions.length === 0 && q.correctAnswer && (
+                              <div className="bg-green-50 border border-green-200 rounded p-3 text-sm text-green-800">
+                                <strong>Gabarito:</strong> {q.correctAnswer}
+                              </div>
+                            )}
+                            {/* Explicação */}
+                            {(q.answerExplanation || q.explanation) && (
+                              <div className="bg-amber-50 border border-amber-200 rounded p-3 text-sm text-amber-800">
+                                <strong>Explicação:</strong> {q.answerExplanation || q.explanation}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </PageWrapper>
     </div>
   );
