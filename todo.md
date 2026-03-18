@@ -7649,3 +7649,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Painel de Notas: turma obrigatória, disciplina carregada dinamicamente baseada nas aulas agendadas (scheduled_classes) da turma selecionada
 - [x] Painel de Notas: substituir filtros separados por dropdown único 'Disciplina — Turma' atrelado via scheduled_classes
 - [x] Calendário de Atividades do professor - visualização mensal com datas de entrega, aulas agendadas e prazos importantes
+- [x] Fix: FlowEdu na VPS não está abrindo - corrigido: assets antigos na VPS, usou rsync --delete para limpar e enviar todos os novos
+- [x] Remover integração de atividades em sala e aulas agendadas do calendário (redundante)

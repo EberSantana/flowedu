@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
 import { getDb, createNotification } from "./db";
 import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts, scheduledClasses } from "../drizzle/schema";
-import { eq, and, desc, inArray, sql, gte, lte } from "drizzle-orm";
+import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
 
@@ -710,97 +710,4 @@ export const activitiesRouter = router({
       };
     }),
 
-  // ── Professor: buscar eventos do calendário (atividades + aulas agendadas) ──
-  getCalendarActivities: protectedProcedure
-    .input(z.object({
-      year: z.number(),
-      month: z.number(), // 0-indexed (0=Jan, 11=Dec)
-    }))
-    .query(async ({ ctx, input }) => {
-      const db = (await getDb())!;
-      const { scheduledClasses, timeSlots, subjects: subjectsTable, classes: classesTable } = await import('../drizzle/schema');
-
-      // 1. Buscar atividades do professor com dueDate no mês selecionado
-      const startDate = new Date(input.year, input.month, 1);
-      const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59);
-
-      const activityRows = await db
-        .select({
-          id: activities.id,
-          title: activities.title,
-          dueDate: activities.dueDate,
-          status: activities.status,
-          subjectName: subjectsTable.name,
-          className: classesTable.name,
-        })
-        .from(activities)
-        .leftJoin(subjectsTable, eq(activities.subjectId, subjectsTable.id))
-        .leftJoin(classesTable, eq(activities.classId, classesTable.id))
-        .where(
-          and(
-            eq(activities.userId, ctx.user.id),
-            gte(activities.dueDate, startDate),
-            lte(activities.dueDate, endDate),
-            eq(activities.status, 'published')
-          )
-        );
-
-      // 2. Buscar aulas agendadas do professor com info de disciplina, turma e horário
-      const scheduleRows = await db
-        .select({
-          id: scheduledClasses.id,
-          dayOfWeek: scheduledClasses.dayOfWeek,
-          subjectName: subjectsTable.name,
-          className: classesTable.name,
-          startTime: timeSlots.startTime,
-          endTime: timeSlots.endTime,
-        })
-        .from(scheduledClasses)
-        .innerJoin(subjectsTable, eq(scheduledClasses.subjectId, subjectsTable.id))
-        .innerJoin(classesTable, eq(scheduledClasses.classId, classesTable.id))
-        .innerJoin(timeSlots, eq(scheduledClasses.timeSlotId, timeSlots.id))
-        .where(eq(scheduledClasses.userId, ctx.user.id));
-
-      // 3. Expandir aulas agendadas para datas reais do mês
-      const scheduledEvents: Array<{
-        id: number;
-        date: string;
-        subjectName: string;
-        className: string;
-        startTime: string;
-        endTime: string;
-      }> = [];
-
-      // Iterar por cada dia do mês
-      const daysInMonth = new Date(input.year, input.month + 1, 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(input.year, input.month, day);
-        const dayOfWeek = date.getDay(); // 0=Dom, 1=Seg, ..., 6=Sab
-
-        const matchingClasses = scheduleRows.filter(sc => sc.dayOfWeek === dayOfWeek);
-        for (const sc of matchingClasses) {
-          const dateStr = `${input.year}-${String(input.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          scheduledEvents.push({
-            id: sc.id,
-            date: dateStr,
-            subjectName: sc.subjectName,
-            className: sc.className,
-            startTime: sc.startTime,
-            endTime: sc.endTime,
-          });
-        }
-      }
-
-      return {
-        activities: activityRows.map(a => ({
-          id: a.id,
-          title: a.title,
-          dueDate: a.dueDate,
-          status: a.status,
-          subjectName: a.subjectName,
-          className: a.className,
-        })),
-        scheduledClasses: scheduledEvents,
-      };
-    }),
 });
