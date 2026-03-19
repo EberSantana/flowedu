@@ -87,6 +87,7 @@ export default function AccessLogsPage() {
   const [heatmapUserType, setHeatmapUserType] = useState<"all" | "teacher" | "student">("all");
   const [heatmapClassId, setHeatmapClassId] = useState<number | undefined>(undefined); // filtro por turma no mapa de calor
   const [heatmapCompare, setHeatmapCompare] = useState(false); // modo comparativo de períodos
+  const [heatmapTimezone, setHeatmapTimezone] = useState(-4); // offset UTC padrão: Manaus (UTC-4)
   const [compareDays1, setCompareDays1] = useState(30); // período 1
   const [compareDays2, setCompareDays2] = useState(60); // período 2 (mais antigo)
   const [isExporting, setIsExporting] = useState(false);
@@ -252,12 +253,12 @@ export default function AccessLogsPage() {
   );
 
   const { data: heatmapData, isLoading: heatmapLoading } = trpc.accessLogs.getHeatmap.useQuery(
-    { days: heatmapDays, userType: heatmapUserType },
+    { days: heatmapDays, userType: heatmapUserType, timezoneOffset: heatmapTimezone },
     { refetchOnWindowFocus: false, enabled: !heatmapClassId }
   );
   // Mapa de calor filtrado por turma
   const { data: heatmapClassData, isLoading: heatmapClassLoading } = trpc.accessLogs.getHeatmapByClass.useQuery(
-    { days: heatmapDays, classId: heatmapClassId },
+    { days: heatmapDays, classId: heatmapClassId, timezoneOffset: heatmapTimezone },
     { refetchOnWindowFocus: false, enabled: !!heatmapClassId }
   );
   // Dados efetivos do mapa de calor (turma ou geral)
@@ -685,7 +686,8 @@ export default function AccessLogsPage() {
                     Mapa de Calor — Acessos por Dia e Horário
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Identifique os momentos de maior engajamento para planejar comunicados • Horário de Manaus (UTC−4)
+                    Identifique os momentos de maior engajamento para planejar comunicados •
+                    {heatmapTimezone === -4 ? ' Manaus (UTC−4)' : heatmapTimezone === -3 ? ' Brasília/São Paulo (UTC−3)' : heatmapTimezone === -5 ? ' Acre/Roraima (UTC−5)' : ` UTC${heatmapTimezone >= 0 ? '+' : ''}${heatmapTimezone}`}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -734,6 +736,21 @@ export default function AccessLogsPage() {
                       <SelectItem value="30">30 dias</SelectItem>
                       <SelectItem value="90">90 dias</SelectItem>
                       <SelectItem value="180">180 dias</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {/* Seletor de fuso horário */}
+                  <Select
+                    value={heatmapTimezone.toString()}
+                    onValueChange={(v) => setHeatmapTimezone(Number(v))}
+                  >
+                    <SelectTrigger className="w-52">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="-5">🕑 Acre / Roraima (UTC−5)</SelectItem>
+                      <SelectItem value="-4">🕑 Manaus / Cuiabá (UTC−4)</SelectItem>
+                      <SelectItem value="-3">🕑 Brasília / São Paulo (UTC−3)</SelectItem>
+                      <SelectItem value="-2">🕑 Fernando de Noronha (UTC−2)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -807,6 +824,44 @@ export default function AccessLogsPage() {
                           <div key={i} className={`w-5 h-4 rounded-sm ${c}`} />
                         ))}
                         <span className="text-xs text-muted-foreground">Mais</span>
+                      </div>
+
+                      {/* Botões de exportação */}
+                      <div className="flex items-center gap-2 mt-4 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const DAYS_FULL_LOCAL = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+                            const tzLabel = heatmapTimezone === -4 ? 'Manaus_UTC-4' : heatmapTimezone === -3 ? 'Brasilia_UTC-3' : heatmapTimezone === -5 ? 'Acre_UTC-5' : `UTC${heatmapTimezone}`;
+                            const header = ['Dia da Semana', ...Array.from({ length: 24 }, (_, h) => `${h}h`), 'Total'];
+                            const rows = matrix.map((row, d) => [
+                              DAYS_FULL_LOCAL[d],
+                              ...row.map(String),
+                              String(row.reduce((a, b) => a + b, 0))
+                            ]);
+                            const csv = [header, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+                            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `mapa-calor-${heatmapDays}dias-${tzLabel}-${new Date().toISOString().slice(0,10)}.csv`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          <Download className="h-3.5 w-3.5 mr-1.5" />
+                          Exportar Mapa (CSV)
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleExportCSV}
+                          disabled={isExporting}
+                        >
+                          <Download className={`h-3.5 w-3.5 mr-1.5 ${isExporting ? 'animate-pulse' : ''}`} />
+                          {isExporting ? 'Exportando...' : 'Exportar Log de Acessos (CSV)'}
+                        </Button>
                       </div>
                     </div>
                   </div>

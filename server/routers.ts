@@ -4284,6 +4284,7 @@ JSON (descrições MAX 15 chars):
       .input(z.object({
         days: z.number().min(1).max(365).default(90),
         userType: z.enum(['all', 'teacher', 'student']).default('all'),
+        timezoneOffset: z.number().min(-12).max(12).default(-4), // offset em horas em relação ao UTC
       }))
       .query(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
@@ -4299,12 +4300,13 @@ JSON (descrições MAX 15 chars):
         const filtered = input.userType === 'all'
           ? allLogs2
           : allLogs2.filter(l => l.userType === input.userType);
-        // Converter UTC para horário de Manaus (UTC-4) — solução definitiva
+        // Converter UTC para o fuso horário selecionado
+        const toTz = (date: Date) => new Date(date.getTime() + input.timezoneOffset * 60 * 60 * 1000);
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of filtered) {
-          const manausDate = toManaus(new Date(log.accessedAt));
-          const dow = manausDate.getUTCDay();
-          const hour = manausDate.getUTCHours();
+          const localDate = toTz(new Date(log.accessedAt));
+          const dow = localDate.getUTCDay();
+          const hour = localDate.getUTCHours();
           matrix[dow][hour]++;
         }
         return { matrix, total: filtered.length };
@@ -4315,6 +4317,7 @@ JSON (descrições MAX 15 chars):
       .input(z.object({
         days: z.number().min(1).max(365).default(90),
         classId: z.number().optional(), // undefined = todas as turmas
+        timezoneOffset: z.number().min(-12).max(12).default(-4), // offset em horas em relação ao UTC
       }))
       .query(async ({ ctx, input }) => {
         const database = await getDb();
@@ -4379,11 +4382,12 @@ JSON (descrições MAX 15 chars):
           finalLogs = allStudentLogs;
         }
 
+        const toTzByClass = (date: Date) => new Date(date.getTime() + input.timezoneOffset * 60 * 60 * 1000);
         const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
         for (const log of finalLogs) {
-          const manausDate = toManaus(new Date(log.accessedAt));
-          const dow = manausDate.getUTCDay();
-          const hour = manausDate.getUTCHours();
+          const localDate = toTzByClass(new Date(log.accessedAt));
+          const dow = localDate.getUTCDay();
+          const hour = localDate.getUTCHours();
           matrix[dow][hour]++;
         }
         return { matrix, total: finalLogs.length, className };
