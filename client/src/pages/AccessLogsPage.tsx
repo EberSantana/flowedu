@@ -826,33 +826,8 @@ export default function AccessLogsPage() {
                         <span className="text-xs text-muted-foreground">Mais</span>
                       </div>
 
-                      {/* Botões de exportação */}
+                      {/* Botão de exportação */}
                       <div className="flex items-center gap-2 mt-4 justify-end">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const DAYS_FULL_LOCAL = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-                            const tzLabel = heatmapTimezone === -4 ? 'Manaus_UTC-4' : heatmapTimezone === -3 ? 'Brasilia_UTC-3' : heatmapTimezone === -5 ? 'Acre_UTC-5' : `UTC${heatmapTimezone}`;
-                            const header = ['Dia da Semana', ...Array.from({ length: 24 }, (_, h) => `${h}h`), 'Total'];
-                            const rows = matrix.map((row, d) => [
-                              DAYS_FULL_LOCAL[d],
-                              ...row.map(String),
-                              String(row.reduce((a, b) => a + b, 0))
-                            ]);
-                            const csv = [header, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
-                            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `mapa-calor-${heatmapDays}dias-${tzLabel}-${new Date().toISOString().slice(0,10)}.csv`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                          }}
-                        >
-                          <Download className="h-3.5 w-3.5 mr-1.5" />
-                          Exportar Mapa (CSV)
-                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
