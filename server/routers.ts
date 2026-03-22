@@ -4284,19 +4284,31 @@ JSON (descrições MAX 15 chars):
       .input(z.object({
         days: z.number().min(1).max(365).default(90),
         userType: z.enum(['all', 'teacher', 'student']).default('all'),
-        timezoneOffset: z.number().min(-12).max(12).default(-4), // offset em horas em relação ao UTC
+        timezoneOffset: z.number().min(-12).max(12).default(-4),
+        dateFrom: z.string().optional(), // YYYY-MM-DD para período personalizado
+        dateTo: z.string().optional(),   // YYYY-MM-DD para período personalizado
       }))
       .query(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-        const { gte: gteOp2 } = await import('drizzle-orm');
-        const since2 = new Date();
-        since2.setDate(since2.getDate() - input.days);
+        const { gte: gteOp2, lte: lteOp2, and: andOp2hm } = await import('drizzle-orm');
+        let since2: Date;
+        let until2: Date | undefined;
+        if (input.dateFrom) {
+          since2 = new Date(input.dateFrom + 'T00:00:00Z');
+          until2 = input.dateTo ? new Date(input.dateTo + 'T23:59:59Z') : undefined;
+        } else {
+          since2 = new Date();
+          since2.setDate(since2.getDate() - input.days);
+        }
+        const whereClause2 = until2
+          ? andOp2hm(gteOp2(accessLogs.accessedAt, since2), lteOp2(accessLogs.accessedAt, until2))
+          : gteOp2(accessLogs.accessedAt, since2);
         const allLogs2 = await database
           .select()
           .from(accessLogs)
-          .where(gteOp2(accessLogs.accessedAt, since2));
+          .where(whereClause2);
         const filtered = input.userType === 'all'
           ? allLogs2
           : allLogs2.filter(l => l.userType === input.userType);
@@ -4316,16 +4328,25 @@ JSON (descrições MAX 15 chars):
     getHeatmapByClass: protectedProcedure
       .input(z.object({
         days: z.number().min(1).max(365).default(90),
-        classId: z.number().optional(), // undefined = todas as turmas
-        timezoneOffset: z.number().min(-12).max(12).default(-4), // offset em horas em relação ao UTC
+        classId: z.number().optional(),
+        timezoneOffset: z.number().min(-12).max(12).default(-4),
+        dateFrom: z.string().optional(), // YYYY-MM-DD para período personalizado
+        dateTo: z.string().optional(),   // YYYY-MM-DD para período personalizado
       }))
       .query(async ({ ctx, input }) => {
         const database = await getDb();
         if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         const teacherId = ctx.user.id;
-        const { gte: gteOp3, and: andOp3 } = await import('drizzle-orm');
-        const since3 = new Date();
-        since3.setDate(since3.getDate() - input.days);
+        const { gte: gteOp3, lte: lteOp3, and: andOp3 } = await import('drizzle-orm');
+        let since3: Date;
+        let until3: Date | undefined;
+        if (input.dateFrom) {
+          since3 = new Date(input.dateFrom + 'T00:00:00Z');
+          until3 = input.dateTo ? new Date(input.dateTo + 'T23:59:59Z') : undefined;
+        } else {
+          since3 = new Date();
+          since3.setDate(since3.getDate() - input.days);
+        }
 
         // Buscar alunos da turma selecionada (se classId fornecido)
         let studentIds: number[] | undefined;
@@ -4347,11 +4368,14 @@ JSON (descrições MAX 15 chars):
         }
 
         // Buscar logs de alunos no período, filtrados pela turma se necessário
+        const dateWhereByClass = until3
+          ? andOp3(gteOp3(accessLogs.accessedAt, since3), lteOp3(accessLogs.accessedAt, until3))
+          : gteOp3(accessLogs.accessedAt, since3);
         let logsQuery = database
           .select({ accessedAt: accessLogs.accessedAt })
           .from(accessLogs)
           .where(andOp3(
-            gteOp3(accessLogs.accessedAt, since3),
+            dateWhereByClass,
             eq(accessLogs.userType, 'student'),
             eq(accessLogs.teacherId, teacherId),
           ));
@@ -4373,7 +4397,7 @@ JSON (descrições MAX 15 chars):
             .select({ accessedAt: accessLogs.accessedAt, studentId: accessLogs.studentId })
             .from(accessLogs)
             .where(andOp3(
-              gteOp3(accessLogs.accessedAt, since3),
+              dateWhereByClass,
               eq(accessLogs.userType, 'student'),
               eq(accessLogs.teacherId, teacherId),
             ));

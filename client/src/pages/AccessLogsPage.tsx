@@ -88,6 +88,11 @@ export default function AccessLogsPage() {
   const [heatmapClassId, setHeatmapClassId] = useState<number | undefined>(undefined); // filtro por turma no mapa de calor
   const [heatmapCompare, setHeatmapCompare] = useState(false); // modo comparativo de períodos
   const [heatmapTimezone, setHeatmapTimezone] = useState(-4); // offset UTC padrão: Manaus (UTC-4)
+  const [heatmapPeriodMode, setHeatmapPeriodMode] = useState<"days" | "custom">("days"); // modo de filtro do heatmap
+  const [heatmapDateFrom, setHeatmapDateFrom] = useState(() => {
+    const d = new Date(); d.setDate(d.getDate() - 90); return d.toISOString().slice(0, 10);
+  });
+  const [heatmapDateTo, setHeatmapDateTo] = useState(() => new Date().toISOString().slice(0, 10));
   const [compareDays1, setCompareDays1] = useState(30); // período 1
   const [compareDays2, setCompareDays2] = useState(60); // período 2 (mais antigo)
   const [isExporting, setIsExporting] = useState(false);
@@ -252,13 +257,20 @@ export default function AccessLogsPage() {
     { refetchOnWindowFocus: false }
   );
 
+  const heatmapQueryInput = heatmapPeriodMode === 'custom'
+    ? { days: heatmapDays, userType: heatmapUserType, timezoneOffset: heatmapTimezone, dateFrom: heatmapDateFrom, dateTo: heatmapDateTo }
+    : { days: heatmapDays, userType: heatmapUserType, timezoneOffset: heatmapTimezone };
+  const heatmapClassQueryInput = heatmapPeriodMode === 'custom'
+    ? { days: heatmapDays, classId: heatmapClassId, timezoneOffset: heatmapTimezone, dateFrom: heatmapDateFrom, dateTo: heatmapDateTo }
+    : { days: heatmapDays, classId: heatmapClassId, timezoneOffset: heatmapTimezone };
+
   const { data: heatmapData, isLoading: heatmapLoading } = trpc.accessLogs.getHeatmap.useQuery(
-    { days: heatmapDays, userType: heatmapUserType, timezoneOffset: heatmapTimezone },
+    heatmapQueryInput,
     { refetchOnWindowFocus: false, enabled: !heatmapClassId }
   );
-  // Mapa de calor filtrado por turma
+
   const { data: heatmapClassData, isLoading: heatmapClassLoading } = trpc.accessLogs.getHeatmapByClass.useQuery(
-    { days: heatmapDays, classId: heatmapClassId, timezoneOffset: heatmapTimezone },
+    heatmapClassQueryInput,
     { refetchOnWindowFocus: false, enabled: !!heatmapClassId }
   );
   // Dados efetivos do mapa de calor (turma ou geral)
@@ -725,19 +737,64 @@ export default function AccessLogsPage() {
                       </SelectContent>
                     </Select>
                   )}
+                  {/* Seletor de período do heatmap */}
                   <Select
-                    value={heatmapDays.toString()}
-                    onValueChange={(v) => setHeatmapDays(Number(v))}
+                    value={heatmapPeriodMode === 'custom' ? 'custom' : heatmapDays.toString()}
+                    onValueChange={(v) => {
+                      if (v === 'custom') { setHeatmapPeriodMode('custom'); }
+                      else { setHeatmapPeriodMode('days'); setHeatmapDays(Number(v)); }
+                    }}
                   >
-                    <SelectTrigger className="w-36">
+                    <SelectTrigger className="w-44">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="30">30 dias</SelectItem>
                       <SelectItem value="90">90 dias</SelectItem>
                       <SelectItem value="180">180 dias</SelectItem>
+                      <SelectItem value="custom">Período personalizado</SelectItem>
                     </SelectContent>
                   </Select>
+                  {/* Seletores de data quando no modo personalizado */}
+                  {heatmapPeriodMode === 'custom' && (
+                    <div className="flex items-center gap-1">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-32 text-xs">
+                            <CalendarIcon className="h-3 w-3 mr-1" />
+                            {heatmapDateFrom ? format(new Date(heatmapDateFrom + 'T12:00:00'), 'dd/MM/yyyy') : 'De'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={heatmapDateFrom ? new Date(heatmapDateFrom + 'T12:00:00') : undefined}
+                            onSelect={(d) => d && setHeatmapDateFrom(d.toISOString().slice(0, 10))}
+                            locale={ptBR}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <span className="text-xs text-muted-foreground">até</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-32 text-xs">
+                            <CalendarIcon className="h-3 w-3 mr-1" />
+                            {heatmapDateTo ? format(new Date(heatmapDateTo + 'T12:00:00'), 'dd/MM/yyyy') : 'Até'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={heatmapDateTo ? new Date(heatmapDateTo + 'T12:00:00') : undefined}
+                            onSelect={(d) => d && setHeatmapDateTo(d.toISOString().slice(0, 10))}
+                            locale={ptBR}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
                   {/* Seletor de fuso horário */}
                   <Select
                     value={heatmapTimezone.toString()}

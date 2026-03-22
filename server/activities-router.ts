@@ -193,13 +193,13 @@ export const activitiesRouter = router({
       const db = (await getDb())!;
       // Verificar que a submissão é de uma atividade do professor
       const [sub] = await db
-        .select({ id: activitySubmissions.id, activityId: activitySubmissions.activityId })
+        .select({ id: activitySubmissions.id, activityId: activitySubmissions.activityId, studentId: activitySubmissions.studentId })
         .from(activitySubmissions)
         .where(eq(activitySubmissions.id, input.submissionId));
       if (!sub) throw new TRPCError({ code: "NOT_FOUND", message: "Submissão não encontrada" });
 
       const [activity] = await db
-        .select({ userId: activities.userId })
+        .select({ userId: activities.userId, title: activities.title, maxScore: activities.maxScore })
         .from(activities)
         .where(eq(activities.id, sub.activityId));
       if (!activity || activity.userId !== ctx.user.id)
@@ -214,6 +214,29 @@ export const activitiesRouter = router({
           gradedBy: ctx.user.id,
         })
         .where(eq(activitySubmissions.id, input.submissionId));
+
+      // Notificar o aluno sobre a correção da atividade
+      if (sub.studentId) {
+        try {
+          const [studentRow] = await db
+            .select({ userId: students.userId })
+            .from(students)
+            .where(eq(students.id, sub.studentId));
+          if (studentRow?.userId) {
+            const maxScore = activity.maxScore ? Number(activity.maxScore) : 10;
+            const nota = maxScore > 0 ? ((input.score / maxScore) * 10).toFixed(1) : input.score.toFixed(1);
+            const feedbackMsg = input.feedback ? ` Feedback: "${input.feedback.slice(0, 80)}${input.feedback.length > 80 ? '...' : ''}"` : '';
+            await createNotification({
+              userId: studentRow.userId,
+              type: 'grade_received',
+              title: 'Atividade Corrigida',
+              message: `Sua atividade "${activity.title}" foi corrigida. Nota: ${nota}/10.${feedbackMsg}`,
+              link: '/student/activities',
+              relatedId: sub.activityId,
+            });
+          }
+        } catch (e) { /* notificação não deve bloquear correção */ }
+      }
 
       return { success: true };
     }),
