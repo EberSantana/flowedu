@@ -2,8 +2,7 @@ import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Bug, Sparkles, Wrench, Shield, ArrowLeft, Star, Zap, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Bug, Sparkles, Wrench, Shield, Star, Zap, CheckCircle2 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 
@@ -189,14 +188,6 @@ export default function ChangelogPage() {
       <Sidebar />
       <PageWrapper>
         <div className="container mx-auto py-8 px-4 max-w-4xl">
-          {/* Botão Voltar */}
-          <Link href="/ajuda">
-            <Button variant="ghost" className="mb-6">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar para Central de Ajuda
-            </Button>
-          </Link>
-
           {/* Cabeçalho — mesmo padrão da Central de Ajuda */}
           <div className="text-center mb-10">
             <div className="flex items-center justify-center mb-4">
