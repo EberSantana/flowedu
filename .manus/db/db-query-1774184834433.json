@@ -1,0 +1,13 @@
+{
+  "query": "UPDATE notifications SET link='/activities' WHERE link='/atividades-em-sala'; SELECT ROW_COUNT() as registros_atualizados;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute UPDATE notifications SET link='/activities' WHERE link='/atividades-em-sala'; SELECT ROW_COUNT() as registros_atualizados;",
+  "rows": [
+    {
+      "registros_atualizados": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "registros_atualizados\n0\n",
+  "stderr": "",
+  "execution_time_ms": 574
+}
