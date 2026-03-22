@@ -65,7 +65,7 @@ export function StudentAlerts() {
         message: t.description || '',
         priority: isOverdue ? 'high' as const : (t.priority as 'high' | 'medium' | 'low'),
         dueDate: t.dueDate,
-        link: '/student-tasks',
+        link: '/student/activities',
         createdAt: new Date(t.createdAt),
       };
     });
