@@ -33,6 +33,7 @@ import {
   BellRing,
   Server,
   FileText,
+  Sparkles,
   Activity,
   MessageCircle,
   Mail,
@@ -691,6 +692,25 @@ export default function Sidebar() {
                       <p>Central de Ajuda</p>
                     </TooltipContent>
                   </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          window.location.href = '/novidades';
+                        }}
+                        className="p-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200 group"
+                      >
+                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
+                          <Sparkles className="h-4 w-4" />
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Novidades</p>
+                    </TooltipContent>
+                  </Tooltip>
               
                   <div className="flex items-center justify-center">
                     <ThemeSelectorCompact />
@@ -742,6 +762,17 @@ export default function Sidebar() {
                   >
                     <HelpCircle className="h-4 w-4" />
                     <span className="text-sm">Central de Ajuda</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      window.location.href = '/novidades';
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    <span className="text-sm">Novidades</span>
                   </button>
                   
                   <ThemeSelector

@@ -10,7 +10,8 @@ import {
   Users,
   Copy,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,14 @@ export default function Help() {
       href: "/ajuda/faq",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
+    },
+    {
+      title: "Novidades",
+      description: "Histórico de atualizações e melhorias do sistema — veja o que há de novo em cada versão",
+      icon: Sparkles,
+      href: "/novidades",
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
     },
   ];
 

@@ -94,6 +94,7 @@ const Help = lazy(() => import("./pages/Help"));
 const HelpProfessor = lazy(() => import("./pages/HelpProfessor"));
 const HelpAluno = lazy(() => import("./pages/HelpAluno"));
 const HelpFAQ = lazy(() => import("./pages/HelpFAQ"));
+const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 
 // Lazy loaded pages - Auth
 const Register = lazy(() => import("./pages/Register"));
@@ -206,6 +207,7 @@ function Router() {
           <Route path={"/ajuda/professor"} component={HelpProfessor} />
           <Route path={"/ajuda/aluno"} component={HelpAluno} />
           <Route path={"/ajuda/faq"} component={HelpFAQ} />
+          <Route path={"/novidades"} component={ChangelogPage} />
 
           {/* 404 */}
           <Route path={"/404"} component={NotFound} />
