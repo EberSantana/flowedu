@@ -20,15 +20,16 @@ export interface QuickAction {
 // Cores hexadecimais para consistência visual
 // Verde: #10b981, Azul: #3b82f6, Vermelho: #ef4444, Laranja: #f59e0b, Roxo: #8b5cf6
 const DEFAULT_ACTIONS: QuickAction[] = [
-  { id: 'new-subject', label: 'Nova Disciplina', icon: 'Plus', href: '/subjects', color: 'from-primary to-primary/80', enabled: true, order: 1 },
-  { id: 'schedule', label: 'Grade Completa', icon: 'Calendar', href: '/schedule', color: 'from-primary to-primary/80', enabled: true, order: 2 },
-  { id: 'analytics', label: 'Análise de Aprendizado com IA', icon: 'Brain', href: '/learning-analytics', color: 'from-primary to-primary/80', enabled: true, order: 3 },
-  { id: 'tasks', label: 'Tarefas', icon: 'CheckSquare', href: '/tasks', color: 'from-primary to-primary/80', enabled: true, order: 4 },
-  { id: 'announcements', label: 'Avisos', icon: 'Bell', href: '/announcements', color: 'from-primary to-primary/80', enabled: true, order: 5 },
-  { id: 'classes', label: 'Turmas', icon: 'Users', href: '/classes', color: 'from-primary to-primary/80', enabled: false, order: 6 },
+  { id: 'activities', label: 'Atividades em Sala', icon: 'ClipboardList', href: '/activities', color: 'from-primary to-primary/80', enabled: true, order: 1 },
+  { id: 'grades', label: 'Boletim', icon: 'BarChart2', href: '/grades', color: 'from-primary to-primary/80', enabled: true, order: 2 },
+  { id: 'announcements', label: 'Avisos', icon: 'Bell', href: '/announcements', color: 'from-primary to-primary/80', enabled: true, order: 3 },
+  { id: 'schedule', label: 'Grade Semanal', icon: 'Calendar', href: '/schedule', color: 'from-primary to-primary/80', enabled: true, order: 4 },
+  { id: 'doubts', label: 'Dúvidas dos Alunos', icon: 'MessageCircleQuestion', href: '/doubts', color: 'from-primary to-primary/80', enabled: true, order: 5 },
+  { id: 'exams', label: 'Banco de Provas', icon: 'FileText', href: '/exams', color: 'from-primary to-primary/80', enabled: true, order: 6 },
   { id: 'calendar', label: 'Calendário', icon: 'CalendarDays', href: '/calendar', color: 'from-primary to-primary/80', enabled: false, order: 7 },
-  { id: 'methodologies', label: 'Metodologias', icon: 'Lightbulb', href: '/active-methodologies', color: 'from-primary to-primary/80', enabled: false, order: 8 },
-  { id: 'learning-paths', label: 'Trilhas', icon: 'Route', href: '/learning-paths', color: 'from-primary to-primary/80', enabled: false, order: 9 },
+  { id: 'analytics', label: 'IA Pedagógica', icon: 'Brain', href: '/learning-analytics', color: 'from-primary to-primary/80', enabled: false, order: 8 },
+  { id: 'tasks', label: 'Tarefas', icon: 'CheckSquare', href: '/tasks', color: 'from-primary to-primary/80', enabled: false, order: 9 },
+  { id: 'trails', label: 'Trilhas', icon: 'TrendingUp', href: '/learning-paths', color: 'from-primary to-primary/80', enabled: false, order: 10 },
 ];
 
 interface QuickActionsCustomizerProps {

@@ -231,7 +231,7 @@ function DashboardLayoutContent({
               </DropdownMenuContent>
             </DropdownMenu>
           <div className="px-3 pb-1 group-data-[collapsible=icon]:hidden">
-            <p className="text-[10px] text-muted-foreground/50 text-center select-none">FlowEdu v5.1.0</p>
+            <p className="text-[10px] text-muted-foreground/50 text-center select-none">FlowEdu v5.5.0</p>
           </div>
           </SidebarFooter>
         </Sidebar>

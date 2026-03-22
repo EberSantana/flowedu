@@ -158,15 +158,16 @@ function Dashboard() {
       // Usa a cor primary do tema escolhido pelo usuário
       const themeColor = "from-primary to-primary/80";
       setQuickActions([
-        { id: "new-subject", label: "Nova Disciplina", icon: "Plus", href: "/subjects", color: themeColor, enabled: true },
-        { id: "schedule", label: "Grade Completa", icon: "Calendar", href: "/schedule", color: themeColor, enabled: true },
-        { id: "analytics", label: "Análise de Aprendizado com IA", icon: "Brain", href: "/learning-analytics", color: themeColor, enabled: true },
-        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: themeColor, enabled: true },
+        { id: "activities", label: "Atividades em Sala", icon: "ClipboardList", href: "/activities", color: themeColor, enabled: true },
+        { id: "grades", label: "Boletim", icon: "BarChart2", href: "/grades", color: themeColor, enabled: true },
         { id: "announcements", label: "Avisos", icon: "Bell", href: "/announcements", color: themeColor, enabled: true },
-        { id: "classes", label: "Turmas", icon: "Users", href: "/classes", color: themeColor, enabled: true },
-        { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: themeColor, enabled: true },
-        { id: "methodologies", label: "Metodologias", icon: "Lightbulb", href: "/methodologies", color: themeColor, enabled: true },
-        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: themeColor, enabled: true },
+        { id: "schedule", label: "Grade Semanal", icon: "Calendar", href: "/schedule", color: themeColor, enabled: true },
+        { id: "doubts", label: "Dúvidas dos Alunos", icon: "MessageCircleQuestion", href: "/doubts", color: themeColor, enabled: true },
+        { id: "exams", label: "Banco de Provas", icon: "FileText", href: "/exams", color: themeColor, enabled: true },
+        { id: "calendar", label: "Calendário", icon: "CalendarDays", href: "/calendar", color: themeColor, enabled: false },
+        { id: "analytics", label: "IA Pedagógica", icon: "Brain", href: "/learning-analytics", color: themeColor, enabled: false },
+        { id: "tasks", label: "Tarefas", icon: "CheckSquare", href: "/tasks", color: themeColor, enabled: false },
+        { id: "trails", label: "Trilhas", icon: "TrendingUp", href: "/learning-paths", color: themeColor, enabled: false },
       ]);
     }
   }, [preferences, isLoadingPreferences]);
