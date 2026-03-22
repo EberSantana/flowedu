@@ -127,7 +127,7 @@ export function StudentRankingWidget({ subjectId, subjectName }: StudentRankingW
           )}
 
           {/* Link para estatísticas completas */}
-          <Link href="/student-stats" className="block w-full text-center text-sm text-primary hover:underline">
+          <Link href="/student/statistics" className="block w-full text-center text-sm text-primary hover:underline">
             Ver estatísticas completas →
           </Link>
         </div>

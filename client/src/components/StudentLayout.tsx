@@ -248,6 +248,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
           {/* Bottom Actions */}
           {renderBottomActions()}
+          <div className="py-1.5 text-center border-t border-border">
+            <p className="text-[10px] text-muted-foreground/40 select-none">FlowEdu v5.1.0</p>
+          </div>
         </div>
       </aside>
 
@@ -309,6 +312,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
           {/* Bottom Actions */}
           {renderBottomActions(true)}
+          <div className="py-1.5 text-center border-t border-border">
+            <p className="text-[10px] text-muted-foreground/40 select-none">FlowEdu v5.1.0</p>
+          </div>
         </div>
       </aside>
 

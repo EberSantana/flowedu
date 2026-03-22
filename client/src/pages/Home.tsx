@@ -71,7 +71,7 @@ export default function Home() {
             </span>
           </div>
 
-          <Link href="/teacher-login">
+          <Link href="/login-professor">
             <button className="w-full max-w-sm bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-3 text-lg">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -82,7 +82,7 @@ export default function Home() {
 
           <p className="text-purple-300 text-sm">
             Não tem conta?{" "}
-            <Link href="/teacher-register" className="text-pink-300 hover:text-pink-200 font-semibold underline">
+            <Link href="/cadastro-professor" className="text-pink-300 hover:text-pink-200 font-semibold underline">
               Cadastre-se
             </Link>
           </p>

@@ -149,7 +149,7 @@ export default function StudentLearningPathDetail() {
               <p className="text-gray-600 mb-4">
                 Esta disciplina ainda não possui uma trilha de aprendizagem configurada.
               </p>
-              <Link href="/student/learning-paths">
+              <Link href="/student-learning-paths">
                 <Button>
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Voltar

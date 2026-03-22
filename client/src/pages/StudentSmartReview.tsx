@@ -219,7 +219,7 @@ export default function StudentSmartReview() {
                     <p className="text-muted-foreground">
                       Você não tem itens pendentes para revisar no momento.
                     </p>
-                    <Link href="/student/exercises">
+                    <Link href="/student-exercises">
                       <Button className="mt-4">
                         Resolver Novos Exercícios
                       </Button>
