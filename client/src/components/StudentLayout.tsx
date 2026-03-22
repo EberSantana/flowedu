@@ -19,7 +19,8 @@ import {
   BarChart3,
   PenLine,
   ClipboardList,
-  ClipboardCheck
+  ClipboardCheck,
+  Smartphone
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -196,6 +197,16 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         >
           <User className="w-5 h-5" />
           <span className="text-sm font-medium">Meu Perfil</span>
+        </Button>
+      </Link>
+      <Link href="/student/instalar-app">
+        <Button
+          onClick={closeSidebar ? () => setSidebarOpen(false) : undefined}
+          variant="outline"
+          className="w-full justify-start gap-3 h-11"
+        >
+          <Smartphone className="w-5 h-5" />
+          <span className="text-sm font-medium">Instalar App</span>
         </Button>
       </Link>
       <a
