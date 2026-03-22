@@ -45,9 +45,8 @@ async function startServer() {
   // ============================================
   // Configurar trust proxy apenas para Nginx local (127.0.0.1)
   // Isso permite rate limiting correto sem permitir falsificação de IPs
-  if (process.env.NODE_ENV === "production") {
-    app.set("trust proxy", "loopback"); // Apenas localhost/127.0.0.1
-  }
+  // Em produção, confiar no primeiro proxy (Nginx/Cloudflare)
+  app.set("trust proxy", 1);
   
   // ============================================
   // SEGURANÇA - Proteção contra Path Traversal

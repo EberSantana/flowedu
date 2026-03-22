@@ -124,11 +124,6 @@ const teacherNavCategories: NavCategory[] = [
         icon: <Clock className="h-5 w-5" />,
         href: "/shifts",
       },
-      {
-        label: "Atividades em Sala",
-        icon: <ClipboardList className="h-5 w-5" />,
-        href: "/activities",
-      },
     ],
   },
   {
@@ -150,7 +145,7 @@ const teacherNavCategories: NavCategory[] = [
   },
   {
     id: "analytics",
-    label: "Análise e Desempenho",
+    label: "Relatórios",
     icon: <BarChart3 className="h-5 w-5" />,
     items: [
       {
@@ -177,9 +172,14 @@ const teacherNavCategories: NavCategory[] = [
   },
   {
     id: "resources",
-    label: "Recursos Pedagógicos",
+    label: "Conteúdo",
     icon: <FolderOpen className="h-5 w-5" />,
     items: [
+      {
+        label: "Atividades em Sala",
+        icon: <ClipboardList className="h-5 w-5" />,
+        href: "/activities",
+      },
       {
         label: "Trilhas de Aprendizagem",
         icon: <Route className="h-5 w-5" />,
