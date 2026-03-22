@@ -1,14 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  CheckCircle2,
-  Bug,
-  Sparkles,
-  Wrench,
-  Shield,
-  ArrowLeft,
-} from "lucide-react";
+import { Bug, Sparkles, Wrench, Shield, ArrowLeft, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 
@@ -28,9 +21,27 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.2.0",
+    version: "5.3.0",
     date: "22/03/2026",
     label: "Mais recente",
+    changes: [
+      {
+        type: "feature",
+        text: "Página de Novidades — histórico completo de versões acessível pela sidebar e Central de Ajuda",
+      },
+      {
+        type: "improvement",
+        text: "Link 'Novidades' (✨) adicionado na sidebar do professor em modo expandido e colapsado",
+      },
+      {
+        type: "improvement",
+        text: "Card 'Novidades' adicionado na Central de Ajuda",
+      },
+    ],
+  },
+  {
+    version: "5.2.0",
+    date: "22/03/2026",
     changes: [
       {
         type: "feature",
@@ -41,8 +52,8 @@ const changelog: VersionEntry[] = [
         text: "Notificação automática ao aluno quando o professor corrige uma atividade — inclui nota (ex: 9.0/10) e trecho do feedback com link direto para Atividades",
       },
       {
-        type: "fix",
-        text: "Versão do sistema exibida na sidebar do professor e do aluno (desktop e mobile)",
+        type: "improvement",
+        text: "Versão do sistema exibida no rodapé da sidebar do professor e do aluno (desktop e mobile)",
       },
     ],
   },
@@ -64,7 +75,7 @@ const changelog: VersionEntry[] = [
       },
       {
         type: "improvement",
-        text: "Criado arquivo RULES.md com regra obrigatória: toda atualização do sistema deve incrementar a versão no package.json antes do deploy",
+        text: "Regra de versionamento obrigatória: toda atualização do sistema deve incrementar a versão antes do deploy",
       },
     ],
   },
@@ -74,7 +85,7 @@ const changelog: VersionEntry[] = [
     changes: [
       {
         type: "fix",
-        text: "Boletim do aluno: adicionada aba 'Provas' exibindo notas de provas submetidas (nota 0–10, pontuação bruta, status aprovado/reprovado e data)",
+        text: "Boletim do aluno: adicionada aba 'Provas' exibindo notas de provas submetidas (nota 0–10, pontuação bruta, status e data)",
       },
       {
         type: "fix",
@@ -82,11 +93,11 @@ const changelog: VersionEntry[] = [
       },
       {
         type: "fix",
-        text: "Procedure getStudentReport não retornava notas de provas (assessment_attempts) — corrigida para incluir todos os dados de avaliação",
+        text: "Procedure getStudentReport não retornava notas de provas — corrigida para incluir todos os dados de avaliação",
       },
       {
         type: "feature",
-        text: "Seletor de fuso horário no Mapa de Calor: Acre/Roraima (UTC-5), Manaus/Cuiabá (UTC-4), Brasília/São Paulo (UTC-3), Fernando de Noronha (UTC-2)",
+        text: "Seletor de fuso horário no Mapa de Calor: Acre (UTC-5), Manaus (UTC-4), Brasília (UTC-3), Fernando de Noronha (UTC-2)",
       },
       {
         type: "feature",
@@ -100,26 +111,30 @@ const changelog: VersionEntry[] = [
   },
 ];
 
-const typeConfig: Record<ChangeType, { icon: React.ReactNode; label: string; color: string }> = {
+const typeConfig: Record<ChangeType, { icon: React.ReactNode; label: string; bgColor: string; color: string }> = {
   feature: {
-    icon: <Sparkles className="h-4 w-4" />,
+    icon: <Sparkles className="h-3.5 w-3.5" />,
     label: "Novidade",
-    color: "bg-blue-500/10 text-blue-600 border-blue-200 dark:text-blue-400 dark:border-blue-800",
+    bgColor: "bg-blue-50",
+    color: "text-blue-600",
   },
   fix: {
-    icon: <Bug className="h-4 w-4" />,
+    icon: <Bug className="h-3.5 w-3.5" />,
     label: "Correção",
-    color: "bg-red-500/10 text-red-600 border-red-200 dark:text-red-400 dark:border-red-800",
+    bgColor: "bg-red-50",
+    color: "text-red-600",
   },
   improvement: {
-    icon: <Wrench className="h-4 w-4" />,
+    icon: <Wrench className="h-3.5 w-3.5" />,
     label: "Melhoria",
-    color: "bg-amber-500/10 text-amber-600 border-amber-200 dark:text-amber-400 dark:border-amber-800",
+    bgColor: "bg-amber-50",
+    color: "text-amber-600",
   },
   security: {
-    icon: <Shield className="h-4 w-4" />,
+    icon: <Shield className="h-3.5 w-3.5" />,
     label: "Segurança",
-    color: "bg-green-500/10 text-green-600 border-green-200 dark:text-green-400 dark:border-green-800",
+    bgColor: "bg-green-50",
+    color: "text-green-600",
   },
 };
 
@@ -127,96 +142,83 @@ export default function ChangelogPage() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Cabeçalho */}
-      <div className="mb-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mb-4 -ml-2 text-muted-foreground"
-          onClick={() => setLocation("/help")}
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Voltar para Ajuda
-        </Button>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <CheckCircle2 className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Novidades do FlowEdu</h1>
-            <p className="text-sm text-muted-foreground">
-              Histórico de atualizações e melhorias do sistema
-            </p>
-          </div>
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
+      {/* Voltar */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="mb-6 -ml-2 text-muted-foreground"
+        onClick={() => setLocation("/ajuda")}
+      >
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Voltar para Ajuda
+      </Button>
+
+      {/* Cabeçalho — igual ao padrão da Central de Ajuda */}
+      <div className="text-center mb-10">
+        <div className="flex items-center justify-center mb-4">
+          <Star className="h-12 w-12 text-primary mr-3" />
+          <h1 className="text-4xl font-bold">Novidades do FlowEdu</h1>
         </div>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Histórico de atualizações e melhorias do sistema
+        </p>
       </div>
 
       {/* Lista de versões */}
-      <div className="relative">
-        {/* Linha vertical do timeline */}
-        <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-border" />
-
-        <div className="space-y-8">
-          {changelog.map((entry, idx) => (
-            <div key={entry.version} className="relative pl-8">
-              {/* Ponto do timeline */}
-              <div
-                className={`absolute left-0 top-1.5 h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                  idx === 0
-                    ? "bg-primary border-primary"
-                    : "bg-background border-border"
-                }`}
-              >
-                {idx === 0 && (
-                  <div className="h-2 w-2 rounded-full bg-primary-foreground" />
-                )}
+      <div className="space-y-6">
+        {changelog.map((entry, idx) => (
+          <Card key={entry.version} className={idx === 0 ? "border-primary shadow-md" : ""}>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-xl">v{entry.version}</CardTitle>
+                  {entry.label && (
+                    <Badge className="text-xs">
+                      {entry.label}
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-sm text-muted-foreground">{entry.date}</span>
               </div>
-
-              <Card className={idx === 0 ? "border-primary/40 shadow-sm" : ""}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">v{entry.version}</CardTitle>
-                      {entry.label && (
-                        <Badge className="bg-primary text-primary-foreground text-xs">
-                          {entry.label}
-                        </Badge>
-                      )}
-                    </div>
-                    <span className="text-sm text-muted-foreground">{entry.date}</span>
-                  </div>
-                </CardHeader>
-                <Separator />
-                <CardContent className="pt-4">
-                  <ul className="space-y-3">
-                    {entry.changes.map((change, cIdx) => {
-                      const cfg = typeConfig[change.type];
-                      return (
-                        <li key={cIdx} className="flex items-start gap-3">
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-medium shrink-0 mt-0.5 ${cfg.color}`}
-                          >
-                            {cfg.icon}
-                            {cfg.label}
-                          </span>
-                          <span className="text-sm text-foreground leading-relaxed">
-                            {change.text}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
+            </CardHeader>
+            <Separator />
+            <CardContent className="pt-4">
+              <ul className="space-y-3">
+                {entry.changes.map((change, cIdx) => {
+                  const cfg = typeConfig[change.type];
+                  return (
+                    <li key={cIdx} className="flex items-start gap-3">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium shrink-0 mt-0.5 ${cfg.bgColor} ${cfg.color}`}
+                      >
+                        {cfg.icon}
+                        {cfg.label}
+                      </span>
+                      <span className="text-sm text-foreground leading-relaxed">
+                        {change.text}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Rodapé */}
-      <div className="mt-10 text-center text-xs text-muted-foreground">
-        FlowEdu — versão atual <strong>5.2.0</strong>
+      <div className="mt-10 text-center">
+        <p className="text-sm text-muted-foreground">
+          Versão atual: <strong>v5.3.0</strong> · Para dúvidas, acesse a{" "}
+          <button
+            onClick={() => setLocation("/ajuda")}
+            className="text-primary hover:underline"
+          >
+            Central de Ajuda
+          </button>
+          .
+        </p>
       </div>
     </div>
   );
