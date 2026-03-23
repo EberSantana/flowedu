@@ -190,8 +190,8 @@ export type InsertTeacherBeltHistory = typeof teacherBeltHistory.$inferInsert;
 
 export const subjects = mysqlTable("subjects", {
   id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
-  code: varchar("code", { length: 20 }).notNull().unique(),
+  name: varchar("name", { length: 200 }).notNull(),
+  code: varchar("code", { length: 200 }).notNull().unique(),
   description: text("description"),
   color: varchar("color", { length: 7 }).default("#3b82f6"),
   userId: int("userId").notNull(),
@@ -219,8 +219,8 @@ export type InsertSubject = typeof subjects.$inferInsert;
  */
 export const classes = mysqlTable("classes", {
   id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
-  code: varchar("code", { length: 20 }).notNull().unique(),
+  name: varchar("name", { length: 200 }).notNull(),
+  code: varchar("code", { length: 200 }).notNull().unique(),
   description: text("description"),
   userId: int("userId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

@@ -602,8 +602,14 @@ export const appRouter = router({
           console.log('[subjects.create] Usuário:', ctx.user.id, ctx.user.email);
           console.log('[subjects.create] Input recebido:', JSON.stringify(input, null, 2));
           
+          // Gerar code único para evitar conflito UNIQUE
+          const baseCode = (input.code || input.name).trim().substring(0, 150);
+          const uniqueSuffix = Date.now().toString(36).toUpperCase();
+          const uniqueCode = `${baseCode}-${uniqueSuffix}`;
+          
           const result = await db.createSubject({
             ...input,
+            code: uniqueCode,
             userId: ctx.user.id,
           });
           
@@ -723,12 +729,18 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         name: z.string().min(1),
-        code: z.string().min(1),
+        code: z.string().min(1).optional(),
         description: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Gerar code único para evitar conflito UNIQUE
+        const baseCode = (input.code || input.name).trim().substring(0, 150);
+        const uniqueSuffix = Date.now().toString(36).toUpperCase();
+        const uniqueCode = `${baseCode}-${uniqueSuffix}`;
         await db.createClass({
-          ...input,
+          name: input.name,
+          code: uniqueCode,
+          description: input.description,
           userId: ctx.user.id,
         });
         return { success: true };
