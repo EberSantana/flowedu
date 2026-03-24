@@ -23,9 +23,48 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
+    version: "5.5.1",
+    date: "24/03/2026",
+    label: "Mais recente",
+    highlight: "Contador de conclusão por exercício e correções gerais",
+    changes: [
+      {
+        type: "feature",
+        text: "Contador de conclusão em cada exercício do Banco de Provas: badges \"X fizeram\" (verde), \"X faltam\" (laranja) e \"X total\" (cinza) com barra de progresso percentual",
+      },
+      {
+        type: "fix",
+        text: "Correção de 6 exercícios com totalPoints incorreto (100 em vez de 10) no banco de dados",
+      },
+      {
+        type: "improvement",
+        text: "Personalizar Ações Rápidas expandido de 10 para 25 opções organizadas em 6 categorias",
+      },
+      {
+        type: "fix",
+        text: "Correção de campos varchar com limite pequeno que causavam erros ao cadastrar nomes longos (turmas, disciplinas, matrícula)",
+      },
+      {
+        type: "feature",
+        text: "Notificações automáticas para alunos ao criar atividade de sala, publicar exercício ou criar prova publicada",
+      },
+      {
+        type: "improvement",
+        text: "PWA corrigido para abrir na página correta (professor ou aluno) via detecção automática de perfil no localStorage",
+      },
+      {
+        type: "fix",
+        text: "Headers Cache-Control adicionados para index.html e sw.js — elimina erro \"Unable to preload CSS\" após deploy",
+      },
+      {
+        type: "feature",
+        text: "Página de manutenção HTML no Nginx exibida automaticamente durante reinicialização do PM2 (erros 502/503/504)",
+      },
+    ],
+  },
+  {
     version: "5.5.0",
     date: "22/03/2026",
-    label: "Mais recente",
     highlight: "Ações Rápidas reorganizadas no Dashboard",
     changes: [
       {
