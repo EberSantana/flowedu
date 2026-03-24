@@ -58,7 +58,21 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // Servir arquivos estáticos com cache longo (assets com hash são imutáveis)
+  app.use(express.static(distPath, {
+    setHeaders: (res, filePath) => {
+      // Assets com hash do Vite: cache longo (1 ano)
+      if (filePath.includes('/assets/')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+      // sw.js e manifest.json: nunca cachear
+      else if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.json')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+    }
+  }));
 
   // Assets com hash (JS/CSS do Vite) que não existem devem retornar 404
   // Isso evita o erro "Failed to fetch dynamically imported module" quando
@@ -67,8 +81,13 @@ export function serveStatic(app: Express) {
     res.status(404).send("Asset not found");
   });
 
-  // fall through to index.html if the file doesn't exist (SPA routing)
+  // fall through to index.html se o arquivo não existir (SPA routing)
+  // Sempre retornar index.html sem cache para garantir que o browser
+  // carregue os assets mais recentes após cada deploy
   app.use("*", (_req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
