@@ -1,9 +1,9 @@
 {
-  "name": "FlowEdu - Portal do Aluno",
+  "name": "FlowEdu",
   "short_name": "FlowEdu",
   "description": "FlowEdu - Acesse suas disciplinas, trilhas de aprendizagem, exercícios, provas e acompanhe seu progresso.",
-  "start_url": "/student-dashboard",
-  "id": "/student-dashboard",
+  "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
