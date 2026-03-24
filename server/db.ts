@@ -1901,7 +1901,7 @@ export async function deleteTopicComment(id: number, authorId: number) {
 
 export async function createNotification(data: {
   userId: number;
-  type: 'new_material' | 'new_assignment' | 'new_announcement' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received';
+  type: 'new_material' | 'new_assignment' | 'new_announcement' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received' | 'assessment_published' | 'activity_submission' | 'new_activity';
   title: string;
   message: string;
   link?: string;

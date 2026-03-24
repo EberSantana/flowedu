@@ -3431,6 +3431,45 @@ JSON (descrições MAX 15 chars):
         // Publicar imediatamente se solicitado
         if (input.status === 'published') {
           await db.updateAssessment(assessmentId, ctx.user.id, { status: 'published' });
+
+          // Notificar alunos automaticamente
+          try {
+            const dbConn = await getDb();
+            if (dbConn) {
+              let studentRows: any[] = [];
+              if (input.classId) {
+                const res = await dbConn.execute(sql`
+                  SELECT DISTINCT s.userId FROM students s
+                  JOIN student_class_enrollments sce ON sce.studentId = s.id
+                  WHERE sce.classId = ${input.classId} AND sce.status = 'active' AND s.userId IS NOT NULL
+                `) as any[];
+                studentRows = (res[0] as any[]) || [];
+              } else if (input.subjectId) {
+                const enrolled = await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+                studentRows = enrolled.filter((s: any) => s.status === 'active' && s.userId).map((s: any) => ({ userId: s.userId }));
+              }
+              const appDateMsg = input.applicationDate
+                ? ` Data: ${new Date(input.applicationDate).toLocaleDateString('pt-BR')}.`
+                : '';
+              for (const s of studentRows) {
+                await dbConn.execute(sql`
+                  INSERT INTO notifications (userId, type, title, message, relatedId, relatedType, isRead, createdAt)
+                  VALUES (
+                    ${s.userId},
+                    'assessment_published',
+                    ${'📝 Nova Prova Disponível'},
+                    ${`A prova "${input.title}" foi publicada e está disponível para você.${appDateMsg}`},
+                    ${assessmentId},
+                    'assessment',
+                    0,
+                    NOW()
+                  )
+                `);
+              }
+            }
+          } catch (e) {
+            console.error('[assessments.create] Erro ao notificar alunos:', e);
+          }
         }
         
         // Salvar as questões
@@ -7797,8 +7836,30 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           teacherId: ctx.user.id,
           status: "published",
         });
-        
-        return { success: true, exerciseId: result[0].insertId };
+        const exerciseId = result[0].insertId;
+
+        // Notificar alunos matriculados na disciplina
+        try {
+          const enrolled = await db.getStudentsBySubject(input.subjectId, ctx.user.id);
+          const activeStudents = enrolled.filter((s: any) => s.status === 'active' && s.userId);
+          const availableMsg = input.availableTo
+            ? ` Disponível até ${new Date(input.availableTo).toLocaleDateString('pt-BR')}.`
+            : '';
+          for (const student of activeStudents) {
+            await db.createNotification({
+              userId: (student as any).userId,
+              type: 'new_assignment',
+              title: '📚 Novo Exercício Disponível',
+              message: `O exercício "${input.title}" foi publicado.${availableMsg}`,
+              link: '/student/exercises',
+              relatedId: exerciseId,
+            });
+          }
+        } catch (e) {
+          console.error('[teacherExercises.publish] Erro ao notificar alunos:', e);
+        }
+
+        return { success: true, exerciseId };
       }),
 
     // Listar exercícios criados pelo professor

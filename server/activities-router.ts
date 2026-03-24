@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
-import { getDb, createNotification } from "./db";
+import { getDb, createNotification, getStudentsBySubject } from "./db";
 import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts, scheduledClasses } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
@@ -49,7 +49,59 @@ export const activitiesRouter = router({
         maxScore: String(input.maxScore),
         status: input.status,
       });
-      return { success: true, id: (result as any).insertId };
+      const activityId = (result as any).insertId;
+
+      // Notificar alunos automaticamente se a atividade for publicada
+      if (input.status === 'published') {
+        try {
+          let studentsToNotify: Array<{ userId: number }> = [];
+
+          if (input.subjectId) {
+            // Buscar alunos matriculados na disciplina
+            const enrolled = await getStudentsBySubject(input.subjectId, ctx.user.id);
+            studentsToNotify = enrolled
+              .filter((s: any) => s.status === 'active' && s.userId)
+              .map((s: any) => ({ userId: s.userId }));
+          } else if (input.classId) {
+            // Buscar alunos matriculados na turma
+            const classStudents = await db.execute(
+              sql`SELECT DISTINCT s.userId FROM students s
+                  JOIN student_class_enrollments sce ON sce.studentId = s.id
+                  WHERE sce.classId = ${input.classId} AND sce.status = 'active' AND s.userId IS NOT NULL`
+            ) as any[];
+            studentsToNotify = ((classStudents[0] as any[]) || []).map((r: any) => ({ userId: r.userId }));
+          } else {
+            // Sem disciplina/turma: notificar todos os alunos do professor
+            const allStudents = await db.execute(
+              sql`SELECT DISTINCT s.userId FROM students s WHERE s.userId IN (
+                SELECT DISTINCT se.studentId FROM subjectEnrollments se
+                JOIN subjects sub ON sub.id = se.subjectId
+                WHERE sub.userId = ${ctx.user.id} AND se.status = 'active'
+              ) AND s.userId IS NOT NULL`
+            ) as any[];
+            studentsToNotify = ((allStudents[0] as any[]) || []).map((r: any) => ({ userId: r.userId }));
+          }
+
+          const dueDateMsg = input.dueDate
+            ? ` Prazo: ${new Date(input.dueDate).toLocaleDateString('pt-BR')}.`
+            : '';
+
+          for (const student of studentsToNotify) {
+            await createNotification({
+              userId: student.userId,
+              type: 'new_activity',
+              title: '📋 Nova Atividade Disponível',
+              message: `A atividade "${input.title}" foi publicada.${dueDateMsg}`,
+              link: '/student/activities',
+              relatedId: activityId,
+            });
+          }
+        } catch (e) {
+          console.error('[activities.create] Erro ao notificar alunos:', e);
+        }
+      }
+
+      return { success: true, id: activityId };
     }),
 
   // ── Professor: listar atividades criadas ────────────────────────────────
