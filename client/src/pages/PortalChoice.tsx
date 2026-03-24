@@ -14,11 +14,23 @@ export default function PortalChoice() {
     if (isLoading) return;
     
     if (studentSession) {
-      // Se é aluno, redirecionar para dashboard de aluno
+      // Salvar preferência de portal no localStorage
+      localStorage.setItem('flowedu_last_portal', 'aluno');
       setLocation('/student-dashboard');
     } else if (user) {
-      // Se é professor, redirecionar para dashboard
+      // Salvar preferência de portal no localStorage
+      localStorage.setItem('flowedu_last_portal', 'professor');
       setLocation('/dashboard');
+    } else {
+      // Verificar se há preferência salva para redirecionar para o login correto
+      // (apenas quando o app é aberto via PWA sem sessão ativa)
+      const lastPortal = localStorage.getItem('flowedu_last_portal');
+      if (lastPortal === 'aluno') {
+        setLocation('/student-login');
+      } else if (lastPortal === 'professor') {
+        setLocation('/login');
+      }
+      // Se não há preferência salva, mostrar a tela de escolha normalmente
     }
   }, [user, studentSession, isLoading, setLocation]);
   
