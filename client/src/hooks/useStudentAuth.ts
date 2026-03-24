@@ -1,6 +1,5 @@
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
 
 export function useStudentAuth() {
   const [, setLocation] = useLocation();
@@ -11,12 +10,6 @@ export function useStudentAuth() {
     refetchOnReconnect: false,
     staleTime: Infinity, // Nunca considerar dados como obsoletos
   });
-  // Redirecionar para a raiz se não houver sessão de aluno (ex: ao abrir o PWA)
-  useEffect(() => {
-    if (!isLoading && !student) {
-      setLocation('/');
-    }
-  }, [isLoading, student, setLocation]);
 
   const logoutMutation = trpc.student.logout.useMutation({
     onSuccess: () => {
