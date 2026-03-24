@@ -1910,6 +1910,24 @@ export async function createNotification(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Deduplicação: se relatedId estiver presente, evitar duplicatas nos últimos 30 minutos
+  // Isso previne disparos múltiplos por cluster PM2, retries ou chamadas acidentais
+  if (data.relatedId) {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const existing = await db.select({ id: notifications.id })
+      .from(notifications)
+      .where(and(
+        eq(notifications.userId, data.userId),
+        eq(notifications.type, data.type),
+        eq(notifications.relatedId, data.relatedId),
+        sql`${notifications.createdAt} > ${thirtyMinutesAgo}`
+      ))
+      .limit(1);
+    if (existing.length > 0) {
+      return { id: existing[0].id, ...data };
+    }
+  }
+  
   const [result]: any = await db.insert(notifications).values(data);
   
   return { id: Number(result.insertId || 0), ...data };

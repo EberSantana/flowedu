@@ -1,0 +1,58 @@
+{
+  "query": "SELECT userId, type, relatedId, COUNT(*) as cnt FROM notifications GROUP BY userId, type, relatedId HAVING cnt > 1 ORDER BY cnt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT userId, type, relatedId, COUNT(*) as cnt FROM notifications GROUP BY userId, type, relatedId HAVING cnt > 1 ORDER BY cnt DESC LIMIT 10;",
+  "rows": [
+    {
+      "userId": "1",
+      "type": "new_assignment",
+      "relatedId": "NULL",
+      "cnt": "87"
+    },
+    {
+      "userId": "1",
+      "type": "new_material",
+      "relatedId": "NULL",
+      "cnt": "67"
+    },
+    {
+      "userId": "1",
+      "type": "grade_received",
+      "relatedId": "NULL",
+      "cnt": "23"
+    },
+    {
+      "userId": "1",
+      "type": "feedback_received",
+      "relatedId": "5",
+      "cnt": "23"
+    },
+    {
+      "userId": "1",
+      "type": "new_material",
+      "relatedId": "1",
+      "cnt": "22"
+    },
+    {
+      "userId": "1",
+      "type": "comment_received",
+      "relatedId": "NULL",
+      "cnt": "22"
+    },
+    {
+      "userId": "1",
+      "type": "assignment_due",
+      "relatedId": "NULL",
+      "cnt": "22"
+    },
+    {
+      "userId": "1",
+      "type": "feedback_received",
+      "relatedId": "NULL",
+      "cnt": "22"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\ttype\trelatedId\tcnt\n1\tnew_assignment\tNULL\t87\n1\tnew_material\tNULL\t67\n1\tgrade_received\tNULL\t23\n1\tfeedback_received\t5\t23\n1\tnew_material\t1\t22\n1\tcomment_received\tNULL\t22\n1\tassignment_due\tNULL\t22\n1\tfeedback_received\tNULL\t22\n",
+  "stderr": "",
+  "execution_time_ms": 142
+}

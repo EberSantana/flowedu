@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, userId, type, title, relatedId, createdAt FROM notifications WHERE userId = 1 AND type = 'new_assignment' ORDER BY createdAt DESC LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, userId, type, title, relatedId, createdAt FROM notifications WHERE userId = 1 AND type = 'new_assignment' ORDER BY createdAt DESC LIMIT 15;",
+  "rows": [
+    {
+      "id": "750025",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste new_assignment",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:36"
+    },
+    {
+      "id": "750019",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "✏️ Nova atividade",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:36"
+    },
+    {
+      "id": "750022",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste 2",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:36"
+    },
+    {
+      "id": "750031",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Sem relatedId",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:36"
+    },
+    {
+      "id": "750014",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Sem relatedId",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:15"
+    },
+    {
+      "id": "750008",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste new_assignment",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:15"
+    },
+    {
+      "id": "750002",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "✏️ Nova atividade",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:14"
+    },
+    {
+      "id": "750005",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste 2",
+      "relatedId": "NULL",
+      "createdAt": "2026-03-07 21:08:14"
+    },
+    {
+      "id": "720133",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Sem relatedId",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:58"
+    },
+    {
+      "id": "720124",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste 2",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:57"
+    },
+    {
+      "id": "720121",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "✏️ Nova atividade",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:57"
+    },
+    {
+      "id": "720127",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste new_assignment",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:57"
+    },
+    {
+      "id": "720116",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Sem relatedId",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:29"
+    },
+    {
+      "id": "720104",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "✏️ Nova atividade",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:29"
+    },
+    {
+      "id": "720110",
+      "userId": "1",
+      "type": "new_assignment",
+      "title": "Teste new_assignment",
+      "relatedId": "NULL",
+      "createdAt": "2026-02-17 17:47:29"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\ttype\ttitle\trelatedId\tcreatedAt\n750025\t1\tnew_assignment\tTeste new_assignment\tNULL\t2026-03-07 21:08:36\n750019\t1\tnew_assignment\t✏️ Nova atividade\tNULL\t2026-03-07 21:08:36\n750022\t1\tnew_assignment\tTeste 2\tNULL\t2026-03-07 21:08:36\n750031\t1\tnew_assignment\tSem relatedId\tNULL\t2026-03-07 21:08:36\n750014\t1\tnew_assignment\tSem relatedId\tNULL\t2026-03-07 21:08:15\n750008\t1\tnew_assignment\tTeste new_assignment\tNULL\t2026-03-07 21:08:15\n750002\t1\tnew_assignment\t✏️ Nova atividade\tNULL\t2026-03-07 21:08:14\n750005\t1\tnew_assignment\tTeste 2\tNULL\t2026-03-07 21:08:14\n720133\t1\tnew_assignment\tSem relatedId\tNULL\t2026-02-17 17:47:58\n720124\t1\tnew_assignment\tTeste 2\tNULL\t2026-02-17 17:47:57\n720121\t1\tnew_assignment\t✏️ Nova atividade\tNULL\t2026-02-17 17:47:57\n720127\t1\tnew_assignment\tTeste new_assignment\tNULL\t2026-02-17 17:47:57\n720116\t1\tnew_assignment\tSem relatedId\tNULL\t2026-02-17 17:47:29\n720104\t1\tnew_assignment\t✏️ Nova atividade\tNULL\t2026-02-17 17:47:29\n720110\t1\tnew_assignment\tTeste new_assignment\tNULL\t2026-02-17 17:47:29\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

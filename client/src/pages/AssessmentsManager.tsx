@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   ClipboardList,
   BookOpen,
@@ -50,6 +51,8 @@ import {
   Users,
   UserCheck,
   UserX,
+  Settings,
+  RotateCcw,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { toast } from "sonner";
@@ -65,6 +68,12 @@ export default function AssessmentsManager() {
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
   const [editMaxAttemptsId, setEditMaxAttemptsId] = useState<number | null>(null);
   const [editMaxAttemptsValue, setEditMaxAttemptsValue] = useState<string>("1");
+
+  // Estado para o modal de configurações de exercício
+  const [editExerciseId, setEditExerciseId] = useState<number | null>(null);
+  const [editExerciseTitle, setEditExerciseTitle] = useState<string>("");
+  const [editExerciseMaxAttempts, setEditExerciseMaxAttempts] = useState<string>("3");
+  const [resetConfirmStudent, setResetConfirmStudent] = useState<{ studentId: number; name: string } | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -87,6 +96,12 @@ export default function AssessmentsManager() {
   const { data: completionStats } = trpc.teacherExercises.getCompletionStats.useQuery(
     { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
     { enabled: !!user }
+  );
+
+  // Buscar lista de alunos com tentativas (para o modal de edição)
+  const { data: studentAttemptsList, isLoading: loadingAttempts } = trpc.teacherExercises.getStudentAttemptsList.useQuery(
+    { exerciseId: editExerciseId! },
+    { enabled: editExerciseId !== null }
   );
 
   // Buscar questões da prova selecionada
@@ -121,7 +136,7 @@ export default function AssessmentsManager() {
     },
   });
 
-  // Mutation para atualizar maxAttempts
+  // Mutation para atualizar maxAttempts de PROVA
   const updateMaxAttemptsMutation = trpc.learningPath.updateAssessmentMaxAttempts.useMutation({
     onSuccess: () => {
       toast.success("Número máximo de tentativas atualizado!");
@@ -129,6 +144,29 @@ export default function AssessmentsManager() {
       setEditMaxAttemptsId(null);
     },
     onError: (err) => toast.error("Erro: " + err.message),
+  });
+
+  // Mutation para atualizar maxAttempts de EXERCÍCIO
+  const updateExerciseMaxAttemptsMutation = trpc.teacherExercises.updateExerciseMaxAttempts.useMutation({
+    onSuccess: () => {
+      toast.success("Número máximo de tentativas atualizado!");
+      utils.teacherExercises.list.invalidate();
+    },
+    onError: (err) => toast.error("Erro: " + err.message),
+  });
+
+  // Mutation para resetar tentativas de um aluno
+  const resetStudentAttemptsMutation = trpc.teacherExercises.resetStudentAttempts.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Tentativas resetadas! ${data.deleted} tentativa(s) removida(s).`);
+      utils.teacherExercises.getStudentAttemptsList.invalidate({ exerciseId: editExerciseId! });
+      utils.teacherExercises.getCompletionStats.invalidate();
+      setResetConfirmStudent(null);
+    },
+    onError: (err) => {
+      toast.error("Erro ao resetar tentativas: " + err.message);
+      setResetConfirmStudent(null);
+    },
   });
 
   // Mutation para alterar status da prova
@@ -147,6 +185,21 @@ export default function AssessmentsManager() {
     } else {
       deleteExerciseMutation.mutate({ exerciseId: deleteTarget.id });
     }
+  };
+
+  const openEditExercise = (exercise: any) => {
+    setEditExerciseId(exercise.id);
+    setEditExerciseTitle(exercise.title);
+    setEditExerciseMaxAttempts(String(exercise.maxAttempts ?? 3));
+  };
+
+  const handleSaveExerciseMaxAttempts = () => {
+    const val = parseInt(editExerciseMaxAttempts);
+    if (isNaN(val) || val < 1) {
+      toast.error("Informe um número válido de tentativas (mínimo 1)");
+      return;
+    }
+    updateExerciseMaxAttemptsMutation.mutate({ exerciseId: editExerciseId!, maxAttempts: val });
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -268,86 +321,56 @@ export default function AssessmentsManager() {
                     <AlertCircle className="h-12 w-12 text-gray-300 mb-4" />
                     <p className="text-gray-500 font-medium">Nenhuma prova encontrada</p>
                     <p className="text-gray-400 text-sm mt-1">
-                      Crie provas em <strong>Trilhas de Aprendizagem</strong> e clique em "Publicar para Alunos"
+                      Crie provas em <strong>Trilhas de Aprendizagem</strong> e publique para os alunos
                     </p>
                   </CardContent>
                 </Card>
               ) : (
                 <div className="space-y-3">
                   {assessments.map((assessment: any) => (
-                    <Card key={assessment.id} className="border border-gray-200 hover:border-blue-200 transition-colors">
+                    <Card key={assessment.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                       <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{assessment.title}</h3>
                               {getStatusBadge(assessment.status)}
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
-                              {assessment.subjectName && (
-                                <span className="flex items-center gap-1">
-                                  <FileText className="h-3.5 w-3.5" />
-                                  {assessment.subjectName}
-                                </span>
-                              )}
-                              {assessment.className && (
-                                <span className="flex items-center gap-1">
-                                  <BookOpen className="h-3.5 w-3.5" />
-                                  {assessment.className}
-                                </span>
-                              )}
                               <span className="flex items-center gap-1">
                                 <Hash className="h-3.5 w-3.5" />
                                 {assessment.totalQuestions} questões · {assessment.totalPoints} pts
                               </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3.5 w-3.5" />
-                                Criada em {formatDate(assessment.createdAt)}
-                              </span>
-                              {assessment.applicationDate && (
-                                <span className="flex items-center gap-1 text-blue-600">
-                                  Aplicação: {formatDate(assessment.applicationDate)}
-                                </span>
-                              )}
-                              {/* Tentativas máximas */}
+                              {/* Edição inline de tentativas máximas */}
                               {editMaxAttemptsId === assessment.id ? (
-                                <span className="flex items-center gap-1">
-                                  <RefreshCw className="h-3.5 w-3.5 text-purple-500" />
+                                <div className="flex items-center gap-1">
                                   <Input
                                     type="number"
                                     min={1}
                                     max={99}
+                                    className="w-16 h-6 text-xs px-1 py-0"
                                     value={editMaxAttemptsValue}
                                     onChange={(e) => setEditMaxAttemptsValue(e.target.value)}
-                                    className="h-6 w-16 text-xs px-1 py-0"
-                                    autoFocus
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         const val = parseInt(editMaxAttemptsValue);
-                                        if (!isNaN(val) && val >= 1) {
+                                        if (val >= 1)
                                           updateMaxAttemptsMutation.mutate({ assessmentId: assessment.id, maxAttempts: val });
-                                        }
                                       }
                                       if (e.key === "Escape") setEditMaxAttemptsId(null);
                                     }}
+                                    autoFocus
                                   />
-                                  <button
-                                    className="text-xs text-green-700 font-semibold hover:underline"
-                                    onClick={() => {
-                                      const val = parseInt(editMaxAttemptsValue);
-                                      if (!isNaN(val) && val >= 1) {
-                                        updateMaxAttemptsMutation.mutate({ assessmentId: assessment.id, maxAttempts: val });
-                                      }
-                                    }}
-                                  >OK</button>
-                                  <button
-                                    className="text-xs text-gray-400 hover:underline"
-                                    onClick={() => setEditMaxAttemptsId(null)}
-                                  >Cancelar</button>
-                                </span>
+                                  <Button size="sm" className="h-6 px-2 text-xs" onClick={() => {
+                                    const val = parseInt(editMaxAttemptsValue);
+                                    if (val >= 1)
+                                      updateMaxAttemptsMutation.mutate({ assessmentId: assessment.id, maxAttempts: val });
+                                  }}>OK</Button>
+                                  <Button size="sm" variant="ghost" className="h-6 px-1" onClick={() => setEditMaxAttemptsId(null)}>✕</Button>
+                                </div>
                               ) : (
                                 <button
-                                  className="flex items-center gap-1 text-purple-600 hover:text-purple-800 hover:underline"
+                                  className="flex items-center gap-1 hover:text-blue-600 transition-colors cursor-pointer"
                                   onClick={() => {
                                     setEditMaxAttemptsId(assessment.id);
                                     setEditMaxAttemptsValue(String(assessment.maxAttempts ?? 1));
@@ -358,44 +381,51 @@ export default function AssessmentsManager() {
                                   {assessment.maxAttempts ?? 1} tentativa{(assessment.maxAttempts ?? 1) !== 1 ? "s" : ""} máx.
                                 </button>
                               )}
+                              {assessment.availableFrom && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  Disponível: {formatDate(assessment.availableFrom)}
+                                  {assessment.availableTo && ` até ${formatDate(assessment.availableTo)}`}
+                                </span>
+                              )}
                             </div>
+                            {assessment.description && (
+                              <p className="text-sm text-gray-400 mt-1 truncate">{assessment.description}</p>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                            {/* Botão Ver Questões */}
+                          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-blue-700 border-blue-200 hover:bg-blue-50"
                               onClick={() => {
                                 setViewQuestionsId(assessment.id);
                                 setViewQuestionsTitle(assessment.title);
-                                setExpandedQuestion(null);
                               }}
                             >
-                              <ListOrdered className="h-4 w-4 mr-1" />
+                              <FileText className="h-4 w-4 mr-1" />
                               Ver Questões
                             </Button>
-                            {assessment.status === "published" ? (
+                            {assessment.status !== "published" ? (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-yellow-700 border-yellow-200 hover:bg-yellow-50"
-                                onClick={() => toggleStatusMutation.mutate({ assessmentId: assessment.id, status: "draft" })}
-                                disabled={toggleStatusMutation.isPending}
-                              >
-                                <EyeOff className="h-4 w-4 mr-1" />
-                                Despublicar
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-green-700 border-green-200 hover:bg-green-50"
+                                className="text-green-600 border-green-200 hover:bg-green-50"
                                 onClick={() => toggleStatusMutation.mutate({ assessmentId: assessment.id, status: "published" })}
                                 disabled={toggleStatusMutation.isPending}
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 Publicar
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-yellow-600 border-yellow-200 hover:bg-yellow-50"
+                                onClick={() => toggleStatusMutation.mutate({ assessmentId: assessment.id, status: "draft" })}
+                                disabled={toggleStatusMutation.isPending}
+                              >
+                                <EyeOff className="h-4 w-4 mr-1" />
+                                Despublicar
                               </Button>
                             )}
                             <Button
@@ -439,9 +469,9 @@ export default function AssessmentsManager() {
                     const pending = stats?.pending ?? 0;
                     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
                     return (
-                    <Card key={exercise.id} className="border border-gray-200 hover:border-blue-200 transition-colors">
+                    <Card key={exercise.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                       <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{exercise.title}</h3>
@@ -455,7 +485,10 @@ export default function AssessmentsManager() {
                                 {exercise.totalQuestions} questões · {exercise.totalPoints} pts
                               </span>
                               {exercise.maxAttempts && (
-                                <span>{exercise.maxAttempts} tentativas máx.</span>
+                                <span className="flex items-center gap-1">
+                                  <RefreshCw className="h-3.5 w-3.5" />
+                                  {exercise.maxAttempts} tentativa{exercise.maxAttempts !== 1 ? "s" : ""} máx.
+                                </span>
                               )}
                               {exercise.availableFrom && (
                                 <span className="flex items-center gap-1">
@@ -496,6 +529,15 @@ export default function AssessmentsManager() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                              onClick={() => openEditExercise(exercise)}
+                            >
+                              <Settings className="h-4 w-4 mr-1" />
+                              Editar
+                            </Button>
                             <Button
                               variant="outline"
                               size="sm"
@@ -543,6 +585,134 @@ export default function AssessmentsManager() {
           </AlertDialogContent>
         </AlertDialog>
 
+        {/* Modal de Configurações do Exercício */}
+        <Dialog open={editExerciseId !== null} onOpenChange={(open) => { if (!open) { setEditExerciseId(null); setResetConfirmStudent(null); } }}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-blue-600" />
+                Configurações: {editExerciseTitle}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-6 mt-2">
+              {/* Seção: Número máximo de tentativas */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 text-blue-500" />
+                  Número Máximo de Tentativas
+                </h4>
+                <p className="text-sm text-gray-500 mb-3">
+                  Defina quantas vezes cada aluno pode tentar este exercício. Alterar aqui afeta todos os alunos.
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 max-w-xs">
+                    <Label htmlFor="maxAttempts" className="text-sm font-medium">Tentativas máximas</Label>
+                    <Input
+                      id="maxAttempts"
+                      type="number"
+                      min={1}
+                      max={99}
+                      value={editExerciseMaxAttempts}
+                      onChange={(e) => setEditExerciseMaxAttempts(e.target.value)}
+                      className="mt-1 w-32"
+                    />
+                  </div>
+                  <Button
+                    className="mt-6"
+                    onClick={handleSaveExerciseMaxAttempts}
+                    disabled={updateExerciseMaxAttemptsMutation.isPending}
+                  >
+                    {updateExerciseMaxAttemptsMutation.isPending ? "Salvando..." : "Salvar"}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Seção: Resetar tentativas por aluno */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
+                  <RotateCcw className="h-4 w-4 text-orange-500" />
+                  Resetar Tentativas de Aluno
+                </h4>
+                <p className="text-sm text-gray-500 mb-4">
+                  Use esta opção para liberar uma nova tentativa a um aluno específico que teve problemas técnicos (ex: fechou o aplicativo acidentalmente).
+                </p>
+
+                {loadingAttempts ? (
+                  <div className="text-center py-6 text-gray-400 text-sm">Carregando alunos...</div>
+                ) : !studentAttemptsList?.students || studentAttemptsList.students.length === 0 ? (
+                  <div className="text-center py-6 text-gray-400">
+                    <Users className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">Nenhum aluno fez tentativas neste exercício ainda.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {studentAttemptsList.students.map((student) => (
+                      <div key={student.studentId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                          <p className="font-medium text-sm text-gray-800">{student.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {student.attemptCount} tentativa{student.attemptCount !== 1 ? "s" : ""}
+                            {student.status === 'completed' ? (
+                              <span className="ml-2 text-green-600 font-medium">· Completou</span>
+                            ) : (
+                              <span className="ml-2 text-orange-500 font-medium">· Em andamento/Incompleto</span>
+                            )}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                          onClick={() => setResetConfirmStudent({ studentId: student.studentId, name: student.name })}
+                        >
+                          <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                          Resetar
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Confirmação de reset de tentativas */}
+        <AlertDialog open={!!resetConfirmStudent} onOpenChange={(open) => !open && setResetConfirmStudent(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <RotateCcw className="h-5 w-5 text-orange-500" />
+                Resetar tentativas
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja resetar todas as tentativas de{" "}
+                <strong>{resetConfirmStudent?.name}</strong> neste exercício?
+                <br /><br />
+                O aluno poderá recomeçar do zero. As respostas anteriores serão removidas permanentemente.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={() => {
+                  if (resetConfirmStudent && editExerciseId) {
+                    resetStudentAttemptsMutation.mutate({
+                      exerciseId: editExerciseId,
+                      studentId: resetConfirmStudent.studentId,
+                    });
+                  }
+                }}
+                disabled={resetStudentAttemptsMutation.isPending}
+              >
+                {resetStudentAttemptsMutation.isPending ? "Resetando..." : "Resetar Tentativas"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Modal de Visualização de Questões */}
         <Dialog open={viewQuestionsId !== null} onOpenChange={(open) => !open && setViewQuestionsId(null)}>
           <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
@@ -572,7 +742,6 @@ export default function AssessmentsManager() {
                   if (q.optionC) options.push({ label: "C", text: q.optionC });
                   if (q.optionD) options.push({ label: "D", text: q.optionD });
                   if (q.optionE) options.push({ label: "E", text: q.optionE });
-                  // Fallback: parse options JSON if available
                   let parsedOptions: { label: string; text: string }[] = options;
                   if (options.length === 0 && q.options) {
                     try {
@@ -615,13 +784,11 @@ export default function AssessmentsManager() {
 
                         {isExpanded && (
                           <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
-                            {/* Contexto */}
                             {q.context && (
                               <div className="bg-blue-50 rounded p-3 text-sm text-blue-800">
                                 <strong>Contexto:</strong> {q.context}
                               </div>
                             )}
-                            {/* Alternativas */}
                             {parsedOptions.length > 0 && (
                               <div className="space-y-1.5">
                                 {parsedOptions.map((opt) => (
@@ -644,13 +811,11 @@ export default function AssessmentsManager() {
                                 ))}
                               </div>
                             )}
-                            {/* Gabarito para questões sem alternativas */}
                             {parsedOptions.length === 0 && q.correctAnswer && (
                               <div className="bg-green-50 border border-green-200 rounded p-3 text-sm text-green-800">
                                 <strong>Gabarito:</strong> {q.correctAnswer}
                               </div>
                             )}
-                            {/* Explicação */}
                             {(q.answerExplanation || q.explanation) && (
                               <div className="bg-amber-50 border border-amber-200 rounded p-3 text-sm text-amber-800">
                                 <strong>Explicação:</strong> {q.answerExplanation || q.explanation}

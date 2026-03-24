@@ -8286,6 +8286,97 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
 
         return result;
       }),
+
+    // Listar alunos que fizeram tentativas no exercício (para modal de reset)
+    getStudentAttemptsList: protectedProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error('Database not available');
+        const { studentExercises: seTable, studentExerciseAttempts: seaTable } = await import('../drizzle/schema');
+        // Verificar se o exercício pertence ao professor
+        const [exercise] = await db_instance
+          .select({ id: seTable.id, teacherId: seTable.teacherId, maxAttempts: seTable.maxAttempts })
+          .from(seTable)
+          .where(and(eq(seTable.id, input.exerciseId), eq(seTable.teacherId, ctx.user.id)))
+          .limit(1);
+        if (!exercise) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado' });
+        // Buscar tentativas agrupadas por aluno
+        const attemptsRaw = await db_instance.execute(
+          sql`SELECT sea.studentId, COUNT(*) as attemptCount, MAX(sea.createdAt) as lastAttempt, MAX(sea.status) as lastStatus
+              FROM studentExerciseAttempts sea
+              WHERE sea.exerciseId = ${input.exerciseId}
+              GROUP BY sea.studentId`
+        ) as any[];
+        const attempts = (attemptsRaw[0] as any[]) || [];
+        if (attempts.length === 0) return { students: [], maxAttempts: exercise.maxAttempts };
+        const studentIds = attempts.map((a: any) => a.studentId);
+        const studentInfosRaw = await db_instance.execute(
+          sql`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id IN (${sql.join(studentIds.map((id: number) => sql`${id}`), sql`, `)})`
+        ) as any[];
+        const studentInfos = (studentInfosRaw[0] as any[]) || [];
+        const nameMap = new Map(studentInfos.map((s: any) => [s.id, s.fullName || s.name?.trim() || `Aluno #${s.id}`]));
+        return {
+          maxAttempts: exercise.maxAttempts,
+          students: attempts.map((a: any) => ({
+            studentId: Number(a.studentId),
+            name: nameMap.get(Number(a.studentId)) ?? `Aluno #${a.studentId}`,
+            attemptCount: Number(a.attemptCount),
+            lastAttempt: a.lastAttempt,
+            status: a.lastStatus,
+          }))
+        };
+      }),
+
+    // Resetar tentativas de um aluno específico em um exercício
+    resetStudentAttempts: protectedProcedure
+      .input(z.object({ exerciseId: z.number(), studentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error('Database not available');
+        const { studentExercises: seTable, studentExerciseAttempts: seaTable } = await import('../drizzle/schema');
+        // Verificar se o exercício pertence ao professor
+        const [exercise] = await db_instance
+          .select({ id: seTable.id })
+          .from(seTable)
+          .where(and(eq(seTable.id, input.exerciseId), eq(seTable.teacherId, ctx.user.id)))
+          .limit(1);
+        if (!exercise) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado ou sem permissão' });
+        // Buscar tentativas do aluno
+        const studentAttempts = await db_instance
+          .select({ id: seaTable.id })
+          .from(seaTable)
+          .where(and(eq(seaTable.exerciseId, input.exerciseId), eq(seaTable.studentId, input.studentId)));
+        if (studentAttempts.length === 0) return { success: true, deleted: 0 };
+        const attemptIds = studentAttempts.map(a => a.id);
+        // Deletar respostas das tentativas
+        await db_instance.execute(
+          sql`DELETE FROM studentExerciseAnswers WHERE attemptId IN (${sql.join(attemptIds.map(id => sql`${id}`), sql`, `)})`
+        );
+        // Deletar as tentativas
+        await db_instance.delete(seaTable)
+          .where(and(eq(seaTable.exerciseId, input.exerciseId), eq(seaTable.studentId, input.studentId)));
+        return { success: true, deleted: attemptIds.length };
+      }),
+
+    // Atualizar maxAttempts de um exercício
+    updateExerciseMaxAttempts: protectedProcedure
+      .input(z.object({ exerciseId: z.number(), maxAttempts: z.number().min(1).max(99) }))
+      .mutation(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error('Database not available');
+        const { studentExercises: seTable } = await import('../drizzle/schema');
+        const [exercise] = await db_instance
+          .select({ id: seTable.id })
+          .from(seTable)
+          .where(and(eq(seTable.id, input.exerciseId), eq(seTable.teacherId, ctx.user.id)))
+          .limit(1);
+        if (!exercise) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado ou sem permissão' });
+        await db_instance.update(seTable)
+          .set({ maxAttempts: input.maxAttempts })
+          .where(eq(seTable.id, input.exerciseId));
+        return { success: true };
+      }),
   }),
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================
