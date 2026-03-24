@@ -47,6 +47,9 @@ import {
   ChevronDown,
   ChevronUp,
   RefreshCw,
+  Users,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { toast } from "sonner";
@@ -76,6 +79,12 @@ export default function AssessmentsManager() {
 
   // Buscar exercícios do professor
   const { data: exercises, isLoading: loadingExercises } = trpc.teacherExercises.list.useQuery(
+    { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
+    { enabled: !!user }
+  );
+
+  // Buscar contador de conclusão por exercício
+  const { data: completionStats } = trpc.teacherExercises.getCompletionStats.useQuery(
     { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
     { enabled: !!user }
   );
@@ -423,7 +432,13 @@ export default function AssessmentsManager() {
                 </Card>
               ) : (
                 <div className="space-y-3">
-                  {exercises.map((exercise: any) => (
+                  {exercises.map((exercise: any) => {
+                    const stats = completionStats?.[exercise.id];
+                    const done = stats?.done ?? 0;
+                    const total = stats?.total ?? 0;
+                    const pending = stats?.pending ?? 0;
+                    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+                    return (
                     <Card key={exercise.id} className="border border-gray-200 hover:border-blue-200 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -453,6 +468,32 @@ export default function AssessmentsManager() {
                             {exercise.description && (
                               <p className="text-sm text-gray-400 mt-1 truncate">{exercise.description}</p>
                             )}
+                            {/* Contador de conclusão */}
+                            <div className="mt-3 flex items-center gap-3 flex-wrap">
+                              <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-2.5 py-1 text-xs font-medium text-green-700">
+                                <UserCheck className="h-3.5 w-3.5" />
+                                <span>{done} fizeram</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 rounded-full px-2.5 py-1 text-xs font-medium text-orange-700">
+                                <UserX className="h-3.5 w-3.5" />
+                                <span>{pending} faltam</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1 text-xs font-medium text-gray-600">
+                                <Users className="h-3.5 w-3.5" />
+                                <span>{total} total</span>
+                              </div>
+                              {total > 0 && (
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div
+                                      className="h-full bg-green-500 rounded-full transition-all"
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs text-gray-500">{pct}%</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <Button
@@ -468,7 +509,8 @@ export default function AssessmentsManager() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </TabsContent>

@@ -8206,6 +8206,86 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           topStudents,
         };
       }),
+    // Contador de conclusão por exercício: quantos alunos fizeram e quantos faltam
+    getCompletionStats: protectedProcedure
+      .input(z.object({
+        subjectId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error("Database not available");
+
+        const { studentExercises: seTable, studentExerciseAttempts: seaTable, subjectEnrollments: seEnroll } = await import("../drizzle/schema");
+
+        // Buscar exercícios do professor
+        const exerciseConditions: any[] = [eq(seTable.teacherId, ctx.user.id)];
+        if (input.subjectId) {
+          exerciseConditions.push(eq(seTable.subjectId, input.subjectId));
+        }
+
+        const exercises = await db_instance
+          .select({ id: seTable.id, subjectId: seTable.subjectId })
+          .from(seTable)
+          .where(and(...exerciseConditions));
+
+        if (exercises.length === 0) return {};
+
+        const exerciseIds = exercises.map(e => e.id);
+
+        // Buscar tentativas completadas (distinct studentId por exercício)
+        const completedRows = await db_instance
+          .select({
+            exerciseId: seaTable.exerciseId,
+            studentId: seaTable.studentId,
+          })
+          .from(seaTable)
+          .where(
+            and(
+              sql`${seaTable.exerciseId} IN (${sql.join(exerciseIds.map(id => sql`${id}`), sql`, `)})`,
+              eq(seaTable.status, 'completed')
+            )
+          );
+
+        // Agrupar por exercício: set de studentIds únicos que completaram
+        const completedByExercise = new Map<number, Set<number>>();
+        completedRows.forEach(row => {
+          if (!completedByExercise.has(row.exerciseId)) {
+            completedByExercise.set(row.exerciseId, new Set());
+          }
+          completedByExercise.get(row.exerciseId)!.add(row.studentId);
+        });
+
+        // Para cada disciplina única, contar alunos matriculados ativos
+        const uniqueSubjectIds = Array.from(new Set(exercises.map(e => e.subjectId)));
+        const enrollmentCounts = new Map<number, number>();
+        for (const subjectId of uniqueSubjectIds) {
+          const enrolled = await db_instance
+            .select({ studentId: seEnroll.studentId })
+            .from(seEnroll)
+            .where(
+              and(
+                eq(seEnroll.subjectId, subjectId),
+                eq(seEnroll.userId, ctx.user.id),
+                eq(seEnroll.status, 'active')
+              )
+            );
+          enrollmentCounts.set(subjectId, enrolled.length);
+        }
+
+        // Montar resultado: { [exerciseId]: { done: number, total: number, pending: number } }
+        const result: Record<number, { done: number; total: number; pending: number }> = {};
+        for (const exercise of exercises) {
+          const done = completedByExercise.get(exercise.id)?.size ?? 0;
+          const total = enrollmentCounts.get(exercise.subjectId) ?? 0;
+          result[exercise.id] = {
+            done,
+            total,
+            pending: Math.max(0, total - done),
+          };
+        }
+
+        return result;
+      }),
   }),
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================

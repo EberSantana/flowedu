@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, title, totalQuestions, totalPoints, status, createdAt FROM assessments ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, title, totalQuestions, totalPoints, status, createdAt FROM assessments ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "Teste",
+      "totalQuestions": "10",
+      "totalPoints": "10",
+      "status": "draft",
+      "createdAt": "2026-03-18 15:00:12"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\ttotalQuestions\ttotalPoints\tstatus\tcreatedAt\n1\tTeste\t10\t10\tdraft\t2026-03-18 15:00:12\n",
+  "stderr": "",
+  "execution_time_ms": 174
+}
