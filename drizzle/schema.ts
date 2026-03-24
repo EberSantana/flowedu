@@ -30,7 +30,7 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const inviteCodes = mysqlTable("invite_codes", {
   id: int("id").autoincrement().primaryKey(),
-  code: varchar("code", { length: 20 }).notNull().unique(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
   createdBy: int("createdBy").notNull(), // ID do admin que criou
   usedBy: int("usedBy"), // ID do usuário que usou (null se não usado)
   maxUses: int("maxUses").default(1).notNull(), // Número máximo de usos
@@ -595,8 +595,8 @@ export type InsertNotification = typeof notifications.$inferInsert;
 export const students = mysqlTable("students", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(), // Professor responsável
-  registrationNumber: varchar("registrationNumber", { length: 50 }).notNull(), // Matrícula do aluno
-  fullName: varchar("fullName", { length: 255 }).notNull(), // Nome completo do aluno
+  registrationNumber: varchar("registrationNumber", { length: 100 }).notNull(), // Matrícula do aluno
+  fullName: varchar("fullName", { length: 300 }).notNull(), // Nome completo do aluno
   email: varchar("email", { length: 255 }), // E-mail do aluno
   birthDate: varchar("birthDate", { length: 10 }), // Data de nascimento (YYYY-MM-DD)
   gender: mysqlEnum("gender", ["masculino", "feminino", "nao_binario", "personalizar", "prefiro_nao_informar"]).default("prefiro_nao_informar"), // Gênero
@@ -749,7 +749,7 @@ export const pointsHistory = mysqlTable("points_history", {
   studentId: int("studentId").notNull(), // FK para students
   points: int("points").notNull(),
   reason: varchar("reason", { length: 255 }).notNull(),
-  activityType: varchar("activityType", { length: 100 }).notNull(), // exercise_objective, exercise_subjective, exam, etc
+  activityType: varchar("activityType", { length: 150 }).notNull(), // exercise_objective, exercise_subjective, exam, etc
   relatedId: int("relatedId"), // ID da atividade relacionada (exercício, prova, etc)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
@@ -1184,7 +1184,7 @@ export const studentExercises = mysqlTable("student_exercises", {
   isActive: boolean("isActive").default(true).notNull(),
   tags: json("tags"),
   metadata: json("metadata"),
-  status: varchar("status", { length: 20 }).default("draft").notNull(),
+  status: varchar("status", { length: 50 }).default("draft").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -2606,7 +2606,7 @@ export const accessLogs = mysqlTable("access_logs", {
   os: varchar("os", { length: 100 }), // Sistema operacional identificado
   teacherId: int("teacherId"), // ID do professor dono do registro
   accessedAt: timestamp("accessedAt").defaultNow().notNull(), // Data/hora do acesso
-  pageVisited: varchar("pageVisited", { length: 100 }), // Página/recurso acessado (ex: 'trilha', 'exercicios', 'avisos')
+  pageVisited: varchar("pageVisited", { length: 255 }), // Página/recurso acessado (ex: 'trilha', 'exercicios', 'avisos')
   sessionDurationSec: int("sessionDurationSec"), // Duração da sessão em segundos (atualizado ao sair)
 });
 export type AccessLog = typeof accessLogs.$inferSelect;
@@ -2645,7 +2645,7 @@ export const emailConfigs = mysqlTable("email_configs", {
   fromName: varchar("from_name", { length: 255 }).notNull().default("FlowEdu"),
   isActive: boolean("is_active").notNull().default(true),
   lastTestedAt: timestamp("last_tested_at"),
-  lastTestStatus: varchar("last_test_status", { length: 20 }).default("untested"),
+  lastTestStatus: varchar("last_test_status", { length: 50 }).default("untested"),
   lastTestError: text("last_test_error"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),

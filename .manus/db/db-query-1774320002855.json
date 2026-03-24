@@ -1,0 +1,31 @@
+{
+  "query": "SHOW TABLES LIKE '%point%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE '%point%';",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "pointsHistory"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "points_history"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "studentPoints"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "student_points"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "student_subject_points"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "subject_points_history"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)": "teacher_points"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%point%)\npointsHistory\npoints_history\nstudentPoints\nstudent_points\nstudent_subject_points\nsubject_points_history\nteacher_points\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}
