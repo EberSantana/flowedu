@@ -21,17 +21,8 @@ export default function PortalChoice() {
       // Salvar preferência de portal no localStorage
       localStorage.setItem('flowedu_last_portal', 'professor');
       setLocation('/dashboard');
-    } else {
-      // Verificar se há preferência salva para redirecionar para o login correto
-      // (apenas quando o app é aberto via PWA sem sessão ativa)
-      const lastPortal = localStorage.getItem('flowedu_last_portal');
-      if (lastPortal === 'aluno') {
-        setLocation('/student-login');
-      } else if (lastPortal === 'professor') {
-        setLocation('/login-professor');
-      }
-      // Se não há preferência salva, mostrar a tela de escolha normalmente
     }
+    // Se não há sessão ativa, sempre mostrar a tela de escolha de portal
   }, [user, studentSession, isLoading, setLocation]);
   
   // Mostrar loading enquanto verifica autenticação
