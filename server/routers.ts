@@ -8315,11 +8315,26 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         console.log('[getStudentAttemptsList] exerciseId:', input.exerciseId, 'userId:', ctx.user.id, 'attemptsRaw type:', typeof attemptsRaw, 'isArray:', Array.isArray(attemptsRaw), 'length:', attemptsRaw?.length, 'raw[0] length:', (attemptsRaw[0] as any[])?.length);
         const attempts = (attemptsRaw[0] as any[]) || [];
         if (attempts.length === 0) return { students: [], maxAttempts: exercise.maxAttempts };
-        const studentIds = attempts.map((a: any) => a.studentId);
+        const studentIds = attempts.map((a: any) => Number(a.studentId));
+        // Usar placeholders manuais para compatibilidade com TiDB/MySQL2
+        const placeholders = studentIds.map(() => '?').join(', ');
         const studentInfosRaw = await db_instance.execute(
-          sql`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id IN (${sql.join(studentIds.map((id: number) => sql`${id}`), sql`, `)})`
+          sql.raw(`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id IN (${placeholders})`)
         ) as any[];
-        const studentInfos = (studentInfosRaw[0] as any[]) || [];
+        // Fallback: buscar cada aluno individualmente se a query IN falhar
+        let studentInfos = (studentInfosRaw[0] as any[]) || [];
+        if (studentInfos.length === 0 && studentIds.length > 0) {
+          // Buscar individualmente como fallback
+          const individualResults = await Promise.all(
+            studentIds.map(async (sid: number) => {
+              const res = await db_instance.execute(
+                sql`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id = ${sid} LIMIT 1`
+              ) as any[];
+              return ((res[0] as any[]) || [])[0];
+            })
+          );
+          studentInfos = individualResults.filter(Boolean);
+        }
         const nameMap = new Map(studentInfos.map((s: any) => [s.id, s.fullName || s.name?.trim() || `Aluno #${s.id}`]));
         return {
           maxAttempts: exercise.maxAttempts,
