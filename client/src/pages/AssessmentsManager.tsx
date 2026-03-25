@@ -99,9 +99,14 @@ export default function AssessmentsManager() {
   );
 
   // Buscar lista de alunos com tentativas (para o modal de edição)
-  const { data: studentAttemptsList, isLoading: loadingAttempts } = trpc.teacherExercises.getStudentAttemptsList.useQuery(
-    { exerciseId: editExerciseId! },
-    { enabled: editExerciseId !== null }
+  const { data: studentAttemptsList, isLoading: loadingAttempts, error: attemptsError } = trpc.teacherExercises.getStudentAttemptsList.useQuery(
+    { exerciseId: editExerciseId ?? 0 },
+    { 
+      enabled: editExerciseId !== null && editExerciseId !== undefined && editExerciseId > 0,
+      staleTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    }
   );
 
   // Buscar questões da prova selecionada
@@ -640,6 +645,10 @@ export default function AssessmentsManager() {
 
                 {loadingAttempts ? (
                   <div className="text-center py-6 text-gray-400 text-sm">Carregando alunos...</div>
+                ) : attemptsError ? (
+                  <div className="text-center py-6 text-red-400">
+                    <p className="text-sm">Erro ao carregar alunos: {attemptsError.message}</p>
+                  </div>
                 ) : !studentAttemptsList?.students || studentAttemptsList.students.length === 0 ? (
                   <div className="text-center py-6 text-gray-400">
                     <Users className="h-8 w-8 mx-auto mb-2 text-gray-300" />

@@ -8293,14 +8293,18 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
       .query(async ({ ctx, input }) => {
         const db_instance = await db.getDb();
         if (!db_instance) throw new Error('Database not available');
-        const { studentExercises: seTable, studentExerciseAttempts: seaTable } = await import('../drizzle/schema');
-        // Verificar se o exercício pertence ao professor
+        const { studentExercises: seTable } = await import('../drizzle/schema');
+        // Buscar o exercício - aceitar admin ou dono do exercício
         const [exercise] = await db_instance
           .select({ id: seTable.id, teacherId: seTable.teacherId, maxAttempts: seTable.maxAttempts })
           .from(seTable)
-          .where(and(eq(seTable.id, input.exerciseId), eq(seTable.teacherId, ctx.user.id)))
+          .where(eq(seTable.id, input.exerciseId))
           .limit(1);
         if (!exercise) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado' });
+        // Verificar permissão: dono do exercício ou admin
+        if (exercise.teacherId !== ctx.user.id && ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Sem permissão para ver este exercício' });
+        }
         // Buscar tentativas agrupadas por aluno
         const attemptsRaw = await db_instance.execute(
           sql`SELECT sea.studentId, COUNT(*) as attemptCount, MAX(sea.createdAt) as lastAttempt, MAX(sea.status) as lastStatus
@@ -8308,6 +8312,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
               WHERE sea.exerciseId = ${input.exerciseId}
               GROUP BY sea.studentId`
         ) as any[];
+        console.log('[getStudentAttemptsList] exerciseId:', input.exerciseId, 'userId:', ctx.user.id, 'attemptsRaw type:', typeof attemptsRaw, 'isArray:', Array.isArray(attemptsRaw), 'length:', attemptsRaw?.length, 'raw[0] length:', (attemptsRaw[0] as any[])?.length);
         const attempts = (attemptsRaw[0] as any[]) || [];
         if (attempts.length === 0) return { students: [], maxAttempts: exercise.maxAttempts };
         const studentIds = attempts.map((a: any) => a.studentId);
@@ -8351,7 +8356,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         const attemptIds = studentAttempts.map(a => a.id);
         // Deletar respostas das tentativas
         await db_instance.execute(
-          sql`DELETE FROM studentExerciseAnswers WHERE attemptId IN (${sql.join(attemptIds.map(id => sql`${id}`), sql`, `)})`
+          sql`DELETE FROM student_exercise_answers WHERE attemptId IN (${sql.join(attemptIds.map(id => sql`${id}`), sql`, `)})`
         );
         // Deletar as tentativas
         await db_instance.delete(seaTable)
