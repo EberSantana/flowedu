@@ -28,7 +28,7 @@ export default function PortalChoice() {
       if (lastPortal === 'aluno') {
         setLocation('/student-login');
       } else if (lastPortal === 'professor') {
-        setLocation('/login');
+        setLocation('/login-professor');
       }
       // Se não há preferência salva, mostrar a tela de escolha normalmente
     }
