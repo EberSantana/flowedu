@@ -1,5 +1,5 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch, useLocation, Redirect } from "wouter";
 import { Suspense, lazy } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -128,6 +128,7 @@ function Router() {
           <Route path={"/"} component={PortalChoice} />
           <Route path={"/student-login"} component={StudentLogin} />
           <Route path={"/login-professor"} component={TeacherLogin} />
+          <Route path={"/login"}><Redirect to="/login-professor" /></Route>
           
           {/* Auth pages - lazy loaded */}
           <Route path={"/register"} component={Register} />
