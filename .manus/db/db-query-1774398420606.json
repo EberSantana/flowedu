@@ -1,0 +1,79 @@
+{
+  "query": "SELECT COUNT(*) as total FROM student_exercise_attempts; SELECT * FROM student_exercise_attempts LIMIT 5; DESCRIBE student_exercise_attempts;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT COUNT(*) as total FROM student_exercise_attempts; SELECT * FROM student_exercise_attempts LIMIT 5; DESCRIBE student_exercise_attempts;",
+  "rows": [
+    {
+      "total": "34"
+    },
+    {
+      "total": "id\texerciseId\tstudentId\tattemptNumber\tanswers\tscore\tcorrectAnswers\ttotalQuestions\tpointsEarned\ttimeSpent\tstatus\tstartedAt\tcompletedAt\tcreatedAt\tupdatedAt"
+    },
+    {
+      "total": "300001\t360001\t60060\t1\t\"[{\\\"questionNumber\\\":1,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":2,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":3,\\\"answer\\\":\\\"C) O agente que causa o dano.\\\"},{\\\"questionNumber\\\":4,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":5,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":6,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":7,\\\"answer\\\":\\\"C) Armazenamento e Manutenção\\\"},{\\\"questionNumber\\\":8,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":9,\\\"answer\\\":\\\"C) Aplicação de hashes criptográficos (checksums) para verificar a imutabilidade de um arquivo.\\\"},{\\\"questionNumber\\\":10,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":11,\\\"answer\\\":\\\"C) Vulnerabilidades em protocolos de rede (TCP/IP).\\\"},{\\\"questionNumber\\\":12,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":13,\\\"answer\\\":\\\"C) Servidores de aplicação.\\\"},{\\\"questionNumber\\\":14,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":15,\\\"answer\\\":\\\"\\\"}]\"\t0\t0\t15\t0\t17\tcompleted\t2026-01-05 17:50:25\t2026-01-05 17:50:42\t2026-01-05 17:50:25\t2026-01-05 17:50:42"
+    },
+    {
+      "total": "300017\t360001\t60060\t2\t\"[{\\\"questionNumber\\\":1,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":2,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":3,\\\"answer\\\":\\\"C) O agente que causa o dano.\\\"},{\\\"questionNumber\\\":4,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":5,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":6,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":7,\\\"answer\\\":\\\"C) Armazenamento e Manutenção\\\"},{\\\"questionNumber\\\":8,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":9,\\\"answer\\\":\\\"C) Aplicação de hashes criptográficos (checksums) para verificar a imutabilidade de um arquivo.\\\"},{\\\"questionNumber\\\":10,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":11,\\\"answer\\\":\\\"C) Vulnerabilidades em protocolos de rede (TCP/IP).\\\"},{\\\"questionNumber\\\":12,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":13,\\\"answer\\\":\\\"C) Servidores de aplicação.\\\"},{\\\"questionNumber\\\":14,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":15,\\\"answer\\\":\\\"\\\"}]\"\t0\t0\t15\t0\t17\tcompleted\t2026-01-05 18:08:56\t2026-01-05 18:09:14\t2026-01-05 18:08:55\t2026-01-05 18:09:13"
+    },
+    {
+      "total": "300019\t360005\t2100013\t2\t[]\t0\t0\t3\t0\tNULL\tin_progress\t2026-01-05 18:49:44\tNULL\t2026-01-05 18:49:44\t2026-01-05 18:49:44"
+    },
+    {
+      "total": "300025\t360007\t2100023\t1\t\"[{\\\"answer\\\":\\\"C) Brasília\\\"},{\\\"answer\\\":\\\"Democracia é um sistema onde o povo governa\\\"}]\"\t50\t1\t2\t10\t0\tcompleted\t2026-01-05 18:50:16\t2026-01-05 18:50:16\t2026-01-05 18:50:16\t2026-01-05 18:50:16"
+    },
+    {
+      "total": "300035\t360013\t2100063\t1\t\"[{\\\"answer\\\":\\\"C) Brasília\\\"},{\\\"answer\\\":\\\"Democracia é um sistema onde o povo governa\\\"}]\"\t50\t1\t2\t10\t0\tcompleted\t2026-01-05 19:14:39\t2026-01-05 19:14:39\t2026-01-05 19:14:39\t2026-01-05 19:14:39"
+    },
+    {
+      "total": "Field\tType\tNull\tKey\tDefault\tExtra"
+    },
+    {
+      "total": "id\tint\tNO\tPRI\tNULL\tauto_increment"
+    },
+    {
+      "total": "exerciseId\tint\tNO\tMUL\tNULL\t"
+    },
+    {
+      "total": "studentId\tint\tNO\tMUL\tNULL\t"
+    },
+    {
+      "total": "attemptNumber\tint\tNO\t\tNULL\t"
+    },
+    {
+      "total": "answers\tjson\tNO\t\tNULL\t"
+    },
+    {
+      "total": "score\tint\tNO\t\tNULL\t"
+    },
+    {
+      "total": "correctAnswers\tint\tNO\t\tNULL\t"
+    },
+    {
+      "total": "totalQuestions\tint\tNO\t\tNULL\t"
+    },
+    {
+      "total": "pointsEarned\tint\tNO\t\tNULL\t"
+    },
+    {
+      "total": "timeSpent\tint\tYES\t\tNULL\t"
+    },
+    {
+      "total": "status\tenum('in_progress','completed','abandoned')\tNO\t\tin_progress\t"
+    },
+    {
+      "total": "startedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t"
+    },
+    {
+      "total": "completedAt\ttimestamp\tYES\t\tNULL\t"
+    },
+    {
+      "total": "createdAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t"
+    },
+    {
+      "total": "updatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n34\nid\texerciseId\tstudentId\tattemptNumber\tanswers\tscore\tcorrectAnswers\ttotalQuestions\tpointsEarned\ttimeSpent\tstatus\tstartedAt\tcompletedAt\tcreatedAt\tupdatedAt\n300001\t360001\t60060\t1\t\"[{\\\"questionNumber\\\":1,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":2,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":3,\\\"answer\\\":\\\"C) O agente que causa o dano.\\\"},{\\\"questionNumber\\\":4,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":5,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":6,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":7,\\\"answer\\\":\\\"C) Armazenamento e Manutenção\\\"},{\\\"questionNumber\\\":8,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":9,\\\"answer\\\":\\\"C) Aplicação de hashes criptográficos (checksums) para verificar a imutabilidade de um arquivo.\\\"},{\\\"questionNumber\\\":10,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":11,\\\"answer\\\":\\\"C) Vulnerabilidades em protocolos de rede (TCP/IP).\\\"},{\\\"questionNumber\\\":12,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":13,\\\"answer\\\":\\\"C) Servidores de aplicação.\\\"},{\\\"questionNumber\\\":14,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":15,\\\"answer\\\":\\\"\\\"}]\"\t0\t0\t15\t0\t17\tcompleted\t2026-01-05 17:50:25\t2026-01-05 17:50:42\t2026-01-05 17:50:25\t2026-01-05 17:50:42\n300017\t360001\t60060\t2\t\"[{\\\"questionNumber\\\":1,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":2,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":3,\\\"answer\\\":\\\"C) O agente que causa o dano.\\\"},{\\\"questionNumber\\\":4,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":5,\\\"answer\\\":\\\"C) Disponibilidade\\\"},{\\\"questionNumber\\\":6,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":7,\\\"answer\\\":\\\"C) Armazenamento e Manutenção\\\"},{\\\"questionNumber\\\":8,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":9,\\\"answer\\\":\\\"C) Aplicação de hashes criptográficos (checksums) para verificar a imutabilidade de um arquivo.\\\"},{\\\"questionNumber\\\":10,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":11,\\\"answer\\\":\\\"C) Vulnerabilidades em protocolos de rede (TCP/IP).\\\"},{\\\"questionNumber\\\":12,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":13,\\\"answer\\\":\\\"C) Servidores de aplicação.\\\"},{\\\"questionNumber\\\":14,\\\"answer\\\":\\\"\\\"},{\\\"questionNumber\\\":15,\\\"answer\\\":\\\"\\\"}]\"\t0\t0\t15\t0\t17\tcompleted\t2026-01-05 18:08:56\t2026-01-05 18:09:14\t2026-01-05 18:08:55\t2026-01-05 18:09:13\n300019\t360005\t2100013\t2\t[]\t0\t0\t3\t0\tNULL\tin_progress\t2026-01-05 18:49:44\tNULL\t2026-01-05 18:49:44\t2026-01-05 18:49:44\n300025\t360007\t2100023\t1\t\"[{\\\"answer\\\":\\\"C) Brasília\\\"},{\\\"answer\\\":\\\"Democracia é um sistema onde o povo governa\\\"}]\"\t50\t1\t2\t10\t0\tcompleted\t2026-01-05 18:50:16\t2026-01-05 18:50:16\t2026-01-05 18:50:16\t2026-01-05 18:50:16\n300035\t360013\t2100063\t1\t\"[{\\\"answer\\\":\\\"C) Brasília\\\"},{\\\"answer\\\":\\\"Democracia é um sistema onde o povo governa\\\"}]\"\t50\t1\t2\t10\t0\tcompleted\t2026-01-05 19:14:39\t2026-01-05 19:14:39\t2026-01-05 19:14:39\t2026-01-05 19:14:39\nField\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\nexerciseId\tint\tNO\tMUL\tNULL\t\nstudentId\tint\tNO\tMUL\tNULL\t\nattemptNumber\tint\tNO\t\tNULL\t\nanswers\tjson\tNO\t\tNULL\t\nscore\tint\tNO\t\tNULL\t\ncorrectAnswers\tint\tNO\t\tNULL\t\ntotalQuestions\tint\tNO\t\tNULL\t\npointsEarned\tint\tNO\t\tNULL\t\ntimeSpent\tint\tYES\t\tNULL\t\nstatus\tenum('in_progress','completed','abandoned')\tNO\t\tin_progress\t\nstartedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\ncompletedAt\ttimestamp\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 69
+}

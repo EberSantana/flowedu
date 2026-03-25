@@ -482,7 +482,7 @@ export default function AssessmentsManager() {
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
                               <span className="flex items-center gap-1">
                                 <Hash className="h-3.5 w-3.5" />
-                                {exercise.totalQuestions} questões · {exercise.totalPoints} pts
+                                {exercise.totalQuestions} questões · {exercise.totalQuestions > 0 ? Math.round(exercise.totalPoints / exercise.totalQuestions) : exercise.totalPoints} pts/questão
                               </span>
                               {exercise.maxAttempts && (
                                 <span className="flex items-center gap-1">

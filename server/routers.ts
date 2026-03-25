@@ -8304,7 +8304,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         // Buscar tentativas agrupadas por aluno
         const attemptsRaw = await db_instance.execute(
           sql`SELECT sea.studentId, COUNT(*) as attemptCount, MAX(sea.createdAt) as lastAttempt, MAX(sea.status) as lastStatus
-              FROM studentExerciseAttempts sea
+              FROM student_exercise_attempts sea
               WHERE sea.exerciseId = ${input.exerciseId}
               GROUP BY sea.studentId`
         ) as any[];

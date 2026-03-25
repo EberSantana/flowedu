@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, title, totalPoints, totalQuestions, teacherId FROM student_exercises ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, title, totalPoints, totalQuestions, teacherId FROM student_exercises ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "810011",
+      "title": "Exercício Atualizado",
+      "totalPoints": "10",
+      "totalQuestions": "1",
+      "teacherId": "1"
+    },
+    {
+      "id": "810005",
+      "title": "Exercício Atualizado",
+      "totalPoints": "10",
+      "totalQuestions": "1",
+      "teacherId": "1"
+    },
+    {
+      "id": "780001",
+      "title": "Exercício Atualizado",
+      "totalPoints": "10",
+      "totalQuestions": "1",
+      "teacherId": "1"
+    },
+    {
+      "id": "630001",
+      "title": "Teste de Validação de Respostas",
+      "totalPoints": "30",
+      "totalQuestions": "3",
+      "teacherId": "2820006"
+    },
+    {
+      "id": "600005",
+      "title": "MISTA",
+      "totalPoints": "60",
+      "totalQuestions": "6",
+      "teacherId": "1"
+    },
+    {
+      "id": "600004",
+      "title": "PBL",
+      "totalPoints": "50",
+      "totalQuestions": "5",
+      "teacherId": "1"
+    },
+    {
+      "id": "600003",
+      "title": "ESTUDO DE CASO",
+      "totalPoints": "50",
+      "totalQuestions": "5",
+      "teacherId": "1"
+    },
+    {
+      "id": "600002",
+      "title": "ATVSUBJETIVAS",
+      "totalPoints": "100",
+      "totalQuestions": "10",
+      "teacherId": "1"
+    },
+    {
+      "id": "600001",
+      "title": "ATVMD1",
+      "totalPoints": "100",
+      "totalQuestions": "10",
+      "teacherId": "1"
+    },
+    {
+      "id": "540001",
+      "title": "MATAV1",
+      "totalPoints": "150",
+      "totalQuestions": "15",
+      "teacherId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\ttotalPoints\ttotalQuestions\tteacherId\n810011\tExercício Atualizado\t10\t1\t1\n810005\tExercício Atualizado\t10\t1\t1\n780001\tExercício Atualizado\t10\t1\t1\n630001\tTeste de Validação de Respostas\t30\t3\t2820006\n600005\tMISTA\t60\t6\t1\n600004\tPBL\t50\t5\t1\n600003\tESTUDO DE CASO\t50\t5\t1\n600002\tATVSUBJETIVAS\t100\t10\t1\n600001\tATVMD1\t100\t10\t1\n540001\tMATAV1\t150\t15\t1\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

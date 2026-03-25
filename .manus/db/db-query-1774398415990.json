@@ -1,0 +1,40 @@
+{
+  "query": "SHOW TABLES LIKE '%attempt%'; SHOW TABLES LIKE '%exercise%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE '%attempt%'; SHOW TABLES LIKE '%exercise%';",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "assessment_attempts"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "mistake_notebook_attempts"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "practice_question_attempts"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "student_exercise_attempts"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%exercise%)"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "ct_exercises"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "exercise_tags"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "student_exercise_answers"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "student_exercise_attempts"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)": "student_exercises"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (%attempt%)\nassessment_attempts\nmistake_notebook_attempts\npractice_question_attempts\nstudent_exercise_attempts\nTables_in_c6FhCpifoFzEQqXNtsKEU6 (%exercise%)\nct_exercises\nexercise_tags\nstudent_exercise_answers\nstudent_exercise_attempts\nstudent_exercises\n",
+  "stderr": "",
+  "execution_time_ms": 167
+}

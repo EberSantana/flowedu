@@ -1,0 +1,217 @@
+{
+  "query": "DESCRIBE student_exercises; SELECT id, title, totalPoints, totalQuestions FROM student_exercises LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute DESCRIBE student_exercises; SELECT id, title, totalPoints, totalQuestions FROM student_exercises LIMIT 5;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "moduleId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "subjectId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "topicId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "teacherId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "title",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "description",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "exerciseData",
+      "Type": "json",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "totalQuestions",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "totalPoints",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "passingScore",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "60",
+      "Extra": ""
+    },
+    {
+      "Field": "exerciseType",
+      "Type": "enum('multiple_choice','true_false','fill_blank','matching','ordering','essay','short_answer')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "multiple_choice",
+      "Extra": ""
+    },
+    {
+      "Field": "maxAttempts",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "3",
+      "Extra": ""
+    },
+    {
+      "Field": "timeLimit",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "showAnswersAfter",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "availableFrom",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "availableTo",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('draft','published','archived')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "draft",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "difficulty",
+      "Type": "enum('easy','medium','hard','expert')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "medium",
+      "Extra": ""
+    },
+    {
+      "Field": "points",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "10",
+      "Extra": ""
+    },
+    {
+      "Field": "isActive",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "tags",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "metadata",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [
+    "id\ttitle\ttotalPoints\ttotalQuestions",
+    "300001\tExercício de Teste - Revisão\t100\t1",
+    "360001\tModulo1 \t150\t15",
+    "360005\tTeste de Validação de Respostas\t30\t3",
+    "360043\tExercício de Teste - Revisão\t100\t1",
+    "420001\tTeste 01\t50\t5"
+  ],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\nmoduleId\tint\tYES\t\tNULL\t\nsubjectId\tint\tNO\t\tNULL\t\ntopicId\tint\tYES\t\tNULL\t\nteacherId\tint\tNO\t\tNULL\t\ntitle\tvarchar(255)\tNO\t\tNULL\t\ndescription\ttext\tYES\t\tNULL\t\nexerciseData\tjson\tNO\t\tNULL\t\ntotalQuestions\tint\tNO\t\tNULL\t\ntotalPoints\tint\tNO\t\tNULL\t\npassingScore\tint\tNO\t\t60\t\nexerciseType\tenum('multiple_choice','true_false','fill_blank','matching','ordering','essay','short_answer')\tNO\t\tmultiple_choice\t\nmaxAttempts\tint\tNO\t\t3\t\ntimeLimit\tint\tYES\t\tNULL\t\nshowAnswersAfter\ttinyint(1)\tNO\t\t1\t\navailableFrom\ttimestamp\tYES\t\tNULL\t\navailableTo\ttimestamp\tYES\t\tNULL\t\nstatus\tenum('draft','published','archived')\tNO\t\tdraft\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ndifficulty\tenum('easy','medium','hard','expert')\tNO\t\tmedium\t\npoints\tint\tNO\t\t10\t\nisActive\ttinyint(1)\tNO\t\t1\t\ntags\tjson\tYES\t\tNULL\t\nmetadata\tjson\tYES\t\tNULL\t\nid\ttitle\ttotalPoints\ttotalQuestions\n300001\tExercício de Teste - Revisão\t100\t1\n360001\tModulo1 \t150\t15\n360005\tTeste de Validação de Respostas\t30\t3\n360043\tExercício de Teste - Revisão\t100\t1\n420001\tTeste 01\t50\t5\n",
+  "stderr": "",
+  "execution_time_ms": 70
+}
