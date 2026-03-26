@@ -545,20 +545,33 @@ export const activitiesRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
-      // Buscar disciplinas do professor que têm alunos matriculados
-      // Usa subjectEnrollments como fonte primária (scheduled_classes pode estar vazia)
-      const result = await db
+      // Buscar combinações reais de disciplina + turma via scheduled_classes
+      const withClass = await db
         .selectDistinct({
           subjectId: subjects.id,
           subjectName: subjects.name,
-          classId: sql<number>`0`.as('classId'), // placeholder - sem turma separada
-          className: sql<string>`'Turma Geral'`.as('className'),
+          classId: classes.id,
+          className: classes.name,
         })
+        .from(scheduledClasses)
+        .innerJoin(subjects, eq(scheduledClasses.subjectId, subjects.id))
+        .innerJoin(classes, eq(scheduledClasses.classId, classes.id))
+        .where(eq(scheduledClasses.userId, ctx.user.id))
+        .orderBy(subjects.name, classes.name);
+
+      // Fallback: disciplinas sem turma vinculada em scheduled_classes
+      const subjectsWithClass = new Set(withClass.map(r => r.subjectId));
+      const allSubjects = await db
+        .select({ subjectId: subjects.id, subjectName: subjects.name })
         .from(subjects)
         .where(eq(subjects.userId, ctx.user.id))
         .orderBy(subjects.name);
 
-      return result;
+      const withoutClass = allSubjects
+        .filter(s => !subjectsWithClass.has(s.subjectId))
+        .map(s => ({ subjectId: s.subjectId, subjectName: s.subjectName, classId: 0, className: null }));
+
+      return [...withClass, ...withoutClass];
     }),
 
   // Buscar alunos de uma disciplina com notas consolidadas (exercícios + atividades)

@@ -65,11 +65,11 @@ export default function TeacherGradePanel() {
   // Buscar combinações Disciplina — Turma do professor
   const { data: combinations } = trpc.activities.getSubjectClassCombinations.useQuery();
 
-  // Extrair subjectId da combinação selecionada (classId agora é o subjectId)
+  // Extrair subjectId e classId da combinação selecionada
   const selectedSubjectId = selectedCombo ? Number(selectedCombo.split("-")[0]) : null;
-  const selectedClassId = selectedSubjectId; // classId = subjectId neste contexto
+  const selectedClassId = selectedCombo ? Number(selectedCombo.split("-")[1]) : null;
 
-  // Buscar notas da disciplina selecionada
+  // Buscar notas da disciplina selecionada (filtrando pela turma quando disponível)
   const { data: gradesData, isLoading: loadingGrades } = trpc.activities.getGradesByClass.useQuery(
     { classId: selectedSubjectId!, subjectId: selectedSubjectId ?? undefined },
     { enabled: !!selectedSubjectId }
