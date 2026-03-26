@@ -415,8 +415,8 @@ export const activitiesRouter = router({
             type: 'new_assignment',
             title: 'Atividade Reenviada',
             message: `O aluno ${ctx.studentSession.fullName} reenviou a atividade "${activity.title}".`,
-            link: '/activities',
-            relatedId: input.activityId,
+            link: '/student/activities',
+              relatedId: input.activityId,
           });
         } catch (e) { /* notificação não deve bloquear envio */ }
         return { success: true, submissionId: existing.id, fileUrl: url };
@@ -439,7 +439,7 @@ export const activitiesRouter = router({
             type: 'new_assignment',
             title: 'Nova Submissão de Atividade',
             message: `O aluno ${ctx.studentSession.fullName} enviou a atividade "${activity.title}".`,
-            link: '/activities',
+            link: '/student/activities',
             relatedId: input.activityId,
           });
         } catch (e) { /* notificação não deve bloquear envio */ }

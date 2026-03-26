@@ -3486,12 +3486,13 @@ JSON (descrições MAX 15 chars):
                 : '';
               for (const s of studentRows) {
                 await dbConn.execute(sql`
-                  INSERT INTO notifications (userId, type, title, message, relatedId, relatedType, isRead, createdAt)
+                  INSERT INTO notifications (userId, type, title, message, link, relatedId, relatedType, isRead, createdAt)
                   VALUES (
                     ${s.userId},
                     'assessment_published',
                     ${'📝 Nova Prova Disponível'},
                     ${`A prova "${input.title}" foi publicada e está disponível para você.${appDateMsg}`},
+                    ${'/student/assessments'},
                     ${assessmentId},
                     'assessment',
                     0,
@@ -3702,12 +3703,13 @@ JSON (descrições MAX 15 chars):
               // Criar notificação para cada aluno
               for (const student of students) {
                 await dbConn.execute(sql`
-                  INSERT INTO notifications (userId, type, title, message, relatedId, relatedType, isRead, createdAt)
+                  INSERT INTO notifications (userId, type, title, message, link, relatedId, relatedType, isRead, createdAt)
                   VALUES (
                     ${student.studentId},
                     'assessment_published',
-                    'Nova prova disponível',
+                    ${'📝 Nova Prova Disponível'},
                     ${`A prova "${assessment.title}" foi publicada e está disponível para você.`},
+                    ${'/student/assessments'},
                     ${input.assessmentId},
                     'assessment',
                     0,

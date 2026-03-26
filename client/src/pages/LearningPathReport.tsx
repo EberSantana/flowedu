@@ -245,63 +245,77 @@ function StudentEvolutionModal({
         </DialogHeader>
 
         <div className="px-6 py-5 space-y-5">
-          {/* Cards de estatísticas */}
+          {/* Cards de estatísticas — redesenhados */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Média do Aluno */}
-            <div className={`rounded-xl p-4 text-center border-2 ${
-              pctToGrade(student.avgPercentage) !== null && pctToGrade(student.avgPercentage)! >= 7
-                ? 'border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-700'
-                : pctToGrade(student.avgPercentage) !== null && pctToGrade(student.avgPercentage)! >= 5
-                ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-700'
-                : student.avgPercentage !== null
-                ? 'border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-700'
-                : 'border-border bg-muted/30'
-            }`}>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Média do Aluno</p>
-              <p className={`text-2xl font-bold ${getGradeColor(pctToGrade(student.avgPercentage))}`}>
-                {student.avgPercentage !== null ? pctToGrade(student.avgPercentage)!.toFixed(1) : "—"}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
-            </div>
+            {(() => {
+              const avg = pctToGrade(student.avgPercentage);
+              const isGood = avg !== null && avg >= 7;
+              const isMid = avg !== null && avg >= 5 && avg < 7;
+              const isBad = avg !== null && avg < 5;
+              return (
+                <div className={`rounded-xl p-4 text-center border-2 shadow-sm ${
+                  isGood ? 'border-green-400 bg-gradient-to-b from-green-50 to-green-100/60 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-600'
+                  : isMid ? 'border-yellow-400 bg-gradient-to-b from-yellow-50 to-yellow-100/60 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-600'
+                  : isBad ? 'border-red-400 bg-gradient-to-b from-red-50 to-red-100/60 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-600'
+                  : 'border-border bg-muted/20'
+                }`}>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Média</p>
+                  <p className={`text-3xl font-extrabold leading-none ${getGradeColor(avg)}`}>
+                    {avg !== null ? avg.toFixed(1) : "—"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-1.5">de 10,0</p>
+                </div>
+              );
+            })()}
             {/* Melhor Nota */}
-            <div className={`rounded-xl p-4 text-center border-2 ${
-              maxGrade10 !== null && maxGrade10 >= 7
-                ? 'border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-700'
-                : maxGrade10 !== null && maxGrade10 >= 5
-                ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-700'
-                : maxGrade10 !== null
-                ? 'border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-700'
-                : 'border-border bg-muted/30'
-            }`}>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Melhor Nota</p>
-              <p className={`text-2xl font-bold ${getGradeColor(maxGrade10 ?? null)}`}>
-                {maxGrade10 !== null ? maxGrade10.toFixed(1) : "—"}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
-            </div>
+            {(() => {
+              const isGood = maxGrade10 !== null && maxGrade10 >= 7;
+              const isMid = maxGrade10 !== null && maxGrade10 >= 5 && maxGrade10 < 7;
+              const isBad = maxGrade10 !== null && maxGrade10 < 5;
+              return (
+                <div className={`rounded-xl p-4 text-center border-2 shadow-sm ${
+                  isGood ? 'border-green-400 bg-gradient-to-b from-green-50 to-green-100/60 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-600'
+                  : isMid ? 'border-yellow-400 bg-gradient-to-b from-yellow-50 to-yellow-100/60 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-600'
+                  : isBad ? 'border-red-400 bg-gradient-to-b from-red-50 to-red-100/60 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-600'
+                  : 'border-border bg-muted/20'
+                }`}>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Melhor</p>
+                  <p className={`text-3xl font-extrabold leading-none ${getGradeColor(maxGrade10 ?? null)}`}>
+                    {maxGrade10 !== null ? maxGrade10.toFixed(1) : "—"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-1.5">de 10,0</p>
+                </div>
+              );
+            })()}
             {/* Pior Nota */}
-            <div className={`rounded-xl p-4 text-center border-2 ${
-              minGrade10 !== null && minGrade10 >= 7
-                ? 'border-green-300 bg-green-50 dark:bg-green-950/30 dark:border-green-700'
-                : minGrade10 !== null && minGrade10 >= 5
-                ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-700'
-                : minGrade10 !== null
-                ? 'border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-700'
-                : 'border-border bg-muted/30'
-            }`}>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Pior Nota</p>
-              <p className={`text-2xl font-bold ${getGradeColor(minGrade10 ?? null)}`}>
-                {minGrade10 !== null ? minGrade10.toFixed(1) : "—"}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
-            </div>
+            {(() => {
+              const isGood = minGrade10 !== null && minGrade10 >= 7;
+              const isMid = minGrade10 !== null && minGrade10 >= 5 && minGrade10 < 7;
+              const isBad = minGrade10 !== null && minGrade10 < 5;
+              return (
+                <div className={`rounded-xl p-4 text-center border-2 shadow-sm ${
+                  isGood ? 'border-green-400 bg-gradient-to-b from-green-50 to-green-100/60 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-600'
+                  : isMid ? 'border-yellow-400 bg-gradient-to-b from-yellow-50 to-yellow-100/60 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-600'
+                  : isBad ? 'border-red-400 bg-gradient-to-b from-red-50 to-red-100/60 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-600'
+                  : 'border-border bg-muted/20'
+                }`}>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Menor</p>
+                  <p className={`text-3xl font-extrabold leading-none ${getGradeColor(minGrade10 ?? null)}`}>
+                    {minGrade10 !== null ? minGrade10.toFixed(1) : "—"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-1.5">de 10,0</p>
+                </div>
+              );
+            })()}
             {/* Concluídas */}
-            <div className="rounded-xl p-4 text-center border-2 border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-700">
-              <p className="text-xs font-medium text-muted-foreground mb-1">Concluídas</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {completedCount}/{exercises.length}
+            <div className="rounded-xl p-4 text-center border-2 border-blue-300 bg-gradient-to-b from-blue-50 to-blue-100/60 dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-600 shadow-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Concluídas</p>
+              <p className="text-3xl font-extrabold leading-none text-blue-600 dark:text-blue-400">
+                {completedCount}
+                <span className="text-base font-medium text-muted-foreground">/{exercises.length}</span>
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">atividades</p>
+              <p className="text-[11px] text-muted-foreground mt-1.5">atividades</p>
             </div>
           </div>
 
@@ -357,10 +371,10 @@ function StudentEvolutionModal({
                 </span>
               </div>
 
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={300}>
                 <AreaChart
                   data={chartData}
-                  margin={{ top: 8, right: 16, left: 0, bottom: 48 }}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 60 }}
                 >
                   <defs>
                     <linearGradient id="gradAluno" x1="0" y1="0" x2="0" y2="1">
