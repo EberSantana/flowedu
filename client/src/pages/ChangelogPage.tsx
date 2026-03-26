@@ -23,9 +23,161 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
+    version: "5.13.0",
+    date: "26/03/2026",
+    label: "Mais recente",
+    highlight: "Modal Evolução Individual compacto e responsivo",
+    changes: [
+      {
+        type: "improvement",
+        text: "Modal Evolução Individual redesenhado: cards menores e compactos (4 colunas fixas), gráfico reduzido para 220px, tabela com scroll horizontal e colunas ocultas no mobile",
+      },
+      {
+        type: "improvement",
+        text: "Modal com max-w-2xl e max-h-85vh para caber corretamente em qualquer resolução de tela",
+      },
+      {
+        type: "fix",
+        text: "Deploy na VPS corrigido definitivamente: script /root/deploy.sh agora sincroniza a versão nos dois diretórios (/root/flowedu e /var/www/flowedu) automaticamente",
+      },
+    ],
+  },
+  {
+    version: "5.12.0",
+    date: "26/03/2026",
+    highlight: "Painel de Notas com turmas reais e Atividades de Sala integrada",
+    changes: [
+      {
+        type: "fix",
+        text: "Painel de Notas: filtro agora exibe Disciplina — Turma real (ex: \"Informática Básica — Turma IAGRO 11\") em vez de \"Turma Geral\" hardcoded",
+      },
+      {
+        type: "feature",
+        text: "Atividades de Sala integrada como terceira aba no Banco de Provas e Exercícios — item removido do menu lateral para evitar duplicidade",
+      },
+      {
+        type: "improvement",
+        text: "Componente ActivitiesTab criado com todas as funcionalidades: criar, editar, excluir, ver submissões, avaliar e exportar Excel",
+      },
+    ],
+  },
+  {
+    version: "5.11.0",
+    date: "26/03/2026",
+    highlight: "Banco de Provas unificado com Exercícios e Atividades de Sala",
+    changes: [
+      {
+        type: "feature",
+        text: "Banco de Provas e Exercícios agora possui 3 abas: Provas, Exercícios e Atividades de Sala — centralizando todo o conteúdo avaliativo em uma única página",
+      },
+      {
+        type: "improvement",
+        text: "Item \"Atividades em Sala\" removido do menu lateral do professor (já acessível dentro do Banco de Provas)",
+      },
+    ],
+  },
+  {
+    version: "5.10.0",
+    date: "26/03/2026",
+    highlight: "Notificações ao criar módulo na trilha e correção de links",
+    changes: [
+      {
+        type: "feature",
+        text: "Notificação automática enviada aos alunos ao professor criar novo módulo na Trilha de Aprendizagem, com link direto para /student-learning-paths",
+      },
+      {
+        type: "fix",
+        text: "Link da notificação do professor ao receber submissão de atividade corrigido de /student/activities para /activities",
+      },
+      {
+        type: "fix",
+        text: "Link das notificações de atividades para o aluno corrigido de /activities para /student/activities",
+      },
+    ],
+  },
+  {
+    version: "5.9.0",
+    date: "26/03/2026",
+    highlight: "Evolução Individual redesenhada, avisos ao criar prova e correção de 404",
+    changes: [
+      {
+        type: "improvement",
+        text: "Cards de Evolução Individual redesenhados com gradiente, fonte maior (extrabold), label em maiúsculas e sombra para melhor destaque visual",
+      },
+      {
+        type: "improvement",
+        text: "Gráfico de Evolução Individual com altura aumentada (300px) e margem inferior maior para os rótulos do eixo X",
+      },
+      {
+        type: "feature",
+        text: "Notificação ao aluno ao criar prova agora inclui campo link com rota /student/assessments — tanto ao criar quanto ao publicar",
+      },
+      {
+        type: "fix",
+        text: "Erro 404 ao clicar em aviso de criação de prova/atividade corrigido — links das notificações apontam para as rotas corretas do portal do aluno",
+      },
+    ],
+  },
+  {
+    version: "5.8.0",
+    date: "26/03/2026",
+    highlight: "Painel de Notas com turma, Atividades no Banco e modal do Calendário",
+    changes: [
+      {
+        type: "improvement",
+        text: "Painel de Notas: filtro exibe Disciplina — Turma juntos (ex: \"Matemática — 3º A\") e badge da turma aparece no cabeçalho da tabela",
+      },
+      {
+        type: "improvement",
+        text: "Atividades em Sala movida para a seção Conteúdo no Sidebar, ao lado de Banco de Provas e Exercícios",
+      },
+      {
+        type: "feature",
+        text: "Cards do Calendário clicáveis: ao clicar em um evento abre modal com título, data, tipo, descrição e botões de editar/excluir",
+      },
+    ],
+  },
+  {
+    version: "5.7.0",
+    date: "26/03/2026",
+    highlight: "Menu do portal do aluno reorganizado",
+    changes: [
+      {
+        type: "improvement",
+        text: "Menu do portal do aluno reorganizado em seções mais coerentes: Principal, Estudos (com Atividades), Avaliações (Provas + Estatísticas + Boletim) e Suporte",
+      },
+      {
+        type: "improvement",
+        text: "\"Minhas Atividades\" movida de lugar solto para a seção Estudos, onde faz sentido semântico",
+      },
+      {
+        type: "improvement",
+        text: "Itens renomeados no portal do aluno: \"Exercícios\" → \"Exercícios da Trilha\" e \"Atividades\" → \"Atividades de Sala\"",
+      },
+    ],
+  },
+  {
+    version: "5.6.0",
+    date: "26/03/2026",
+    highlight: "Migração para API Groq (Llama 3.3 70B)",
+    changes: [
+      {
+        type: "improvement",
+        text: "Sistema migrado da API Manus para API Groq (Llama 3.3 70B) — geração de exercícios, análise de alunos e módulos agora usam Groq com prioridade máxima",
+      },
+      {
+        type: "improvement",
+        text: "Código do llm.ts atualizado: Groq tem prioridade sobre a API Manus quando GROQ_API_KEY estiver configurada",
+      },
+      {
+        type: "fix",
+        text: "Chave Groq atualizada no ecosystem.config.cjs da VPS — chave anterior estava inválida causando falhas na geração de IA",
+      },
+    ],
+  },
+  {
     version: "5.5.1",
     date: "24/03/2026",
-    label: "Mais recente",
     highlight: "Contador de conclusão por exercício e correções gerais",
     changes: [
       {
