@@ -11624,6 +11624,145 @@ Retorne em formato JSON com estrutura:
         return { success: true };
       }),
   }),
+  // ==================== CONFIGURAÇÕES DE IA ====================
+  aiSettings: router({
+    // Buscar configurações atuais de IA
+    getSettings: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem acessar configurações de IA' });
+      }
+      const dbConn = await getDb();
+      if (!dbConn) return { id: null, provider: 'groq', model: 'llama-3.3-70b-versatile', isActive: true, groqApiKeyPreview: null, geminiApiKeyPreview: null, hasGroqKey: false, hasGeminiKey: false };
+      const rows = await dbConn.execute(sql`SELECT id, provider, model, isActive, updatedAt, CASE WHEN groqApiKey IS NOT NULL AND groqApiKey != '' THEN LEFT(groqApiKey, 8) ELSE NULL END as groqApiKeyPreview, CASE WHEN geminiApiKey IS NOT NULL AND geminiApiKey != '' THEN LEFT(geminiApiKey, 8) ELSE NULL END as geminiApiKeyPreview FROM ai_settings LIMIT 1`) as any[];
+      const rowList = (rows[0] as any[]) || [];
+      if (!rowList || rowList.length === 0) {
+        return { id: null, provider: 'groq', model: 'llama-3.3-70b-versatile', isActive: true, groqApiKeyPreview: null, geminiApiKeyPreview: null, hasGroqKey: false, hasGeminiKey: false };
+      }
+      const row = rowList[0];
+      return { ...row, hasGroqKey: !!row.groqApiKeyPreview, hasGeminiKey: !!row.geminiApiKeyPreview };
+    }),
+    // Salvar configurações de IA
+    saveSettings: protectedProcedure
+      .input(z.object({
+        provider: z.enum(['groq', 'gemini', 'manus']),
+        model: z.string().min(1),
+        groqApiKey: z.string().optional(),
+        geminiApiKey: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem alterar configurações de IA' });
+        }
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco de dados não disponível' });
+        const existingRows = await dbConn.execute(sql`SELECT id FROM ai_settings LIMIT 1`) as any[];
+        const existing = (existingRows[0] as any[]) || [];
+        if (existing && existing.length > 0) {
+          const existingId = existing[0].id;
+          if (input.groqApiKey && input.groqApiKey !== '' && input.geminiApiKey && input.geminiApiKey !== '') {
+            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, groqApiKey = ${input.groqApiKey}, geminiApiKey = ${input.geminiApiKey}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
+          } else if (input.groqApiKey && input.groqApiKey !== '') {
+            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, groqApiKey = ${input.groqApiKey}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
+          } else if (input.geminiApiKey && input.geminiApiKey !== '') {
+            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, geminiApiKey = ${input.geminiApiKey}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
+          } else {
+            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
+          }
+        } else {
+          await dbConn.execute(sql`INSERT INTO ai_settings (provider, model, groqApiKey, geminiApiKey, updatedBy) VALUES (${input.provider}, ${input.model}, ${input.groqApiKey || null}, ${input.geminiApiKey || null}, ${ctx.user.id})`);
+        }
+        return { success: true };
+      }),
+    // Testar conexão com a API de IA
+    testConnection: protectedProcedure
+      .input(z.object({
+        provider: z.enum(['groq', 'gemini', 'manus']),
+        apiKey: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem testar conexões de IA' });
+        }
+        try {
+          if (input.provider === 'groq') {
+            const apiKey = input.apiKey || process.env.GROQ_API_KEY;
+            if (!apiKey) throw new Error('Chave API Groq não configurada');
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: 'Responda apenas: OK' }], max_tokens: 5 }),
+            });
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({})) as any;
+              throw new Error((err as any)?.error?.message || `HTTP ${response.status}`);
+            }
+            const data = await response.json() as any;
+            return { success: true, message: 'Conexão com Groq estabelecida com sucesso!', model: (data as any).model || 'llama-3.3-70b-versatile' };
+          } else if (input.provider === 'manus') {
+            await invokeLLM({ messages: [{ role: 'user', content: 'Responda apenas: OK' }] });
+            return { success: true, message: 'Conexão com Manus AI estabelecida com sucesso!', model: 'manus-default' };
+          } else {
+            throw new Error('Provedor Gemini ainda não suportado nesta versão');
+          }
+        } catch (error: any) {
+          return { success: false, message: (error as any).message || 'Erro ao testar conexão', model: null };
+        }
+      }),
+    // Buscar estatísticas de uso de IA
+    getUsageStats: protectedProcedure
+      .input(z.object({
+        period: z.enum(['7d', '30d', '90d', 'all']).default('30d'),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem ver estatísticas de IA' });
+        }
+        const dbConn = await getDb();
+        if (!dbConn) return { totalCalls: 0, totalTokens: 0, promptTokens: 0, completionTokens: 0, successCalls: 0, errorCalls: 0, estimatedCost: 0, byFeature: [], byProvider: [], daily: [], recent: [] };
+        const days = input.period === '7d' ? 7 : input.period === '30d' ? 30 : input.period === '90d' ? 90 : null;
+        const totalsRes = days
+          ? await dbConn.execute(sql`SELECT COUNT(*) as totalCalls, SUM(totalTokens) as totalTokens, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successCalls, SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as errorCalls FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`) as any[]
+          : await dbConn.execute(sql`SELECT COUNT(*) as totalCalls, SUM(totalTokens) as totalTokens, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successCalls, SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as errorCalls FROM ai_usage_logs`) as any[];
+        const byFeatureRes = days
+          ? await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[]
+          : await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[];
+        const byProviderRes = days
+          ? await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY provider`) as any[]
+          : await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY provider`) as any[];
+        const dailyRes = days
+          ? await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[]
+          : await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[];
+        const recentRes = await dbConn.execute(sql`SELECT id, provider, model, feature, promptTokens, completionTokens, totalTokens, success, errorMessage, createdAt FROM ai_usage_logs ORDER BY createdAt DESC LIMIT 20`) as any[];
+        const total = ((totalsRes[0] as any[])[0]) || {};
+        const estimatedCost = ((total.promptTokens || 0) * 0.00000059) + ((total.completionTokens || 0) * 0.00000079);
+        return {
+          totalCalls: total.totalCalls || 0,
+          totalTokens: total.totalTokens || 0,
+          promptTokens: total.promptTokens || 0,
+          completionTokens: total.completionTokens || 0,
+          successCalls: total.successCalls || 0,
+          errorCalls: total.errorCalls || 0,
+          estimatedCost: parseFloat(estimatedCost.toFixed(4)),
+          byFeature: (byFeatureRes[0] as any[]) || [],
+          byProvider: (byProviderRes[0] as any[]) || [],
+          daily: (dailyRes[0] as any[]) || [],
+          recent: (recentRes[0] as any[]) || [],
+        };
+      }),
+    // Limpar logs de uso
+    clearUsageLogs: protectedProcedure
+      .input(z.object({ olderThanDays: z.number().min(1).default(90) }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem limpar logs de IA' });
+        }
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco de dados não disponível' });
+        const days = input.olderThanDays;
+        await dbConn.execute(sql`DELETE FROM ai_usage_logs WHERE createdAt < DATE_SUB(NOW(), INTERVAL ${days} DAY)`);
+        return { success: true };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 

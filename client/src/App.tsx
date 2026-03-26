@@ -55,6 +55,7 @@ const ExerciseDashboard = lazy(() => import("./pages/ExerciseDashboard"));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
 const BackupAdmin = lazy(() => import("./pages/BackupAdmin"));
 const VPSMonitoring = lazy(() => import("./pages/VPSMonitoring"));
+const AISettingsPage = lazy(() => import("./pages/AISettingsPage"));
 const LearningPathReport = lazy(() => import("./pages/LearningPathReport"));
 const AssessmentsManager = lazy(() => import("./pages/AssessmentsManager"));
 const AccessLogsPage = lazy(() => import("./pages/AccessLogsPage"));
@@ -161,6 +162,7 @@ function Router() {
           <Route path={"/admin/settings"} component={AdminSettings} />
           <Route path={"/admin/backups"} component={BackupAdmin} />
           <Route path={"/admin/vps-monitoring"} component={VPSMonitoring} />
+          <Route path={"/admin/ai-settings"} component={AISettingsPage} />
           <Route path={"/admin/email-config"} component={EmailConfig} />
           <Route path={"/admin/email-send"} component={EmailSend} />
           <Route path={"/activities"} component={ActivitiesPage} />

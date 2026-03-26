@@ -7685,3 +7685,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Banco de Provas não funciona na VPS
 - [ ] Enviar E-mail não funciona na VPS
 - [ ] Config. de E-mail não funciona na VPS
+
+## v5.17.0 - Configurações de IA
+- [x] Criar tabelas ai_settings e ai_usage_logs no banco de dados
+- [x] Criar procedures backend: getSettings, saveSettings, testConnection, getUsageStats, clearUsageLogs
+- [x] Criar página AISettingsPage.tsx com UI completa (configurações, uso/gastos, histórico)
+- [x] Adicionar rota /admin/ai-settings no App.tsx
+- [x] Adicionar item "Configurações de IA" no Sidebar de Administração
+- [x] Integrar logging automático de tokens no invokeLLM (llm.ts)
+- [x] Atualizar versão para 5.17.0

@@ -2776,3 +2776,39 @@ export const assessmentAnswers = mysqlTable("assessment_answers", {
 
 export type AssessmentAnswer = typeof assessmentAnswers.$inferSelect;
 export type InsertAssessmentAnswer = typeof assessmentAnswers.$inferInsert;
+
+// ============================================================
+// Tabela de logs de uso de IA (monitoramento de tokens e gastos)
+// ============================================================
+export const aiUsageLogs = mysqlTable("ai_usage_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  provider: varchar("provider", { length: 50 }).notNull(), // groq, manus, gemini
+  model: varchar("model", { length: 100 }).notNull(),
+  feature: varchar("feature", { length: 100 }).notNull(), // ex: generate_exercise, analyze_student
+  promptTokens: int("prompt_tokens").default(0).notNull(),
+  completionTokens: int("completion_tokens").default(0).notNull(),
+  totalTokens: int("total_tokens").default(0).notNull(),
+  success: boolean("success").default(true).notNull(),
+  errorMessage: text("error_message"),
+  userId: int("user_id"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AiUsageLog = typeof aiUsageLogs.$inferSelect;
+export type InsertAiUsageLog = typeof aiUsageLogs.$inferInsert;
+
+// ============================================================
+// Tabela de configurações de IA (provedor, chave API, modelo)
+// ============================================================
+export const aiSettings = mysqlTable("ai_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  provider: varchar("provider", { length: 50 }).default("groq").notNull(), // groq, gemini, manus
+  groqApiKey: text("groqApiKey"),
+  geminiApiKey: text("geminiApiKey"),
+  model: varchar("model", { length: 100 }).default("llama-3.3-70b-versatile").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedBy: int("updatedBy"),
+});
+export type AiSettings = typeof aiSettings.$inferSelect;
+export type InsertAiSettings = typeof aiSettings.$inferInsert;

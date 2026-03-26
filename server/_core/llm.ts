@@ -303,7 +303,36 @@ const normalizeResponseFormat = ({
   };
 };
 
-export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
+// Função para registrar uso da IA no banco de dados (fire-and-forget)
+async function logAIUsage(params: {
+  provider: string;
+  model: string;
+  feature: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  success: boolean;
+  errorMessage?: string;
+}) {
+  try {
+    const { getDb } = await import('../db');
+    const { sql } = await import('drizzle-orm');
+    const dbConn = await getDb();
+    if (!dbConn) return;
+    await dbConn.execute(
+      sql`INSERT INTO ai_usage_logs (provider, model, feature, promptTokens, completionTokens, totalTokens, success, errorMessage) VALUES (${params.provider}, ${params.model}, ${params.feature}, ${params.promptTokens}, ${params.completionTokens}, ${params.totalTokens}, ${params.success ? 1 : 0}, ${params.errorMessage || null})`
+    );
+  } catch (e) {
+    // Falha no log não deve impedir o fluxo principal
+    console.warn('[LLM] Failed to log AI usage:', e);
+  }
+}
+
+// Contexto de feature atual para logging (thread-local simulado via AsyncLocalStorage seria ideal, mas usamos variável global simples)
+let _currentFeature = 'other';
+export function setLLMFeature(feature: string) { _currentFeature = feature; }
+
+export async function invokeLLM(params: InvokeParams & { feature?: string }): Promise<InvokeResult> {
   assertApiKey();
 
   const {
@@ -361,6 +390,10 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   const apiUrl = resolveApiUrl();
   const apiKey = resolveApiKey();
   
+  const feature = (params as any).feature || _currentFeature || 'other';
+  const provider = ENV.groqApiKey ? 'groq' : ENV.forgeApiKey ? 'manus' : 'gemini';
+  const model = resolveModel();
+  
   console.log(`[LLM] Using ${resolveProvider()} API`);
   
   const response = await fetch(apiUrl, {
@@ -374,10 +407,27 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
 
   if (!response.ok) {
     const errorText = await response.text();
+    // Log de erro
+    logAIUsage({ provider, model, feature, promptTokens: 0, completionTokens: 0, totalTokens: 0, success: false, errorMessage: `HTTP ${response.status}: ${errorText.slice(0, 200)}` });
     throw new Error(
       `LLM invoke failed: ${response.status} ${response.statusText} – ${errorText}`
     );
   }
 
-  return (await response.json()) as InvokeResult;
+  const result = (await response.json()) as InvokeResult;
+  
+  // Log de sucesso com tokens
+  if (result.usage) {
+    logAIUsage({
+      provider,
+      model: result.model || model,
+      feature,
+      promptTokens: result.usage.prompt_tokens || 0,
+      completionTokens: result.usage.completion_tokens || 0,
+      totalTokens: result.usage.total_tokens || 0,
+      success: true,
+    });
+  }
+  
+  return result;
 }

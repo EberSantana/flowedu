@@ -39,7 +39,8 @@ import {
   Mail,
   Send,
   ClipboardList,
-  ClipboardCheck
+  ClipboardCheck,
+  Bot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -261,6 +262,12 @@ const teacherNavCategories: NavCategory[] = [
         label: "Enviar E-mail",
         icon: <Send className="h-5 w-5" />,
         href: "/admin/email-send",
+        adminOnly: true,
+      },
+      {
+        label: "Configurações de IA",
+        icon: <Bot className="h-5 w-5" />,
+        href: "/admin/ai-settings",
         adminOnly: true,
       },
     ],
