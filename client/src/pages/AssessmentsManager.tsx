@@ -77,24 +77,27 @@ export default function AssessmentsManager() {
 
   const utils = trpc.useUtils();
 
-  // Buscar disciplinas
-  const { data: subjects } = trpc.subjects.list.useQuery();
+  // Buscar disciplinas com turmas vinculadas
+  const { data: subjectsWithClass } = trpc.subjects.listWithClass.useQuery();
+
+  // Extrair subjectId do filtro (formato "subjectId" ou "subjectId:classId")
+  const filterSubjectId = subjectFilter !== "all" ? parseInt(subjectFilter.split(":")[0]) : undefined;
 
   // Buscar provas do professor
   const { data: assessments, isLoading: loadingAssessments } = trpc.learningPath.getTeacherAssessments.useQuery(
-    { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
+    { subjectId: filterSubjectId },
     { enabled: !!user }
   );
 
   // Buscar exercícios do professor
   const { data: exercises, isLoading: loadingExercises } = trpc.teacherExercises.list.useQuery(
-    { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
+    { subjectId: filterSubjectId },
     { enabled: !!user }
   );
 
   // Buscar contador de conclusão por exercício
   const { data: completionStats } = trpc.teacherExercises.getCompletionStats.useQuery(
-    { subjectId: subjectFilter !== "all" ? parseInt(subjectFilter) : undefined },
+    { subjectId: filterSubjectId },
     { enabled: !!user }
   );
 
@@ -265,8 +268,8 @@ export default function AssessmentsManager() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas as disciplinas</SelectItem>
-                  {subjects?.map((s) => (
-                    <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                  {subjectsWithClass?.map((s) => (
+                    <SelectItem key={s.filterKey} value={s.filterKey}>{s.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

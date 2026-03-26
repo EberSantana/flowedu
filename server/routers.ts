@@ -570,6 +570,39 @@ export const appRouter = router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return await db.getSubjectsByUserId(ctx.user.id);
     }),
+    // Listar disciplinas com turmas vinculadas (via scheduledClasses)
+    listWithClass: protectedProcedure.query(async ({ ctx }) => {
+      const db_instance = await db.getDb();
+      if (!db_instance) throw new Error('Database not available');
+      const { subjects: subjectsTable, scheduledClasses, classes: classesTable } = await import('../drizzle/schema');
+      // Buscar disciplinas do professor com turmas vinculadas via scheduledClasses
+      const rows = await db_instance
+        .select({
+          subjectId: subjectsTable.id,
+          subjectName: subjectsTable.name,
+          subjectColor: subjectsTable.color,
+          classId: classesTable.id,
+          className: classesTable.name,
+        })
+        .from(subjectsTable)
+        .leftJoin(scheduledClasses, eq(scheduledClasses.subjectId, subjectsTable.id))
+        .leftJoin(classesTable, eq(classesTable.id, scheduledClasses.classId))
+        .where(eq(subjectsTable.userId, ctx.user.id))
+        .groupBy(subjectsTable.id, classesTable.id)
+        .orderBy(subjectsTable.name, classesTable.name);
+      // Retornar combinações únicas disciplina+turma
+      return rows.map(r => ({
+        id: r.subjectId,
+        name: r.subjectName,
+        color: r.subjectColor,
+        classId: r.classId,
+        className: r.className,
+        // Label para exibição no filtro: "Disciplina — Turma" ou só "Disciplina" se sem turma
+        label: r.className ? `${r.subjectName} — ${r.className}` : r.subjectName,
+        // Chave única para o filtro (subjectId:classId ou só subjectId)
+        filterKey: r.classId ? `${r.subjectId}:${r.classId}` : `${r.subjectId}`,
+      }));
+    }),
     
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
@@ -8316,25 +8349,16 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         const attempts = (attemptsRaw[0] as any[]) || [];
         if (attempts.length === 0) return { students: [], maxAttempts: exercise.maxAttempts };
         const studentIds = attempts.map((a: any) => Number(a.studentId));
-        // Usar placeholders manuais para compatibilidade com TiDB/MySQL2
-        const placeholders = studentIds.map(() => '?').join(', ');
-        const studentInfosRaw = await db_instance.execute(
-          sql.raw(`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id IN (${placeholders})`)
-        ) as any[];
-        // Fallback: buscar cada aluno individualmente se a query IN falhar
-        let studentInfos = (studentInfosRaw[0] as any[]) || [];
-        if (studentInfos.length === 0 && studentIds.length > 0) {
-          // Buscar individualmente como fallback
-          const individualResults = await Promise.all(
-            studentIds.map(async (sid: number) => {
-              const res = await db_instance.execute(
-                sql`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id = ${sid} LIMIT 1`
-              ) as any[];
-              return ((res[0] as any[]) || [])[0];
-            })
-          );
-          studentInfos = individualResults.filter(Boolean);
-        }
+        // Buscar cada aluno individualmente para compatibilidade com TiDB/MySQL2
+        const individualResults = await Promise.all(
+          studentIds.map(async (sid: number) => {
+            const res = await db_instance.execute(
+              sql`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id = ${sid} LIMIT 1`
+            ) as any[];
+            return ((res[0] as any[]) || [])[0];
+          })
+        );
+        const studentInfos = individualResults.filter(Boolean);
         const nameMap = new Map(studentInfos.map((s: any) => [s.id, s.fullName || s.name?.trim() || `Aluno #${s.id}`]));
         return {
           maxAttempts: exercise.maxAttempts,
