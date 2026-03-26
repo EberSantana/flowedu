@@ -215,7 +215,7 @@ function StudentEvolutionModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-3xl w-full p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl w-full p-0 overflow-hidden max-h-[85vh] overflow-y-auto">
         {/* Cabeçalho */}
         <DialogHeader className="px-6 pt-6 pb-4 border-b sticky top-0 bg-background z-10">
           <div className="flex items-start justify-between gap-4">
@@ -244,9 +244,9 @@ function StudentEvolutionModal({
           </div>
         </DialogHeader>
 
-        <div className="px-6 py-5 space-y-5">
-          {/* Cards de estatísticas — redesenhados */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="px-4 sm:px-6 py-4 space-y-4">
+          {/* Cards de estatísticas — compactos e responsivos */}
+          <div className="grid grid-cols-4 gap-2">
             {/* Média do Aluno */}
             {(() => {
               const avg = pctToGrade(student.avgPercentage);
@@ -254,17 +254,17 @@ function StudentEvolutionModal({
               const isMid = avg !== null && avg >= 5 && avg < 7;
               const isBad = avg !== null && avg < 5;
               return (
-                <div className={`rounded-xl p-4 text-center border-2 shadow-sm ${
+                <div className={`rounded-lg p-2.5 text-center border shadow-sm ${
                   isGood ? 'border-green-400 bg-gradient-to-b from-green-50 to-green-100/60 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-600'
                   : isMid ? 'border-yellow-400 bg-gradient-to-b from-yellow-50 to-yellow-100/60 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-600'
                   : isBad ? 'border-red-400 bg-gradient-to-b from-red-50 to-red-100/60 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-600'
                   : 'border-border bg-muted/20'
                 }`}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Média</p>
-                  <p className={`text-3xl font-extrabold leading-none ${getGradeColor(avg)}`}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Média</p>
+                  <p className={`text-xl font-extrabold leading-none ${getGradeColor(avg)}`}>
                     {avg !== null ? avg.toFixed(1) : "—"}
                   </p>
-                  <p className="text-[11px] text-muted-foreground mt-1.5">de 10,0</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">de 10,0</p>
                 </div>
               );
             })()}
@@ -274,17 +274,17 @@ function StudentEvolutionModal({
               const isMid = maxGrade10 !== null && maxGrade10 >= 5 && maxGrade10 < 7;
               const isBad = maxGrade10 !== null && maxGrade10 < 5;
               return (
-                <div className={`rounded-xl p-4 text-center border-2 shadow-sm ${
+                <div className={`rounded-lg p-2.5 text-center border shadow-sm ${
                   isGood ? 'border-green-400 bg-gradient-to-b from-green-50 to-green-100/60 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-600'
                   : isMid ? 'border-yellow-400 bg-gradient-to-b from-yellow-50 to-yellow-100/60 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-600'
                   : isBad ? 'border-red-400 bg-gradient-to-b from-red-50 to-red-100/60 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-600'
                   : 'border-border bg-muted/20'
                 }`}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Melhor</p>
-                  <p className={`text-3xl font-extrabold leading-none ${getGradeColor(maxGrade10 ?? null)}`}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Melhor</p>
+                  <p className={`text-xl font-extrabold leading-none ${getGradeColor(maxGrade10 ?? null)}`}>
                     {maxGrade10 !== null ? maxGrade10.toFixed(1) : "—"}
                   </p>
-                  <p className="text-[11px] text-muted-foreground mt-1.5">de 10,0</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">de 10,0</p>
                 </div>
               );
             })()}
@@ -294,28 +294,27 @@ function StudentEvolutionModal({
               const isMid = minGrade10 !== null && minGrade10 >= 5 && minGrade10 < 7;
               const isBad = minGrade10 !== null && minGrade10 < 5;
               return (
-                <div className={`rounded-xl p-4 text-center border-2 shadow-sm ${
+                <div className={`rounded-lg p-2.5 text-center border shadow-sm ${
                   isGood ? 'border-green-400 bg-gradient-to-b from-green-50 to-green-100/60 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-600'
                   : isMid ? 'border-yellow-400 bg-gradient-to-b from-yellow-50 to-yellow-100/60 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-600'
                   : isBad ? 'border-red-400 bg-gradient-to-b from-red-50 to-red-100/60 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-600'
                   : 'border-border bg-muted/20'
                 }`}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Menor</p>
-                  <p className={`text-3xl font-extrabold leading-none ${getGradeColor(minGrade10 ?? null)}`}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Menor</p>
+                  <p className={`text-xl font-extrabold leading-none ${getGradeColor(minGrade10 ?? null)}`}>
                     {minGrade10 !== null ? minGrade10.toFixed(1) : "—"}
                   </p>
-                  <p className="text-[11px] text-muted-foreground mt-1.5">de 10,0</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">de 10,0</p>
                 </div>
               );
             })()}
             {/* Concluídas */}
-            <div className="rounded-xl p-4 text-center border-2 border-blue-300 bg-gradient-to-b from-blue-50 to-blue-100/60 dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-600 shadow-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Concluídas</p>
-              <p className="text-3xl font-extrabold leading-none text-blue-600 dark:text-blue-400">
-                {completedCount}
-                <span className="text-base font-medium text-muted-foreground">/{exercises.length}</span>
+            <div className="rounded-lg p-2.5 text-center border shadow-sm border-blue-300 bg-gradient-to-b from-blue-50 to-blue-100/60 dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-600">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Feitas</p>
+              <p className="text-xl font-extrabold leading-none text-blue-600 dark:text-blue-400">
+                {completedCount}<span className="text-sm font-medium text-muted-foreground">/{exercises.length}</span>
               </p>
-              <p className="text-[11px] text-muted-foreground mt-1.5">atividades</p>
+              <p className="text-[10px] text-muted-foreground mt-1">atividades</p>
             </div>
           </div>
 
@@ -371,10 +370,10 @@ function StudentEvolutionModal({
                 </span>
               </div>
 
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={220}>
                 <AreaChart
                   data={chartData}
-                  margin={{ top: 10, right: 20, left: 0, bottom: 60 }}
+                  margin={{ top: 8, right: 16, left: 0, bottom: 50 }}
                 >
                   <defs>
                     <linearGradient id="gradAluno" x1="0" y1="0" x2="0" y2="1">
@@ -389,11 +388,11 @@ function StudentEvolutionModal({
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                    angle={-35}
+                    tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                    angle={-40}
                     textAnchor="end"
                     interval={0}
-                    height={60}
+                    height={50}
                   />
                   <YAxis
                     domain={[0, 10]}
@@ -442,67 +441,56 @@ function StudentEvolutionModal({
             </div>
           )}
 
-          {/* Tabela detalhada */}
-          <div className="border rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-primary/5 border-b border-border">
-                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-left">
-                    Atividade
-                  </th>
-                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-left">
-                    Módulo
-                  </th>
-                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-center">
-                    Nota (0–10)
-                  </th>
-                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-center">
-                    Média Turma
-                  </th>
-                  <th className="px-4 py-3 font-semibold text-xs text-muted-foreground text-center">
-                    Tentativas
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {chartData.map((row, i) => (
-                  <tr key={i} className="hover:bg-muted/30 transition-colors">
-                    <td
-                      className="px-4 py-3 font-medium max-w-[200px] truncate"
-                      title={row.fullName}
-                    >
-                      {row.fullName}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs max-w-[130px] truncate">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
-                        {row.modulo}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {row.aluno !== null ? (
-                        <span className={`inline-flex items-center justify-center w-14 py-1 rounded-lg text-sm font-bold ${getGradeBg(row.aluno)} ${getGradeColor(row.aluno)}`}>
-                          {row.aluno.toFixed(1)}
-                        </span>
-                      ) : <span className="text-muted-foreground text-sm">—</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {row.turma !== null ? (
-                        <span className={`inline-flex items-center justify-center w-14 py-1 rounded-lg text-sm font-bold ${getGradeBg(row.turma)} ${getGradeColor(row.turma)}`}>
-                          {row.turma.toFixed(1)}
-                        </span>
-                      ) : <span className="text-muted-foreground text-sm">—</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {row.tentativas > 0 ? (
-                        <span className="inline-flex items-center justify-center w-10 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">
-                          {row.tentativas}x
-                        </span>
-                      ) : <span className="text-muted-foreground text-sm">—</span>}
-                    </td>
+          {/* Tabela detalhada — compacta e responsiva */}
+          <div className="border rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="px-3 py-2 font-semibold text-muted-foreground text-left">Atividade</th>
+                    <th className="px-3 py-2 font-semibold text-muted-foreground text-left hidden sm:table-cell">Módulo</th>
+                    <th className="px-3 py-2 font-semibold text-muted-foreground text-center">Nota</th>
+                    <th className="px-3 py-2 font-semibold text-muted-foreground text-center">Média</th>
+                    <th className="px-3 py-2 font-semibold text-muted-foreground text-center hidden sm:table-cell">Tent.</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {chartData.map((row, i) => (
+                    <tr key={i} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-3 py-2 font-medium max-w-[140px] truncate" title={row.fullName}>
+                        {row.fullName}
+                      </td>
+                      <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]">
+                          {row.modulo}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        {row.aluno !== null ? (
+                          <span className={`inline-flex items-center justify-center w-12 py-0.5 rounded text-xs font-bold ${getGradeBg(row.aluno)} ${getGradeColor(row.aluno)}`}>
+                            {row.aluno.toFixed(1)}
+                          </span>
+                        ) : <span className="text-muted-foreground">—</span>}
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        {row.turma !== null ? (
+                          <span className={`inline-flex items-center justify-center w-12 py-0.5 rounded text-xs font-bold ${getGradeBg(row.turma)} ${getGradeColor(row.turma)}`}>
+                            {row.turma.toFixed(1)}
+                          </span>
+                        ) : <span className="text-muted-foreground">—</span>}
+                      </td>
+                      <td className="px-3 py-2 text-center hidden sm:table-cell">
+                        {row.tentativas > 0 ? (
+                          <span className="inline-flex items-center justify-center w-8 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">
+                            {row.tentativas}x
+                          </span>
+                        ) : <span className="text-muted-foreground">—</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </DialogContent>
