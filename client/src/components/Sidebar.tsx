@@ -191,11 +191,6 @@ const teacherNavCategories: NavCategory[] = [
         icon: <ClipboardList className="h-5 w-5" />,
         href: "/assessments-manager",
       },
-      {
-        label: "Atividades em Sala",
-        icon: <ClipboardCheck className="h-5 w-5" />,
-        href: "/activities",
-      },
     ],
   },
   {

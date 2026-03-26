@@ -55,6 +55,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import ActivitiesTab from "@/components/ActivitiesTab";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -308,7 +309,7 @@ export default function AssessmentsManager() {
           </div>
 
           <Tabs defaultValue="assessments">
-            <TabsList className="grid w-full grid-cols-2 max-w-sm">
+            <TabsList className="grid w-full grid-cols-3 max-w-xl">
               <TabsTrigger value="assessments" className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4" />
                 Provas ({assessments?.length ?? 0})
@@ -316,6 +317,10 @@ export default function AssessmentsManager() {
               <TabsTrigger value="exercises" className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
                 Exercícios ({exercises?.length ?? 0})
+              </TabsTrigger>
+              <TabsTrigger value="activities" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Atividades de Sala
               </TabsTrigger>
             </TabsList>
 
@@ -563,6 +568,11 @@ export default function AssessmentsManager() {
                   })}
                 </div>
               )}
+            </TabsContent>
+
+            {/* ABA ATIVIDADES DE SALA */}
+            <TabsContent value="activities" className="mt-4">
+              <ActivitiesTab />
             </TabsContent>
           </Tabs>
         </div>
