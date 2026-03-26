@@ -517,19 +517,20 @@ export default function Calendar() {
                 </CardHeader>
                 <CardContent className="p-4">
                   {/* Dias da semana */}
-                  <div className="grid grid-cols-7 gap-2 mb-2">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
                     {WEEKDAYS.map((day) => (
                       <div
                         key={day}
-                        className="text-center text-sm font-semibold text-gray-600 py-2"
+                        className="text-center text-[10px] sm:text-sm font-semibold text-gray-600 py-1 sm:py-2"
                       >
-                        {day}
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{day.charAt(0)}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Grade de dias */}
-                  <div className="grid grid-cols-7 gap-2">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
                     {calendarDays.map((date, index) => {
                       const dayEvents = getDayEvents(date);
                       const hasEvents = dayEvents.length > 0;
@@ -540,7 +541,7 @@ export default function Calendar() {
                           onClick={() => date && handleDayClick(date)}
                           disabled={!date}
                           className={`
-                            aspect-square p-2 rounded-lg border-2 transition-all
+                            aspect-square p-0.5 sm:p-2 rounded-md sm:rounded-lg border sm:border-2 transition-all
                             ${!date ? 'invisible' : ''}
                             ${isToday(date) ? 'border-primary bg-primary/10 font-bold' : 'border-gray-200'}
                             ${date && !isToday(date) ? 'hover:border-primary/50 hover:bg-primary/5' : ''}
@@ -549,15 +550,15 @@ export default function Calendar() {
                         >
                           {date && (
                             <div className="flex flex-col items-center justify-center h-full">
-                              <span className={`text-sm ${isToday(date) ? 'text-primary' : 'text-gray-700'}`}>
+                              <span className={`text-[10px] sm:text-sm ${isToday(date) ? 'text-primary' : 'text-gray-700'}`}>
                                 {date.getDate()}
                               </span>
                               {hasEvents && (
-                                <div className="flex gap-1 mt-1 flex-wrap justify-center">
+                                <div className="flex gap-0.5 sm:gap-1 mt-0.5 sm:mt-1 flex-wrap justify-center">
                                   {dayEvents.slice(0, 3).map((event: any, i: number) => (
                                     <div
                                       key={i}
-                                      className="w-1.5 h-1.5 rounded-full"
+                                      className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full"
                                       style={{ backgroundColor: EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES].dotColor }}
                                     />
                                   ))}

@@ -138,7 +138,7 @@ export function Announcements() {
 
           {/* Form */}
           {isCreating && (
-            <div className="bg-success/10 border-success/30 p-6 rounded-lg border shadow-sm mb-6">
+            <div className="bg-success/10 border-success/30 p-4 sm:p-6 rounded-lg border shadow-sm mb-6">
               <h2 className="text-lg font-semibold mb-4">
                 {editingId ? "Editar Aviso" : "Criar Novo Aviso"}
               </h2>
@@ -208,7 +208,7 @@ export function Announcements() {
                   </label>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     type="submit"
                     disabled={createMutation.isPending || updateMutation.isPending}

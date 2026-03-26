@@ -491,6 +491,7 @@ export default function AdminUsers() {
             </div>
           </CardHeader>
           <CardContent>
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -647,6 +648,7 @@ export default function AdminUsers() {
                 ))}
               </TableBody>
             </Table>
+            </div>
             
             {/* Paginação */}
             <AdvancedPagination

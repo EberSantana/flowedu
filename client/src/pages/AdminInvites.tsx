@@ -293,6 +293,7 @@ export default function AdminInvites() {
                       <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
                     </div>
                   ) : inviteCodesQuery.data && inviteCodesQuery.data.length > 0 ? (
+                    <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-gray-50">
@@ -393,6 +394,7 @@ export default function AdminInvites() {
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-gray-500">
                       <KeyRound className="w-16 h-16 mx-auto mb-4 opacity-30" />
@@ -419,6 +421,7 @@ export default function AdminInvites() {
                       <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
                     </div>
                   ) : pendingUsersQuery.data && pendingUsersQuery.data.length > 0 ? (
+                    <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-gray-50">
@@ -475,6 +478,7 @@ export default function AdminInvites() {
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-gray-500">
                       <Clock className="w-16 h-16 mx-auto mb-4 opacity-30" />
