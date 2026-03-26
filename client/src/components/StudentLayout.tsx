@@ -110,8 +110,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       label: "Estudos",
       items: [
         { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths" },
-        { icon: FileText, label: "Exercícios", path: "/student-exercises" },
-        { icon: ClipboardList, label: "Atividades", path: "/student/activities" },
+        { icon: FileText, label: "Exercícios da Trilha", path: "/student-exercises" },
+        { icon: ClipboardList, label: "Atividades de Sala", path: "/student/activities" },
       ],
     },
     {
