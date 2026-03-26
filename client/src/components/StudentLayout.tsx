@@ -20,7 +20,9 @@ import {
   PenLine,
   ClipboardList,
   ClipboardCheck,
-  Smartphone
+  Smartphone,
+  BookMarked,
+  Activity
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -109,27 +111,22 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       items: [
         { icon: Map, label: "Trilhas de Aprendizagem", path: "/student-learning-paths" },
         { icon: FileText, label: "Exercícios", path: "/student-exercises" },
-      ],
-    },
-    {
-      label: "Ferramentas",
-      items: [
-        { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts", badge: unseenAnswersCount },
-        { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
+        { icon: ClipboardList, label: "Atividades", path: "/student/activities" },
       ],
     },
     {
       label: "Avaliações",
       items: [
         { icon: ClipboardCheck, label: "Provas", path: "/student/assessments" },
-        { icon: FileText, label: "Minhas Atividades", path: "/student/activities" },
+        { icon: BarChart3, label: "Estatísticas", path: "/student/statistics" },
+        { icon: BookMarked, label: "Boletim", path: "/student/grade-book" },
       ],
     },
     {
-      label: "Meu Progresso",
+      label: "Suporte",
       items: [
-        { icon: BarChart3, label: "Estatísticas", path: "/student/statistics" },
-        { icon: ClipboardList, label: "Boletim", path: "/student/grade-book" },
+        { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts", badge: unseenAnswersCount },
+        { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
       ],
     },
   ];
@@ -260,7 +257,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           {/* Bottom Actions */}
           {renderBottomActions()}
           <div className="py-1.5 text-center border-t border-border">
-            <p className="text-[10px] text-muted-foreground/40 select-none">FlowEdu v5.5.0</p>
+            <p className="text-[10px] text-muted-foreground/40 select-none">FlowEdu v5.6.0</p>
           </div>
         </div>
       </aside>
@@ -324,7 +321,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           {/* Bottom Actions */}
           {renderBottomActions(true)}
           <div className="py-1.5 text-center border-t border-border">
-            <p className="text-[10px] text-muted-foreground/40 select-none">FlowEdu v5.5.0</p>
+            <p className="text-[10px] text-muted-foreground/40 select-none">FlowEdu v5.6.0</p>
           </div>
         </div>
       </aside>
