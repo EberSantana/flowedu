@@ -278,7 +278,7 @@ export default function AssessmentsManager() {
           </div>
 
           {/* Estatísticas rápidas */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <ClipboardList className="h-5 w-5 text-blue-600" />
@@ -309,18 +309,21 @@ export default function AssessmentsManager() {
           </div>
 
           <Tabs defaultValue="assessments">
-            <TabsList className="grid w-full grid-cols-3 max-w-xl">
-              <TabsTrigger value="assessments" className="flex items-center gap-2">
-                <ClipboardList className="h-4 w-4" />
-                Provas ({assessments?.length ?? 0})
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="assessments" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+                <ClipboardList className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span>Provas</span>
+                <span className="hidden sm:inline">({assessments?.length ?? 0})</span>
               </TabsTrigger>
-              <TabsTrigger value="exercises" className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                Exercícios ({exercises?.length ?? 0})
+              <TabsTrigger value="exercises" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+                <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span>Exercícios</span>
+                <span className="hidden sm:inline">({exercises?.length ?? 0})</span>
               </TabsTrigger>
-              <TabsTrigger value="activities" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Atividades de Sala
+              <TabsTrigger value="activities" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
+                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Atividades de Sala</span>
+                <span className="sm:hidden">Atividades</span>
               </TabsTrigger>
             </TabsList>
 

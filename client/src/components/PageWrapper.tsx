@@ -10,7 +10,7 @@ export default function PageWrapper({ children, className = '' }: PageWrapperPro
   const { isCompact } = useSidebarContext();
   
   return (
-    <div className={`${className} ${isCompact ? 'lg:ml-16' : 'lg:ml-64'} transition-all duration-300`}>
+    <div className={`${className} ${isCompact ? 'lg:ml-16' : 'lg:ml-64'} transition-all duration-300 pt-14 lg:pt-0`}>
       {children}
     </div>
   );
