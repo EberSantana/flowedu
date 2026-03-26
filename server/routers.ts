@@ -8353,7 +8353,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         const individualResults = await Promise.all(
           studentIds.map(async (sid: number) => {
             const res = await db_instance.execute(
-              sql`SELECT id, CONCAT(COALESCE(firstName,''), ' ', COALESCE(lastName,''), ' ', COALESCE(fullName,'')) as name, fullName, registrationNumber FROM students WHERE id = ${sid} LIMIT 1`
+              sql`SELECT id, fullName as name, fullName, registrationNumber FROM students WHERE id = ${sid} LIMIT 1`
             ) as any[];
             return ((res[0] as any[]) || [])[0];
           })

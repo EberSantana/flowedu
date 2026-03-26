@@ -1,0 +1,10 @@
+{
+  "query": "SHOW TABLES LIKE 'students'; SELECT id, firstName, lastName, fullName, registrationNumber FROM student_enrollments LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE 'students'; SELECT id, firstName, lastName, fullName, registrationNumber FROM student_enrollments LIMIT 3;",
+  "returncode": 1,
+  "logs": [
+    "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (students)",
+    "students",
+    "ERROR 1054 (42S22) at line 1: Unknown column 'firstname' in 'field list'"
+  ]
+}
