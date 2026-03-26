@@ -55,6 +55,9 @@ export default function Calendar() {
   const [exportEventTypes, setExportEventTypes] = useState<string[]>(["holiday", "commemorative", "school_event", "personal"]);
   const [isExporting, setIsExporting] = useState(false);
 
+  // Estado para visualizar detalhes de evento
+  const [viewingEvent, setViewingEvent] = useState<any>(null);
+
   // Estados para atualização anual
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [updateYear, setUpdateYear] = useState<number>(new Date().getFullYear() - 1);
@@ -388,12 +391,22 @@ export default function Calendar() {
   };
 
   const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
-    setFormData({
-      ...formData,
-      eventDate: date.toISOString().split('T')[0],
-    });
-    setIsDialogOpen(true);
+    const dayEvts = getDayEvents(date);
+    if (dayEvts.length === 1) {
+      // Se há exatamente 1 evento, abre direto o modal de detalhes
+      setViewingEvent(dayEvts[0]);
+    } else if (dayEvts.length > 1) {
+      // Se há múltiplos eventos, abre modal de detalhes do primeiro (lista)
+      setViewingEvent({ _multiple: true, _date: date, _events: dayEvts });
+    } else {
+      // Sem eventos: abre form de criação
+      setSelectedDate(date);
+      setFormData({
+        ...formData,
+        eventDate: date.toISOString().split('T')[0],
+      });
+      setIsDialogOpen(true);
+    }
   };
 
   const previousMonth = () => {
@@ -632,8 +645,9 @@ export default function Calendar() {
                         return (
                           <div
                             key={event.id}
-                            className="p-3 rounded-lg border-l-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                            className="p-3 rounded-lg border-l-4 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                             style={{ borderLeftColor: eventType.dotColor }}
+                            onClick={() => setViewingEvent(event)}
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1 min-w-0">
@@ -652,7 +666,7 @@ export default function Calendar() {
                                   </p>
                                 )}
                               </div>
-                              <div className="flex flex-col gap-1">
+                              <div className="flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
                                   <Button
                                     size="icon"
                                     variant="ghost"
@@ -1103,6 +1117,114 @@ export default function Calendar() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      {/* Modal de Detalhes do Evento */}
+      <Dialog open={!!viewingEvent} onOpenChange={(open) => !open && setViewingEvent(null)}>
+        <DialogContent className="max-w-md">
+          {viewingEvent && !viewingEvent._multiple ? (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-4 h-4 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: EVENT_TYPES[viewingEvent.eventType as keyof typeof EVENT_TYPES]?.dotColor || '#6b7280' }}
+                  />
+                  <DialogTitle className="text-lg">{viewingEvent.title}</DialogTitle>
+                </div>
+                <DialogDescription asChild>
+                  <div className="space-y-1 pt-1">
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium text-white ${
+                      EVENT_TYPES[viewingEvent.eventType as keyof typeof EVENT_TYPES]?.color || 'bg-gray-500'
+                    }`}>
+                      {EVENT_TYPES[viewingEvent.eventType as keyof typeof EVENT_TYPES]?.label || viewingEvent.eventType}
+                    </span>
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 py-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CalendarDays className="w-4 h-4" />
+                  <span>
+                    {(() => {
+                      const { day, month, year } = parseDateStr(viewingEvent.eventDate);
+                      return `${day} de ${MONTHS[month]} de ${year}`;
+                    })()}
+                  </span>
+                </div>
+                {viewingEvent.description && (
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <p className="text-sm text-foreground whitespace-pre-wrap">{viewingEvent.description}</p>
+                  </div>
+                )}
+                {viewingEvent.isRecurring ? (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Clock className="w-3 h-3" /> Evento recorrente
+                  </p>
+                ) : null}
+              </div>
+              <DialogFooter className="gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setViewingEvent(null);
+                    handleEdit(viewingEvent);
+                  }}
+                  className="gap-1"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> Editar
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    setViewingEvent(null);
+                    handleDelete(viewingEvent.id);
+                  }}
+                  className="gap-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Excluir
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setViewingEvent(null)}>
+                  Fechar
+                </Button>
+              </DialogFooter>
+            </>
+          ) : viewingEvent?._multiple ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>
+                  {viewingEvent._events.length} eventos em {viewingEvent._date.getDate()} de {MONTHS[viewingEvent._date.getMonth()]}
+                </DialogTitle>
+                <DialogDescription>Clique em um evento para ver os detalhes</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 py-2 max-h-80 overflow-y-auto">
+                {viewingEvent._events.map((evt: any) => {
+                  const evtType = EVENT_TYPES[evt.eventType as keyof typeof EVENT_TYPES];
+                  return (
+                    <button
+                      key={evt.id}
+                      onClick={() => setViewingEvent(evt)}
+                      className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: evtType?.dotColor }} />
+                        <span className="font-medium text-sm">{evt.title}</span>
+                      </div>
+                      {evt.description && (
+                        <p className="text-xs text-muted-foreground mt-1 ml-5 line-clamp-1">{evt.description}</p>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" size="sm" onClick={() => setViewingEvent(null)}>Fechar</Button>
+              </DialogFooter>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
       </PageWrapper>
     </>
   );

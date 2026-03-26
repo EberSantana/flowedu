@@ -38,7 +38,8 @@ import {
   MessageCircle,
   Mail,
   Send,
-  ClipboardList
+  ClipboardList,
+  ClipboardCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -176,11 +177,6 @@ const teacherNavCategories: NavCategory[] = [
     icon: <FolderOpen className="h-5 w-5" />,
     items: [
       {
-        label: "Atividades em Sala",
-        icon: <ClipboardList className="h-5 w-5" />,
-        href: "/activities",
-      },
-      {
         label: "Trilhas de Aprendizagem",
         icon: <Route className="h-5 w-5" />,
         href: "/learning-paths",
@@ -194,6 +190,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Banco de Provas e Exercícios",
         icon: <ClipboardList className="h-5 w-5" />,
         href: "/assessments-manager",
+      },
+      {
+        label: "Atividades em Sala",
+        icon: <ClipboardCheck className="h-5 w-5" />,
+        href: "/activities",
       },
     ],
   },

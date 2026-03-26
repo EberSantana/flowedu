@@ -200,7 +200,7 @@ export default function TeacherGradePanel() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Selecionar Disciplina — Turma */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Disciplina</label>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Disciplina / Turma</label>
                   <select
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={selectedCombo}
@@ -209,10 +209,10 @@ export default function TeacherGradePanel() {
                       setSearchTerm("");
                     }}
                   >
-                    <option value="">Selecione uma disciplina...</option>
+                    <option value="">Selecione disciplina e turma...</option>
                     {combinations?.map((c) => (
                       <option key={`${c.subjectId}-${c.classId}`} value={`${c.subjectId}-${c.classId}`}>
-                        {c.subjectName}
+                        {c.subjectName}{c.className ? ` — ${c.className}` : ""}
                       </option>
                     ))}
                   </select>
@@ -320,6 +320,27 @@ export default function TeacherGradePanel() {
               {/* Tabela de notas */}
               <Card>
                 <CardContent className="pt-6">
+                  {/* Cabeçalho com disciplina e turma */}
+                  {(() => {
+                    const combo = combinations?.find(c => `${c.subjectId}-${c.classId}` === selectedCombo);
+                    return combo ? (
+                      <div className="flex items-center gap-3 mb-4 pb-4 border-b">
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="w-4 h-4 text-primary" />
+                          <span className="font-semibold text-foreground">{combo.subjectName}</span>
+                        </div>
+                        {combo.className && (
+                          <>
+                            <span className="text-muted-foreground">—</span>
+                            <Badge variant="secondary" className="gap-1">
+                              <GraduationCap className="w-3 h-3" />
+                              {combo.className}
+                            </Badge>
+                          </>
+                        )}
+                      </div>
+                    ) : null;
+                  })()}
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
