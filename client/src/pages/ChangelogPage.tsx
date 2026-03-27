@@ -23,9 +23,36 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.29.0",
+    version: "5.30.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Configurações de IA: suporte a 5 provedores com chaves manuais",
+    changes: [
+      {
+        type: "feature",
+        text: "Adicionados provedores OpenAI (ChatGPT) e Anthropic (Claude) nas Configurações de IA — agora são 5 provedores disponíveis: Groq, OpenAI, Anthropic, Gemini e Manus AI",
+      },
+      {
+        type: "feature",
+        text: "Cada provedor tem seu próprio campo de chave de API com botão mostrar/ocultar, indicador de status (configurada/não configurada) e link direto para obter a chave",
+      },
+      {
+        type: "feature",
+        text: "Modelos disponíveis por provedor: Groq (Llama 3.3 70B, Mixtral), OpenAI (GPT-4o, GPT-4o Mini, GPT-3.5), Anthropic (Claude 3.5 Sonnet, Haiku, Opus), Gemini (1.5 Pro, Flash, 2.0)",
+      },
+      {
+        type: "improvement",
+        text: "Testar Conexão agora funciona para todos os 5 provedores, incluindo verificação real da chave via API",
+      },
+      {
+        type: "improvement",
+        text: "Informações de preço de cada provedor exibidas diretamente na tela para facilitar a escolha",
+      },
+    ],
+  },
+  {
+    version: "5.29.0",
+    date: "27/03/2026",
     highlight: "Correção crítica: nomes de alunos nas listas de pendentes",
     changes: [
       {

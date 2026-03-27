@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import {
   Bot, Key, Zap, BarChart3, Clock, CheckCircle2, XCircle,
   RefreshCw, Trash2, Eye, EyeOff, Activity, AlertCircle,
-  Cpu, ArrowLeft, TrendingUp, DollarSign, Database,
+  Cpu, ArrowLeft, TrendingUp, DollarSign, Database, ExternalLink,
 } from "lucide-react";
 
 const featureNames: Record<string, string> = {
@@ -53,21 +53,108 @@ const featureNames: Record<string, string> = {
   other: "Outros",
 };
 
-const modelsByProvider: Record<string, { value: string; label: string }[]> = {
-  groq: [
-    { value: "llama-3.3-70b-versatile", label: "Llama 3.3 70B (Recomendado)" },
-    { value: "llama-3.1-8b-instant", label: "Llama 3.1 8B (Rápido)" },
-    { value: "mixtral-8x7b-32768", label: "Mixtral 8x7B" },
-    { value: "gemma2-9b-it", label: "Gemma 2 9B" },
-  ],
-  gemini: [
-    { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
-    { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash (Rápido)" },
-  ],
-  manus: [
-    { value: "manus-default", label: "Manus AI (Padrão)" },
-  ],
-};
+type Provider = "groq" | "gemini" | "openai" | "anthropic" | "manus";
+
+const PROVIDERS: {
+  id: Provider;
+  label: string;
+  emoji: string;
+  color: string;
+  badgeColor: string;
+  keyPlaceholder: string;
+  keyPrefix: string;
+  docsUrl: string;
+  docsLabel: string;
+  pricingNote: string;
+  models: { value: string; label: string }[];
+}[] = [
+  {
+    id: "groq",
+    label: "Groq",
+    emoji: "🟠",
+    color: "orange",
+    badgeColor: "bg-orange-100 text-orange-800 border-orange-200",
+    keyPlaceholder: "gsk_...",
+    keyPrefix: "gsk_",
+    docsUrl: "https://console.groq.com",
+    docsLabel: "console.groq.com",
+    pricingNote: "Plano gratuito: 14.400 req/dia · Llama 3.3 70B: $0,59/1M tokens",
+    models: [
+      { value: "llama-3.3-70b-versatile", label: "Llama 3.3 70B (Recomendado)" },
+      { value: "llama-3.1-8b-instant", label: "Llama 3.1 8B (Rápido)" },
+      { value: "mixtral-8x7b-32768", label: "Mixtral 8x7B" },
+      { value: "gemma2-9b-it", label: "Gemma 2 9B" },
+    ],
+  },
+  {
+    id: "openai",
+    label: "OpenAI (ChatGPT)",
+    emoji: "🟢",
+    color: "green",
+    badgeColor: "bg-green-100 text-green-800 border-green-200",
+    keyPlaceholder: "sk-...",
+    keyPrefix: "sk-",
+    docsUrl: "https://platform.openai.com/api-keys",
+    docsLabel: "platform.openai.com",
+    pricingNote: "GPT-4o: $2,50/1M tokens entrada · GPT-4o-mini: $0,15/1M tokens",
+    models: [
+      { value: "gpt-4o", label: "GPT-4o (Mais capaz)" },
+      { value: "gpt-4o-mini", label: "GPT-4o Mini (Rápido e barato)" },
+      { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+      { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo (Econômico)" },
+    ],
+  },
+  {
+    id: "anthropic",
+    label: "Anthropic (Claude)",
+    emoji: "🟤",
+    color: "amber",
+    badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+    keyPlaceholder: "sk-ant-...",
+    keyPrefix: "sk-ant-",
+    docsUrl: "https://console.anthropic.com",
+    docsLabel: "console.anthropic.com",
+    pricingNote: "Claude 3.5 Sonnet: $3/1M tokens entrada · Claude 3 Haiku: $0,25/1M tokens",
+    models: [
+      { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet (Mais capaz)" },
+      { value: "claude-3-5-haiku-20241022", label: "Claude 3.5 Haiku (Rápido)" },
+      { value: "claude-3-opus-20240229", label: "Claude 3 Opus (Premium)" },
+      { value: "claude-3-haiku-20240307", label: "Claude 3 Haiku (Econômico)" },
+    ],
+  },
+  {
+    id: "gemini",
+    label: "Google Gemini",
+    emoji: "🔵",
+    color: "blue",
+    badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
+    keyPlaceholder: "AIza...",
+    keyPrefix: "AIza",
+    docsUrl: "https://aistudio.google.com",
+    docsLabel: "aistudio.google.com",
+    pricingNote: "Gemini 1.5 Flash: gratuito até 1M tokens/min · Pro: $3,50/1M tokens",
+    models: [
+      { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro (Mais capaz)" },
+      { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash (Rápido)" },
+      { value: "gemini-2.0-flash", label: "Gemini 2.0 Flash (Novo)" },
+    ],
+  },
+  {
+    id: "manus",
+    label: "Manus AI",
+    emoji: "🟣",
+    color: "purple",
+    badgeColor: "bg-purple-100 text-purple-800 border-purple-200",
+    keyPlaceholder: "Automático (sem chave necessária)",
+    keyPrefix: "",
+    docsUrl: "https://manus.im",
+    docsLabel: "manus.im",
+    pricingNote: "Incluído na plataforma Manus — sem custo adicional",
+    models: [
+      { value: "manus-default", label: "Manus AI (Padrão)" },
+    ],
+  },
+];
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -77,21 +164,27 @@ function formatNumber(n: number): string {
 
 const providerColors: Record<string, string> = {
   groq: "bg-orange-100 text-orange-800 border-orange-200",
+  openai: "bg-green-100 text-green-800 border-green-200",
+  anthropic: "bg-amber-100 text-amber-800 border-amber-200",
   gemini: "bg-blue-100 text-blue-800 border-blue-200",
   manus: "bg-purple-100 text-purple-800 border-purple-200",
 };
 
 export default function AISettingsPage() {
   const [period, setPeriod] = useState<"7d" | "30d" | "90d" | "all">("30d");
-  const [showGroqKey, setShowGroqKey] = useState(false);
-  const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [groqApiKey, setGroqApiKey] = useState("");
-  const [geminiApiKey, setGeminiApiKey] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState<"groq" | "gemini" | "manus">("groq");
+  const [selectedProvider, setSelectedProvider] = useState<Provider>("groq");
   const [selectedModel, setSelectedModel] = useState("llama-3.3-70b-versatile");
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [clearDays, setClearDays] = useState(90);
+
+  // Chaves de API — uma por provedor
+  const [apiKeys, setApiKeys] = useState<Record<Provider, string>>({
+    groq: "", gemini: "", openai: "", anthropic: "", manus: "",
+  });
+  const [showKey, setShowKey] = useState<Record<Provider, boolean>>({
+    groq: false, gemini: false, openai: false, anthropic: false, manus: false,
+  });
 
   const { data: settings, refetch: refetchSettings } = trpc.aiSettings.getSettings.useQuery();
   const { data: stats, isLoading: loadingStats, refetch: refetchStats } = trpc.aiSettings.getUsageStats.useQuery({ period });
@@ -113,22 +206,25 @@ export default function AISettingsPage() {
 
   useEffect(() => {
     if (settings) {
-      setSelectedProvider((settings.provider as any) || "groq");
+      setSelectedProvider((settings.provider as Provider) || "groq");
       setSelectedModel(settings.model || "llama-3.3-70b-versatile");
     }
   }, [settings]);
 
   useEffect(() => {
-    const models = modelsByProvider[selectedProvider];
-    if (models?.length > 0) setSelectedModel(models[0].value);
+    const providerDef = PROVIDERS.find(p => p.id === selectedProvider);
+    if (providerDef?.models?.length) setSelectedModel(providerDef.models[0].value);
+    setTestResult(null);
   }, [selectedProvider]);
 
   const handleSaveSettings = () => {
     saveSettingsMut.mutate({
       provider: selectedProvider,
       model: selectedModel,
-      groqApiKey: groqApiKey || undefined,
-      geminiApiKey: geminiApiKey || undefined,
+      groqApiKey: apiKeys.groq || undefined,
+      geminiApiKey: apiKeys.gemini || undefined,
+      openaiApiKey: apiKeys.openai || undefined,
+      anthropicApiKey: apiKeys.anthropic || undefined,
     });
   };
 
@@ -137,9 +233,31 @@ export default function AISettingsPage() {
     setTestResult(null);
     testConnectionMut.mutate({
       provider: selectedProvider,
-      apiKey: selectedProvider === "groq" ? groqApiKey || undefined : selectedProvider === "gemini" ? geminiApiKey || undefined : undefined,
+      apiKey: selectedProvider !== "manus" ? (apiKeys[selectedProvider] || undefined) : undefined,
     });
   };
+
+  // Verifica se um provedor tem chave configurada
+  const hasKey = (pid: Provider): boolean => {
+    if (!settings) return false;
+    if (pid === "groq") return !!settings.hasGroqKey;
+    if (pid === "gemini") return !!settings.hasGeminiKey;
+    if (pid === "openai") return !!(settings as any).hasOpenaiKey;
+    if (pid === "anthropic") return !!(settings as any).hasAnthropicKey;
+    if (pid === "manus") return true;
+    return false;
+  };
+
+  const getKeyPreview = (pid: Provider): string | null => {
+    if (!settings) return null;
+    if (pid === "groq") return settings.groqApiKeyPreview ?? null;
+    if (pid === "gemini") return settings.geminiApiKeyPreview ?? null;
+    if (pid === "openai") return (settings as any).openaiApiKeyPreview ?? null;
+    if (pid === "anthropic") return (settings as any).anthropicApiKeyPreview ?? null;
+    return null;
+  };
+
+  const currentProviderDef = PROVIDERS.find(p => p.id === selectedProvider)!;
 
   const chartData = (() => {
     if (!stats?.daily || stats.daily.length === 0) return null;
@@ -154,18 +272,14 @@ export default function AISettingsPage() {
           data: stats.daily.map((d: any) => d.calls),
           borderColor: "rgb(99, 102, 241)",
           backgroundColor: "rgba(99, 102, 241, 0.1)",
-          fill: true,
-          tension: 0.4,
-          yAxisID: "y",
+          fill: true, tension: 0.4, yAxisID: "y",
         },
         {
           label: "Tokens",
           data: stats.daily.map((d: any) => d.tokens),
           borderColor: "rgb(34, 197, 94)",
           backgroundColor: "rgba(34, 197, 94, 0.1)",
-          fill: true,
-          tension: 0.4,
-          yAxisID: "y1",
+          fill: true, tension: 0.4, yAxisID: "y1",
         },
       ],
     };
@@ -210,43 +324,42 @@ export default function AISettingsPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge className={providerColors[settings.provider] || "bg-gray-100 text-gray-800"}>
                     <Activity className="h-3 w-3 mr-1" />
-                    {settings.provider?.toUpperCase() || "GROQ"}
+                    {settings.provider?.toUpperCase() || "GROQ"} ativo
                   </Badge>
-                  {settings.hasGroqKey ? (
-                    <Badge className="bg-green-100 text-green-800 border-green-200">
-                      <CheckCircle2 className="h-3 w-3 mr-1" /> Chave configurada
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-red-100 text-red-800 border-red-200">
-                      <XCircle className="h-3 w-3 mr-1" /> Sem chave API
-                    </Badge>
-                  )}
                 </div>
               )}
             </div>
           </div>
 
-          {/* ==================== SEÇÃO 1: CONFIGURAÇÕES ==================== */}
+          {/* ==================== SEÇÃO 1: PROVEDOR E MODELO ==================== */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
-            {/* Coluna esquerda: Provedor e Modelo */}
+
+            {/* Coluna esquerda: Seleção de provedor e modelo */}
             <div className="lg:col-span-2">
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-5">
                     <Cpu className="w-5 h-5 text-gray-700" />
-                    <h2 className="text-lg font-semibold text-gray-900">Provedor e Modelo</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">Provedor Ativo</h2>
                   </div>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label>Provedor de IA</Label>
-                      <Select value={selectedProvider} onValueChange={(v) => setSelectedProvider(v as any)}>
+                      <Select value={selectedProvider} onValueChange={(v) => setSelectedProvider(v as Provider)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="groq">🟠 Groq (Recomendado)</SelectItem>
-                          <SelectItem value="gemini">🔵 Google Gemini</SelectItem>
-                          <SelectItem value="manus">🟣 Manus AI</SelectItem>
+                          {PROVIDERS.map(p => (
+                            <SelectItem key={p.id} value={p.id}>
+                              <span className="flex items-center gap-2">
+                                {p.emoji} {p.label}
+                                {hasKey(p.id) && p.id !== "manus" && (
+                                  <span className="text-xs text-green-600 font-medium">✓</span>
+                                )}
+                              </span>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -257,13 +370,21 @@ export default function AISettingsPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {modelsByProvider[selectedProvider]?.map((m) => (
+                          {currentProviderDef?.models.map((m) => (
                             <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="pt-2">
+
+                    {/* Preço do provedor selecionado */}
+                    <div className="flex items-start gap-2 p-3 rounded-lg bg-gray-50 border border-gray-200">
+                      <AlertCircle className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-gray-600">{currentProviderDef?.pricingNote}</p>
+                    </div>
+
+                    {/* Testar conexão */}
+                    <div className="pt-1">
                       <Button
                         variant="outline"
                         className="w-full"
@@ -285,75 +406,7 @@ export default function AISettingsPage() {
                         </div>
                       )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
 
-            {/* Coluna direita: Chaves de API */}
-            <div className="lg:col-span-3">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-5">
-                    <Key className="w-5 h-5 text-gray-700" />
-                    <h2 className="text-lg font-semibold text-gray-900">Chaves de API</h2>
-                  </div>
-                  <div className="space-y-5">
-                    {/* Groq API Key */}
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <span className="text-orange-500">●</span> Chave API Groq
-                        {settings?.hasGroqKey && (
-                          <Badge className="bg-green-100 text-green-700 text-xs">Configurada</Badge>
-                        )}
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          type={showGroqKey ? "text" : "password"}
-                          placeholder={settings?.hasGroqKey ? `${settings.groqApiKeyPreview}••••••••••••••••` : "gsk_..."}
-                          value={groqApiKey}
-                          onChange={(e) => setGroqApiKey(e.target.value)}
-                          className="font-mono text-sm"
-                        />
-                        <Button variant="ghost" size="icon" onClick={() => setShowGroqKey(!showGroqKey)}>
-                          {showGroqKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        Obtenha em: <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">console.groq.com</a>
-                      </p>
-                    </div>
-                    {/* Gemini API Key */}
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <span className="text-blue-500">●</span> Chave API Gemini
-                        {settings?.hasGeminiKey && (
-                          <Badge className="bg-green-100 text-green-700 text-xs">Configurada</Badge>
-                        )}
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          type={showGeminiKey ? "text" : "password"}
-                          placeholder={settings?.hasGeminiKey ? `${settings.geminiApiKeyPreview}••••••••••••••••` : "AIza..."}
-                          value={geminiApiKey}
-                          onChange={(e) => setGeminiApiKey(e.target.value)}
-                          className="font-mono text-sm"
-                        />
-                        <Button variant="ghost" size="icon" onClick={() => setShowGeminiKey(!showGeminiKey)}>
-                          {showGeminiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        Obtenha em: <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">aistudio.google.com</a>
-                      </p>
-                    </div>
-                    {/* Aviso de preços */}
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
-                      <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-amber-700">
-                        <strong>Groq — Plano gratuito:</strong> 14.400 req/dia · 500K tokens/min · Llama 3.3 70B: $0,59/1M tokens entrada
-                      </p>
-                    </div>
                     {/* Botão salvar */}
                     <Button
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white"
@@ -366,6 +419,86 @@ export default function AISettingsPage() {
                         <><CheckCircle2 className="h-4 w-4 mr-2" /> Salvar Configurações</>
                       )}
                     </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Coluna direita: Chaves de API — todos os provedores */}
+            <div className="lg:col-span-3">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-5">
+                    <Key className="w-5 h-5 text-gray-700" />
+                    <h2 className="text-lg font-semibold text-gray-900">Chaves de API</h2>
+                    <span className="text-xs text-gray-400 ml-1">— configure cada provedor individualmente</span>
+                  </div>
+                  <div className="space-y-5">
+                    {PROVIDERS.filter(p => p.id !== "manus").map((prov) => (
+                      <div key={prov.id} className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          <span>{prov.emoji}</span>
+                          <span className="font-medium">{prov.label}</span>
+                          {hasKey(prov.id) ? (
+                            <Badge className="bg-green-100 text-green-700 text-xs border-green-200">
+                              <CheckCircle2 className="h-3 w-3 mr-1" /> Configurada
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-gray-100 text-gray-500 text-xs border-gray-200">
+                              Não configurada
+                            </Badge>
+                          )}
+                        </Label>
+                        <div className="flex gap-2">
+                          <Input
+                            type={showKey[prov.id] ? "text" : "password"}
+                            placeholder={
+                              hasKey(prov.id)
+                                ? `${getKeyPreview(prov.id) ?? ""}••••••••••••••••`
+                                : prov.keyPlaceholder
+                            }
+                            value={apiKeys[prov.id]}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, [prov.id]: e.target.value }))}
+                            className="font-mono text-sm"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowKey(prev => ({ ...prev, [prov.id]: !prev[prov.id] }))}
+                          >
+                            {showKey[prov.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                          Obtenha em:
+                          <a
+                            href={prov.docsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline flex items-center gap-0.5"
+                          >
+                            {prov.docsLabel}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </p>
+                      </div>
+                    ))}
+
+                    {/* Manus AI — sem chave */}
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <span>🟣</span>
+                        <span className="font-medium">Manus AI</span>
+                        <Badge className="bg-purple-100 text-purple-700 text-xs border-purple-200">
+                          <CheckCircle2 className="h-3 w-3 mr-1" /> Automático
+                        </Badge>
+                      </Label>
+                      <div className="p-3 rounded-lg bg-purple-50 border border-purple-200">
+                        <p className="text-xs text-purple-700">
+                          O Manus AI está sempre disponível sem necessidade de chave de API. Incluído na plataforma.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -407,7 +540,6 @@ export default function AISettingsPage() {
                 </div>
               ) : stats ? (
                 <>
-                  {/* Cards de resumo */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div className="p-4 rounded-lg bg-indigo-50 border border-indigo-100">
                       <div className="flex items-center gap-2 mb-1">
@@ -440,14 +572,15 @@ export default function AISettingsPage() {
                         <TrendingUp className="h-4 w-4 text-purple-600" />
                         <span className="text-xs font-medium text-purple-700">Taxa de Sucesso</span>
                       </div>
-                      <p className="text-2xl font-bold text-purple-900">{stats.totalCalls > 0 ? ((stats.successCalls / stats.totalCalls) * 100).toFixed(1) : "0.0"}%</p>
+                      <p className="text-2xl font-bold text-purple-900">
+                        {stats.totalCalls > 0 ? ((stats.successCalls / stats.totalCalls) * 100).toFixed(1) : "0.0"}%
+                      </p>
                       <p className="text-xs text-purple-600 mt-1">
                         {stats.successCalls} ok · {stats.errorCalls} erros
                       </p>
                     </div>
                   </div>
 
-                  {/* Gráfico de linha */}
                   {chartData && stats.totalCalls > 0 && (
                     <div className="mb-6">
                       <h3 className="text-sm font-semibold text-gray-600 mb-3">Evolução Diária</h3>
@@ -457,7 +590,6 @@ export default function AISettingsPage() {
                     </div>
                   )}
 
-                  {/* Uso por feature */}
                   {stats.byFeature && stats.byFeature.length > 0 && (
                     <div>
                       <h3 className="text-sm font-semibold text-gray-600 mb-3">Uso por Funcionalidade</h3>

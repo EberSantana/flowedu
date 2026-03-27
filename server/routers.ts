@@ -11778,22 +11778,29 @@ Retorne em formato JSON com estrutura:
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem acessar configurações de IA' });
       }
       const dbConn = await getDb();
-      if (!dbConn) return { id: null, provider: 'groq', model: 'llama-3.3-70b-versatile', isActive: true, groqApiKeyPreview: null, geminiApiKeyPreview: null, hasGroqKey: false, hasGeminiKey: false };
-      const rows = await dbConn.execute(sql`SELECT id, provider, model, isActive, updatedAt, CASE WHEN groqApiKey IS NOT NULL AND groqApiKey != '' THEN LEFT(groqApiKey, 8) ELSE NULL END as groqApiKeyPreview, CASE WHEN geminiApiKey IS NOT NULL AND geminiApiKey != '' THEN LEFT(geminiApiKey, 8) ELSE NULL END as geminiApiKeyPreview FROM ai_settings LIMIT 1`) as any[];
+      if (!dbConn) return { id: null, provider: 'groq', model: 'llama-3.3-70b-versatile', isActive: true, groqApiKeyPreview: null, geminiApiKeyPreview: null, openaiApiKeyPreview: null, anthropicApiKeyPreview: null, hasGroqKey: false, hasGeminiKey: false, hasOpenaiKey: false, hasAnthropicKey: false };
+      const rows = await dbConn.execute(sql`SELECT id, provider, model, isActive, updatedAt,
+        CASE WHEN groqApiKey IS NOT NULL AND groqApiKey != '' THEN LEFT(groqApiKey, 8) ELSE NULL END as groqApiKeyPreview,
+        CASE WHEN geminiApiKey IS NOT NULL AND geminiApiKey != '' THEN LEFT(geminiApiKey, 8) ELSE NULL END as geminiApiKeyPreview,
+        CASE WHEN openaiApiKey IS NOT NULL AND openaiApiKey != '' THEN LEFT(openaiApiKey, 8) ELSE NULL END as openaiApiKeyPreview,
+        CASE WHEN anthropicApiKey IS NOT NULL AND anthropicApiKey != '' THEN LEFT(anthropicApiKey, 8) ELSE NULL END as anthropicApiKeyPreview
+        FROM ai_settings LIMIT 1`) as any[];
       const rowList = (rows[0] as any[]) || [];
       if (!rowList || rowList.length === 0) {
-        return { id: null, provider: 'groq', model: 'llama-3.3-70b-versatile', isActive: true, groqApiKeyPreview: null, geminiApiKeyPreview: null, hasGroqKey: false, hasGeminiKey: false };
+        return { id: null, provider: 'groq', model: 'llama-3.3-70b-versatile', isActive: true, groqApiKeyPreview: null, geminiApiKeyPreview: null, openaiApiKeyPreview: null, anthropicApiKeyPreview: null, hasGroqKey: false, hasGeminiKey: false, hasOpenaiKey: false, hasAnthropicKey: false };
       }
       const row = rowList[0];
-      return { ...row, hasGroqKey: !!row.groqApiKeyPreview, hasGeminiKey: !!row.geminiApiKeyPreview };
+      return { ...row, hasGroqKey: !!row.groqApiKeyPreview, hasGeminiKey: !!row.geminiApiKeyPreview, hasOpenaiKey: !!row.openaiApiKeyPreview, hasAnthropicKey: !!row.anthropicApiKeyPreview };
     }),
     // Salvar configurações de IA
     saveSettings: protectedProcedure
       .input(z.object({
-        provider: z.enum(['groq', 'gemini', 'manus']),
+        provider: z.enum(['groq', 'gemini', 'openai', 'anthropic', 'manus']),
         model: z.string().min(1),
         groqApiKey: z.string().optional(),
         geminiApiKey: z.string().optional(),
+        openaiApiKey: z.string().optional(),
+        anthropicApiKey: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') {
@@ -11803,26 +11810,28 @@ Retorne em formato JSON com estrutura:
         if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco de dados não disponível' });
         const existingRows = await dbConn.execute(sql`SELECT id FROM ai_settings LIMIT 1`) as any[];
         const existing = (existingRows[0] as any[]) || [];
+        // Monta SET dinâmico: sempre atualiza provider e model; só atualiza chaves se fornecidas
         if (existing && existing.length > 0) {
           const existingId = existing[0].id;
-          if (input.groqApiKey && input.groqApiKey !== '' && input.geminiApiKey && input.geminiApiKey !== '') {
-            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, groqApiKey = ${input.groqApiKey}, geminiApiKey = ${input.geminiApiKey}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
-          } else if (input.groqApiKey && input.groqApiKey !== '') {
-            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, groqApiKey = ${input.groqApiKey}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
-          } else if (input.geminiApiKey && input.geminiApiKey !== '') {
-            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, geminiApiKey = ${input.geminiApiKey}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
-          } else {
-            await dbConn.execute(sql`UPDATE ai_settings SET provider = ${input.provider}, model = ${input.model}, updatedBy = ${ctx.user.id} WHERE id = ${existingId}`);
-          }
+          await dbConn.execute(sql`UPDATE ai_settings SET
+            provider = ${input.provider},
+            model = ${input.model},
+            groqApiKey = CASE WHEN ${input.groqApiKey || ''} != '' THEN ${input.groqApiKey || null} ELSE groqApiKey END,
+            geminiApiKey = CASE WHEN ${input.geminiApiKey || ''} != '' THEN ${input.geminiApiKey || null} ELSE geminiApiKey END,
+            openaiApiKey = CASE WHEN ${input.openaiApiKey || ''} != '' THEN ${input.openaiApiKey || null} ELSE openaiApiKey END,
+            anthropicApiKey = CASE WHEN ${input.anthropicApiKey || ''} != '' THEN ${input.anthropicApiKey || null} ELSE anthropicApiKey END,
+            updatedBy = ${ctx.user.id}
+            WHERE id = ${existingId}`);
         } else {
-          await dbConn.execute(sql`INSERT INTO ai_settings (provider, model, groqApiKey, geminiApiKey, updatedBy) VALUES (${input.provider}, ${input.model}, ${input.groqApiKey || null}, ${input.geminiApiKey || null}, ${ctx.user.id})`);
+          await dbConn.execute(sql`INSERT INTO ai_settings (provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey, updatedBy)
+            VALUES (${input.provider}, ${input.model}, ${input.groqApiKey || null}, ${input.geminiApiKey || null}, ${input.openaiApiKey || null}, ${input.anthropicApiKey || null}, ${ctx.user.id})`);
         }
         return { success: true };
       }),
     // Testar conexão com a API de IA
     testConnection: protectedProcedure
       .input(z.object({
-        provider: z.enum(['groq', 'gemini', 'manus']),
+        provider: z.enum(['groq', 'gemini', 'openai', 'anthropic', 'manus']),
         apiKey: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -11844,11 +11853,50 @@ Retorne em formato JSON com estrutura:
             }
             const data = await response.json() as any;
             return { success: true, message: 'Conexão com Groq estabelecida com sucesso!', model: (data as any).model || 'llama-3.3-70b-versatile' };
+          } else if (input.provider === 'openai') {
+            const apiKey = input.apiKey;
+            if (!apiKey) throw new Error('Chave API OpenAI não configurada');
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: 'Responda apenas: OK' }], max_tokens: 5 }),
+            });
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({})) as any;
+              throw new Error((err as any)?.error?.message || `HTTP ${response.status}`);
+            }
+            return { success: true, message: 'Conexão com OpenAI estabelecida com sucesso!', model: 'gpt-4o-mini' };
+          } else if (input.provider === 'anthropic') {
+            const apiKey = input.apiKey;
+            if (!apiKey) throw new Error('Chave API Anthropic não configurada');
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+              method: 'POST',
+              headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
+              body: JSON.stringify({ model: 'claude-3-haiku-20240307', messages: [{ role: 'user', content: 'Responda apenas: OK' }], max_tokens: 5 }),
+            });
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({})) as any;
+              throw new Error((err as any)?.error?.message || `HTTP ${response.status}`);
+            }
+            return { success: true, message: 'Conexão com Anthropic (Claude) estabelecida com sucesso!', model: 'claude-3-haiku' };
+          } else if (input.provider === 'gemini') {
+            const apiKey = input.apiKey;
+            if (!apiKey) throw new Error('Chave API Gemini não configurada');
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: [{ text: 'Responda apenas: OK' }] }] }),
+            });
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({})) as any;
+              throw new Error((err as any)?.error?.message || `HTTP ${response.status}`);
+            }
+            return { success: true, message: 'Conexão com Google Gemini estabelecida com sucesso!', model: 'gemini-1.5-flash' };
           } else if (input.provider === 'manus') {
             await invokeLLM({ messages: [{ role: 'user', content: 'Responda apenas: OK' }] });
             return { success: true, message: 'Conexão com Manus AI estabelecida com sucesso!', model: 'manus-default' };
           } else {
-            throw new Error('Provedor Gemini ainda não suportado nesta versão');
+            throw new Error('Provedor não reconhecido');
           }
         } catch (error: any) {
           return { success: false, message: (error as any).message || 'Erro ao testar conexão', model: null };

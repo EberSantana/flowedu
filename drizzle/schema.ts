@@ -2802,9 +2802,11 @@ export type InsertAiUsageLog = typeof aiUsageLogs.$inferInsert;
 // ============================================================
 export const aiSettings = mysqlTable("ai_settings", {
   id: int("id").autoincrement().primaryKey(),
-  provider: varchar("provider", { length: 50 }).default("groq").notNull(), // groq, gemini, manus
+  provider: varchar("provider", { length: 50 }).default("groq").notNull(), // groq, gemini, openai, anthropic, manus
   groqApiKey: text("groqApiKey"),
   geminiApiKey: text("geminiApiKey"),
+  openaiApiKey: text("openaiApiKey"),
+  anthropicApiKey: text("anthropicApiKey"),
   model: varchar("model", { length: 100 }).default("llama-3.3-70b-versatile").notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
