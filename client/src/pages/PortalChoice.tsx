@@ -97,7 +97,7 @@ export default function PortalChoice() {
           </span>
         </div>
         <div className="hidden md:flex items-center gap-2">
-          <Link href="/help" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
+          <Link href="/ajuda" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
             Central de Ajuda
           </Link>
           <Link href="/novidades" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
@@ -189,7 +189,7 @@ export default function PortalChoice() {
               </p>
 
               {/* Tags */}
-              <div className="flex flex-wrap justify-center gap-2 relative z-10">
+              <div className="flex flex-nowrap justify-center gap-2 relative z-10">
                 {[
                   { icon: <BookOpen className="w-3 h-3" />, label: "Materiais" },
                   { icon: <TrendingUp className="w-3 h-3" />, label: "Progresso" },
@@ -306,7 +306,7 @@ export default function PortalChoice() {
             <span>LGPD Compliant</span>
           </div>
           <p className="text-xs" style={{ color: "#4a5568" }}>
-            v5.36.0 · Março 2026 · © 2026 FlowEdu — Onde a educação flui
+            v5.38.0 · Março 2026 · © 2026 FlowEdu — Onde a educação flui
           </p>
         </div>
       </main>

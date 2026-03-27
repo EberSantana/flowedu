@@ -23,9 +23,19 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.37.0",
+    version: "5.38.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Tags do Portal do Aluno em linha única e Central de Ajuda/Novidades acessíveis sem login",
+    changes: [
+      { type: "fix", text: "Portal do Aluno: tags Materiais, Progresso e Exercícios agora ficam na mesma linha que o Portal do Professor (flex-nowrap)" },
+      { type: "fix", text: "Link 'Central de Ajuda' na topbar da tela de entrada corrigido para /ajuda (rota pública correta)" },
+      { type: "improvement", text: "Central de Ajuda e Novidades acessíveis diretamente pela topbar sem necessidade de login" },
+    ]
+  },
+  {
+    version: "5.37.0",
+    date: "27/03/2026",
     highlight: "Login dark/tech, busca na Central de Ajuda e filtro disciplina+turma no Relatório de Trilhas",
     changes: [
       {
