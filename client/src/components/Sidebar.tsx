@@ -701,17 +701,21 @@ export default function Sidebar() {
                       <button
                         onClick={() => {
                           setIsMobileMenuOpen(false);
+                          localStorage.setItem('flowedu_seen_version', '5.31.0');
                           window.location.href = '/novidades';
                         }}
-                        className="p-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200 group"
+                        className="relative p-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200 group"
                       >
                         <span className="inline-block transition-transform duration-200 group-hover:scale-110">
                           <Sparkles className="h-4 w-4" />
                         </span>
+                        {localStorage.getItem('flowedu_seen_version') !== '5.31.0' && (
+                          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-background" />
+                        )}
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
-                      <p>Novidades</p>
+                      <p>Novidades — v5.31.0 disponível!</p>
                     </TooltipContent>
                   </Tooltip>
               
@@ -770,12 +774,18 @@ export default function Sidebar() {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
+                      localStorage.setItem('flowedu_seen_version', '5.31.0');
                       window.location.href = '/novidades';
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200"
                   >
                     <Sparkles className="h-4 w-4" />
                     <span className="text-sm">Novidades</span>
+                    {localStorage.getItem('flowedu_seen_version') !== '5.31.0' && (
+                      <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
+                        Novo
+                      </span>
+                    )}
                   </button>
                   
                   <ThemeSelector
