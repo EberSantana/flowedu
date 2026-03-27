@@ -3712,15 +3712,15 @@ JSON (descrições MAX 15 chars):
               let studentQuery;
               if (assessment.classId) {
                 studentQuery = dbConn.execute(sql`
-                  SELECT DISTINCT s.id as studentId FROM students s
+                  SELECT DISTINCT s.userId FROM students s
                   JOIN student_class_enrollments sce ON sce.studentId = s.id
-                  WHERE sce.classId = ${assessment.classId} AND sce.status = 'active'
+                  WHERE sce.classId = ${assessment.classId} AND sce.status = 'active' AND s.userId IS NOT NULL
                 `);
               } else {
                 studentQuery = dbConn.execute(sql`
-                  SELECT DISTINCT s.id as studentId FROM students s
+                  SELECT DISTINCT s.userId FROM students s
                   JOIN subjectEnrollments se ON se.studentId = s.id
-                  WHERE se.subjectId = ${assessment.subjectId} AND se.status = 'active'
+                  WHERE se.subjectId = ${assessment.subjectId} AND se.status = 'active' AND s.userId IS NOT NULL
                 `);
               }
               const studentRows = await studentQuery;
@@ -3730,7 +3730,7 @@ JSON (descrições MAX 15 chars):
                 await dbConn.execute(sql`
                   INSERT INTO notifications (userId, type, title, message, link, relatedId, relatedType, isRead, createdAt)
                   VALUES (
-                    ${student.studentId},
+                    ${student.userId},
                     'assessment_published',
                     ${'📝 Nova Prova Disponível'},
                     ${`A prova "${assessment.title}" foi publicada e está disponível para você.`},
@@ -6647,9 +6647,10 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         
         // Criar notificação para cada aluno matriculado
         for (const student of enrolledStudents) {
+          if (!student.userId) continue; // Pular alunos sem conta de usuário
           try {
             await db.createNotification({
-              userId: student.studentId,
+              userId: student.userId,
               type: 'new_announcement',
               title: input.isImportant ? `🚨 Aviso Importante: ${input.title}` : `📢 Novo Aviso: ${input.title}`,
               message: `${subject?.name || 'Disciplina'}: ${input.message.substring(0, 100)}${input.message.length > 100 ? '...' : ''}`,
