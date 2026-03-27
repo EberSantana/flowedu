@@ -277,13 +277,19 @@ export default function TeacherLogin() {
               <Label className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
                 E-mail Institucional
               </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: "rgba(255,255,255,0.3)" }} />
-                <Input
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <input
                   type="email"
                   placeholder="professor@escola.edu.br"
-                  className="pl-11 h-12 text-white placeholder:text-white/30 border-white/10 focus:border-teal-400/50 focus-visible:ring-teal-400/20"
-                  style={{ background: "rgba(255,255,255,0.05)" }}
+                  className="w-full h-12 rounded-lg pl-11 pr-4 text-sm outline-none transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "white",
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.4)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loginMutation.isPending || isBlocked}
@@ -305,13 +311,19 @@ export default function TeacherLogin() {
                   </span>
                 </Link>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: "rgba(255,255,255,0.3)" }} />
-                <Input
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-11 pr-11 h-12 text-white placeholder:text-white/30 border-white/10 focus:border-teal-400/50 focus-visible:ring-teal-400/20"
-                  style={{ background: "rgba(255,255,255,0.05)" }}
+                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  className="w-full h-12 rounded-lg pl-11 pr-11 text-sm outline-none transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "white",
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.4)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loginMutation.isPending || isBlocked}
@@ -320,7 +332,7 @@ export default function TeacherLogin() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  className="absolute right-3 transition-colors z-10"
                   style={{ color: "rgba(255,255,255,0.3)" }}
                   tabIndex={-1}
                 >

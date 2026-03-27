@@ -7719,8 +7719,10 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
               id: attempt.id,
               attemptNumber: attempt.attemptNumber,
               score: attempt.score,
-              correctAnswers: attempt.correctAnswers,
-              totalQuestions: attempt.totalQuestions,
+              // correctAnswers e totalQuestions não existem na tabela de tentativas;
+              // usar os valores calculados a partir das respostas detalhadas
+              correctAnswers: results?.correctCount ?? 0,
+              totalQuestions: results?.totalQuestions ?? 0,
               submittedAt: attempt.completedAt || attempt.startedAt,
               status: attempt.status,
               responses: results?.questions || []

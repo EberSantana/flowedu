@@ -255,7 +255,7 @@ export default function PortalChoice() {
             </p>
 
             {/* Tags */}
-            <div className="flex flex-wrap justify-center gap-2 relative z-10">
+            <div className="flex flex-nowrap justify-center gap-2 relative z-10">
               {[
                 { icon: <BookOpen className="w-3 h-3" />, label: "Disciplinas" },
                 { icon: <Users className="w-3 h-3" />, label: "Turmas" },
