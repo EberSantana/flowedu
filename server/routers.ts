@@ -13,7 +13,7 @@ import { ENV } from "./_core/env";
 import { sdk } from "./_core/sdk";
 import { createSessionToken as createStandaloneSession } from "./_core/auth-standalone";
 import { TRPCError } from "@trpc/server";
-import { invokeLLM } from "./_core/llm";
+import { invokeLLM, invalidateAISettingsCache } from './_core/llm';
 import { sendPasswordResetEmail } from './_core/email';
 import { emailRouter } from './email-router';
 import { activitiesRouter } from './activities-router';
@@ -11826,6 +11826,7 @@ Retorne em formato JSON com estrutura:
           await dbConn.execute(sql`INSERT INTO ai_settings (provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey, updatedBy)
             VALUES (${input.provider}, ${input.model}, ${input.groqApiKey || null}, ${input.geminiApiKey || null}, ${input.openaiApiKey || null}, ${input.anthropicApiKey || null}, ${ctx.user.id})`);
         }
+        invalidateAISettingsCache();
         return { success: true };
       }),
     // Testar conexão com a API de IA

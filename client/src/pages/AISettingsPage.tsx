@@ -217,7 +217,18 @@ export default function AISettingsPage() {
     setTestResult(null);
   }, [selectedProvider]);
 
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
+    // Identificar quais chaves foram preenchidas agora
+    const keysToValidate: Provider[] = (['groq', 'gemini', 'openai', 'anthropic'] as Provider[]).filter(p => apiKeys[p]?.trim());
+    
+    // Marcar como "validando" os provedores com chave nova
+    if (keysToValidate.length > 0) {
+      const newStatus = { ...keyValidationStatus };
+      keysToValidate.forEach(p => { newStatus[p] = 'validating'; });
+      setKeyValidationStatus(newStatus);
+    }
+    
+    // Salvar primeiro
     saveSettingsMut.mutate({
       provider: selectedProvider,
       model: selectedModel,
@@ -226,6 +237,20 @@ export default function AISettingsPage() {
       openaiApiKey: apiKeys.openai || undefined,
       anthropicApiKey: apiKeys.anthropic || undefined,
     });
+    
+    // Validar cada chave nova em paralelo
+    if (keysToValidate.length > 0) {
+      await Promise.allSettled(keysToValidate.map(async (p) => {
+        try {
+          const result = await testConnectionMut.mutateAsync({ provider: p, apiKey: apiKeys[p] });
+          setKeyValidationStatus(prev => ({ ...prev, [p]: result.success ? 'valid' : 'invalid' }));
+          setKeyValidationMsg(prev => ({ ...prev, [p]: result.message }));
+        } catch (err: any) {
+          setKeyValidationStatus(prev => ({ ...prev, [p]: 'invalid' }));
+          setKeyValidationMsg(prev => ({ ...prev, [p]: err.message || 'Chave inválida' }));
+        }
+      }));
+    }
   };
 
   const handleTestConnection = () => {
@@ -240,6 +265,9 @@ export default function AISettingsPage() {
   // Estado de verificação manual de chaves
   const [checkingKeys, setCheckingKeys] = useState(false);
   const [keyCheckResults, setKeyCheckResults] = useState<Record<string, { valid: boolean; message: string }> | null>(null);
+  // Estado de validação individual por provedor (ao salvar)
+  const [keyValidationStatus, setKeyValidationStatus] = useState<Record<Provider, 'idle' | 'validating' | 'valid' | 'invalid'>>({ groq: 'idle', gemini: 'idle', openai: 'idle', anthropic: 'idle', manus: 'idle' });
+  const [keyValidationMsg, setKeyValidationMsg] = useState<Record<Provider, string>>({ groq: '', gemini: '', openai: '', anthropic: '', manus: '' });
 
   const checkKeysMut = trpc.aiSettings.checkApiKeys.useMutation({
     onSuccess: (data: { results: { provider: string; valid: boolean; message: string }[] }) => {
@@ -497,14 +525,30 @@ export default function AISettingsPage() {
                   <div className="space-y-5">
                     {PROVIDERS.filter(p => p.id !== "manus").map((prov) => (
                       <div key={prov.id} className="space-y-2">
-                        <Label className="flex items-center gap-2">
+                        <Label className="flex items-center gap-2 flex-wrap">
                           <span>{prov.emoji}</span>
                           <span className="font-medium">{prov.label}</span>
-                          {hasKey(prov.id) ? (
+                          {keyValidationStatus[prov.id] === 'validating' && (
+                            <Badge className="bg-blue-100 text-blue-700 text-xs border-blue-200">
+                              <RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Validando...
+                            </Badge>
+                          )}
+                          {keyValidationStatus[prov.id] === 'valid' && (
+                            <Badge className="bg-green-100 text-green-700 text-xs border-green-200">
+                              <CheckCircle2 className="h-3 w-3 mr-1" /> Validada ✓
+                            </Badge>
+                          )}
+                          {keyValidationStatus[prov.id] === 'invalid' && (
+                            <Badge className="bg-red-100 text-red-700 text-xs border-red-200">
+                              <XCircle className="h-3 w-3 mr-1" /> Inválida ✗
+                            </Badge>
+                          )}
+                          {keyValidationStatus[prov.id] === 'idle' && hasKey(prov.id) && (
                             <Badge className="bg-green-100 text-green-700 text-xs border-green-200">
                               <CheckCircle2 className="h-3 w-3 mr-1" /> Configurada
                             </Badge>
-                          ) : (
+                          )}
+                          {keyValidationStatus[prov.id] === 'idle' && !hasKey(prov.id) && (
                             <Badge className="bg-gray-100 text-gray-500 text-xs border-gray-200">
                               Não configurada
                             </Badge>
@@ -530,6 +574,18 @@ export default function AISettingsPage() {
                             {showKey[prov.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </Button>
                         </div>
+                        {keyValidationStatus[prov.id] === 'invalid' && keyValidationMsg[prov.id] && (
+                          <p className="text-xs text-red-600 flex items-center gap-1">
+                            <XCircle className="h-3 w-3" />
+                            {keyValidationMsg[prov.id]}
+                          </p>
+                        )}
+                        {keyValidationStatus[prov.id] === 'valid' && (
+                          <p className="text-xs text-green-600 flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Chave válida e funcionando corretamente.
+                          </p>
+                        )}
                         <p className="text-xs text-gray-500 flex items-center gap-1">
                           Obtenha em:
                           <a

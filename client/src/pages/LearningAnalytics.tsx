@@ -34,7 +34,7 @@ export function LearningAnalytics() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Queries
-  const { data: subjects } = trpc.subjects.list.useQuery();
+  const { data: subjects } = trpc.subjects.listWithClass.useQuery();
   const { data: students, isLoading: loadingStudents } = trpc.students.list.useQuery(
     { subjectId: selectedSubject! },
     { enabled: !!selectedSubject }
@@ -252,8 +252,11 @@ export function LearningAnalytics() {
                       {subjects && subjects.length > 0 ? (
                         subjects.map((subject: any) => (
                           subject.id ? (
-                            <SelectItem key={subject.id} value={subject.id.toString()}>
-                              {subject.name}
+                            <SelectItem key={subject.filterKey || subject.id.toString()} value={subject.id.toString()}>
+                              <span className="font-medium">{subject.name}</span>
+                              {subject.className && (
+                                <span className="text-muted-foreground"> — {subject.className}</span>
+                              )}
                             </SelectItem>
                           ) : null
                         ))

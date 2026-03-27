@@ -58,8 +58,8 @@ export default function ExercisePerformanceReport() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState<any>(null);
 
-  // Buscar disciplinas do professor
-  const { data: subjects } = trpc.subjects.list.useQuery();
+  // Buscar disciplinas do professor com turmas vinculadas
+  const { data: subjects } = trpc.subjects.listWithClass.useQuery();
 
   // Buscar exercícios da disciplina selecionada
   const { data: exercises, refetch: refetchExercises } = trpc.teacherExercises.listBySubject.useQuery(
@@ -185,8 +185,11 @@ export default function ExercisePerformanceReport() {
                     </SelectTrigger>
                     <SelectContent>
                       {subjects?.map((subject: any) => (
-                        <SelectItem key={subject.id} value={subject.id.toString()}>
-                          {subject.name}
+                        <SelectItem key={subject.filterKey || subject.id.toString()} value={subject.id.toString()}>
+                          <span className="font-medium">{subject.name}</span>
+                          {subject.className && (
+                            <span className="text-muted-foreground"> — {subject.className}</span>
+                          )}
                         </SelectItem>
                       ))}
                     </SelectContent>

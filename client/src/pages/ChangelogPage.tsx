@@ -23,9 +23,47 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.32.0",
+    version: "5.35.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Filtro de disciplina vinculado à turma em Análise de IA e Relatório de Desempenho",
+    changes: [
+      {
+        type: "improvement",
+        text: "Filtro de disciplina em Análise de Aprendizado com IA agora exibe o formato 'Disciplina — Turma' (ex: Informática Básica — Turma INFW 11 - D1), facilitando a seleção quando a mesma disciplina existe em múltiplas turmas",
+      },
+      {
+        type: "improvement",
+        text: "Filtro de disciplina em Relatório de Desempenho de Exercícios também atualizado com o formato 'Disciplina — Turma' para consistência",
+      },
+    ],
+  },
+  {
+    version: "5.34.0",
+    date: "27/03/2026",
+    highlight: "Validação instantânea de chaves de API e cache de IA invalidado ao salvar",
+    changes: [
+      {
+        type: "feature",
+        text: "Ao salvar uma chave de API em Configurações de IA, o sistema testa automaticamente a chave e exibe o badge 'Validada ✓' (verde) ou 'Inválida ✗' (vermelho) imediatamente no campo correspondente",
+      },
+      {
+        type: "feature",
+        text: "Cache de configurações de IA é invalidado imediatamente ao salvar: a IA passa a usar o novo provedor/chave sem esperar os 5 minutos do cache",
+      },
+      {
+        type: "fix",
+        text: "Corrigido erro 401 Unauthorized na geração de exercícios: o sistema agora usa corretamente a chave do provedor configurado no banco em vez do fallback do ambiente",
+      },
+      {
+        type: "improvement",
+        text: "Mensagem de erro detalhada exibida abaixo do campo quando a chave é inválida, facilitando o diagnóstico do problema",
+      },
+    ],
+  },
+  {
+    version: "5.32.0",
+    date: "27/03/2026",
     highlight: "Provedor de IA dinâmico e correção de contagem de alunos nas Atividades de Sala",
     changes: [
       {
