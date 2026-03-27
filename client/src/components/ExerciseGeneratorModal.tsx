@@ -480,13 +480,13 @@ export default function ExerciseGeneratorModal({
                   <button
                     key={option.value}
                     onClick={() => setExerciseType(option.value as ExerciseType)}
-                    className={`p-5 rounded-lg border-2 transition-all flex flex-col items-center justify-center min-h-[100px] ${
+                    className={`p-3 sm:p-5 rounded-lg border-2 transition-all flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px] ${
                       exerciseType === option.value
                         ? "border-green-500 bg-green-50 shadow-md"
                         : "border-gray-200 hover:border-green-300 hover:shadow-sm"
                     }`}
                   >
-                    <option.icon className={`h-8 w-8 mb-3 ${
+                    <option.icon className={`h-6 w-6 sm:h-8 sm:w-8 mb-2 sm:mb-3 ${
                       exerciseType === option.value ? "text-green-600" : "text-gray-500"
                     }`} />
                     <div className="font-semibold text-sm text-center">{option.label}</div>

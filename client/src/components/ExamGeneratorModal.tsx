@@ -514,7 +514,7 @@ export default function ExamGeneratorModal({
                   <button
                     key={option.value}
                     onClick={() => setExamType(option.value as ExamType)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-2 sm:p-4 rounded-lg border-2 transition-all min-h-[80px] flex flex-col items-center justify-center ${
                       examType === option.value
                         ? "border-purple-500 bg-purple-50"
                         : "border-gray-200 hover:border-purple-300"

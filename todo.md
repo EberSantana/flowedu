@@ -7715,3 +7715,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## v5.21.0 - Novidades do FlowEdu atualizadas
 - [x] Adicionadas versões v5.14.0 a v5.20.0 na página de Novidades/Changelog
+
+## v5.22.0 - UX dos modais: cards mobile e indicador de scroll
+- [x] Reduzir cards de tipo nos modais de Exercícios e Prova para mobile (min-h-[80px], ícone h-6 w-6)
+- [x] Adicionar indicador de scroll com gradiente fade-out no DialogContent
