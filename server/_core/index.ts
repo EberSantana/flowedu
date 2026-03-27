@@ -251,6 +251,13 @@ async function startServer() {
     }).catch(error => {
       console.warn('[WeeklyReport] Falha ao inicializar relatório semanal:', error);
     });
+
+    // Inicializar verificador diário de chaves de API de IA
+    import('../ai-key-checker').then(({ startApiKeyCheckerJob }) => {
+      startApiKeyCheckerJob();
+    }).catch(error => {
+      console.warn('[AIKeyChecker] Falha ao inicializar verificador de chaves:', error);
+    });
   });
 }
 

@@ -237,6 +237,29 @@ export default function AISettingsPage() {
     });
   };
 
+  // Estado de verificação manual de chaves
+  const [checkingKeys, setCheckingKeys] = useState(false);
+  const [keyCheckResults, setKeyCheckResults] = useState<Record<string, { valid: boolean; message: string }> | null>(null);
+
+  const checkKeysMut = trpc.aiSettings.checkApiKeys.useMutation({
+    onSuccess: (data: { results: { provider: string; valid: boolean; message: string }[] }) => {
+      const results: Record<string, { valid: boolean; message: string }> = {};
+      (data.results || []).forEach((r) => { results[r.provider] = { valid: r.valid, message: r.message }; });
+      setKeyCheckResults(results);
+      setCheckingKeys(false);
+      const invalid = (data.results || []).filter((r) => !r.valid);
+      if (invalid.length === 0) toast.success('Todas as chaves estão válidas!');
+      else toast.error(`${invalid.length} chave(s) inválida(s) encontrada(s)`);
+    },
+    onError: (err: any) => { setCheckingKeys(false); toast.error('Erro ao verificar chaves', { description: err.message }); },
+  });
+
+  const handleCheckKeys = () => {
+    setCheckingKeys(true);
+    setKeyCheckResults(null);
+    checkKeysMut.mutate();
+  };
+
   // Verifica se um provedor tem chave configurada
   const hasKey = (pid: Provider): boolean => {
     if (!settings) return false;
@@ -428,11 +451,49 @@ export default function AISettingsPage() {
             <div className="lg:col-span-3">
               <Card>
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-5">
-                    <Key className="w-5 h-5 text-gray-700" />
-                    <h2 className="text-lg font-semibold text-gray-900">Chaves de API</h2>
-                    <span className="text-xs text-gray-400 ml-1">— configure cada provedor individualmente</span>
+                  <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+                    <div className="flex items-center gap-2">
+                      <Key className="w-5 h-5 text-gray-700" />
+                      <h2 className="text-lg font-semibold text-gray-900">Chaves de API</h2>
+                      <span className="text-xs text-gray-400 ml-1">— configure cada provedor individualmente</span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCheckKeys}
+                      disabled={checkingKeys}
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      {checkingKeys ? <RefreshCw className="h-4 w-4 mr-1 animate-spin" /> : <Activity className="h-4 w-4 mr-1" />}
+                      {checkingKeys ? 'Verificando...' : 'Verificar Chaves'}
+                    </Button>
                   </div>
+
+                  {keyCheckResults && (
+                    <div className="mb-5 p-4 rounded-lg border border-gray-200 bg-gray-50">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <Activity className="h-4 w-4" />
+                        Resultado da Verificação
+                      </h3>
+                      <div className="space-y-2">
+                        {Object.entries(keyCheckResults).map(([prov, result]) => (
+                          <div key={prov} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              {result.valid ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                              <Badge className={`text-xs ${providerColors[prov] || 'bg-gray-100 text-gray-600'}`}>{prov.toUpperCase()}</Badge>
+                            </div>
+                            <span className={`text-xs ${result.valid ? 'text-green-600' : 'text-red-600'}`}>
+                              {result.valid ? 'Válida' : result.message}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-3">
+                        ⚠️ A verificação automática diária ocorre todo dia às 7h (Manaus) e notifica o administrador em caso de falha.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-5">
                     {PROVIDERS.filter(p => p.id !== "manus").map((prov) => (
                       <div key={prov.id} className="space-y-2">
@@ -564,8 +625,8 @@ export default function AISettingsPage() {
                         <DollarSign className="h-4 w-4 text-amber-600" />
                         <span className="text-xs font-medium text-amber-700">Custo Estimado</span>
                       </div>
-                      <p className="text-2xl font-bold text-amber-900">${stats.estimatedCost?.toFixed(4)}</p>
-                      <p className="text-xs text-amber-600 mt-1">USD (Groq pricing)</p>
+                      <p className="text-2xl font-bold text-amber-900">${stats.estimatedCost?.toFixed(6)}</p>
+                      <p className="text-xs text-amber-600 mt-1">USD · custo real por provedor</p>
                     </div>
                     <div className="p-4 rounded-lg bg-purple-50 border border-purple-100">
                       <div className="flex items-center gap-2 mb-1">
@@ -611,6 +672,56 @@ export default function AISettingsPage() {
                           );
                         })}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Custo por Provedor */}
+                  {stats.byProvider && stats.byProvider.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-amber-500" />
+                        Custo por Provedor
+                      </h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-100">
+                              <th className="text-left py-2 pr-3 text-gray-500 font-medium">Provedor</th>
+                              <th className="text-right py-2 px-3 text-gray-500 font-medium">Chamadas</th>
+                              <th className="text-right py-2 px-3 text-gray-500 font-medium">Tokens</th>
+                              <th className="text-right py-2 px-3 text-gray-500 font-medium">Entrada/M</th>
+                              <th className="text-right py-2 px-3 text-gray-500 font-medium">Saída/M</th>
+                              <th className="text-right py-2 pl-3 text-gray-500 font-medium">Custo (USD)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {stats.byProvider.map((p: any) => (
+                              <tr key={p.provider} className="border-b border-gray-50 hover:bg-gray-50">
+                                <td className="py-2 pr-3">
+                                  <Badge className={`text-xs ${providerColors[p.provider] || 'bg-gray-100 text-gray-600'}`}>
+                                    {p.provider?.toUpperCase()}
+                                  </Badge>
+                                  <span className="ml-2 text-xs text-gray-500">{p.pricingLabel}</span>
+                                </td>
+                                <td className="text-right py-2 px-3 text-gray-700">{formatNumber(p.calls)}</td>
+                                <td className="text-right py-2 px-3 text-gray-700">{formatNumber(p.tokens)}</td>
+                                <td className="text-right py-2 px-3 text-gray-500 text-xs">{p.inputPricePerM === 0 ? 'grátis' : `$${p.inputPricePerM?.toFixed(2)}`}</td>
+                                <td className="text-right py-2 px-3 text-gray-500 text-xs">{p.outputPricePerM === 0 ? 'grátis' : `$${p.outputPricePerM?.toFixed(2)}`}</td>
+                                <td className="text-right py-2 pl-3 font-semibold text-amber-700">
+                                  {p.estimatedCost === 0 ? <span className="text-green-600 font-medium">incluso</span> : `$${p.estimatedCost?.toFixed(6)}`}
+                                </td>
+                              </tr>
+                            ))}
+                            <tr className="bg-amber-50">
+                              <td colSpan={5} className="py-2 pr-3 font-semibold text-amber-800 text-right">Total</td>
+                              <td className="text-right py-2 pl-3 font-bold text-amber-900">${stats.estimatedCost?.toFixed(6)}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">
+                        * Preços de referência: Groq $0,59/$0,79 · OpenAI $2,50/$10,00 · Anthropic $3,00/$15,00 · Gemini $1,25/$5,00 por milhão de tokens
+                      </p>
                     </div>
                   )}
 

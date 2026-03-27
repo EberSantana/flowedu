@@ -11921,14 +11921,34 @@ Retorne em formato JSON com estrutura:
           ? await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[]
           : await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[];
         const byProviderRes = days
-          ? await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY provider`) as any[]
-          : await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY provider`) as any[];
+          ? await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY provider`) as any[]
+          : await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY provider`) as any[];
         const dailyRes = days
           ? await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[]
           : await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[];
         const recentRes = await dbConn.execute(sql`SELECT id, provider, model, feature, promptTokens, completionTokens, totalTokens, success, errorMessage, createdAt FROM ai_usage_logs ORDER BY createdAt DESC LIMIT 20`) as any[];
         const total = ((totalsRes[0] as any[])[0]) || {};
-        const estimatedCost = ((total.promptTokens || 0) * 0.00000059) + ((total.completionTokens || 0) * 0.00000079);
+        // Tabela de preços por provedor (USD por 1M tokens)
+        const PRICING: Record<string, { input: number; output: number; label: string }> = {
+          groq:      { input: 0.59,  output: 0.79,  label: 'Groq (Llama 3.3 70B)' },
+          openai:    { input: 2.50,  output: 10.00, label: 'OpenAI (GPT-4o)' },
+          anthropic: { input: 3.00,  output: 15.00, label: 'Anthropic (Claude 3.5 Sonnet)' },
+          gemini:    { input: 1.25,  output: 5.00,  label: 'Google Gemini (1.5 Pro)' },
+          manus:     { input: 0.00,  output: 0.00,  label: 'Manus AI (incluído)' },
+        };
+        const calcCost = (provider: string, promptTok: number, completionTok: number): number => {
+          const p = PRICING[provider] || PRICING.groq;
+          return ((promptTok || 0) * p.input / 1_000_000) + ((completionTok || 0) * p.output / 1_000_000);
+        };
+        const byProviderRaw = (byProviderRes[0] as any[]) || [];
+        const byProviderWithCost = byProviderRaw.map((row: any) => ({
+          ...row,
+          estimatedCost: parseFloat(calcCost(row.provider, row.promptTokens || 0, row.completionTokens || 0).toFixed(6)),
+          pricingLabel: (PRICING[row.provider] || PRICING.groq).label,
+          inputPricePerM: (PRICING[row.provider] || PRICING.groq).input,
+          outputPricePerM: (PRICING[row.provider] || PRICING.groq).output,
+        }));
+        const totalCost = byProviderWithCost.reduce((acc: number, row: any) => acc + (row.estimatedCost || 0), 0);
         return {
           totalCalls: total.totalCalls || 0,
           totalTokens: total.totalTokens || 0,
@@ -11936,9 +11956,9 @@ Retorne em formato JSON com estrutura:
           completionTokens: total.completionTokens || 0,
           successCalls: total.successCalls || 0,
           errorCalls: total.errorCalls || 0,
-          estimatedCost: parseFloat(estimatedCost.toFixed(4)),
+          estimatedCost: parseFloat(totalCost.toFixed(6)),
           byFeature: (byFeatureRes[0] as any[]) || [],
-          byProvider: (byProviderRes[0] as any[]) || [],
+          byProvider: byProviderWithCost,
           daily: (dailyRes[0] as any[]) || [],
           recent: (recentRes[0] as any[]) || [],
         };
@@ -11955,6 +11975,36 @@ Retorne em formato JSON com estrutura:
         const days = input.olderThanDays;
         await dbConn.execute(sql`DELETE FROM ai_usage_logs WHERE createdAt < DATE_SUB(NOW(), INTERVAL ${days} DAY)`);
         return { success: true };
+      }),
+    // Verificar chaves de API manualmente
+    checkApiKeys: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas administradores podem verificar chaves de API' });
+        }
+        const dbConn2 = await getDb();
+        if (!dbConn2) return { results: [] as { provider: string; valid: boolean; message: string }[] };
+        let settings2: any = null;
+        try {
+          const rows2 = await dbConn2.execute(sql`SELECT groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey FROM ai_settings LIMIT 1`) as any[];
+          const rowList2 = (rows2[0] as any[]) || [];
+          if (rowList2.length > 0) settings2 = rowList2[0];
+        } catch { return { results: [] as { provider: string; valid: boolean; message: string }[] }; }
+        if (!settings2) return { results: [] as { provider: string; valid: boolean; message: string }[] };
+        const results2: { provider: string; valid: boolean; message: string }[] = [];
+        const testFetch2 = async (provider: string, url: string, opts: RequestInit): Promise<{ provider: string; valid: boolean; message: string }> => {
+          try {
+            const r = await fetch(url, opts);
+            if (r.ok) return { provider, valid: true, message: 'OK' };
+            const errData = await r.json().catch(() => ({})) as any;
+            return { provider, valid: false, message: errData?.error?.message || errData?.message || `HTTP ${r.status}` };
+          } catch (e: any) { return { provider, valid: false, message: e.message || 'Erro de rede' }; }
+        };
+        if (settings2.groqApiKey) results2.push(await testFetch2('groq', 'https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Authorization': `Bearer ${settings2.groqApiKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: 'OK' }], max_tokens: 3 }) }));
+        if (settings2.openaiApiKey) results2.push(await testFetch2('openai', 'https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Authorization': `Bearer ${settings2.openaiApiKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: 'OK' }], max_tokens: 3 }) }));
+        if (settings2.anthropicApiKey) results2.push(await testFetch2('anthropic', 'https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'x-api-key': settings2.anthropicApiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-3-haiku-20240307', messages: [{ role: 'user', content: 'OK' }], max_tokens: 3 }) }));
+        if (settings2.geminiApiKey) results2.push(await testFetch2('gemini', `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${settings2.geminiApiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: 'OK' }] }] }) }));
+        return { results: results2 };
       }),
   }),
 });

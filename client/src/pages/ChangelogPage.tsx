@@ -23,9 +23,36 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.30.0",
+    version: "5.31.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Indicador de custo por provedor e alerta automático de chaves inválidas",
+    changes: [
+      {
+        type: "feature",
+        text: "Tabela de Custo por Provedor no painel Uso & Gastos: exibe chamadas, tokens, preço de entrada/saída e custo estimado separado para cada provedor (Groq, OpenAI, Anthropic, Gemini, Manus)",
+      },
+      {
+        type: "feature",
+        text: "Custo calculado com tabela de preços real por milhão de tokens: Groq $0,59/$0,79 · OpenAI $2,50/$10,00 · Anthropic $3,00/$15,00 · Gemini $1,25/$5,00 · Manus AI incluído",
+      },
+      {
+        type: "feature",
+        text: "Botão 'Verificar Chaves' no card de Chaves de API: testa cada chave configurada em tempo real e exibe o resultado (Válida / mensagem de erro) para cada provedor",
+      },
+      {
+        type: "feature",
+        text: "Verificação automática diária de chaves: job agendado todo dia às 7h (Manaus) que testa todas as chaves e envia notificação push ao administrador se alguma estiver inválida ou expirada",
+      },
+      {
+        type: "improvement",
+        text: "Card 'Custo Estimado' atualizado para exibir 6 casas decimais e refletir o custo real por provedor em vez de usar apenas o preço do Groq",
+      },
+    ],
+  },
+  {
+    version: "5.30.0",
+    date: "27/03/2026",
     highlight: "Configurações de IA: suporte a 5 provedores com chaves manuais",
     changes: [
       {
