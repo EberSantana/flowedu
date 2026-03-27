@@ -160,7 +160,10 @@ import {
   vpsAlerts,
   assessments,
   assessmentQuestions,
-  InsertAssessment,} from "../drizzle/schema";
+  InsertAssessment,
+  forumTopics,
+  forumReplies,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
 
@@ -12559,4 +12562,149 @@ export async function getLearningPathClassReport(subjectId: number, classId: num
     totalStudents: enrolledStudents.length,
     generatedAt: new Date(),
   };
+}
+
+// ============================================================
+// FÓRUM DE DISCUSSÃO
+// ============================================================
+
+export async function listForumTopics(subjectId: number, classId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions = classId
+    ? and(eq(forumTopics.subjectId, subjectId), eq(forumTopics.classId, classId))
+    : eq(forumTopics.subjectId, subjectId);
+  return db.select().from(forumTopics).where(conditions)
+    .orderBy(desc(forumTopics.isPinned), desc(forumTopics.updatedAt));
+}
+
+export async function getForumTopic(topicId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [topic] = await db.select().from(forumTopics).where(eq(forumTopics.id, topicId));
+  return topic ?? null;
+}
+
+export async function createForumTopic(data: {
+  subjectId: number; classId?: number; title: string; content: string;
+  authorType: 'teacher' | 'student'; authorUserId?: number; authorStudentId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(forumTopics).values(data);
+  return result;
+}
+
+export async function incrementForumTopicView(topicId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(forumTopics).set({ viewCount: sql`viewCount + 1` }).where(eq(forumTopics.id, topicId));
+}
+
+export async function pinForumTopic(topicId: number, isPinned: boolean) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(forumTopics).set({ isPinned }).where(eq(forumTopics.id, topicId));
+}
+
+export async function closeForumTopic(topicId: number, isClosed: boolean) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(forumTopics).set({ isClosed }).where(eq(forumTopics.id, topicId));
+}
+
+export async function deleteForumTopic(topicId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(forumReplies).where(eq(forumReplies.topicId, topicId));
+  await db.delete(forumTopics).where(eq(forumTopics.id, topicId));
+}
+
+export async function listForumReplies(topicId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(forumReplies).where(eq(forumReplies.topicId, topicId))
+    .orderBy(asc(forumReplies.createdAt));
+}
+
+export async function createForumReply(data: {
+  topicId: number; content: string;
+  authorType: 'teacher' | 'student'; authorUserId?: number; authorStudentId?: number; parentReplyId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(forumReplies).values(data);
+  await db.update(forumTopics)
+    .set({ replyCount: sql`replyCount + 1`, updatedAt: new Date() })
+    .where(eq(forumTopics.id, data.topicId));
+  return result;
+}
+
+export async function markBestAnswer(topicId: number, replyId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(forumReplies).set({ isBestAnswer: false }).where(eq(forumReplies.topicId, topicId));
+  await db.update(forumReplies).set({ isBestAnswer: true }).where(eq(forumReplies.id, replyId));
+  await db.update(forumTopics).set({ bestReplyId: replyId }).where(eq(forumTopics.id, topicId));
+}
+
+export async function deleteForumReply(replyId: number) {
+  const db = await getDb();
+  if (!db) return;
+  const [reply] = await db.select({ topicId: forumReplies.topicId }).from(forumReplies).where(eq(forumReplies.id, replyId));
+  if (reply) {
+    await db.delete(forumReplies).where(eq(forumReplies.id, replyId));
+    await db.update(forumTopics).set({ replyCount: sql`GREATEST(replyCount - 1, 0)` }).where(eq(forumTopics.id, reply.topicId));
+  }
+}
+
+// ============================================================
+// MURAL DE AVISOS (extensão)
+// ============================================================
+
+export async function listAnnouncementsForTeacher(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(announcements).where(eq(announcements.userId, userId))
+    .orderBy(desc(announcements.createdAt));
+}
+
+export async function listAnnouncementsForStudent(studentId: number, subjectIds: number[]) {
+  const db = await getDb();
+  if (!db || subjectIds.length === 0) return [];
+  return db.select({
+    id: announcements.id,
+    title: announcements.title,
+    message: announcements.message,
+    isImportant: announcements.isImportant,
+    subjectId: announcements.subjectId,
+    userId: announcements.userId,
+    createdAt: announcements.createdAt,
+    readAt: announcementReads.readAt,
+  })
+  .from(announcements)
+  .leftJoin(announcementReads, and(
+    eq(announcementReads.announcementId, announcements.id),
+    eq(announcementReads.studentId, studentId)
+  ))
+  .where(inArray(announcements.subjectId, subjectIds))
+  .orderBy(desc(announcements.isImportant), desc(announcements.createdAt));
+}
+
+export async function markAnnouncementRead(announcementId: number, studentId: number) {
+  const db = await getDb();
+  if (!db) return;
+  const [existing] = await db.select().from(announcementReads)
+    .where(and(eq(announcementReads.announcementId, announcementId), eq(announcementReads.studentId, studentId)));
+  if (!existing) {
+    await db.insert(announcementReads).values({ announcementId, studentId });
+  }
+}
+
+export async function getAnnouncementReadCount(announcementId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  const [{ count }] = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(announcementReads).where(eq(announcementReads.announcementId, announcementId));
+  return Number(count);
 }

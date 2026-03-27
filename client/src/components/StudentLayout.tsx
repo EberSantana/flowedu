@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   MessageCircle,
+  MessageSquare,
   BarChart3,
   PenLine,
   ClipboardList,
@@ -126,6 +127,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       label: "Suporte",
       items: [
         { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts", badge: unseenAnswersCount },
+        { icon: MessageSquare, label: "Fórum de Discussão", path: "/student/forum" },
         { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
       ],
     },

@@ -2814,3 +2814,48 @@ export const aiSettings = mysqlTable("ai_settings", {
 });
 export type AiSettings = typeof aiSettings.$inferSelect;
 export type InsertAiSettings = typeof aiSettings.$inferInsert;
+
+// ============================================================
+// FÓRUM DE DISCUSSÃO POR DISCIPLINA
+// ============================================================
+
+/**
+ * Tópicos do Fórum — criados por professor ou aluno dentro de uma disciplina
+ */
+export const forumTopics = mysqlTable("forum_topics", {
+  id: int("id").autoincrement().primaryKey(),
+  subjectId: int("subjectId").notNull(),        // FK para subjects
+  classId: int("classId"),                       // FK para classes (opcional — pode ser por disciplina geral)
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),             // FK para users (professor)
+  authorStudentId: int("authorStudentId"),       // FK para students (aluno)
+  isPinned: boolean("isPinned").default(false).notNull(),
+  isClosed: boolean("isClosed").default(false).notNull(), // professor pode fechar tópico
+  bestReplyId: int("bestReplyId"),               // FK para forum_replies (melhor resposta)
+  viewCount: int("viewCount").default(0).notNull(),
+  replyCount: int("replyCount").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type ForumTopic = typeof forumTopics.$inferSelect;
+export type InsertForumTopic = typeof forumTopics.$inferInsert;
+
+/**
+ * Respostas do Fórum — respostas a um tópico
+ */
+export const forumReplies = mysqlTable("forum_replies", {
+  id: int("id").autoincrement().primaryKey(),
+  topicId: int("topicId").notNull(),             // FK para forum_topics
+  content: text("content").notNull(),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),             // FK para users (professor)
+  authorStudentId: int("authorStudentId"),       // FK para students (aluno)
+  isBestAnswer: boolean("isBestAnswer").default(false).notNull(),
+  parentReplyId: int("parentReplyId"),           // para respostas aninhadas (opcional)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type ForumReply = typeof forumReplies.$inferSelect;
+export type InsertForumReply = typeof forumReplies.$inferInsert;

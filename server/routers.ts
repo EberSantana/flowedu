@@ -7944,6 +7944,13 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
 
         return Object.values(bySubject).sort((a, b) => a.subjectName.localeCompare(b.subjectName));
       }),
+    // Contar exercícios pendentes (não tentados) para tela de boas-vindas
+    getPendingCount: studentProcedure.query(async ({ ctx }) => {
+      const studentId = ctx.studentSession.studentId;
+      const exercises = await db.listAvailableExercises(studentId);
+      const pending = exercises.filter((e: any) => e.attempts === 0);
+      return { pendingCount: pending.length, totalExercises: exercises.length };
+    }),
   }),
 
   // Rotas do professor para gerenciar exercícios
@@ -12008,6 +12015,200 @@ Retorne em formato JSON com estrutura:
         if (settings2.anthropicApiKey) results2.push(await testFetch2('anthropic', 'https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'x-api-key': settings2.anthropicApiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-3-haiku-20240307', messages: [{ role: 'user', content: 'OK' }], max_tokens: 3 }) }));
         if (settings2.geminiApiKey) results2.push(await testFetch2('gemini', `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${settings2.geminiApiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: 'OK' }] }] }) }));
         return { results: results2 };
+      }),
+  }),
+
+  // ============================================================
+  // FÓRUM DE DISCUSSÃO POR DISCIPLINA
+  // ============================================================
+  forum: router({
+    // Listar tópicos de uma disciplina
+    listTopics: publicProcedure
+      .input(z.object({ subjectId: z.number(), classId: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.listForumTopics(input.subjectId, input.classId);
+      }),
+
+    // Buscar tópico com respostas
+    getTopic: publicProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ input }) => {
+        const topic = await db.getForumTopic(input.topicId);
+        if (!topic) throw new TRPCError({ code: 'NOT_FOUND', message: 'Tópico não encontrado' });
+        await db.incrementForumTopicView(input.topicId);
+        const replies = await db.listForumReplies(input.topicId);
+        return { topic, replies };
+      }),
+
+    // Criar tópico (professor)
+    createTopicAsTeacher: protectedProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        classId: z.number().optional(),
+        title: z.string().min(3).max(255),
+        content: z.string().min(10),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.createForumTopic({
+          ...input,
+          authorType: 'teacher',
+          authorUserId: ctx.user.id,
+        });
+      }),
+
+    // Criar tópico (aluno)
+    createTopicAsStudent: studentProcedure
+      .input(z.object({
+        subjectId: z.number(),
+        classId: z.number().optional(),
+        title: z.string().min(3).max(255),
+        content: z.string().min(10),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const result = await db.createForumTopic({
+          ...input,
+          authorType: 'student',
+          authorStudentId: ctx.studentSession.studentId,
+        });
+        // Notificar professor
+        try {
+          const subject = await db.getSubjectById(input.subjectId, 0);
+          if (subject?.userId) {
+            await db.createNotification({
+              userId: subject.userId,
+              type: 'new_announcement',
+              title: 'Nova dúvida no Fórum',
+              message: `Um aluno criou um novo tópico em ${subject.name}: "${input.title}"`,
+              link: `/forum/${input.subjectId}/${(result as any).insertId}`,
+            });
+          }
+        } catch {}
+        return result;
+      }),
+
+    // Responder tópico (professor)
+    replyAsTeacher: protectedProcedure
+      .input(z.object({
+        topicId: z.number(),
+        content: z.string().min(1),
+        parentReplyId: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.createForumReply({
+          ...input,
+          authorType: 'teacher',
+          authorUserId: ctx.user.id,
+        });
+      }),
+
+    // Responder tópico (aluno)
+    replyAsStudent: studentProcedure
+      .input(z.object({
+        topicId: z.number(),
+        content: z.string().min(1),
+        parentReplyId: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.createForumReply({
+          ...input,
+          authorType: 'student',
+          authorStudentId: ctx.studentSession.studentId,
+        });
+      }),
+
+    // Fixar/desafixar tópico (professor)
+    pinTopic: protectedProcedure
+      .input(z.object({ topicId: z.number(), isPinned: z.boolean() }))
+      .mutation(async ({ input }) => {
+        await db.pinForumTopic(input.topicId, input.isPinned);
+        return { success: true };
+      }),
+
+    // Fechar/abrir tópico (professor)
+    closeTopic: protectedProcedure
+      .input(z.object({ topicId: z.number(), isClosed: z.boolean() }))
+      .mutation(async ({ input }) => {
+        await db.closeForumTopic(input.topicId, input.isClosed);
+        return { success: true };
+      }),
+
+    // Marcar melhor resposta (professor)
+    markBestAnswer: protectedProcedure
+      .input(z.object({ topicId: z.number(), replyId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.markBestAnswer(input.topicId, input.replyId);
+        return { success: true };
+      }),
+
+    // Deletar tópico (professor)
+    deleteTopic: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteForumTopic(input.topicId);
+        return { success: true };
+      }),
+
+    // Deletar resposta (professor)
+    deleteReply: protectedProcedure
+      .input(z.object({ replyId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteForumReply(input.replyId);
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================
+  // MURAL DE AVISOS
+  // ============================================================
+  murals: router({
+    // Listar avisos do professor
+    listForTeacher: protectedProcedure.query(async ({ ctx }) => {
+      return db.listAnnouncementsForTeacher(ctx.user.id);
+    }),
+
+    // Criar aviso (professor)
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(3).max(255),
+        message: z.string().min(1),
+        subjectId: z.number(),
+        isImportant: z.boolean().default(false),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { announcements: ann } = await import('../drizzle/schema');
+        const [result] = await db2.insert(ann).values({ ...input, userId: ctx.user.id });
+        return result;
+      }),
+
+    // Deletar aviso (professor)
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { announcements: ann } = await import('../drizzle/schema');
+        const { eq: eqFn } = await import('drizzle-orm');
+        await db2.delete(ann).where(eqFn(ann.id, input.id));
+        return { success: true };
+      }),
+
+    // Listar avisos para aluno
+    listForStudent: studentProcedure.query(async ({ ctx }) => {
+      const studentId = ctx.studentSession.studentId;
+      // Buscar disciplinas do aluno
+      const enrollments = await db.getStudentEnrollments(studentId);
+      const subjectIds = enrollments.map((e: any) => e.subjectId).filter(Boolean) as number[];
+      return db.listAnnouncementsForStudent(studentId, subjectIds);
+    }),
+
+    // Marcar aviso como lido (aluno)
+    markRead: studentProcedure
+      .input(z.object({ announcementId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.markAnnouncementRead(input.announcementId, ctx.studentSession.studentId);
+        return { success: true };
       }),
   }),
 });

@@ -61,6 +61,7 @@ const AssessmentsManager = lazy(() => import("./pages/AssessmentsManager"));
 const AccessLogsPage = lazy(() => import("./pages/AccessLogsPage"));
 const TeacherDoubts = lazy(() => import("./pages/TeacherDoubts"));
 const TeacherGradePanel = lazy(() => import("./pages/TeacherGradePanel"));
+const TeacherForum = lazy(() => import("./pages/TeacherForum"));
 
 // Lazy loaded pages - Student Portal
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
@@ -82,6 +83,7 @@ const StudentSubmitQuestion = lazy(() => import("./pages/StudentSubmitQuestion")
 const StudentMyQuestions = lazy(() => import("./pages/StudentMyQuestions"));
 const StudentLearningJournal = lazy(() => import("./pages/StudentLearningJournal"));
 const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
+const StudentForum = lazy(() => import("./pages/StudentForum"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
 const StudentGradeBook = lazy(() => import("./pages/StudentGradeBook"));
@@ -176,6 +178,7 @@ function Router() {
           <Route path={"/questions/:id"} component={QuestionDetail} />
           <Route path={"/teacher-doubts"} component={TeacherDoubts} />
           <Route path={"/teacher-grades"} component={TeacherGradePanel} />
+          <Route path={"/teacher-forum"} component={TeacherForum} />
           <Route path={"/assessments-manager"} component={AssessmentsManager} />
 
           {/* Student Portal - lazy loaded */}
@@ -198,6 +201,7 @@ function Router() {
           <Route path={"/student/my-questions"} component={StudentMyQuestions} />
           <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
           <Route path={"/student/doubts"} component={StudentDoubts} />
+          <Route path={"/student/forum"} component={StudentForum} />
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
           <Route path={"/student/grade-book"} component={StudentGradeBook} />

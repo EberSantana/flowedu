@@ -214,6 +214,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <MessageCircle className="h-5 w-5" />,
         href: "/teacher-doubts",
       },
+      {
+        label: "Fórum de Discussão",
+        icon: <MessageSquare className="h-5 w-5" />,
+        href: "/teacher-forum",
+      },
     ],
   },
   {
