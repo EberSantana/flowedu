@@ -11,7 +11,9 @@ import {
   Copy,
   ExternalLink,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Server,
+  PlayCircle
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -63,6 +65,14 @@ export default function Help() {
       href: "/novidades",
       color: "text-amber-600",
       bgColor: "bg-amber-50",
+    },
+    {
+      title: "Guia de Instalação VPS",
+      description: "Passo a passo para hospedar o FlowEdu no servidor da sua escola com total controle dos dados",
+      icon: Server,
+      href: "/ajuda/professor#instalacao",
+      color: "text-gray-600",
+      bgColor: "bg-gray-100",
     },
   ];
 
@@ -175,9 +185,15 @@ export default function Help() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Em breve: vídeos tutoriais sobre as principais funcionalidades do sistema.
                 </p>
-                <Button variant="outline" disabled className="w-full">
-                  Em Desenvolvimento
-                </Button>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Roteiro de vídeos disponível:</p>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li className="flex items-center gap-2"><PlayCircle className="h-3 w-3 text-primary" /> Visão Geral do FlowEdu (5 min)</li>
+                    <li className="flex items-center gap-2"><PlayCircle className="h-3 w-3 text-primary" /> Criando Turmas e Disciplinas (8 min)</li>
+                    <li className="flex items-center gap-2"><PlayCircle className="h-3 w-3 text-primary" /> Gerando Exercícios com IA (6 min)</li>
+                    <li className="flex items-center gap-2"><PlayCircle className="h-3 w-3 text-primary" /> Aplicando Provas Online (7 min)</li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
 

@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowLeft, BookOpen, Users, FileText, ClipboardList, Bell, BarChart } from "lucide-react";
+import { ArrowLeft, BookOpen, Users, FileText, ClipboardList, Bell, BarChart, Brain, Upload, Server } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,13 +32,16 @@ export default function HelpProfessor() {
 
           {/* Tabs Navigation */}
           <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="turmas">Turmas</TabsTrigger>
               <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
               <TabsTrigger value="exercicios">Exercícios</TabsTrigger>
               <TabsTrigger value="provas">Provas</TabsTrigger>
+              <TabsTrigger value="atividades">Atividades</TabsTrigger>
+              <TabsTrigger value="ia">IA</TabsTrigger>
               <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
+              <TabsTrigger value="instalacao">Instalação VPS</TabsTrigger>
             </TabsList>
 
             {/* Dashboard Tab */}
@@ -547,6 +550,142 @@ export default function HelpProfessor() {
                       <li><strong>DOCX</strong> (Word) - Formato editável</li>
                       <li><strong>TXT</strong> (Texto simples) - Formato básico</li>
                     </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Atividades de Sala Tab */}
+            <TabsContent value="atividades" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Upload className="h-5 w-5 text-orange-600" />Atividades de Sala</CardTitle>
+                  <CardDescription>Publique trabalhos e receba arquivos dos alunos</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p>As <strong>Atividades de Sala</strong> permitem que você publique trabalhos e os alunos enviem arquivos (PDF, Word, PowerPoint) diretamente pelo sistema.</p>
+                  <div>
+                    <h4 className="font-semibold mb-3">Como criar uma Atividade de Sala:</h4>
+                    <ol className="space-y-2 list-decimal list-inside">
+                      <li>No menu lateral, clique em <strong>"Atividades de Sala"</strong></li>
+                      <li>Clique em <strong>"Nova Atividade"</strong></li>
+                      <li>Preencha o título, descrição e data de entrega</li>
+                      <li>Selecione a turma ou disciplina</li>
+                      <li>Defina a pontuação máxima (opcional)</li>
+                      <li>Clique em <strong>"Publicar"</strong></li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Acompanhar Entregas:</h4>
+                    <p className="text-sm text-muted-foreground mb-2">No card da atividade, você verá o botão <strong>"Alunos (X/Y enviaram)"</strong> — onde X é quantos já enviaram e Y é o total de alunos.</p>
+                    <ul className="space-y-1 list-disc list-inside text-sm">
+                      <li>Clique em <strong>"Ver Submissões"</strong> para ver todos os arquivos enviados</li>
+                      <li>Clique em cada submissão para baixar o arquivo e dar nota</li>
+                      <li>O aluno recebe a nota imediatamente após a correção</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* IA Tab */}
+            <TabsContent value="ia" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Brain className="h-5 w-5 text-purple-600" />Inteligência Artificial</CardTitle>
+                  <CardDescription>Configure e use a IA para gerar exercícios e provas automaticamente</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p>O FlowEdu possui IA integrada que gera exercícios e provas completas em segundos. Você pode escolher o provedor de IA nas Configurações.</p>
+                  <div>
+                    <h4 className="font-semibold mb-3">Provedores de IA disponíveis:</h4>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Provedor</TableHead>
+                          <TableHead>Custo</TableHead>
+                          <TableHead>Como obter a chave</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow><TableCell className="font-medium">Groq</TableCell><TableCell>Gratuito (com limites)</TableCell><TableCell>console.groq.com</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">Manus AI</TableCell><TableCell>Gratuito (integrado)</TableCell><TableCell>Sem chave necessária</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">OpenAI (ChatGPT)</TableCell><TableCell>Pago por uso</TableCell><TableCell>platform.openai.com</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">Anthropic (Claude)</TableCell><TableCell>Pago por uso</TableCell><TableCell>console.anthropic.com</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">Google Gemini</TableCell><TableCell>Gratuito (com limites)</TableCell><TableCell>aistudio.google.com</TableCell></TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Como configurar a IA:</h4>
+                    <ol className="space-y-2 list-decimal list-inside">
+                      <li>Acesse <strong>Administração → Configurações de IA</strong></li>
+                      <li>No card <strong>"Provedor e Modelo"</strong>, selecione o provedor desejado</li>
+                      <li>No card <strong>"Chaves de API"</strong>, cole a chave do provedor escolhido</li>
+                      <li>Clique em <strong>"Testar Conexão"</strong> para verificar se a chave está funcionando</li>
+                      <li>Clique em <strong>"Salvar Configurações"</strong></li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Como gerar exercícios com IA:</h4>
+                    <ol className="space-y-2 list-decimal list-inside">
+                      <li>Acesse <strong>Exercícios → Novo Exercício</strong></li>
+                      <li>Clique no botão <strong>"Gerar com IA"</strong></li>
+                      <li>Informe o tema (ex: "Frações" ou "Segunda Guerra Mundial")</li>
+                      <li>Escolha a quantidade de questões e o nível de dificuldade</li>
+                      <li>Clique em <strong>"Gerar"</strong> — em menos de 30 segundos as questões aparecem</li>
+                      <li>Revise, edite se necessário e clique em <strong>"Publicar"</strong></li>
+                    </ol>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Instalação VPS Tab */}
+            <TabsContent value="instalacao" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Server className="h-5 w-5 text-gray-600" />Instalação em Servidor Próprio (VPS)</CardTitle>
+                  <CardDescription>Guia passo a passo para hospedar o FlowEdu no servidor da sua escola</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <p className="text-sm text-amber-800"><strong>Para quem é isso?</strong> Este guia é para administradores que querem hospedar o FlowEdu no servidor da própria escola, com total controle dos dados.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Requisitos do Servidor:</h4>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Componente</TableHead>
+                          <TableHead>Requisito Mínimo</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow><TableCell className="font-medium">Sistema Operacional</TableCell><TableCell>Ubuntu 22.04 LTS</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">RAM</TableCell><TableCell>2 GB (recomendado 4 GB)</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">Armazenamento</TableCell><TableCell>20 GB SSD</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">Node.js</TableCell><TableCell>v18 ou superior</TableCell></TableRow>
+                        <TableRow><TableCell className="font-medium">Banco de Dados</TableCell><TableCell>MySQL 8.0 ou TiDB</TableCell></TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Passo a Passo de Instalação:</h4>
+                    <ol className="space-y-3 list-decimal list-inside">
+                      <li><strong>Conecte ao servidor</strong> via SSH: <code className="bg-muted px-1 rounded text-sm">ssh root@IP_DO_SERVIDOR</code></li>
+                      <li><strong>Instale o Node.js</strong>: <code className="bg-muted px-1 rounded text-sm">curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs</code></li>
+                      <li><strong>Instale o PM2</strong> (gerenciador de processos): <code className="bg-muted px-1 rounded text-sm">npm install -g pm2</code></li>
+                      <li><strong>Instale o Nginx</strong>: <code className="bg-muted px-1 rounded text-sm">sudo apt install nginx</code></li>
+                      <li><strong>Copie os arquivos</strong> do FlowEdu para <code className="bg-muted px-1 rounded text-sm">/var/www/flowedu/</code></li>
+                      <li><strong>Configure o .env</strong> com as variáveis de ambiente (DATABASE_URL, JWT_SECRET, etc.)</li>
+                      <li><strong>Inicie o servidor</strong>: <code className="bg-muted px-1 rounded text-sm">pm2 start dist/index.js --name flowedu</code></li>
+                      <li><strong>Configure o Nginx</strong> para redirecionar o domínio para a porta 3000</li>
+                      <li><strong>Instale o SSL</strong> com Certbot: <code className="bg-muted px-1 rounded text-sm">sudo certbot --nginx -d seudominio.com.br</code></li>
+                    </ol>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800"><strong>Precisa de ajuda?</strong> Entre em contato pelo e-mail <strong>ebersantana@flowedu.app</strong> para suporte na instalação.</p>
                   </div>
                 </CardContent>
               </Card>
