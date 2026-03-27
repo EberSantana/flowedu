@@ -32,6 +32,7 @@ export default function ActivitiesTab() {
   const [gradingSubmission, setGradingSubmission] = useState<any>(null);
   const [exportingActivity, setExportingActivity] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
+  const [viewingPendingActivity, setViewingPendingActivity] = useState<any>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -60,6 +61,12 @@ export default function ActivitiesTab() {
     { activityId: viewingSubmissions?.id ?? 0 },
     { enabled: !!viewingSubmissions }
   );
+  // Query: alunos pendentes por atividade
+  const { data: pendingActivityData, isLoading: loadingPendingActivity } = trpc.activities.getPendingStudentsForActivity.useQuery(
+    { activityId: viewingPendingActivity?.id ?? 0 },
+    { enabled: !!viewingPendingActivity, staleTime: 0 }
+  );
+
   const { data: exportData, isFetching: isFetchingExport } = trpc.activities.exportSubmissions.useQuery(
     { activityId: exportingActivity?.id ?? 0 },
     { enabled: !!exportingActivity }
@@ -317,6 +324,15 @@ export default function ActivitiesTab() {
                   )}
                   <div className="flex flex-col gap-1.5 mt-auto pt-2">
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setViewingPendingActivity(activity)}
+                      className="w-full text-purple-600 border-purple-200 hover:bg-purple-50 text-xs"
+                    >
+                      <Users className="mr-1.5 h-3 w-3" />
+                      Alunos ({activity.submissionCount ?? 0}/{(activity as any).totalStudents ?? 0} enviaram)
+                    </Button>
+                    <Button
                       variant="default"
                       size="sm"
                       onClick={() => setViewingSubmissions(activity)}
@@ -526,6 +542,69 @@ export default function ActivitiesTab() {
             <LoadingButton loading={gradeMutation.isPending} onClick={handleGrade} className="bg-purple-600 hover:bg-purple-700 text-white">
               Salvar Avaliação
             </LoadingButton>
+          </DialogFooter>
+        </DialogContent>
+       </Dialog>
+
+      {/* ── Dialog: Alunos Pendentes / Concluídos ─────────────────── */}
+      <Dialog open={!!viewingPendingActivity} onOpenChange={(open) => { if (!open) setViewingPendingActivity(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Participação — {viewingPendingActivity?.title}</DialogTitle>
+            <DialogDescription>
+              {loadingPendingActivity ? 'Carregando...' : `${(pendingActivityData as any)?.done?.length ?? 0} enviaram · ${(pendingActivityData as any)?.pending?.length ?? 0} pendentes · ${(pendingActivityData as any)?.total ?? 0} total`}
+            </DialogDescription>
+          </DialogHeader>
+          {loadingPendingActivity ? (
+            <div className="text-center py-8 text-muted-foreground">Carregando...</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {/* Pendentes */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-orange-400" />
+                  <span className="text-sm font-semibold text-orange-700">Faltam enviar ({(pendingActivityData as any)?.pending?.length ?? 0})</span>
+                </div>
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                  {((pendingActivityData as any)?.pending ?? []).length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic">Todos enviaram!</p>
+                  ) : (
+                    ((pendingActivityData as any)?.pending ?? []).map((s: any) => (
+                      <div key={s.studentId} className="flex items-center gap-2 p-1.5 rounded bg-orange-50 border border-orange-100">
+                        <div className="w-6 h-6 rounded-full bg-orange-200 flex items-center justify-center text-xs font-bold text-orange-700">
+                          {s.name?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <span className="text-xs text-gray-700 truncate">{s.name}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+              {/* Concluídos */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-sm font-semibold text-emerald-700">Enviaram ({(pendingActivityData as any)?.done?.length ?? 0})</span>
+                </div>
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                  {((pendingActivityData as any)?.done ?? []).length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic">Nenhum enviou ainda.</p>
+                  ) : (
+                    ((pendingActivityData as any)?.done ?? []).map((s: any) => (
+                      <div key={s.studentId} className="flex items-center gap-2 p-1.5 rounded bg-emerald-50 border border-emerald-100">
+                        <div className="w-6 h-6 rounded-full bg-emerald-200 flex items-center justify-center text-xs font-bold text-emerald-700">
+                          {s.name?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <span className="text-xs text-gray-700 truncate">{s.name}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewingPendingActivity(null)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

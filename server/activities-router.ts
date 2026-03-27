@@ -1006,4 +1006,60 @@ export const activitiesRouter = router({
         rows,
       };
     }),
+
+  // Listar alunos pendentes e concluídos para uma atividade de sala
+  getPendingStudentsForActivity: protectedProcedure
+    .input(z.object({ activityId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const dbConn = await getDb();
+      if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      // Verificar que a atividade pertence ao professor
+      const actResult = await dbConn.execute(
+        sql`SELECT id, subjectId, classId FROM activities WHERE id = ${input.activityId} AND userId = ${ctx.user.id} LIMIT 1`
+      ) as any[];
+      const actRows = (actResult[0] as any[]) || [];
+      if (actRows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Atividade não encontrada' });
+      const { subjectId, classId } = actRows[0];
+      // Buscar todos os alunos ativos (por disciplina ou por turma)
+      let studentsResult: any[];
+      if (subjectId) {
+        studentsResult = await dbConn.execute(
+          sql`SELECT s.id AS studentId, u.name
+              FROM students s
+              JOIN users u ON u.id = s.userId
+              JOIN subjectEnrollments se ON se.studentId = s.id
+              WHERE se.subjectId = ${subjectId} AND se.status = 'active'
+              ORDER BY u.name ASC`
+        ) as any[];
+      } else if (classId) {
+        studentsResult = await dbConn.execute(
+          sql`SELECT s.id AS studentId, u.name
+              FROM students s
+              JOIN users u ON u.id = s.userId
+              JOIN studentClassEnrollments sce ON sce.studentId = s.id
+              WHERE sce.classId = ${classId} AND sce.status = 'active'
+              ORDER BY u.name ASC`
+        ) as any[];
+      } else {
+        studentsResult = await dbConn.execute(
+          sql`SELECT s.id AS studentId, u.name
+              FROM students s
+              JOIN users u ON u.id = s.userId
+              WHERE s.userId = ${ctx.user.id}
+              ORDER BY u.name ASC`
+        ) as any[];
+      }
+      const allStudents: { studentId: number; name: string }[] = ((studentsResult[0] as any[]) || []).map((r: any) => ({
+        studentId: r.studentId,
+        name: r.name,
+      }));
+      // Buscar alunos que já enviaram a atividade
+      const doneResult = await dbConn.execute(
+        sql`SELECT DISTINCT studentId FROM activity_submissions WHERE activityId = ${input.activityId}`
+      ) as any[];
+      const doneIds = new Set(((doneResult[0] as any[]) || []).map((r: any) => r.studentId));
+      const done = allStudents.filter(s => doneIds.has(s.studentId));
+      const pending = allStudents.filter(s => !doneIds.has(s.studentId));
+      return { pending, done, total: allStudents.length };
+    }),
 });

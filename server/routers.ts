@@ -4119,6 +4119,54 @@ JSON (descrições MAX 15 chars):
         `);
         return (result[0] as unknown) as any[];
       }),
+
+    // Listar alunos pendentes e concluídos para uma prova
+    getPendingStudentsForAssessment: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Verificar que a prova pertence ao professor
+        const checkResult = await dbConn.execute(
+          sql`SELECT id, subjectId, classId FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        const checkRows = (checkResult[0] as any[]) || [];
+        if (checkRows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
+        const { subjectId, classId } = checkRows[0];
+        // Buscar todos os alunos ativos
+        let studentsResult: any[];
+        if (classId) {
+          studentsResult = await dbConn.execute(
+            sql`SELECT s.id AS studentId, u.name
+                FROM students s
+                JOIN users u ON u.id = s.userId
+                JOIN student_class_enrollments sce ON sce.studentId = s.id
+                WHERE sce.classId = ${classId} AND sce.status = 'active'
+                ORDER BY u.name ASC`
+          ) as any[];
+        } else {
+          studentsResult = await dbConn.execute(
+            sql`SELECT s.id AS studentId, u.name
+                FROM students s
+                JOIN users u ON u.id = s.userId
+                JOIN subjectEnrollments se ON se.studentId = s.id
+                WHERE se.subjectId = ${subjectId} AND se.status = 'active'
+                ORDER BY u.name ASC`
+          ) as any[];
+        }
+        const allStudents: { studentId: number; name: string }[] = ((studentsResult[0] as any[]) || []).map((r: any) => ({
+          studentId: r.studentId,
+          name: r.name,
+        }));
+        // Buscar alunos que já fizeram a prova (têm pelo menos uma tentativa)
+        const doneResult = await dbConn.execute(
+          sql`SELECT DISTINCT studentId FROM assessment_attempts WHERE assessmentId = ${input.assessmentId}`
+        ) as any[];
+        const doneIds = new Set(((doneResult[0] as any[]) || []).map((r: any) => r.studentId));
+        const done = allStudents.filter(s => doneIds.has(s.studentId));
+        const pending = allStudents.filter(s => !doneIds.has(s.studentId));
+        return { pending, done, total: allStudents.length };
+      }),
   }),
   // Boletim de Atividades da Trilha por Turma
   learningPathReport: router({

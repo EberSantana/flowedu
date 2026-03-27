@@ -70,6 +70,10 @@ export default function AssessmentsManager() {
   const [editMaxAttemptsId, setEditMaxAttemptsId] = useState<number | null>(null);
   const [editMaxAttemptsValue, setEditMaxAttemptsValue] = useState<string>("1");
 
+  // Estado para o modal de alunos pendentes de PROVA
+  const [viewAssessmentStudentsId, setViewAssessmentStudentsId] = useState<number | null>(null);
+  const [viewAssessmentStudentsTitle, setViewAssessmentStudentsTitle] = useState<string>("");
+
   // Estado para o modal de configurações de exercício
   const [editExerciseId, setEditExerciseId] = useState<number | null>(null);
   const [editExerciseTitle, setEditExerciseTitle] = useState<string>("");
@@ -119,6 +123,17 @@ export default function AssessmentsManager() {
     { exerciseId: editExerciseId ?? 0 },
     { 
       enabled: editExerciseId !== null && editExerciseId !== undefined && editExerciseId > 0,
+      staleTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  // Buscar alunos pendentes/concluídos para a prova selecionada
+  const { data: assessmentStudentsData, isLoading: loadingAssessmentStudents } = trpc.learningPath.getPendingStudentsForAssessment.useQuery(
+    { assessmentId: viewAssessmentStudentsId ?? 0 },
+    {
+      enabled: viewAssessmentStudentsId !== null && viewAssessmentStudentsId > 0,
       staleTime: 0,
       refetchOnMount: true,
       refetchOnWindowFocus: false,
@@ -423,6 +438,18 @@ export default function AssessmentsManager() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                              onClick={() => {
+                                setViewAssessmentStudentsId(assessment.id);
+                                setViewAssessmentStudentsTitle(assessment.title);
+                              }}
+                            >
+                              <Users className="h-4 w-4 mr-1" />
+                              Alunos
+                            </Button>
                             <Button
                               variant="outline"
                               size="sm"
@@ -861,6 +888,80 @@ export default function AssessmentsManager() {
         </AlertDialog>
 
         {/* Modal de Visualização de Questões */}
+        {/* Modal: Alunos Pendentes de Prova */}
+        <Dialog open={viewAssessmentStudentsId !== null} onOpenChange={(open) => { if (!open) { setViewAssessmentStudentsId(null); setViewAssessmentStudentsTitle(""); } }}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-purple-600" />
+                Alunos — {viewAssessmentStudentsTitle}
+              </DialogTitle>
+            </DialogHeader>
+            {loadingAssessmentStudents ? (
+              <div className="text-center py-8 text-gray-400">Carregando alunos...</div>
+            ) : !assessmentStudentsData ? (
+              <div className="text-center py-8 text-gray-400">Nenhum dado encontrado.</div>
+            ) : (
+              <div className="space-y-4">
+                {/* Resumo */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-orange-600">{assessmentStudentsData.pending.length}</p>
+                    <p className="text-xs text-orange-700 mt-1">Faltam fazer</p>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-green-600">{assessmentStudentsData.done.length}</p>
+                    <p className="text-xs text-green-700 mt-1">Concluíram</p>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-blue-600">{assessmentStudentsData.total}</p>
+                    <p className="text-xs text-blue-700 mt-1">Total</p>
+                  </div>
+                </div>
+                {/* Listas lado a lado */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Pendentes */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-orange-700 flex items-center gap-1.5 mb-2">
+                      <UserX className="h-4 w-4" /> Faltam fazer ({assessmentStudentsData.pending.length})
+                    </h4>
+                    <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                      {assessmentStudentsData.pending.length === 0 ? (
+                        <p className="text-xs text-gray-400 py-2 text-center">Todos já fizeram!</p>
+                      ) : (
+                        assessmentStudentsData.pending.map((s: any) => (
+                          <div key={s.studentId} className="flex items-center gap-2 p-2 bg-orange-50 rounded text-sm">
+                            <UserX className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />
+                            <span className="truncate text-gray-700">{s.name}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  {/* Concluídos */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-green-700 flex items-center gap-1.5 mb-2">
+                      <UserCheck className="h-4 w-4" /> Concluíram ({assessmentStudentsData.done.length})
+                    </h4>
+                    <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                      {assessmentStudentsData.done.length === 0 ? (
+                        <p className="text-xs text-gray-400 py-2 text-center">Nenhum ainda.</p>
+                      ) : (
+                        assessmentStudentsData.done.map((s: any) => (
+                          <div key={s.studentId} className="flex items-center gap-2 p-2 bg-green-50 rounded text-sm">
+                            <UserCheck className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                            <span className="truncate text-gray-700">{s.name}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={viewQuestionsId !== null} onOpenChange={(open) => !open && setViewQuestionsId(null)}>
           <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
