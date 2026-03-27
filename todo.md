@@ -7707,3 +7707,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir clique em notificações de prova no NotificationBell (não redirecionar para login do aluno)
 - [x] Adicionar notificação automática ao gerar exercícios de módulo/trilha (generateModuleExercises)
 - [x] Adicionar notificação automática ao criar atividade de trilha (assignments.create)
+
+## v5.20.0 - Correção global de modais com overflow
+- [x] Adicionado max-h-[90vh] e overflow-y-auto no componente base DialogContent
+- [x] Corrigido ExerciseGeneratorModal - scroll no step 1 com botões sempre visíveis
+- [x] Corrigido ExamGeneratorModal - scroll no step 1 com botões sempre visíveis

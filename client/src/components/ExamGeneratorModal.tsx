@@ -505,7 +505,7 @@ export default function ExamGeneratorModal({
         </DialogHeader>
 
         {!generatedExam ? (
-          <div className="space-y-6 py-4">
+          <div className="space-y-6 py-4 overflow-y-auto flex-1 min-h-0">
             {/* Tipo de Prova */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">Tipo de Questões</Label>
