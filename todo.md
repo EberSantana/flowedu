@@ -7712,3 +7712,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionado max-h-[90vh] e overflow-y-auto no componente base DialogContent
 - [x] Corrigido ExerciseGeneratorModal - scroll no step 1 com botões sempre visíveis
 - [x] Corrigido ExamGeneratorModal - scroll no step 1 com botões sempre visíveis
+
+## v5.21.0 - Novidades do FlowEdu atualizadas
+- [x] Adicionadas versões v5.14.0 a v5.20.0 na página de Novidades/Changelog

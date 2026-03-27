@@ -23,9 +23,115 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
+    version: "5.20.0",
+    date: "27/03/2026",
+    label: "Mais recente",
+    highlight: "Correção global de modais em resoluções grandes",
+    changes: [
+      {
+        type: "fix",
+        text: "Todos os modais do sistema agora têm altura máxima (90vh) e scroll automático — botões de ação nunca ficam cortados em telas grandes ou ultrawide",
+      },
+      {
+        type: "fix",
+        text: "Modal Criar Exercícios e Criar Prova: conteúdo do passo de configuração rola internamente, mantendo os botões Gerar/Próximo sempre visíveis",
+      },
+    ],
+  },
+  {
+    version: "5.19.0",
+    date: "27/03/2026",
+    highlight: "Notificações automáticas para alunos e correção do sino",
+    changes: [
+      {
+        type: "fix",
+        text: "Clique em notificações de prova/exercício no painel do professor não redireciona mais para o login do aluno — o painel fecha normalmente",
+      },
+      {
+        type: "feature",
+        text: "Alunos recebem notificação automática '📚 Novos Exercícios Disponíveis' quando exercícios de módulo/trilha são gerados com IA",
+      },
+      {
+        type: "feature",
+        text: "Alunos recebem notificação automática '📋 Nova Atividade Disponível' (com prazo, quando informado) ao criar atividade em tópico da trilha",
+      },
+    ],
+  },
+  {
+    version: "5.18.0",
+    date: "27/03/2026",
+    highlight: "Gráfico de uso diário de IA e feature tagging automático",
+    changes: [
+      {
+        type: "feature",
+        text: "Configurações de IA — aba Uso & Gastos: gráfico de linha interativo (Chart.js) com duplo eixo mostrando chamadas e tokens consumidos nos últimos 30 dias",
+      },
+      {
+        type: "feature",
+        text: "Feature tagging automático: todas as 18 chamadas de IA do sistema registram a funcionalidade utilizada (Gerar Exercício, Gerar Prova, Mapa Mental, Infográfico, Plano de Aula, etc.)",
+      },
+      {
+        type: "improvement",
+        text: "Painel de uso exibe nomes em português para cada funcionalidade de IA, facilitando a identificação do consumo por recurso",
+      },
+    ],
+  },
+  {
+    version: "5.17.0",
+    date: "27/03/2026",
+    highlight: "Painel de Configurações de IA com monitoramento de gastos",
+    changes: [
+      {
+        type: "feature",
+        text: "Nova seção Administração → Configurações de IA: selecione provedor (Groq/Gemini/Manus), modelo, insira chave de API e teste a conexão com um clique",
+      },
+      {
+        type: "feature",
+        text: "Aba Uso & Gastos: dashboard com total de chamadas, tokens consumidos (entrada/saída), custo estimado em USD e taxa de sucesso — filtros por 7/30/90 dias",
+      },
+      {
+        type: "feature",
+        text: "Aba Histórico: tabela com as últimas 20 chamadas da API mostrando provedor, modelo, funcionalidade, tokens e status",
+      },
+      {
+        type: "improvement",
+        text: "Logging automático de todas as chamadas ao invokeLLM sem impacto no fluxo principal",
+      },
+    ],
+  },
+  {
+    version: "5.16.0",
+    date: "26/03/2026",
+    highlight: "Correções de UX no portal do professor",
+    changes: [
+      {
+        type: "fix",
+        text: "Notificações de prova/exercício: clique não redireciona mais professores para área restrita do aluno",
+      },
+      {
+        type: "improvement",
+        text: "Melhorias de estabilidade e performance no carregamento de páginas do portal do professor",
+      },
+    ],
+  },
+  {
+    version: "5.14.0",
+    date: "26/03/2026",
+    highlight: "Correções de notas e UX do portal do aluno",
+    changes: [
+      {
+        type: "fix",
+        text: "Painel de Notas: exibição de turmas reais corrigida em todos os filtros e cabeçalhos de tabela",
+      },
+      {
+        type: "improvement",
+        text: "Portal do aluno: identidade visual padronizada em todas as páginas (exercícios, trilha, avisos)",
+      },
+    ],
+  },
+  {
     version: "5.13.0",
     date: "26/03/2026",
-    label: "Mais recente",
     highlight: "Modal Evolução Individual compacto e responsivo",
     changes: [
       {
