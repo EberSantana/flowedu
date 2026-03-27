@@ -8475,6 +8475,49 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           .where(eq(seTable.id, input.exerciseId));
         return { success: true };
       }),
+    // Listar alunos que ainda NÃO fizeram o exercício (pendentes)
+    getPendingStudents: protectedProcedure
+      .input(z.object({ exerciseId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db_instance = await db.getDb();
+        if (!db_instance) throw new Error('Database not available');
+        const { studentExercises: seTable, studentExerciseAttempts: seaTable, subjectEnrollments: seEnroll } = await import('../drizzle/schema');
+        const [exercise] = await db_instance
+          .select({ id: seTable.id, teacherId: seTable.teacherId, subjectId: seTable.subjectId, title: seTable.title })
+          .from(seTable)
+          .where(eq(seTable.id, input.exerciseId))
+          .limit(1);
+        if (!exercise) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado' });
+        if (exercise.teacherId !== ctx.user.id && ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Sem permissão' });
+        }
+        const enrolledRaw = await db_instance
+          .select({ studentId: seEnroll.studentId })
+          .from(seEnroll)
+          .where(and(eq(seEnroll.subjectId, exercise.subjectId), eq(seEnroll.userId, ctx.user.id), eq(seEnroll.status, 'active')));
+        const enrolledIds = enrolledRaw.map(e => e.studentId);
+        if (enrolledIds.length === 0) return { pending: [], done: [], total: 0, exerciseTitle: exercise.title };
+        const completedRaw = await db_instance
+          .select({ studentId: seaTable.studentId })
+          .from(seaTable)
+          .where(and(eq(seaTable.exerciseId, input.exerciseId), eq(seaTable.status, 'completed')));
+        const completedIds = new Set(completedRaw.map(r => r.studentId));
+        const pendingIds = enrolledIds.filter(id => !completedIds.has(id));
+        const doneIds = enrolledIds.filter(id => completedIds.has(id));
+        const fetchStudentName = async (sid: number) => {
+          const res = await db_instance!.execute(sql`SELECT id, fullName FROM students WHERE id = ${sid} LIMIT 1`) as any[];
+          const row = ((res[0] as any[]) || [])[0];
+          return row ? { studentId: sid, name: row.fullName || `Aluno #${sid}` } : null;
+        };
+        const pendingStudents = (await Promise.all(pendingIds.map(fetchStudentName))).filter(Boolean) as { studentId: number; name: string }[];
+        const doneStudents = (await Promise.all(doneIds.map(fetchStudentName))).filter(Boolean) as { studentId: number; name: string }[];
+        return {
+          pending: pendingStudents.sort((a, b) => a.name.localeCompare(b.name)),
+          done: doneStudents.sort((a, b) => a.name.localeCompare(b.name)),
+          total: enrolledIds.length,
+          exerciseTitle: exercise.title,
+        };
+      }),
   }),
 
   // ==================== SISTEMA DE REVISÃO INTELIGENTE ====================

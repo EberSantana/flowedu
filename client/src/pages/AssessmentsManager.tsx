@@ -75,6 +75,7 @@ export default function AssessmentsManager() {
   const [editExerciseTitle, setEditExerciseTitle] = useState<string>("");
   const [editExerciseMaxAttempts, setEditExerciseMaxAttempts] = useState<string>("3");
   const [resetConfirmStudent, setResetConfirmStudent] = useState<{ studentId: number; name: string } | null>(null);
+  const [exerciseModalTab, setExerciseModalTab] = useState<"pending" | "config">("pending");
 
   const utils = trpc.useUtils();
 
@@ -100,6 +101,17 @@ export default function AssessmentsManager() {
   const { data: completionStats } = trpc.teacherExercises.getCompletionStats.useQuery(
     { subjectId: filterSubjectId },
     { enabled: !!user }
+  );
+
+  // Buscar alunos pendentes e concluídos (para o modal de edição)
+  const { data: pendingStudentsData, isLoading: loadingPending } = trpc.teacherExercises.getPendingStudents.useQuery(
+    { exerciseId: editExerciseId ?? 0 },
+    {
+      enabled: editExerciseId !== null && editExerciseId !== undefined && editExerciseId > 0,
+      staleTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    }
   );
 
   // Buscar lista de alunos com tentativas (para o modal de edição)
@@ -200,6 +212,7 @@ export default function AssessmentsManager() {
     setEditExerciseId(exercise.id);
     setEditExerciseTitle(exercise.title);
     setEditExerciseMaxAttempts(String(exercise.maxAttempts ?? 3));
+    setExerciseModalTab("pending");
   };
 
   const handleSaveExerciseMaxAttempts = () => {
@@ -612,11 +625,120 @@ export default function AssessmentsManager() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5 text-blue-600" />
-                Configurações: {editExerciseTitle}
+                {editExerciseTitle}
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-6 mt-2">
+            {/* Abas do modal */}
+            <div className="flex border-b border-gray-200 mt-2 mb-4">
+              <button
+                onClick={() => setExerciseModalTab("pending")}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  exerciseModalTab === "pending"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" />
+                  Alunos
+                  {pendingStudentsData && pendingStudentsData.pending.length > 0 && (
+                    <span className="bg-orange-100 text-orange-700 text-xs font-bold px-1.5 py-0.5 rounded-full">
+                      {pendingStudentsData.pending.length}
+                    </span>
+                  )}
+                </span>
+              </button>
+              <button
+                onClick={() => setExerciseModalTab("config")}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  exerciseModalTab === "config"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Settings className="h-4 w-4" />
+                  Configurações
+                </span>
+              </button>
+            </div>
+
+            {/* ABA: ALUNOS */}
+            {exerciseModalTab === "pending" && (
+              <div className="space-y-4">
+                {loadingPending ? (
+                  <div className="text-center py-8 text-gray-400 text-sm">Carregando alunos...</div>
+                ) : !pendingStudentsData ? (
+                  <div className="text-center py-8 text-gray-400 text-sm">Nenhum dado disponível.</div>
+                ) : (
+                  <>
+                    {/* Resumo */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+                        <p className="text-2xl font-bold text-orange-600">{pendingStudentsData.pending.length}</p>
+                        <p className="text-xs text-orange-700 mt-0.5">Faltam fazer</p>
+                      </div>
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                        <p className="text-2xl font-bold text-green-600">{pendingStudentsData.done.length}</p>
+                        <p className="text-xs text-green-700 mt-0.5">Concluíram</p>
+                      </div>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+                        <p className="text-2xl font-bold text-gray-600">{pendingStudentsData.total}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Total</p>
+                      </div>
+                    </div>
+
+                    {/* Lista de pendentes */}
+                    {pendingStudentsData.pending.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-orange-700 mb-2 flex items-center gap-1.5">
+                          <UserX className="h-4 w-4" />
+                          Ainda não fizeram ({pendingStudentsData.pending.length})
+                        </h4>
+                        <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                          {pendingStudentsData.pending.map((s) => (
+                            <div key={s.studentId} className="flex items-center gap-2 px-3 py-2 bg-orange-50 border border-orange-100 rounded-lg">
+                              <UserX className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />
+                              <span className="text-sm text-gray-800">{s.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Lista de concluídos */}
+                    {pendingStudentsData.done.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center gap-1.5">
+                          <UserCheck className="h-4 w-4" />
+                          Já concluíram ({pendingStudentsData.done.length})
+                        </h4>
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                          {pendingStudentsData.done.map((s) => (
+                            <div key={s.studentId} className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-100 rounded-lg">
+                              <UserCheck className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                              <span className="text-sm text-gray-800">{s.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {pendingStudentsData.total === 0 && (
+                      <div className="text-center py-6 text-gray-400">
+                        <Users className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">Nenhum aluno matriculado nesta disciplina.</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* ABA: CONFIGURAÇÕES */}
+            {exerciseModalTab === "config" && (
+            <div className="space-y-6">
               {/* Seção: Número máximo de tentativas */}
               <div className="border border-gray-200 rounded-lg p-4">
                 <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -700,9 +822,9 @@ export default function AssessmentsManager() {
                 )}
               </div>
             </div>
+            )}
           </DialogContent>
         </Dialog>
-
         {/* Confirmação de reset de tentativas */}
         <AlertDialog open={!!resetConfirmStudent} onOpenChange={(open) => !open && setResetConfirmStudent(null)}>
           <AlertDialogContent>
