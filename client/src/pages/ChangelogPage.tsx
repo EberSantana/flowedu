@@ -23,9 +23,28 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.35.0",
+    version: "5.36.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Nova tela de entrada dark/tech com dois portais",
+    changes: [
+      {
+        type: "feature",
+        text: "Tela de entrada completamente redesenhada: fundo escuro (#080d1a), logo F com gradiente teal, ícones flutuantes animados, topbar com links de navegação e botão flowedu.app",
+      },
+      {
+        type: "feature",
+        text: "Dois cards de portal com hover interativo: Portal do Aluno (gradiente teal/azul) e Portal do Professor (gradiente roxo/pink) com ícones, tags e botões coloridos distintos",
+      },
+      {
+        type: "improvement",
+        text: "Loading state com logo animada em vez do spinner genérico, mantendo a identidade visual da nova entrada",
+      },
+    ],
+  },
+  {
+    version: "5.35.0",
+    date: "27/03/2026",
     highlight: "Filtro de disciplina vinculado à turma em Análise de IA e Relatório de Desempenho",
     changes: [
       {

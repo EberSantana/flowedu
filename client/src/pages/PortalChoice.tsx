@@ -1,6 +1,6 @@
-// Version: 2026-01-15-v3 - Cards com altura igual
+// Version: 2026-03-27-v5.36 - Nova entrada dark/tech com ícones flutuantes
 import { Link, useLocation } from "wouter";
-import { GraduationCap, Users, Mail, Shield, BookOpen, Award, TrendingUp } from "lucide-react";
+import { GraduationCap, Users, Mail, Shield, BookOpen, TrendingUp, CheckCircle, Brain, BarChart2, FileText, Zap } from "lucide-react";
 import { useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 
@@ -8,442 +8,314 @@ export default function PortalChoice() {
   const [, setLocation] = useLocation();
   const { data: user, isLoading } = trpc.auth.me.useQuery();
   const { data: studentSession } = trpc.auth.studentSession.useQuery();
-  
-  // Redirecionar automaticamente se já estiver autenticado
+
   useEffect(() => {
     if (isLoading) return;
-    
     if (studentSession) {
-      // Salvar preferência de portal no localStorage
-      localStorage.setItem('flowedu_last_portal', 'aluno');
-      setLocation('/student-dashboard');
+      localStorage.setItem("flowedu_last_portal", "aluno");
+      setLocation("/student-dashboard");
     } else if (user) {
-      // Salvar preferência de portal no localStorage
-      localStorage.setItem('flowedu_last_portal', 'professor');
-      setLocation('/dashboard');
+      localStorage.setItem("flowedu_last_portal", "professor");
+      setLocation("/dashboard");
     }
-    // Se não há sessão ativa, sempre mostrar a tela de escolha de portal
   }, [user, studentSession, isLoading, setLocation]);
-  
-  // Mostrar loading enquanto verifica autenticação
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)' }}>
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#080d1a" }}>
+        <div className="flex flex-col items-center gap-4">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-black text-white animate-pulse"
+            style={{ background: "linear-gradient(135deg, #00e5c0, #1a6fff)", boxShadow: "0 0 40px rgba(0,229,192,0.5)" }}
+          >
+            F
+          </div>
+          <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "#00e5c0", borderTopColor: "transparent" }} />
+        </div>
       </div>
     );
   }
+
   return (
-    <div 
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)'
-      }}
-    >
-      {/* Elementos decorativos abstratos */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div 
-          className="absolute rounded-full"
-          style={{
-            top: '-160px',
-            left: '-160px',
-            width: '320px',
-            height: '320px',
-            background: 'rgba(168, 85, 247, 0.2)',
-            filter: 'blur(80px)',
-            animation: 'pulse 4s ease-in-out infinite'
-          }}
-        />
-        <div 
-          className="absolute rounded-full"
-          style={{
-            top: '25%',
-            right: '-80px',
-            width: '384px',
-            height: '384px',
-            background: 'rgba(59, 130, 246, 0.15)',
-            filter: 'blur(80px)'
-          }}
-        />
-        <div 
-          className="absolute rounded-full"
-          style={{
-            bottom: '0',
-            left: '33%',
-            width: '288px',
-            height: '288px',
-            background: 'rgba(99, 102, 241, 0.2)',
-            filter: 'blur(80px)',
-            animation: 'pulse 4s ease-in-out infinite',
-            animationDelay: '1s'
-          }}
-        />
-        <div 
-          className="absolute rounded-full"
-          style={{
-            top: '50%',
-            left: '25%',
-            width: '256px',
-            height: '256px',
-            background: 'rgba(139, 92, 246, 0.1)',
-            filter: 'blur(80px)'
-          }}
-        />
-      </div>
-      
-      {/* Grid pattern overlay */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          opacity: 0.03,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="min-h-screen relative overflow-hidden" style={{ background: "#080d1a", fontFamily: "'Inter', sans-serif" }}>
 
-      {/* Conteúdo principal */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 py-12">
-        <div className="max-w-6xl w-full">
-          {/* Header com branding impactante */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center gap-4 mb-6">
-              <div className="relative">
-                <div 
-                  className="absolute inset-0 rounded-2xl"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    filter: 'blur(20px)'
-                  }}
-                />
-                <img src="/logo.png" alt="FlowEdu" className="relative h-20 w-20" style={{ filter: 'drop-shadow(0 25px 25px rgba(0, 0, 0, 0.5))' }} />
-              </div>
-              <h1 className="text-5xl md:text-6xl font-extrabold text-white tracking-tight">
-                Flow<span 
-                  style={{
-                    background: 'linear-gradient(to right, #c084fc, #f472b6)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
-                  }}
-                >Edu</span>
-              </h1>
-            </div>
-            <p className="text-xl md:text-2xl font-light max-w-2xl mx-auto" style={{ color: 'rgba(233, 213, 255, 0.9)' }}>
-              Onde a educação flui
-            </p>
-            <p className="text-base mt-3" style={{ color: '#94a3b8' }}>
-              Escolha como deseja acessar a plataforma
-            </p>
+      {/* ── Radial glows ── */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: `
+          radial-gradient(ellipse 60% 50% at 15% 50%, rgba(0,229,192,0.07) 0%, transparent 70%),
+          radial-gradient(ellipse 50% 60% at 85% 30%, rgba(26,111,255,0.06) 0%, transparent 70%),
+          radial-gradient(ellipse 40% 40% at 50% 90%, rgba(124,58,237,0.05) 0%, transparent 70%)
+        `
+      }} />
+
+      {/* ── Grid overlay ── */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        opacity: 0.025,
+        backgroundImage: "linear-gradient(rgba(0,229,192,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,192,1) 1px, transparent 1px)",
+        backgroundSize: "60px 60px"
+      }} />
+
+      {/* ── Floating icons ── */}
+      <div className="absolute inset-0 pointer-events-none hidden lg:block">
+        {[
+          { icon: <Brain className="w-6 h-6" />, style: { top: "12%", right: "8%", animationDelay: "0s" } },
+          { icon: <BarChart2 className="w-6 h-6" />, style: { top: "28%", right: "5%", animationDelay: "1.5s" } },
+          { icon: <BookOpen className="w-6 h-6" />, style: { top: "18%", right: "14%", animationDelay: "0.8s" } },
+          { icon: <FileText className="w-6 h-6" />, style: { bottom: "20%", right: "7%", animationDelay: "2s" } },
+          { icon: <Users className="w-6 h-6" />, style: { bottom: "35%", right: "12%", animationDelay: "1s" } },
+          { icon: <Zap className="w-6 h-6" />, style: { top: "40%", left: "4%", animationDelay: "0.5s" } },
+          { icon: <CheckCircle className="w-6 h-6" />, style: { bottom: "25%", left: "6%", animationDelay: "2.5s" } },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className="absolute w-14 h-14 rounded-2xl flex items-center justify-center"
+            style={{
+              ...item.style,
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "rgba(0,229,192,0.6)",
+              animation: "floatIcon 6s ease-in-out infinite",
+            }}
+          >
+            {item.icon}
           </div>
+        ))}
+      </div>
 
-          {/* Cards de Escolha com design premium - ALTURA IGUAL */}
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            {/* Portal do Aluno */}
-            <Link href="/student-login">
-              <div className="group relative h-full">
-                {/* Glow effect no hover */}
-                <div 
-                  className="absolute rounded-3xl opacity-0 group-hover:opacity-40 transition-all duration-500"
-                  style={{
-                    inset: '-4px',
-                    background: 'linear-gradient(to right, #06b6d4, #3b82f6, #a855f7)',
-                    filter: 'blur(16px)'
-                  }}
-                />
-                
-                <div 
-                  className="relative rounded-3xl p-8 lg:p-10 cursor-pointer transition-all duration-500 group-hover:translate-y-[-8px] overflow-hidden h-full"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    backdropFilter: 'blur(24px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    minHeight: '520px'
-                  }}
-                >
-                  {/* Decoração interna */}
-                  <div 
-                    className="absolute rounded-full group-hover:scale-150 transition-transform duration-700"
-                    style={{
-                      top: '0',
-                      right: '0',
-                      width: '160px',
-                      height: '160px',
-                      background: 'linear-gradient(to bottom right, rgba(59, 130, 246, 0.2), transparent)',
-                      filter: 'blur(32px)',
-                      transform: 'translate(40px, -40px)'
-                    }}
-                  />
-                  
-                  <div className="flex flex-col items-center text-center h-full relative z-10">
-                    {/* Ícone com animação */}
-                    <div className="relative mb-8">
-                      <div 
-                        className="absolute inset-0 rounded-full group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
-                        style={{
-                          background: 'linear-gradient(to bottom right, #22d3ee, #2563eb)',
-                          filter: 'blur(20px)',
-                          opacity: 0.5
-                        }}
-                      />
-                      <div 
-                        className="relative w-28 h-28 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
-                        style={{
-                          background: 'linear-gradient(to bottom right, #22d3ee, #3b82f6, #2563eb)',
-                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-                        }}
-                      >
-                        <GraduationCap className="w-14 h-14 text-white" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }} />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3 mb-6">
-                      <h2 className="text-3xl font-bold text-white group-hover:text-cyan-100 transition-colors">
-                        Portal do Aluno
-                      </h2>
-                      <p className="text-lg leading-relaxed max-w-sm" style={{ color: '#cbd5e1' }}>
-                        Acesse suas disciplinas, trilhas de aprendizagem e acompanhe seu progresso acadêmico
-                      </p>
-                    </div>
+      {/* ── Top bar ── */}
+      <header className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(8,13,26,0.7)", backdropFilter: "blur(12px)" }}>
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-black text-white"
+            style={{ background: "linear-gradient(135deg, #00e5c0, #1a6fff)", boxShadow: "0 0 20px rgba(0,229,192,0.4)" }}
+          >
+            F
+          </div>
+          <span className="text-xl font-extrabold text-white tracking-tight">
+            Flow<span style={{ color: "#00e5c0" }}>Edu</span>
+          </span>
+        </div>
+        <div className="hidden md:flex items-center gap-2">
+          <Link href="/help" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
+            Central de Ajuda
+          </Link>
+          <Link href="/novidades" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
+            Novidades
+          </Link>
+          <a
+            href="https://flowedu.app"
+            target="_blank"
+            rel="noreferrer"
+            className="px-5 py-2 rounded-lg text-sm font-semibold"
+            style={{ background: "linear-gradient(135deg, #00e5c0, #1a6fff)", color: "#080d1a", boxShadow: "0 0 16px rgba(0,229,192,0.3)" }}
+          >
+            flowedu.app
+          </a>
+        </div>
+      </header>
 
-                    {/* Features badges */}
-                    <div className="flex flex-wrap justify-center gap-2 mb-6">
-                      <span 
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: '#cbd5e1'
-                        }}
-                      >
-                        <BookOpen className="w-3.5 h-3.5" />
-                        Materiais
-                      </span>
-                      <span 
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: '#cbd5e1'
-                        }}
-                      >
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        Progresso
-                      </span>
-                      <span 
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: '#cbd5e1'
-                        }}
-                      >
-                        <Award className="w-3.5 h-3.5" />
-                        Exercícios
-                      </span>
-                    </div>
+      {/* ── Main content ── */}
+      <main className="relative z-10 flex flex-col items-center justify-center px-4 py-12 md:py-16">
 
-                    {/* Área de botões - flex-grow para empurrar para baixo */}
-                    <div className="flex-grow" />
+        {/* Badge */}
+        <div
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-widest mb-8"
+          style={{ border: "1px solid rgba(0,229,192,0.3)", background: "rgba(0,229,192,0.08)", color: "#00e5c0" }}
+        >
+          <GraduationCap className="w-3.5 h-3.5" />
+          Gestão Educacional Inteligente
+        </div>
 
-                    {/* Botão principal */}
-                    <div className="w-full max-w-xs mb-4">
-                      <div className="relative">
-                        <div 
-                          className="absolute rounded-xl"
-                          style={{
-                            inset: '-4px',
-                            background: 'linear-gradient(to right, #06b6d4, #3b82f6)',
-                            filter: 'blur(8px)',
-                            opacity: 0.6
-                          }}
-                        />
-                        <div 
-                          className="relative inline-flex items-center justify-center w-full px-8 py-4 rounded-xl font-semibold text-lg text-white transition-all"
-                          style={{
-                            background: 'linear-gradient(to right, #06b6d4, #2563eb)',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
-                          }}
-                        >
-                          <Shield className="w-5 h-5 mr-2" />
-                          Entrar como Aluno
-                        </div>
-                      </div>
-                    </div>
+        {/* Logo + Title */}
+        <div className="flex items-center gap-5 mb-5">
+          <div
+            className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-black text-white"
+            style={{
+              background: "linear-gradient(135deg, #00e5c0, #1a6fff)",
+              boxShadow: "0 0 40px rgba(0,229,192,0.5), 0 0 80px rgba(0,229,192,0.2)"
+            }}
+          >
+            F
+          </div>
+          <h1 className="text-6xl md:text-7xl font-black text-white tracking-tighter leading-none">
+            FlowEdu
+          </h1>
+        </div>
 
-                    <p className="text-sm" style={{ color: '#94a3b8' }}>
-                      Login com número de matrícula
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Link>
+        {/* Divider */}
+        <div className="w-16 h-1 rounded-full mb-6" style={{ background: "linear-gradient(90deg, #00e5c0, #1a6fff)" }} />
 
-            {/* Portal do Professor */}
-            <div className="group relative h-full">
-              {/* Glow effect no hover */}
-              <div 
-                className="absolute rounded-3xl opacity-0 group-hover:opacity-40 transition-all duration-500"
+        <p className="text-2xl md:text-3xl font-semibold mb-3" style={{ color: "#00e5c0" }}>
+          Onde a Educação Flui
+        </p>
+        <p className="text-base text-center max-w-lg mb-12 leading-relaxed" style={{ color: "#8899b4" }}>
+          Sistema completo para professores organizarem disciplinas, turmas, exercícios e provas — com IA integrada para análise de desempenho.
+        </p>
+
+        {/* ── Portal cards ── */}
+        <div className="grid md:grid-cols-2 gap-6 w-full max-w-3xl">
+
+          {/* Aluno */}
+          <Link href="/student-login">
+            <div
+              className="group relative rounded-2xl p-8 flex flex-col items-center text-center gap-4 cursor-pointer transition-all duration-300 overflow-hidden"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                minHeight: "380px"
+              }}
+            >
+              {/* Hover glow */}
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(0,229,192,0.10) 0%, transparent 70%)" }} />
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
+                style={{ border: "1px solid rgba(0,229,192,0.35)" }} />
+
+              {/* Icon */}
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 relative z-10"
                 style={{
-                  inset: '-4px',
-                  background: 'linear-gradient(to right, #a855f7, #ec4899, #f43f5e)',
-                  filter: 'blur(16px)'
-                }}
-              />
-              
-              <div 
-                className="relative rounded-3xl p-8 lg:p-10 transition-all duration-500 group-hover:translate-y-[-8px] overflow-hidden h-full"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  backdropFilter: 'blur(24px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  minHeight: '520px'
+                  background: "linear-gradient(135deg, #00e5c0, #1a6fff)",
+                  boxShadow: "0 0 30px rgba(0,229,192,0.35)"
                 }}
               >
-                {/* Decoração interna */}
-                <div 
-                  className="absolute rounded-full group-hover:scale-150 transition-transform duration-700"
-                  style={{
-                    top: '0',
-                    right: '0',
-                    width: '160px',
-                    height: '160px',
-                    background: 'linear-gradient(to bottom right, rgba(168, 85, 247, 0.2), transparent)',
-                    filter: 'blur(32px)',
-                    transform: 'translate(40px, -40px)'
-                  }}
-                />
-                
-                <div className="flex flex-col items-center text-center h-full relative z-10">
-                  {/* Ícone com animação */}
-                  <div className="relative mb-8">
-                    <div 
-                      className="absolute inset-0 rounded-full group-hover:opacity-80 group-hover:scale-110 transition-all duration-500"
-                      style={{
-                        background: 'linear-gradient(to bottom right, #c084fc, #db2777)',
-                        filter: 'blur(20px)',
-                        opacity: 0.5
-                      }}
-                    />
-                    <div 
-                      className="relative w-28 h-28 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
-                      style={{
-                        background: 'linear-gradient(to bottom right, #c084fc, #a855f7, #db2777)',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-                      }}
-                    >
-                      <Users className="w-14 h-14 text-white" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }} />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6">
-                    <h2 className="text-3xl font-bold text-white group-hover:text-purple-100 transition-colors">
-                      Portal do Professor
-                    </h2>
-                    <p className="text-lg leading-relaxed max-w-sm" style={{ color: '#cbd5e1' }}>
-                      Gerencie disciplinas, turmas, horários e acompanhe o desempenho dos seus alunos
-                    </p>
-                  </div>
-
-                  {/* Features badges */}
-                  <div className="flex flex-wrap justify-center gap-2 mb-6">
-                    <span 
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#cbd5e1'
-                      }}
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      Disciplinas
-                    </span>
-                    <span 
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#cbd5e1'
-                      }}
-                    >
-                      <Users className="w-3.5 h-3.5" />
-                      Turmas
-                    </span>
-                    <span 
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#cbd5e1'
-                      }}
-                    >
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      Relatórios
-                    </span>
-                  </div>
-
-                  {/* Área de botões - flex-grow para empurrar para baixo */}
-                  <div className="flex-grow" />
-
-                  {/* Botão de Login */}
-                  <div className="w-full max-w-xs mb-4">
-                    <Link href="/login-professor" className="block">
-                      <div className="relative">
-                        <div 
-                          className="absolute rounded-xl"
-                          style={{
-                            inset: '-4px',
-                            background: 'linear-gradient(to right, #a855f7, #ec4899)',
-                            filter: 'blur(8px)',
-                            opacity: 0.6
-                          }}
-                        />
-                        <div 
-                          className="relative inline-flex items-center justify-center w-full px-8 py-4 rounded-xl font-semibold text-lg text-white transition-all"
-                          style={{
-                            background: 'linear-gradient(to right, #a855f7, #db2777)',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
-                          }}
-                        >
-                          <Mail className="w-5 h-5 mr-2" />
-                          Entrar com E-mail
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  <div className="text-sm" style={{ color: '#94a3b8' }}>
-                    <Link href="/cadastro-professor" className="hover:underline transition-colors" style={{ color: '#d8b4fe' }}>
-                      Não tem conta? Cadastre-se
-                    </Link>
-                  </div>
-                </div>
+                <GraduationCap className="w-10 h-10 text-white" />
               </div>
-            </div>
-          </div>
 
-          {/* Footer elegante */}
-          <div className="text-center mt-16 space-y-4">
-            <div className="flex items-center justify-center gap-6 text-sm" style={{ color: '#64748b' }}>
-              <span className="inline-flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-white relative z-10">Portal do Aluno</h2>
+              <p className="text-sm leading-relaxed relative z-10" style={{ color: "#8899b4", maxWidth: "260px" }}>
+                Acesse suas disciplinas, trilhas de aprendizagem e acompanhe seu progresso acadêmico
+              </p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap justify-center gap-2 relative z-10">
+                {[
+                  { icon: <BookOpen className="w-3 h-3" />, label: "Materiais" },
+                  { icon: <TrendingUp className="w-3 h-3" />, label: "Progresso" },
+                  { icon: <CheckCircle className="w-3 h-3" />, label: "Exercícios" },
+                ].map((tag) => (
+                  <span
+                    key={tag.label}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs"
+                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", color: "#8899b4" }}
+                  >
+                    {tag.icon}{tag.label}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex-1" />
+
+              {/* Button */}
+              <button
+                className="w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 relative z-10 transition-all duration-200 group-hover:scale-[1.02]"
+                style={{
+                  background: "linear-gradient(135deg, #00e5c0, #1a6fff)",
+                  color: "#080d1a",
+                  boxShadow: "0 8px 24px rgba(0,229,192,0.3)"
+                }}
+              >
                 <Shield className="w-4 h-4" />
-                Acesso Seguro
-              </span>
-              <span className="w-1 h-1 rounded-full" style={{ background: '#475569' }} />
-              <span>Dados Protegidos</span>
-              <span className="w-1 h-1 rounded-full" style={{ background: '#475569' }} />
-              <span>LGPD Compliant</span>
+                Entrar como Aluno
+              </button>
+              <span className="text-xs relative z-10" style={{ color: "#8899b4" }}>Login com número de matrícula</span>
             </div>
-            <p className="text-sm" style={{ color: '#64748b' }}>
-              © 2026 FlowEdu - Onde a educação flui
+          </Link>
+
+          {/* Professor */}
+          <div
+            className="group relative rounded-2xl p-8 flex flex-col items-center text-center gap-4 overflow-hidden"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              minHeight: "380px"
+            }}
+          >
+            {/* Hover glow */}
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+              style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(224,64,251,0.10) 0%, transparent 70%)" }} />
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
+              style={{ border: "1px solid rgba(224,64,251,0.35)" }} />
+
+            {/* Icon */}
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 relative z-10"
+              style={{
+                background: "linear-gradient(135deg, #7c3aed, #e040fb)",
+                boxShadow: "0 0 30px rgba(224,64,251,0.35)"
+              }}
+            >
+              <Users className="w-10 h-10 text-white" />
+            </div>
+
+            <h2 className="text-2xl font-bold text-white relative z-10">Portal do Professor</h2>
+            <p className="text-sm leading-relaxed relative z-10" style={{ color: "#8899b4", maxWidth: "260px" }}>
+              Gerencie disciplinas, turmas, horários e acompanhe o desempenho dos seus alunos com IA
             </p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap justify-center gap-2 relative z-10">
+              {[
+                { icon: <BookOpen className="w-3 h-3" />, label: "Disciplinas" },
+                { icon: <Users className="w-3 h-3" />, label: "Turmas" },
+                { icon: <TrendingUp className="w-3 h-3" />, label: "Relatórios" },
+              ].map((tag) => (
+                <span
+                  key={tag.label}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", color: "#8899b4" }}
+                >
+                  {tag.icon}{tag.label}
+                </span>
+              ))}
+            </div>
+
+            <div className="flex-1" />
+
+            {/* Button */}
+            <Link href="/login-professor" className="w-full relative z-10">
+              <button
+                className="w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 group-hover:scale-[1.02]"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed, #e040fb)",
+                  color: "#fff",
+                  boxShadow: "0 8px 24px rgba(224,64,251,0.3)"
+                }}
+              >
+                <Mail className="w-4 h-4" />
+                Entrar com E-mail
+              </button>
+            </Link>
+            <span className="text-xs relative z-10" style={{ color: "#8899b4" }}>
+              Não tem conta?{" "}
+              <Link href="/cadastro-professor" className="font-semibold" style={{ color: "#e040fb" }}>
+                Cadastre-se
+              </Link>
+            </span>
           </div>
         </div>
-      </div>
 
-      {/* CSS para animação de pulse */}
+        {/* Footer */}
+        <div className="mt-14 flex flex-col items-center gap-3">
+          <div className="flex items-center gap-6 text-xs" style={{ color: "#4a5568" }}>
+            <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" />Acesso Seguro</span>
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span>Dados Protegidos</span>
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span>LGPD Compliant</span>
+          </div>
+          <p className="text-xs" style={{ color: "#4a5568" }}>
+            v5.36.0 · Março 2026 · © 2026 FlowEdu — Onde a educação flui
+          </p>
+        </div>
+      </main>
+
       <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        @keyframes floatIcon {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
         }
       `}</style>
     </div>
