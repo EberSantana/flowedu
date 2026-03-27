@@ -23,9 +23,73 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.20.0",
+    version: "5.24.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Correção crítica: notificações duplicadas no sino do professor",
+    changes: [
+      {
+        type: "fix",
+        text: "Bug crítico corrigido: notificações de prova, exercício, atividade de trilha e avisos usavam o ID interno do aluno (studentId) como destinatário — o sino do professor exibia notificações destinadas aos alunos",
+      },
+      {
+        type: "fix",
+        text: "Todas as notificações agora usam corretamente o userId da conta de usuário do aluno — professor não vê mais notificações dos alunos no seu sino",
+      },
+      {
+        type: "fix",
+        text: "Alunos sem conta de usuário vinculada são ignorados no envio de notificações (evita erros silenciosos no banco)",
+      },
+    ],
+  },
+  {
+    version: "5.23.0",
+    date: "27/03/2026",
+    highlight: "Configurações de IA redesenhada com padrão de layout do sistema",
+    changes: [
+      {
+        type: "improvement",
+        text: "Página Configurações de IA completamente redesenhada: layout com Sidebar + PageWrapper sem abas, igual ao padrão do restante do sistema",
+      },
+      {
+        type: "improvement",
+        text: "Conteúdo organizado em cards lado a lado: Provedor e Modelo (esquerda) + Chaves de API (direita), seguido de Uso & Gastos com gráfico e Histórico de Chamadas",
+      },
+      {
+        type: "improvement",
+        text: "Header com título, botão Voltar ao Dashboard e badges de status do provedor ativo e chave API configurada",
+      },
+    ],
+  },
+  {
+    version: "5.22.0",
+    date: "27/03/2026",
+    highlight: "UX dos modais aprimorada para mobile e indicador de scroll",
+    changes: [
+      {
+        type: "improvement",
+        text: "Cards de tipo nos modais de Criar Exercícios e Criar Prova reduzidos para mobile: min-h-[80px], padding p-3 sm:p-5, ícone h-6 w-6 sm:h-8 sm:w-8",
+      },
+      {
+        type: "improvement",
+        text: "Todos os modais com conteúdo rolável exibem gradiente fade-out na borda inferior indicando que há mais conteúdo abaixo — desaparece ao chegar no final",
+      },
+    ],
+  },
+  {
+    version: "5.21.0",
+    date: "27/03/2026",
+    highlight: "Página Novidades atualizada com todas as versões",
+    changes: [
+      {
+        type: "improvement",
+        text: "Página Novidades atualizada com as versões v5.14.0 a v5.20.0, documentando todas as melhorias implementadas desde a versão que estava na VPS",
+      },
+    ],
+  },
+  {
+    version: "5.20.0",
+    date: "27/03/2026",
     highlight: "Correção global de modais em resoluções grandes",
     changes: [
       {
