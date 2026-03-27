@@ -1,5 +1,70 @@
 import { ENV } from "./env";
 
+// Cache da configuração de IA (recarregada a cada 5 minutos)
+let _aiSettingsCache: { provider: string; model: string; apiKey: string; apiUrl: string; updatedAt: number } | null = null;
+const AI_SETTINGS_CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+/**
+ * Lê as configurações de IA do banco de dados (com cache de 5 min)
+ * Retorna o provedor, modelo, chave e URL configurados pelo administrador
+ */
+async function getConfiguredProvider(): Promise<{ provider: string; model: string; apiKey: string; apiUrl: string } | null> {
+  try {
+    const now = Date.now();
+    if (_aiSettingsCache && (now - _aiSettingsCache.updatedAt) < AI_SETTINGS_CACHE_TTL) {
+      return _aiSettingsCache;
+    }
+    const { getDb } = await import('../db');
+    const { sql } = await import('drizzle-orm');
+    const dbConn = await getDb();
+    if (!dbConn) return null;
+    const result = await dbConn.execute(
+      sql`SELECT provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey FROM ai_settings WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1`
+    ) as any[];
+    const rows = (result[0] as any[]) || [];
+    if (rows.length === 0) return null;
+    const row = rows[0];
+    const provider: string = row.provider || 'groq';
+    const model: string = row.model || 'llama-3.3-70b-versatile';
+    let apiKey = '';
+    let apiUrl = '';
+    switch (provider) {
+      case 'openai':
+        apiKey = row.openaiApiKey || '';
+        apiUrl = 'https://api.openai.com/v1/chat/completions';
+        break;
+      case 'anthropic':
+        apiKey = row.anthropicApiKey || '';
+        apiUrl = 'https://api.anthropic.com/v1/messages';
+        break;
+      case 'gemini':
+        apiKey = row.geminiApiKey || '';
+        apiUrl = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+        break;
+      case 'manus':
+        apiKey = ENV.forgeApiKey || '';
+        apiUrl = ENV.forgeApiUrl ? `${ENV.forgeApiUrl.replace(/\/$/, '')}/v1/chat/completions` : 'https://forge.manus.im/v1/chat/completions';
+        break;
+      case 'groq':
+      default:
+        apiKey = row.groqApiKey || ENV.groqApiKey || '';
+        apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+        break;
+    }
+    if (!apiKey) return null;
+    _aiSettingsCache = { provider, model, apiKey, apiUrl, updatedAt: now };
+    return { provider, model, apiKey, apiUrl };
+  } catch (e) {
+    console.warn('[LLM] Failed to load AI settings from DB:', e);
+    return null;
+  }
+}
+
+/** Invalida o cache de configurações de IA (chamar após salvar novas configurações) */
+export function invalidateAISettingsCache() {
+  _aiSettingsCache = null;
+}
+
 export type Role = "system" | "user" | "assistant" | "tool" | "function";
 
 export type TextContent = {
@@ -333,8 +398,6 @@ let _currentFeature = 'other';
 export function setLLMFeature(feature: string) { _currentFeature = feature; }
 
 export async function invokeLLM(params: InvokeParams & { feature?: string }): Promise<InvokeResult> {
-  assertApiKey();
-
   const {
     messages,
     tools,
@@ -346,8 +409,33 @@ export async function invokeLLM(params: InvokeParams & { feature?: string }): Pr
     response_format,
   } = params;
 
+  // Tentar usar o provedor configurado no banco de dados
+  const configuredProvider = await getConfiguredProvider();
+  
+  let apiUrl: string;
+  let apiKey: string;
+  let activeProvider: string;
+  let activeModel: string;
+
+  if (configuredProvider) {
+    // Usar provedor configurado pelo administrador
+    apiUrl = configuredProvider.apiUrl;
+    apiKey = configuredProvider.apiKey;
+    activeProvider = configuredProvider.provider;
+    activeModel = configuredProvider.model;
+    console.log(`[LLM] Using configured provider: ${activeProvider} (${activeModel})`);
+  } else {
+    // Fallback para o provedor padrão do ambiente
+    assertApiKey();
+    apiUrl = resolveApiUrl();
+    apiKey = resolveApiKey();
+    activeProvider = ENV.groqApiKey ? 'groq' : ENV.forgeApiKey ? 'manus' : 'gemini';
+    activeModel = resolveModel();
+    console.log(`[LLM] Using default provider: ${activeProvider}`);
+  }
+
   const payload: Record<string, unknown> = {
-    model: resolveModel(),
+    model: activeModel,
     messages: messages.map(normalizeMessage),
   };
 
@@ -363,17 +451,20 @@ export async function invokeLLM(params: InvokeParams & { feature?: string }): Pr
     payload.tool_choice = normalizedToolChoice;
   }
 
-  payload.max_tokens = 32768;
-  // Thinking só funciona com Forge API (Manus built-in) e apenas quando Groq não está ativo
-  if (ENV.forgeApiKey && !ENV.groqApiKey) {
-    payload.thinking = {
-      "budget_tokens": 128
-    };
+  // Definir max_tokens baseado no provedor
+  if (activeProvider === 'groq') {
+    payload.max_tokens = 8192; // Groq free tier limit
+  } else if (activeProvider === 'anthropic') {
+    payload.max_tokens = 8192;
+  } else if (activeProvider === 'openai') {
+    payload.max_tokens = 16384;
+  } else {
+    payload.max_tokens = 32768;
   }
 
-  // Groq tem limite de max_tokens diferente
-  if (ENV.groqApiKey) {
-    payload.max_tokens = 8192; // Groq free tier limit
+  // Thinking só funciona com Forge API (Manus built-in)
+  if (activeProvider === 'manus' && ENV.forgeApiKey) {
+    payload.thinking = { "budget_tokens": 128 };
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
@@ -387,14 +478,11 @@ export async function invokeLLM(params: InvokeParams & { feature?: string }): Pr
     payload.response_format = normalizedResponseFormat;
   }
 
-  const apiUrl = resolveApiUrl();
-  const apiKey = resolveApiKey();
-  
   const feature = (params as any).feature || _currentFeature || 'other';
-  const provider = ENV.groqApiKey ? 'groq' : ENV.forgeApiKey ? 'manus' : 'gemini';
-  const model = resolveModel();
+  const provider = activeProvider;
+  const model = activeModel;
   
-  console.log(`[LLM] Using ${resolveProvider()} API`);
+  console.log(`[LLM] Invoking ${provider}/${model} for feature: ${feature}`);
   
   const response = await fetch(apiUrl, {
     method: "POST",

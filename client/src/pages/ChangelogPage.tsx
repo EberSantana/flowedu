@@ -23,9 +23,32 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.31.0",
+    version: "5.32.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Provedor de IA dinâmico e correção de contagem de alunos nas Atividades de Sala",
+    changes: [
+      {
+        type: "feature",
+        text: "A IA agora usa o provedor e modelo configurados em Configurações de IA (Groq, OpenAI, Anthropic, Gemini ou Manus) em vez de sempre usar o Groq padrão",
+      },
+      {
+        type: "feature",
+        text: "Cache inteligente de 5 minutos para as configurações de IA: alterações no provedor são aplicadas automaticamente sem reiniciar o servidor",
+      },
+      {
+        type: "fix",
+        text: "Corrigido bug no botão 'Alunos (X/Y enviaram)' nas Atividades de Sala: o total de alunos agora exibe corretamente quando os alunos estão matriculados via disciplina (subjectEnrollments) e não apenas via turma",
+      },
+      {
+        type: "improvement",
+        text: "max_tokens ajustado por provedor: Groq/Anthropic 8.192 · OpenAI 16.384 · Manus/Gemini 32.768 — evitando erros de limite",
+      },
+    ],
+  },
+  {
+    version: "5.31.0",
+    date: "27/03/2026",
     highlight: "Indicador de custo por provedor e alerta automático de chaves inválidas",
     changes: [
       {

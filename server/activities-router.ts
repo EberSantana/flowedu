@@ -182,16 +182,20 @@ export const activitiesRouter = router({
         subjectCounts.forEach(c => { subjectStudentCounts[c.subjectId] = Number(c.count); });
       }
 
-      return rows.map(r => ({
-        ...r,
-        maxScore: Number(r.maxScore),
-        submissionCount: submissionCounts[r.id] ?? 0,
-        totalStudents: r.classId
-          ? (classStudentCounts[r.classId] ?? 0)
-          : r.subjectId
-          ? (subjectStudentCounts[r.subjectId] ?? 0)
-          : 0,
-      }));
+      return rows.map(r => {
+        // Prioridade: usar classId se tiver alunos, senão usar subjectId
+        // Isso resolve o caso onde a atividade tem classId e subjectId mas os alunos
+        // estão matriculados via subjectEnrollments (não via studentClassEnrollments)
+        const classCount = r.classId ? (classStudentCounts[r.classId] ?? 0) : 0;
+        const subjectCount = r.subjectId ? (subjectStudentCounts[r.subjectId] ?? 0) : 0;
+        const totalStudents = classCount > 0 ? classCount : subjectCount;
+        return {
+          ...r,
+          maxScore: Number(r.maxScore),
+          submissionCount: submissionCounts[r.id] ?? 0,
+          totalStudents,
+        };
+      });
     }),
 
   // ── Professor: ver submissões de uma atividade ──────────────────────────
