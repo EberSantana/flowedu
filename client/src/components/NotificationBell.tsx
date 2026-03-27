@@ -75,9 +75,17 @@ export default function NotificationBell() {
       markAsReadMutation.mutate({ id: notification.id });
     }
 
-    // Navegar para o link se existir
-    if (notification.link) {
+    // Navegar para o link se existir, mas NUNCA para rotas do portal do aluno.
+    // O NotificationBell é usado pelo professor — links /student/* são do portal do aluno
+    // e causariam redirecionamento para a tela de login do aluno.
+    const isStudentRoute = notification.link &&
+      (notification.link.startsWith('/student/') || notification.link.startsWith('/student-'));
+
+    if (notification.link && !isStudentRoute) {
       setLocation(notification.link);
+      setIsOpen(false);
+    } else {
+      // Notificação informativa — apenas fecha o painel sem navegar
       setIsOpen(false);
     }
   };

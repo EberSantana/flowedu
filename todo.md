@@ -7702,3 +7702,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar feature tag em todas as 18 chamadas invokeLLM do routers.ts
 - [x] Atualizar mapeamento featureNames com 20 features (professor + aluno + sistema)
 - [x] Atualizar versão para 5.18.0
+
+## v5.19.0 - Notificações automáticas para alunos
+- [x] Corrigir clique em notificações de prova no NotificationBell (não redirecionar para login do aluno)
+- [x] Adicionar notificação automática ao gerar exercícios de módulo/trilha (generateModuleExercises)
+- [x] Adicionar notificação automática ao criar atividade de trilha (assignments.create)

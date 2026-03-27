@@ -3012,6 +3012,23 @@ Retorne um JSON com a estrutura:
           }
         }
         
+        // Notificar alunos matriculados na disciplina sobre novos exercícios do módulo
+        try {
+          const enrolled = await db.getStudentsBySubject(module.subjectId, ctx.user.id);
+          const activeStudents = enrolled.filter((s: any) => s.status === 'active' && s.userId);
+          for (const student of activeStudents) {
+            await db.createNotification({
+              userId: (student as any).userId,
+              type: 'new_assignment',
+              title: '📚 Novos Exercícios Disponíveis',
+              message: `Novos exercícios foram gerados para o módulo "${module.title}" da sua trilha de aprendizado.`,
+              link: '/student/learning-path',
+              relatedId: input.moduleId,
+            });
+          }
+        } catch (e) {
+          console.error('[generateModuleExercises] Erro ao notificar alunos:', e);
+        }
         return result;
       }),
 
@@ -6083,9 +6100,34 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           professorId: ctx.user.id,
         });
         
-        // Notificações serão implementadas em segundo plano
-        // TODO: Adicionar worker para notificar alunos sobre novas atividades
-        
+        // Notificar alunos matriculados sobre nova atividade de trilha
+        try {
+          // Buscar o módulo via tópico para obter o subjectId
+          const topic = await db.getLearningTopicsByModule(input.topicId, ctx.user.id);
+          const topicData = topic?.find((t: any) => t.id === input.topicId);
+          if (topicData) {
+            const moduleData = await db.getLearningModuleById(topicData.moduleId, ctx.user.id);
+            if (moduleData) {
+              const enrolled = await db.getStudentsBySubject(moduleData.subjectId, ctx.user.id);
+              const activeStudents = enrolled.filter((s: any) => s.status === 'active' && s.userId);
+              const dueMsg = input.dueDate
+                ? ` Prazo: ${new Date(input.dueDate).toLocaleDateString('pt-BR')}.`
+                : '';
+              for (const student of activeStudents) {
+                await db.createNotification({
+                  userId: (student as any).userId,
+                  type: 'new_assignment',
+                  title: '📋 Nova Atividade Disponível',
+                  message: `A atividade "${input.title}" foi adicionada à trilha de aprendizado.${dueMsg}`,
+                  link: '/student/learning-path',
+                  relatedId: assignment.id,
+                });
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[assignments.create] Erro ao notificar alunos:', e);
+        }
         return assignment;
       }),
     
