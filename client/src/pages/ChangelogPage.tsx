@@ -23,9 +23,28 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.36.0",
+    version: "5.37.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Login dark/tech, busca na Central de Ajuda e filtro disciplina+turma no Relatório de Trilhas",
+    changes: [
+      {
+        type: "improvement",
+        text: "Tela de login do professor redesenhada no estilo dark/tech — fundo escuro #080d1a, logo F com gradiente teal, inputs escuros e botão com gradiente, consistente com a nova tela de entrada",
+      },
+      {
+        type: "feature",
+        text: "Busca funcional em tempo real na Central de Ajuda — filtra 14 artigos ao digitar com badge de categoria, contador de resultados e botão para limpar a busca",
+      },
+      {
+        type: "improvement",
+        text: "Filtro disciplina+turma padronizado no Relatório de Trilhas de Aprendizado — mesmo visual 'Disciplina — Turma' das outras páginas de relatório",
+      },
+    ],
+  },
+  {
+    version: "5.36.0",
+    date: "27/03/2026",
     highlight: "Nova tela de entrada dark/tech com dois portais",
     changes: [
       {

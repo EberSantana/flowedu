@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +18,7 @@ import {
   Shield, 
   AlertTriangle,
   Info,
-  GraduationCap
 } from "lucide-react";
-import { getLoginUrl } from "@/const";
 
 export default function TeacherLogin() {
   const [email, setEmail] = useState("");
@@ -36,7 +33,6 @@ export default function TeacherLogin() {
 
   const utils = trpc.useUtils();
 
-  // Verificar se há bloqueio salvo no localStorage
   useEffect(() => {
     const blockUntil = localStorage.getItem("loginBlockUntil");
     if (blockUntil) {
@@ -50,14 +46,10 @@ export default function TeacherLogin() {
         localStorage.removeItem("loginAttempts");
       }
     }
-    
     const attempts = localStorage.getItem("loginAttempts");
-    if (attempts) {
-      setLoginAttempts(parseInt(attempts));
-    }
+    if (attempts) setLoginAttempts(parseInt(attempts));
   }, []);
 
-  // Contador regressivo para desbloqueio
   useEffect(() => {
     if (isBlocked && blockTimeRemaining > 0) {
       const timer = setInterval(() => {
@@ -76,16 +68,13 @@ export default function TeacherLogin() {
     }
   }, [isBlocked, blockTimeRemaining]);
 
-  // Query para verificar sessão após login
   const { data: sessionData } = trpc.auth.me.useQuery(undefined, {
     enabled: isVerifyingSession,
     refetchInterval: isVerifyingSession ? 500 : false,
   });
 
-  // Redirecionar quando sessão for confirmada
   useEffect(() => {
     if (isVerifyingSession && sessionData) {
-      // Limpar tentativas após login bem-sucedido
       localStorage.removeItem("loginAttempts");
       localStorage.removeItem("loginBlockUntil");
       window.location.href = "/dashboard";
@@ -99,26 +88,16 @@ export default function TeacherLogin() {
         icon: <CheckCircle className="h-4 w-4 text-green-500" />,
       });
       setIsLoggingIn(true);
-      
-      // Invalidar cache e começar verificação de sessão
       await utils.auth.me.invalidate();
       setIsVerifyingSession(true);
-      
-      // Fallback: redirecionar após 3 segundos se verificação não funcionar
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 3000);
+      setTimeout(() => { window.location.href = "/dashboard"; }, 3000);
     },
     onError: (error) => {
-      // Incrementar tentativas de login
       const newAttempts = loginAttempts + 1;
       setLoginAttempts(newAttempts);
       localStorage.setItem("loginAttempts", newAttempts.toString());
-      
-      // Bloquear após 5 tentativas
       if (newAttempts >= 5) {
-        const blockDuration = 5 * 60 * 1000; // 5 minutos
-        const blockUntil = Date.now() + blockDuration;
+        const blockUntil = Date.now() + 5 * 60 * 1000;
         localStorage.setItem("loginBlockUntil", blockUntil.toString());
         setIsBlocked(true);
         setBlockTimeRemaining(300);
@@ -127,282 +106,297 @@ export default function TeacherLogin() {
           icon: <AlertTriangle className="h-4 w-4 text-red-500" />,
         });
       } else {
-        toast.error(error.message, {
-          description: `Tentativa ${newAttempts} de 5`,
-        });
+        toast.error(error.message, { description: `Tentativa ${newAttempts} de 5` });
       }
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (isBlocked) {
       toast.error("Conta bloqueada", {
-        description: `Aguarde ${Math.floor(blockTimeRemaining / 60)}:${(blockTimeRemaining % 60).toString().padStart(2, '0')} para tentar novamente.`,
+        description: `Aguarde ${Math.floor(blockTimeRemaining / 60)}:${(blockTimeRemaining % 60).toString().padStart(2, "0")} para tentar novamente.`,
       });
       return;
     }
-
     const trimmedEmail = email.trim().toLowerCase();
-
-    if (!trimmedEmail) {
-      toast.error("Digite seu e-mail");
+    if (!trimmedEmail) { toast.error("Digite seu e-mail"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      toast.error("E-mail inválido", { description: "Digite um endereço de e-mail válido." });
       return;
     }
-
-    // Validação básica de e-mail
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) {
-      toast.error("E-mail inválido", {
-        description: "Digite um endereço de e-mail válido.",
-      });
-      return;
-    }
-
-    if (!password) {
-      toast.error("Digite sua senha");
-      return;
-    }
-
+    if (!password) { toast.error("Digite sua senha"); return; }
     if (password.length < 6) {
-      toast.error("Senha muito curta", {
-        description: "A senha deve ter pelo menos 6 caracteres.",
-      });
+      toast.error("Senha muito curta", { description: "A senha deve ter pelo menos 6 caracteres." });
       return;
     }
-
-    loginMutation.mutate({
-      email: trimmedEmail,
-      password: password,
-    });
+    loginMutation.mutate({ email: trimmedEmail, password });
   };
 
-  // Tela de sucesso após login
+  // Tela de sucesso
   if (isLoggingIn) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center border-0 shadow-2xl">
-          <CardContent className="pt-10 pb-10">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-              <CheckCircle className="h-12 w-12 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Autenticação Confirmada</h2>
-            <p className="text-muted-foreground mb-6">
-              Sua sessão foi iniciada com segurança.
-            </p>
-            <div className="flex items-center justify-center gap-2 text-primary">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span className="font-medium">Redirecionando para o sistema...</span>
-            </div>
-            <div className="mt-6 p-3 bg-muted/50 rounded-lg">
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <Shield className="h-4 w-4" />
-                <span>Conexão segura estabelecida</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ background: "linear-gradient(135deg, #080d1a 0%, #0d1528 50%, #080d1a 100%)" }}
+      >
+        <div className="text-center">
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ background: "rgba(0,230,180,0.15)", border: "2px solid rgba(0,230,180,0.4)" }}
+          >
+            <CheckCircle className="h-12 w-12" style={{ color: "#00e6b4" }} />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Autenticação Confirmada</h2>
+          <p className="mb-6" style={{ color: "rgba(255,255,255,0.6)" }}>
+            Sua sessão foi iniciada com segurança.
+          </p>
+          <div className="flex items-center justify-center gap-2" style={{ color: "#00e6b4" }}>
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="font-medium">Redirecionando para o sistema...</span>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Lado esquerdo - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-12 flex-col justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-8">
-            <img src="/logo.png" alt="FlowEdu" className="h-12 w-12" />
-            <div>
-              <h1 className="text-2xl font-bold text-white">FlowEdu</h1>
-              <p className="text-white/70 text-sm">Onde a educação flui</p>
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #080d1a 0%, #0d1528 50%, #080d1a 100%)" }}
+    >
+      {/* Glow de fundo */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,180,140,0.08) 0%, transparent 70%)",
+        }}
+      />
+
+      {/* Grid sutil */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "linear-gradient(rgba(0,230,180,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,230,180,0.03) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Voltar */}
+        <Link href="/">
+          <button
+            className="flex items-center gap-2 mb-8 text-sm font-medium transition-colors"
+            style={{ color: "rgba(255,255,255,0.5)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#00e6b4")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar ao início
+          </button>
+        </Link>
+
+        {/* Card principal */}
+        <div
+          className="rounded-2xl p-8"
+          style={{
+            background: "rgba(13,21,40,0.9)",
+            border: "1px solid rgba(0,230,180,0.15)",
+            boxShadow: "0 0 40px rgba(0,0,0,0.5), 0 0 80px rgba(0,180,140,0.05)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
+          {/* Header */}
+          <div className="text-center mb-8">
+            {/* Logo */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-xl"
+                style={{
+                  background: "linear-gradient(135deg, #00c896 0%, #0080ff 100%)",
+                  boxShadow: "0 0 20px rgba(0,200,150,0.4)",
+                }}
+              >
+                F
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-bold text-white">FlowEdu</div>
+                <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Portal do Professor</div>
+              </div>
             </div>
-          </div>
-        </div>
-        
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Bem-vindo de volta!
-            </h2>
-            <p className="text-white/80 text-lg leading-relaxed">
-              Acesse sua conta para gerenciar suas turmas, disciplinas e acompanhar o progresso dos seus alunos.
+
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: "rgba(0,230,180,0.1)", border: "1px solid rgba(0,230,180,0.2)" }}
+            >
+              <Shield className="h-7 w-7" style={{ color: "#00e6b4" }} />
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-1">Acesso Seguro</h1>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>
+              Entre com suas credenciais de professor
             </p>
           </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <div className="text-3xl font-bold text-white mb-1">100%</div>
-              <div className="text-white/70 text-sm">Seguro e Criptografado</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <div className="text-3xl font-bold text-white mb-1">24/7</div>
-              <div className="text-white/70 text-sm">Disponível Online</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="text-white/60 text-sm">
-          © 2026 FlowEdu. Todos os direitos reservados.
-        </div>
-      </div>
 
-      {/* Lado direito - Formulário */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
-        <div className="w-full max-w-md">
-          {/* Link voltar - Mobile */}
-          <Link href="/">
-            <Button variant="ghost" className="mb-6 text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao início
-            </Button>
-          </Link>
-
-          <Card className="border-0 shadow-2xl">
-            <CardHeader className="text-center pb-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-primary" />
+          {/* Alerta de bloqueio */}
+          {isBlocked && (
+            <div
+              className="rounded-xl p-4 mb-6 flex items-start gap-3"
+              style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}
+            >
+              <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-red-400 text-sm">Conta Temporariamente Bloqueada</p>
+                <p className="text-red-400/70 text-xs mt-1">
+                  Aguarde{" "}
+                  <span className="font-mono font-bold">
+                    {Math.floor(blockTimeRemaining / 60)}:{(blockTimeRemaining % 60).toString().padStart(2, "0")}
+                  </span>{" "}
+                  para tentar novamente.
+                </p>
               </div>
-              <CardTitle className="text-2xl font-bold text-foreground">Acesso Seguro</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Entre com suas credenciais de professor
-              </CardDescription>
-            </CardHeader>
+            </div>
+          )}
 
-            <CardContent className="space-y-6">
-              {/* Alerta de bloqueio */}
-              {isBlocked && (
-                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-destructive">Conta Temporariamente Bloqueada</h4>
-                      <p className="text-sm text-destructive/80 mt-1">
-                        Muitas tentativas de login incorretas. Aguarde{" "}
-                        <span className="font-mono font-bold">
-                          {Math.floor(blockTimeRemaining / 60)}:{(blockTimeRemaining % 60).toString().padStart(2, '0')}
-                        </span>{" "}
-                        para tentar novamente.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+          {/* Aviso de tentativas */}
+          {loginAttempts > 0 && loginAttempts < 5 && !isBlocked && (
+            <div
+              className="rounded-xl p-3 mb-6 flex items-center gap-2"
+              style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
+            >
+              <Info className="h-4 w-4 text-amber-400 flex-shrink-0" />
+              <span className="text-amber-400 text-xs">
+                Tentativa {loginAttempts} de 5. Após 5 tentativas, sua conta será bloqueada.
+              </span>
+            </div>
+          )}
 
-              {/* Aviso de tentativas */}
-              {loginAttempts > 0 && loginAttempts < 5 && !isBlocked && (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 text-sm">
-                    <Info className="h-4 w-4" />
-                    <span>Tentativa {loginAttempts} de 5. Após 5 tentativas, sua conta será bloqueada temporariamente.</span>
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* E-mail */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground font-medium">E-mail Institucional</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="professor@escola.edu.br"
-                      className="pl-11 h-12 bg-muted/50 border-muted-foreground/20 focus:border-primary"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loginMutation.isPending || isBlocked}
-                      autoComplete="email"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-
-                {/* Senha */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-foreground font-medium">Senha</Label>
-                    <Link href="/esqueci-senha" className="text-sm text-primary hover:underline font-medium">
-                      Esqueceu a senha?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      className="pl-11 pr-11 h-12 bg-muted/50 border-muted-foreground/20 focus:border-primary"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loginMutation.isPending || isBlocked}
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Lembrar-me */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="remember" 
-                    checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                    disabled={isBlocked}
-                  />
-                  <label
-                    htmlFor="remember"
-                    className="text-sm text-muted-foreground cursor-pointer select-none"
-                  >
-                    Manter-me conectado neste dispositivo
-                  </label>
-                </div>
-
-                {/* Botão de Login */}
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base shadow-lg shadow-primary/25"
+          {/* Formulário */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* E-mail */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                E-mail Institucional
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <Input
+                  type="email"
+                  placeholder="professor@escola.edu.br"
+                  className="pl-11 h-12 text-white placeholder:text-white/30 border-white/10 focus:border-teal-400/50 focus-visible:ring-teal-400/20"
+                  style={{ background: "rgba(255,255,255,0.05)" }}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={loginMutation.isPending || isBlocked}
-                >
-                  {loginMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Autenticando...
-                    </>
-                  ) : (
-                    <>
-                      <LogIn className="h-5 w-5 mr-2" />
-                      Entrar no Sistema
-                    </>
-                  )}
-                </Button>
-              </form>
+                  autoComplete="email"
+                  autoFocus
+                />
+              </div>
+            </div>
 
-              {/* Link para cadastro */}
-              <div className="text-center text-sm text-muted-foreground pt-2">
-                Não possui uma conta?{" "}
-                <Link href="/cadastro-professor" className="text-primary hover:underline font-semibold">
-                  Solicitar Acesso
+            {/* Senha */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  Senha
+                </Label>
+                <Link href="/esqueci-senha">
+                  <span className="text-xs font-medium transition-colors cursor-pointer" style={{ color: "#00e6b4" }}>
+                    Esqueceu a senha?
+                  </span>
                 </Link>
               </div>
-
-              {/* Indicador de segurança */}
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-4 border-t border-muted-foreground/10">
-                <Shield className="h-3.5 w-3.5" />
-                <span>Conexão protegida por criptografia SSL/TLS</span>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="pl-11 pr-11 h-12 text-white placeholder:text-white/30 border-white/10 focus:border-teal-400/50 focus-visible:ring-teal-400/20"
+                  style={{ background: "rgba(255,255,255,0.05)" }}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loginMutation.isPending || isBlocked}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: "rgba(255,255,255,0.3)" }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Lembrar-me */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                disabled={isBlocked}
+                className="border-white/20 data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500"
+              />
+              <label
+                htmlFor="remember"
+                className="text-sm cursor-pointer select-none"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                Manter-me conectado neste dispositivo
+              </label>
+            </div>
+
+            {/* Botão de Login */}
+            <button
+              type="submit"
+              disabled={loginMutation.isPending || isBlocked}
+              className="w-full h-12 rounded-xl font-semibold text-base text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: loginMutation.isPending || isBlocked
+                  ? "rgba(0,200,150,0.4)"
+                  : "linear-gradient(135deg, #00c896 0%, #0080ff 100%)",
+                boxShadow: loginMutation.isPending || isBlocked ? "none" : "0 0 20px rgba(0,200,150,0.3)",
+              }}
+            >
+              {loginMutation.isPending ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Autenticando...
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-5 w-5" />
+                  Entrar no Sistema
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Link cadastro */}
+          <div className="text-center text-sm mt-6" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Não possui uma conta?{" "}
+            <Link href="/cadastro-professor">
+              <span className="font-semibold cursor-pointer transition-colors" style={{ color: "#00e6b4" }}>
+                Solicitar Acesso
+              </span>
+            </Link>
+          </div>
+
+          {/* Segurança */}
+          <div
+            className="flex items-center justify-center gap-2 text-xs mt-6 pt-6"
+            style={{ color: "rgba(255,255,255,0.25)", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <Shield className="h-3.5 w-3.5" />
+            <span>Conexão protegida por criptografia SSL/TLS</span>
+          </div>
         </div>
+
+        {/* Footer */}
+        <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.2)" }}>
+          © 2026 FlowEdu · Onde a Educação Flui
+        </p>
       </div>
     </div>
   );

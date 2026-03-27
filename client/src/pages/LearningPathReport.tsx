@@ -675,9 +675,9 @@ export default function LearningPathReport() {
                           key={`${c.subjectId}:${c.classId}`}
                           value={`${c.subjectId}:${c.classId}`}
                         >
-                          <span className="font-medium">{c.subjectName}</span>
+                          <span className="font-semibold">{c.subjectName}</span>
                           {c.classId > 0 && (
-                            <span className="text-muted-foreground ml-1">
+                            <span className="text-muted-foreground text-xs ml-2">
                               — {c.className}
                             </span>
                           )}

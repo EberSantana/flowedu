@@ -33,6 +33,33 @@ import PageWrapper from "@/components/PageWrapper";
 export default function Help() {
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Todos os artigos pesquisáveis (seções + links rápidos)
+  const allArticles = [
+    { title: "Manual do Professor", description: "Gerenciar turmas, criar exercícios, provas e trilhas de aprendizado", href: "/ajuda/professor", category: "Manual" },
+    { title: "Manual do Aluno", description: "Acessar trilhas, fazer exercícios, provas e acompanhar progresso", href: "/ajuda/aluno", category: "Manual" },
+    { title: "Perguntas Frequentes", description: "Respostas rápidas para as dúvidas mais comuns de professores e alunos", href: "/ajuda/faq", category: "FAQ" },
+    { title: "Novidades e Atualizações", description: "Histórico de versões e melhorias do sistema", href: "/novidades", category: "Sistema" },
+    { title: "Guia de Instalação VPS", description: "Hospedar o FlowEdu no servidor da sua escola", href: "/ajuda/professor#instalacao", category: "Instalação" },
+    { title: "Como criar uma turma?", description: "Passo a passo para criar e gerenciar turmas", href: "/ajuda/professor#gerenciar-turmas", category: "Professor" },
+    { title: "Como criar exercícios?", description: "Criar exercícios manualmente ou com IA", href: "/ajuda/professor#criar-exercicios", category: "Professor" },
+    { title: "Como fazer uma prova?", description: "Acessar e responder provas online", href: "/ajuda/aluno#provas", category: "Aluno" },
+    { title: "Como ver minhas notas?", description: "Acompanhar notas e progresso acadêmico", href: "/ajuda/aluno#perfil-progresso", category: "Aluno" },
+    { title: "Esqueci minha senha", description: "Recuperar acesso à conta", href: "/ajuda/faq#senha", category: "FAQ" },
+    { title: "Configurações de IA", description: "Configurar provedores de IA: Groq, OpenAI, Anthropic, Gemini", href: "/ajuda/professor#ia", category: "IA" },
+    { title: "Atividades de Sala", description: "Criar e corrigir atividades de sala com envio de arquivos", href: "/ajuda/professor#atividades", category: "Professor" },
+    { title: "Relatórios de Desempenho", description: "Analisar desempenho dos alunos com gráficos e estatísticas", href: "/ajuda/professor#relatorios", category: "Professor" },
+    { title: "Portal do Aluno", description: "Como acessar o portal do aluno com número de matrícula", href: "/ajuda/aluno", category: "Aluno" },
+  ];
+
+  const filteredArticles = searchQuery.trim()
+    ? allArticles.filter(
+        (a) =>
+          a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          a.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          a.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
   const helpSections = [
     {
       title: "Manual do Professor",
@@ -101,18 +128,61 @@ export default function Help() {
           </div>
 
           {/* Search Bar */}
-          <Card className="mb-12">
+          <Card className="mb-8">
             <CardContent className="pt-6">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
                 <Input
                   type="text"
-                  placeholder="Buscar ajuda... (ex: como criar exercício)"
+                  placeholder="Buscar ajuda... (ex: como criar exercício, IA, turma, nota)"
                   className="pl-10 h-12 text-lg"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  autoComplete="off"
                 />
+                {searchQuery && (
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
+
+              {/* Resultados da busca */}
+              {searchQuery.trim() && (
+                <div className="mt-4">
+                  {filteredArticles.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Nenhum resultado encontrado para <strong>"{searchQuery}"</strong>. Tente outro termo.
+                    </p>
+                  ) : (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {filteredArticles.length} resultado{filteredArticles.length !== 1 ? "s" : ""} encontrado{filteredArticles.length !== 1 ? "s" : ""} para <strong>"{searchQuery}"</strong>
+                      </p>
+                      <div className="space-y-2">
+                        {filteredArticles.map((article) => (
+                          <Link key={article.href} href={article.href}>
+                            <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors cursor-pointer border border-transparent hover:border-border">
+                              <FileText className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-sm">{article.title}</span>
+                                  <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{article.category}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5 truncate">{article.description}</p>
+                              </div>
+                              <ExternalLink className="h-3 w-3 text-muted-foreground flex-shrink-0 mt-1" />
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
