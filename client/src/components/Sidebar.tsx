@@ -21,7 +21,6 @@ import {
   BarChart3,
   Route,
   Target,
-  HelpCircle,
   Megaphone,
   KeyRound,
   Brain,
@@ -33,7 +32,6 @@ import {
   BellRing,
   Server,
   FileText,
-  Sparkles,
   Activity,
   MessageCircle,
   Mail,
@@ -682,47 +680,9 @@ export default function Sidebar() {
                     </TooltipContent>
                   </Tooltip>
                   
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          window.location.href = '/ajuda';
-                        }}
-                        className="p-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200 group"
-                      >
-                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                          <HelpCircle className="h-4 w-4" />
-                        </span>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Central de Ajuda</p>
-                    </TooltipContent>
-                  </Tooltip>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          localStorage.setItem('flowedu_seen_version', '5.31.0');
-                          window.location.href = '/novidades';
-                        }}
-                        className="relative p-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200 group"
-                      >
-                        <span className="inline-block transition-transform duration-200 group-hover:scale-110">
-                          <Sparkles className="h-4 w-4" />
-                        </span>
-                        {localStorage.getItem('flowedu_seen_version') !== '5.31.0' && (
-                          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-background" />
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Novidades — v5.31.0 disponível!</p>
-                    </TooltipContent>
-                  </Tooltip>
+
+
               
                   <div className="flex items-center justify-center">
                     <ThemeSelectorCompact />
@@ -765,33 +725,9 @@ export default function Sidebar() {
                     <span className="text-sm">Meu Perfil</span>
                   </Link>
                   
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      window.location.href = '/ajuda';
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-primary hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:shadow-md transition-all duration-200"
-                  >
-                    <HelpCircle className="h-4 w-4" />
-                    <span className="text-sm">Central de Ajuda</span>
-                  </button>
 
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      localStorage.setItem('flowedu_seen_version', '5.31.0');
-                      window.location.href = '/novidades';
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-amber-500 hover:bg-gradient-to-r hover:from-amber-500/10 hover:to-amber-500/5 hover:shadow-md transition-all duration-200"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    <span className="text-sm">Novidades</span>
-                    {localStorage.getItem('flowedu_seen_version') !== '5.31.0' && (
-                      <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
-                        Novo
-                      </span>
-                    )}
-                  </button>
+
+
                   
                   <ThemeSelector
                     trigger={
