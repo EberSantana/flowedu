@@ -4133,30 +4133,28 @@ JSON (descrições MAX 15 chars):
         const checkRows = (checkResult[0] as any[]) || [];
         if (checkRows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
         const { subjectId, classId } = checkRows[0];
-        // Buscar todos os alunos ativos
+        // Buscar todos os alunos ativos com nome correto da tabela students.fullName
         let studentsResult: any[];
         if (classId) {
           studentsResult = await dbConn.execute(
-            sql`SELECT s.id AS studentId, u.name
+            sql`SELECT s.id AS studentId, s.fullName AS name
                 FROM students s
-                JOIN users u ON u.id = s.userId
-                JOIN student_class_enrollments sce ON sce.studentId = s.id
-                WHERE sce.classId = ${classId} AND sce.status = 'active'
-                ORDER BY u.name ASC`
+                INNER JOIN student_class_enrollments sce ON sce.studentId = s.id
+                WHERE sce.classId = ${classId}
+                ORDER BY s.fullName ASC`
           ) as any[];
         } else {
           studentsResult = await dbConn.execute(
-            sql`SELECT s.id AS studentId, u.name
+            sql`SELECT s.id AS studentId, s.fullName AS name
                 FROM students s
-                JOIN users u ON u.id = s.userId
-                JOIN subjectEnrollments se ON se.studentId = s.id
+                INNER JOIN subjectEnrollments se ON se.studentId = s.id
                 WHERE se.subjectId = ${subjectId} AND se.status = 'active'
-                ORDER BY u.name ASC`
+                ORDER BY s.fullName ASC`
           ) as any[];
         }
         const allStudents: { studentId: number; name: string }[] = ((studentsResult[0] as any[]) || []).map((r: any) => ({
           studentId: r.studentId,
-          name: r.name,
+          name: r.name || `Aluno #${r.studentId}`,
         }));
         // Buscar alunos que já fizeram a prova (têm pelo menos uma tentativa)
         const doneResult = await dbConn.execute(
@@ -8527,43 +8525,40 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
     getPendingStudents: protectedProcedure
       .input(z.object({ exerciseId: z.number() }))
       .query(async ({ ctx, input }) => {
-        const db_instance = await db.getDb();
-        if (!db_instance) throw new Error('Database not available');
-        const { studentExercises: seTable, studentExerciseAttempts: seaTable, subjectEnrollments: seEnroll } = await import('../drizzle/schema');
-        const [exercise] = await db_instance
-          .select({ id: seTable.id, teacherId: seTable.teacherId, subjectId: seTable.subjectId, title: seTable.title })
-          .from(seTable)
-          .where(eq(seTable.id, input.exerciseId))
-          .limit(1);
-        if (!exercise) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado' });
-        if (exercise.teacherId !== ctx.user.id && ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Sem permissão' });
-        }
-        const enrolledRaw = await db_instance
-          .select({ studentId: seEnroll.studentId })
-          .from(seEnroll)
-          .where(and(eq(seEnroll.subjectId, exercise.subjectId), eq(seEnroll.userId, ctx.user.id), eq(seEnroll.status, 'active')));
-        const enrolledIds = enrolledRaw.map(e => e.studentId);
-        if (enrolledIds.length === 0) return { pending: [], done: [], total: 0, exerciseTitle: exercise.title };
-        const completedRaw = await db_instance
-          .select({ studentId: seaTable.studentId })
-          .from(seaTable)
-          .where(and(eq(seaTable.exerciseId, input.exerciseId), eq(seaTable.status, 'completed')));
-        const completedIds = new Set(completedRaw.map(r => r.studentId));
-        const pendingIds = enrolledIds.filter(id => !completedIds.has(id));
-        const doneIds = enrolledIds.filter(id => completedIds.has(id));
-        const fetchStudentName = async (sid: number) => {
-          const res = await db_instance!.execute(sql`SELECT id, fullName FROM students WHERE id = ${sid} LIMIT 1`) as any[];
-          const row = ((res[0] as any[]) || [])[0];
-          return row ? { studentId: sid, name: row.fullName || `Aluno #${sid}` } : null;
-        };
-        const pendingStudents = (await Promise.all(pendingIds.map(fetchStudentName))).filter(Boolean) as { studentId: number; name: string }[];
-        const doneStudents = (await Promise.all(doneIds.map(fetchStudentName))).filter(Boolean) as { studentId: number; name: string }[];
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Verificar que o exercício pertence ao professor
+        const exResult = await dbConn.execute(
+          sql`SELECT id, subjectId, title FROM student_exercises WHERE id = ${input.exerciseId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        const exRows = (exResult[0] as any[]) || [];
+        if (exRows.length === 0) throw new TRPCError({ code: 'NOT_FOUND', message: 'Exercício não encontrado' });
+        const { subjectId, title } = exRows[0];
+        // Buscar todos os alunos matriculados na disciplina (com nome correto da tabela students)
+        const allStudentsResult = await dbConn.execute(
+          sql`SELECT s.id AS studentId, s.fullName AS name
+              FROM students s
+              INNER JOIN subjectEnrollments se ON se.studentId = s.id
+              WHERE se.subjectId = ${subjectId} AND se.status = 'active'
+              ORDER BY s.fullName ASC`
+        ) as any[];
+        const allStudents: { studentId: number; name: string }[] = ((allStudentsResult[0] as any[]) || []).map((r: any) => ({
+          studentId: r.studentId,
+          name: r.name || `Aluno #${r.studentId}`,
+        }));
+        if (allStudents.length === 0) return { pending: [], done: [], total: 0, exerciseTitle: title };
+        // Buscar alunos que já completaram o exercício
+        const doneResult = await dbConn.execute(
+          sql`SELECT DISTINCT studentId FROM student_exercise_attempts WHERE exerciseId = ${input.exerciseId} AND status = 'completed'`
+        ) as any[];
+        const doneIds = new Set(((doneResult[0] as any[]) || []).map((r: any) => r.studentId));
+        const done = allStudents.filter(s => doneIds.has(s.studentId));
+        const pending = allStudents.filter(s => !doneIds.has(s.studentId));
         return {
-          pending: pendingStudents.sort((a, b) => a.name.localeCompare(b.name)),
-          done: doneStudents.sort((a, b) => a.name.localeCompare(b.name)),
-          total: enrolledIds.length,
-          exerciseTitle: exercise.title,
+          pending,
+          done,
+          total: allStudents.length,
+          exerciseTitle: title,
         };
       }),
   }),

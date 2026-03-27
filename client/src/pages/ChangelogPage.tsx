@@ -23,9 +23,39 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.27.0",
+    version: "5.29.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Correção crítica: nomes de alunos nas listas de pendentes",
+    changes: [
+      {
+        type: "fix",
+        text: "Corrigido bug crítico onde todos os alunos apareciam com o nome do professor logado nas listas de 'Quem fez / Quem falta' de Exercícios, Provas e Atividades de Sala",
+      },
+      {
+        type: "fix",
+        text: "Corrigido JOIN incorreto nas procedures: agora usa subjectEnrollments.studentId → students.id e exibe students.fullName (nome real do aluno)",
+      },
+      {
+        type: "fix",
+        text: "Contagens de pendentes/concluídos agora refletem corretamente os alunos matriculados na disciplina",
+      },
+    ],
+  },
+  {
+    version: "5.28.0",
+    date: "27/03/2026",
+    highlight: "Página de Novidades atualizada com versões v5.25 a v5.27",
+    changes: [
+      {
+        type: "improvement",
+        text: "Changelog atualizado com as versões v5.25.0, v5.26.0 e v5.27.0",
+      },
+    ],
+  },
+  {
+    version: "5.27.0",
+    date: "27/03/2026",
     highlight: "Quem fez / quem falta em Provas e Atividades de Sala",
     changes: [
       {

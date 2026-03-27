@@ -1020,38 +1020,35 @@ export const activitiesRouter = router({
       const actRows = (actResult[0] as any[]) || [];
       if (actRows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Atividade não encontrada' });
       const { subjectId, classId } = actRows[0];
-      // Buscar todos os alunos ativos (por disciplina ou por turma)
+      // Buscar todos os alunos ativos (por disciplina ou por turma) - usa students.fullName
       let studentsResult: any[];
       if (subjectId) {
         studentsResult = await dbConn.execute(
-          sql`SELECT s.id AS studentId, u.name
+          sql`SELECT s.id AS studentId, s.fullName AS name
               FROM students s
-              JOIN users u ON u.id = s.userId
-              JOIN subjectEnrollments se ON se.studentId = s.id
+              INNER JOIN subjectEnrollments se ON se.studentId = s.id
               WHERE se.subjectId = ${subjectId} AND se.status = 'active'
-              ORDER BY u.name ASC`
+              ORDER BY s.fullName ASC`
         ) as any[];
       } else if (classId) {
         studentsResult = await dbConn.execute(
-          sql`SELECT s.id AS studentId, u.name
+          sql`SELECT s.id AS studentId, s.fullName AS name
               FROM students s
-              JOIN users u ON u.id = s.userId
-              JOIN studentClassEnrollments sce ON sce.studentId = s.id
-              WHERE sce.classId = ${classId} AND sce.status = 'active'
-              ORDER BY u.name ASC`
+              INNER JOIN studentClassEnrollments sce ON sce.studentId = s.id
+              WHERE sce.classId = ${classId}
+              ORDER BY s.fullName ASC`
         ) as any[];
       } else {
         studentsResult = await dbConn.execute(
-          sql`SELECT s.id AS studentId, u.name
+          sql`SELECT s.id AS studentId, s.fullName AS name
               FROM students s
-              JOIN users u ON u.id = s.userId
               WHERE s.userId = ${ctx.user.id}
-              ORDER BY u.name ASC`
+              ORDER BY s.fullName ASC`
         ) as any[];
       }
       const allStudents: { studentId: number; name: string }[] = ((studentsResult[0] as any[]) || []).map((r: any) => ({
         studentId: r.studentId,
-        name: r.name,
+        name: r.name || `Aluno #${r.studentId}`,
       }));
       // Buscar alunos que já enviaram a atividade
       const doneResult = await dbConn.execute(
