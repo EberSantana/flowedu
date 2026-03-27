@@ -23,9 +23,58 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
-    version: "5.24.0",
+    version: "5.27.0",
     date: "27/03/2026",
     label: "Mais recente",
+    highlight: "Quem fez / quem falta em Provas e Atividades de Sala",
+    changes: [
+      {
+        type: "feature",
+        text: "Provas (Banco de Provas): botão 'Alunos' em cada card mostra modal com duas colunas — Faltam fazer (laranja) e Concluíram (verde) com nome de cada aluno",
+      },
+      {
+        type: "feature",
+        text: "Atividades de Sala: botão 'Alunos (X/Y enviaram)' com modal de participação, mostrando quem enviou e quem ainda não enviou",
+      },
+      {
+        type: "improvement",
+        text: "Procedures backend dedicadas para calcular pendentes/concluídos por prova e por atividade, com junção correta entre alunos matriculados e submissões",
+      },
+    ],
+  },
+  {
+    version: "5.26.0",
+    date: "27/03/2026",
+    highlight: "Alunos pendentes nos Exercícios do Banco de Provas",
+    changes: [
+      {
+        type: "feature",
+        text: "Modal de edição de exercício agora abre na aba 'Alunos': mostra quantos faltam fazer (laranja), quantos concluíram (verde) e o total matriculado",
+      },
+      {
+        type: "improvement",
+        text: "Listas ordenadas alfabeticamente com scroll independente — aba Configurações (tentativas + reset) continua disponível na segunda aba",
+      },
+    ],
+  },
+  {
+    version: "5.25.0",
+    date: "27/03/2026",
+    highlight: "Página de Novidades completa com todas as versões",
+    changes: [
+      {
+        type: "improvement",
+        text: "Página Novidades atualizada com versões v5.21.0 a v5.24.0 que estavam faltando no changelog",
+      },
+      {
+        type: "improvement",
+        text: "Badge 'Mais recente' atualizado para apontar sempre para a versão mais nova disponível",
+      },
+    ],
+  },
+  {
+    version: "5.24.0",
+    date: "27/03/2026",
     highlight: "Correção crítica: notificações duplicadas no sino do professor",
     changes: [
       {
