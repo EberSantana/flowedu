@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { GraduationCap, ArrowLeft, LogIn, Hash, Lock, Eye, EyeOff, Shield, Loader2 } from "lucide-react";
+import { GraduationCap, ArrowLeft, LogIn, Hash, Lock, Eye, EyeOff, Shield, Loader2, BookOpen, BarChart2, ClipboardList, Sparkles } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
@@ -11,12 +11,15 @@ export default function StudentLogin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState("");
 
   const loginMutation = trpc.auth.loginStudent.useMutation({
     onSuccess: (data) => {
       if (data?.success) {
-        toast.success(`Bem-vindo, ${data.student?.fullName || "Aluno"}!`);
-        setLocation("/student-dashboard");
+        setWelcomeName(data.student?.fullName || "Aluno");
+        setShowWelcome(true);
+        setTimeout(() => setLocation("/student-dashboard"), 3500);
       } else {
         toast.error("Erro inesperado no login. Tente novamente.");
         setIsLoading(false);
@@ -47,6 +50,60 @@ export default function StudentLogin() {
     setIsLoading(true);
     loginMutation.mutate({ registrationNumber: trimmedRegistration, password: trimmedPassword });
   };
+
+  // Tela de boas-vindas ao aluno
+  if (showWelcome) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #080d1a 0%, #0d1528 50%, #080d1a 100%)" }}
+      >
+        {/* Glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,180,220,0.12) 0%, transparent 70%)" }} />
+        {/* Grid */}
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+
+        <div className="relative z-10 text-center max-w-md w-full">
+          {/* Ícone */}
+          <div
+            className="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ background: "rgba(0,229,192,0.12)", border: "2px solid rgba(0,229,192,0.4)", boxShadow: "0 0 40px rgba(0,229,192,0.2)" }}
+          >
+            <GraduationCap className="h-14 w-14" style={{ color: "#00e5c0" }} />
+          </div>
+
+          {/* Saudação */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Sparkles className="h-5 w-5" style={{ color: "#00e5c0" }} />
+            <span className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00e5c0" }}>Bem-vindo</span>
+            <Sparkles className="h-5 w-5" style={{ color: "#00e5c0" }} />
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-1">{welcomeName}</h2>
+          <p className="text-base mb-8" style={{ color: "rgba(255,255,255,0.5)" }}>Portal do Aluno · FlowEdu</p>
+
+          {/* Cards */}
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            {[
+              { icon: BookOpen, label: "Materiais" },
+              { icon: ClipboardList, label: "Exercícios" },
+              { icon: BarChart2, label: "Progresso" },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="rounded-xl p-3 flex flex-col items-center gap-2" style={{ background: "rgba(0,229,192,0.07)", border: "1px solid rgba(0,229,192,0.15)" }}>
+                <Icon className="h-5 w-5" style={{ color: "#00e5c0" }} />
+                <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.6)" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Carregando */}
+          <div className="flex items-center justify-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" style={{ color: "#00e5c0" }} />
+            <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>Carregando seu painel...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -130,18 +187,18 @@ export default function StudentLogin() {
                 Número de Matrícula
               </Label>
               <div className="relative flex items-center">
-                <Hash className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <Hash className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "#00e5c0" }} />
                 <input
                   type="text"
                   placeholder="Ex: 2024001"
                   className="w-full h-12 rounded-lg pl-11 pr-4 text-sm outline-none transition-colors"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "#0d1a2e",
+                    border: "1px solid rgba(0,229,192,0.2)",
                     color: "white",
                   }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,229,192,0.4)"; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,229,192,0.7)"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,229,192,0.15)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(0,229,192,0.2)"; e.currentTarget.style.boxShadow = "none"; }}
                   value={registrationNumber}
                   onChange={(e) => setRegistrationNumber(e.target.value)}
                   disabled={isLoading}
@@ -157,18 +214,18 @@ export default function StudentLogin() {
                 Senha
               </Label>
               <div className="relative flex items-center">
-                <Lock className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <Lock className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "#00e5c0" }} />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="w-full h-12 rounded-lg pl-11 pr-11 text-sm outline-none transition-colors"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "#0d1a2e",
+                    border: "1px solid rgba(0,229,192,0.2)",
                     color: "white",
                   }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,229,192,0.4)"; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,229,192,0.7)"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,229,192,0.15)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(0,229,192,0.2)"; e.currentTarget.style.boxShadow = "none"; }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
@@ -178,7 +235,7 @@ export default function StudentLogin() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 transition-colors z-10"
-                  style={{ color: "rgba(255,255,255,0.3)" }}
+                  style={{ color: "#00e5c0" }}
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

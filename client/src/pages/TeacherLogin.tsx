@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { GraduationCap, BookOpen, Users, BarChart2, X, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ export default function TeacherLogin() {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState("");
 
   const utils = trpc.useUtils();
 
@@ -83,14 +86,12 @@ export default function TeacherLogin() {
 
   const loginMutation = trpc.auth.loginTeacher.useMutation({
     onSuccess: async (data) => {
-      toast.success(`Bem-vindo, ${data.user.name}!`, {
-        description: "Login realizado com sucesso.",
-        icon: <CheckCircle className="h-4 w-4 text-green-500" />,
-      });
+      setWelcomeName(data.user.name || "Professor");
+      setShowWelcome(true);
       setIsLoggingIn(true);
       await utils.auth.me.invalidate();
       setIsVerifyingSession(true);
-      setTimeout(() => { window.location.href = "/dashboard"; }, 3000);
+      setTimeout(() => { window.location.href = "/dashboard"; }, 3500);
     },
     onError: (error) => {
       const newAttempts = loginAttempts + 1;
@@ -133,27 +134,54 @@ export default function TeacherLogin() {
     loginMutation.mutate({ email: trimmedEmail, password });
   };
 
-  // Tela de sucesso
+  // Tela de boas-vindas ao professor
   if (isLoggingIn) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center p-4"
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, #080d1a 0%, #0d1528 50%, #080d1a 100%)" }}
       >
-        <div className="text-center">
+        {/* Glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,180,140,0.12) 0%, transparent 70%)" }} />
+        {/* Grid */}
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(0,230,180,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,230,180,0.03) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+
+        <div className="relative z-10 text-center max-w-md w-full">
+          {/* Ícone animado */}
           <div
-            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ background: "rgba(0,230,180,0.15)", border: "2px solid rgba(0,230,180,0.4)" }}
+            className="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ background: "rgba(0,230,180,0.12)", border: "2px solid rgba(0,230,180,0.4)", boxShadow: "0 0 40px rgba(0,230,180,0.2)" }}
           >
-            <CheckCircle className="h-12 w-12" style={{ color: "#00e6b4" }} />
+            <GraduationCap className="h-14 w-14" style={{ color: "#00e6b4" }} />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Autenticação Confirmada</h2>
-          <p className="mb-6" style={{ color: "rgba(255,255,255,0.6)" }}>
-            Sua sessão foi iniciada com segurança.
-          </p>
-          <div className="flex items-center justify-center gap-2" style={{ color: "#00e6b4" }}>
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span className="font-medium">Redirecionando para o sistema...</span>
+
+          {/* Saudação */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Sparkles className="h-5 w-5" style={{ color: "#00e6b4" }} />
+            <span className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00e6b4" }}>Bem-vindo de volta</span>
+            <Sparkles className="h-5 w-5" style={{ color: "#00e6b4" }} />
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-1">{welcomeName}</h2>
+          <p className="text-base mb-8" style={{ color: "rgba(255,255,255,0.5)" }}>Portal do Professor · FlowEdu</p>
+
+          {/* Cards de funcionalidades */}
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            {[
+              { icon: BookOpen, label: "Disciplinas" },
+              { icon: Users, label: "Turmas" },
+              { icon: BarChart2, label: "Relatórios" },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="rounded-xl p-3 flex flex-col items-center gap-2" style={{ background: "rgba(0,230,180,0.07)", border: "1px solid rgba(0,230,180,0.15)" }}>
+                <Icon className="h-5 w-5" style={{ color: "#00e6b4" }} />
+                <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.6)" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Carregando */}
+          <div className="flex items-center justify-center gap-2" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <Loader2 className="h-4 w-4 animate-spin" style={{ color: "#00e6b4" }} />
+            <span className="text-sm">Carregando seu painel...</span>
           </div>
         </div>
       </div>
@@ -278,18 +306,18 @@ export default function TeacherLogin() {
                 E-mail Institucional
               </Label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <Mail className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "#00e6b4" }} />
                 <input
                   type="email"
                   placeholder="professor@escola.edu.br"
                   className="w-full h-12 rounded-lg pl-11 pr-4 text-sm outline-none transition-colors"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "#0d1a2e",
+                    border: "1px solid rgba(0,230,180,0.2)",
                     color: "white",
                   }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.4)"; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.7)"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,230,180,0.15)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.2)"; e.currentTarget.style.boxShadow = "none"; }}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loginMutation.isPending || isBlocked}
@@ -312,18 +340,18 @@ export default function TeacherLogin() {
                 </Link>
               </div>
               <div className="relative flex items-center">
-                <Lock className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <Lock className="absolute left-3 h-5 w-5 pointer-events-none z-10" style={{ color: "#00e6b4" }} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  placeholder="••••••••"
                   className="w-full h-12 rounded-lg pl-11 pr-11 text-sm outline-none transition-colors"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "#0d1a2e",
+                    border: "1px solid rgba(0,230,180,0.2)",
                     color: "white",
                   }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.4)"; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.7)"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,230,180,0.15)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(0,230,180,0.2)"; e.currentTarget.style.boxShadow = "none"; }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loginMutation.isPending || isBlocked}
@@ -333,7 +361,7 @@ export default function TeacherLogin() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 transition-colors z-10"
-                  style={{ color: "rgba(255,255,255,0.3)" }}
+                  style={{ color: "#00e6b4" }}
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
