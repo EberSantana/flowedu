@@ -72,6 +72,7 @@ function getMesNome(pageNum: number): string {
 // Função auxiliar para extrair eventos com LLM (fallback)
 async function extractEventsWithLLM(pdfText: string, calendarYear: number): Promise<Array<{title: string; description: string; eventDate: string; eventType: 'holiday' | 'commemorative' | 'school_event' | 'personal'}>> {
   const response = await invokeLLM({
+    feature: 'extract_calendar_events',
     messages: [
       {
         role: "system",
@@ -2313,6 +2314,7 @@ Diretrizes OBRIGATÓRIAS:
         
         console.log('[generateFromAI] Calling LLM...');
         const response = await invokeLLM({
+          feature: 'generate_exercise',
           messages: [
             { role: 'system', content: 'Você é um especialista em design instrucional e pedagogia. Responda APENAS em JSON válido.' },
             { role: 'user', content: prompt }
@@ -2618,6 +2620,7 @@ Crie sugestões no formato JSON:
 }`;
         
         const response = await invokeLLM({
+          feature: 'suggest_lesson_plans',
           messages: [
             { role: 'system', content: 'Você é um especialista em pedagogia e metodologias ativas de ensino.' },
             { role: 'user', content: prompt }
@@ -2717,6 +2720,7 @@ Crie sugestões no formato JSON:
         };
         
         const response = await invokeLLM({
+          feature: 'generate_assessment',
           messages: [
             {
               role: 'system',
@@ -2847,6 +2851,7 @@ Retorne um JSON com a estrutura:
         };
         
         const response = await invokeLLM({
+          feature: 'generate_exercise',
           messages: [
             {
               role: 'system',
@@ -3038,6 +3043,7 @@ Retorne um JSON com a estrutura:
         }));
         
         const response = await invokeLLM({
+          feature: 'generate_mind_map',
           max_tokens: 1500,
           messages: [
             {
@@ -3164,6 +3170,7 @@ JSON (descrições MAX 20 chars):
         }));
         
         const response = await invokeLLM({
+          feature: 'generate_infographic',
           messages: [
             {
               role: 'system',
@@ -3283,6 +3290,7 @@ Retorne JSON:
         const topics = moduleWithTopics?.topics?.slice(0, 5) || [];
         
         const response = await invokeLLM({
+          feature: 'generate_mind_map',
           max_tokens: 1000,
           messages: [
             {
@@ -5546,6 +5554,7 @@ Dados coletados do sistema FlowEdu no período de ${input.days} dias:
         }[input.focus];
 
         const response = await invokeLLM({
+          feature: 'learning_analytics',
           messages: [
             {
               role: 'system',
@@ -8617,6 +8626,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
 
         try {
           const response = await invokeLLM({
+            feature: 'student_study_tips',
             messages: [
               {
                 role: "system",
@@ -8786,6 +8796,7 @@ Foque em desenvolver autonomia de aprendizado e pensamento crítico, não apenas
 
         try {
           const response = await invokeLLM({
+            feature: 'student_study_material',
             messages: [
               {
                 role: "system",
@@ -9985,6 +9996,7 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
 
         // ===== CHAMAR IA =====
         const response = await invokeLLM({
+          feature: 'student_analysis',
           messages: [
             {
               role: 'system',
@@ -10507,6 +10519,7 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
           const topicContext = input.topicName ? `Tópico específico: ${input.topicName}` : "";
           
           const response = await invokeLLM({
+            feature: 'student_ai_hints',
             messages: [
               {
                 role: "system",
@@ -10703,6 +10716,7 @@ Forneça:
 
         try {
           const response = await invokeLLM({
+            feature: 'student_study_material',
             messages: [
               { role: 'system', content: 'Você é um tutor educacional que cria materiais de estudo personalizados.' },
               { role: 'user', content: prompt },
@@ -10967,6 +10981,7 @@ Retorne uma análise clara e objetiva.`;
         
         try {
           const response = await invokeLLM({
+            feature: 'student_pattern_analysis',
             messages: [
               { role: 'system', content: 'Você é um tutor educacional especializado em identificar padrões de aprendizagem.' },
               { role: 'user', content: prompt },
@@ -11026,6 +11041,7 @@ Gere 5 sugestões práticas e específicas de estudo para melhorar o desempenho.
         
         try {
           const response = await invokeLLM({
+            feature: 'student_study_suggestions',
             messages: [
               { role: 'system', content: 'Você é um tutor educacional que cria sugestões de estudo personalizadas.' },
               { role: 'user', content: prompt },
@@ -11102,6 +11118,7 @@ Retorne em formato JSON com estrutura:
         
         try {
           const response = await invokeLLM({
+            feature: 'student_study_plan',
             messages: [
               { role: 'system', content: 'Você é um planejador educacional especializado.' },
               { role: 'user', content: prompt },
@@ -11838,6 +11855,7 @@ Retorne JSON com:
 
   try {
     const response = await invokeLLM({
+      feature: 'ct_answer_evaluation',
       messages: [
         { role: 'system', content: 'Você é um avaliador de Pensamento Computacional. Seja justo e construtivo.' },
         { role: 'user', content: prompts[dimension] || prompts.decomposition },

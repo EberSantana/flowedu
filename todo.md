@@ -7694,3 +7694,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar item "Configurações de IA" no Sidebar de Administração
 - [x] Integrar logging automático de tokens no invokeLLM (llm.ts)
 - [x] Atualizar versão para 5.17.0
+
+## v5.18.0 - Gráfico de Uso Diário e Feature Tagging
+- [x] Substituir tabela de uso diário por gráfico de linha Chart.js (duplo eixo: chamadas + tokens)
+- [x] Gráfico mostra últimos 30 dias com área preenchida e tooltip interativo
+- [x] Tabela de dados recolhível abaixo do gráfico (details/summary)
+- [x] Adicionar feature tag em todas as 18 chamadas invokeLLM do routers.ts
+- [x] Atualizar mapeamento featureNames com 20 features (professor + aluno + sistema)
+- [x] Atualizar versão para 5.18.0

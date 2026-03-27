@@ -1,4 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line, Bar } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+);
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,12 +41,26 @@ import {
 
 // Mapeamento de features para nomes legíveis
 const featureNames: Record<string, string> = {
+  // Professor
   generate_exercise: "Gerar Exercício",
   generate_assessment: "Gerar Prova",
   generate_activity: "Gerar Atividade",
-  analyze_student: "Analisar Aluno",
+  suggest_lesson_plans: "Sugerir Planos de Aula",
+  generate_mind_map: "Gerar Mapa Mental",
   generate_infographic: "Gerar Infográfico",
-  extract_calendar: "Extrair Calendário",
+  extract_calendar_events: "Extrair Eventos do Calendário",
+  learning_analytics: "Análise de Aprendizado",
+  // Aluno
+  student_study_tips: "Dicas de Estudo (Aluno)",
+  student_study_material: "Material de Estudo (Aluno)",
+  student_analysis: "Análise do Aluno",
+  student_ai_hints: "Dicas de IA (Dúvidas)",
+  student_pattern_analysis: "Análise de Padrões",
+  student_study_suggestions: "Sugestões de Estudo",
+  student_study_plan: "Plano de Estudo",
+  // Sistema
+  ct_answer_evaluation: "Avaliar Resposta (PC)",
+  analyze_student: "Analisar Aluno",
   analyze_answer: "Analisar Resposta",
   generate_content: "Gerar Conteúdo",
   other: "Outros",
@@ -522,39 +561,127 @@ export default function AISettingsPage() {
                 </Card>
               )}
 
-              {/* Uso diário */}
-              {stats.daily && stats.daily.length > 0 && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                      Uso Diário
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b text-gray-500">
-                            <th className="text-left py-2 pr-4">Data</th>
-                            <th className="text-right py-2 pr-4">Chamadas</th>
-                            <th className="text-right py-2">Tokens</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stats.daily.slice(-14).reverse().map((d: any, i: number) => (
-                            <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                              <td className="py-2 pr-4 text-gray-600">{formatDate(d.date)}</td>
-                              <td className="py-2 pr-4 text-right font-medium">{d.calls}</td>
-                              <td className="py-2 text-right text-gray-500">{formatNumber(d.tokens || 0)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              {/* Uso diário — gráfico de linha */}
+              {stats.daily && stats.daily.length > 0 && (() => {
+                const dailySlice = stats.daily.slice(-30);
+                const labels = dailySlice.map((d: any) => {
+                  const dt = new Date(d.date);
+                  return `${String(dt.getUTCDate()).padStart(2,'0')}/${String(dt.getUTCMonth()+1).padStart(2,'0')}`;
+                });
+                const callsData = dailySlice.map((d: any) => Number(d.calls) || 0);
+                const tokensData = dailySlice.map((d: any) => Number(d.tokens) || 0);
+                const chartData = {
+                  labels,
+                  datasets: [
+                    {
+                      label: 'Chamadas',
+                      data: callsData,
+                      borderColor: '#6366f1',
+                      backgroundColor: 'rgba(99,102,241,0.12)',
+                      pointBackgroundColor: '#6366f1',
+                      pointRadius: 4,
+                      pointHoverRadius: 6,
+                      fill: true,
+                      tension: 0.4,
+                      yAxisID: 'yCalls',
+                    },
+                    {
+                      label: 'Tokens',
+                      data: tokensData,
+                      borderColor: '#10b981',
+                      backgroundColor: 'rgba(16,185,129,0.08)',
+                      pointBackgroundColor: '#10b981',
+                      pointRadius: 4,
+                      pointHoverRadius: 6,
+                      fill: true,
+                      tension: 0.4,
+                      yAxisID: 'yTokens',
+                    },
+                  ],
+                };
+                const chartOptions: any = {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  interaction: { mode: 'index' as const, intersect: false },
+                  plugins: {
+                    legend: { position: 'top' as const, labels: { boxWidth: 12, font: { size: 12 } } },
+                    tooltip: {
+                      callbacks: {
+                        label: (ctx: any) => {
+                          if (ctx.dataset.yAxisID === 'yTokens') return ` Tokens: ${formatNumber(ctx.parsed.y)}`;
+                          return ` Chamadas: ${ctx.parsed.y}`;
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: { color: 'rgba(0,0,0,0.04)' },
+                      ticks: { font: { size: 11 }, maxTicksLimit: 14 },
+                    },
+                    yCalls: {
+                      type: 'linear' as const,
+                      position: 'left' as const,
+                      title: { display: true, text: 'Chamadas', font: { size: 11 }, color: '#6366f1' },
+                      grid: { color: 'rgba(0,0,0,0.04)' },
+                      ticks: { font: { size: 11 }, precision: 0 },
+                      beginAtZero: true,
+                    },
+                    yTokens: {
+                      type: 'linear' as const,
+                      position: 'right' as const,
+                      title: { display: true, text: 'Tokens', font: { size: 11 }, color: '#10b981' },
+                      grid: { drawOnChartArea: false },
+                      ticks: {
+                        font: { size: 11 },
+                        callback: (v: any) => formatNumber(v),
+                      },
+                      beginAtZero: true,
+                    },
+                  },
+                };
+                return (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        Evolução de Uso Diário
+                        <span className="text-xs font-normal text-gray-400 ml-1">(últimos {dailySlice.length} dias)</span>
+                      </CardTitle>
+                      <CardDescription className="text-xs">Chamadas à API e tokens consumidos por dia</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div style={{ height: 280 }}>
+                        <Line data={chartData} options={chartOptions} />
+                      </div>
+                      {/* Tabela resumida abaixo do gráfico */}
+                      <details className="mt-4">
+                        <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 select-none">Ver tabela de dados</summary>
+                        <div className="overflow-x-auto mt-2">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="border-b text-gray-400">
+                                <th className="text-left py-1.5 pr-4">Data</th>
+                                <th className="text-right py-1.5 pr-4">Chamadas</th>
+                                <th className="text-right py-1.5">Tokens</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {dailySlice.slice().reverse().map((d: any, i: number) => (
+                                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
+                                  <td className="py-1.5 pr-4 text-gray-500">{formatDate(d.date)}</td>
+                                  <td className="py-1.5 pr-4 text-right font-medium">{d.calls}</td>
+                                  <td className="py-1.5 text-right text-gray-400">{formatNumber(d.tokens || 0)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </details>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {stats.totalCalls === 0 && (
                 <Card>
