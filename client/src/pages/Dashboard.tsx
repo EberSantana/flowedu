@@ -453,12 +453,30 @@ function Dashboard() {
                     </div>
                   </div>
                 </div>
-                {/* Direita: Data + Botões */}
+                {/* Direita: Resumo do Dia + Botões */}
                 <div className="flex flex-col items-end gap-3 shrink-0">
                   <div className="text-right">
                     <p className="text-white/70 text-sm">
                       {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
                     </p>
+                  </div>
+                  {/* Resumo do Dia */}
+                  <div className="flex flex-col gap-1.5 items-end">
+                    <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-xl px-4 py-2">
+                      <CalendarIcon className="h-4 w-4 text-blue-200 shrink-0" />
+                      <div className="text-right">
+                        <p className="text-white font-semibold text-sm leading-tight">
+                          {todayClasses && todayClasses.length > 0
+                            ? `${todayClasses.length} aula${todayClasses.length !== 1 ? 's' : ''} hoje`
+                            : 'Sem aulas hoje'}
+                        </p>
+                        {upcomingClasses && upcomingClasses.length > 0 && (
+                          <p className="text-blue-200 text-xs leading-tight mt-0.5">
+                            Próxima: {upcomingClasses[0].subjectName} às {upcomingClasses[0].startTime}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     {isCustomizing && (

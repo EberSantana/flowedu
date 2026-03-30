@@ -21,6 +21,14 @@ import { useStudentAuth } from "@/hooks/useStudentAuth";
 export default function StudentDashboard() {
   const { student } = useStudentAuth();
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
+  const { data: pendingExercisesData } = trpc.studentExercises.getPendingCount.useQuery();
+  const { data: allAssessments } = trpc.learningPath.getAllStudentAssessments.useQuery();
+
+  // Calcular provas pendentes (sem tentativa ou em progresso)
+  const pendingAssessmentsCount = allAssessments
+    ? allAssessments.filter((a: any) => !a.attemptStatus || a.attemptStatus === 'in_progress').length
+    : 0;
+  const totalPending = (pendingExercisesData?.pendingCount || 0) + pendingAssessmentsCount;
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
@@ -69,11 +77,25 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               </div>
-              {/* Direita: Data */}
-              <div className="text-right shrink-0">
+              {/* Direita: Resumo do Dia + Data */}
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 <p className="text-white/70 text-sm">
                   {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
                 </p>
+                {/* Resumo de Pendentes */}
+                <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-xl px-4 py-2">
+                  <FileText className="h-4 w-4 text-blue-200 shrink-0" />
+                  <div className="text-right">
+                    <p className="text-white font-semibold text-sm leading-tight">
+                      {totalPending > 0
+                        ? `${totalPending} atividade${totalPending !== 1 ? 's' : ''} pendente${totalPending !== 1 ? 's' : ''}`
+                        : 'Tudo em dia!'}
+                    </p>
+                    <p className="text-blue-200 text-xs leading-tight mt-0.5">
+                      {pendingExercisesData?.pendingCount || 0} exercício{(pendingExercisesData?.pendingCount || 0) !== 1 ? 's' : ''} • {pendingAssessmentsCount} prova{pendingAssessmentsCount !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
