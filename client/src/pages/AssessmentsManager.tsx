@@ -379,6 +379,14 @@ export default function AssessmentsManager() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{assessment.title}</h3>
                               {getStatusBadge(assessment.status)}
+                              {assessment.shuffleQuestions ? (
+                                <span
+                                  title="Anti-cola ativo: questões e alternativas embaralhadas para cada aluno"
+                                  className="inline-flex items-center gap-1 text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 rounded-full px-2 py-0.5 cursor-default"
+                                >
+                                  🎲 Anti-cola
+                                </span>
+                              ) : null}
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
                               <span className="flex items-center gap-1">
@@ -534,6 +542,14 @@ export default function AssessmentsManager() {
                               <Badge className="bg-blue-100 text-blue-800 border-blue-200">
                                 <CheckCircle2 className="h-3 w-3 mr-1" />Publicado
                               </Badge>
+                              {exercise.shuffleQuestions ? (
+                                <span
+                                  title="Anti-cola ativo: questões e alternativas embaralhadas para cada aluno"
+                                  className="inline-flex items-center gap-1 text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 rounded-full px-2 py-0.5 cursor-default"
+                                >
+                                  🎲 Anti-cola
+                                </span>
+                              ) : null}
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
                               <span className="flex items-center gap-1">
