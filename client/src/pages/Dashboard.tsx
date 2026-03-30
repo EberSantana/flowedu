@@ -419,34 +419,34 @@ function Dashboard() {
       <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           {/* Banner de Boas-vindas */}
-          <div className="mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900">
+          <div className="mb-8 rounded-2xl overflow-hidden shadow-xl bg-primary">
             <div className="px-6 py-6 sm:px-8 sm:py-7">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 {/* Esquerda: Avatar + Saudação */}
                 <div className="flex items-center gap-5">
-                  <Avatar className="h-16 w-16 border-2 border-white/30 shadow-lg shrink-0">
+                  <Avatar className="h-16 w-16 border-2 border-primary-foreground/30 shadow-lg shrink-0">
                     <AvatarImage 
                       src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'Professor')}&backgroundColor=1e3a5f&textColor=ffffff`} 
                       alt={user?.name || 'Professor'}
                     />
-                    <AvatarFallback className="bg-white/20 text-white text-xl font-bold">
+                    <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground text-xl font-bold">
                       {user?.name?.charAt(0).toUpperCase() || 'P'}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-primary-foreground leading-tight">
                       {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
                     </h1>
-                    <p className="text-blue-200 mt-1 text-base">
+                    <p className="text-primary-foreground/70 mt-1 text-base">
                       {dashboardConfig.dashboardDescription}
                     </p>
                     {/* Badges de Disciplinas e Turmas */}
                     <div className="flex gap-2 mt-3 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                      <span className="inline-flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-sm font-medium px-3 py-1 rounded-full border border-primary-foreground/20">
                         <BookOpen className="h-3.5 w-3.5" />
                         {subjects?.length || 0} Disciplinas
                       </span>
-                      <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                      <span className="inline-flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-sm font-medium px-3 py-1 rounded-full border border-primary-foreground/20">
                         <Users className="h-3.5 w-3.5" />
                         {classes?.length || 0} Turmas
                       </span>
@@ -456,22 +456,22 @@ function Dashboard() {
                 {/* Direita: Resumo do Dia + Botões */}
                 <div className="flex flex-col items-end gap-3 shrink-0">
                   <div className="text-right">
-                    <p className="text-white/70 text-sm">
+                    <p className="text-primary-foreground/70 text-sm">
                       {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
                     </p>
                   </div>
                   {/* Resumo do Dia */}
                   <div className="flex flex-col gap-1.5 items-end">
-                    <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-xl px-4 py-2">
-                      <CalendarIcon className="h-4 w-4 text-blue-200 shrink-0" />
+                    <div className="inline-flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/20 rounded-xl px-4 py-2">
+                      <CalendarIcon className="h-4 w-4 text-primary-foreground/70 shrink-0" />
                       <div className="text-right">
-                        <p className="text-white font-semibold text-sm leading-tight">
+                        <p className="text-primary-foreground font-semibold text-sm leading-tight">
                           {todayClasses && todayClasses.length > 0
                             ? `${todayClasses.length} aula${todayClasses.length !== 1 ? 's' : ''} hoje`
                             : 'Sem aulas hoje'}
                         </p>
                         {upcomingClasses && upcomingClasses.length > 0 && (
-                          <p className="text-blue-200 text-xs leading-tight mt-0.5">
+                          <p className="text-primary-foreground/70 text-xs leading-tight mt-0.5">
                             Próxima: {upcomingClasses[0].subjectName} às {upcomingClasses[0].startTime}
                           </p>
                         )}
@@ -484,7 +484,7 @@ function Dashboard() {
                         onClick={resetToDefault}
                         variant="outline"
                         size="sm"
-                        className="gap-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+                        className="gap-2 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20"
                       >
                         <RotateCcw className="h-4 w-4" />
                         Restaurar
@@ -494,7 +494,7 @@ function Dashboard() {
                       onClick={() => setIsCustomizing(!isCustomizing)}
                       variant={isCustomizing ? "default" : "outline"}
                       size="sm"
-                      className={isCustomizing ? "gap-2" : "gap-2 bg-white/10 border-white/30 text-white hover:bg-white/20"}
+                      className={isCustomizing ? "gap-2" : "gap-2 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20"}
                     >
                       <Settings className="h-4 w-4" />
                       {isCustomizing ? 'Concluir' : 'Personalizar'}
@@ -504,8 +504,8 @@ function Dashboard() {
               </div>
             </div>
             {/* Faixa inferior com frase motivacional */}
-            <div className="bg-black/20 px-6 sm:px-8 py-3 border-t border-white/10">
-              <p className="text-blue-200 text-sm italic">
+            <div className="bg-primary-foreground/10 px-6 sm:px-8 py-3 border-t border-primary-foreground/10">
+              <p className="text-primary-foreground/70 text-sm italic">
                 {(() => {
                   const quotes = [
                     '"A educação é a arma mais poderosa que você pode usar para mudar o mundo." — Nelson Mandela',
@@ -855,10 +855,10 @@ function Dashboard() {
                                 ? 'bg-gradient-to-br from-destructive via-destructive/90 to-destructive/80'
                                 : 'bg-gradient-to-br from-primary via-primary/90 to-primary/80'
                             }`}>
-                              <span className="text-[10px] font-bold text-white uppercase tracking-wide">
+                              <span className="text-[10px] font-bold text-primary-foreground uppercase tracking-wide">
                                 {cls.dayOfWeek.substring(0, 3)}
                               </span>
-                              <span className="text-xl font-extrabold text-white">
+                              <span className="text-xl font-extrabold text-primary-foreground">
                                 {formatDate(cls.date)}
                               </span>
                             </div>
@@ -881,7 +881,7 @@ function Dashboard() {
                                   {cls.subjectName}
                                 </p>
                                 {isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-primary-foreground text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
                                     <span className="relative flex h-1.5 w-1.5">
                                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
@@ -890,7 +890,7 @@ function Dashboard() {
                                   </span>
                                 )}
                                 {cls.isPast && !isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-primary-foreground text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
                                     Concluída
                                   </span>
                                 )}
@@ -900,7 +900,7 @@ function Dashboard() {
                                   const status = getClassStatus(cls.id);
                                   if (status) {
                                     return (
-                                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap ${
+                                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-primary-foreground text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap ${
                                         status.status === 'given' ? 'bg-green-500' :
                                         status.status === 'not_given' ? 'bg-yellow-500' :
                                         'bg-red-500'
@@ -939,7 +939,7 @@ function Dashboard() {
                                 variant={getClassStatus(cls.id)?.status === 'given' ? 'default' : 'outline'}
                                 className={`flex-1 min-w-[100px] h-8 text-xs ${
                                   getClassStatus(cls.id)?.status === 'given'
-                                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                                    ? 'bg-green-600 hover:bg-green-700 text-primary-foreground'
                                     : 'hover:bg-green-50 hover:border-green-500 hover:text-green-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'given')}
@@ -954,7 +954,7 @@ function Dashboard() {
                                 variant={getClassStatus(cls.id)?.status === 'not_given' ? 'default' : 'outline'}
                                 className={`flex-1 min-w-[100px] h-8 text-xs ${
                                   getClassStatus(cls.id)?.status === 'not_given'
-                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-primary-foreground'
                                     : 'hover:bg-yellow-50 hover:border-yellow-500 hover:text-yellow-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'not_given')}
@@ -969,7 +969,7 @@ function Dashboard() {
                                 variant={getClassStatus(cls.id)?.status === 'cancelled' ? 'default' : 'outline'}
                                 className={`flex-1 min-w-[100px] h-8 text-xs ${
                                   getClassStatus(cls.id)?.status === 'cancelled'
-                                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                                    ? 'bg-red-600 hover:bg-red-700 text-primary-foreground'
                                     : 'hover:bg-red-50 hover:border-red-500 hover:text-red-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'cancelled')}
@@ -1065,7 +1065,7 @@ function Dashboard() {
                         className={`relative p-4 rounded-xl border-2 ${style.borderColor} ${style.bgColor} hover:shadow-lg transition-all duration-300`}
                       >
                         {/* Badge de Urgência */}
-                        <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
+                        <div className={`absolute -top-2 -right-2 ${urgencyColor} text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
                           {urgencyText}
                         </div>
                         
