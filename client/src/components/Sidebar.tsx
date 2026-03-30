@@ -38,7 +38,8 @@ import {
   Send,
   ClipboardList,
   ClipboardCheck,
-  Bot
+  Bot,
+  Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -189,6 +190,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Banco de Provas e Exercícios",
         icon: <ClipboardList className="h-5 w-5" />,
         href: "/assessments-manager",
+      },
+      {
+        label: "Mural Colaborativo",
+        icon: <Layers className="h-5 w-5" />,
+        href: "/mural-colaborativo",
       },
     ],
   },

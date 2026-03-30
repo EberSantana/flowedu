@@ -17,6 +17,7 @@ import { invokeLLM, invalidateAISettingsCache } from './_core/llm';
 import { sendPasswordResetEmail } from './_core/email';
 import { emailRouter } from './email-router';
 import { activitiesRouter } from './activities-router';
+import { muralRouter } from './mural-router';
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
 import * as pushNotif from './push-notifications';
@@ -11576,6 +11577,7 @@ Retorne em formato JSON com estrutura:
   email: emailRouter,
   // ==================== ATIVIDADES EM SALA ====================
   activities: activitiesRouter,
+  mural: muralRouter,
   // ==================== VPS MONITORING ====================
   vps: router({
     // Listar todos os servidores VPS

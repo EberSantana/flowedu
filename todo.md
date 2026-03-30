@@ -7719,3 +7719,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## v5.22.0 - UX dos modais: cards mobile e indicador de scroll
 - [x] Reduzir cards de tipo nos modais de Exercícios e Prova para mobile (min-h-[80px], ícone h-6 w-6)
 - [x] Adicionar indicador de scroll com gradiente fade-out no DialogContent
+
+## v5.40.0 - Mural Colaborativo em Tempo Real
+- [ ] Adicionar tabelas murals, mural_columns, mural_cards, mural_votes ao schema
+- [ ] Executar pnpm db:push para criar tabelas no banco
+- [ ] Criar servidor WebSocket integrado ao Express (server/mural-ws.ts)
+- [ ] Criar procedures tRPC para murais (server/mural-router.ts)
+- [ ] Criar página TeacherMural.tsx no portal do professor
+- [ ] Criar página StudentMural.tsx no portal do aluno
+- [ ] Integrar WebSocket no frontend (hook useMuralWS.ts)
+- [ ] Adicionar rotas /teacher/mural e /student/mural no App.tsx
+- [ ] Adicionar item "Mural Colaborativo" no Sidebar do professor e menu do aluno
+- [ ] Deploy no VPS

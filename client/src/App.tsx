@@ -91,6 +91,8 @@ const StudentActivitiesPage = lazy(() => import("./pages/StudentActivitiesPage")
 const StudentAssessmentsPage = lazy(() => import("./pages/StudentAssessmentsPage"));
 const StudentExamPage = lazy(() => import("./pages/StudentExamPage"));
 const InstallAppPage = lazy(() => import("./pages/InstallAppPage"));
+const MuralColaborativo = lazy(() => import("./pages/MuralColaborativo"));
+const StudentMural = lazy(() => import("./pages/student/StudentMural"));
 // MistakeNotebook removido - funcionalidade consolidada em StudentSmartReview
 
 // Lazy loaded pages - Help/Ajuda
@@ -205,9 +207,11 @@ function Router() {
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
           <Route path={"/student/grade-book"} component={StudentGradeBook} />
+          <Route path={"/mural-colaborativo"} component={MuralColaborativo} />
           <Route path={"/student/activities"} component={StudentActivitiesPage} />
           <Route path={"/student/assessments"} component={StudentAssessmentsPage} />
           <Route path={"/student/exam/:assessmentId"} component={StudentExamPage} />
+          <Route path={"/student/mural"} component={StudentMural} />
           <Route path={"/student/instalar-app"} component={InstallAppPage} />
           {/* MistakeNotebook removido - usar /student/smart-review */}
 

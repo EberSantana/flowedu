@@ -2859,3 +2859,76 @@ export const forumReplies = mysqlTable("forum_replies", {
 });
 export type ForumReply = typeof forumReplies.$inferSelect;
 export type InsertForumReply = typeof forumReplies.$inferInsert;
+
+// ============================================================
+// MURAL COLABORATIVO EM TEMPO REAL
+// ============================================================
+
+/**
+ * Murais — criados pelo professor para uma disciplina/turma
+ */
+export const murals = mysqlTable("murals", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  subjectId: int("subjectId").notNull(),
+  classId: int("classId").notNull(),
+  createdBy: int("createdBy").notNull(),
+  isLocked: boolean("isLocked").default(false).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type Mural = typeof murals.$inferSelect;
+export type InsertMural = typeof murals.$inferInsert;
+
+/**
+ * Colunas do Mural — ex: "O que aprendi", "Dúvidas", "Ideias"
+ */
+export const muralColumns = mysqlTable("mural_columns", {
+  id: int("id").autoincrement().primaryKey(),
+  muralId: int("muralId").notNull(),
+  title: varchar("title", { length: 100 }).notNull(),
+  icon: varchar("icon", { length: 10 }).default("📌").notNull(),
+  color: varchar("color", { length: 20 }).default("green").notNull(),
+  position: int("position").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type MuralColumn = typeof muralColumns.$inferSelect;
+export type InsertMuralColumn = typeof muralColumns.$inferInsert;
+
+/**
+ * Cards (Post-its) do Mural
+ */
+export const muralCards = mysqlTable("mural_cards", {
+  id: int("id").autoincrement().primaryKey(),
+  muralId: int("muralId").notNull(),
+  columnId: int("columnId").notNull(),
+  text: text("text").notNull(),
+  color: varchar("color", { length: 20 }).default("yellow").notNull(),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),
+  authorStudentId: int("authorStudentId"),
+  authorName: varchar("authorName", { length: 100 }).notNull(),
+  teacherReply: text("teacherReply"),
+  teacherReplyAt: timestamp("teacherReplyAt"),
+  isDeleted: boolean("isDeleted").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type MuralCard = typeof muralCards.$inferSelect;
+export type InsertMuralCard = typeof muralCards.$inferInsert;
+
+/**
+ * Votos nos Cards — alunos e professores podem votar 👍
+ */
+export const muralVotes = mysqlTable("mural_votes", {
+  id: int("id").autoincrement().primaryKey(),
+  cardId: int("cardId").notNull(),
+  voterType: mysqlEnum("voterType", ["teacher", "student"]).notNull(),
+  voterUserId: int("voterUserId"),
+  voterStudentId: int("voterStudentId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type MuralVote = typeof muralVotes.$inferSelect;
+export type InsertMuralVote = typeof muralVotes.$inferInsert;

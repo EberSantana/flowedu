@@ -97,12 +97,6 @@ export default function PortalChoice() {
           </span>
         </div>
         <div className="hidden md:flex items-center gap-2">
-          <Link href="/ajuda" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
-            Central de Ajuda
-          </Link>
-          <Link href="/novidades" className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={{ color: "#8899b4" }}>
-            Novidades
-          </Link>
           <a
             href="https://flowedu.app"
             target="_blank"
