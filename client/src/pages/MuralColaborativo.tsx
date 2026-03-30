@@ -405,8 +405,8 @@ export default function MuralColaborativo() {
   const wsRef = useRef<WebSocket | null>(null);
 
   // ── Queries ────────────────────────────────────────────────────────────────
-  const { data: subjects } = trpc.subjects?.list?.useQuery(undefined, { enabled: !!user }) as any;
-  const { data: classes } = trpc.classes?.list?.useQuery(undefined, { enabled: !!user }) as any;
+  const { data: subjects } = trpc.subjects.list.useQuery(undefined, { enabled: !!user });
+  const { data: classes } = trpc.classes.list.useQuery(undefined, { enabled: !!user });
   const { data: muralList, refetch: refetchList } = trpc.mural.list.useQuery(
     { includeArchived: false },
     { enabled: view === "list" && !!user }
