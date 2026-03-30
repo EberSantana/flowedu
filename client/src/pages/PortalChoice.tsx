@@ -1,4 +1,4 @@
-// Version: 2026-03-27-v5.36 - Nova entrada dark/tech com ícones flutuantes
+// Version: 2026-03-30-v6.0.0 - Atualização versão e mural colaborativo
 import { Link, useLocation } from "wouter";
 import { GraduationCap, Users, Mail, Shield, BookOpen, TrendingUp, CheckCircle, Brain, BarChart2, FileText, Zap } from "lucide-react";
 import { useEffect } from "react";
