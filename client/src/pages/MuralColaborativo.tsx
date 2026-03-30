@@ -22,6 +22,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
@@ -37,6 +38,11 @@ import {
   ArrowLeft,
   Layers,
   Archive,
+  FileDown,
+  Timer,
+  LayoutTemplate,
+  Play,
+  Square,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 
@@ -75,7 +81,68 @@ interface MuralData {
   cards: MuralCard[];
 }
 
-// ── Cores dos cards ────────────────────────────────────────────────────────────
+// ── Modelos pré-definidos ──────────────────────────────────────────────────────
+const MURAL_TEMPLATES = [
+  {
+    id: "brainstorming",
+    name: "Brainstorming",
+    description: "Geração livre de ideias em grupo",
+    icon: "🧠",
+    columns: [
+      { title: "Ideias", icon: "💡", color: "yellow", position: 0 },
+      { title: "Desenvolver", icon: "🔧", color: "blue", position: 1 },
+      { title: "Aprovadas", icon: "✅", color: "green", position: 2 },
+      { title: "Descartar", icon: "🗑️", color: "red", position: 3 },
+    ],
+  },
+  {
+    id: "kwl",
+    name: "KWL",
+    description: "O que sei / Quero aprender / Aprendi",
+    icon: "📚",
+    columns: [
+      { title: "O que sei (K)", icon: "🧩", color: "blue", position: 0 },
+      { title: "Quero aprender (W)", icon: "❓", color: "orange", position: 1 },
+      { title: "O que aprendi (L)", icon: "🌟", color: "green", position: 2 },
+    ],
+  },
+  {
+    id: "semaforo",
+    name: "Semáforo de Compreensão",
+    description: "Avaliação do nível de entendimento",
+    icon: "🚦",
+    columns: [
+      { title: "Entendi bem 🟢", icon: "🟢", color: "green", position: 0 },
+      { title: "Tenho dúvidas 🟡", icon: "🟡", color: "yellow", position: 1 },
+      { title: "Não entendi 🔴", icon: "🔴", color: "red", position: 2 },
+    ],
+  },
+  {
+    id: "retrospectiva",
+    name: "Retrospectiva",
+    description: "O que foi bem, o que melhorar e próximos passos",
+    icon: "🔄",
+    columns: [
+      { title: "Foi bem 👍", icon: "👍", color: "green", position: 0 },
+      { title: "Melhorar 🔧", icon: "🔧", color: "orange", position: 1 },
+      { title: "Próximos passos 🚀", icon: "🚀", color: "purple", position: 2 },
+    ],
+  },
+  {
+    id: "personalizado",
+    name: "Personalizado",
+    description: "Colunas padrão: Aprendi / Dúvidas / Ideias",
+    icon: "⚙️",
+    columns: [
+      { title: "O que aprendi", icon: "💡", color: "green", position: 0 },
+      { title: "Dúvidas", icon: "❓", color: "orange", position: 1 },
+      { title: "Ideias", icon: "🚀", color: "purple", position: 2 },
+      { title: "Respondido", icon: "✅", color: "blue", position: 3 },
+    ],
+  },
+];
+
+// ── Cores ──────────────────────────────────────────────────────────────────────
 const CARD_COLORS: Record<string, string> = {
   yellow: "bg-yellow-100 border-yellow-300",
   green: "bg-green-100 border-green-300",
@@ -113,9 +180,7 @@ function MuralCardItem({
   const colorClass = CARD_COLORS[card.color] || CARD_COLORS.yellow;
 
   return (
-    <div
-      className={`rounded-lg border-2 p-3 shadow-sm mb-2 ${colorClass}`}
-    >
+    <div className={`rounded-lg border-2 p-3 shadow-sm mb-2 ${colorClass}`}>
       <div className="flex items-start justify-between gap-1">
         <p className="text-sm text-gray-800 flex-1 whitespace-pre-wrap">{card.text}</p>
         <DropdownMenu>
@@ -128,17 +193,16 @@ function MuralCardItem({
             <DropdownMenuItem onClick={() => onReply(card)}>
               <MessageSquare className="h-4 w-4 mr-2" /> Responder
             </DropdownMenuItem>
-            {columns.map((col) => (
-              col.id !== card.columnId && (
-                <DropdownMenuItem key={col.id} onClick={() => onMove(card.id, col.id)}>
-                  <ArrowLeft className="h-4 w-4 mr-2" /> Mover para {col.title}
-                </DropdownMenuItem>
-              )
-            ))}
-            <DropdownMenuItem
-              className="text-red-600"
-              onClick={() => onDelete(card.id)}
-            >
+            {columns.map(
+              (col) =>
+                col.id !== card.columnId && (
+                  <DropdownMenuItem key={col.id} onClick={() => onMove(card.id, col.id)}>
+                    <ArrowLeft className="h-4 w-4 mr-2" /> Mover para {col.title}
+                  </DropdownMenuItem>
+                )
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-red-600" onClick={() => onDelete(card.id)}>
               <Trash2 className="h-4 w-4 mr-2" /> Excluir
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -168,31 +232,179 @@ function MuralCardItem({
   );
 }
 
+// ── Componente Temporizador ────────────────────────────────────────────────────
+function TimerDisplay({
+  seconds,
+  isRunning,
+}: {
+  seconds: number;
+  isRunning: boolean;
+}) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  const isUrgent = seconds <= 60 && seconds > 0;
+  const isExpired = seconds === 0 && isRunning;
+
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border font-mono text-sm font-bold transition-colors ${
+        isExpired
+          ? "bg-red-100 border-red-400 text-red-700 animate-pulse"
+          : isUrgent
+          ? "bg-orange-100 border-orange-400 text-orange-700"
+          : "bg-blue-50 border-blue-300 text-blue-700"
+      }`}
+    >
+      <Timer className="h-3.5 w-3.5" />
+      <span>
+        {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+      </span>
+      {isExpired && <span className="text-xs font-normal ml-1">Tempo esgotado!</span>}
+    </div>
+  );
+}
+
+// ── Exportação PDF ─────────────────────────────────────────────────────────────
+function exportMuralToPDF(mural: MuralData) {
+  const win = window.open("", "_blank");
+  if (!win) {
+    toast.error("Permita pop-ups para exportar o PDF");
+    return;
+  }
+
+  const now = new Date().toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const colorsMap: Record<string, string> = {
+    yellow: "#fef9c3",
+    green: "#dcfce7",
+    blue: "#dbeafe",
+    pink: "#fce7f3",
+    purple: "#f3e8ff",
+    orange: "#ffedd5",
+    red: "#fee2e2",
+  };
+
+  const colHeaderColors: Record<string, string> = {
+    green: "#22c55e",
+    orange: "#f97316",
+    purple: "#a855f7",
+    blue: "#3b82f6",
+    red: "#ef4444",
+    yellow: "#eab308",
+  };
+
+  const columnsHtml = mural.columns
+    .map((col) => {
+      const cards = mural.cards.filter((c) => c.columnId === col.id);
+      const headerBg = colHeaderColors[col.color] || "#6b7280";
+      const cardsHtml = cards
+        .map((card) => {
+          const cardBg = colorsMap[card.color] || "#fef9c3";
+          const replyHtml = card.teacherReply
+            ? `<div style="margin-top:6px;padding:6px 8px;background:#eff6ff;border-left:3px solid #3b82f6;border-radius:4px;">
+                <p style="margin:0;font-size:10px;color:#1d4ed8;font-weight:600;">Resposta do professor:</p>
+                <p style="margin:4px 0 0;font-size:11px;color:#374151;">${card.teacherReply}</p>
+               </div>`
+            : "";
+          return `<div style="background:${cardBg};border:1px solid #d1d5db;border-radius:8px;padding:10px;margin-bottom:8px;">
+            <p style="margin:0;font-size:12px;color:#1f2937;white-space:pre-wrap;">${card.text}</p>
+            <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:10px;color:#6b7280;">${card.authorType === "teacher" ? "👨‍🏫" : "👤"} ${card.authorName}</span>
+              <span style="font-size:10px;color:#6b7280;">👍 ${card.voteCount}</span>
+            </div>
+            ${replyHtml}
+          </div>`;
+        })
+        .join("");
+
+      return `<div style="width:220px;flex-shrink:0;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff;">
+        <div style="background:${headerBg};padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#fff;font-weight:700;font-size:13px;">${col.icon} ${col.title}</span>
+          <span style="background:rgba(255,255,255,0.25);color:#fff;border-radius:12px;padding:1px 8px;font-size:11px;">${cards.length}</span>
+        </div>
+        <div style="padding:10px;min-height:80px;">${cardsHtml || '<p style="color:#d1d5db;font-size:12px;text-align:center;padding:20px 0;">Nenhum card</p>'}</div>
+      </div>`;
+    })
+    .join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mural: ${mural.title}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; background: #f9fafb; color: #111; }
+    @media print { body { padding: 0; background: #fff; } .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom:16px;">
+    <button onclick="window.print()" style="background:#2563eb;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;">🖨️ Imprimir / Salvar PDF</button>
+  </div>
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px 24px;margin-bottom:20px;">
+    <h1 style="margin:0 0 4px;font-size:20px;color:#1f2937;">${mural.title}</h1>
+    ${mural.description ? `<p style="margin:0 0 8px;color:#6b7280;font-size:13px;">${mural.description}</p>` : ""}
+    <p style="margin:0;font-size:11px;color:#9ca3af;">Exportado em ${now} · ${mural.cards.length} cards · ${mural.columns.length} colunas</p>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+    ${columnsHtml}
+  </div>
+</body>
+</html>`;
+
+  win.document.write(html);
+  win.document.close();
+}
+
 // ── Componente Principal ───────────────────────────────────────────────────────
 export default function MuralColaborativo() {
   const { user } = useAuth();
 
-  // Estado de navegação: lista ou mural aberto
+  // Estado de navegação
   const [view, setView] = useState<"list" | "board">("list");
   const [selectedMuralId, setSelectedMuralId] = useState<number | null>(null);
+
+  // Dialogs
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
-  const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null);
-  const [replyCard, setReplyCard] = useState<MuralCard | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+  const [showTimerDialog, setShowTimerDialog] = useState(false);
 
   // Formulários
-  const [newMural, setNewMural] = useState({ title: "", description: "", subjectId: "", classId: "" });
+  const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null);
+  const [replyCard, setReplyCard] = useState<MuralCard | null>(null);
+  const [newMural, setNewMural] = useState({
+    title: "",
+    description: "",
+    subjectId: "",
+    classId: "",
+    templateId: "personalizado",
+  });
   const [newCard, setNewCard] = useState({ text: "", color: "yellow" });
   const [replyText, setReplyText] = useState("");
+
+  // Presença online
+  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+
+  // Temporizador
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerInput, setTimerInput] = useState("10");
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // WebSocket
   const wsRef = useRef<WebSocket | null>(null);
 
-  // Queries
-  const { data: subjects } = trpc.subjects?.list?.useQuery(undefined, { enabled: !!user });
-  const { data: classes } = trpc.classes?.list?.useQuery(undefined, { enabled: !!user });
+  // ── Queries ────────────────────────────────────────────────────────────────
+  const { data: subjects } = trpc.subjects?.list?.useQuery(undefined, { enabled: !!user }) as any;
+  const { data: classes } = trpc.classes?.list?.useQuery(undefined, { enabled: !!user }) as any;
   const { data: muralList, refetch: refetchList } = trpc.mural.list.useQuery(
     { includeArchived: false },
     { enabled: view === "list" && !!user }
@@ -202,95 +414,99 @@ export default function MuralColaborativo() {
     { enabled: view === "board" && !!selectedMuralId }
   );
 
-  // Mutations
+  // ── Mutations ──────────────────────────────────────────────────────────────
   const createMural = trpc.mural.create.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setShowCreateDialog(false);
-      setNewMural({ title: "", description: "", subjectId: "", classId: "" });
+      setNewMural({ title: "", description: "", subjectId: "", classId: "", templateId: "personalizado" });
       refetchList();
       openMural(data.id);
       toast.success("Mural criado com sucesso!");
     },
   });
 
-  const setLocked = trpc.mural.setLocked.useMutation({
-    onSuccess: () => refetchMural(),
-  });
-
+  const setLocked = trpc.mural.setLocked.useMutation({ onSuccess: () => refetchMural() });
   const archiveMural = trpc.mural.archive.useMutation({
-    onSuccess: () => {
-      setView("list");
-      refetchList();
-      toast.success("Mural arquivado.");
-    },
+    onSuccess: () => { setView("list"); refetchList(); toast.success("Mural arquivado."); },
   });
-
   const addCard = trpc.mural.addCard.useMutation({
-    onSuccess: () => {
-      setShowAddCardDialog(false);
-      setNewCard({ text: "", color: "yellow" });
-      refetchMural();
-    },
+    onSuccess: () => { setShowAddCardDialog(false); setNewCard({ text: "", color: "yellow" }); refetchMural(); },
   });
-
   const replyCardMutation = trpc.mural.replyCard.useMutation({
-    onSuccess: () => {
-      setShowReplyDialog(false);
-      setReplyText("");
-      setReplyCard(null);
-      refetchMural();
-    },
+    onSuccess: () => { setShowReplyDialog(false); setReplyText(""); setReplyCard(null); refetchMural(); },
   });
+  const moveCard = trpc.mural.moveCard.useMutation({ onSuccess: () => refetchMural() });
+  const deleteCard = trpc.mural.deleteCard.useMutation({ onSuccess: () => refetchMural() });
+  const toggleVote = trpc.mural.toggleVoteTeacher.useMutation({ onSuccess: () => refetchMural() });
 
-  const moveCard = trpc.mural.moveCard.useMutation({
-    onSuccess: () => refetchMural(),
-  });
+  // ── Temporizador ───────────────────────────────────────────────────────────
+  const startTimer = (minutes: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    const totalSecs = minutes * 60;
+    setTimerSeconds(totalSecs);
+    setTimerRunning(true);
+    setShowTimerDialog(false);
 
-  const deleteCard = trpc.mural.deleteCard.useMutation({
-    onSuccess: () => refetchMural(),
-  });
-
-  const toggleVote = trpc.mural.toggleVoteTeacher.useMutation({
-    onSuccess: () => refetchMural(),
-  });
-
-  // ── WebSocket ──────────────────────────────────────────────────────────────
-  const connectWs = useCallback((muralId: number) => {
-    if (wsRef.current) {
-      wsRef.current.close();
+    // Broadcast via WebSocket
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "timer_start", seconds: totalSecs }));
     }
 
-    // Obter token JWT do cookie
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("session="))
-      ?.split("=")[1];
-
-    if (!token) return;
-
-    const wsUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/mural?token=${token}&type=teacher`;
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ type: "join", muralId }));
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        if (msg.type === "presence") {
-          setOnlineUsers(msg.payload?.users || []);
-        } else if (
-          ["card_added", "card_updated", "card_deleted", "vote_toggled", "mural_locked", "mural_unlocked"].includes(msg.type)
-        ) {
-          refetchMural();
+    timerRef.current = setInterval(() => {
+      setTimerSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          setTimerRunning(false);
+          toast.info("⏰ Tempo esgotado!");
+          if (wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({ type: "timer_end" }));
+          }
+          return 0;
         }
-      } catch {}
-    };
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
-    ws.onclose = () => setOnlineUsers([]);
-  }, [refetchMural]);
+  const stopTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setTimerRunning(false);
+    setTimerSeconds(0);
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "timer_end" }));
+    }
+  };
+
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+
+  // ── WebSocket ──────────────────────────────────────────────────────────────
+  const connectWs = useCallback(
+    (muralId: number) => {
+      if (wsRef.current) wsRef.current.close();
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("session="))
+        ?.split("=")[1];
+      if (!token) return;
+
+      const wsUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/mural?token=${token}&type=teacher`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => ws.send(JSON.stringify({ type: "join", muralId }));
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "presence") setOnlineUsers(msg.payload?.users || []);
+          else if (
+            ["card_added", "card_updated", "card_deleted", "vote_toggled", "mural_locked", "mural_unlocked"].includes(msg.type)
+          ) refetchMural();
+        } catch {}
+      };
+      ws.onclose = () => setOnlineUsers([]);
+    },
+    [refetchMural]
+  );
 
   const openMural = (id: number) => {
     setSelectedMuralId(id);
@@ -298,13 +514,9 @@ export default function MuralColaborativo() {
     connectWs(id);
   };
 
-  useEffect(() => {
-    return () => {
-      wsRef.current?.close();
-    };
-  }, []);
+  useEffect(() => () => wsRef.current?.close(), []);
 
-  // ── Renderização: Lista de Murais ──────────────────────────────────────────
+  // ── Vista: Lista de Murais ─────────────────────────────────────────────────
   if (view === "list") {
     return (
       <div className="p-6 max-w-5xl mx-auto">
@@ -323,16 +535,15 @@ export default function MuralColaborativo() {
           </Button>
         </div>
 
-        {/* Grade de murais */}
-        {!muralList || muralList.length === 0 ? (
+        {!muralList || (muralList as any[]).length === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <Layers className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="text-lg font-medium">Nenhum mural criado ainda</p>
+            <p className="font-medium">Nenhum mural criado ainda</p>
             <p className="text-sm mt-1">Clique em "Novo Mural" para começar</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {muralList.map((m: any) => (
+            {(muralList as any[]).map((m: any) => (
               <div
                 key={m.id}
                 className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer"
@@ -346,12 +557,8 @@ export default function MuralColaborativo() {
                   <p className="text-sm text-gray-500 mt-1 line-clamp-2">{m.description}</p>
                 )}
                 <div className="mt-3 flex items-center gap-2 flex-wrap">
-                  {m.subjectName && (
-                    <Badge variant="secondary" className="text-xs">{m.subjectName}</Badge>
-                  )}
-                  {m.className && (
-                    <Badge variant="outline" className="text-xs">{m.className}</Badge>
-                  )}
+                  {m.subjectName && <Badge variant="secondary" className="text-xs">{m.subjectName}</Badge>}
+                  {m.className && <Badge variant="outline" className="text-xs">{m.className}</Badge>}
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
                   {new Date(m.createdAt).toLocaleDateString("pt-BR")}
@@ -363,7 +570,7 @@ export default function MuralColaborativo() {
 
         {/* Dialog: Criar Mural */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>Criar Novo Mural</DialogTitle>
             </DialogHeader>
@@ -405,6 +612,42 @@ export default function MuralColaborativo() {
                   ))}
                 </SelectContent>
               </Select>
+
+              {/* Seletor de modelo */}
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                  <LayoutTemplate className="h-4 w-4" /> Modelo de Mural
+                </p>
+                <div className="grid grid-cols-1 gap-2">
+                  {MURAL_TEMPLATES.map((tpl) => (
+                    <button
+                      key={tpl.id}
+                      type="button"
+                      className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                        newMural.templateId === tpl.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => setNewMural({ ...newMural, templateId: tpl.id })}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{tpl.icon}</span>
+                        <div>
+                          <p className="font-medium text-sm text-gray-900">{tpl.name}</p>
+                          <p className="text-xs text-gray-500">{tpl.description}</p>
+                        </div>
+                      </div>
+                      <div className="mt-1.5 flex gap-1 flex-wrap">
+                        {tpl.columns.map((col) => (
+                          <span key={col.title} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                            {col.icon} {col.title}
+                          </span>
+                        ))}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowCreateDialog(false)}>Cancelar</Button>
@@ -414,12 +657,14 @@ export default function MuralColaborativo() {
                     toast.error("Preencha todos os campos obrigatórios");
                     return;
                   }
+                  const template = MURAL_TEMPLATES.find((t) => t.id === newMural.templateId);
                   createMural.mutate({
                     title: newMural.title,
                     description: newMural.description || undefined,
                     subjectId: Number(newMural.subjectId),
                     classId: Number(newMural.classId),
-                  });
+                    columns: template?.columns,
+                  } as any);
                 }}
                 disabled={createMural.isPending}
               >
@@ -432,22 +677,24 @@ export default function MuralColaborativo() {
     );
   }
 
-  // ── Renderização: Board do Mural ───────────────────────────────────────────
+  // ── Vista: Board do Mural ──────────────────────────────────────────────────
   const mural = muralData as MuralData | undefined;
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header do Mural */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0 flex-wrap gap-2">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => { setView("list"); wsRef.current?.close(); }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => { setView("list"); wsRef.current?.close(); stopTimer(); }}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
             <h2 className="font-semibold text-gray-900">{mural?.title || "Carregando..."}</h2>
-            {mural?.description && (
-              <p className="text-xs text-gray-500">{mural.description}</p>
-            )}
+            {mural?.description && <p className="text-xs text-gray-500">{mural.description}</p>}
           </div>
           {mural?.isLocked && (
             <Badge variant="outline" className="text-orange-600 border-orange-300 gap-1">
@@ -456,13 +703,17 @@ export default function MuralColaborativo() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Temporizador ativo */}
+          {(timerRunning || timerSeconds > 0) && (
+            <TimerDisplay seconds={timerSeconds} isRunning={timerRunning} />
+          )}
+
           {/* Usuários online */}
           {onlineUsers.length > 0 && (
-            <div className="flex items-center gap-1 text-sm text-gray-500 bg-green-50 border border-green-200 rounded-full px-3 py-1">
+            <div className="flex items-center gap-1 text-sm bg-green-50 border border-green-200 rounded-full px-3 py-1">
               <Users className="h-3.5 w-3.5 text-green-600" />
-              <span className="text-green-700 font-medium">{onlineUsers.length}</span>
-              <span className="text-xs text-green-600">online</span>
+              <span className="text-green-700 font-medium text-xs">{onlineUsers.length} online</span>
             </div>
           )}
 
@@ -471,25 +722,13 @@ export default function MuralColaborativo() {
             variant="outline"
             size="sm"
             className="gap-1"
-            onClick={() => {
-              if (!mural) return;
-              setLocked.mutate({ id: mural.id, locked: !mural.isLocked });
-            }}
+            onClick={() => mural && setLocked.mutate({ id: mural.id, locked: !mural.isLocked })}
           >
-            {mural?.isLocked ? (
-              <><Unlock className="h-3.5 w-3.5" /> Desbloquear</>
-            ) : (
-              <><Lock className="h-3.5 w-3.5" /> Bloquear</>
-            )}
+            {mural?.isLocked ? <><Unlock className="h-3.5 w-3.5" /> Desbloquear</> : <><Lock className="h-3.5 w-3.5" /> Bloquear</>}
           </Button>
 
           {/* Adicionar card */}
-          <Button
-            size="sm"
-            className="gap-1"
-            onClick={() => setShowAddCardDialog(true)}
-            disabled={mural?.isLocked}
-          >
+          <Button size="sm" className="gap-1" onClick={() => setShowAddCardDialog(true)} disabled={mural?.isLocked}>
             <Plus className="h-3.5 w-3.5" /> Adicionar Card
           </Button>
 
@@ -501,6 +740,21 @@ export default function MuralColaborativo() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {/* Temporizador */}
+              {timerRunning ? (
+                <DropdownMenuItem onClick={stopTimer}>
+                  <Square className="h-4 w-4 mr-2 text-red-500" /> Parar Temporizador
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => setShowTimerDialog(true)}>
+                  <Timer className="h-4 w-4 mr-2" /> Iniciar Temporizador
+                </DropdownMenuItem>
+              )}
+              {/* Exportar PDF */}
+              <DropdownMenuItem onClick={() => mural && exportMuralToPDF(mural)}>
+                <FileDown className="h-4 w-4 mr-2" /> Exportar PDF
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"
                 onClick={() => mural && archiveMural.mutate({ id: mural.id })}
@@ -512,7 +766,7 @@ export default function MuralColaborativo() {
         </div>
       </div>
 
-      {/* Colunas do Mural */}
+      {/* Colunas */}
       <div className="flex-1 overflow-x-auto p-4">
         <div className="flex gap-4 h-full min-w-max">
           {mural?.columns.map((col) => {
@@ -524,23 +778,17 @@ export default function MuralColaborativo() {
                 key={col.id}
                 className="w-72 flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
               >
-                {/* Cabeçalho da coluna */}
                 <div className={`${headerColor} px-4 py-3 flex items-center justify-between`}>
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{col.icon}</span>
                     <span className="font-semibold text-white text-sm">{col.title}</span>
                   </div>
-                  <Badge className="bg-white/20 text-white border-0 text-xs">
-                    {colCards.length}
-                  </Badge>
+                  <Badge className="bg-white/20 text-white border-0 text-xs">{colCards.length}</Badge>
                 </div>
 
-                {/* Cards */}
-                <div className="flex-1 overflow-y-auto p-3 space-y-0">
+                <div className="flex-1 overflow-y-auto p-3">
                   {colCards.length === 0 ? (
-                    <div className="text-center py-8 text-gray-300 text-sm">
-                      Nenhum card ainda
-                    </div>
+                    <div className="text-center py-8 text-gray-300 text-sm">Nenhum card ainda</div>
                   ) : (
                     colCards.map((card) => (
                       <MuralCardItem
@@ -556,17 +804,13 @@ export default function MuralColaborativo() {
                   )}
                 </div>
 
-                {/* Botão adicionar na coluna */}
                 {!mural.isLocked && (
                   <div className="p-2 border-t border-gray-100">
                     <Button
                       variant="ghost"
                       size="sm"
                       className="w-full text-gray-400 hover:text-gray-600 gap-1 text-xs"
-                      onClick={() => {
-                        setSelectedColumnId(col.id);
-                        setShowAddCardDialog(true);
-                      }}
+                      onClick={() => { setSelectedColumnId(col.id); setShowAddCardDialog(true); }}
                     >
                       <Plus className="h-3 w-3" /> Adicionar card
                     </Button>
@@ -581,23 +825,17 @@ export default function MuralColaborativo() {
       {/* Dialog: Adicionar Card */}
       <Dialog open={showAddCardDialog} onOpenChange={setShowAddCardDialog}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adicionar Card</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Adicionar Card</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             {mural && (
               <Select
                 value={selectedColumnId ? String(selectedColumnId) : ""}
                 onValueChange={(v) => setSelectedColumnId(Number(v))}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar coluna *" />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecionar coluna *" /></SelectTrigger>
                 <SelectContent>
                   {mural.columns.map((col) => (
-                    <SelectItem key={col.id} value={String(col.id)}>
-                      {col.icon} {col.title}
-                    </SelectItem>
+                    <SelectItem key={col.id} value={String(col.id)}>{col.icon} {col.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -629,12 +867,7 @@ export default function MuralColaborativo() {
                   toast.error("Preencha o texto e selecione a coluna");
                   return;
                 }
-                addCard.mutate({
-                  muralId: mural.id,
-                  columnId: selectedColumnId,
-                  text: newCard.text,
-                  color: newCard.color,
-                });
+                addCard.mutate({ muralId: mural.id, columnId: selectedColumnId, text: newCard.text, color: newCard.color });
               }}
               disabled={addCard.isPending}
             >
@@ -647,9 +880,7 @@ export default function MuralColaborativo() {
       {/* Dialog: Responder Card */}
       <Dialog open={showReplyDialog} onOpenChange={setShowReplyDialog}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Responder Card</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Responder Card</DialogTitle></DialogHeader>
           {replyCard && (
             <div className="space-y-3 py-2">
               <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 border">
@@ -674,6 +905,62 @@ export default function MuralColaborativo() {
               disabled={replyCardMutation.isPending}
             >
               {replyCardMutation.isPending ? "Enviando..." : "Responder"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog: Temporizador */}
+      <Dialog open={showTimerDialog} onOpenChange={setShowTimerDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Timer className="h-5 w-5 text-blue-600" /> Temporizador de Sessão
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-3 space-y-4">
+            <p className="text-sm text-gray-600">
+              Defina o tempo da atividade. A contagem regressiva ficará visível para todos os alunos no mural.
+            </p>
+            <div className="flex items-center gap-3">
+              <Input
+                type="number"
+                min="1"
+                max="120"
+                value={timerInput}
+                onChange={(e) => setTimerInput(e.target.value)}
+                className="w-24 text-center text-lg font-bold"
+              />
+              <span className="text-gray-600 font-medium">minutos</span>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {[5, 10, 15, 20, 30].map((min) => (
+                <button
+                  key={min}
+                  className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                    timerInput === String(min)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "border-gray-300 text-gray-600 hover:border-blue-400"
+                  }`}
+                  onClick={() => setTimerInput(String(min))}
+                >
+                  {min} min
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTimerDialog(false)}>Cancelar</Button>
+            <Button
+              className="gap-2"
+              onClick={() => {
+                const mins = parseInt(timerInput, 10);
+                if (!mins || mins < 1) { toast.error("Informe um tempo válido"); return; }
+                startTimer(mins);
+                toast.success(`Temporizador iniciado: ${mins} minuto${mins > 1 ? "s" : ""}`);
+              }}
+            >
+              <Play className="h-4 w-4" /> Iniciar
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -25,6 +25,7 @@ import {
   ThumbsUp,
   Layers,
   RefreshCw,
+  Timer,
 } from "lucide-react";
 
 // ── Tipos ──────────────────────────────────────────────────────────────────────
@@ -127,6 +128,11 @@ export default function StudentMural() {
   const [newCard, setNewCard] = useState({ text: "", color: "yellow" });
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
 
+  // Temporizador recebido do professor via WebSocket
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // WebSocket
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -202,6 +208,26 @@ export default function StudentMural() {
           ["card_added", "card_updated", "card_deleted", "vote_toggled", "mural_locked", "mural_unlocked"].includes(msg.type)
         ) {
           refetchMural();
+        } else if (msg.type === "timer_start" && msg.seconds) {
+          // Iniciar contagem regressiva recebida do professor
+          if (timerRef.current) clearInterval(timerRef.current);
+          setTimerSeconds(msg.seconds);
+          setTimerRunning(true);
+          timerRef.current = setInterval(() => {
+            setTimerSeconds((prev) => {
+              if (prev <= 1) {
+                clearInterval(timerRef.current!);
+                setTimerRunning(false);
+                toast.info("⏰ Tempo esgotado!");
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        } else if (msg.type === "timer_end") {
+          if (timerRef.current) clearInterval(timerRef.current);
+          setTimerRunning(false);
+          setTimerSeconds(0);
         }
       } catch {}
     };
@@ -214,6 +240,7 @@ export default function StudentMural() {
   }, [mural?.id, connectWs]);
 
   useEffect(() => () => wsRef.current?.close(), []);
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
   // ── Seletor de disciplina/turma ────────────────────────────────────────────
   if (!selectedSubjectId || !selectedClassId) {
@@ -290,6 +317,24 @@ export default function StudentMural() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Temporizador do professor */}
+          {(timerRunning || timerSeconds > 0) && (
+            <div
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border font-mono text-sm font-bold ${
+                timerSeconds === 0
+                  ? "bg-red-100 border-red-400 text-red-700 animate-pulse"
+                  : timerSeconds <= 60
+                  ? "bg-orange-100 border-orange-400 text-orange-700"
+                  : "bg-blue-50 border-blue-300 text-blue-700"
+              }`}
+            >
+              <Timer className="h-3.5 w-3.5" />
+              <span>
+                {String(Math.floor(timerSeconds / 60)).padStart(2, "0")}:{String(timerSeconds % 60).padStart(2, "0")}
+              </span>
+              {timerSeconds === 0 && <span className="text-xs font-normal ml-1">Tempo esgotado!</span>}
+            </div>
+          )}
           {onlineUsers.length > 0 && (
             <div className="flex items-center gap-1 text-sm bg-green-50 border border-green-200 rounded-full px-3 py-1">
               <Users className="h-3.5 w-3.5 text-green-600" />
