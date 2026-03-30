@@ -416,20 +416,20 @@ function Dashboard() {
       {/* ProfileOnboarding removido - perfil único tradicional */}
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
-        <div className="container mx-auto py-8 px-4">
+        <div className="container mx-auto py-4 sm:py-8 px-3 sm:px-4">
           {/* Banner de Boas-vindas */}
-          <div className="mb-8 rounded-2xl overflow-hidden shadow-xl bg-primary">
-            <div className="px-6 py-6 sm:px-8 sm:py-7">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="mb-4 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-primary">
+            <div className="px-4 py-4 sm:px-8 sm:py-7">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 {/* Esquerda: Avatar + Saudação */}
-                <div className="flex items-center gap-5">
-                  <div className="h-16 w-16 rounded-full bg-primary-foreground/20 border-2 border-primary-foreground/30 flex items-center justify-center shadow-lg shrink-0">
-                    <span className="text-primary-foreground text-2xl font-bold">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-primary-foreground/20 border-2 border-primary-foreground/30 flex items-center justify-center shadow-lg shrink-0">
+                    <span className="text-primary-foreground text-xl sm:text-2xl font-bold">
                       {user?.name?.charAt(0).toUpperCase() || 'P'}
                     </span>
                   </div>
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-primary-foreground leading-tight">
+                    <h1 className="text-xl sm:text-3xl font-bold text-primary-foreground leading-tight">
                       {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
                     </h1>
                     <p className="text-primary-foreground/70 mt-1 text-base">
@@ -449,15 +449,15 @@ function Dashboard() {
                   </div>
                 </div>
                 {/* Direita: Resumo do Dia + Botões */}
-                <div className="flex flex-col items-end gap-3 shrink-0">
+                <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
                   <div className="text-right">
                     <p className="text-primary-foreground/70 text-sm">
                       {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
                     </p>
                   </div>
                   {/* Resumo do Dia */}
-                  <div className="flex flex-col gap-1.5 items-end">
-                    <div className="inline-flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/20 rounded-xl px-4 py-2">
+                  <div className="flex flex-col gap-1.5 items-start sm:items-end">
+                    <div className="inline-flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/20 rounded-xl px-3 py-2">
                       <CalendarIcon className="h-4 w-4 text-primary-foreground/70 shrink-0" />
                       <div className="text-right">
                         <p className="text-primary-foreground font-semibold text-sm leading-tight">
@@ -607,7 +607,7 @@ function Dashboard() {
 
           {/* Cards          {/* Estatísticas */}
           {widgetVisibility.stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
                 <Card className="border-l-4 border-l-primary">
@@ -642,47 +642,47 @@ function Dashboard() {
               // Conteúdo Real
               <>
                 <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
+                  <CardHeader className="pb-1 sm:pb-3 pt-3 sm:pt-6 px-3 sm:px-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Disciplinas
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-gray-900">
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                       {subjects?.length || 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">disciplinas cadastradas</p>
+                    <p className="text-xs text-gray-500 mt-0.5">disciplinas</p>
                   </CardContent>
                 </Card>
 
                 <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <Users className="h-4 w-4" />
+                  <CardHeader className="pb-1 sm:pb-3 pt-3 sm:pt-6 px-3 sm:px-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Turmas
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-gray-900">
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                       {classes?.length || 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">turmas cadastradas</p>
+                    <p className="text-xs text-gray-500 mt-0.5">turmas</p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
+                <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow col-span-2 lg:col-span-1">
+                  <CardHeader className="pb-1 sm:pb-3 pt-3 sm:pt-6 px-3 sm:px-6">
+                    <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Carga Horária
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-gray-900">
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                       {totalScheduledClasses}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">aulas agendadas</p>
+                    <p className="text-xs text-gray-500 mt-0.5">aulas agendadas</p>
                   </CardContent>
                 </Card>
               </>
