@@ -576,6 +576,7 @@ export const notifications = mysqlTable("notifications", {
     "assessment_published",  // Nova prova publicada
     "activity_submission",   // Aluno enviou atividade
     "new_activity",          // Nova atividade criada
+    "new_mural",             // Novo mural colaborativo criado
   ]).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),

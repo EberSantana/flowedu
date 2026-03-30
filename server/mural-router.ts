@@ -6,10 +6,11 @@
 import { z } from "zod";
 import { protectedProcedure, studentProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
-import { murals, muralColumns, muralCards, muralVotes, subjects, classes } from "../drizzle/schema";
+import { murals, muralColumns, muralCards, muralVotes, subjects, classes, studentClassEnrollments } from "../drizzle/schema";
 import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { broadcastMuralEvent } from "./mural-ws";
+import { createNotification } from "./db";
 
 // ── Configurações padrão de colunas ──────────────────────────────────────────
 const DEFAULT_COLUMNS = [
@@ -206,6 +207,42 @@ export const muralRouter = router({
           position: i,
         }))
       );
+
+      // ── Notificar alunos da turma ─────────────────────────────────────────────
+      try {
+        // Buscar nome da disciplina para a notificação
+        const [subjectRow] = await db
+          .select({ name: subjects.name })
+          .from(subjects)
+          .where(eq(subjects.id, input.subjectId))
+          .limit(1);
+        const subjectName = subjectRow?.name || 'Disciplina';
+
+        // Buscar todos os alunos matriculados na turma
+        const enrolledStudents = await db
+          .select({ studentId: studentClassEnrollments.studentId })
+          .from(studentClassEnrollments)
+          .where(eq(studentClassEnrollments.classId, input.classId));
+
+        // Criar notificação in-app para cada aluno (com deduplicação automática)
+        for (const { studentId } of enrolledStudents) {
+          try {
+            await createNotification({
+              userId: studentId,
+              type: 'new_mural',
+              title: `🖼️ Novo Mural: ${input.title}`,
+              message: `${subjectName}: Um novo mural colaborativo foi criado. Clique para participar!`,
+              link: '/student/mural',
+              relatedId: muralId,
+            });
+          } catch (err) {
+            console.error('[Mural] Erro ao notificar aluno', studentId, err);
+          }
+        }
+      } catch (err) {
+        // Falha na notificação não deve impedir a criação do mural
+        console.error('[Mural] Erro ao enviar notificações:', err);
+      }
 
       return { id: muralId };
     }),
