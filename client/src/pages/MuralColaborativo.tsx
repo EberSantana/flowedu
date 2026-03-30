@@ -411,7 +411,7 @@ export default function MuralColaborativo() {
     ? Array.from(new Map(subjectsWithClass.map((s: any) => [s.id, s])).values())
     : [];
   // Turmas filtradas pela disciplina selecionada
-  const { data: filteredClasses } = trpc.classes.getClassesBySubject.useQuery(
+  const { data: filteredClasses } = trpc.learningPathReport.getClassesBySubject.useQuery(
     { subjectId: Number(newMural.subjectId) },
     { enabled: !!user && !!newMural.subjectId }
   );
