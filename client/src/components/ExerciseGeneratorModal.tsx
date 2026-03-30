@@ -71,6 +71,21 @@ export default function ExerciseGeneratorModal({
   const [generatedExercises, setGeneratedExercises] = useState<GeneratedExercises | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showHints, setShowHints] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
+
+  // Embaralhar exercícios (Fisher-Yates) e renumerar
+  const handleShuffleExercises = () => {
+    if (!generatedExercises) return;
+    const arr = [...generatedExercises.exercises];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    const renumbered = arr.map((ex, idx) => ({ ...ex, number: idx + 1 }));
+    setGeneratedExercises({ ...generatedExercises, exercises: renumbered });
+    setIsShuffled(true);
+    toast.success('Questões embaralhadas!');
+  };
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [publishConfig, setPublishConfig] = useState({
     title: "",
@@ -80,6 +95,7 @@ export default function ExerciseGeneratorModal({
     maxAttempts: 3,
     timeLimit: 0, // 0 = sem limite
     showAnswersAfter: "submission" as "submission" | "deadline" | "never",
+    shuffleQuestions: false, // Embaralhar questões por aluno (anti-cola)
   });
 
   const generateExercisesMutation = trpc.learningPath.generateModuleExercises.useMutation({
@@ -105,6 +121,7 @@ export default function ExerciseGeneratorModal({
         maxAttempts: 3,
         timeLimit: 0,
         showAnswersAfter: "submission",
+        shuffleQuestions: false,
       });
     },
     onError: (error: any) => {
@@ -846,6 +863,25 @@ export default function ExerciseGeneratorModal({
             </Select>
           </div>
 
+          {/* Embaralhar Questões */}
+          <div className="flex items-start gap-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+            <input
+              type="checkbox"
+              id="shuffle-questions-ex"
+              checked={publishConfig.shuffleQuestions}
+              onChange={(e) => setPublishConfig({ ...publishConfig, shuffleQuestions: e.target.checked })}
+              className="mt-0.5 h-4 w-4 accent-purple-600 cursor-pointer"
+            />
+            <div>
+              <label htmlFor="shuffle-questions-ex" className="text-sm font-semibold text-purple-900 cursor-pointer flex items-center gap-1.5">
+                🎲 Embaralhar questões por aluno
+              </label>
+              <p className="text-xs text-purple-700 mt-0.5">
+                Cada aluno recebe as questões em ordem diferente, dificultando a cópia entre colegas.
+              </p>
+            </div>
+          </div>
+
           {/* Resumo */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
             <h4 className="font-semibold text-blue-900 flex items-center gap-2">
@@ -857,6 +893,7 @@ export default function ExerciseGeneratorModal({
               <li>• {publishConfig.maxAttempts === 999 ? "Tentativas ilimitadas" : `${publishConfig.maxAttempts} tentativa(s)`}</li>
               <li>• {publishConfig.timeLimit > 0 ? `${publishConfig.timeLimit} minutos` : "Sem limite de tempo"}</li>
               <li>• Respostas: {publishConfig.showAnswersAfter === "submission" ? "Imediatas" : publishConfig.showAnswersAfter === "deadline" ? "Após prazo" : "Não mostrar"}</li>
+              {publishConfig.shuffleQuestions && <li>• 🎲 Questões embaralhadas por aluno</li>}
             </ul>
           </div>
         </div>
@@ -899,6 +936,7 @@ export default function ExerciseGeneratorModal({
                 maxAttempts: publishConfig.maxAttempts === 999 ? 999 : publishConfig.maxAttempts,
                 timeLimit: publishConfig.timeLimit > 0 ? publishConfig.timeLimit : undefined,
                 showAnswersAfter: publishConfig.showAnswersAfter === "submission",
+                shuffleQuestions: publishConfig.shuffleQuestions,
                 availableFrom: publishConfig.availableFrom ? new Date(publishConfig.availableFrom) : new Date(),
                 availableTo: publishConfig.availableUntil ? new Date(publishConfig.availableUntil) : undefined,
               });

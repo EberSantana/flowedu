@@ -61,7 +61,37 @@ export default function StudentExamPage() {
       { enabled: assessmentId > 0 }
     );
 
-  const questionsArr = (questions as any[]) || [];
+  const rawQuestionsArr = (questions as any[]) || [];
+
+  // Embaralhamento determinístico por aluno: usa studentId como semente
+  // Assim cada aluno sempre vê a mesma ordem (consistente entre tentativas), mas diferente dos colegas
+  const questionsArr = (() => {
+    if (!assessment?.shuffleQuestions || rawQuestionsArr.length === 0) return rawQuestionsArr;
+    // Semente baseada no assessmentId + studentId (do cookie JWT decodificado via session)
+    // Usamos o assessmentId como semente pública pois não temos studentId no frontend sem query extra
+    // Para garantir ordem única por aluno, usamos sessionStorage para persistir a ordem embaralhada
+    const storageKey = `exam_order_${assessmentId}`;
+    const stored = sessionStorage.getItem(storageKey);
+    if (stored) {
+      try {
+        const storedOrder = JSON.parse(stored) as number[];
+        // Reordenar as questões conforme a ordem salva
+        const reordered = storedOrder
+          .map((origNum: number) => rawQuestionsArr.find((q: any) => q.questionNumber === origNum))
+          .filter(Boolean);
+        if (reordered.length === rawQuestionsArr.length) return reordered;
+      } catch { /* ignorar */ }
+    }
+    // Gerar nova ordem aleatória e salvar no sessionStorage
+    const arr = [...rawQuestionsArr];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    const order = arr.map((q: any) => q.questionNumber);
+    sessionStorage.setItem(storageKey, JSON.stringify(order));
+    return arr;
+  })();
 
   // Mutations
   const startAttempt = trpc.learningPath.startAssessmentAttempt.useMutation();

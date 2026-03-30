@@ -72,6 +72,22 @@ export default function ExamGeneratorModal({
   const [showAnswers, setShowAnswers] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedAssessmentId, setSavedAssessmentId] = useState<number | null>(null);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleForStudents, setShuffleForStudents] = useState(false); // Embaralhar para cada aluno ao responder
+
+  // Embaralhar questões (Fisher-Yates) e renumerar
+  const handleShuffleExam = () => {
+    if (!generatedExam) return;
+    const arr = [...generatedExam.questions];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    const renumbered = arr.map((q, idx) => ({ ...q, number: idx + 1 }));
+    setGeneratedExam({ ...generatedExam, questions: renumbered });
+    setIsShuffled(true);
+    toast.success('Questões embaralhadas!');
+  };
 
   const saveAssessmentMutation = trpc.learningPath.saveAssessment.useMutation({
     onSuccess: (data) => {
@@ -94,6 +110,7 @@ export default function ExamGeneratorModal({
       instructions: generatedExam.instructions,
       totalPoints: generatedExam.totalPoints,
       status: 'published',
+      shuffleQuestions: shuffleForStudents,
       questions: generatedExam.questions.map((q) => ({
         number: q.number,
         type: q.type,
@@ -789,6 +806,20 @@ export default function ExamGeneratorModal({
                   <span><strong>Prova gerada mas não publicada!</strong> Clique em <strong>"Publicar para Alunos"</strong> para que ela apareça no portal do aluno.</span>
                 </div>
               )}
+              {!savedAssessmentId && (
+                <div className="flex items-center gap-2.5 bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
+                  <input
+                    type="checkbox"
+                    id="shuffle-for-students"
+                    checked={shuffleForStudents}
+                    onChange={(e) => setShuffleForStudents(e.target.checked)}
+                    className="h-3.5 w-3.5 accent-purple-600 cursor-pointer"
+                  />
+                  <label htmlFor="shuffle-for-students" className="text-xs font-medium text-purple-800 cursor-pointer">
+                    🎲 Embaralhar questões para cada aluno (anti-cola)
+                  </label>
+                </div>
+              )}
               <div className="flex items-center justify-between w-full gap-2 flex-wrap">
                 <div className="flex items-center gap-2">
                   <Checkbox
@@ -801,6 +832,20 @@ export default function ExamGeneratorModal({
                   </Label>
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleShuffleExam}
+                    className={`text-xs h-8 px-2.5 transition-all ${
+                      isShuffled
+                        ? "bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100"
+                        : "hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700"
+                    }`}
+                    title="Embaralhar a ordem das questões"
+                  >
+                    <Shuffle className="h-3.5 w-3.5 mr-1" />
+                    {isShuffled ? "Embaralhado ✓" : "Embaralhar"}
+                  </Button>
                   <Button size="sm" variant="outline" onClick={handleExportWord} className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 text-xs h-8 px-2.5">
                     <Download className="h-3.5 w-3.5 mr-1" />
                     Word

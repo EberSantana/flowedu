@@ -3452,6 +3452,7 @@ JSON (descrições MAX 15 chars):
         availableFrom: z.string().optional(),
         availableTo: z.string().optional(),
         status: z.enum(['draft', 'published']).default('published'),
+        shuffleQuestions: z.boolean().default(false),
         questions: z.array(z.object({
           number: z.number(),
           type: z.string(),
@@ -3483,6 +3484,7 @@ JSON (descrições MAX 15 chars):
           applicationDate: input.applicationDate ? new Date(input.applicationDate) : undefined,
           availableFrom: input.availableFrom ? new Date(input.availableFrom) : undefined,
           availableTo: input.availableTo ? new Date(input.availableTo) : undefined,
+          shuffleQuestions: input.shuffleQuestions ?? false,
         });
         const assessmentId = (result as any)[0]?.insertId || (result as any).insertId;
         if (!assessmentId) throw new Error('Erro ao criar avaliação');
@@ -7970,6 +7972,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         maxAttempts: z.number().default(3),
         timeLimit: z.number().optional(),
         showAnswersAfter: z.boolean().default(true),
+        shuffleQuestions: z.boolean().default(false),
         availableFrom: z.date(),
         availableTo: z.date().optional(),
       }))

@@ -1179,6 +1179,7 @@ export const studentExercises = mysqlTable("student_exercises", {
   timeLimit: int("timeLimit"), // Tempo limite em minutos (null = sem limite)
   maxAttempts: int("maxAttempts").default(3), // Número máximo de tentativas
   showAnswersAfter: boolean("showAnswersAfter").default(true).notNull(), // Mostrar gabarito após conclusão
+  shuffleQuestions: boolean("shuffleQuestions").default(false).notNull(), // Embaralhar questões por aluno (anti-cola)
   availableFrom: timestamp("availableFrom"),
   availableTo: timestamp("availableTo"),
   isActive: boolean("isActive").default(true).notNull(),
@@ -2130,6 +2131,9 @@ export const assessments = mysqlTable("assessments", {
   // Tentativas
   maxAttempts: int("maxAttempts").default(1), // Número máximo de tentativas (null = ilimitado)
   
+  // Embaralhamento de questões por aluno (anti-cola)
+  shuffleQuestions: boolean("shuffleQuestions").default(false).notNull(),
+
   // Status
   status: mysqlEnum("status", ["draft", "published", "applied", "corrected", "archived"]).default("draft").notNull(),
   
