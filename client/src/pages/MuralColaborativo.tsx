@@ -405,8 +405,16 @@ export default function MuralColaborativo() {
   const wsRef = useRef<WebSocket | null>(null);
 
   // ── Queries ────────────────────────────────────────────────────────────────
-  const { data: subjects } = trpc.subjects.list.useQuery(undefined, { enabled: !!user });
-  const { data: classes } = trpc.classes.list.useQuery(undefined, { enabled: !!user });
+  const { data: subjectsWithClass } = trpc.subjects.listWithClass.useQuery(undefined, { enabled: !!user });
+  // Deduplica disciplinas para o select
+  const uniqueSubjects = subjectsWithClass
+    ? Array.from(new Map(subjectsWithClass.map((s: any) => [s.id, s])).values())
+    : [];
+  // Turmas filtradas pela disciplina selecionada
+  const { data: filteredClasses } = trpc.classes.getClassesBySubject.useQuery(
+    { subjectId: Number(newMural.subjectId) },
+    { enabled: !!user && !!newMural.subjectId }
+  );
   const { data: muralList, refetch: refetchList } = trpc.mural.list.useQuery(
     { includeArchived: false },
     { enabled: view === "list" && !!user }
@@ -424,6 +432,9 @@ export default function MuralColaborativo() {
       refetchList();
       openMural(data.id);
       toast.success("Mural criado com sucesso!");
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || "Erro ao criar mural. Verifique os campos e tente novamente.");
     },
   });
 
@@ -594,13 +605,13 @@ export default function MuralColaborativo() {
               />
               <Select
                 value={newMural.subjectId}
-                onValueChange={(v) => setNewMural({ ...newMural, subjectId: v })}
+                onValueChange={(v) => setNewMural({ ...newMural, subjectId: v, classId: "" })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar disciplina *" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(subjects as any[])?.map((s: any) => (
+                  {(uniqueSubjects as any[])?.map((s: any) => (
                     <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -608,14 +619,21 @@ export default function MuralColaborativo() {
               <Select
                 value={newMural.classId}
                 onValueChange={(v) => setNewMural({ ...newMural, classId: v })}
+                disabled={!newMural.subjectId}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecionar turma *" />
+                  <SelectValue placeholder={newMural.subjectId ? "Selecionar turma *" : "Selecione a disciplina primeiro"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {(classes as any[])?.map((c: any) => (
-                    <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-                  ))}
+                  {!filteredClasses || filteredClasses.length === 0 ? (
+                    <div className="px-3 py-2 text-sm text-muted-foreground">
+                      {newMural.subjectId ? "Nenhuma turma vinculada a esta disciplina" : "Selecione uma disciplina"}
+                    </div>
+                  ) : (
+                    (filteredClasses as any[]).map((c: any) => (
+                      <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
 
