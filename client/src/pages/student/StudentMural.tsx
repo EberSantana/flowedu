@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import StudentLayout from "@/components/StudentLayout";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -102,8 +103,8 @@ function StudentCardItem({
           onClick={() => onVote(card.id)}
           className={`flex items-center gap-1 text-xs transition-colors rounded-full px-2 py-0.5 ${
             card.myVote
-              ? "bg-blue-100 text-blue-700 border border-blue-300"
-              : "text-gray-400 hover:text-blue-600"
+              ? "bg-primary/10 text-primary border border-primary/30"
+              : "text-muted-foreground hover:text-primary"
           }`}
         >
           <ThumbsUp className="h-3 w-3" />
@@ -112,9 +113,9 @@ function StudentCardItem({
       </div>
 
       {card.teacherReply && (
-        <div className="mt-2 bg-white/70 rounded p-2 border-l-2 border-blue-400">
-          <p className="text-xs text-blue-700 font-medium">Resposta do professor:</p>
-          <p className="text-xs text-gray-700 mt-0.5">{card.teacherReply}</p>
+          <div className="mt-2 bg-white/70 rounded p-2 border-l-2 border-primary">
+            <p className="text-xs text-primary font-medium">Resposta do professor:</p>
+            <p className="text-xs text-foreground/80 mt-0.5">{card.teacherReply}</p>
         </div>
       )}
     </div>
@@ -245,72 +246,108 @@ export default function StudentMural() {
   // ── Seletor de disciplina/turma ────────────────────────────────────────────
   if (!selectedSubjectId || !selectedClassId) {
     return (
-      <div className="p-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-2 mb-6">
-          <Layers className="h-6 w-6 text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Mural Colaborativo</h1>
+      <StudentLayout>
+        <div className="min-h-screen bg-background">
+          <div className="bg-gradient-to-r from-primary to-accent text-white py-10 px-4">
+            <div className="container mx-auto">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                  <Layers className="h-8 w-8" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold">Mural Colaborativo</h1>
+                  <p className="text-primary-foreground/80 mt-1">Participe das atividades interativas em tempo real</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="container mx-auto py-8 px-4 max-w-2xl">
+            <p className="text-muted-foreground text-sm mb-4">Selecione a disciplina para acessar o mural:</p>
+            <div className="space-y-3">
+              {enrollmentList?.map((enr: any) => (
+                <button
+                  key={`${enr.subjectId}-${enr.classId}`}
+                  className="w-full text-left p-4 rounded-xl border border-border bg-card hover:border-primary hover:bg-primary/5 transition-colors shadow-sm"
+                  onClick={() => {
+                    setSelectedSubjectId(enr.subjectId);
+                    setSelectedClassId(enr.classId);
+                  }}
+                >
+                  <p className="font-semibold text-foreground">{enr.subjectName}</p>
+                  {enr.className && <p className="text-sm text-muted-foreground mt-0.5">{enr.className}</p>}
+                </button>
+              ))}
+              {!enrollments?.length && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Layers className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                  <p>Nenhuma disciplina encontrada</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <p className="text-gray-600 text-sm">Selecione a disciplina para acessar o mural:</p>
-          {enrollmentList?.map((enr: any) => (
-            <button
-              key={`${enr.subjectId}-${enr.classId}`}
-              className="w-full text-left p-4 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors"
-              onClick={() => {
-                setSelectedSubjectId(enr.subjectId);
-                setSelectedClassId(enr.classId);
-              }}
-            >
-              <p className="font-medium text-gray-900">{enr.subjectName}</p>
-              <p className="text-sm text-gray-500">{enr.className}</p>
-            </button>
-          ))}
-          {!enrollments?.length && (
-            <p className="text-gray-400 text-sm text-center py-4">
-              Nenhuma disciplina encontrada
-            </p>
-          )}
-        </div>
-      </div>
+      </StudentLayout>
     );
   }
 
   // ── Mural não encontrado ───────────────────────────────────────────────────
   if (!isLoading && !mural) {
     return (
-      <div className="p-6 max-w-lg mx-auto text-center">
-        <Layers className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-        <h2 className="text-lg font-semibold text-gray-700">Nenhum mural ativo</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          O professor ainda não criou um mural para esta disciplina.
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-4 gap-1"
-          onClick={() => { setSelectedSubjectId(null); setSelectedClassId(null); }}
-        >
-          <RefreshCw className="h-3.5 w-3.5" /> Voltar
-        </Button>
-      </div>
+      <StudentLayout>
+        <div className="min-h-screen bg-background">
+          <div className="bg-gradient-to-r from-primary to-accent text-white py-10 px-4">
+            <div className="container mx-auto flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <Layers className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold">Mural Colaborativo</h1>
+                <p className="text-primary-foreground/80 mt-1">Participe das atividades interativas em tempo real</p>
+              </div>
+            </div>
+          </div>
+          <div className="container mx-auto py-16 px-4 text-center">
+            <Layers className="h-12 w-12 mx-auto mb-3 text-muted-foreground/30" />
+            <h2 className="text-lg font-semibold text-foreground">Nenhum mural ativo</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              O professor ainda não criou um mural para esta disciplina.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4 gap-1"
+              onClick={() => { setSelectedSubjectId(null); setSelectedClassId(null); }}
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Voltar
+            </Button>
+          </div>
+        </div>
+      </StudentLayout>
     );
   }
 
   // ── Board do Mural ─────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0">
+    <StudentLayout>
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Header colorido */}
+      <div className="bg-gradient-to-r from-primary to-accent text-white px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <Layers className="h-5 w-5 text-blue-600" />
+          <button
+            onClick={() => { setSelectedSubjectId(null); setSelectedClassId(null); }}
+            className="text-white/80 hover:text-white transition-colors text-sm"
+          >
+            ← Voltar
+          </button>
+          <Layers className="h-5 w-5 text-white/80" />
           <div>
-            <h2 className="font-semibold text-gray-900">{mural?.title || "Mural"}</h2>
+            <h2 className="font-semibold text-white">{mural?.title || "Mural"}</h2>
             {mural?.description && (
-              <p className="text-xs text-gray-500">{mural.description}</p>
+              <p className="text-xs text-white/70">{mural.description}</p>
             )}
           </div>
           {mural?.isLocked && (
-            <Badge variant="outline" className="text-orange-600 border-orange-300 gap-1 text-xs">
+            <Badge className="bg-white/20 text-white border-white/30 gap-1 text-xs">
               <Lock className="h-3 w-3" /> Bloqueado pelo professor
             </Badge>
           )}
@@ -363,7 +400,7 @@ export default function StudentMural() {
             return (
               <div
                 key={col.id}
-                className="w-72 flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                className="w-72 flex flex-col bg-card rounded-xl border border-border shadow-sm overflow-hidden"
               >
                 <div className={`${headerColor} px-4 py-3 flex items-center justify-between`}>
                   <div className="flex items-center gap-2">
@@ -377,7 +414,7 @@ export default function StudentMural() {
 
                 <div className="flex-1 overflow-y-auto p-3">
                   {colCards.length === 0 ? (
-                    <div className="text-center py-8 text-gray-300 text-sm">
+                    <div className="text-center py-8 text-muted-foreground/40 text-sm">
                       Nenhum card ainda
                     </div>
                   ) : (
@@ -393,11 +430,11 @@ export default function StudentMural() {
 
                 {/* Botão adicionar na coluna */}
                 {!mural.isLocked && (
-                  <div className="p-2 border-t border-gray-100">
+                  <div className="p-2 border-t border-border">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full text-gray-400 hover:text-gray-600 gap-1 text-xs"
+                      className="w-full text-muted-foreground hover:text-foreground gap-1 text-xs"
                       onClick={() => {
                         setSelectedColumnId(col.id);
                         setShowAddCardDialog(true);
@@ -481,5 +518,6 @@ export default function StudentMural() {
         </DialogContent>
       </Dialog>
     </div>
+    </StudentLayout>
   );
 }
