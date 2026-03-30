@@ -1,64 +1,40 @@
 #!/bin/bash
 set -e
 
-echo "=== Deploy FlowEdu v2.6.0 para VPS ==="
+echo "=== Deploy FlowEdu para VPS ==="
 echo ""
 
 # Configurações
 VPS_HOST="76.13.67.5"
-VPS_USER="325476"
+VPS_USER="root"
 VPS_PASS="325476@Flowedu"
-VPS_PATH="/root/flowedu"
 
-echo "1. Compactando arquivos de build..."
+# Caminhos no VPS onde o Node.js serve os arquivos estáticos:
+# 1. /root/flowedu/public/         (backup / referência)
+# 2. /var/www/flowedu/dist/public/ (caminho REAL usado pelo PM2/Node.js)
+VPS_PATH_1="/root/flowedu/public"
+VPS_PATH_2="/var/www/flowedu/dist/public"
+
 cd /home/ubuntu/teacher_schedule_system
-tar -czf dist.tar.gz dist/
-echo "✓ Arquivo compactado: $(ls -lh dist.tar.gz | awk '{print $5}')"
+
+echo "1. Sincronizando build para $VPS_PATH_1 ..."
+sshpass -p "$VPS_PASS" rsync -az --delete \
+  -e "ssh -o StrictHostKeyChecking=no" \
+  dist/public/ ${VPS_USER}@${VPS_HOST}:${VPS_PATH_1}/
+echo "✓ Concluído"
 
 echo ""
-echo "2. Fazendo upload para VPS via SCP..."
-sshpass -p "$VPS_PASS" scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-  dist.tar.gz ${VPS_USER}@${VPS_HOST}:${VPS_PATH}/ 2>&1 | grep -v "Warning:"
-
-if [ $? -eq 0 ]; then
-  echo "✓ Upload concluído com sucesso!"
-else
-  echo "✗ Erro no upload. Tentando método alternativo..."
-  exit 1
-fi
+echo "2. Sincronizando build para $VPS_PATH_2 (caminho principal do Node.js) ..."
+sshpass -p "$VPS_PASS" rsync -az --delete \
+  -e "ssh -o StrictHostKeyChecking=no" \
+  dist/public/ ${VPS_USER}@${VPS_HOST}:${VPS_PATH_2}/
+echo "✓ Concluído"
 
 echo ""
-echo "3. Executando comandos na VPS..."
-sshpass -p "$VPS_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-  ${VPS_USER}@${VPS_HOST} << 'EOFSSH'
-cd /root/flowedu
-
-echo "  - Fazendo backup da versão atual..."
-if [ -d "dist" ]; then
-  mv dist dist_backup_$(date +%Y%m%d_%H%M%S)
-fi
-
-echo "  - Extraindo novo build..."
-tar -xzf dist.tar.gz
-
-echo "  - Removendo arquivo temporário..."
-rm dist.tar.gz
-
-echo "  - Verificando estrutura..."
-ls -la dist/ | head -5
-
-echo "  - Reiniciando PM2..."
-pm2 restart flowedu
-pm2 save
-
-echo ""
-echo "✓ Deploy concluído!"
-echo ""
-echo "Verificando status..."
-pm2 status | grep flowedu
-EOFSSH
+echo "3. Reiniciando PM2..."
+sshpass -p "$VPS_PASS" ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} \
+  "pm2 restart flowedu && pm2 save && pm2 status | grep flowedu"
 
 echo ""
 echo "=== Deploy Finalizado ==="
 echo "Acesse: https://flowedu.app"
-echo "Versão: 2.6.0"
