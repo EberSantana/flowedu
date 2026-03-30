@@ -23,9 +23,19 @@ interface VersionEntry {
 
 const changelog: VersionEntry[] = [
   {
+    version: "6.0.0",
+    date: "30/03/2026",
+    label: "Mais recente",
+    highlight: "Mural Colaborativo: seleção unificada Disciplina — Turma para evitar confusão entre matérias homônimas",
+    changes: [
+      { type: "improvement", text: "Modal 'Criar Novo Mural': dois selects separados (disciplina + turma) substituídos por um único dropdown no formato 'Disciplina — Turma' (ex: Informática Básica — Turma IAGRO 11)" },
+      { type: "fix", text: "Eliminada confusão entre disciplinas com o mesmo nome em turmas distintas na criação de murais colaborativos" },
+    ]
+  },
+  {
     version: "5.38.0",
     date: "27/03/2026",
-    label: "Mais recente",
+    label: undefined,
     highlight: "Tags do Portal do Aluno em linha única e Central de Ajuda/Novidades acessíveis sem login",
     changes: [
       { type: "fix", text: "Portal do Aluno: tags Materiais, Progresso e Exercícios agora ficam na mesma linha que o Portal do Professor (flex-nowrap)" },

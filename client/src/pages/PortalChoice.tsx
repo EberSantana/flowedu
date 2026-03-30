@@ -300,7 +300,7 @@ export default function PortalChoice() {
             <span>LGPD Compliant</span>
           </div>
           <p className="text-xs" style={{ color: "#4a5568" }}>
-            v5.38.0 · Março 2026 · © 2026 FlowEdu — Onde a educação flui
+            v6.0.0 · Março 2026 · © 2026 FlowEdu — Onde a educação flui
           </p>
         </div>
       </main>
