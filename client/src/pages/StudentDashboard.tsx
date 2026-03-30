@@ -36,25 +36,65 @@ export default function StudentDashboard() {
   return (
     <StudentLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Header de Boas-vindas */}
-        <div className="mb-8">
-          <Card className="bg-gradient-to-r from-primary to-accent text-primary-foreground border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                  <User className="w-8 h-8 text-white" />
+        {/* Banner de Boas-vindas */}
+        <div className="mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900">
+          <div className="px-6 py-6 sm:px-8 sm:py-7">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              {/* Esquerda: Avatar + Saudação */}
+              <div className="flex items-center gap-5">
+                <div className="h-16 w-16 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center shadow-lg shrink-0">
+                  <span className="text-white text-2xl font-bold">
+                    {student?.fullName?.charAt(0).toUpperCase() || 'A'}
+                  </span>
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
                     Olá, {student?.fullName?.split(' ')[0] || 'Aluno'}!
                   </h1>
-                  <p className="text-primary-foreground/80 mt-1">
+                  <p className="text-blue-200 mt-1 text-base">
                     Bem-vindo ao seu portal de estudos
                   </p>
+                  {/* Badges de disciplinas */}
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                      <BookOpen className="h-3.5 w-3.5" />
+                      {activeSubjects.length} Disciplinas ativas
+                    </span>
+                    {completedSubjects.length > 0 && (
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                        <GraduationCap className="h-3.5 w-3.5" />
+                        {completedSubjects.length} Concluídas
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              {/* Direita: Data */}
+              <div className="text-right shrink-0">
+                <p className="text-white/70 text-sm">
+                  {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* Faixa inferior com frase motivacional */}
+          <div className="bg-black/20 px-6 sm:px-8 py-3 border-t border-white/10">
+            <p className="text-blue-200 text-sm italic">
+              {(() => {
+                const quotes = [
+                  '"O sucesso é a soma de pequenos esforços repetidos dia após dia." — Robert Collier',
+                  '"Aprender é a única coisa que a mente nunca se cansa, nunca tem medo e nunca se arrepende." — Leonardo da Vinci',
+                  '"Cada dia é uma nova oportunidade para aprender algo novo." — Anônimo',
+                  '"O conhecimento é o único bem que cresce quando é compartilhado." — Anônimo',
+                  '"Grandes conquistas exigem grandes sacrifícios." — Anônimo',
+                  '"Invista em conhecimento. Ele sempre paga os melhores juros." — Benjamin Franklin',
+                  '"A educação é o passaporte para o futuro." — Malcolm X',
+                ];
+                const idx = new Date().getDay() % quotes.length;
+                return quotes[idx];
+              })()}
+            </p>
+          </div>
         </div>
 
         {/* Ações Rápidas */}

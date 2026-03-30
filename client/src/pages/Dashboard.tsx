@@ -418,51 +418,88 @@ function Dashboard() {
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
-          {/* Header */}
-          <div className="mb-8 flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              {/* Avatar do Usuário */}
-              <Avatar className="h-16 w-16 border-2 border-primary/20 shadow-lg">
-                <AvatarImage 
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'Professor')}&backgroundColor=6366f1&textColor=ffffff`} 
-                  alt={user?.name || 'Professor'}
-                />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
-                  {user?.name?.charAt(0).toUpperCase() || 'P'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">
-                  {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  {dashboardConfig.dashboardDescription}
-                </p>
+          {/* Banner de Boas-vindas */}
+          <div className="mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900">
+            <div className="px-6 py-6 sm:px-8 sm:py-7">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Esquerda: Avatar + Saudação */}
+                <div className="flex items-center gap-5">
+                  <Avatar className="h-16 w-16 border-2 border-white/30 shadow-lg shrink-0">
+                    <AvatarImage 
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'Professor')}&backgroundColor=1e3a5f&textColor=ffffff`} 
+                      alt={user?.name || 'Professor'}
+                    />
+                    <AvatarFallback className="bg-white/20 text-white text-xl font-bold">
+                      {user?.name?.charAt(0).toUpperCase() || 'P'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                      {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
+                    </h1>
+                    <p className="text-blue-200 mt-1 text-base">
+                      {dashboardConfig.dashboardDescription}
+                    </p>
+                    {/* Badges de Disciplinas e Turmas */}
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                        <BookOpen className="h-3.5 w-3.5" />
+                        {subjects?.length || 0} Disciplinas
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                        <Users className="h-3.5 w-3.5" />
+                        {classes?.length || 0} Turmas
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Direita: Data + Botões */}
+                <div className="flex flex-col items-end gap-3 shrink-0">
+                  <div className="text-right">
+                    <p className="text-white/70 text-sm">
+                      {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {isCustomizing && (
+                      <Button
+                        onClick={resetToDefault}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+                      >
+                        <RotateCcw className="h-4 w-4" />
+                        Restaurar
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => setIsCustomizing(!isCustomizing)}
+                      variant={isCustomizing ? "default" : "outline"}
+                      size="sm"
+                      className={isCustomizing ? "gap-2" : "gap-2 bg-white/10 border-white/30 text-white hover:bg-white/20"}
+                    >
+                      <Settings className="h-4 w-4" />
+                      {isCustomizing ? 'Concluir' : 'Personalizar'}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2 items-center">
-              {/* Botão de perfil removido - perfil único tradicional */}
-              {/* Botão Sair removido - disponível no Sidebar */}
-              {isCustomizing && (
-                <Button
-                  onClick={resetToDefault}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Restaurar Padrão
-                </Button>
-              )}
-              <Button
-                onClick={() => setIsCustomizing(!isCustomizing)}
-                variant={isCustomizing ? "default" : "outline"}
-                size="sm"
-                className="gap-2"
-              >
-                <Settings className="h-4 w-4" />
-                {isCustomizing ? 'Concluir' : 'Personalizar'}
-              </Button>
+            {/* Faixa inferior com frase motivacional */}
+            <div className="bg-black/20 px-6 sm:px-8 py-3 border-t border-white/10">
+              <p className="text-blue-200 text-sm italic">
+                {(() => {
+                  const quotes = [
+                    '"A educação é a arma mais poderosa que você pode usar para mudar o mundo." — Nelson Mandela',
+                    '"O professor que tenta ensinar sem inspirar o aluno com o desejo de aprender está batendo em ferro frio." — Horace Mann',
+                    '"Educar é semear com sabedoria e colher com paciência." — Augusto Cury',
+                    '"A tarefa do professor é preparar o terreno para que o aluno possa plantar suas próprias sementes." — Anônimo',
+                    '"Grandes conquistas exigem grandes sacrifícios." — Anônimo',
+                  ];
+                  const idx = new Date().getDay() % quotes.length;
+                  return quotes[idx];
+                })()}
+              </p>
             </div>
           </div>
           
