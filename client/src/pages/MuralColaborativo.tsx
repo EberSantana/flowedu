@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
+import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -519,14 +521,17 @@ export default function MuralColaborativo() {
   // ── Vista: Lista de Murais ─────────────────────────────────────────────────
   if (view === "list") {
     return (
-      <div className="p-6 max-w-5xl mx-auto">
+      <>
+        <Sidebar />
+        <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Layers className="h-6 w-6 text-blue-600" />
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Layers className="h-6 w-6 text-primary" />
               Mural Colaborativo
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Crie murais interativos em tempo real para suas turmas
             </p>
           </div>
@@ -568,6 +573,7 @@ export default function MuralColaborativo() {
           </div>
         )}
 
+        </div>
         {/* Dialog: Criar Mural */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogContent className="max-w-lg">
@@ -673,7 +679,8 @@ export default function MuralColaborativo() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </PageWrapper>
+      </>
     );
   }
 
@@ -681,9 +688,12 @@ export default function MuralColaborativo() {
   const mural = muralData as MuralData | undefined;
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <>
+      <Sidebar />
+      <PageWrapper className="min-h-screen bg-background">
+      <div className="flex flex-col" style={{minHeight: 'calc(100vh - 0px)'}}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0 flex-wrap gap-2">
+      <div className="bg-card border-b border-border px-4 py-3 flex items-center justify-between shrink-0 flex-wrap gap-2">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -693,8 +703,8 @@ export default function MuralColaborativo() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="font-semibold text-gray-900">{mural?.title || "Carregando..."}</h2>
-            {mural?.description && <p className="text-xs text-gray-500">{mural.description}</p>}
+            <h2 className="font-semibold text-foreground">{mural?.title || "Carregando..."}</h2>
+            {mural?.description && <p className="text-xs text-muted-foreground">{mural.description}</p>}
           </div>
           {mural?.isLocked && (
             <Badge variant="outline" className="text-orange-600 border-orange-300 gap-1">
@@ -767,8 +777,8 @@ export default function MuralColaborativo() {
       </div>
 
       {/* Colunas */}
-      <div className="flex-1 overflow-x-auto p-4">
-        <div className="flex gap-4 h-full min-w-max">
+      <div className="flex-1 overflow-x-auto p-4" style={{minHeight: '500px'}}>
+        <div className="flex gap-4 min-w-max">
           {mural?.columns.map((col) => {
             const colCards = mural.cards.filter((c) => c.columnId === col.id);
             const headerColor = COLUMN_COLORS[col.color] || "bg-gray-500";
@@ -776,7 +786,7 @@ export default function MuralColaborativo() {
             return (
               <div
                 key={col.id}
-                className="w-72 flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                className="w-72 flex flex-col bg-card rounded-xl border border-border shadow-sm overflow-hidden"
               >
                 <div className={`${headerColor} px-4 py-3 flex items-center justify-between`}>
                   <div className="flex items-center gap-2">
@@ -788,7 +798,7 @@ export default function MuralColaborativo() {
 
                 <div className="flex-1 overflow-y-auto p-3">
                   {colCards.length === 0 ? (
-                    <div className="text-center py-8 text-gray-300 text-sm">Nenhum card ainda</div>
+                    <div className="text-center py-8 text-muted-foreground/40 text-sm">Nenhum card ainda</div>
                   ) : (
                     colCards.map((card) => (
                       <MuralCardItem
@@ -805,11 +815,11 @@ export default function MuralColaborativo() {
                 </div>
 
                 {!mural.isLocked && (
-                  <div className="p-2 border-t border-gray-100">
+                  <div className="p-2 border-t border-border">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full text-gray-400 hover:text-gray-600 gap-1 text-xs"
+                      className="w-full text-muted-foreground hover:text-foreground gap-1 text-xs"
                       onClick={() => { setSelectedColumnId(col.id); setShowAddCardDialog(true); }}
                     >
                       <Plus className="h-3 w-3" /> Adicionar card
@@ -819,7 +829,7 @@ export default function MuralColaborativo() {
               </div>
             );
           })}
-        </div>
+       </div>
       </div>
 
       {/* Dialog: Adicionar Card */}
@@ -847,7 +857,7 @@ export default function MuralColaborativo() {
               rows={3}
             />
             <div>
-              <p className="text-sm text-gray-600 mb-2">Cor do card:</p>
+              <p className="text-sm text-muted-foreground mb-2">Cor do card:</p>
               <div className="flex gap-2">
                 {Object.entries(CARD_COLORS).map(([color, cls]) => (
                   <button
@@ -883,8 +893,8 @@ export default function MuralColaborativo() {
           <DialogHeader><DialogTitle>Responder Card</DialogTitle></DialogHeader>
           {replyCard && (
             <div className="space-y-3 py-2">
-              <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 border">
-                <p className="font-medium text-xs text-gray-500 mb-1">{replyCard.authorName}</p>
+              <div className="bg-muted rounded-lg p-3 text-sm text-foreground border">
+                <p className="font-medium text-xs text-muted-foreground mb-1">{replyCard.authorName}</p>
                 {replyCard.text}
               </div>
               <Textarea
@@ -915,11 +925,11 @@ export default function MuralColaborativo() {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Timer className="h-5 w-5 text-blue-600" /> Temporizador de Sessão
+              <Timer className="h-5 w-5 text-primary" /> Temporizador de Sessão
             </DialogTitle>
           </DialogHeader>
           <div className="py-3 space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Defina o tempo da atividade. A contagem regressiva ficará visível para todos os alunos no mural.
             </p>
             <div className="flex items-center gap-3">
@@ -931,7 +941,7 @@ export default function MuralColaborativo() {
                 onChange={(e) => setTimerInput(e.target.value)}
                 className="w-24 text-center text-lg font-bold"
               />
-              <span className="text-gray-600 font-medium">minutos</span>
+              <span className="text-muted-foreground font-medium">minutos</span>
             </div>
             <div className="flex gap-2 flex-wrap">
               {[5, 10, 15, 20, 30].map((min) => (
@@ -939,8 +949,8 @@ export default function MuralColaborativo() {
                   key={min}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                     timerInput === String(min)
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "border-gray-300 text-gray-600 hover:border-blue-400"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:border-primary"
                   }`}
                   onClick={() => setTimerInput(String(min))}
                 >
@@ -965,6 +975,8 @@ export default function MuralColaborativo() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </PageWrapper>
+    </>
   );
 }

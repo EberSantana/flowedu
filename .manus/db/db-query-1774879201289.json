@@ -1,0 +1,22 @@
+{
+  "query": "SHOW TABLES LIKE 'mural%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SHOW TABLES LIKE 'mural%';",
+  "rows": [
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (mural%)": "mural_cards"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (mural%)": "mural_columns"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (mural%)": "mural_votes"
+    },
+    {
+      "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (mural%)": "murals"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_c6FhCpifoFzEQqXNtsKEU6 (mural%)\nmural_cards\nmural_columns\nmural_votes\nmurals\n",
+  "stderr": "",
+  "execution_time_ms": 188
+}
