@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as LucideIcons from "lucide-react";
 import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, CalendarDays, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User, UserCog } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -424,15 +423,11 @@ function Dashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 {/* Esquerda: Avatar + Saudação */}
                 <div className="flex items-center gap-5">
-                  <Avatar className="h-16 w-16 border-2 border-primary-foreground/30 shadow-lg shrink-0">
-                    <AvatarImage 
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'Professor')}&backgroundColor=1e3a5f&textColor=ffffff`} 
-                      alt={user?.name || 'Professor'}
-                    />
-                    <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground text-xl font-bold">
+                  <div className="h-16 w-16 rounded-full bg-primary-foreground/20 border-2 border-primary-foreground/30 flex items-center justify-center shadow-lg shrink-0">
+                    <span className="text-primary-foreground text-2xl font-bold">
                       {user?.name?.charAt(0).toUpperCase() || 'P'}
-                    </AvatarFallback>
-                  </Avatar>
+                    </span>
+                  </div>
                   <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-primary-foreground leading-tight">
                       {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
