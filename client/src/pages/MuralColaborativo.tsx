@@ -406,15 +406,10 @@ export default function MuralColaborativo() {
 
   // ── Queries ────────────────────────────────────────────────────────────────
   const { data: subjectsWithClass } = trpc.subjects.listWithClass.useQuery(undefined, { enabled: !!user });
-  // Deduplica disciplinas para o select
-  const uniqueSubjects = subjectsWithClass
-    ? Array.from(new Map(subjectsWithClass.map((s: any) => [s.id, s])).values())
+  // Cada entrada já é uma combinação única Disciplina+Turma (filterKey = "subjectId:classId")
+  const subjectClassOptions = subjectsWithClass
+    ? (subjectsWithClass as any[]).filter((s: any) => s.classId) // apenas com turma vinculada
     : [];
-  // Turmas filtradas pela disciplina selecionada
-  const { data: filteredClasses } = trpc.learningPathReport.getClassesBySubject.useQuery(
-    { subjectId: Number(newMural.subjectId) },
-    { enabled: !!user && !!newMural.subjectId }
-  );
   const { data: muralList, refetch: refetchList } = trpc.mural.list.useQuery(
     { includeArchived: false },
     { enabled: view === "list" && !!user }
@@ -603,35 +598,25 @@ export default function MuralColaborativo() {
                 onChange={(e) => setNewMural({ ...newMural, description: e.target.value })}
                 rows={2}
               />
+              {/* Select único: Disciplina — Turma */}
               <Select
-                value={newMural.subjectId}
-                onValueChange={(v) => setNewMural({ ...newMural, subjectId: v, classId: "" })}
+                value={newMural.subjectId && newMural.classId ? `${newMural.subjectId}:${newMural.classId}` : ""}
+                onValueChange={(v) => {
+                  const [sid, cid] = v.split(":");
+                  setNewMural({ ...newMural, subjectId: sid, classId: cid });
+                }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecionar disciplina *" />
+                  <SelectValue placeholder="Selecionar disciplina * (Disciplina — Turma)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(uniqueSubjects as any[])?.map((s: any) => (
-                    <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={newMural.classId}
-                onValueChange={(v) => setNewMural({ ...newMural, classId: v })}
-                disabled={!newMural.subjectId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={newMural.subjectId ? "Selecionar turma *" : "Selecione a disciplina primeiro"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {!filteredClasses || filteredClasses.length === 0 ? (
-                    <div className="px-3 py-2 text-sm text-muted-foreground">
-                      {newMural.subjectId ? "Nenhuma turma vinculada a esta disciplina" : "Selecione uma disciplina"}
-                    </div>
+                  {subjectClassOptions.length === 0 ? (
+                    <div className="px-3 py-2 text-sm text-muted-foreground">Nenhuma disciplina com turma vinculada</div>
                   ) : (
-                    (filteredClasses as any[]).map((c: any) => (
-                      <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
+                    subjectClassOptions.map((s: any) => (
+                      <SelectItem key={s.filterKey} value={s.filterKey}>
+                        {s.label}
+                      </SelectItem>
                     ))
                   )}
                 </SelectContent>
