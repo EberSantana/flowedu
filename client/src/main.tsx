@@ -52,6 +52,23 @@ createRoot(document.getElementById("root")!).render(
 
 // Registrar Service Worker para PWA com atualização automática
 if ('serviceWorker' in navigator) {
+  // Forçar limpeza de caches antigos ao carregar a página
+  window.addEventListener('load', async () => {
+    try {
+      const cacheNames = await caches.keys();
+      const currentVersion = (window as any).__APP_VERSION__ || '';
+      for (const name of cacheNames) {
+        // Remover qualquer cache que não corresponde à versão atual
+        if (currentVersion && !name.includes(currentVersion)) {
+          await caches.delete(name);
+          console.log('[PWA] Cache antigo removido:', name);
+        }
+      }
+    } catch (e) {
+      console.warn('[PWA] Erro ao limpar caches:', e);
+    }
+  });
+
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js')

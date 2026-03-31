@@ -1,7 +1,7 @@
 // Service Worker para PWA - FlowEdu
 // A versão é controlada automaticamente pelo sistema de deploy
 // Quando o sw.js muda (nova versão injetada), o browser detecta e atualiza automaticamente
-const CACHE_VERSION = '__SW_VERSION__' !== '__SW_VERSION__' ? '__SW_VERSION__' : Date.now().toString(); // Versão dinâmica em dev
+const CACHE_VERSION = (typeof __SW_VERSION__ !== 'undefined' && __SW_VERSION__ !== '__SW_VERSION__') ? __SW_VERSION__ : Date.now().toString(); // Versão injetada no deploy
 const CACHE_NAME = `flowedu-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `flowedu-runtime-${CACHE_VERSION}`;
 
