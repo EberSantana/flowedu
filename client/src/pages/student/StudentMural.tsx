@@ -160,8 +160,8 @@ export default function StudentMural() {
   })) || [];
 
   const { data: muralData, refetch: refetchMural, isLoading } = trpc.mural.getForStudent.useQuery(
-    { subjectId: selectedSubjectId!, classId: selectedClassId! },
-    { enabled: !!selectedSubjectId && !!selectedClassId }
+    { subjectId: selectedSubjectId!, classId: selectedClassId ?? undefined },
+    { enabled: !!selectedSubjectId }
   );
 
   const mural = muralData as MuralData | null | undefined;

@@ -103,20 +103,27 @@ export const muralRouter = router({
       };
     }),
 
-  /** Obter mural para aluno (por subjectId + classId) */
+  /** Obter mural para aluno (por subjectId + classId opcional) */
   getForStudent: studentProcedure
-    .input(z.object({ subjectId: z.number(), classId: z.number() }))
+    .input(z.object({ subjectId: z.number(), classId: z.number().nullable().optional() }))
     .query(async ({ ctx, input }) => {
       const db = (await getDb())!;
       // Buscar mural ativo mais recente para essa disciplina/turma
+      // Se classId não estiver disponível (matrícula via subjectEnrollments), buscar só por subjectId
+      const whereConditions = input.classId
+        ? and(
+            eq(murals.subjectId, input.subjectId),
+            eq(murals.classId, input.classId),
+            eq(murals.isActive, true),
+          )
+        : and(
+            eq(murals.subjectId, input.subjectId),
+            eq(murals.isActive, true),
+          );
       const [mural] = await db
         .select()
         .from(murals)
-        .where(and(
-          eq(murals.subjectId, input.subjectId),
-          eq(murals.classId, input.classId),
-          eq(murals.isActive, true),
-        ))
+        .where(whereConditions)
         .orderBy(desc(murals.createdAt))
         .limit(1);
 
