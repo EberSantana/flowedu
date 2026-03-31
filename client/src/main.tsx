@@ -13,9 +13,9 @@ const queryClient = new QueryClient({
       refetchOnMount: false,
       refetchOnReconnect: false,
       retry: 1,
-      staleTime: 10 * 60 * 1000, // 10 minutos - cache mais agressivo
-      gcTime: 30 * 60 * 1000, // 30 minutos - mantém dados em cache por mais tempo
-      networkMode: 'online', // Só faz requests quando online
+      staleTime: 10 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      networkMode: 'online',
     },
     mutations: {
       retry: 1,
@@ -23,9 +23,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// REMOVIDO: Subscribers de redirecionamento automático
-// O redirecionamento agora é gerenciado individualmente por cada página protegida
 
 const trpcClient = trpc.createClient({
   links: [
@@ -50,65 +47,47 @@ createRoot(document.getElementById("root")!).render(
   </QueryClientProvider>
 );
 
-// Registrar Service Worker para PWA com atualização automática
+// ==================== SERVICE WORKER ====================
 if ('serviceWorker' in navigator) {
-  // Forçar limpeza de caches antigos ao carregar a página
   window.addEventListener('load', async () => {
     try {
-      const cacheNames = await caches.keys();
-      const currentVersion = (window as any).__APP_VERSION__ || '';
-      for (const name of cacheNames) {
-        // Remover qualquer cache que não corresponde à versão atual
-        if (currentVersion && !name.includes(currentVersion)) {
-          await caches.delete(name);
-          console.log('[PWA] Cache antigo removido:', name);
-        }
-      }
-    } catch (e) {
-      console.warn('[PWA] Erro ao limpar caches:', e);
+      // 1. Verificar se há um SW antigo registrado
+      const existingRegs = await navigator.serviceWorker.getRegistrations();
+      
+      // 2. Registrar o novo SW
+      const registration = await navigator.serviceWorker.register('/sw.js', {
+        updateViaCache: 'none', // Sempre buscar sw.js do servidor, sem cache
+      });
+      
+      console.log('[PWA] Service Worker registrado');
+
+      // 3. Verificar atualizações a cada 30 minutos
+      setInterval(() => registration.update(), 30 * 60 * 1000);
+
+      // 4. Quando nova versão for encontrada, ativar imediatamente
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (!newWorker) return;
+
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            console.log('[PWA] Nova versão disponível, ativando...');
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error('[PWA] Falha ao registrar Service Worker:', error);
     }
   });
 
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then((registration) => {
-        console.log('[PWA] Service Worker registrado, versão app:', __APP_VERSION__);
-        
-        // Verificar atualizações a cada 30 minutos
-        setInterval(() => {
-          registration.update();
-        }, 30 * 60 * 1000);
-        
-        // Quando uma nova versão do SW for encontrada
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          if (!newWorker) return;
-          
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // Nova versão disponível - forçar ativação imediata
-              console.log('[PWA] Nova versão detectada, atualizando...');
-              newWorker.postMessage({ type: 'SKIP_WAITING' });
-            }
-          });
-        });
-      })
-      .catch((error) => {
-        console.error('[PWA] Falha ao registrar Service Worker:', error);
-      });
-  });
-  
-  // Quando o novo SW assumir controle, recarregar a página
+  // 5. Quando o novo SW assumir controle, recarregar UMA VEZ
+  let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('[PWA] Novo Service Worker ativo, recarregando...');
+    if (reloading) return;
+    reloading = true;
+    console.log('[PWA] Novo SW ativo, recarregando...');
     window.location.reload();
-  });
-  
-  // Ouvir mensagens do SW (ex: notificação de atualização)
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    if (event.data?.type === 'SW_UPDATED') {
-      console.log('[PWA] Cache atualizado para versão:', event.data.version);
-    }
   });
 }

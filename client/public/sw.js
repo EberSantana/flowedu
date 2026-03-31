@@ -1,273 +1,94 @@
 // Service Worker para PWA - FlowEdu
-// A versão é controlada automaticamente pelo sistema de deploy
-// Quando o sw.js muda (nova versão injetada), o browser detecta e atualiza automaticamente
-const CACHE_VERSION = (typeof __SW_VERSION__ !== 'undefined' && __SW_VERSION__ !== '__SW_VERSION__') ? __SW_VERSION__ : Date.now().toString(); // Versão injetada no deploy
-const CACHE_NAME = `flowedu-static-${CACHE_VERSION}`;
-const RUNTIME_CACHE = `flowedu-runtime-${CACHE_VERSION}`;
+// VERSÃO INJETADA NO DEPLOY - não usar Date.now() para evitar loops de reload
+// O deploy.sh substitui esta linha com: const CACHE_VERSION = 'TIMESTAMP';
+const CACHE_VERSION = 'DEPLOY_VERSION_PLACEHOLDER';
+const CACHE_NAME = `flowedu-v${CACHE_VERSION}`;
 
-// Recursos estáticos essenciais para cache offline
-const STATIC_ASSETS = [
-  '/',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-];
-
-// Instalação do Service Worker
+// ==================== INSTALAÇÃO ====================
 self.addEventListener('install', (event) => {
-  console.log('[SW] Instalando nova versão:', CACHE_VERSION);
-  
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching static assets');
-      return cache.addAll(STATIC_ASSETS).catch(err => {
-        console.warn('[SW] Failed to cache some static assets:', err);
-      });
-    }).then(() => {
-      console.log('[SW] Installation complete, skipping waiting');
-      // Força ativação imediata sem esperar abas fecharem
-      return self.skipWaiting();
-    })
-  );
+  console.log('[SW] Instalando versão:', CACHE_VERSION);
+  // Ativar imediatamente sem esperar abas fecharem
+  event.waitUntil(self.skipWaiting());
 });
 
-// Ativação do Service Worker
+// ==================== ATIVAÇÃO ====================
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Ativando nova versão:', CACHE_VERSION);
-  
+  console.log('[SW] Ativando versão:', CACHE_VERSION);
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          // Remover TODOS os caches que não são da versão atual
-          if (cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE) {
-            console.log('[SW] Removendo cache antigo:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => {
+            console.log('[SW] Removendo cache antigo:', name);
+            return caches.delete(name);
+          })
       );
     }).then(() => {
-      console.log('[SW] Versão', CACHE_VERSION, 'ativada com sucesso');
-      // Toma controle de todas as abas imediatamente
+      console.log('[SW] Versão', CACHE_VERSION, 'ativada');
       return self.clients.claim();
-    }).then(() => {
-      // Notifica todas as abas abertas que uma nova versão está ativa
-      return self.clients.matchAll().then(clients => {
-        clients.forEach(client => {
-          client.postMessage({
-            type: 'SW_UPDATED',
-            version: CACHE_VERSION
-          });
-        });
-      });
     })
   );
 });
 
-// Interceptar requisições
+// ==================== FETCH ====================
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
-  
-  // Ignorar requisições não-GET
+
+  // Ignorar não-GET e outros domínios
   if (request.method !== 'GET') return;
-  
-  // Ignorar requisições de outros domínios
   if (url.origin !== self.location.origin) return;
-  
-  // NUNCA cachear arquivos de assets com hash do Vite (eles já são imutáveis)
-  // Se o browser pedir um asset que não existe, deixar o servidor retornar 404/302
+
+  // NUNCA cachear API
+  if (url.pathname.startsWith('/api/')) return;
+
+  // NUNCA cachear sw.js (sempre buscar do servidor)
+  if (url.pathname === '/sw.js') return;
+
+  // Assets com hash (imutáveis) - Cache-First
   if (url.pathname.startsWith('/assets/')) {
     event.respondWith(
-      fetch(request).catch(() => caches.match(request))
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        try {
+          const response = await fetch(request);
+          if (response.ok) cache.put(request, response.clone());
+          return response;
+        } catch {
+          return new Response('Asset not found', { status: 404 });
+        }
+      })
     );
     return;
   }
-  
-  // NUNCA cachear módulos dinâmicos do Vite (.tsx, .ts, .jsx, .js com @fs ou src/)
-  if (url.pathname.includes('/src/') || url.pathname.endsWith('.tsx') || url.pathname.endsWith('.ts') || url.pathname.includes('@fs') || url.pathname.includes('@vite') || url.pathname.includes('node_modules')) {
-    event.respondWith(fetch(request));
-    return;
-  }
-  
-  // Network-First para API
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirstStrategy(request));
-    return;
-  }
-  
-  // Network-First para index.html e rotas SPA (sempre buscar a versão mais recente)
+
+  // HTML / navegação - Network-First (sempre pegar versão mais recente)
   if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
-    event.respondWith(networkFirstStrategy(request));
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/') || createOfflineResponse())
+    );
     return;
   }
-  
-  // Cache-First para outros recursos estáticos (imagens, fontes, etc)
-  event.respondWith(cacheFirstStrategy(request));
-});
 
-// Estratégia Network-First: Busca na rede primeiro, depois no cache
-async function networkFirstStrategy(request) {
-  try {
-    const networkResponse = await fetch(request);
-    if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) return cachedResponse;
-    
-    // Se for navegação HTML, retornar página offline
-    if (request.mode === 'navigate') {
-      return createOfflineResponse();
-    }
-    
-    return new Response('Offline', { status: 503 });
-  }
-}
-
-// Estratégia Cache-First para assets estáticos
-async function cacheFirstStrategy(request) {
-  try {
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) return cachedResponse;
-    
-    const networkResponse = await fetch(request);
-    if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    const cachedResponse = await caches.match(request);
-    return cachedResponse || createOfflineResponse();
-  }
-}
-
-// Criar resposta offline HTML
-function createOfflineResponse() {
-  return new Response(
-    `<!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Offline - FlowEdu</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          display: flex; align-items: center; justify-content: center;
-          min-height: 100vh;
-          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-          color: white; text-align: center; padding: 20px;
-        }
-        .container {
-          max-width: 500px; background: rgba(255,255,255,0.1);
-          backdrop-filter: blur(10px); border-radius: 20px;
-          padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-        .icon { font-size: 4rem; margin-bottom: 1rem; }
-        h1 { font-size: 2rem; margin-bottom: 1rem; }
-        p { font-size: 1.1rem; opacity: 0.95; margin-bottom: 2rem; line-height: 1.6; }
-        button {
-          background: white; color: #3b82f6; border: none;
-          padding: 14px 32px; font-size: 1rem; border-radius: 10px;
-          cursor: pointer; font-weight: 600;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="icon">📡</div>
-        <h1>Você está offline</h1>
-        <p>Verifique sua conexão com a internet e tente novamente.</p>
-        <button onclick="window.location.reload()">Tentar Novamente</button>
-      </div>
-    </body>
-    </html>`,
-    { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-  );
-}
-
-// ==================== PUSH NOTIFICATIONS ====================
-
-// Receber notificação push
-self.addEventListener('push', (event) => {
-  console.log('[SW] Push recebido:', event);
-  
-  let data = {
-    title: 'FlowEdu',
-    body: 'Você tem uma nova notificação',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
-    tag: 'flowedu-notification',
-    data: { url: '/dashboard' },
-  };
-  
-  try {
-    if (event.data) {
-      const payload = event.data.json();
-      data = { ...data, ...payload };
-    }
-  } catch (e) {
-    console.warn('[SW] Erro ao parsear push data:', e);
-  }
-  
-  const options = {
-    body: data.body,
-    icon: data.icon || '/icon-192.png',
-    badge: data.badge || '/icon-192.png',
-    tag: data.tag || 'flowedu-notification',
-    vibrate: [200, 100, 200],
-    requireInteraction: false,
-    data: data.data || { url: '/dashboard' },
-    actions: [
-      { action: 'open', title: 'Abrir' },
-      { action: 'dismiss', title: 'Dispensar' },
-    ],
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
+  // Outros recursos estáticos - Cache-First
+  event.respondWith(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const cached = await cache.match(request);
+      if (cached) return cached;
+      try {
+        const response = await fetch(request);
+        if (response.ok) cache.put(request, response.clone());
+        return response;
+      } catch {
+        return createOfflineResponse();
+      }
+    })
   );
 });
 
-// Clique na notificação
-self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notificação clicada:', event.action);
-  event.notification.close();
-  
-  if (event.action === 'dismiss') return;
-  
-  const url = event.notification.data?.url || '/dashboard';
-  
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        // Se já tem uma aba aberta, focar nela
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.navigate(url);
-            return client.focus();
-          }
-        }
-        // Senão, abrir nova aba
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(url);
-        }
-      })
-  );
-});
-
-// Fechar notificação
-self.addEventListener('notificationclose', (event) => {
-  console.log('[SW] Notificação fechada:', event.notification.tag);
-});
-
-// Mensagens do cliente
+// ==================== MENSAGENS ====================
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -282,4 +103,62 @@ self.addEventListener('message', (event) => {
   }
 });
 
-console.log('[SW] Service Worker loaded, version:', CACHE_VERSION);
+// ==================== PUSH NOTIFICATIONS ====================
+self.addEventListener('push', (event) => {
+  let data = {
+    title: 'FlowEdu',
+    body: 'Você tem uma nova notificação',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'flowedu-notification',
+    data: { url: '/dashboard' },
+  };
+
+  try {
+    if (event.data) {
+      const payload = event.data.json();
+      data = { ...data, ...payload };
+    }
+  } catch (e) {
+    console.warn('[SW] Erro ao parsear push data:', e);
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon || '/icon-192.png',
+      badge: data.badge || '/icon-192.png',
+      tag: data.tag || 'flowedu-notification',
+      vibrate: [200, 100, 200],
+      requireInteraction: false,
+      data: data.data || { url: '/dashboard' },
+      actions: [
+        { action: 'open', title: 'Abrir' },
+        { action: 'dismiss', title: 'Dispensar' },
+      ],
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  if (event.action === 'dismiss') return;
+  const url = event.notification.data?.url || '/dashboard';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
+});
+
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notificação fechada:', event.notification.tag);
+});
+
+console.log('[SW] Carregado, versão:', CACHE_VERSION);
