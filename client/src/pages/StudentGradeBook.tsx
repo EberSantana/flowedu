@@ -94,17 +94,21 @@ export default function StudentGradeBook() {
 
   return (
     <StudentLayout>
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
-        {/* Cabeçalho */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-            <ClipboardList className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Boletim</h1>
-            <p className="text-sm text-muted-foreground">Histórico de notas por disciplina (escala 0–10)</p>
+      {/* Header gradiente */}
+      <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+        <div className="container mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+              <ClipboardList className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold">Boletim</h1>
+              <p className="text-white/80 mt-1 text-sm">Acompanhe seu desempenho acadêmico</p>
+            </div>
           </div>
         </div>
+      </div>
+      <div className="container mx-auto py-8 px-4">
 
         {/* Cards de resumo */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">

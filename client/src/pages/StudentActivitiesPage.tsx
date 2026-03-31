@@ -160,17 +160,21 @@ export default function StudentActivitiesPage() {
   return (
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto py-6 px-4 max-w-5xl">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <ClipboardList className="w-8 h-8 text-primary" />
-              Minhas Atividades
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Visualize e entregue suas atividades
-            </p>
+        {/* Header gradiente */}
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <ClipboardList className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Minhas Atividades</h1>
+                <p className="text-white/80 mt-1 text-sm">Visualize e entregue suas atividades</p>
+              </div>
+            </div>
           </div>
+        </div>
+        <div className="container mx-auto py-6 px-4">
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

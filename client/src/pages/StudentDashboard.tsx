@@ -17,21 +17,43 @@ import {
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
+import { useStudentGreeting } from "@/hooks/useMotivationalGreeting";
+import { MotivationalBanner } from "@/components/MotivationalBanner";
 
 export default function StudentDashboard() {
   const { student } = useStudentAuth();
   const { data: enrolledSubjects, isLoading } = trpc.student.getEnrolledSubjects.useQuery();
+  
+  // Dados para mensagem motivacional dinâmica
   const { data: pendingExercisesData } = trpc.studentExercises.getPendingCount.useQuery();
-  const { data: allAssessments } = trpc.learningPath.getAllStudentAssessments.useQuery();
-
-  // Calcular provas pendentes (sem tentativa ou em progresso)
-  const pendingAssessmentsCount = allAssessments
-    ? allAssessments.filter((a: any) => !a.attemptStatus || a.attemptStatus === 'in_progress').length
-    : 0;
-  const totalPending = (pendingExercisesData?.pendingCount || 0) + pendingAssessmentsCount;
+  const { data: unreadAnnouncementsData } = trpc.announcements.getUnreadCount.useQuery();
+  const { data: unseenAnswersData } = trpc.studentDoubts.getUnseenAnswersCount.useQuery();
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
+
+  // Calcular progresso médio das disciplinas ativas
+  const activeSubjectsForGreeting = enrolledSubjects?.filter(e => e.status === 'active') || [];
+  const overallProgress = activeSubjectsForGreeting.length > 0
+    ? Math.round(
+        activeSubjectsForGreeting.reduce((sum, e) => {
+          const prog = e.progress as any;
+          const completed = prog?.completedTopics ?? 0;
+          const total = prog?.totalTopics ?? 0;
+          return sum + (total > 0 ? (completed / total) * 100 : 0);
+        }, 0) / activeSubjectsForGreeting.length
+      )
+    : 0;
+
+  // Hook de mensagem motivacional dinâmica
+  const studentGreeting = useStudentGreeting({
+    name: student?.fullName,
+    activeSubjectsCount: activeSubjectsForGreeting.length,
+    pendingExercisesCount: (pendingExercisesData as any)?.pendingCount ?? 0,
+    unreadAnnouncementsCount: (unreadAnnouncementsData as any)?.count ?? 0,
+    unseenAnswersCount: (unseenAnswersData as any)?.count ?? 0,
+    overallProgressPercent: overallProgress,
+  });
 
   // Ações rápidas profissionais (Revisão removida conforme solicitado)
   const quickActions = [
@@ -44,91 +66,23 @@ export default function StudentDashboard() {
   return (
     <StudentLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Banner de Boas-vindas */}
-        <div className="mb-8 rounded-2xl overflow-hidden shadow-xl bg-primary">
-          <div className="px-6 py-6 sm:px-8 sm:py-7">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              {/* Esquerda: Avatar + Saudação */}
-              <div className="flex items-center gap-5">
-                <div className="h-16 w-16 rounded-full bg-primary-foreground/20 border-2 border-primary-foreground/30 flex items-center justify-center shadow-lg shrink-0">
-                  <span className="text-primary-foreground text-2xl font-bold">
-                    {student?.fullName?.charAt(0).toUpperCase() || 'A'}
-                  </span>
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-primary-foreground leading-tight">
-                    Olá, {student?.fullName?.split(' ')[0] || 'Aluno'}!
-                  </h1>
-                  <p className="text-primary-foreground/70 mt-1 text-base">
-                    Bem-vindo ao seu portal de estudos
-                  </p>
-                  {/* Badges de disciplinas */}
-                  <div className="flex gap-2 mt-3 flex-wrap">
-                    <span className="inline-flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-sm font-medium px-3 py-1 rounded-full border border-primary-foreground/20">
-                      <BookOpen className="h-3.5 w-3.5" />
-                      {activeSubjects.length} Disciplinas ativas
-                    </span>
-                    {completedSubjects.length > 0 && (
-                      <span className="inline-flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-sm font-medium px-3 py-1 rounded-full border border-primary-foreground/20">
-                        <GraduationCap className="h-3.5 w-3.5" />
-                        {completedSubjects.length} Concluídas
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              {/* Direita: Resumo do Dia + Data */}
-              <div className="flex flex-col items-end gap-2 shrink-0">
-                <p className="text-primary-foreground/70 text-sm">
-                  {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
-                </p>
-                {/* Resumo de Pendentes */}
-                <div className="inline-flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/20 rounded-xl px-4 py-2">
-                  <FileText className="h-4 w-4 text-primary-foreground/70 shrink-0" />
-                  <div className="text-right">
-                    <p className="text-primary-foreground font-semibold text-sm leading-tight">
-                      {totalPending > 0
-                        ? `${totalPending} atividade${totalPending !== 1 ? 's' : ''} pendente${totalPending !== 1 ? 's' : ''}`
-                        : 'Tudo em dia!'}
-                    </p>
-                    <p className="text-primary-foreground/70 text-xs leading-tight mt-0.5">
-                      {pendingExercisesData?.pendingCount || 0} exercício{(pendingExercisesData?.pendingCount || 0) !== 1 ? 's' : ''} • {pendingAssessmentsCount} prova{pendingAssessmentsCount !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Faixa inferior com frase motivacional */}
-          <div className="bg-primary-foreground/10 px-6 sm:px-8 py-3 border-t border-primary-foreground/10">
-            <p className="text-primary-foreground/70 text-sm italic">
-              {(() => {
-                const quotes = [
-                  '"O sucesso é a soma de pequenos esforços repetidos dia após dia." — Robert Collier',
-                  '"Aprender é a única coisa que a mente nunca se cansa, nunca tem medo e nunca se arrepende." — Leonardo da Vinci',
-                  '"Cada dia é uma nova oportunidade para aprender algo novo." — Anônimo',
-                  '"O conhecimento é o único bem que cresce quando é compartilhado." — Anônimo',
-                  '"Grandes conquistas exigem grandes sacrifícios." — Anônimo',
-                  '"Invista em conhecimento. Ele sempre paga os melhores juros." — Benjamin Franklin',
-                  '"A educação é o passaporte para o futuro." — Malcolm X',
-                ];
-                const idx = new Date().getDay() % quotes.length;
-                return quotes[idx];
-              })()}
-            </p>
-          </div>
-        </div>
+        {/* Banner motivacional dinâmico */}
+        <MotivationalBanner
+          greeting={studentGreeting}
+          avatarInitial={student?.fullName?.charAt(0).toUpperCase() || 'A'}
+          variant="student"
+        />
 
         {/* Ações Rápidas */}
         <div className="mb-8">
-          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Acesso Rápido</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Acesso Rápido</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:grid-cols-4">
             {quickActions.map((action) => (
               <Link key={action.path} href={action.path}>
                 <Card className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-primary/50">
                   <CardContent className="p-4 text-center">
                     <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                      <action.icon className="w-6 h-6 text-primary-foreground" />
+                      <action.icon className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="font-semibold text-gray-900">{action.label}</h3>
                     <p className="text-xs text-gray-500 mt-1">{action.description}</p>
@@ -154,7 +108,7 @@ export default function StudentDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary rounded-xl">
-                    <BookOpen className="w-5 h-5 text-primary-foreground" />
+                    <BookOpen className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">Minhas Disciplinas</h2>

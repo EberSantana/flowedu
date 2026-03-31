@@ -61,37 +61,7 @@ export default function StudentExamPage() {
       { enabled: assessmentId > 0 }
     );
 
-  const rawQuestionsArr = (questions as any[]) || [];
-
-  // Embaralhamento determinístico por aluno: usa studentId como semente
-  // Assim cada aluno sempre vê a mesma ordem (consistente entre tentativas), mas diferente dos colegas
-  const questionsArr = (() => {
-    if (!assessment?.shuffleQuestions || rawQuestionsArr.length === 0) return rawQuestionsArr;
-    // Semente baseada no assessmentId + studentId (do cookie JWT decodificado via session)
-    // Usamos o assessmentId como semente pública pois não temos studentId no frontend sem query extra
-    // Para garantir ordem única por aluno, usamos sessionStorage para persistir a ordem embaralhada
-    const storageKey = `exam_order_${assessmentId}`;
-    const stored = sessionStorage.getItem(storageKey);
-    if (stored) {
-      try {
-        const storedOrder = JSON.parse(stored) as number[];
-        // Reordenar as questões conforme a ordem salva
-        const reordered = storedOrder
-          .map((origNum: number) => rawQuestionsArr.find((q: any) => q.questionNumber === origNum))
-          .filter(Boolean);
-        if (reordered.length === rawQuestionsArr.length) return reordered;
-      } catch { /* ignorar */ }
-    }
-    // Gerar nova ordem aleatória e salvar no sessionStorage
-    const arr = [...rawQuestionsArr];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    const order = arr.map((q: any) => q.questionNumber);
-    sessionStorage.setItem(storageKey, JSON.stringify(order));
-    return arr;
-  })();
+  const questionsArr = (questions as any[]) || [];
 
   // Mutations
   const startAttempt = trpc.learningPath.startAssessmentAttempt.useMutation();
@@ -434,35 +404,12 @@ export default function StudentExamPage() {
   const currentQ = questionsArr[currentQuestion];
   if (!currentQ) return null;
 
-  // Montar alternativas e embaralhá-las por questão se shuffleQuestions ativo
-  const buildOptions = (q: any): { label: string; text: string }[] => {
-    const raw: { label: string; text: string }[] = [];
-    if (q.optionA) raw.push({ label: "A", text: q.optionA });
-    if (q.optionB) raw.push({ label: "B", text: q.optionB });
-    if (q.optionC) raw.push({ label: "C", text: q.optionC });
-    if (q.optionD) raw.push({ label: "D", text: q.optionD });
-    if (q.optionE) raw.push({ label: "E", text: q.optionE });
-    if (!assessment?.shuffleQuestions || raw.length === 0) return raw;
-    // Embaralhar alternativas de forma determinística por questão (persistida na sessão)
-    const optKey = `exam_opts_${assessmentId}_q${q.id}`;
-    const stored = sessionStorage.getItem(optKey);
-    if (stored) {
-      try {
-        const order = JSON.parse(stored) as string[];
-        const reordered = order.map((lbl: string) => raw.find(o => o.label === lbl)).filter(Boolean) as { label: string; text: string }[];
-        if (reordered.length === raw.length) return reordered;
-      } catch { /* ignorar */ }
-    }
-    const arr = [...raw];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    sessionStorage.setItem(optKey, JSON.stringify(arr.map(o => o.label)));
-    return arr;
-  };
-
-  const options = buildOptions(currentQ);
+  const options: { label: string; text: string }[] = [];
+  if (currentQ.optionA) options.push({ label: "A", text: currentQ.optionA });
+  if (currentQ.optionB) options.push({ label: "B", text: currentQ.optionB });
+  if (currentQ.optionC) options.push({ label: "C", text: currentQ.optionC });
+  if (currentQ.optionD) options.push({ label: "D", text: currentQ.optionD });
+  if (currentQ.optionE) options.push({ label: "E", text: currentQ.optionE });
 
   const selectedAnswer = answers[currentQ.id] || "";
 

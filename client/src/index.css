@@ -63,8 +63,8 @@
 }
 
 :root {
-  /* Primary - Azul vibrante educacional */
-  --primary: oklch(0.55 0.20 250);
+  /* Primary - Verde escuro FlowEdu */
+  --primary: oklch(0.42 0.14 145);
   --primary-foreground: oklch(0.98 0 0);
   
   /* Success - Verde vibrante */
@@ -84,7 +84,7 @@
   --sidebar-primary-foreground: oklch(0.98 0 0);
   
   /* Charts - Paleta vibrante educacional */
-  --chart-1: oklch(0.55 0.20 250);
+  --chart-1: oklch(0.42 0.14 145);
   --chart-2: oklch(0.60 0.18 150);
   --chart-3: oklch(0.68 0.18 50);
   --chart-4: oklch(0.58 0.16 280);
@@ -100,25 +100,25 @@
   --secondary-foreground: oklch(0.35 0.01 240);
   --muted: oklch(0.96 0.005 240);
   --muted-foreground: oklch(0.50 0.01 240);
-  --accent: oklch(0.94 0.008 240);
-  --accent-foreground: oklch(0.30 0.01 240);
+  --accent: oklch(0.90 0.04 145);
+  --accent-foreground: oklch(0.20 0.05 145);
   --destructive: oklch(0.50 0.12 20);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.88 0.005 240);
   --input: oklch(0.90 0.005 240);
-  --ring: oklch(0.48 0.04 240);
+  --ring: oklch(0.42 0.14 145);
   --sidebar: oklch(0.97 0.003 240);
   --sidebar-foreground: oklch(0.32 0.01 240);
   --sidebar-accent: oklch(0.93 0.008 240);
   --sidebar-accent-foreground: oklch(0.28 0.01 240);
   --sidebar-border: oklch(0.88 0.005 240);
-  --sidebar-ring: oklch(0.48 0.04 240);
+  --sidebar-ring: oklch(0.42 0.14 145);
 }
 
 .dark {
-  /* Primary - Cinza azulado claro para dark mode */
-  --primary: oklch(0.58 0.04 240);
-  --primary-foreground: oklch(0.15 0 0);
+  /* Primary - Verde FlowEdu dark mode */
+  --primary: oklch(0.55 0.12 145);
+  --primary-foreground: oklch(0.98 0 0);
   
   /* Success - Verde acinzentado */
   --success: oklch(0.60 0.07 150);

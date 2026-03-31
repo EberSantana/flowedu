@@ -5,28 +5,6 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import "./index.css";
-import { applyTheme, getSavedColorTheme } from "@/lib/themes";
-
-// Aplicar tema de cores salvo ANTES de renderizar qualquer componente
-// Isso garante que o banner e todos os elementos usem a cor correta do tema escolhido pelo usuário
-(function initColorTheme() {
-  try {
-    const savedColorTheme = getSavedColorTheme();
-    if (savedColorTheme && savedColorTheme !== "default") {
-      // Detectar o modo atual (dark/light) a partir do localStorage ou sistema
-      const savedMode = localStorage.getItem("theme");
-      let mode: "light" | "dark" = "light";
-      if (savedMode === "dark") {
-        mode = "dark";
-      } else if (savedMode === "system" || !savedMode) {
-        mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      }
-      applyTheme(savedColorTheme, mode);
-    }
-  } catch (e) {
-    // Silenciosamente ignorar erros de inicialização do tema
-  }
-})();
 
 const queryClient = new QueryClient({
   defaultOptions: {

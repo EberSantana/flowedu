@@ -1,4 +1,4 @@
-// Version: 2026-03-30-v6.0.0 - Atualização versão e mural colaborativo
+// Version: 2026-03-30-v6.0.0 - Atualização versão
 import { Link, useLocation } from "wouter";
 import { GraduationCap, Users, Mail, Shield, BookOpen, TrendingUp, CheckCircle, Brain, BarChart2, FileText, Zap } from "lucide-react";
 import { useEffect } from "react";

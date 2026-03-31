@@ -23,6 +23,7 @@ import {
   FileText,
   Play,
   Trophy,
+  ClipboardCheck,
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
 import { useLocation } from "wouter";
@@ -83,17 +84,22 @@ export default function StudentAssessmentsPage() {
 
   return (
     <StudentLayout>
-      <div className="p-6 space-y-5">
-        {/* Cabeçalho */}
-        <div>
-          <h1 className="text-xl font-bold flex items-center gap-2 text-foreground">
-            <ClipboardList className="h-6 w-6 text-primary" />
-            Minhas Provas
-          </h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Provas e avaliações publicadas pelos seus professores
-          </p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header gradiente padrão */}
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <ClipboardCheck className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Minhas Provas</h1>
+                <p className="text-primary-foreground/80 mt-1">Visualize e realize suas provas e avaliações</p>
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="p-6 space-y-5">
 
         {/* Conteúdo */}
         {isLoading ? (
@@ -339,6 +345,7 @@ export default function StudentAssessmentsPage() {
           )}
         </DialogContent>
       </Dialog>
+        </div>
     </StudentLayout>
   );
 }

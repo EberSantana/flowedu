@@ -126,23 +126,33 @@ export default function StudentExercises() {
   return (
     <StudentLayout>
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto py-8 px-4 max-w-7xl">
-          {/* Cabeçalho */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Exercícios Disponíveis</h1>
-              <p className="text-muted-foreground mt-1">Pratique e aprimore seus conhecimentos</p>
+        {/* Header gradiente */}
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                  <BookOpen className="h-7 w-7" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
+                  <p className="text-white/80 mt-1 text-sm">Pratique e aprimore seus conhecimentos</p>
+                </div>
+              </div>
+              <Button
+                onClick={handleRefresh}
+                disabled={isFetching}
+                variant="outline"
+                size="sm"
+                className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+                {isFetching ? 'Atualizando...' : 'Atualizar'}
+              </Button>
             </div>
-            <Button
-              onClick={handleRefresh}
-              disabled={isFetching}
-              variant="outline"
-              size="sm"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-              {isFetching ? 'Atualizando...' : 'Atualizar'}
-            </Button>
           </div>
+        </div>
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
           {/* Barra de Busca e Filtros */}
           <div className="mb-6 space-y-4">
             <div className="flex flex-wrap gap-3 items-center">

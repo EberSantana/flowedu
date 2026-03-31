@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
-import * as XLSX from "xlsx";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -110,92 +109,6 @@ export default function TeacherGradePanel() {
     };
   }, [gradesData]);
 
-  // Exportar Excel (.xlsx) com formatação profissional
-  const exportExcel = () => {
-    if (!filteredGrades || filteredGrades.length === 0) {
-      toast.error("Nenhum dado para exportar");
-      return;
-    }
-    const combo = combinations?.find(c => `${c.subjectId}-${c.classId}` === selectedCombo);
-    const subjectName = combo?.subjectName ?? "Disciplina";
-    const className = combo?.className ?? "Turma";
-    const dateStr = new Date().toLocaleDateString("pt-BR");
-
-    // Linha de título
-    const titleRow = [`Notas — ${subjectName} / ${className} — Exportado em ${dateStr}`];
-
-    // Cabeçalhos
-    const headers = [
-      "Matrícula",
-      "Nome do Aluno",
-      "Exercícios (qtd)",
-      "Média Exercícios",
-      "Atividades (qtd)",
-      "Média Atividades",
-      "Provas (qtd)",
-      "Média Provas",
-      "Média Geral",
-      "Situação",
-    ];
-
-    // Linhas de dados
-    const rows = filteredGrades.map((s: any) => [
-      s.registrationNumber ?? "",
-      s.studentName,
-      s.exerciseCount ?? 0,
-      s.exerciseAverage !== null ? parseFloat(s.exerciseAverage.toFixed(2)) : "",
-      s.activityCount ?? 0,
-      s.activityAverage !== null ? parseFloat(s.activityAverage.toFixed(2)) : "",
-      s.assessmentCount ?? 0,
-      s.assessmentAverage !== null ? parseFloat(s.assessmentAverage.toFixed(2)) : "",
-      s.overallAverage !== null ? parseFloat(s.overallAverage.toFixed(2)) : "",
-      s.overallAverage !== null ? gradeLabel(s.overallAverage) : "Sem notas",
-    ]);
-
-    // Linha de médias da turma
-    const avgRow = [
-      "",
-      "MÉDIA DA TURMA",
-      "",
-      stats.avgOverall !== null ? parseFloat(stats.avgOverall.toFixed(2)) : "",
-      "",
-      "",
-      "",
-      "",
-      stats.avgOverall !== null ? parseFloat(stats.avgOverall.toFixed(2)) : "",
-      `${stats.approved} aprovados / ${stats.failed} em recuperação`,
-    ];
-
-    // Montar planilha
-    const wsData = [titleRow, [], headers, ...rows, [], avgRow];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-    // Largura das colunas
-    ws["!cols"] = [
-      { wch: 14 }, // Matrícula
-      { wch: 32 }, // Nome
-      { wch: 16 }, // Exercícios qtd
-      { wch: 18 }, // Média Exercícios
-      { wch: 16 }, // Atividades qtd
-      { wch: 18 }, // Média Atividades
-      { wch: 12 }, // Provas qtd
-      { wch: 14 }, // Média Provas
-      { wch: 14 }, // Média Geral
-      { wch: 22 }, // Situação
-    ];
-
-    // Mesclar célula do título
-    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }];
-
-    // Criar workbook
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, `${subjectName.slice(0, 28)}`);
-
-    // Baixar arquivo
-    XLSX.writeFile(wb, `notas_${subjectName}_${className}_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    toast.success("Planilha Excel exportada com sucesso!");
-  };
-
   // Exportar CSV
   const exportCSV = () => {
     if (!filteredGrades || filteredGrades.length === 0) {
@@ -274,16 +187,10 @@ export default function TeacherGradePanel() {
               </div>
             </div>
             {selectedCombo && filteredGrades && filteredGrades.length > 0 && (
-              <div className="flex gap-2">
-                <Button onClick={exportExcel} variant="default" className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-                  <Download className="w-4 h-4" />
-                  Excel (.xlsx)
-                </Button>
-                <Button onClick={exportCSV} variant="outline" className="gap-2">
-                  <Download className="w-4 h-4" />
-                  CSV
-                </Button>
-              </div>
+              <Button onClick={exportCSV} variant="outline" className="gap-2">
+                <Download className="w-4 h-4" />
+                Exportar CSV
+              </Button>
             )}
           </div>
 

@@ -19,17 +19,52 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-// import { getLoginUrl } from "@/const"; // Não usar OAuth, usar login standalone
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  Calendar,
+  ClipboardList,
+  BarChart2,
+  MessageSquare,
+  HelpCircle,
+  LogOut,
+  PanelLeft,
+  GraduationCap,
+  Layers,
+  Bell,
+  FileText,
+  Settings,
+  Layout,
+  CheckSquare,
+  Star,
+  Newspaper,
+  Activity,
+} from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: BookOpen,        label: "Disciplinas", path: "/subjects" },
+  { icon: Users,           label: "Turmas", path: "/classes" },
+  { icon: GraduationCap,   label: "Alunos", path: "/students" },
+  { icon: Calendar,        label: "Calendário", path: "/calendar" },
+  { icon: ClipboardList,   label: "Exercícios", path: "/exercise-dashboard" },
+  { icon: FileText,        label: "Atividades", path: "/activities" },
+  { icon: CheckSquare,     label: "Avaliações", path: "/assessments-manager" },
+  { icon: Layers,          label: "Trilhas de Aprendizagem", path: "/learning-paths" },
+  { icon: Layout,          label: "Mural Colaborativo", path: "/teacher-mural" },
+  { icon: MessageSquare,   label: "Fórum", path: "/teacher-forum" },
+  { icon: MessageSquare,   label: "Dúvidas", path: "/teacher-doubts" },
+  { icon: Star,            label: "Notas", path: "/teacher-grades" },
+  { icon: Newspaper,       label: "Avisos", path: "/announcements" },
+  { icon: BarChart2,       label: "Analytics", path: "/learning-analytics" },
+  { icon: Activity,        label: "Metodologias Ativas", path: "/active-methodologies" },
+  { icon: HelpCircle,      label: "Ajuda", path: "/ajuda" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -47,48 +82,38 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { isLoading, user } = useAuth();
-
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
-
   if (isLoading) {
     return <DashboardLayoutSkeleton />
   }
-
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
           <div className="flex flex-col items-center gap-6">
             <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Sign in to continue
+              Acesso restrito
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+              Esta área requer autenticação. Faça login para continuar.
             </p>
           </div>
-            <Button
-            onClick={() => {
-              window.location.href = '/login-professor';
-            }}
+          <Button
+            onClick={() => { window.location.href = '/login-professor'; }}
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
           >
-            Sign in
+            Entrar
           </Button>
         </div>
       </div>
     );
   }
-
   return (
     <SidebarProvider
-      style={
-        {
-          "--sidebar-width": `${sidebarWidth}px`,
-        } as CSSProperties
-      }
+      style={{ "--sidebar-width": `${sidebarWidth}px` } as CSSProperties}
     >
       <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
         {children}
@@ -99,7 +124,7 @@ export default function DashboardLayout({
 
 type DashboardLayoutContentProps = {
   children: React.ReactNode;
-  setSidebarWidth: (width: number) => void;
+  setSidebarWidth: (w: number) => void;
 };
 
 function DashboardLayoutContent({
@@ -108,41 +133,31 @@ function DashboardLayoutContent({
 }: DashboardLayoutContentProps) {
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
-  const { state, toggleSidebar } = useSidebar();
+  const isMobile = useIsMobile();
+  const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (isCollapsed) {
-      setIsResizing(false);
-    }
-  }, [isCollapsed]);
-
-  useEffect(() => {
+    if (!isResizing) return;
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
-
       const sidebarLeft = sidebarRef.current?.getBoundingClientRect().left ?? 0;
       const newWidth = e.clientX - sidebarLeft;
       if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
         setSidebarWidth(newWidth);
       }
     };
-
     const handleMouseUp = () => {
       setIsResizing(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
     };
-
-    if (isResizing) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "col-resize";
-      document.body.style.userSelect = "none";
-    }
-
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
@@ -162,7 +177,7 @@ function DashboardLayoutContent({
           <SidebarHeader className="h-16 justify-center">
             <div className="flex items-center gap-3 px-2 transition-all w-full">
               <button
-                onClick={toggleSidebar}
+                onClick={() => {}}
                 className="h-8 w-8 flex items-center justify-center hover:bg-accent rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
                 aria-label="Toggle navigation"
               >
@@ -170,14 +185,13 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                  <span className="font-semibold tracking-tight truncate text-primary">
+                    FlowEdu
                   </span>
                 </div>
               ) : null}
             </div>
           </SidebarHeader>
-
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
               {menuItems.map(item => {
@@ -200,7 +214,6 @@ function DashboardLayoutContent({
               })}
             </SidebarMenu>
           </SidebarContent>
-
           <SidebarFooter className="p-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -222,17 +235,24 @@ function DashboardLayoutContent({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
+                  onClick={() => setLocation("/profile")}
+                  className="cursor-pointer"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
+                  <span>Sair</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          <div className="px-3 pb-1 group-data-[collapsible=icon]:hidden">
-            <p className="text-[10px] text-muted-foreground/50 text-center select-none">FlowEdu v6.0.0</p>
-          </div>
+            <div className="px-3 pb-1 group-data-[collapsible=icon]:hidden">
+              <p className="text-[10px] text-muted-foreground/50 text-center select-none">FlowEdu v6.0.0</p>
+            </div>
           </SidebarFooter>
         </Sidebar>
         <div
@@ -244,7 +264,6 @@ function DashboardLayoutContent({
           style={{ zIndex: 50 }}
         />
       </div>
-
       <SidebarInset>
         {isMobile && (
           <div className="flex border-b h-14 items-center justify-between bg-background/95 px-2 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">

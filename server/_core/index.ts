@@ -48,6 +48,7 @@ async function startServer() {
   // Isso permite rate limiting correto sem permitir falsificação de IPs
   // Em produção, confiar no primeiro proxy (Nginx/Cloudflare)
   app.set("trust proxy", 1);
+  app.disable('etag'); // Desabilitar ETag para forçar reload após deploy
   
   // ============================================
   // SEGURANÇA - Proteção contra Path Traversal

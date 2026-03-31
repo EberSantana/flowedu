@@ -23,54 +23,10 @@ export default function StudentExerciseAttempt() {
   const [attemptId, setAttemptId] = useState<number | null>(null);
 
   // Buscar detalhes do exercício
-  const { data: rawExercise, isLoading, error } = trpc.studentExercises.getDetails.useQuery(
+  const { data: exercise, isLoading, error } = trpc.studentExercises.getDetails.useQuery(
     { exerciseId: parseInt(id!) },
     { enabled: !!id }
   );
-
-  // Embaralhamento determinístico por aluno: gera uma ordem aleatória única por sessão
-  // Cada aluno recebe uma ordem diferente ao abrir o exercício, dificultando cópia
-  const exercise = (() => {
-    if (!rawExercise || !rawExercise.shuffleQuestions || !rawExercise.questions?.length) return rawExercise;
-    const storageKey = `exercise_order_${id}`;
-    const stored = sessionStorage.getItem(storageKey);
-    let orderedQuestions: any[];
-    if (stored) {
-      try {
-        const storedOrder = JSON.parse(stored) as number[];
-        const reordered = storedOrder
-          .map((idx: number) => rawExercise.questions[idx])
-          .filter(Boolean);
-        if (reordered.length === rawExercise.questions.length) {
-          orderedQuestions = reordered;
-        } else {
-          throw new Error('invalid');
-        }
-      } catch {
-        // Fallback: gerar nova ordem
-        const arr = [...rawExercise.questions];
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        const order = arr.map((_: any, newIdx: number) => rawExercise.questions.indexOf(arr[newIdx]));
-        sessionStorage.setItem(storageKey, JSON.stringify(order));
-        orderedQuestions = arr;
-      }
-    } else {
-      // Gerar nova ordem aleatória e salvar
-      const arr = [...rawExercise.questions];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      // Salvar índices originais para reconstrução
-      const originalIndices = arr.map((q: any) => rawExercise.questions.findIndex((orig: any) => orig === q));
-      sessionStorage.setItem(storageKey, JSON.stringify(originalIndices));
-      orderedQuestions = arr;
-    }
-    return { ...rawExercise, questions: orderedQuestions };
-  })();
 
   // Iniciar tentativa
   const startAttemptMutation = trpc.studentExercises.startAttempt.useMutation();
@@ -319,30 +275,7 @@ export default function StudentExerciseAttempt() {
 
         {/* Questões */}
         <div className="space-y-6">
-          {exercise.questions.map((question: any, index: number) => {
-            // Embaralhar alternativas por questão se shuffleQuestions ativo
-            const getShuffledOptions = (opts: string[]): string[] => {
-              if (!exercise.shuffleQuestions || !opts?.length) return opts;
-              const optKey = `exercise_opts_${id}_q${index}`;
-              const stored = sessionStorage.getItem(optKey);
-              if (stored) {
-                try {
-                  const order = JSON.parse(stored) as number[];
-                  const reordered = order.map((i: number) => opts[i]).filter(Boolean);
-                  if (reordered.length === opts.length) return reordered;
-                } catch { /* ignorar */ }
-              }
-              const arr = [...opts];
-              for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-              }
-              const originalIndices = arr.map((o: string) => opts.indexOf(o));
-              sessionStorage.setItem(optKey, JSON.stringify(originalIndices));
-              return arr;
-            };
-            const displayOptions = getShuffledOptions(question.options || []);
-            return (
+          {exercise.questions.map((question: any, index: number) => (
             <Card key={index} id={`question-${index}`} className="scroll-mt-4">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-l-4 border-l-purple-500">
                 <div className="flex items-start gap-3">
@@ -361,13 +294,13 @@ export default function StudentExerciseAttempt() {
               </CardHeader>
               <CardContent className="pt-6">
                 {/* Questões de múltipla escolha */}
-                {displayOptions && displayOptions.length > 0 ? (
+                {question.options && question.options.length > 0 ? (
                   <RadioGroup
                     value={answers[index] || ""}
                     onValueChange={(value) => handleAnswerChange(index, value)}
                   >
                     <div className="space-y-3">
-                      {displayOptions.map((option: string, optIndex: number) => {
+                      {question.options.map((option: string, optIndex: number) => {
                         const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
                         return (
                           <div
@@ -416,8 +349,7 @@ export default function StudentExerciseAttempt() {
                 )}
               </CardContent>
             </Card>
-          );
-          })}
+          ))}
         </div>
 
         {/* Botão de envio */}

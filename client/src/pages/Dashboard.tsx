@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as LucideIcons from "lucide-react";
 import { BookOpen, Users, Clock, Plus, Calendar as CalendarIcon, CalendarDays, BarChart3, ArrowRight, AlertCircle, ExternalLink, Lightbulb, Settings, Eye, EyeOff, RotateCcw, Timer, CheckSquare, Square, Trash2, Bell, TrendingUp, CheckCircle2, XCircle, Ban, LogOut, User, UserCog } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
@@ -28,6 +29,8 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useOnboardingTour } from "@/components/OnboardingTour";
 // GuidedTour removido - usando apenas OnboardingTour (Shepherd.js)
 import { useAdaptiveDashboard } from "@/hooks/useAdaptiveDashboard";
+import { useProfessorGreeting } from "@/hooks/useMotivationalGreeting";
+import { MotivationalBanner } from "@/components/MotivationalBanner";
 import { QuickActionsCustomizer, QuickAction } from "@/components/QuickActionsCustomizer";
 // ProfileOnboarding removido - perfil único tradicional
 import {
@@ -148,6 +151,15 @@ function Dashboard() {
   
   // Carregar preferências de ações rápidas
   const { data: preferences, isLoading: isLoadingPreferences, refetch: refetchPreferences } = trpc.dashboard.getQuickActionsPreferences.useQuery();
+  
+  // Dados para mensagem motivacional dinâmica
+  const { data: pendingDoubtsData } = trpc.studentDoubts.getPendingDoubtsCount.useQuery();
+  
+
+  
+
+  
+
   
   useEffect(() => {
     if (preferences?.actions && preferences.actions.length > 0) {
@@ -296,8 +308,17 @@ function Dashboard() {
     calculateTimeToNextClass();
     const interval = setInterval(calculateTimeToNextClass, 1000);
     
-    return () => clearInterval(interval);
+  return () => clearInterval(interval);
   }, [upcomingClasses]);
+
+  // Hook de mensagem motivacional dinâmica
+  const professorGreeting = useProfessorGreeting({
+    name: user?.name ?? undefined,
+    todayClassesCount: todayClasses?.length ?? 0,
+    pendingDoubtsCount: pendingDoubtsData?.count ?? 0,
+    subjectsCount: subjects?.length ?? 0,
+    classesCount: classes?.length ?? 0,
+  });
   
   // Prazos importantes (eventos dos próximos 7 dias)
   const importantDeadlines = calendarUpcomingEvents?.filter((event: any) => {
@@ -411,110 +432,22 @@ function Dashboard() {
     return weekClassStatuses?.find(s => s.scheduledClassId === scheduledClassId);
   };
 
+
   return (
     <>
       {/* ProfileOnboarding removido - perfil único tradicional */}
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
-        <div className="container mx-auto py-4 sm:py-8 px-3 sm:px-4">
-          {/* Banner de Boas-vindas */}
-          <div className="mb-4 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-primary">
-            <div className="px-4 py-4 sm:px-8 sm:py-7">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                {/* Esquerda: Avatar + Saudação */}
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-primary-foreground/20 border-2 border-primary-foreground/30 flex items-center justify-center shadow-lg shrink-0">
-                    <span className="text-primary-foreground text-xl sm:text-2xl font-bold">
-                      {user?.name?.charAt(0).toUpperCase() || 'P'}
-                    </span>
-                  </div>
-                  <div>
-                    <h1 className="text-xl sm:text-3xl font-bold text-primary-foreground leading-tight">
-                      {dashboardConfig.welcomeMessage.replace('professor', user?.name || 'Professor')}
-                    </h1>
-                    <p className="text-primary-foreground/70 mt-1 text-base">
-                      {dashboardConfig.dashboardDescription}
-                    </p>
-                    {/* Badges de Disciplinas e Turmas */}
-                    <div className="flex gap-2 mt-3 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-sm font-medium px-3 py-1 rounded-full border border-primary-foreground/20">
-                        <BookOpen className="h-3.5 w-3.5" />
-                        {subjects?.length || 0} Disciplinas
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 bg-primary-foreground/15 text-primary-foreground text-sm font-medium px-3 py-1 rounded-full border border-primary-foreground/20">
-                        <Users className="h-3.5 w-3.5" />
-                        {classes?.length || 0} Turmas
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {/* Direita: Resumo do Dia + Botões */}
-                <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
-                  <div className="text-right">
-                    <p className="text-primary-foreground/70 text-sm">
-                      {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}
-                    </p>
-                  </div>
-                  {/* Resumo do Dia */}
-                  <div className="flex flex-col gap-1.5 items-start sm:items-end">
-                    <div className="inline-flex items-center gap-2 bg-primary-foreground/15 border border-primary-foreground/20 rounded-xl px-3 py-2">
-                      <CalendarIcon className="h-4 w-4 text-primary-foreground/70 shrink-0" />
-                      <div className="text-right">
-                        <p className="text-primary-foreground font-semibold text-sm leading-tight">
-                          {todayClasses && todayClasses.length > 0
-                            ? `${todayClasses.length} aula${todayClasses.length !== 1 ? 's' : ''} hoje`
-                            : 'Sem aulas hoje'}
-                        </p>
-                        {upcomingClasses && upcomingClasses.length > 0 && (
-                          <p className="text-primary-foreground/70 text-xs leading-tight mt-0.5">
-                            Próxima: {upcomingClasses[0].subjectName} às {upcomingClasses[0].startTime}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {isCustomizing && (
-                      <Button
-                        onClick={resetToDefault}
-                        variant="outline"
-                        size="sm"
-                        className="gap-2 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20"
-                      >
-                        <RotateCcw className="h-4 w-4" />
-                        Restaurar
-                      </Button>
-                    )}
-                    <Button
-                      onClick={() => setIsCustomizing(!isCustomizing)}
-                      variant={isCustomizing ? "default" : "outline"}
-                      size="sm"
-                      className={isCustomizing ? "gap-2" : "gap-2 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20"}
-                    >
-                      <Settings className="h-4 w-4" />
-                      {isCustomizing ? 'Concluir' : 'Personalizar'}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Faixa inferior com frase motivacional */}
-            <div className="bg-primary-foreground/10 px-6 sm:px-8 py-3 border-t border-primary-foreground/10">
-              <p className="text-primary-foreground/70 text-sm italic">
-                {(() => {
-                  const quotes = [
-                    '"A educação é a arma mais poderosa que você pode usar para mudar o mundo." — Nelson Mandela',
-                    '"O professor que tenta ensinar sem inspirar o aluno com o desejo de aprender está batendo em ferro frio." — Horace Mann',
-                    '"Educar é semear com sabedoria e colher com paciência." — Augusto Cury',
-                    '"A tarefa do professor é preparar o terreno para que o aluno possa plantar suas próprias sementes." — Anônimo',
-                    '"Grandes conquistas exigem grandes sacrifícios." — Anônimo',
-                  ];
-                  const idx = new Date().getDay() % quotes.length;
-                  return quotes[idx];
-                })()}
-              </p>
-            </div>
-          </div>
+        <div className="container mx-auto py-8 px-4">
+          {/* Banner motivacional dinâmico */}
+          <MotivationalBanner
+            greeting={professorGreeting}
+            avatarInitial={user?.name?.charAt(0).toUpperCase() || 'P'}
+            variant="professor"
+            isCustomizing={isCustomizing}
+            onCustomize={() => setIsCustomizing(!isCustomizing)}
+            onReset={isCustomizing ? resetToDefault : undefined}
+          />
           
           {/* Painel de Controle de Widgets */}
           {isCustomizing && (
@@ -607,7 +540,7 @@ function Dashboard() {
 
           {/* Cards          {/* Estatísticas */}
           {widgetVisibility.stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6" data-tour="stats">          {isLoadingSubjects || isLoadingClasses || isLoadingSchedule ? (
               // Skeleton Loading
               <>
                 <Card className="border-l-4 border-l-primary">
@@ -642,47 +575,47 @@ function Dashboard() {
               // Conteúdo Real
               <>
                 <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 sm:pb-3 pt-3 sm:pt-6 px-3 sm:px-6">
-                    <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1.5">
-                      <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
                       Disciplinas
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <CardContent>
+                    <div className="text-3xl font-bold text-gray-900">
                       {subjects?.length || 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">disciplinas</p>
+                    <p className="text-xs text-gray-500 mt-1">disciplinas cadastradas</p>
                   </CardContent>
                 </Card>
 
                 <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-1 sm:pb-3 pt-3 sm:pt-6 px-3 sm:px-6">
-                    <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <Users className="h-4 w-4" />
                       Turmas
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <CardContent>
+                    <div className="text-3xl font-bold text-gray-900">
                       {classes?.length || 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">turmas</p>
+                    <p className="text-xs text-gray-500 mt-1">turmas cadastradas</p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow col-span-2 lg:col-span-1">
-                  <CardHeader className="pb-1 sm:pb-3 pt-3 sm:pt-6 px-3 sm:px-6">
-                    <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
                       Carga Horária
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <CardContent>
+                    <div className="text-3xl font-bold text-gray-900">
                       {totalScheduledClasses}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">aulas agendadas</p>
+                    <p className="text-xs text-gray-500 mt-1">aulas agendadas</p>
                   </CardContent>
                 </Card>
               </>
@@ -850,10 +783,10 @@ function Dashboard() {
                                 ? 'bg-gradient-to-br from-destructive via-destructive/90 to-destructive/80'
                                 : 'bg-gradient-to-br from-primary via-primary/90 to-primary/80'
                             }`}>
-                              <span className="text-[10px] font-bold text-primary-foreground uppercase tracking-wide">
+                              <span className="text-[10px] font-bold text-white uppercase tracking-wide">
                                 {cls.dayOfWeek.substring(0, 3)}
                               </span>
-                              <span className="text-xl font-extrabold text-primary-foreground">
+                              <span className="text-xl font-extrabold text-white">
                                 {formatDate(cls.date)}
                               </span>
                             </div>
@@ -876,7 +809,7 @@ function Dashboard() {
                                   {cls.subjectName}
                                 </p>
                                 {isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-primary-foreground text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full animate-pulse shadow-md whitespace-nowrap">
                                     <span className="relative flex h-1.5 w-1.5">
                                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
@@ -885,7 +818,7 @@ function Dashboard() {
                                   </span>
                                 )}
                                 {cls.isPast && !isClassHappeningNow(cls.date, cls.startTime, cls.endTime) && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-primary-foreground text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-400 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap">
                                     Concluída
                                   </span>
                                 )}
@@ -895,7 +828,7 @@ function Dashboard() {
                                   const status = getClassStatus(cls.id);
                                   if (status) {
                                     return (
-                                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-primary-foreground text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap ${
+                                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-white text-[10px] font-bold rounded-full shadow-sm whitespace-nowrap ${
                                         status.status === 'given' ? 'bg-green-500' :
                                         status.status === 'not_given' ? 'bg-yellow-500' :
                                         'bg-red-500'
@@ -934,7 +867,7 @@ function Dashboard() {
                                 variant={getClassStatus(cls.id)?.status === 'given' ? 'default' : 'outline'}
                                 className={`flex-1 min-w-[100px] h-8 text-xs ${
                                   getClassStatus(cls.id)?.status === 'given'
-                                    ? 'bg-green-600 hover:bg-green-700 text-primary-foreground'
+                                    ? 'bg-green-600 hover:bg-green-700 text-white'
                                     : 'hover:bg-green-50 hover:border-green-500 hover:text-green-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'given')}
@@ -949,7 +882,7 @@ function Dashboard() {
                                 variant={getClassStatus(cls.id)?.status === 'not_given' ? 'default' : 'outline'}
                                 className={`flex-1 min-w-[100px] h-8 text-xs ${
                                   getClassStatus(cls.id)?.status === 'not_given'
-                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-primary-foreground'
+                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
                                     : 'hover:bg-yellow-50 hover:border-yellow-500 hover:text-yellow-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'not_given')}
@@ -964,7 +897,7 @@ function Dashboard() {
                                 variant={getClassStatus(cls.id)?.status === 'cancelled' ? 'default' : 'outline'}
                                 className={`flex-1 min-w-[100px] h-8 text-xs ${
                                   getClassStatus(cls.id)?.status === 'cancelled'
-                                    ? 'bg-red-600 hover:bg-red-700 text-primary-foreground'
+                                    ? 'bg-red-600 hover:bg-red-700 text-white'
                                     : 'hover:bg-red-50 hover:border-red-500 hover:text-red-700'
                                 }`}
                                 onClick={() => handleSetStatus(cls, 'cancelled')}
@@ -1060,7 +993,7 @@ function Dashboard() {
                         className={`relative p-4 rounded-xl border-2 ${style.borderColor} ${style.bgColor} hover:shadow-lg transition-all duration-300`}
                       >
                         {/* Badge de Urgência */}
-                        <div className={`absolute -top-2 -right-2 ${urgencyColor} text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
+                        <div className={`absolute -top-2 -right-2 ${urgencyColor} text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md`}>
                           {urgencyText}
                         </div>
                         

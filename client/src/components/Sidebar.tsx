@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Lightbulb,
+  Layout,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -38,8 +39,7 @@ import {
   Send,
   ClipboardList,
   ClipboardCheck,
-  Bot,
-  Layers
+  Bot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -191,11 +191,6 @@ const teacherNavCategories: NavCategory[] = [
         icon: <ClipboardList className="h-5 w-5" />,
         href: "/assessments-manager",
       },
-      {
-        label: "Mural Colaborativo",
-        icon: <Layers className="h-5 w-5" />,
-        href: "/mural-colaborativo",
-      },
     ],
   },
   {
@@ -217,6 +212,11 @@ const teacherNavCategories: NavCategory[] = [
         label: "Dúvidas dos Alunos",
         icon: <MessageCircle className="h-5 w-5" />,
         href: "/teacher-doubts",
+      },
+      {
+        label: "Mural Colaborativo",
+        icon: <Layout className="h-5 w-5" />,
+        href: "/teacher-mural",
       },
       {
         label: "Fórum de Discussão",

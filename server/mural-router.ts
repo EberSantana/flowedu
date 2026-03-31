@@ -229,7 +229,7 @@ export const muralRouter = router({
           try {
             await createNotification({
               userId: studentId,
-              type: 'new_mural',
+              type: 'new_announcement',
               title: `🖼️ Novo Mural: ${input.title}`,
               message: `${subjectName}: Um novo mural colaborativo foi criado. Clique para participar!`,
               link: '/student/mural',

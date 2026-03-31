@@ -163,8 +163,6 @@ import {
   InsertAssessment,
   forumTopics,
   forumReplies,
-  forumLikes,
-  forumSubscriptions,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -1906,7 +1904,7 @@ export async function deleteTopicComment(id: number, authorId: number) {
 
 export async function createNotification(data: {
   userId: number;
-  type: 'new_material' | 'new_assignment' | 'new_announcement' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received' | 'assessment_published' | 'activity_submission' | 'new_activity' | 'new_mural';
+  type: 'new_material' | 'new_assignment' | 'new_announcement' | 'assignment_due' | 'feedback_received' | 'grade_received' | 'comment_received' | 'assessment_published' | 'activity_submission' | 'new_activity';
   title: string;
   message: string;
   link?: string;
@@ -12572,6 +12570,182 @@ export async function getLearningPathClassReport(subjectId: number, classId: num
 // FÓRUM DE DISCUSSÃO
 // ============================================================
 
+export async function listForumsForSubject(subjectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Buscar fóruns da disciplina usando SQL raw para evitar problema de import da tabela
+  const [rows] = await (db as any).execute(
+    `SELECT * FROM forums WHERE subjectId = ? AND isOpen = 1 ORDER BY createdAt DESC`,
+    [subjectId]
+  ) as any;
+  return rows as any[];
+}
+
+export async function listTopicsByForum(forumId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const [rows] = await (db as any).execute(
+    `SELECT ft.*,
+      COALESCE(u.name, s.fullName, 'Usuário') as authorName
+    FROM forum_topics ft
+    LEFT JOIN users u ON ft.authorUserId = u.id
+    LEFT JOIN students s ON ft.authorStudentId = s.id
+    WHERE ft.forumId = ?
+    ORDER BY ft.isPinned DESC, ft.updatedAt DESC`,
+    [forumId]
+  ) as any;
+  return rows as any[];
+}
+
+export async function getForumById(forumId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [rows] = await (db as any).execute(
+    `SELECT * FROM forums WHERE id = ? LIMIT 1`,
+    [forumId]
+  ) as any;
+  return rows[0] ?? null;
+}
+
+export async function getStudentForumGrades(studentId: number, subjectId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const query = subjectId
+    ? `SELECT fg.*, f.title as forumTitle, f.gradeMax FROM forum_grades fg JOIN forums f ON fg.forumId = f.id WHERE fg.studentId = ? AND f.subjectId = ?`
+    : `SELECT fg.*, f.title as forumTitle, f.gradeMax FROM forum_grades fg JOIN forums f ON fg.forumId = f.id WHERE fg.studentId = ?`;
+  const params = subjectId ? [studentId, subjectId] : [studentId];
+  const [rows] = await (db as any).execute(query, params) as any;
+  return rows as any[];
+}
+
+export async function createForum(data: {
+  subjectId: number;
+  classId?: number;
+  createdBy: number;
+  title: string;
+  description?: string;
+  forumType?: 'general' | 'single_topic' | 'qa';
+  requireSubscription?: boolean;
+  monitorReading?: boolean;
+  maxAttachmentSizeKb?: number;
+  gradeEnabled?: boolean;
+  gradeMax?: string;
+  gradeAggregation?: 'max' | 'avg' | 'sum' | 'first' | 'last';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await (db as any).execute(
+    `INSERT INTO forums (subjectId, classId, createdBy, title, description, forumType, requireSubscription, monitorReading, maxAttachmentSizeKb, gradeEnabled, gradeMax, gradeAggregation, isOpen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+    [
+      data.subjectId,
+      data.classId ?? null,
+      data.createdBy,
+      data.title,
+      data.description ?? null,
+      data.forumType ?? 'general',
+      data.requireSubscription ? 1 : 0,
+      data.monitorReading ? 1 : 0,
+      data.maxAttachmentSizeKb ?? 512,
+      data.gradeEnabled ? 1 : 0,
+      data.gradeMax ?? null,
+      data.gradeAggregation ?? 'max',
+    ]
+  ) as any;
+  return result;
+}
+
+export async function deleteForum(forumId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await (db as any).execute(`DELETE FROM forums WHERE id = ?`, [forumId]);
+  return true;
+}
+
+export async function getForumGradesByForum(forumId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const [rows] = await (db as any).execute(
+    `SELECT fg.*, s.fullName as studentName FROM forum_grades fg JOIN students s ON fg.studentId = s.id WHERE fg.forumId = ?`,
+    [forumId]
+  ) as any;
+  return rows as any[];
+}
+
+export async function getForumParticipationStats(forumId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const [rows] = await (db as any).execute(
+    `SELECT s.id as studentId, s.fullName as studentName,
+      COUNT(DISTINCT ft.id) as topicsCreated,
+      COUNT(DISTINCT fr.id) as repliesCreated
+    FROM students s
+    LEFT JOIN forum_topics ft ON ft.authorStudentId = s.id AND ft.forumId = ?
+    LEFT JOIN forum_replies fr ON fr.authorStudentId = s.id AND fr.topicId IN (SELECT id FROM forum_topics WHERE forumId = ?)
+    WHERE ft.id IS NOT NULL OR fr.id IS NOT NULL
+    GROUP BY s.id, s.fullName`,
+    [forumId, forumId]
+  ) as any;
+  return rows as any[];
+}
+
+export async function setForumGrade(data: {
+  forumId: number;
+  studentId: number;
+  gradedBy: number;
+  grade: number;
+  feedback?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [existing] = await (db as any).execute(
+    `SELECT id FROM forum_grades WHERE forumId = ? AND studentId = ?`,
+    [data.forumId, data.studentId]
+  ) as any;
+  if (existing && existing.length > 0) {
+    await (db as any).execute(
+      `UPDATE forum_grades SET grade = ?, feedback = ?, gradedBy = ?, updatedAt = NOW() WHERE forumId = ? AND studentId = ?`,
+      [data.grade, data.feedback ?? null, data.gradedBy, data.forumId, data.studentId]
+    );
+  } else {
+    await (db as any).execute(
+      `INSERT INTO forum_grades (forumId, studentId, gradedBy, grade, feedback) VALUES (?, ?, ?, ?, ?)`,
+      [data.forumId, data.studentId, data.gradedBy, data.grade, data.feedback ?? null]
+    );
+  }
+  return true;
+}
+
+export async function createForumReply(data: {
+  topicId: number;
+  content: string;
+  authorType: 'teacher' | 'student';
+  authorUserId?: number;
+  authorStudentId?: number;
+  attachmentUrl?: string;
+  attachmentKey?: string;
+  attachmentName?: string;
+  attachmentMime?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(forumReplies).values({
+    topicId: data.topicId,
+    content: data.content,
+    authorType: data.authorType,
+    authorUserId: data.authorUserId,
+    authorStudentId: data.authorStudentId,
+    attachmentUrl: data.attachmentUrl,
+    attachmentKey: data.attachmentKey,
+    attachmentName: data.attachmentName,
+    attachmentMime: data.attachmentMime,
+  } as any);
+  // Incrementar replyCount no tópico
+  await db.update(forumTopics)
+    .set({ replyCount: sql`replyCount + 1`, updatedAt: new Date() })
+    .where(eq(forumTopics.id, data.topicId));
+  return result;
+}
+
 export async function listForumTopics(subjectId: number, classId?: number) {
   const db = await getDb();
   if (!db) return [];
@@ -12585,17 +12759,25 @@ export async function listForumTopics(subjectId: number, classId?: number) {
 export async function getForumTopic(topicId: number) {
   const db = await getDb();
   if (!db) return null;
-  const [topic] = await db.select().from(forumTopics).where(eq(forumTopics.id, topicId));
-  return topic ?? null;
+  const [rows] = await (db as any).execute(
+    `SELECT ft.*,
+      COALESCE(u.name, s.fullName, 'Usuário') as authorName
+    FROM forum_topics ft
+    LEFT JOIN users u ON ft.authorUserId = u.id
+    LEFT JOIN students s ON ft.authorStudentId = s.id
+    WHERE ft.id = ? LIMIT 1`,
+    [topicId]
+  ) as any;
+  return (rows as any[])[0] ?? null;
 }
 
 export async function createForumTopic(data: {
-  subjectId: number; classId?: number; title: string; content: string;
+  subjectId: number; classId?: number; forumId?: number; title: string; content: string;
   authorType: 'teacher' | 'student'; authorUserId?: number; authorStudentId?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(forumTopics).values(data);
+  const [result] = await db.insert(forumTopics).values(data as any);
   return result;
 }
 
@@ -12627,21 +12809,17 @@ export async function deleteForumTopic(topicId: number) {
 export async function listForumReplies(topicId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(forumReplies).where(eq(forumReplies.topicId, topicId))
-    .orderBy(asc(forumReplies.createdAt));
-}
-
-export async function createForumReply(data: {
-  topicId: number; content: string;
-  authorType: 'teacher' | 'student'; authorUserId?: number; authorStudentId?: number; parentReplyId?: number;
-}) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(forumReplies).values(data);
-  await db.update(forumTopics)
-    .set({ replyCount: sql`replyCount + 1`, updatedAt: new Date() })
-    .where(eq(forumTopics.id, data.topicId));
-  return result;
+  const [rows] = await (db as any).execute(
+    `SELECT fr.*,
+      COALESCE(u.name, s.fullName, 'Usuário') as authorName
+    FROM forum_replies fr
+    LEFT JOIN users u ON fr.authorUserId = u.id
+    LEFT JOIN students s ON fr.authorStudentId = s.id
+    WHERE fr.topicId = ?
+    ORDER BY fr.createdAt ASC`,
+    [topicId]
+  ) as any;
+  return rows as any[];
 }
 
 export async function markBestAnswer(topicId: number, replyId: number) {
@@ -12660,161 +12838,6 @@ export async function deleteForumReply(replyId: number) {
     await db.delete(forumReplies).where(eq(forumReplies.id, replyId));
     await db.update(forumTopics).set({ replyCount: sql`GREATEST(replyCount - 1, 0)` }).where(eq(forumTopics.id, reply.topicId));
   }
-}
-
-// ============================================================
-// FÓRUM — NOVAS FUNCIONALIDADES (curtidas, inscrições, edição)
-// ============================================================
-
-/** Curtir/descurtir tópico ou resposta */
-export async function toggleForumLike(data: {
-  targetType: 'topic' | 'reply';
-  targetId: number;
-  authorType: 'teacher' | 'student';
-  authorUserId?: number;
-  authorStudentId?: number;
-}) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  // Verificar se já curtiu
-  const conditions = data.authorType === 'teacher'
-    ? and(eq(forumLikes.targetType, data.targetType), eq(forumLikes.targetId, data.targetId), eq(forumLikes.authorType, 'teacher'), eq(forumLikes.authorUserId, data.authorUserId!))
-    : and(eq(forumLikes.targetType, data.targetType), eq(forumLikes.targetId, data.targetId), eq(forumLikes.authorType, 'student'), eq(forumLikes.authorStudentId, data.authorStudentId!));
-  const [existing] = await db.select().from(forumLikes).where(conditions);
-  if (existing) {
-    // Remover curtida
-    await db.delete(forumLikes).where(eq(forumLikes.id, existing.id));
-    if (data.targetType === 'topic') {
-      await db.update(forumTopics).set({ likeCount: sql`GREATEST(likeCount - 1, 0)` }).where(eq(forumTopics.id, data.targetId));
-    } else {
-      await db.update(forumReplies).set({ likeCount: sql`GREATEST(likeCount - 1, 0)` }).where(eq(forumReplies.id, data.targetId));
-    }
-    return { liked: false };
-  } else {
-    // Adicionar curtida
-    await db.insert(forumLikes).values(data);
-    if (data.targetType === 'topic') {
-      await db.update(forumTopics).set({ likeCount: sql`likeCount + 1` }).where(eq(forumTopics.id, data.targetId));
-    } else {
-      await db.update(forumReplies).set({ likeCount: sql`likeCount + 1` }).where(eq(forumReplies.id, data.targetId));
-    }
-    return { liked: true };
-  }
-}
-
-/** Verificar curtidas de um usuário em um tópico e suas respostas */
-export async function getForumLikesForUser(topicId: number, authorType: 'teacher' | 'student', authorId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  // Buscar IDs das respostas do tópico
-  const replies = await db.select({ id: forumReplies.id }).from(forumReplies).where(eq(forumReplies.topicId, topicId));
-  const replyIds = replies.map(r => r.id);
-  const conditions = authorType === 'teacher'
-    ? and(eq(forumLikes.authorType, 'teacher'), eq(forumLikes.authorUserId, authorId))
-    : and(eq(forumLikes.authorType, 'student'), eq(forumLikes.authorStudentId, authorId));
-  return db.select().from(forumLikes).where(conditions);
-}
-
-/** Inscrever/desinscrever em notificações de um tópico */
-export async function toggleForumSubscription(data: {
-  topicId: number;
-  authorType: 'teacher' | 'student';
-  authorUserId?: number;
-  authorStudentId?: number;
-}) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const conditions = data.authorType === 'teacher'
-    ? and(eq(forumSubscriptions.topicId, data.topicId), eq(forumSubscriptions.authorType, 'teacher'), eq(forumSubscriptions.authorUserId, data.authorUserId!))
-    : and(eq(forumSubscriptions.topicId, data.topicId), eq(forumSubscriptions.authorType, 'student'), eq(forumSubscriptions.authorStudentId, data.authorStudentId!));
-  const [existing] = await db.select().from(forumSubscriptions).where(conditions);
-  if (existing) {
-    await db.delete(forumSubscriptions).where(eq(forumSubscriptions.id, existing.id));
-    return { subscribed: false };
-  } else {
-    await db.insert(forumSubscriptions).values(data);
-    return { subscribed: true };
-  }
-}
-
-/** Verificar se usuário está inscrito em um tópico */
-export async function isForumSubscribed(topicId: number, authorType: 'teacher' | 'student', authorId: number) {
-  const db = await getDb();
-  if (!db) return false;
-  const conditions = authorType === 'teacher'
-    ? and(eq(forumSubscriptions.topicId, topicId), eq(forumSubscriptions.authorType, 'teacher'), eq(forumSubscriptions.authorUserId, authorId))
-    : and(eq(forumSubscriptions.topicId, topicId), eq(forumSubscriptions.authorType, 'student'), eq(forumSubscriptions.authorStudentId, authorId));
-  const [sub] = await db.select().from(forumSubscriptions).where(conditions);
-  return !!sub;
-}
-
-/** Buscar inscritos de um tópico para notificação por email */
-export async function getForumTopicSubscribers(topicId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(forumSubscriptions).where(eq(forumSubscriptions.topicId, topicId));
-}
-
-/** Editar resposta */
-export async function editForumReply(replyId: number, content: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.update(forumReplies).set({ content, isEdited: true, updatedAt: new Date() }).where(eq(forumReplies.id, replyId));
-}
-
-/** Editar tópico */
-export async function editForumTopic(topicId: number, title: string, content: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.update(forumTopics).set({ title, content, updatedAt: new Date() }).where(eq(forumTopics.id, topicId));
-}
-
-/** Listar tópicos com informações de autor (nome) */
-export async function listForumTopicsWithAuthors(subjectId: number, classId?: number) {
-  const db = await getDb();
-  if (!db) return [];
-  const conditions = classId
-    ? and(eq(forumTopics.subjectId, subjectId), eq(forumTopics.classId, classId))
-    : eq(forumTopics.subjectId, subjectId);
-  const topics = await db.select().from(forumTopics).where(conditions)
-    .orderBy(desc(forumTopics.isPinned), desc(forumTopics.updatedAt));
-  // Enriquecer com nomes dos autores
-  const enriched = await Promise.all(topics.map(async (t) => {
-    let authorName = 'Desconhecido';
-    let authorAvatar = null as string | null;
-    if (t.authorType === 'teacher' && t.authorUserId) {
-      const [user] = await db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, t.authorUserId));
-      if (user) authorName = user.name || user.email || 'Professor';
-    } else if (t.authorType === 'student' && t.authorStudentId) {
-      const [student] = await db.select({ name: students.fullName }).from(students).where(eq(students.id, t.authorStudentId));
-      if (student) authorName = student.name || 'Aluno';
-    }
-    return { ...t, authorName, authorAvatar };
-  }));
-  return enriched;
-}
-
-/** Listar respostas com informações de autor (nome) */
-export async function listForumRepliesWithAuthors(topicId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  const replies = await db.select().from(forumReplies).where(eq(forumReplies.topicId, topicId))
-    .orderBy(asc(forumReplies.createdAt));
-  const enriched = await Promise.all(replies.map(async (r) => {
-    let authorName = 'Desconhecido';
-    let authorRole = r.authorType as string;
-    if (r.authorType === 'teacher' && r.authorUserId) {
-      const [user] = await db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, r.authorUserId));
-      if (user) authorName = user.name || user.email || 'Professor';
-      authorRole = 'Professor';
-    } else if (r.authorType === 'student' && r.authorStudentId) {
-      const [student] = await db.select({ name: students.fullName }).from(students).where(eq(students.id, r.authorStudentId));
-      if (student) authorName = student.name || 'Aluno';
-      authorRole = 'Aluno';
-    }
-    return { ...r, authorName, authorRole };
-  }));
-  return enriched;
 }
 
 // ============================================================

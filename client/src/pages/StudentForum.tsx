@@ -1,382 +1,447 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
+import {
+  MessageSquare, ChevronRight, ArrowLeft, Send,
+  Loader2, BookOpen, Plus, Lock, Pin, Eye, Paperclip,
+  Award, FileText, Home, ChevronRight as Chevron,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast as sonnerToast } from "sonner";
-import StudentLayout from "@/components/StudentLayout";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  MessageSquare, Pin, Lock, CheckCircle,
-  Plus, ArrowLeft, ChevronRight, Eye, Reply, Star,
-  BookOpen, Search, AlertCircle, GraduationCap
-} from "lucide-react";
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import StudentLayout from "@/components/StudentLayout";
 
-type Topic = {
-  id: number; title: string; content: string; authorType: string;
-  isPinned: boolean; isClosed: boolean; bestReplyId: number | null;
-  viewCount: number; replyCount: number; createdAt: Date; updatedAt: Date;
-  subjectId: number;
-};
-
-type ReplyType = {
-  id: number; topicId: number; content: string; authorType: string;
-  isBestAnswer: boolean; createdAt: Date;
-};
+type View = "subjects" | "forums" | "topics" | "topic_detail";
 
 export default function StudentForum() {
-  const [, navigate] = useLocation();
-
+  const [view, setView] = useState<View>("subjects");
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  const [selectedSubjectName, setSelectedSubjectName] = useState("");
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState("");
+  const [selectedSubjectColor, setSelectedSubjectColor] = useState("#3b82f6");
+  const [selectedForumId, setSelectedForumId] = useState<number | null>(null);
+  const [selectedForumTitle, setSelectedForumTitle] = useState("");
   const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
-  const [view, setView] = useState<"subjects" | "topics" | "topic">("subjects");
-  const [search, setSearch] = useState("");
-  const [newTopicTitle, setNewTopicTitle] = useState("");
-  const [newTopicContent, setNewTopicContent] = useState("");
-  const [newReplyContent, setNewReplyContent] = useState("");
-  const [showNewTopic, setShowNewTopic] = useState(false);
-  const [topicError, setTopicError] = useState<string | null>(null);
+  const [selectedTopicTitle, setSelectedTopicTitle] = useState("");
+  const [showCreateTopic, setShowCreateTopic] = useState(false);
+  const [topicForm, setTopicForm] = useState({ title: "", content: "" });
+  const [replyText, setReplyText] = useState("");
 
-  // Buscar disciplinas do aluno via matrículas
-  const { data: enrollments = [] } = trpc.student.getEnrolledSubjects.useQuery(undefined, {
-    retry: false,
-  });
-
-  const { data: topics = [], refetch: refetchTopics } = trpc.forum.listTopics.useQuery(
+  // Queries
+  const { data: enrolledSubjects } = trpc.student.getEnrolledSubjects.useQuery();
+  const { data: forums } = trpc.forum.listForumsForStudent.useQuery(
     { subjectId: selectedSubjectId! },
+    { enabled: !!selectedSubjectId && view === "forums" }
+  );
+  const { data: topics, refetch: refetchTopics } = trpc.forum.listTopicsByForumForStudent.useQuery(
+    { forumId: selectedForumId! },
+    { enabled: !!selectedForumId && (view === "topics" || view === "topic_detail") }
+  );
+  const { data: topicDetail, refetch: refetchTopicDetail } = trpc.forum.getTopic.useQuery(
+    { topicId: selectedTopicId! },
+    { enabled: !!selectedTopicId && view === "topic_detail" }
+  );
+  const { data: myGrades } = trpc.forum.getStudentForumGrades.useQuery(
+    { subjectId: selectedSubjectId ?? undefined },
     { enabled: !!selectedSubjectId }
   );
 
-  const { data: topicData, refetch: refetchTopic } = trpc.forum.getTopic.useQuery(
-    { topicId: selectedTopicId! },
-    { enabled: !!selectedTopicId }
-  );
-
-  const createTopic = trpc.forum.createTopicAsStudent.useMutation({
-    onSuccess: () => {
-      refetchTopics();
-      setShowNewTopic(false);
-      setNewTopicTitle("");
-      setNewTopicContent("");
-      setTopicError(null);
-      sonnerToast.success("Dúvida enviada!", { description: "O professor será notificado." });
-    },
-    onError: (e) => { sonnerToast.error("Erro", { description: e.message }); setTopicError(e.message); },
+  // Mutations
+  const createTopicMutation = trpc.forum.createTopicInForumAsStudent.useMutation({
+    onSuccess: () => { toast.success("Tópico criado!"); setShowCreateTopic(false); refetchTopics(); setTopicForm({ title: "", content: "" }); },
+    onError: (e) => toast.error(`Erro: ${e.message}`),
+  });
+  const replyMutation = trpc.forum.replyWithAttachmentAsStudent.useMutation({
+    onSuccess: () => { toast.success("Resposta enviada!"); setReplyText(""); refetchTopicDetail(); },
+    onError: (e) => toast.error(`Erro: ${e.message}`),
   });
 
-  const reply = trpc.forum.replyAsStudent.useMutation({
-    onSuccess: () => { refetchTopic(); setNewReplyContent(""); sonnerToast.success("Resposta enviada!"); },
-    onError: (e) => sonnerToast.error("Erro", { description: e.message }),
-  });
+  const forumTypeLabel: Record<string, string> = {
+    general: "Fórum geral",
+    single_topic: "Uma discussão",
+    qa: "Perguntas e Respostas",
+  };
 
-  // Extrair disciplinas das matrículas
-  const subjects = (enrollments as any[]).map((e: any) => ({
-    id: e.subjectId,
-    name: e.subject?.name || `Disciplina ${e.subjectId}`,
-    color: e.subject?.color || '#3b82f6',
-  }));
-
-  const selectedSubject = subjects.find((s: any) => s.id === selectedSubjectId);
-  const filteredTopics = topics.filter((t: Topic) =>
-    t.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  function formatDate(d: Date) {
-    return new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  // ── Breadcrumb dinâmico ──────────────────────────────────────────────────
+  function renderBreadcrumb() {
+    return (
+      <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
+        <Home className="w-3.5 h-3.5" />
+        <Chevron className="w-3.5 h-3.5" />
+        <span>Comunicação</span>
+        <Chevron className="w-3.5 h-3.5" />
+        <button
+          onClick={() => { setView("subjects"); setSelectedSubjectId(null); setSelectedForumId(null); setSelectedTopicId(null); }}
+          className={view === "subjects" ? "font-semibold text-foreground" : "hover:text-foreground"}
+        >
+          Fórum de Discussão
+        </button>
+        {view !== "subjects" && (
+          <>
+            <Chevron className="w-3.5 h-3.5" />
+            <button
+              onClick={() => { setView("forums"); setSelectedForumId(null); setSelectedTopicId(null); }}
+              className={view === "forums" ? "font-semibold text-foreground" : "hover:text-foreground"}
+            >
+              {selectedSubjectName}
+            </button>
+          </>
+        )}
+        {(view === "topics" || view === "topic_detail") && (
+          <>
+            <Chevron className="w-3.5 h-3.5" />
+            <button
+              onClick={() => { setView("topics"); setSelectedTopicId(null); }}
+              className={view === "topics" ? "font-semibold text-foreground" : "hover:text-foreground"}
+            >
+              {selectedForumTitle}
+            </button>
+          </>
+        )}
+        {view === "topic_detail" && (
+          <>
+            <Chevron className="w-3.5 h-3.5" />
+            <span className="font-semibold text-foreground truncate max-w-[200px]">{selectedTopicTitle}</span>
+          </>
+        )}
+      </nav>
+    );
   }
 
-  // ─── View: Seleção de disciplina ──────────────────────────────────────────
-  if (view === "subjects") {
-    return (
-      <StudentLayout>
-        <div className="min-h-screen bg-background">
-          {/* Header colorido padrão */}
-          <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
-            <div className="container mx-auto">
+  return (
+    <StudentLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header gradiente padrão */}
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
                   <MessageSquare className="h-8 w-8" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold">Fórum de Discussão</h1>
-                  <p className="text-primary-foreground/80 mt-1">Tire suas dúvidas com o professor</p>
+                  <h1 className="text-4xl font-bold">
+                    {view === "subjects" && "Fórum de Discussão"}
+                    {view === "forums" && `Fóruns — ${selectedSubjectName}`}
+                    {view === "topics" && selectedForumTitle}
+                    {view === "topic_detail" && selectedTopicTitle}
+                  </h1>
+                  <p className="text-primary-foreground/80 mt-1">
+                    {view === "subjects" && "Participe das discussões das suas disciplinas"}
+                    {view === "forums" && `Disciplina: ${selectedSubjectCode || selectedSubjectName}`}
+                    {view === "topics" && "Selecione um tópico para participar"}
+                    {view === "topic_detail" && "Leia e responda o tópico"}
+                  </p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="container mx-auto py-8 px-4 max-w-3xl">
-            <p className="text-muted-foreground text-sm mb-4">Selecione a disciplina para acessar o fórum:</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {subjects.map((s: any) => (
-                <button
-                  key={s.id}
-                  onClick={() => { setSelectedSubjectId(s.id); setView("topics"); }}
-                  className="flex items-center gap-4 p-5 rounded-xl bg-card border border-border hover:border-primary/50 hover:bg-accent/10 transition-all text-left group"
-                >
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-                    style={{ background: s.color || '#3b82f6' }}>
-                    {s.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground truncate">{s.name}</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                </button>
-              ))}
-            </div>
-
-            {subjects.length === 0 && (
-              <div className="text-center py-16 text-muted-foreground">
-                <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p>Você ainda não está matriculado em nenhuma disciplina</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </StudentLayout>
-    );
-  }
-
-  // ─── View: Lista de tópicos ───────────────────────────────────────────────
-  if (view === "topics") {
-    return (
-      <StudentLayout>
-        <div className="min-h-screen bg-background">
-          {/* Header colorido padrão */}
-          <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
-            <div className="container mx-auto">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setView("subjects")}
-                  className="bg-white/20 p-3 rounded-xl backdrop-blur-sm hover:bg-white/30 transition-colors"
-                >
-                  <ArrowLeft className="h-8 w-8" />
-                </button>
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-3xl font-bold truncate">Fórum — {selectedSubject?.name}</h1>
-                  <p className="text-primary-foreground/80 mt-1">{filteredTopics.length} tópico(s)</p>
-                </div>
-                <Button
-                  onClick={() => setShowNewTopic(true)}
-                  className="bg-white/20 hover:bg-white/30 text-primary-foreground border-0 backdrop-blur-sm font-semibold"
-                >
-                  <Plus className="w-4 h-4 mr-2" /> Nova Dúvida
+              {/* Botão voltar */}
+              {view !== "subjects" && (
+                <Button variant="outline" size="sm" className="bg-white/10 border-white/30 text-white hover:bg-white/20" onClick={() => {
+                  if (view === "topic_detail") { setView("topics"); setSelectedTopicId(null); }
+                  else if (view === "topics") { setView("forums"); setSelectedForumId(null); }
+                  else { setView("subjects"); setSelectedSubjectId(null); }
+                }}>
+                  <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
                 </Button>
-              </div>
+              )}
             </div>
           </div>
+        </div>
+        {/* Breadcrumb */}
+        <div className="p-6 max-w-5xl mx-auto w-full">
+        {renderBreadcrumb()}
 
-          <div className="container mx-auto py-8 px-4 max-w-3xl">
-            {/* Busca */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Buscar tópicos..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50"
-              />
-            </div>
-
-            {/* Formulário nova dúvida */}
-            {showNewTopic && (
-              <div className="mb-6 p-5 rounded-xl bg-card border border-primary/30">
-                <h3 className="font-semibold text-foreground mb-1">Enviar Nova Dúvida</h3>
-                <p className="text-muted-foreground text-sm mb-4">O professor será notificado automaticamente</p>
-                <input
-                  type="text"
-                  placeholder="Título da dúvida..."
-                  value={newTopicTitle}
-                  onChange={e => setNewTopicTitle(e.target.value)}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary mb-3"
-                />
-                <textarea
-                  placeholder="Descreva sua dúvida com detalhes..."
-                  value={newTopicContent}
-                  onChange={e => setNewTopicContent(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary resize-none mb-3"
-                />
-                {topicError && (
-                  <p className="text-sm text-destructive mb-2">{topicError}</p>
-                )}
-                <div className="flex gap-2 justify-end">
-                  <Button variant="ghost" onClick={() => { setShowNewTopic(false); setTopicError(null); }}>Cancelar</Button>
-                  <Button
-                    onClick={() => {
-                      if (!newTopicTitle.trim()) { setTopicError("O título é obrigatório."); return; }
-                      if (!newTopicContent.trim()) { setTopicError("A descrição da dúvida é obrigatória."); return; }
-                      setTopicError(null);
-                      createTopic.mutate({ subjectId: selectedSubjectId!, title: newTopicTitle, content: newTopicContent });
-                    }}
-                    disabled={createTopic.isPending}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-                  >
-                    {createTopic.isPending ? "Enviando..." : "Enviar Dúvida"}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Lista de tópicos */}
-            <div className="space-y-3">
-              {filteredTopics.map((t: Topic) => (
+        {/* ══════════════════════════════════════════════════════════
+            VIEW: DISCIPLINAS
+        ══════════════════════════════════════════════════════════ */}
+        {view === "subjects" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {enrolledSubjects?.map((enrollment: any) => {
+              const subj = enrollment.subject || enrollment;
+              const subjectName = subj?.name || enrollment.subjectName || "Disciplina";
+              const subjectCode = subj?.code || enrollment.subjectCode || "";
+              const subjectColor = subj?.color || "#3b82f6";
+              const subjectId = enrollment.subjectId || subj?.id || enrollment.id;
+              return (
                 <button
-                  key={t.id}
-                  onClick={() => { setSelectedTopicId(t.id); setView("topic"); }}
-                  className="w-full flex items-start gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 hover:bg-accent/5 transition-all text-left"
+                  key={subjectId}
+                  onClick={() => {
+                    setSelectedSubjectId(subjectId);
+                    setSelectedSubjectName(subjectName);
+                    setSelectedSubjectCode(subjectCode);
+                    setSelectedSubjectColor(subjectColor);
+                    setView("forums");
+                  }}
+                  className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left"
                 >
-                  <div className={`mt-1 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    t.isClosed ? 'bg-muted' : t.bestReplyId ? 'bg-primary/10' : 'bg-primary/10'
-                  }`}>
-                    <MessageSquare className={`w-5 h-5 ${
-                      t.isClosed ? 'text-muted-foreground' : 'text-primary'
-                    }`} />
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                    style={{ backgroundColor: subjectColor }}
+                  >
+                    {subjectName.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      {t.isPinned && <Pin className="w-3.5 h-3.5 text-amber-500" />}
-                      {t.isClosed && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
-                      {t.bestReplyId && (
-                        <Badge variant="outline" className="text-primary border-primary/30 text-xs py-0">Resolvido</Badge>
-                      )}
-                      <span className="font-semibold text-foreground truncate">{t.title}</span>
-                    </div>
-                    <p className="text-muted-foreground text-sm truncate">{t.content}</p>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t.viewCount}</span>
-                      <span className="flex items-center gap-1"><Reply className="w-3 h-3" />{t.replyCount}</span>
-                      <span>{formatDate(t.updatedAt)}</span>
-                    </div>
+                    <p className="font-semibold text-foreground truncate">{subjectName}</p>
+                    <p className="text-xs text-muted-foreground">{subjectCode || "Código não disponível"}</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-3" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 </button>
-              ))}
-            </div>
-
-            {filteredTopics.length === 0 && (
-              <div className="text-center py-16 text-muted-foreground">
-                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p>Nenhum tópico ainda</p>
-                <p className="text-sm mt-1">Seja o primeiro a enviar uma dúvida!</p>
+              );
+            })}
+            {(!enrolledSubjects || enrolledSubjects.length === 0) && (
+              <div className="col-span-2 text-center py-16 text-muted-foreground">
+                <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                <p className="font-medium">Nenhuma disciplina encontrada</p>
+                <p className="text-sm mt-1">Você ainda não está matriculado em nenhuma disciplina.</p>
               </div>
             )}
           </div>
-        </div>
-      </StudentLayout>
-    );
-  }
+        )}
 
-  // ─── View: Tópico individual ──────────────────────────────────────────────
-  const topic = topicData?.topic as Topic | undefined;
-  const replies = (topicData?.replies || []) as ReplyType[];
-
-  return (
-    <StudentLayout>
-      <div className="min-h-screen bg-background">
-        {/* Header colorido padrão */}
-        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
-          <div className="container mx-auto">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => { setView("topics"); setSelectedTopicId(null); }}
-                className="bg-white/20 p-3 rounded-xl backdrop-blur-sm hover:bg-white/30 transition-colors flex-shrink-0"
-              >
-                <ArrowLeft className="h-8 w-8" />
-              </button>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-bold truncate">{topic?.title || "Carregando..."}</h1>
-                <p className="text-primary-foreground/80 mt-1">{selectedSubject?.name}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="container mx-auto py-8 px-4 max-w-3xl">
-          {/* Tópico principal */}
-          {topic && (
-            <div className="p-5 rounded-xl bg-card border border-border mb-6">
-              <div className="flex items-center gap-2 mb-3 flex-wrap">
-                {topic.isPinned && <Badge variant="outline" className="text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700">Fixado</Badge>}
-                {topic.isClosed && <Badge className="bg-muted text-muted-foreground">Fechado</Badge>}
-                {topic.bestReplyId && <Badge variant="outline" className="text-primary border-primary/30">Resolvido</Badge>}
-                <span className="text-xs text-muted-foreground">{formatDate(topic.createdAt)}</span>
-                <span className={`text-xs font-medium ${topic.authorType === 'teacher' ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {topic.authorType === 'teacher' ? 'Professor' : 'Aluno'}
-                </span>
-              </div>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap">{topic.content}</p>
-            </div>
-          )}
-
-          {/* Respostas */}
-          <div className="space-y-4 mb-6">
-            {replies.map((r: ReplyType) => (
-              <div key={r.id} className={`p-4 rounded-xl border ${
-                r.isBestAnswer
-                  ? 'bg-primary/5 border-primary/30'
-                  : 'bg-card border-border'
-              }`}>
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  {r.isBestAnswer && (
-                    <span className="flex items-center gap-1 text-xs text-primary font-medium">
-                      <CheckCircle className="w-3.5 h-3.5" /> Melhor Resposta
-                    </span>
-                  )}
-                  {r.authorType === 'teacher' && (
-                    <span className="flex items-center gap-1 text-xs text-primary font-medium">
-                      <GraduationCap className="w-3.5 h-3.5" /> Professor
-                    </span>
-                  )}
-                  {r.authorType === 'student' && (
-                    <span className="text-xs text-muted-foreground font-medium">Aluno</span>
-                  )}
-                  <span className="text-xs text-muted-foreground">{formatDate(r.createdAt)}</span>
+        {/* ══════════════════════════════════════════════════════════
+            VIEW: FÓRUNS
+        ══════════════════════════════════════════════════════════ */}
+        {view === "forums" && (
+          <div className="space-y-4">
+            {/* Minhas notas de fórum */}
+            {myGrades && myGrades.length > 0 && (
+              <div className="border-l-4 border-amber-400 bg-amber-50 rounded-r-lg p-4 mb-2">
+                <h3 className="font-semibold text-amber-800 flex items-center gap-2 mb-2">
+                  <Award className="w-4 h-4" /> Suas Notas de Fórum
+                </h3>
+                <div className="space-y-1">
+                  {myGrades.map((g: any) => (
+                    <div key={g.id} className="flex items-center justify-between text-sm">
+                      <span className="text-amber-700">{g.forumTitle}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="border-amber-400 text-amber-700">
+                          {g.grade}/10
+                        </Badge>
+                        {g.feedback && <span className="text-xs text-amber-600 italic">"{g.feedback}"</span>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">{r.content}</p>
+              </div>
+            )}
+
+            {forums?.map((forum: any) => (
+              <button
+                key={forum.id}
+                onClick={() => { setSelectedForumId(forum.id); setSelectedForumTitle(forum.title); setView("topics"); }}
+                className="w-full flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: selectedSubjectColor + "20" }}>
+                  <MessageSquare className="w-5 h-5" style={{ color: selectedSubjectColor }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-semibold text-foreground">{forum.title}</p>
+                    <Badge variant="secondary" className="text-xs">{forumTypeLabel[forum.forumType] || forum.forumType}</Badge>
+                    {forum.gradeEnabled && (
+                      <Badge variant="outline" className="text-xs border-amber-400 text-amber-700">
+                        <Award className="w-3 h-3 mr-1" /> Avaliado
+                      </Badge>
+                    )}
+                  </div>
+                  {forum.description && (
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{forum.description}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">{forum.topicCount ?? 0} tópicos</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+              </button>
+            ))}
+            {(!forums || forums.length === 0) && (
+              <div className="text-center py-16 text-muted-foreground">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                <p className="font-medium">Nenhum fórum disponível</p>
+                <p className="text-sm mt-1">O professor ainda não criou fóruns para esta disciplina.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════
+            VIEW: TÓPICOS
+        ══════════════════════════════════════════════════════════ */}
+        {view === "topics" && (
+          <div className="space-y-3">
+            <div className="flex justify-end mb-2">
+              <Button size="sm" onClick={() => setShowCreateTopic(true)}>
+                <Plus className="w-4 h-4 mr-1" /> Novo Tópico
+              </Button>
+            </div>
+            {topics?.map((topic: any) => (
+              <button
+                key={topic.id}
+                onClick={() => { setSelectedTopicId(topic.id); setSelectedTopicTitle(topic.title); setView("topic_detail"); }}
+                className="w-full flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {topic.isPinned && <Pin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
+                    {topic.isClosed && <Lock className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />}
+                    <p className="font-semibold text-foreground truncate">{topic.title}</p>
+                    {topic.bestReplyId && (
+                      <Badge variant="outline" className="text-xs border-green-400 text-green-700">Resolvido</Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{topic.replyCount ?? 0} respostas</span>
+                    <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{topic.viewCount ?? 0} visualizações</span>
+                    <span>{topic.authorName || "Aluno"}</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+              </button>
+            ))}
+            {(!topics || topics.length === 0) && (
+              <div className="text-center py-16 text-muted-foreground">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                <p className="font-medium">Nenhum tópico ainda</p>
+                <p className="text-sm mt-1">Seja o primeiro a criar um tópico!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════
+            VIEW: DETALHE DO TÓPICO
+        ══════════════════════════════════════════════════════════ */}
+        {view === "topic_detail" && topicDetail && (
+          <div className="space-y-4">
+            {/* Post principal */}
+            <div className="border-l-4 border-blue-500 bg-card rounded-r-lg p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
+                  {(topicDetail.topic?.authorName || "A").charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">{topicDetail.topic?.authorName || "Aluno"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {topicDetail.topic?.createdAt ? new Date(topicDetail.topic.createdAt).toLocaleString("pt-BR") : ""}
+                  </p>
+                </div>
+                {topicDetail.topic?.isClosed && (
+                  <Badge variant="outline" className="ml-auto border-red-300 text-red-600 text-xs">
+                    <Lock className="w-3 h-3 mr-1" /> Fechado
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{topicDetail.topic?.content}</p>
+            </div>
+
+            {/* Respostas */}
+            {topicDetail.replies?.map((reply: any) => (
+              <div
+                key={reply.id}
+                className={`rounded-lg p-4 border ${reply.id === topicDetail.topic?.bestReplyId
+                  ? "border-l-4 border-green-500 bg-green-50"
+                  : "border-border bg-card"
+                }`}
+              >
+                {reply.id === topicDetail.topic?.bestReplyId && (
+                  <div className="flex items-center gap-1 text-green-700 text-xs font-semibold mb-2">
+                    <Award className="w-3.5 h-3.5" /> Melhor Resposta
+                  </div>
+                )}
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs">
+                    {(reply.authorName || "U").charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-xs">{reply.authorName || "Usuário"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {reply.createdAt ? new Date(reply.createdAt).toLocaleString("pt-BR") : ""}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{reply.content}</p>
+                {reply.attachmentUrl && (
+                  <a href={reply.attachmentUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2">
+                    <Paperclip className="w-3 h-3" /> Ver anexo
+                  </a>
+                )}
               </div>
             ))}
 
-            {replies.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">Aguardando resposta do professor...</p>
+            {/* Caixa de resposta */}
+            {!topicDetail.topic?.isClosed ? (
+              <div className="border border-border rounded-lg p-4 bg-card">
+                <Label className="text-sm font-medium mb-2 block">Sua resposta</Label>
+                <Textarea
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Escreva sua resposta..."
+                  className="min-h-[100px] mb-3"
+                />
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    disabled={!replyText.trim() || replyMutation.isPending}
+                    onClick={() => replyMutation.mutate({ topicId: selectedTopicId!, content: replyText })}
+                  >
+                    {replyMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
+                    Enviar Resposta
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground border border-border rounded-lg bg-card">
+                <Lock className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">Este tópico está fechado para novas respostas.</p>
               </div>
             )}
           </div>
+        )}
 
-          {/* Caixa de resposta */}
-          {topic && !topic.isClosed ? (
-            <div className="p-5 rounded-xl bg-card border border-border">
-              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                <Reply className="w-4 h-4 text-primary" /> Adicionar Comentário
-              </h3>
-              <textarea
-                placeholder="Escreva seu comentário..."
-                value={newReplyContent}
-                onChange={e => setNewReplyContent(e.target.value)}
-                rows={3}
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary resize-none mb-3"
-              />
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => reply.mutate({ topicId: topic.id, content: newReplyContent })}
-                  disabled={!newReplyContent.trim() || reply.isPending}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-                >
-                  {reply.isPending ? "Enviando..." : "Enviar"}
-                </Button>
-              </div>
-            </div>
-          ) : topic?.isClosed ? (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-muted border border-border text-muted-foreground">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm">Este tópico está fechado.</span>
-            </div>
-          ) : null}
         </div>
+
+      {/* Modal: Criar Tópico */}
+      <Dialog open={showCreateTopic} onOpenChange={setShowCreateTopic}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo Tópico</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Título *</Label>
+              <Input
+                value={topicForm.title}
+                onChange={(e) => setTopicForm(f => ({ ...f, title: e.target.value }))}
+                placeholder="Título do tópico"
+              />
+            </div>
+            <div>
+              <Label>Conteúdo *</Label>
+              <Textarea
+                value={topicForm.content}
+                onChange={(e) => setTopicForm(f => ({ ...f, content: e.target.value }))}
+                placeholder="Descreva sua dúvida ou discussão..."
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateTopic(false)}>Cancelar</Button>
+            <Button
+              disabled={!topicForm.title.trim() || !topicForm.content.trim() || createTopicMutation.isPending}
+              onClick={() => createTopicMutation.mutate({ forumId: selectedForumId!, title: topicForm.title, content: topicForm.content })}
+            >
+              {createTopicMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Plus className="w-4 h-4 mr-1" />}
+              Criar Tópico
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       </div>
     </StudentLayout>
   );

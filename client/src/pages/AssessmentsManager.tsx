@@ -374,20 +374,11 @@ export default function AssessmentsManager() {
                   {assessments.map((assessment: any) => (
                     <Card key={assessment.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                       <CardContent className="p-4">
-                        <div className="flex flex-col gap-3">
-                          <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{assessment.title}</h3>
                               {getStatusBadge(assessment.status)}
-                              {assessment.shuffleQuestions ? (
-                                <span
-                                  title="Anti-cola ativo: questões e alternativas embaralhadas para cada aluno"
-                                  className="inline-flex items-center gap-1 text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 rounded-full px-2 py-0.5 cursor-default"
-                                >
-                                  🎲 Anti-cola
-                                </span>
-                              ) : null}
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
                               <span className="flex items-center gap-1">
@@ -446,64 +437,61 @@ export default function AssessmentsManager() {
                               <p className="text-sm text-gray-400 mt-1 truncate">{assessment.description}</p>
                             )}
                           </div>
-                          </div>
-                          {/* Botões de ação - linha separada no mobile */}
-                          <div className="flex items-center gap-1.5 flex-wrap">
+                          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-purple-600 border-purple-200 hover:bg-purple-50 h-8 px-2 sm:px-3"
+                              className="text-purple-600 border-purple-200 hover:bg-purple-50"
                               onClick={() => {
                                 setViewAssessmentStudentsId(assessment.id);
                                 setViewAssessmentStudentsTitle(assessment.title);
                               }}
                             >
-                              <Users className="h-3.5 w-3.5 sm:mr-1" />
-                              <span className="hidden sm:inline">Alunos</span>
+                              <Users className="h-4 w-4 mr-1" />
+                              Alunos
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 px-2 sm:px-3"
                               onClick={() => {
                                 setViewQuestionsId(assessment.id);
                                 setViewQuestionsTitle(assessment.title);
                               }}
                             >
-                              <FileText className="h-3.5 w-3.5 sm:mr-1" />
-                              <span className="hidden sm:inline">Ver Questões</span>
+                              <FileText className="h-4 w-4 mr-1" />
+                              Ver Questões
                             </Button>
                             {assessment.status !== "published" ? (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-green-600 border-green-200 hover:bg-green-50 h-8 px-2 sm:px-3"
+                                className="text-green-600 border-green-200 hover:bg-green-50"
                                 onClick={() => toggleStatusMutation.mutate({ assessmentId: assessment.id, status: "published" })}
                                 disabled={toggleStatusMutation.isPending}
                               >
-                                <Eye className="h-3.5 w-3.5 sm:mr-1" />
-                                <span className="hidden sm:inline">Publicar</span>
+                                <Eye className="h-4 w-4 mr-1" />
+                                Publicar
                               </Button>
                             ) : (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-yellow-600 border-yellow-200 hover:bg-yellow-50 h-8 px-2 sm:px-3"
+                                className="text-yellow-600 border-yellow-200 hover:bg-yellow-50"
                                 onClick={() => toggleStatusMutation.mutate({ assessmentId: assessment.id, status: "draft" })}
                                 disabled={toggleStatusMutation.isPending}
                               >
-                                <EyeOff className="h-3.5 w-3.5 sm:mr-1" />
-                                <span className="hidden sm:inline">Despublicar</span>
+                                <EyeOff className="h-4 w-4 mr-1" />
+                                Despublicar
                               </Button>
                             )}
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-red-600 border-red-200 hover:bg-red-50 h-8 px-2 sm:px-3"
+                              className="text-red-600 border-red-200 hover:bg-red-50"
                               onClick={() => setDeleteTarget({ id: assessment.id, title: assessment.title, type: "assessment" })}
                             >
-                              <Trash2 className="h-3.5 w-3.5 sm:mr-1" />
-                              <span className="hidden sm:inline">Excluir</span>
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Excluir
                             </Button>
                           </div>
                         </div>
@@ -546,14 +534,6 @@ export default function AssessmentsManager() {
                               <Badge className="bg-blue-100 text-blue-800 border-blue-200">
                                 <CheckCircle2 className="h-3 w-3 mr-1" />Publicado
                               </Badge>
-                              {exercise.shuffleQuestions ? (
-                                <span
-                                  title="Anti-cola ativo: questões e alternativas embaralhadas para cada aluno"
-                                  className="inline-flex items-center gap-1 text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 rounded-full px-2 py-0.5 cursor-default"
-                                >
-                                  🎲 Anti-cola
-                                </span>
-                              ) : null}
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
                               <span className="flex items-center gap-1">

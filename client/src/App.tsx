@@ -62,6 +62,7 @@ const AccessLogsPage = lazy(() => import("./pages/AccessLogsPage"));
 const TeacherDoubts = lazy(() => import("./pages/TeacherDoubts"));
 const TeacherGradePanel = lazy(() => import("./pages/TeacherGradePanel"));
 const TeacherForum = lazy(() => import("./pages/TeacherForum"));
+const TeacherMural = lazy(() => import("./pages/TeacherMural"));
 
 // Lazy loaded pages - Student Portal
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
@@ -84,6 +85,7 @@ const StudentMyQuestions = lazy(() => import("./pages/StudentMyQuestions"));
 const StudentLearningJournal = lazy(() => import("./pages/StudentLearningJournal"));
 const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
 const StudentForum = lazy(() => import("./pages/StudentForum"));
+const StudentMural = lazy(() => import("./pages/student/StudentMural"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
 const StudentGradeBook = lazy(() => import("./pages/StudentGradeBook"));
@@ -91,8 +93,6 @@ const StudentActivitiesPage = lazy(() => import("./pages/StudentActivitiesPage")
 const StudentAssessmentsPage = lazy(() => import("./pages/StudentAssessmentsPage"));
 const StudentExamPage = lazy(() => import("./pages/StudentExamPage"));
 const InstallAppPage = lazy(() => import("./pages/InstallAppPage"));
-const MuralColaborativo = lazy(() => import("./pages/MuralColaborativo"));
-const StudentMural = lazy(() => import("./pages/student/StudentMural"));
 // MistakeNotebook removido - funcionalidade consolidada em StudentSmartReview
 
 // Lazy loaded pages - Help/Ajuda
@@ -181,6 +181,7 @@ function Router() {
           <Route path={"/teacher-doubts"} component={TeacherDoubts} />
           <Route path={"/teacher-grades"} component={TeacherGradePanel} />
           <Route path={"/teacher-forum"} component={TeacherForum} />
+          <Route path={"/teacher-mural"} component={TeacherMural} />
           <Route path={"/assessments-manager"} component={AssessmentsManager} />
 
           {/* Student Portal - lazy loaded */}
@@ -204,14 +205,13 @@ function Router() {
           <Route path={"/student/learning-journal"} component={StudentLearningJournal} />
           <Route path={"/student/doubts"} component={StudentDoubts} />
           <Route path={"/student/forum"} component={StudentForum} />
+          <Route path={"/student/mural"} component={StudentMural} />
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
           <Route path={"/student/grade-book"} component={StudentGradeBook} />
-          <Route path={"/mural-colaborativo"} component={MuralColaborativo} />
           <Route path={"/student/activities"} component={StudentActivitiesPage} />
           <Route path={"/student/assessments"} component={StudentAssessmentsPage} />
           <Route path={"/student/exam/:assessmentId"} component={StudentExamPage} />
-          <Route path={"/student/mural"} component={StudentMural} />
           <Route path={"/student/instalar-app"} component={InstallAppPage} />
           {/* MistakeNotebook removido - usar /student/smart-review */}
 
