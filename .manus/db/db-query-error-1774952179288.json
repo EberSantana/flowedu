@@ -1,0 +1,8 @@
+{
+  "query": "\nINSERT INTO students (userId, registrationNumber, fullName, avatarGender, createdAt, updatedAt) \nVALUES (3630001, 'CBIE2026', 'Aluno Demo CBIE', 'male', NOW(), NOW());\n\nINSERT INTO student_enrollments (studentId, subjectId, classId, professorId, status, enrolledAt, createdAt, updatedAt)\nSELECT s.id, 180001, 720001, 2820005, 'active', NOW(), NOW(), NOW()\nFROM students s WHERE s.userId = 3630001;\n\nINSERT INTO student_class_enrollments (studentId, classId, userId, enrolledAt)\nSELECT s.id, 720001, 2820005, NOW()\nFROM students s WHERE s.userId = 3630001;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute \nINSERT INTO students (userId, registrationNumber, fullName, avatarGender, createdAt, updatedAt) \nVALUES (3630001, 'CBIE2026', 'Aluno Demo CBIE', 'male', NOW(), NOW());\n\nINSERT INTO student_enrollments (studentId, subjectId, classId, professorId, status, enrolledAt, createdAt, updatedAt)\nSELECT s.id, 180001, 720001, 2820005, 'active', NOW(), NOW(), NOW()\nFROM students s WHERE s.userId = 3630001;\n\nINSERT INTO student_class_enrollments (studentId, classId, userId, enrolledAt)\nSELECT s.id, 720001, 2820005, NOW()\nFROM students s WHERE s.userId = 3630001;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1452 (23000) at line 5: Cannot add or update a child row: a foreign key constraint fails (`c6fhcpifofzeqqxntskeu6`.`student_enrollments`, CONSTRAINT `fk_enrollment_subject` FOREIGN KEY (`subjectId`) REFERENCES `subjects` (`id`) ON DELETE CASCADE)"
+  ]
+}

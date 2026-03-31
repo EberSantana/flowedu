@@ -184,7 +184,7 @@ export async function getDb() {
         password: decodeURIComponent(url.password),
         database: url.pathname.slice(1).split('?')[0],
         ssl: {
-          rejectUnauthorized: true
+          rejectUnauthorized: false
         },
         waitForConnections: true,
         connectionLimit: 10,
@@ -200,6 +200,12 @@ export async function getDb() {
     }
   }
   return _db;
+}
+
+/** Retorna o pool MySQL diretamente para queries raw SQL */
+export async function getRawPool(): Promise<mysql.Pool | null> {
+  await getDb(); // garante que o pool foi inicializado
+  return _pool;
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
@@ -12571,10 +12577,10 @@ export async function getLearningPathClassReport(subjectId: number, classId: num
 // ============================================================
 
 export async function listForumsForSubject(subjectId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const pool = await getRawPool();
+  if (!pool) return [];
   // Buscar fóruns da disciplina usando SQL raw para evitar problema de import da tabela
-  const [rows] = await (db as any).execute(
+  const [rows] = await pool.execute(
     `SELECT * FROM forums WHERE subjectId = ? AND isOpen = 1 ORDER BY createdAt DESC`,
     [subjectId]
   ) as any;
@@ -12582,9 +12588,9 @@ export async function listForumsForSubject(subjectId: number) {
 }
 
 export async function listTopicsByForum(forumId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  const [rows] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) return [];
+  const [rows] = await pool.execute(
     `SELECT ft.*,
       COALESCE(u.name, s.fullName, 'Usuário') as authorName
     FROM forum_topics ft
@@ -12598,9 +12604,9 @@ export async function listTopicsByForum(forumId: number) {
 }
 
 export async function getForumById(forumId: number) {
-  const db = await getDb();
-  if (!db) return null;
-  const [rows] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) return null;
+  const [rows] = await pool.execute(
     `SELECT * FROM forums WHERE id = ? LIMIT 1`,
     [forumId]
   ) as any;
@@ -12608,13 +12614,13 @@ export async function getForumById(forumId: number) {
 }
 
 export async function getStudentForumGrades(studentId: number, subjectId?: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const pool = await getRawPool();
+  if (!pool) return [];
   const query = subjectId
     ? `SELECT fg.*, f.title as forumTitle, f.gradeMax FROM forum_grades fg JOIN forums f ON fg.forumId = f.id WHERE fg.studentId = ? AND f.subjectId = ?`
     : `SELECT fg.*, f.title as forumTitle, f.gradeMax FROM forum_grades fg JOIN forums f ON fg.forumId = f.id WHERE fg.studentId = ?`;
   const params = subjectId ? [studentId, subjectId] : [studentId];
-  const [rows] = await (db as any).execute(query, params) as any;
+  const [rows] = await pool.execute(query, params) as any;
   return rows as any[];
 }
 
@@ -12632,9 +12638,9 @@ export async function createForum(data: {
   gradeMax?: string;
   gradeAggregation?: 'max' | 'avg' | 'sum' | 'first' | 'last';
 }) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [result] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) throw new Error("Database not available");
+  const [result] = await pool.execute(
     `INSERT INTO forums (subjectId, classId, createdBy, title, description, forumType, requireSubscription, monitorReading, maxAttachmentSizeKb, gradeEnabled, gradeMax, gradeAggregation, isOpen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
     [
       data.subjectId,
@@ -12655,16 +12661,16 @@ export async function createForum(data: {
 }
 
 export async function deleteForum(forumId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await (db as any).execute(`DELETE FROM forums WHERE id = ?`, [forumId]);
+  const pool = await getRawPool();
+  if (!pool) throw new Error("Database not available");
+  await pool.execute(`DELETE FROM forums WHERE id = ?`, [forumId]);
   return true;
 }
 
 export async function getForumGradesByForum(forumId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  const [rows] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) return [];
+  const [rows] = await pool.execute(
     `SELECT fg.*, s.fullName as studentName FROM forum_grades fg JOIN students s ON fg.studentId = s.id WHERE fg.forumId = ?`,
     [forumId]
   ) as any;
@@ -12672,9 +12678,9 @@ export async function getForumGradesByForum(forumId: number) {
 }
 
 export async function getForumParticipationStats(forumId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  const [rows] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) return [];
+  const [rows] = await pool.execute(
     `SELECT s.id as studentId, s.fullName as studentName,
       COUNT(DISTINCT ft.id) as topicsCreated,
       COUNT(DISTINCT fr.id) as repliesCreated
@@ -12695,19 +12701,19 @@ export async function setForumGrade(data: {
   grade: number;
   feedback?: string;
 }) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const [existing] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) throw new Error("Database not available");
+  const [existing] = await pool.execute(
     `SELECT id FROM forum_grades WHERE forumId = ? AND studentId = ?`,
     [data.forumId, data.studentId]
   ) as any;
   if (existing && existing.length > 0) {
-    await (db as any).execute(
+    await pool.execute(
       `UPDATE forum_grades SET grade = ?, feedback = ?, gradedBy = ?, updatedAt = NOW() WHERE forumId = ? AND studentId = ?`,
       [data.grade, data.feedback ?? null, data.gradedBy, data.forumId, data.studentId]
     );
   } else {
-    await (db as any).execute(
+    await pool.execute(
       `INSERT INTO forum_grades (forumId, studentId, gradedBy, grade, feedback) VALUES (?, ?, ?, ?, ?)`,
       [data.forumId, data.studentId, data.gradedBy, data.grade, data.feedback ?? null]
     );
@@ -12757,9 +12763,9 @@ export async function listForumTopics(subjectId: number, classId?: number) {
 }
 
 export async function getForumTopic(topicId: number) {
-  const db = await getDb();
-  if (!db) return null;
-  const [rows] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) return null;
+  const [rows] = await pool.execute(
     `SELECT ft.*,
       COALESCE(u.name, s.fullName, 'Usuário') as authorName
     FROM forum_topics ft
@@ -12807,9 +12813,9 @@ export async function deleteForumTopic(topicId: number) {
 }
 
 export async function listForumReplies(topicId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  const [rows] = await (db as any).execute(
+  const pool = await getRawPool();
+  if (!pool) return [];
+  const [rows] = await pool.execute(
     `SELECT fr.*,
       COALESCE(u.name, s.fullName, 'Usuário') as authorName
     FROM forum_replies fr
