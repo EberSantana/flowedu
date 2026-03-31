@@ -163,6 +163,8 @@ import {
   InsertAssessment,
   forumTopics,
   forumReplies,
+  forumLikes,
+  forumSubscriptions,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -12658,6 +12660,161 @@ export async function deleteForumReply(replyId: number) {
     await db.delete(forumReplies).where(eq(forumReplies.id, replyId));
     await db.update(forumTopics).set({ replyCount: sql`GREATEST(replyCount - 1, 0)` }).where(eq(forumTopics.id, reply.topicId));
   }
+}
+
+// ============================================================
+// FÓRUM — NOVAS FUNCIONALIDADES (curtidas, inscrições, edição)
+// ============================================================
+
+/** Curtir/descurtir tópico ou resposta */
+export async function toggleForumLike(data: {
+  targetType: 'topic' | 'reply';
+  targetId: number;
+  authorType: 'teacher' | 'student';
+  authorUserId?: number;
+  authorStudentId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Verificar se já curtiu
+  const conditions = data.authorType === 'teacher'
+    ? and(eq(forumLikes.targetType, data.targetType), eq(forumLikes.targetId, data.targetId), eq(forumLikes.authorType, 'teacher'), eq(forumLikes.authorUserId, data.authorUserId!))
+    : and(eq(forumLikes.targetType, data.targetType), eq(forumLikes.targetId, data.targetId), eq(forumLikes.authorType, 'student'), eq(forumLikes.authorStudentId, data.authorStudentId!));
+  const [existing] = await db.select().from(forumLikes).where(conditions);
+  if (existing) {
+    // Remover curtida
+    await db.delete(forumLikes).where(eq(forumLikes.id, existing.id));
+    if (data.targetType === 'topic') {
+      await db.update(forumTopics).set({ likeCount: sql`GREATEST(likeCount - 1, 0)` }).where(eq(forumTopics.id, data.targetId));
+    } else {
+      await db.update(forumReplies).set({ likeCount: sql`GREATEST(likeCount - 1, 0)` }).where(eq(forumReplies.id, data.targetId));
+    }
+    return { liked: false };
+  } else {
+    // Adicionar curtida
+    await db.insert(forumLikes).values(data);
+    if (data.targetType === 'topic') {
+      await db.update(forumTopics).set({ likeCount: sql`likeCount + 1` }).where(eq(forumTopics.id, data.targetId));
+    } else {
+      await db.update(forumReplies).set({ likeCount: sql`likeCount + 1` }).where(eq(forumReplies.id, data.targetId));
+    }
+    return { liked: true };
+  }
+}
+
+/** Verificar curtidas de um usuário em um tópico e suas respostas */
+export async function getForumLikesForUser(topicId: number, authorType: 'teacher' | 'student', authorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Buscar IDs das respostas do tópico
+  const replies = await db.select({ id: forumReplies.id }).from(forumReplies).where(eq(forumReplies.topicId, topicId));
+  const replyIds = replies.map(r => r.id);
+  const conditions = authorType === 'teacher'
+    ? and(eq(forumLikes.authorType, 'teacher'), eq(forumLikes.authorUserId, authorId))
+    : and(eq(forumLikes.authorType, 'student'), eq(forumLikes.authorStudentId, authorId));
+  return db.select().from(forumLikes).where(conditions);
+}
+
+/** Inscrever/desinscrever em notificações de um tópico */
+export async function toggleForumSubscription(data: {
+  topicId: number;
+  authorType: 'teacher' | 'student';
+  authorUserId?: number;
+  authorStudentId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const conditions = data.authorType === 'teacher'
+    ? and(eq(forumSubscriptions.topicId, data.topicId), eq(forumSubscriptions.authorType, 'teacher'), eq(forumSubscriptions.authorUserId, data.authorUserId!))
+    : and(eq(forumSubscriptions.topicId, data.topicId), eq(forumSubscriptions.authorType, 'student'), eq(forumSubscriptions.authorStudentId, data.authorStudentId!));
+  const [existing] = await db.select().from(forumSubscriptions).where(conditions);
+  if (existing) {
+    await db.delete(forumSubscriptions).where(eq(forumSubscriptions.id, existing.id));
+    return { subscribed: false };
+  } else {
+    await db.insert(forumSubscriptions).values(data);
+    return { subscribed: true };
+  }
+}
+
+/** Verificar se usuário está inscrito em um tópico */
+export async function isForumSubscribed(topicId: number, authorType: 'teacher' | 'student', authorId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  const conditions = authorType === 'teacher'
+    ? and(eq(forumSubscriptions.topicId, topicId), eq(forumSubscriptions.authorType, 'teacher'), eq(forumSubscriptions.authorUserId, authorId))
+    : and(eq(forumSubscriptions.topicId, topicId), eq(forumSubscriptions.authorType, 'student'), eq(forumSubscriptions.authorStudentId, authorId));
+  const [sub] = await db.select().from(forumSubscriptions).where(conditions);
+  return !!sub;
+}
+
+/** Buscar inscritos de um tópico para notificação por email */
+export async function getForumTopicSubscribers(topicId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(forumSubscriptions).where(eq(forumSubscriptions.topicId, topicId));
+}
+
+/** Editar resposta */
+export async function editForumReply(replyId: number, content: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(forumReplies).set({ content, isEdited: true, updatedAt: new Date() }).where(eq(forumReplies.id, replyId));
+}
+
+/** Editar tópico */
+export async function editForumTopic(topicId: number, title: string, content: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(forumTopics).set({ title, content, updatedAt: new Date() }).where(eq(forumTopics.id, topicId));
+}
+
+/** Listar tópicos com informações de autor (nome) */
+export async function listForumTopicsWithAuthors(subjectId: number, classId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions = classId
+    ? and(eq(forumTopics.subjectId, subjectId), eq(forumTopics.classId, classId))
+    : eq(forumTopics.subjectId, subjectId);
+  const topics = await db.select().from(forumTopics).where(conditions)
+    .orderBy(desc(forumTopics.isPinned), desc(forumTopics.updatedAt));
+  // Enriquecer com nomes dos autores
+  const enriched = await Promise.all(topics.map(async (t) => {
+    let authorName = 'Desconhecido';
+    let authorAvatar = null as string | null;
+    if (t.authorType === 'teacher' && t.authorUserId) {
+      const [user] = await db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, t.authorUserId));
+      if (user) authorName = user.name || user.email || 'Professor';
+    } else if (t.authorType === 'student' && t.authorStudentId) {
+      const [student] = await db.select({ name: students.fullName }).from(students).where(eq(students.id, t.authorStudentId));
+      if (student) authorName = student.name || 'Aluno';
+    }
+    return { ...t, authorName, authorAvatar };
+  }));
+  return enriched;
+}
+
+/** Listar respostas com informações de autor (nome) */
+export async function listForumRepliesWithAuthors(topicId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const replies = await db.select().from(forumReplies).where(eq(forumReplies.topicId, topicId))
+    .orderBy(asc(forumReplies.createdAt));
+  const enriched = await Promise.all(replies.map(async (r) => {
+    let authorName = 'Desconhecido';
+    let authorRole = r.authorType as string;
+    if (r.authorType === 'teacher' && r.authorUserId) {
+      const [user] = await db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, r.authorUserId));
+      if (user) authorName = user.name || user.email || 'Professor';
+      authorRole = 'Professor';
+    } else if (r.authorType === 'student' && r.authorStudentId) {
+      const [student] = await db.select({ name: students.fullName }).from(students).where(eq(students.id, r.authorStudentId));
+      if (student) authorName = student.name || 'Aluno';
+      authorRole = 'Aluno';
+    }
+    return { ...r, authorName, authorRole };
+  }));
+  return enriched;
 }
 
 // ============================================================

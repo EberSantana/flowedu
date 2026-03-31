@@ -58,15 +58,45 @@ export function serveStatic(app: Express) {
     );
   }
 
+  const indexHtmlPath = path.resolve(distPath, "index.html");
+
+  // Função para servir index.html sem ETag
+  // Usa readFile + send em vez de sendFile para evitar que o módulo 'send' adicione ETag
+  // O ETag causa 304 Not Modified no browser, servindo conteúdo antigo após deploy
+  const serveIndexHtml = (_req: any, res: any) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.removeHeader('ETag');
+    res.removeHeader('Last-Modified');
+    // Usar readFile + send em vez de sendFile para evitar ETag gerado pelo módulo 'send'
+    try {
+      const content = fs.readFileSync(indexHtmlPath, 'utf-8');
+      res.status(200).send(content);
+    } catch (err) {
+      res.status(500).send('Internal Server Error');
+    }
+  };
+
+  // Servir index.html SEPARADAMENTE com no-cache absoluto (ANTES do static)
+  // Isso garante que o browser sempre baixe o index.html mais recente após deploy
+  app.get(["/", "/index.html"], serveIndexHtml);
+
   // Servir arquivos estáticos com cache longo (assets com hash são imutáveis)
+  // Excluir index.html do static (já tratado acima)
   app.use(express.static(distPath, {
+    index: false, // NÃO servir index.html automaticamente
+    etag: false,  // Desabilitar ETag para todos os arquivos estáticos
+    lastModified: false, // Desabilitar Last-Modified também
     setHeaders: (res, filePath) => {
       // Assets com hash do Vite: cache longo (1 ano)
       if (filePath.includes('/assets/')) {
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       }
       // sw.js e manifest.json: nunca cachear
-      else if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.json')) {
+      else if (filePath.endsWith('sw.js') || filePath.endsWith('manifest.json') || filePath.endsWith('manifest.webmanifest')) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
@@ -81,13 +111,6 @@ export function serveStatic(app: Express) {
     res.status(404).send("Asset not found");
   });
 
-  // fall through to index.html se o arquivo não existir (SPA routing)
-  // Sempre retornar index.html sem cache para garantir que o browser
-  // carregue os assets mais recentes após cada deploy
-  app.use("*", (_req, res) => {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
+  // fall through to index.html para SPA routing (todas as outras rotas)
+  app.use("*", serveIndexHtml);
 }

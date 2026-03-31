@@ -121,7 +121,7 @@ export default function StudentDashboard() {
 
         {/* Ações Rápidas */}
         <div className="mb-8">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Acesso Rápido</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Acesso Rápido</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:grid-cols-4">
             {quickActions.map((action) => (
               <Link key={action.path} href={action.path}>

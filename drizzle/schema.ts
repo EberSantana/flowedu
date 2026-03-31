@@ -2841,6 +2841,9 @@ export const forumTopics = mysqlTable("forum_topics", {
   bestReplyId: int("bestReplyId"),               // FK para forum_replies (melhor resposta)
   viewCount: int("viewCount").default(0).notNull(),
   replyCount: int("replyCount").default(0).notNull(),
+  likeCount: int("likeCount").default(0).notNull(),
+  forumType: mysqlEnum("forumType", ["general", "qa", "single"]).default("general").notNull(),
+  notifyOnReply: boolean("notifyOnReply").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -2858,12 +2861,41 @@ export const forumReplies = mysqlTable("forum_replies", {
   authorUserId: int("authorUserId"),             // FK para users (professor)
   authorStudentId: int("authorStudentId"),       // FK para students (aluno)
   isBestAnswer: boolean("isBestAnswer").default(false).notNull(),
-  parentReplyId: int("parentReplyId"),           // para respostas aninhadas (opcional)
+  parentReplyId: int("parentReplyId"),           // para respostas aninhadas (thread)
+  likeCount: int("likeCount").default(0).notNull(),
+  isEdited: boolean("isEdited").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 export type ForumReply = typeof forumReplies.$inferSelect;
 export type InsertForumReply = typeof forumReplies.$inferInsert;
+
+/**
+ * Curtidas do Fórum — professor ou aluno curte um tópico ou resposta
+ */
+export const forumLikes = mysqlTable("forum_likes", {
+  id: int("id").autoincrement().primaryKey(),
+  targetType: mysqlEnum("targetType", ["topic", "reply"]).notNull(),
+  targetId: int("targetId").notNull(),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),
+  authorStudentId: int("authorStudentId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type ForumLike = typeof forumLikes.$inferSelect;
+
+/**
+ * Inscrições do Fórum — receber notificações por email de novos posts
+ */
+export const forumSubscriptions = mysqlTable("forum_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  topicId: int("topicId").notNull(),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),
+  authorStudentId: int("authorStudentId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type ForumSubscription = typeof forumSubscriptions.$inferSelect;
 
 // ============================================================
 // MURAL COLABORATIVO EM TEMPO REAL

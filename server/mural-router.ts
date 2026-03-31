@@ -276,6 +276,34 @@ export const muralRouter = router({
       return { success: true };
     }),
 
+  /** Deletar mural permanentemente (professor dono) */
+  deleteMural: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = (await getDb())!;
+      // Verificar se o mural pertence ao professor
+      const [mural] = await db
+        .select({ id: murals.id, createdBy: murals.createdBy })
+        .from(murals)
+        .where(eq(murals.id, input.id))
+        .limit(1);
+      if (!mural) throw new TRPCError({ code: "NOT_FOUND", message: "Mural não encontrado" });
+      if (mural.createdBy !== ctx.user.id)
+        throw new TRPCError({ code: "FORBIDDEN", message: "Você não tem permissão para excluir este mural" });
+      // Deletar em cascata: votos → cards → colunas → mural
+      const cards = await db
+        .select({ id: muralCards.id })
+        .from(muralCards)
+        .where(eq(muralCards.muralId, input.id));
+      for (const card of cards) {
+        await db.delete(muralVotes).where(eq(muralVotes.cardId, card.id));
+      }
+      await db.delete(muralCards).where(eq(muralCards.muralId, input.id));
+      await db.delete(muralColumns).where(eq(muralColumns.muralId, input.id));
+      await db.delete(murals).where(eq(murals.id, input.id));
+      return { success: true };
+    }),
+
   // ── CARDS ───────────────────────────────────────────────────────────────────
 
   /** Adicionar card (professor) */

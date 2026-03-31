@@ -34,6 +34,7 @@ export default function StudentForum() {
   const [newTopicContent, setNewTopicContent] = useState("");
   const [newReplyContent, setNewReplyContent] = useState("");
   const [showNewTopic, setShowNewTopic] = useState(false);
+  const [topicError, setTopicError] = useState<string | null>(null);
 
   // Buscar disciplinas do aluno via matrículas
   const { data: enrollments = [] } = trpc.student.getEnrolledSubjects.useQuery(undefined, {
@@ -56,9 +57,10 @@ export default function StudentForum() {
       setShowNewTopic(false);
       setNewTopicTitle("");
       setNewTopicContent("");
+      setTopicError(null);
       sonnerToast.success("Dúvida enviada!", { description: "O professor será notificado." });
     },
-    onError: (e) => sonnerToast.error("Erro", { description: e.message }),
+    onError: (e) => { sonnerToast.error("Erro", { description: e.message }); setTopicError(e.message); },
   });
 
   const reply = trpc.forum.replyAsStudent.useMutation({
@@ -197,11 +199,19 @@ export default function StudentForum() {
                   rows={4}
                   className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary resize-none mb-3"
                 />
+                {topicError && (
+                  <p className="text-sm text-destructive mb-2">{topicError}</p>
+                )}
                 <div className="flex gap-2 justify-end">
-                  <Button variant="ghost" onClick={() => setShowNewTopic(false)}>Cancelar</Button>
+                  <Button variant="ghost" onClick={() => { setShowNewTopic(false); setTopicError(null); }}>Cancelar</Button>
                   <Button
-                    onClick={() => createTopic.mutate({ subjectId: selectedSubjectId!, title: newTopicTitle, content: newTopicContent })}
-                    disabled={!newTopicTitle.trim() || !newTopicContent.trim() || createTopic.isPending}
+                    onClick={() => {
+                      if (!newTopicTitle.trim()) { setTopicError("O título é obrigatório."); return; }
+                      if (!newTopicContent.trim()) { setTopicError("A descrição da dúvida é obrigatória."); return; }
+                      setTopicError(null);
+                      createTopic.mutate({ subjectId: selectedSubjectId!, title: newTopicTitle, content: newTopicContent });
+                    }}
+                    disabled={createTopic.isPending}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
                   >
                     {createTopic.isPending ? "Enviando..." : "Enviar Dúvida"}
@@ -219,10 +229,10 @@ export default function StudentForum() {
                   className="w-full flex items-start gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 hover:bg-accent/5 transition-all text-left"
                 >
                   <div className={`mt-1 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    t.isClosed ? 'bg-muted' : t.bestReplyId ? 'bg-green-100 dark:bg-green-900/20' : 'bg-primary/10'
+                    t.isClosed ? 'bg-muted' : t.bestReplyId ? 'bg-primary/10' : 'bg-primary/10'
                   }`}>
                     <MessageSquare className={`w-5 h-5 ${
-                      t.isClosed ? 'text-muted-foreground' : t.bestReplyId ? 'text-green-600 dark:text-green-400' : 'text-primary'
+                      t.isClosed ? 'text-muted-foreground' : 'text-primary'
                     }`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -230,9 +240,7 @@ export default function StudentForum() {
                       {t.isPinned && <Pin className="w-3.5 h-3.5 text-amber-500" />}
                       {t.isClosed && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
                       {t.bestReplyId && (
-                        <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800 text-xs py-0">
-                          Resolvido
-                        </Badge>
+                        <Badge variant="outline" className="text-primary border-primary/30 text-xs py-0">Resolvido</Badge>
                       )}
                       <span className="font-semibold text-foreground truncate">{t.title}</span>
                     </div>
@@ -291,11 +299,11 @@ export default function StudentForum() {
           {topic && (
             <div className="p-5 rounded-xl bg-card border border-border mb-6">
               <div className="flex items-center gap-2 mb-3 flex-wrap">
-                {topic.isPinned && <Badge className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400">Fixado</Badge>}
+                {topic.isPinned && <Badge variant="outline" className="text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700">Fixado</Badge>}
                 {topic.isClosed && <Badge className="bg-muted text-muted-foreground">Fechado</Badge>}
-                {topic.bestReplyId && <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400">Resolvido</Badge>}
+                {topic.bestReplyId && <Badge variant="outline" className="text-primary border-primary/30">Resolvido</Badge>}
                 <span className="text-xs text-muted-foreground">{formatDate(topic.createdAt)}</span>
-                <span className={`text-xs font-medium ${topic.authorType === 'teacher' ? 'text-primary' : 'text-blue-600 dark:text-blue-400'}`}>
+                <span className={`text-xs font-medium ${topic.authorType === 'teacher' ? 'text-primary' : 'text-muted-foreground'}`}>
                   {topic.authorType === 'teacher' ? 'Professor' : 'Aluno'}
                 </span>
               </div>
@@ -308,12 +316,12 @@ export default function StudentForum() {
             {replies.map((r: ReplyType) => (
               <div key={r.id} className={`p-4 rounded-xl border ${
                 r.isBestAnswer
-                  ? 'bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800'
+                  ? 'bg-primary/5 border-primary/30'
                   : 'bg-card border-border'
               }`}>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   {r.isBestAnswer && (
-                    <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
+                    <span className="flex items-center gap-1 text-xs text-primary font-medium">
                       <CheckCircle className="w-3.5 h-3.5" /> Melhor Resposta
                     </span>
                   )}
@@ -323,7 +331,7 @@ export default function StudentForum() {
                     </span>
                   )}
                   {r.authorType === 'student' && (
-                    <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Aluno</span>
+                    <span className="text-xs text-muted-foreground font-medium">Aluno</span>
                   )}
                   <span className="text-xs text-muted-foreground">{formatDate(r.createdAt)}</span>
                 </div>
@@ -363,7 +371,7 @@ export default function StudentForum() {
               </div>
             </div>
           ) : topic?.isClosed ? (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-orange-50 border border-orange-200 dark:bg-orange-900/10 dark:border-orange-800 text-orange-600 dark:text-orange-400">
+            <div className="flex items-center gap-2 p-4 rounded-xl bg-muted border border-border text-muted-foreground">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm">Este tópico está fechado.</span>
             </div>

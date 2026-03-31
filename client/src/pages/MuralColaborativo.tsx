@@ -433,9 +433,19 @@ export default function MuralColaborativo() {
     },
   });
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const setLocked = trpc.mural.setLocked.useMutation({ onSuccess: () => refetchMural() });
   const archiveMural = trpc.mural.archive.useMutation({
     onSuccess: () => { setView("list"); refetchList(); toast.success("Mural arquivado."); },
+  });
+  const deleteMuralMutation = trpc.mural.deleteMural.useMutation({
+    onSuccess: () => {
+      setConfirmDeleteId(null);
+      if (view === "board") setView("list");
+      refetchList();
+      toast.success("Mural excluído com sucesso.");
+    },
+    onError: (err: any) => toast.error(err?.message || "Erro ao excluir mural."),
   });
   const addCard = trpc.mural.addCard.useMutation({
     onSuccess: () => { setShowAddCardDialog(false); setNewCard({ text: "", color: "yellow" }); refetchMural(); },
@@ -557,21 +567,30 @@ export default function MuralColaborativo() {
             {(muralList as any[]).map((m: any) => (
               <div
                 key={m.id}
-                className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer relative group"
                 onClick={() => openMural(m.id)}
               >
                 <div className="flex items-start justify-between">
-                  <h3 className="font-semibold text-gray-900 line-clamp-1">{m.title}</h3>
-                  {m.isLocked && <Lock className="h-4 w-4 text-orange-500 shrink-0" />}
+                  <h3 className="font-semibold text-foreground line-clamp-1 pr-8">{m.title}</h3>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {m.isLocked && <Lock className="h-4 w-4 text-orange-500" />}
+                    <button
+                      className="p-1 rounded hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(m.id); }}
+                      title="Excluir mural"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
                 {m.description && (
-                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">{m.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{m.description}</p>
                 )}
                 <div className="mt-3 flex items-center gap-2 flex-wrap">
                   {m.subjectName && <Badge variant="secondary" className="text-xs">{m.subjectName}</Badge>}
                   {m.className && <Badge variant="outline" className="text-xs">{m.className}</Badge>}
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   {new Date(m.createdAt).toLocaleDateString("pt-BR")}
                 </p>
               </div>
@@ -769,10 +788,16 @@ export default function MuralColaborativo() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600"
+                className="text-orange-600"
                 onClick={() => mural && archiveMural.mutate({ id: mural.id })}
               >
                 <Archive className="h-4 w-4 mr-2" /> Arquivar Mural
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => mural && setConfirmDeleteId(mural.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" /> Excluir Mural
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -974,6 +999,30 @@ export default function MuralColaborativo() {
               }}
             >
               <Play className="h-4 w-4" /> Iniciar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog: Confirmar Exclusão de Mural */}
+      <Dialog open={!!confirmDeleteId} onOpenChange={(open) => { if (!open) setConfirmDeleteId(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600 flex items-center gap-2">
+              <Trash2 className="h-5 w-5" /> Excluir Mural
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja excluir este mural permanentemente? Todos os cards, colunas e votos serão removidos e esta ação <strong>não pode ser desfeita</strong>.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={deleteMuralMutation.isPending}
+              onClick={() => confirmDeleteId && deleteMuralMutation.mutate({ id: confirmDeleteId })}
+            >
+              {deleteMuralMutation.isPending ? "Excluindo..." : "Excluir permanentemente"}
             </Button>
           </DialogFooter>
         </DialogContent>

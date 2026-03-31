@@ -12027,21 +12027,21 @@ Retorne em formato JSON com estrutura:
   // FÓRUM DE DISCUSSÃO POR DISCIPLINA
   // ============================================================
   forum: router({
-    // Listar tópicos de uma disciplina
+    // Listar tópicos com autores (professor)
     listTopics: publicProcedure
       .input(z.object({ subjectId: z.number(), classId: z.number().optional() }))
       .query(async ({ input }) => {
-        return db.listForumTopics(input.subjectId, input.classId);
+        return db.listForumTopicsWithAuthors(input.subjectId, input.classId);
       }),
 
-    // Buscar tópico com respostas
+    // Buscar tópico com respostas e autores
     getTopic: publicProcedure
       .input(z.object({ topicId: z.number() }))
       .query(async ({ input }) => {
         const topic = await db.getForumTopic(input.topicId);
         if (!topic) throw new TRPCError({ code: 'NOT_FOUND', message: 'Tópico não encontrado' });
         await db.incrementForumTopicView(input.topicId);
-        const replies = await db.listForumReplies(input.topicId);
+        const replies = await db.listForumRepliesWithAuthors(input.topicId);
         return { topic, replies };
       }),
 
@@ -12050,15 +12050,19 @@ Retorne em formato JSON com estrutura:
       .input(z.object({
         subjectId: z.number(),
         classId: z.number().optional(),
-        title: z.string().min(3).max(255),
-        content: z.string().min(10),
+        title: z.string().min(1).max(255),
+        content: z.string().min(1),
+        forumType: z.enum(['general', 'qa', 'single']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return db.createForumTopic({
+        const result = await db.createForumTopic({
           ...input,
           authorType: 'teacher',
           authorUserId: ctx.user.id,
         });
+        // Auto-inscrever autor
+        try { await db.toggleForumSubscription({ topicId: (result as any).insertId, authorType: 'teacher', authorUserId: ctx.user.id }); } catch {}
+        return result;
       }),
 
     // Criar tópico (aluno)
@@ -12066,8 +12070,8 @@ Retorne em formato JSON com estrutura:
       .input(z.object({
         subjectId: z.number(),
         classId: z.number().optional(),
-        title: z.string().min(3).max(255),
-        content: z.string().min(10),
+        title: z.string().min(1).max(255),
+        content: z.string().min(1),
       }))
       .mutation(async ({ ctx, input }) => {
         const result = await db.createForumTopic({
@@ -12075,6 +12079,8 @@ Retorne em formato JSON com estrutura:
           authorType: 'student',
           authorStudentId: ctx.studentSession.studentId,
         });
+        // Auto-inscrever autor
+        try { await db.toggleForumSubscription({ topicId: (result as any).insertId, authorType: 'student', authorStudentId: ctx.studentSession.studentId }); } catch {}
         // Notificar professor
         try {
           const subject = await db.getSubjectById(input.subjectId, 0);
@@ -12084,7 +12090,7 @@ Retorne em formato JSON com estrutura:
               type: 'new_announcement',
               title: 'Nova dúvida no Fórum',
               message: `Um aluno criou um novo tópico em ${subject.name}: "${input.title}"`,
-              link: `/forum/${input.subjectId}/${(result as any).insertId}`,
+              link: `/teacher-forum`,
             });
           }
         } catch {}
@@ -12099,11 +12105,28 @@ Retorne em formato JSON com estrutura:
         parentReplyId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return db.createForumReply({
+        const result = await db.createForumReply({
           ...input,
           authorType: 'teacher',
           authorUserId: ctx.user.id,
         });
+        // Notificar inscritos (exceto o próprio autor)
+        try {
+          const subscribers = await db.getForumTopicSubscribers(input.topicId);
+          const topic = await db.getForumTopic(input.topicId);
+          for (const sub of subscribers) {
+            if (sub.authorType === 'teacher' && sub.authorUserId && sub.authorUserId !== ctx.user.id) {
+              await db.createNotification({
+                userId: sub.authorUserId,
+                type: 'new_announcement',
+                title: 'Nova resposta no Fórum',
+                message: `O professor respondeu ao tópico "${topic?.title || 'Tópico'}"`,
+                link: `/teacher-forum`,
+              });
+            }
+          }
+        } catch {}
+        return result;
       }),
 
     // Responder tópico (aluno)
@@ -12114,11 +12137,111 @@ Retorne em formato JSON com estrutura:
         parentReplyId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return db.createForumReply({
+        const result = await db.createForumReply({
           ...input,
           authorType: 'student',
           authorStudentId: ctx.studentSession.studentId,
         });
+        // Notificar professor do tópico
+        try {
+          const topic = await db.getForumTopic(input.topicId);
+          if (topic?.authorType === 'teacher' && topic.authorUserId) {
+            await db.createNotification({
+              userId: topic.authorUserId,
+              type: 'new_announcement',
+              title: 'Nova resposta no Fórum',
+              message: `Um aluno respondeu ao tópico "${topic.title}"`,
+              link: `/teacher-forum`,
+            });
+          }
+        } catch {}
+        return result;
+      }),
+
+    // Curtir/descurtir tópico ou resposta (professor)
+    likeAsTeacher: protectedProcedure
+      .input(z.object({
+        targetType: z.enum(['topic', 'reply']),
+        targetId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.toggleForumLike({ ...input, authorType: 'teacher', authorUserId: ctx.user.id });
+      }),
+
+    // Curtir/descurtir tópico ou resposta (aluno)
+    likeAsStudent: studentProcedure
+      .input(z.object({
+        targetType: z.enum(['topic', 'reply']),
+        targetId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.toggleForumLike({ ...input, authorType: 'student', authorStudentId: ctx.studentSession.studentId });
+      }),
+
+    // Verificar curtidas do usuário (professor)
+    getUserLikesTeacher: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.getForumLikesForUser(input.topicId, 'teacher', ctx.user.id);
+      }),
+
+    // Verificar curtidas do usuário (aluno)
+    getUserLikesStudent: studentProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.getForumLikesForUser(input.topicId, 'student', ctx.studentSession.studentId);
+      }),
+
+    // Inscrever/desinscrever em tópico (professor)
+    subscribeAsTeacher: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.toggleForumSubscription({ topicId: input.topicId, authorType: 'teacher', authorUserId: ctx.user.id });
+      }),
+
+    // Inscrever/desinscrever em tópico (aluno)
+    subscribeAsStudent: studentProcedure
+      .input(z.object({ topicId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.toggleForumSubscription({ topicId: input.topicId, authorType: 'student', authorStudentId: ctx.studentSession.studentId });
+      }),
+
+    // Verificar inscrição (professor)
+    isSubscribedTeacher: protectedProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return { subscribed: await db.isForumSubscribed(input.topicId, 'teacher', ctx.user.id) };
+      }),
+
+    // Verificar inscrição (aluno)
+    isSubscribedStudent: studentProcedure
+      .input(z.object({ topicId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return { subscribed: await db.isForumSubscribed(input.topicId, 'student', ctx.studentSession.studentId) };
+      }),
+
+    // Editar resposta (professor)
+    editReplyAsTeacher: protectedProcedure
+      .input(z.object({ replyId: z.number(), content: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        await db.editForumReply(input.replyId, input.content);
+        return { success: true };
+      }),
+
+    // Editar resposta (aluno)
+    editReplyAsStudent: studentProcedure
+      .input(z.object({ replyId: z.number(), content: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        await db.editForumReply(input.replyId, input.content);
+        return { success: true };
+      }),
+
+    // Editar tópico (professor)
+    editTopicAsTeacher: protectedProcedure
+      .input(z.object({ topicId: z.number(), title: z.string().min(1), content: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        await db.editForumTopic(input.topicId, input.title, input.content);
+        return { success: true };
       }),
 
     // Fixar/desafixar tópico (professor)
@@ -12155,6 +12278,14 @@ Retorne em formato JSON com estrutura:
 
     // Deletar resposta (professor)
     deleteReply: protectedProcedure
+      .input(z.object({ replyId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteForumReply(input.replyId);
+        return { success: true };
+      }),
+
+    // Deletar resposta (aluno - própria)
+    deleteReplyAsStudent: studentProcedure
       .input(z.object({ replyId: z.number() }))
       .mutation(async ({ input }) => {
         await db.deleteForumReply(input.replyId);
