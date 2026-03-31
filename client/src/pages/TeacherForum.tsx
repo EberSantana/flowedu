@@ -4,6 +4,7 @@ import {
   MessageSquare, Plus, Settings, Trash2, Pin, Lock, Unlock,
   ChevronRight, ArrowLeft, Send, Star, Award, Users, FileText,
   Loader2, BookOpen, Edit2, X, Check, Paperclip, Eye,
+  MessageCircle, Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -123,7 +124,21 @@ export default function TeacherForum() {
     setShowGradeModal(true);
   }
 
-  const forumTypeLabel = { general: "Fórum geral", single_topic: "Uma discussão", qa: "Perguntas e Respostas" };
+  const forumTypeLabel: Record<string, string> = { general: "Fórum geral", single_topic: "Uma discussão", qa: "Perguntas e Respostas" };
+
+  function timeAgo(dateStr: string | null | undefined): string {
+    if (!dateStr) return "—";
+    const d = new Date(dateStr);
+    const diff = Date.now() - d.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "agora";
+    if (mins < 60) return `há ${mins} min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `há ${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return `há ${days}d`;
+    return d.toLocaleDateString("pt-BR");
+  }
   const aggLabel = { max: "Nota máxima", avg: "Média", sum: "Soma", first: "Primeira nota", last: "Última nota" };
 
   return (
@@ -189,62 +204,97 @@ export default function TeacherForum() {
                 <ArrowLeft className="w-4 h-4" /> Voltar às Disciplinas
               </button>
 
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-foreground">Fóruns — {selectedSubjectName}</h1>
-                    <p className="text-sm text-muted-foreground">{forums?.length ?? 0} fórum(s) criado(s)</p>
-                  </div>
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <MessageSquare className="w-6 h-6 text-primary" />
+                    {selectedSubjectName}
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-0.5">{forums?.length ?? 0} fórum(s) disponível(is)</p>
                 </div>
                 <Button onClick={() => setShowCreateForum(true)} className="gap-2">
                   <Plus className="w-4 h-4" /> Novo Fórum
                 </Button>
               </div>
 
-              {/* Cards de fóruns */}
-              <div className="space-y-3">
-                {forums?.map(forum => (
-                  <div key={forum.id} className="border border-border rounded-lg bg-card overflow-hidden">
-                    <div className="flex items-center gap-4 p-4 border-l-4 border-l-primary">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-semibold text-foreground">{forum.title}</h3>
-                          <Badge variant="outline" className="text-xs">{forumTypeLabel[forum.forumType as keyof typeof forumTypeLabel]}</Badge>
-                          {forum.gradeEnabled && <Badge className="text-xs bg-amber-100 text-amber-700 border-amber-200">Avaliado — Nota {forum.gradeMax}</Badge>}
-                          {!forum.isOpen && <Badge variant="destructive" className="text-xs">Fechado</Badge>}
+              {/* Tabela de fóruns estilo Moodle */}
+              {forums && forums.length > 0 ? (
+                <div className="border border-border rounded-md overflow-hidden">
+                  {/* Cabeçalho */}
+                  <div className="grid grid-cols-[1fr_80px_100px_auto] bg-muted/50 border-b border-border px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <span>Fórum</span>
+                    <span className="text-center">Tópicos</span>
+                    <span className="text-center">Tipo</span>
+                    <span className="text-center w-28">Ações</span>
+                  </div>
+                  {forums.map((forum, idx) => (
+                    <div key={forum.id}
+                      className={`grid grid-cols-[1fr_80px_100px_auto] items-center px-4 py-4 ${idx < forums.length - 1 ? "border-b border-border" : ""} hover:bg-accent/20 transition-colors`}>
+                      {/* Fórum info */}
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <MessageCircle className="w-5 h-5 text-primary" />
                         </div>
-                        {forum.description && <p className="text-sm text-muted-foreground mt-1 truncate">{forum.description}</p>}
+                        <div className="min-w-0">
+                          <button
+                            className="font-semibold text-foreground hover:text-primary transition-colors text-left"
+                            onClick={() => { setSelectedForumId(forum.id); setSelectedForumTitle(forum.title); setView("topics"); }}>
+                            {forum.title}
+                          </button>
+                          {forum.description && (
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{forum.description}</p>
+                          )}
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {forum.gradeEnabled && (
+                              <span className="inline-flex items-center gap-1 text-xs text-amber-600">
+                                <Award className="w-3 h-3" /> Avaliado — Nota {forum.gradeMax}
+                              </span>
+                            )}
+                            {!forum.isOpen && (
+                              <Badge variant="destructive" className="text-xs py-0">Fechado</Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Tópicos */}
+                      <div className="text-center">
+                        <button
+                          className="text-sm font-medium text-primary hover:underline"
+                          onClick={() => { setSelectedForumId(forum.id); setSelectedForumTitle(forum.title); setView("topics"); }}>
+                          {(forum as any).topicCount ?? 0}
+                        </button>
+                      </div>
+                      {/* Tipo */}
+                      <div className="text-center">
+                        <Badge variant="secondary" className="text-xs">
+                          {forumTypeLabel[forum.forumType] || forum.forumType}
+                        </Badge>
+                      </div>
+                      {/* Ações */}
+                      <div className="flex items-center gap-1 w-28 justify-end">
                         {forum.gradeEnabled && (
-                          <Button size="sm" variant="outline" className="gap-1 text-amber-600 border-amber-300"
+                          <Button size="sm" variant="ghost" className="h-8 px-2 text-amber-600 hover:text-amber-700"
+                            title="Ver notas"
                             onClick={() => { setSelectedForumId(forum.id); setSelectedForumTitle(forum.title); setView("grades"); }}>
-                            <Award className="w-3 h-3" /> Notas
+                            <Award className="w-4 h-4" />
                           </Button>
                         )}
-                        <Button size="sm" variant="outline" className="gap-1"
-                          onClick={() => { setSelectedForumId(forum.id); setSelectedForumTitle(forum.title); setView("topics"); }}>
-                          <MessageSquare className="w-3 h-3" /> Tópicos
-                        </Button>
-                        <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive"
+                        <Button size="sm" variant="ghost" className="h-8 px-2 text-destructive hover:text-destructive"
+                          title="Excluir fórum"
                           onClick={() => { if (confirm("Excluir este fórum e todos os seus tópicos?")) deleteForumMutation.mutate({ forumId: forum.id }); }}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {(!forums || forums.length === 0) && (
-                  <div className="text-center py-16 text-muted-foreground border border-dashed rounded-lg">
-                    <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p className="font-medium">Nenhum fórum criado ainda</p>
-                    <p className="text-sm mt-1">Clique em "Novo Fórum" para criar o primeiro</p>
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16 text-muted-foreground border border-dashed border-border rounded-md">
+                  <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="font-medium">Nenhum fórum criado ainda</p>
+                  <p className="text-sm mt-1">Clique em "Novo Fórum" para criar o primeiro</p>
+                </div>
+              )}
             </>
           )}
 
@@ -255,61 +305,99 @@ export default function TeacherForum() {
                 <ArrowLeft className="w-4 h-4" /> Voltar aos Fóruns
               </button>
 
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">{selectedForumTitle}</h1>
-                  <p className="text-sm text-muted-foreground">{topics?.length ?? 0} tópico(s)</p>
+                  <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <MessageCircle className="w-6 h-6 text-primary" />
+                    {selectedForumTitle}
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-0.5">{topics?.length ?? 0} tópico(s)</p>
                 </div>
                 <Button onClick={() => setShowCreateTopic(true)} className="gap-2">
                   <Plus className="w-4 h-4" /> Novo Tópico
                 </Button>
               </div>
 
-              <div className="space-y-3">
-                {topics?.map(topic => (
-                  <div key={topic.id}
-                    className={`border rounded-lg bg-card overflow-hidden border-l-4 ${topic.isPinned ? "border-l-amber-400" : topic.isClosed ? "border-l-gray-300" : "border-l-primary"}`}>
-                    <div className="flex items-center gap-4 p-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {topic.isPinned && <Pin className="w-3 h-3 text-amber-500" />}
-                          {topic.isClosed && <Lock className="w-3 h-3 text-gray-400" />}
-                          <h3 className="font-medium text-foreground truncate">{topic.title}</h3>
+              {/* Tabela de tópicos estilo Moodle */}
+              {topics && topics.length > 0 ? (
+                <div className="border border-border rounded-md overflow-hidden">
+                  {/* Cabeçalho */}
+                  <div className="grid grid-cols-[1fr_110px_110px_70px_auto] bg-muted/50 border-b border-border px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <span>Discussão</span>
+                    <span className="text-center">Iniciado por</span>
+                    <span className="text-center">Última resp.</span>
+                    <span className="text-center">Respostas</span>
+                    <span className="text-center w-28">Ações</span>
+                  </div>
+                  {topics.map((topic, idx) => (
+                    <div key={topic.id}
+                      className={`grid grid-cols-[1fr_110px_110px_70px_auto] items-center px-4 py-3 ${idx < topics.length - 1 ? "border-b border-border" : ""} hover:bg-accent/20 transition-colors`}>
+                      {/* Discussão */}
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex-shrink-0">
+                          {topic.isClosed
+                            ? <Lock className="w-4 h-4 text-muted-foreground" />
+                            : topic.isPinned
+                              ? <Pin className="w-4 h-4 text-amber-500" />
+                              : <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                          }
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{topic.viewCount} visualizações</span>
-                          <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{topic.replyCount} respostas</span>
-                          <span>{new Date(topic.createdAt).toLocaleDateString("pt-BR")}</span>
+                        <div className="min-w-0">
+                          <button
+                            className="font-medium text-sm text-foreground hover:text-primary transition-colors text-left truncate block max-w-full"
+                            onClick={() => { setSelectedTopicId(topic.id); setSelectedTopicTitle(topic.title); setView("topic_detail"); }}>
+                            {topic.title}
+                          </button>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                            <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{topic.viewCount}</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Button size="sm" variant="ghost" title={topic.isPinned ? "Desafixar" : "Fixar"}
+                      {/* Iniciado por */}
+                      <div className="text-center px-2">
+                        <p className="text-xs text-foreground truncate">{(topic as any).authorName || "Professor"}</p>
+                        <p className="text-xs text-muted-foreground">{timeAgo(topic.createdAt)}</p>
+                      </div>
+                      {/* Última resposta */}
+                      <div className="text-center px-2">
+                        {(topic as any).lastReplyAt ? (
+                          <>
+                            <p className="text-xs text-foreground truncate">{(topic as any).lastReplyAuthor || "—"}</p>
+                            <p className="text-xs text-muted-foreground">{timeAgo((topic as any).lastReplyAt)}</p>
+                          </>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">—</p>
+                        )}
+                      </div>
+                      {/* Respostas */}
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-foreground">{topic.replyCount ?? 0}</span>
+                      </div>
+                      {/* Ações */}
+                      <div className="flex items-center gap-1 w-28 justify-end">
+                        <Button size="sm" variant="ghost" className="h-8 px-2" title={topic.isPinned ? "Desafixar" : "Fixar"}
                           onClick={() => pinTopicMutation.mutate({ topicId: topic.id, isPinned: !topic.isPinned })}>
                           <Pin className={`w-4 h-4 ${topic.isPinned ? "text-amber-500" : ""}`} />
                         </Button>
-                        <Button size="sm" variant="ghost" title={topic.isClosed ? "Reabrir" : "Fechar"}
+                        <Button size="sm" variant="ghost" className="h-8 px-2" title={topic.isClosed ? "Reabrir" : "Fechar"}
                           onClick={() => closeTopicMutation.mutate({ topicId: topic.id, isClosed: !topic.isClosed })}>
                           {topic.isClosed ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                         </Button>
-                        <Button size="sm" variant="ghost" className="text-destructive"
+                        <Button size="sm" variant="ghost" className="h-8 px-2 text-destructive"
                           onClick={() => { if (confirm("Excluir este tópico?")) deleteTopicMutation.mutate({ topicId: topic.id }); }}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
-                        <Button size="sm" variant="outline" className="gap-1"
-                          onClick={() => { setSelectedTopicId(topic.id); setSelectedTopicTitle(topic.title); setView("topic_detail"); }}>
-                          Ver <ChevronRight className="w-3 h-3" />
-                        </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {(!topics || topics.length === 0) && (
-                  <div className="text-center py-16 text-muted-foreground border border-dashed rounded-lg">
-                    <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>Nenhum tópico ainda. Crie o primeiro!</p>
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16 text-muted-foreground border border-dashed border-border rounded-md">
+                  <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p>Nenhum tópico ainda. Crie o primeiro!</p>
+                </div>
+              )}
+
             </>
           )}
 
