@@ -145,8 +145,8 @@ export default function TeacherForum() {
           {view === "subjects" && (
             <>
               <div className="flex items-center gap-3 mb-2 mt-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">Fórum de Discussão</h1>
@@ -191,8 +191,8 @@ export default function TeacherForum() {
 
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold text-foreground">Fóruns — {selectedSubjectName}</h1>
@@ -208,7 +208,7 @@ export default function TeacherForum() {
               <div className="space-y-3">
                 {forums?.map(forum => (
                   <div key={forum.id} className="border border-border rounded-lg bg-card overflow-hidden">
-                    <div className="flex items-center gap-4 p-4 border-l-4 border-l-blue-500">
+                    <div className="flex items-center gap-4 p-4 border-l-4 border-l-primary">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-foreground">{forum.title}</h3>
@@ -268,7 +268,7 @@ export default function TeacherForum() {
               <div className="space-y-3">
                 {topics?.map(topic => (
                   <div key={topic.id}
-                    className={`border rounded-lg bg-card overflow-hidden border-l-4 ${topic.isPinned ? "border-l-amber-400" : topic.isClosed ? "border-l-gray-300" : "border-l-blue-400"}`}>
+                    className={`border rounded-lg bg-card overflow-hidden border-l-4 ${topic.isPinned ? "border-l-amber-400" : topic.isClosed ? "border-l-gray-300" : "border-l-primary"}`}>
                     <div className="flex items-center gap-4 p-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -322,7 +322,7 @@ export default function TeacherForum() {
 
               {/* Post principal */}
               <div className="border border-border rounded-lg bg-card overflow-hidden mb-4">
-                <div className="border-l-4 border-l-blue-500 p-5">
+                <div className="border-l-4 border-l-primary p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <h2 className="text-xl font-bold text-foreground mb-1">{topicDetail.topic.title}</h2>
@@ -348,7 +348,7 @@ export default function TeacherForum() {
               {/* Respostas */}
               <div className="space-y-3 mb-6">
                 {topicDetail.replies?.map((reply: any) => (
-                  <div key={reply.id} className={`border rounded-lg bg-card overflow-hidden border-l-4 ${reply.isBestAnswer ? "border-l-green-500" : reply.authorType === "teacher" ? "border-l-blue-400" : "border-l-gray-300"}`}>
+                  <div key={reply.id} className={`border rounded-lg bg-card overflow-hidden border-l-4 ${reply.isBestAnswer ? "border-l-green-500" : reply.authorType === "teacher" ? "border-l-primary" : "border-l-gray-300"}`}>
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
                         {reply.isBestAnswer && <Badge className="bg-green-100 text-green-700 text-xs">Melhor Resposta</Badge>}
@@ -359,7 +359,7 @@ export default function TeacherForum() {
                       <p className="text-sm text-foreground whitespace-pre-wrap">{reply.content}</p>
                       {reply.attachmentUrl && (
                         <a href={reply.attachmentUrl} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-1 mt-2 text-xs text-blue-600 hover:underline">
+                          className="flex items-center gap-1 mt-2 text-xs text-primary hover:underline">
                           <Paperclip className="w-3 h-3" /> {reply.attachmentName || "Anexo"}
                         </a>
                       )}
@@ -418,7 +418,7 @@ export default function TeacherForum() {
 
               {/* Cards de estatísticas */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="border border-border rounded-lg bg-card p-4 border-l-4 border-l-blue-500">
+                <div className="border border-border rounded-lg bg-card p-4 border-l-4 border-l-primary">
                   <p className="text-sm text-muted-foreground">Total de Alunos</p>
                   <p className="text-2xl font-bold mt-1">{enrolledStudents?.length ?? 0}</p>
                 </div>

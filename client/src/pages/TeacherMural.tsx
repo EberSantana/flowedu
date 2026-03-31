@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { Link } from "wouter";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -164,17 +169,34 @@ export default function TeacherMural() {
   const selectedMural = muralDetail as Mural | undefined;
 
   return (
-    <div className="space-y-6">
+    <>
+      <Sidebar />
+      <PageWrapper className="min-h-screen bg-background">
+      <div className="container mx-auto py-6 px-4">
+        {/* Breadcrumb */}
+        <Breadcrumb items={[
+          { label: "Início", href: "/" },
+          { label: "Conteúdo" },
+          { label: "Mural Colaborativo" },
+        ]} />
+
+        {/* Botão Voltar */}
+        <Link href="/dashboard">
+          <Button variant="ghost" size="sm" className="mb-4 mt-2">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Dashboard
+          </Button>
+        </Link>
+
+      <div className="space-y-6">
       {/* Cabeçalho */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Layout className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold text-foreground mb-1 flex items-center gap-3">
+            <Layout className="h-8 w-8 text-primary" />
             Mural Colaborativo
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Gerencie os murais interativos das suas turmas
-          </p>
+          <p className="text-muted-foreground">Gerencie os murais interativos das suas turmas</p>
         </div>
         <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
           <Plus className="h-4 w-4" />
@@ -454,5 +476,8 @@ export default function TeacherMural() {
         </DialogContent>
       </Dialog>
     </div>
+      </div>
+      </PageWrapper>
+    </>
   );
 }

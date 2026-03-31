@@ -28,9 +28,10 @@ export function MotivationalBanner({
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl mb-8 bg-gradient-to-r from-primary to-accent"
+      className="relative overflow-hidden rounded-2xl mb-8"
       style={{
-        boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+        background: "linear-gradient(135deg, oklch(32% .14 145) 0%, oklch(42% .14 145) 40%, oklch(55% .10 145) 100%)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
       }}
     >
       {/* Círculos decorativos de fundo */}
