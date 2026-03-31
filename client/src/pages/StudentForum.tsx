@@ -115,45 +115,35 @@ export default function StudentForum() {
 
   return (
     <StudentLayout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header gradiente padrão */}
-        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
-          <div className="container mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                  <MessageSquare className="h-8 w-8" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold">
-                    {view === "subjects" && "Fórum de Discussão"}
-                    {view === "forums" && `Fóruns — ${selectedSubjectName}`}
-                    {view === "topics" && selectedForumTitle}
-                    {view === "topic_detail" && selectedTopicTitle}
-                  </h1>
-                  <p className="text-primary-foreground/80 mt-1">
-                    {view === "subjects" && "Participe das discussões das suas disciplinas"}
-                    {view === "forums" && `Disciplina: ${selectedSubjectCode || selectedSubjectName}`}
-                    {view === "topics" && "Selecione um tópico para participar"}
-                    {view === "topic_detail" && "Leia e responda o tópico"}
-                  </p>
-                </div>
-              </div>
-              {/* Botão voltar */}
-              {view !== "subjects" && (
-                <Button variant="outline" size="sm" className="bg-white/10 border-white/30 text-white hover:bg-white/20" onClick={() => {
-                  if (view === "topic_detail") { setView("topics"); setSelectedTopicId(null); }
-                  else if (view === "topics") { setView("forums"); setSelectedForumId(null); }
-                  else { setView("subjects"); setSelectedSubjectId(null); }
-                }}>
-                  <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
-                </Button>
-              )}
-            </div>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão voltar */}
+          {view !== "subjects" && (
+            <Button variant="ghost" size="sm" className="mb-4" onClick={() => {
+              if (view === "topic_detail") { setView("topics"); setSelectedTopicId(null); }
+              else if (view === "topics") { setView("forums"); setSelectedForumId(null); }
+              else { setView("subjects"); setSelectedSubjectId(null); }
+            }}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+            </Button>
+          )}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-foreground mb-1 flex items-center gap-3">
+              <MessageSquare className="h-8 w-8 text-primary" />
+              {view === "subjects" && "Fórum de Discussão"}
+              {view === "forums" && `Fóruns — ${selectedSubjectName}`}
+              {view === "topics" && selectedForumTitle}
+              {view === "topic_detail" && selectedTopicTitle}
+            </h1>
+            <p className="text-muted-foreground">
+              {view === "subjects" && "Participe das discussões das suas disciplinas"}
+              {view === "forums" && `Disciplina: ${selectedSubjectCode || selectedSubjectName}`}
+              {view === "topics" && "Selecione um tópico para participar"}
+              {view === "topic_detail" && "Leia e responda o tópico"}
+            </p>
           </div>
-        </div>
         {/* Breadcrumb */}
-        <div className="p-6 max-w-5xl mx-auto w-full">
+        <div className="max-w-5xl w-full">
         {renderBreadcrumb()}
 
         {/* ══════════════════════════════════════════════════════════
@@ -404,6 +394,8 @@ export default function StudentForum() {
         )}
 
         </div>
+        </div>
+        </div>
 
       {/* Modal: Criar Tópico */}
       <Dialog open={showCreateTopic} onOpenChange={setShowCreateTopic}>
@@ -442,7 +434,6 @@ export default function StudentForum() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </div>
     </StudentLayout>
   );
 }

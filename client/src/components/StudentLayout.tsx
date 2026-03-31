@@ -23,7 +23,8 @@ import {
   ClipboardCheck,
   Smartphone,
   BookMarked,
-  Activity
+  Activity,
+  Layout
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -128,6 +129,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       items: [
         { icon: MessageCircle, label: "Dúvidas", path: "/student/doubts", badge: unseenAnswersCount },
         { icon: MessageSquare, label: "Fórum de Discussão", path: "/student/forum" },
+        { icon: Layout, label: "Mural Colaborativo", path: "/student/mural" },
         { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
       ],
     },
