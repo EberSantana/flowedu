@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, email, role, approvalStatus, active, loginMethod, passwordHash FROM users WHERE email = 'demo@flowedu.app';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, email, role, approvalStatus, active, loginMethod, passwordHash FROM users WHERE email = 'demo@flowedu.app';",
+  "rows": [
+    {
+      "id": "3480001",
+      "name": "Professor Demo",
+      "email": "demo@flowedu.app",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "active": "1",
+      "loginMethod": "password",
+      "passwordHash": "$2b$10$lcWn7OC7AaR09AklVQ98dOCu8qGHDtvrGif9wLV7Z9kcwYMbtW2xm"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tapprovalStatus\tactive\tloginMethod\tpasswordHash\n3480001\tProfessor Demo\tdemo@flowedu.app\tadmin\tapproved\t1\tpassword\t$2b$10$lcWn7OC7AaR09AklVQ98dOCu8qGHDtvrGif9wLV7Z9kcwYMbtW2xm\n",
+  "stderr": "",
+  "execution_time_ms": 71
+}

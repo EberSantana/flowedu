@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, email, role, approvalStatus, active FROM users WHERE email = 'professor.demo@flowedu.app' OR name LIKE '%Demo%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4EmYiUJsZhACerp.0e9436e27250 --database c6FhCpifoFzEQqXNtsKEU6 --execute SELECT id, name, email, role, approvalStatus, active FROM users WHERE email = 'professor.demo@flowedu.app' OR name LIKE '%Demo%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "3480001",
+      "name": "Professor Demo",
+      "email": "demo@flowedu.app",
+      "role": "admin",
+      "approvalStatus": "approved",
+      "active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tapprovalStatus\tactive\n3480001\tProfessor Demo\tdemo@flowedu.app\tadmin\tapproved\t1\n",
+  "stderr": "",
+  "execution_time_ms": 111
+}
