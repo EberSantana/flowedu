@@ -3,13 +3,14 @@ import { trpc } from "@/lib/trpc";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { Link } from "wouter";
-import { ArrowLeft, Bell } from "lucide-react";
+import { useLocation } from "wouter";
+import { ArrowLeft, Bell, Filter, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -99,6 +100,7 @@ function timeAgo(date: Date | string | null | undefined): string {
 }
 
 export default function TeacherMural() {
+  const [, setLocation] = useLocation();
   const [selectedMuralId, setSelectedMuralId] = useState<number | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
@@ -190,59 +192,108 @@ export default function TeacherMural() {
   const repliedCards = selectedMural?.cards.filter(c => c.teacherReply).length ?? 0;
   const totalVotes = selectedMural?.cards.reduce((sum, c) => sum + c.voteCount, 0) ?? 0;
 
+  const totalMurals = (murals as any[]).length;
+  const activeMurals = (murals as any[]).filter((m: any) => !m.isLocked).length;
+  const lockedMurals = (murals as any[]).filter((m: any) => m.isLocked).length;
+
   return (
     <>
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4">
-          {/* Breadcrumb */}
-          <Breadcrumb items={[
-            { label: "Início", href: "/" },
-            { label: "Comunicação" },
-            { label: "Mural Colaborativo" },
-          ]} />
+          {/* Botão Voltar ao Dashboard */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-4"
+            onClick={() => setLocation("/dashboard")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Dashboard
+          </Button>
 
-          {/* Botão Voltar */}
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="mb-4 mt-2 gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar ao Dashboard
+          <Breadcrumb
+            items={[
+              { label: "Comunicação" },
+              { label: "Mural Colaborativo" },
+            ]}
+          />
+
+          {/* Header */}
+          <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <Layout className="w-8 h-8 text-primary" />
+                Mural Colaborativo
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Gerencie os murais interativos das suas turmas
+              </p>
+            </div>
+            <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Novo Mural
             </Button>
-          </Link>
+          </div>
+
+          {/* Cards de Estatísticas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card className="border-l-4 border-l-primary">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Inbox className="h-4 w-4 text-primary" />
+                  Total de Murais
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-foreground">{totalMurals}</div>
+                <p className="text-xs text-muted-foreground mt-1">Murais criados</p>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  Ativos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-foreground">{activeMurals}</div>
+                <p className="text-xs text-muted-foreground mt-1">Abertos para alunos</p>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-yellow-500">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-yellow-500" />
+                  Bloqueados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-foreground">{lockedMurals}</div>
+                <p className="text-xs text-muted-foreground mt-1">Sem interação de alunos</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filtro por disciplina */}
+          <div className="flex items-center gap-3 mb-6 bg-card p-4 rounded-lg border">
+            <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm font-medium text-muted-foreground">Filtrar:</span>
+            <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
+              <SelectTrigger className="w-[300px]">
+                <SelectValue placeholder="Todas as disciplinas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as disciplinas</SelectItem>
+                {(subjects as any[]).map((s: any) => (
+                  <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="space-y-6">
-            {/* Cabeçalho */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground mb-1 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Layout className="h-5 w-5 text-primary" />
-                  </div>
-                  Mural Colaborativo
-                </h1>
-                <p className="text-sm text-muted-foreground ml-12">Gerencie os murais interativos das suas turmas</p>
-              </div>
-              <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Mural
-              </Button>
-            </div>
-
-            {/* Filtro por disciplina */}
-            <div className="flex items-center gap-3">
-              <Label className="text-sm font-medium shrink-0">Filtrar por disciplina:</Label>
-              <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
-                <SelectTrigger className="w-56">
-                  <SelectValue placeholder="Todas as disciplinas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as disciplinas</SelectItem>
-                  {(subjects as any[]).map((s: any) => (
-                    <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
             {/* Lista de murais */}
             {!selectedMuralId ? (
