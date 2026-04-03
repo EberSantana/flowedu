@@ -223,6 +223,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <MessageSquare className="h-5 w-5" />,
         href: "/teacher-forum",
       },
+      {
+        label: "Glossário",
+        icon: <BookOpen className="h-5 w-5" />,
+        href: "/teacher-glossary",
+      },
     ],
   },
   {
