@@ -7753,3 +7753,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Frontend Professor: criar/gerenciar glossário com navegação por letras A-Z
 - [ ] Frontend Aluno: navegar por letras, adicionar termos ao glossário
 - [ ] Deploy no VPS
+
+## Organização de Materiais por Disciplina
+- [ ] Agrupar materiais por disciplina em pastas automáticas no frontend do professor
+- [ ] Agrupar materiais por disciplina em pastas automáticas no frontend do aluno
+- [ ] Associar materiais sem disciplina ao subjectId correto no banco
