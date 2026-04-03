@@ -7746,3 +7746,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Página StudentStudyMaterials no portal do aluno com filtro por disciplina
 - [ ] Registrar rota e menu no portal do aluno
 - [ ] Deploy no VPS
+
+## Redesign do Glossário Colaborativo (Estilo Moodle/Dicionário)
+- [ ] Redesenhar Glossário Colaborativo estilo Moodle (dicionário alfabético A-Z)
+- [ ] Backend: atualizar schema/routers para glossário alfabético
+- [ ] Frontend Professor: criar/gerenciar glossário com navegação por letras A-Z
+- [ ] Frontend Aluno: navegar por letras, adicionar termos ao glossário
+- [ ] Deploy no VPS

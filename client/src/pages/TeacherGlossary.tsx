@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,15 +26,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   BookOpen,
   Plus,
   Trash2,
   Search,
-  ChevronDown,
-  ChevronUp,
   CheckCircle,
   XCircle,
   Tag,
@@ -44,12 +41,15 @@ import {
   Filter,
   Clock,
   CheckCircle2,
-  Layers,
+  Edit,
+  Settings,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Breadcrumb } from "@/components/Breadcrumb";
+
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 type GlossaryEntry = {
   id: number;
@@ -87,10 +87,10 @@ export default function TeacherGlossary() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEntryModal, setShowEntryModal] = useState(false);
   const [selectedGlossary, setSelectedGlossary] = useState<Glossary | null>(null);
-  const [expandedGlossary, setExpandedGlossary] = useState<number | null>(null);
+  const [selectedLetter, setSelectedLetter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("approved");
   const [filterSubjectId, setFilterSubjectId] = useState<string>("all");
+  const [showPending, setShowPending] = useState(false);
 
   // Form state - Glossary
   const [newTitle, setNewTitle] = useState("");
@@ -108,9 +108,20 @@ export default function TeacherGlossary() {
   // Queries
   const { data: glossaries = [], isLoading } = trpc.glossary.list.useQuery();
   const { data: subjectsWithClass = [] } = trpc.subjects.listWithClass.useQuery();
+
+  // Buscar entradas de TODOS os glossários filtrados
+  const filteredGlossaries = useMemo(() => {
+    return (glossaries as Glossary[]).filter((g) =>
+      filterSubjectId === "all" ? true : String(g.subjectId) === filterSubjectId
+    );
+  }, [glossaries, filterSubjectId]);
+
+  // Buscar entradas do glossário selecionado (ou do primeiro se houver apenas um)
+  const activeGlossaryId = selectedGlossary?.id || (filteredGlossaries.length === 1 ? filteredGlossaries[0]?.id : null);
+
   const { data: entries = [] } = trpc.glossary.listEntries.useQuery(
-    { glossaryId: expandedGlossary! },
-    { enabled: !!expandedGlossary }
+    { glossaryId: activeGlossaryId! },
+    { enabled: !!activeGlossaryId }
   );
 
   // Mutations
@@ -129,6 +140,7 @@ export default function TeacherGlossary() {
   const deleteGlossary = trpc.glossary.delete.useMutation({
     onSuccess: () => {
       utils.glossary.list.invalidate();
+      setSelectedGlossary(null);
       toast.success("Glossário excluído");
     },
     onError: (err) => {
@@ -138,7 +150,7 @@ export default function TeacherGlossary() {
 
   const addEntry = trpc.glossary.addEntry.useMutation({
     onSuccess: () => {
-      if (expandedGlossary) utils.glossary.listEntries.invalidate({ glossaryId: expandedGlossary });
+      if (activeGlossaryId) utils.glossary.listEntries.invalidate({ glossaryId: activeGlossaryId });
       setShowEntryModal(false);
       resetEntryForm();
       toast.success("Termo adicionado com sucesso!");
@@ -150,14 +162,14 @@ export default function TeacherGlossary() {
 
   const deleteEntry = trpc.glossary.deleteEntry.useMutation({
     onSuccess: () => {
-      if (expandedGlossary) utils.glossary.listEntries.invalidate({ glossaryId: expandedGlossary });
+      if (activeGlossaryId) utils.glossary.listEntries.invalidate({ glossaryId: activeGlossaryId });
       toast.success("Termo excluído");
     },
   });
 
   const approveEntry = trpc.glossary.approveEntry.useMutation({
     onSuccess: () => {
-      if (expandedGlossary) utils.glossary.listEntries.invalidate({ glossaryId: expandedGlossary });
+      if (activeGlossaryId) utils.glossary.listEntries.invalidate({ glossaryId: activeGlossaryId });
       toast.success("Termo aprovado!");
     },
   });
@@ -196,12 +208,17 @@ export default function TeacherGlossary() {
   };
 
   const handleAddEntry = () => {
-    if (!entryTerm.trim() || !entryDefinition.trim() || !selectedGlossary) {
+    if (!entryTerm.trim() || !entryDefinition.trim()) {
       toast.error("Preencha o termo e a definição");
       return;
     }
+    const glossaryId = activeGlossaryId;
+    if (!glossaryId) {
+      toast.error("Selecione um glossário primeiro");
+      return;
+    }
     addEntry.mutate({
-      glossaryId: selectedGlossary.id,
+      glossaryId,
       term: entryTerm.trim(),
       definition: entryDefinition.trim(),
       example: entryExample.trim() || undefined,
@@ -209,25 +226,57 @@ export default function TeacherGlossary() {
     });
   };
 
-  // Filtered glossaries by subject
-  const filteredGlossaries = (glossaries as Glossary[]).filter((g) =>
-    filterSubjectId === "all" ? true : String(g.subjectId) === filterSubjectId
-  );
-
   // Entries split by status
-  const approvedEntries = (entries as GlossaryEntry[]).filter((e) => e.isApproved);
-  const pendingEntries = (entries as GlossaryEntry[]).filter((e) => !e.isApproved);
+  const allEntries = entries as GlossaryEntry[];
+  const approvedEntries = allEntries.filter((e) => e.isApproved);
+  const pendingEntries = allEntries.filter((e) => !e.isApproved);
 
-  const filteredApproved = approvedEntries.filter(
-    (e) =>
-      e.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.definition.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter entries by letter and search
+  const displayEntries = useMemo(() => {
+    let filtered = showPending ? pendingEntries : approvedEntries;
 
-  // Stats
-  const totalGlossaries = (glossaries as Glossary[]).length;
-  const totalTerms = 0; // Would need a separate query for total terms
-  const pendingTotal = pendingEntries.length;
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (e) =>
+          e.term.toLowerCase().includes(lower) ||
+          e.definition.toLowerCase().includes(lower)
+      );
+    }
+
+    if (selectedLetter !== "all") {
+      filtered = filtered.filter((e) =>
+        e.term.toUpperCase().startsWith(selectedLetter)
+      );
+    }
+
+    // Ordenar alfabeticamente
+    return filtered.sort((a, b) => a.term.localeCompare(b.term, "pt-BR"));
+  }, [approvedEntries, pendingEntries, searchTerm, selectedLetter, showPending]);
+
+  // Agrupar por letra para exibição estilo dicionário
+  const groupedByLetter = useMemo(() => {
+    const groups: Record<string, GlossaryEntry[]> = {};
+    displayEntries.forEach((entry) => {
+      const letter = entry.term.charAt(0).toUpperCase();
+      if (!groups[letter]) groups[letter] = [];
+      groups[letter].push(entry);
+    });
+    return groups;
+  }, [displayEntries]);
+
+  // Contar termos por letra (para indicar quais letras têm termos)
+  const letterCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const source = showPending ? pendingEntries : approvedEntries;
+    source.forEach((entry) => {
+      const letter = entry.term.charAt(0).toUpperCase();
+      counts[letter] = (counts[letter] || 0) + 1;
+    });
+    return counts;
+  }, [approvedEntries, pendingEntries, showPending]);
+
+  const activeGlossary = selectedGlossary || (filteredGlossaries.length === 1 ? filteredGlossaries[0] : null);
 
   return (
     <>
@@ -260,7 +309,7 @@ export default function TeacherGlossary() {
                 Glossário Colaborativo
               </h1>
               <p className="text-muted-foreground mt-1">
-                Crie e gerencie glossários por disciplina. Alunos podem contribuir com termos.
+                Dicionário de termos por disciplina — estilo alfabético A-Z
               </p>
             </div>
             <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
@@ -270,57 +319,65 @@ export default function TeacherGlossary() {
           </div>
 
           {/* Cards de Estatísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <Card className="border-l-4 border-l-primary">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <BookMarked className="h-4 w-4 text-primary" />
-                  Total de Glossários
+                  Glossários
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-foreground">{totalGlossaries}</div>
-                <p className="text-xs text-muted-foreground mt-1">Glossários criados</p>
-              </CardContent>
-            </Card>
-            <Card className="border-l-4 border-l-yellow-500">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-yellow-500" />
-                  Aguardando Aprovação
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">
-                  {expandedGlossary ? pendingTotal : "—"}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {expandedGlossary ? "Termos pendentes" : "Abra um glossário para ver"}
-                </p>
+                <div className="text-2xl font-bold text-foreground">{(glossaries as Glossary[]).length}</div>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-green-500">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  Termos Aprovados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">{approvedEntries.length}</div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-yellow-500">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                  Pendentes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground">{pendingEntries.length}</div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Users className="h-4 w-4 text-blue-500" />
                   Colaborativos
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-foreground">
+                <div className="text-2xl font-bold text-foreground">
                   {(glossaries as Glossary[]).filter((g) => g.allowStudentContributions).length}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Com contribuição de alunos</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Filtro por disciplina */}
-          <div className="flex items-center gap-3 mb-6 bg-card p-4 rounded-lg border">
-            <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm font-medium text-muted-foreground">Filtrar:</span>
-            <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
-              <SelectTrigger className="w-[300px]">
+          {/* Seletor de Glossário + Filtros */}
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-4 bg-card p-4 rounded-lg border">
+            <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0 hidden md:block" />
+            
+            {/* Filtro por disciplina */}
+            <Select value={filterSubjectId} onValueChange={(val) => {
+              setFilterSubjectId(val);
+              setSelectedGlossary(null);
+            }}>
+              <SelectTrigger className="w-[280px]">
                 <SelectValue placeholder="Filtrar por disciplina" />
               </SelectTrigger>
               <SelectContent>
@@ -332,6 +389,57 @@ export default function TeacherGlossary() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Seletor de glossário */}
+            {filteredGlossaries.length > 1 && (
+              <Select
+                value={selectedGlossary?.id ? String(selectedGlossary.id) : ""}
+                onValueChange={(val) => {
+                  const g = filteredGlossaries.find((g) => String(g.id) === val);
+                  setSelectedGlossary(g || null);
+                  setSelectedLetter("all");
+                  setSearchTerm("");
+                }}
+              >
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Selecionar glossário" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredGlossaries.map((g) => (
+                    <SelectItem key={g.id} value={String(g.id)}>
+                      {g.title} {g.className ? `— ${g.className}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* Busca */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar termos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
+
+            {/* Toggle pendentes */}
+            {pendingEntries.length > 0 && (
+              <Button
+                variant={showPending ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowPending(!showPending)}
+                className="flex items-center gap-2"
+              >
+                <Clock className="w-4 h-4" />
+                Pendentes
+                <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-700 text-xs">
+                  {pendingEntries.length}
+                </Badge>
+              </Button>
+            )}
           </div>
 
           {/* Loading */}
@@ -341,7 +449,7 @@ export default function TeacherGlossary() {
             </div>
           )}
 
-          {/* Empty state */}
+          {/* Empty state - sem glossários */}
           {!isLoading && filteredGlossaries.length === 0 && (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-16">
@@ -350,7 +458,7 @@ export default function TeacherGlossary() {
                   Nenhum glossário criado ainda.
                 </p>
                 <p className="text-sm text-muted-foreground mb-6 text-center max-w-sm">
-                  Crie um glossário para sua disciplina e comece a adicionar termos.
+                  Crie um glossário para sua disciplina e comece a adicionar termos no formato de dicionário.
                 </p>
                 <Button onClick={() => setShowCreateModal(true)}>
                   <Plus className="w-4 h-4 mr-2" />
@@ -360,274 +468,241 @@ export default function TeacherGlossary() {
             </Card>
           )}
 
-          {/* Glossaries list */}
-          {!isLoading && filteredGlossaries.length > 0 && (
-            <div className="space-y-4">
-              {filteredGlossaries.map((glossary: Glossary) => (
-                <Card
-                  key={glossary.id}
-                  className={`overflow-hidden transition-all duration-200 hover:shadow-md ${
-                    expandedGlossary === glossary.id
-                      ? "border-l-4 border-l-primary"
-                      : "border-l-4 border-l-muted"
-                  }`}
-                >
-                  {/* Glossary header */}
-                  <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/30 transition-colors"
-                    onClick={() => {
-                      if (expandedGlossary === glossary.id) {
-                        setExpandedGlossary(null);
-                      } else {
-                        setExpandedGlossary(glossary.id);
-                        setSearchTerm("");
-                        setActiveTab("approved");
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <BookMarked className="w-5 h-5 text-primary flex-shrink-0" />
-                      <div>
-                        <h3 className="font-semibold text-foreground text-base">{glossary.title}</h3>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          {glossary.subjectName && (
-                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                              <BookOpen className="w-3 h-3 mr-1" />
-                              {glossary.subjectName}
-                            </Badge>
-                          )}
-                          {glossary.className && (
-                            <Badge variant="outline" className="text-xs">
-                              <Users className="w-3 h-3 mr-1" />
-                              {glossary.className}
-                            </Badge>
-                          )}
-                          {glossary.allowStudentContributions && (
-                            <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200">
-                              Colaborativo
-                            </Badge>
-                          )}
-                        </div>
-                        {glossary.description && (
-                          <p className="text-xs text-muted-foreground mt-1">{glossary.description}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedGlossary(glossary);
-                          setExpandedGlossary(glossary.id);
-                          setShowEntryModal(true);
-                        }}
-                        className="text-primary border-primary hover:bg-primary/10"
-                      >
-                        <Plus className="w-4 h-4 mr-1" />
-                        Termo
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm("Excluir este glossário e todos os seus termos?")) {
-                            deleteGlossary.mutate({ id: glossary.id });
-                          }
-                        }}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                      {expandedGlossary === glossary.id ? (
-                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          {/* Glossário ativo - info do glossário selecionado */}
+          {!isLoading && activeGlossary && (
+            <>
+              {/* Info do glossário ativo */}
+              <div className="flex items-center justify-between bg-card border rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <BookMarked className="w-5 h-5 text-primary" />
+                  <div>
+                    <span className="font-semibold text-foreground">{activeGlossary.title}</span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {activeGlossary.subjectName && (
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                          {activeGlossary.subjectName}
+                        </Badge>
+                      )}
+                      {activeGlossary.className && (
+                        <Badge variant="outline" className="text-xs">
+                          <Users className="w-3 h-3 mr-1" />
+                          {activeGlossary.className}
+                        </Badge>
+                      )}
+                      {activeGlossary.allowStudentContributions && (
+                        <Badge variant="secondary" className="text-xs bg-green-50 text-green-700">
+                          Colaborativo
+                        </Badge>
                       )}
                     </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowEntryModal(true);
+                    }}
+                    className="text-primary border-primary hover:bg-primary/10"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Novo Termo
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Excluir este glossário e todos os seus termos?")) {
+                        deleteGlossary.mutate({ id: activeGlossary.id });
+                      }
+                    }}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
 
-                  {/* Expanded entries */}
-                  {expandedGlossary === glossary.id && (
-                    <div className="border-t bg-muted/10">
-                      {/* Search bar */}
-                      <div className="p-4 border-b bg-background">
-                        <div className="relative max-w-sm">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input
-                            placeholder="Buscar termos..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9 h-9"
-                          />
+              {/* ═══════════════════════════════════════════════════════════════
+                  NAVEGAÇÃO ALFABÉTICA A-Z (estilo Moodle)
+                 ═══════════════════════════════════════════════════════════════ */}
+              <div className="bg-card border rounded-lg p-3 mb-6">
+                <div className="flex flex-wrap gap-1 justify-center">
+                  <button
+                    onClick={() => setSelectedLetter("all")}
+                    className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${
+                      selectedLetter === "all"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    Todos
+                  </button>
+                  {ALPHABET.map((letter) => {
+                    const count = letterCounts[letter] || 0;
+                    const hasEntries = count > 0;
+                    return (
+                      <button
+                        key={letter}
+                        onClick={() => setSelectedLetter(letter)}
+                        className={`w-9 h-9 rounded-md text-sm font-bold transition-colors relative ${
+                          selectedLetter === letter
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : hasEntries
+                            ? "bg-muted/50 text-foreground hover:bg-primary/20 hover:text-primary"
+                            : "bg-transparent text-muted-foreground/40 cursor-default"
+                        }`}
+                        disabled={!hasEntries && selectedLetter !== letter}
+                      >
+                        {letter}
+                        {hasEntries && selectedLetter !== letter && (
+                          <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-normal">
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ═══════════════════════════════════════════════════════════════
+                  TERMOS DO GLOSSÁRIO (estilo dicionário)
+                 ═══════════════════════════════════════════════════════════════ */}
+              {displayEntries.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-12">
+                    <BookOpen className="w-12 h-12 text-muted-foreground/30 mb-3" />
+                    <p className="text-muted-foreground text-sm">
+                      {searchTerm
+                        ? `Nenhum termo encontrado para "${searchTerm}"`
+                        : selectedLetter !== "all"
+                        ? `Nenhum termo com a letra "${selectedLetter}"`
+                        : showPending
+                        ? "Nenhum termo pendente de aprovação"
+                        : "Nenhum termo adicionado ainda. Clique em \"Novo Termo\" para começar."}
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {Object.keys(groupedByLetter)
+                    .sort()
+                    .map((letter) => (
+                      <div key={letter}>
+                        {/* Letra separadora */}
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <span className="text-2xl font-black text-primary">{letter}</span>
+                          </div>
+                          <div className="flex-1 h-px bg-border" />
+                          <span className="text-xs text-muted-foreground">
+                            {groupedByLetter[letter].length} {groupedByLetter[letter].length === 1 ? "termo" : "termos"}
+                          </span>
+                        </div>
+
+                        {/* Termos desta letra */}
+                        <div className="space-y-3 ml-2">
+                          {groupedByLetter[letter].map((entry) => (
+                            <div
+                              key={entry.id}
+                              className={`border rounded-lg p-4 bg-card hover:shadow-sm transition-shadow ${
+                                !entry.isApproved ? "border-l-4 border-l-yellow-400" : "border-l-4 border-l-primary/30"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  {/* Termo */}
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <h3 className="text-lg font-bold text-foreground">{entry.term}</h3>
+                                    {entry.category && (
+                                      <Badge variant="outline" className="text-xs">
+                                        <Tag className="w-3 h-3 mr-1" />
+                                        {entry.category}
+                                      </Badge>
+                                    )}
+                                    <Badge
+                                      className={`text-xs ${
+                                        entry.authorType === "teacher"
+                                          ? "bg-blue-100 text-blue-700 border-blue-200"
+                                          : "bg-purple-100 text-purple-700 border-purple-200"
+                                      }`}
+                                    >
+                                      {entry.authorType === "teacher" ? "Professor" : "Aluno"}
+                                    </Badge>
+                                    {!entry.isApproved && (
+                                      <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300 text-xs">
+                                        <Clock className="w-3 h-3 mr-1" />
+                                        Pendente
+                                      </Badge>
+                                    )}
+                                  </div>
+
+                                  {/* Definição */}
+                                  <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {entry.definition}
+                                  </p>
+
+                                  {/* Exemplo */}
+                                  {entry.example && (
+                                    <p className="text-xs italic text-muted-foreground/70 mt-2 pl-3 border-l-2 border-primary/20">
+                                      Exemplo: {entry.example}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {/* Ações */}
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  {!entry.isApproved && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-8 text-green-600 border-green-500 hover:bg-green-50"
+                                      onClick={() => approveEntry.mutate({ id: entry.id, approved: true })}
+                                      disabled={approveEntry.isPending}
+                                    >
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      Aprovar
+                                    </Button>
+                                  )}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    onClick={() => {
+                                      if (confirm(`Excluir o termo "${entry.term}"?`)) {
+                                        deleteEntry.mutate({ id: entry.id });
+                                      }
+                                    }}
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
+                    ))}
+                </div>
+              )}
+            </>
+          )}
 
-                      {/* Tabs */}
-                      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                        <div className="px-4 pt-4">
-                          <TabsList className="grid w-full grid-cols-2 mb-4">
-                            <TabsTrigger value="approved" className="flex items-center gap-2">
-                              <CheckCircle2 className="w-4 h-4" />
-                              Aprovados
-                              {approvedEntries.length > 0 && (
-                                <Badge variant="secondary" className="ml-1 bg-green-100 text-green-700 text-xs">
-                                  {approvedEntries.length}
-                                </Badge>
-                              )}
-                            </TabsTrigger>
-                            <TabsTrigger value="pending" className="flex items-center gap-2">
-                              <Clock className="w-4 h-4" />
-                              Aguardando Aprovação
-                              {pendingEntries.length > 0 && (
-                                <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-700 text-xs">
-                                  {pendingEntries.length}
-                                </Badge>
-                              )}
-                            </TabsTrigger>
-                          </TabsList>
-                        </div>
-
-                        {/* Approved entries */}
-                        <TabsContent value="approved" className="mt-0 px-4 pb-4">
-                          {filteredApproved.length === 0 ? (
-                            <div className="py-10 text-center text-muted-foreground text-sm">
-                              {approvedEntries.length === 0
-                                ? "Nenhum termo adicionado ainda. Clique em \"+ Termo\" para começar."
-                                : "Nenhum termo encontrado para esta busca."}
-                            </div>
-                          ) : (
-                            <div className="rounded-lg border overflow-hidden">
-                              <table className="w-full text-sm">
-                                <thead>
-                                  <tr className="border-b bg-muted/30">
-                                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">Termo</th>
-                                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">Definição</th>
-                                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">Categoria</th>
-                                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">Autor</th>
-                                    <th className="px-4 py-3"></th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {filteredApproved.map((entry: GlossaryEntry) => (
-                                    <tr key={entry.id} className="border-b last:border-0 hover:bg-accent/20 transition-colors">
-                                      <td className="px-4 py-3 font-semibold text-foreground">{entry.term}</td>
-                                      <td className="px-4 py-3 text-muted-foreground max-w-xs">
-                                        <p className="line-clamp-2">{entry.definition}</p>
-                                        {entry.example && (
-                                          <p className="text-xs italic mt-1 text-muted-foreground/70">
-                                            Ex: {entry.example}
-                                          </p>
-                                        )}
-                                      </td>
-                                      <td className="px-4 py-3">
-                                        {entry.category ? (
-                                          <Badge variant="outline" className="text-xs">
-                                            <Tag className="w-3 h-3 mr-1" />
-                                            {entry.category}
-                                          </Badge>
-                                        ) : (
-                                          <span className="text-muted-foreground/50">—</span>
-                                        )}
-                                      </td>
-                                      <td className="px-4 py-3">
-                                        <Badge
-                                          className={
-                                            entry.authorType === "teacher"
-                                              ? "bg-blue-100 text-blue-700 border-blue-200 text-xs"
-                                              : "bg-purple-100 text-purple-700 border-purple-200 text-xs"
-                                          }
-                                        >
-                                          {entry.authorType === "teacher" ? "Professor" : "Aluno"}
-                                        </Badge>
-                                      </td>
-                                      <td className="px-4 py-3">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                          onClick={() => deleteEntry.mutate({ id: entry.id })}
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          )}
-                        </TabsContent>
-
-                        {/* Pending entries */}
-                        <TabsContent value="pending" className="mt-0 px-4 pb-4">
-                          {pendingEntries.length === 0 ? (
-                            <div className="py-10 text-center text-muted-foreground text-sm">
-                              Nenhum termo aguardando aprovação.
-                            </div>
-                          ) : (
-                            <div className="space-y-3">
-                              {pendingEntries.map((entry: GlossaryEntry) => (
-                                <Card key={entry.id} className="border-l-4 border-l-yellow-400">
-                                  <CardContent className="p-4">
-                                    <div className="flex items-start justify-between gap-4">
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <span className="font-semibold text-foreground">{entry.term}</span>
-                                          {entry.category && (
-                                            <Badge variant="outline" className="text-xs">
-                                              <Tag className="w-3 h-3 mr-1" />
-                                              {entry.category}
-                                            </Badge>
-                                          )}
-                                          <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300 text-xs">
-                                            <Clock className="w-3 h-3 mr-1" />
-                                            Pendente
-                                          </Badge>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">{entry.definition}</p>
-                                        {entry.example && (
-                                          <p className="text-xs italic text-muted-foreground/70 mt-1">
-                                            Ex: {entry.example}
-                                          </p>
-                                        )}
-                                      </div>
-                                      <div className="flex gap-2 flex-shrink-0">
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-8 text-green-600 border-green-500 hover:bg-green-50"
-                                          onClick={() => approveEntry.mutate({ id: entry.id, approved: true })}
-                                          disabled={approveEntry.isPending}
-                                        >
-                                          <CheckCircle className="w-3 h-3 mr-1" />
-                                          Aprovar
-                                        </Button>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-8 text-destructive border-destructive hover:bg-destructive/10"
-                                          onClick={() => deleteEntry.mutate({ id: entry.id })}
-                                        >
-                                          <XCircle className="w-3 h-3 mr-1" />
-                                          Rejeitar
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                            </div>
-                          )}
-                        </TabsContent>
-                      </Tabs>
-                    </div>
-                  )}
-                </Card>
-              ))}
-            </div>
+          {/* Quando há múltiplos glossários mas nenhum selecionado */}
+          {!isLoading && filteredGlossaries.length > 1 && !selectedGlossary && (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <BookMarked className="w-12 h-12 text-muted-foreground/30 mb-3" />
+                <p className="text-muted-foreground text-sm mb-1">
+                  Selecione um glossário acima para visualizar os termos.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {filteredGlossaries.length} glossários disponíveis
+                </p>
+              </CardContent>
+            </Card>
           )}
 
           {/* Create Glossary Modal */}
@@ -644,7 +719,7 @@ export default function TeacherGlossary() {
                   <Label htmlFor="title">Título *</Label>
                   <Input
                     id="title"
-                    placeholder="Ex: Glossário de Tecnologia Educacional"
+                    placeholder="Ex: Glossário de Informática Básica"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="mt-1"
@@ -716,7 +791,7 @@ export default function TeacherGlossary() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Tag className="w-5 h-5" />
-                  Adicionar Termo
+                  Adicionar Termo ao Glossário
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-2">
@@ -724,7 +799,7 @@ export default function TeacherGlossary() {
                   <Label htmlFor="term">Termo *</Label>
                   <Input
                     id="term"
-                    placeholder="Ex: Aprendizagem Ativa"
+                    placeholder="Ex: Memória RAM"
                     value={entryTerm}
                     onChange={(e) => setEntryTerm(e.target.value)}
                     className="mt-1"
@@ -745,7 +820,7 @@ export default function TeacherGlossary() {
                   <Label htmlFor="example">Exemplo de uso</Label>
                   <Input
                     id="example"
-                    placeholder="Ex: A aprendizagem ativa é usada em..."
+                    placeholder="Ex: A memória RAM é usada para..."
                     value={entryExample}
                     onChange={(e) => setEntryExample(e.target.value)}
                     className="mt-1"
@@ -755,7 +830,7 @@ export default function TeacherGlossary() {
                   <Label htmlFor="category">Categoria</Label>
                   <Input
                     id="category"
-                    placeholder="Ex: Metodologia, Tecnologia, Avaliação..."
+                    placeholder="Ex: Hardware, Software, Redes..."
                     value={entryCategory}
                     onChange={(e) => setEntryCategory(e.target.value)}
                     className="mt-1"
