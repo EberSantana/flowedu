@@ -95,8 +95,7 @@ export default function TeacherGlossary() {
   // Form state - Glossary
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newSubjectId, setNewSubjectId] = useState<string>("");
-  const [newClassId, setNewClassId] = useState<string>("");
+  const [newSubjectClassKey, setNewSubjectClassKey] = useState<string>("");
   const [allowStudentContributions, setAllowStudentContributions] = useState(true);
   const [requireApproval, setRequireApproval] = useState(false);
 
@@ -108,8 +107,7 @@ export default function TeacherGlossary() {
 
   // Queries
   const { data: glossaries = [], isLoading } = trpc.glossary.list.useQuery();
-  const { data: subjects = [] } = trpc.subjects.list.useQuery();
-  const { data: classes = [] } = trpc.classes.list.useQuery();
+  const { data: subjectsWithClass = [] } = trpc.subjects.listWithClass.useQuery();
   const { data: entries = [] } = trpc.glossary.listEntries.useQuery(
     { glossaryId: expandedGlossary! },
     { enabled: !!expandedGlossary }
@@ -167,8 +165,7 @@ export default function TeacherGlossary() {
   const resetCreateForm = () => {
     setNewTitle("");
     setNewDescription("");
-    setNewSubjectId("");
-    setNewClassId("");
+    setNewSubjectClassKey("");
     setAllowStudentContributions(true);
     setRequireApproval(false);
   };
@@ -181,15 +178,18 @@ export default function TeacherGlossary() {
   };
 
   const handleCreateGlossary = () => {
-    if (!newTitle.trim() || !newSubjectId) {
+    if (!newTitle.trim() || !newSubjectClassKey) {
       toast.error("Preencha o título e a disciplina");
       return;
     }
+    const parts = newSubjectClassKey.split(":");
+    const subjectId = parseInt(parts[0]);
+    const classId = parts[1] ? parseInt(parts[1]) : undefined;
     createGlossary.mutate({
       title: newTitle.trim(),
       description: newDescription.trim() || undefined,
-      subjectId: parseInt(newSubjectId),
-      classId: newClassId ? parseInt(newClassId) : undefined,
+      subjectId,
+      classId,
       allowStudentContributions,
       requireApproval,
     });
@@ -325,9 +325,9 @@ export default function TeacherGlossary() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as disciplinas</SelectItem>
-                {(subjects as any[]).map((s: any) => (
-                  <SelectItem key={s.id} value={String(s.id)}>
-                    {s.name} {s.code ? `(${s.code})` : ""}
+                {(subjectsWithClass as any[]).map((s: any) => (
+                  <SelectItem key={s.filterKey} value={String(s.id)}>
+                    {s.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -661,37 +661,20 @@ export default function TeacherGlossary() {
                     rows={2}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label>Disciplina *</Label>
-                    <Select value={newSubjectId} onValueChange={setNewSubjectId}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(subjects as any[]).map((s: any) => (
-                          <SelectItem key={s.id} value={String(s.id)}>
-                            {s.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Turma</Label>
-                    <Select value={newClassId} onValueChange={setNewClassId}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(classes as any[]).map((c: any) => (
-                          <SelectItem key={c.id} value={String(c.id)}>
-                            {c.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <Label>Disciplina — Turma *</Label>
+                  <Select value={newSubjectClassKey} onValueChange={setNewSubjectClassKey}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecionar disciplina e turma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(subjectsWithClass as any[]).map((s: any) => (
+                        <SelectItem key={s.filterKey} value={s.filterKey}>
+                          {s.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-center justify-between py-1">
                   <div>
