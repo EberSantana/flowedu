@@ -107,7 +107,7 @@ export default function TeacherStudyMaterials() {
   // Queries
   const { data: allMaterials = [], isLoading, refetch } = trpc.materials.listAll.useQuery();
   const { data: storageInfo } = trpc.materials.getMyStorageInfo.useQuery();
-  const { data: subjects = [] } = trpc.subjects.list.useQuery();
+  const { data: subjectsWithClass = [] } = trpc.subjects.listWithClass.useQuery();
   const { data: folders = [], refetch: refetchFolders } = trpc.materials.listFolders.useQuery();
 
   // Mutations
@@ -375,7 +375,7 @@ export default function TeacherStudyMaterials() {
                   <SelectTrigger className="w-[200px]"><SelectValue placeholder="Todas as disciplinas" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas as disciplinas</SelectItem>
-                    {subjects.map((s: any) => (<SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>))}
+                    {(subjectsWithClass as any[]).map((s: any) => (<SelectItem key={s.filterKey} value={String(s.id)}>{s.label}</SelectItem>))}
                   </SelectContent>
                 </Select>
                 <Select value={filterType} onValueChange={setFilterType}>
@@ -575,7 +575,7 @@ export default function TeacherStudyMaterials() {
               <Label>Disciplina</Label>
               <Select value={formData.subjectId} onValueChange={(val) => setFormData((p) => ({ ...p, subjectId: val }))}>
                 <SelectTrigger><SelectValue placeholder="Selecione a disciplina (opcional)" /></SelectTrigger>
-                <SelectContent>{subjects.map((s: any) => (<SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>))}</SelectContent>
+                <SelectContent>{(subjectsWithClass as any[]).map((s: any) => (<SelectItem key={s.filterKey} value={String(s.id)}>{s.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             {folders.length > 0 && (
