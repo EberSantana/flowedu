@@ -7731,3 +7731,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Adicionar rotas /teacher/mural e /student/mural no App.tsx
 - [ ] Adicionar item "Mural Colaborativo" no Sidebar do professor e menu do aluno
 - [ ] Deploy no VPS
+
+## Materiais de Estudo
+- [ ] Criar tabela study_materials no banco de dados
+- [ ] Criar router studyMaterials no backend (CRUD + upload)
+- [ ] Criar página TeacherStudyMaterials.tsx com layout padronizado
+- [ ] Adicionar item "Materiais de Estudo" no menu Conteúdo (Sidebar.tsx)
+- [ ] Registrar rota no App.tsx
+- [ ] Deploy no VPS

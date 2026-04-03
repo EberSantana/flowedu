@@ -1636,6 +1636,33 @@ export async function deleteTopicMaterial(id: number, professorId: number) {
   return { success: true, deletedUrl: material?.url || null };
 }
 
+// ==================== ALL MATERIALS (CENTRALIZED VIEW) ====================
+
+export async function getAllMaterialsByProfessor(professorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get all materials from this professor, joining with topics/modules/subjects for context
+  const materials = await db.select({
+    id: topicMaterials.id,
+    title: topicMaterials.title,
+    description: topicMaterials.description,
+    type: topicMaterials.type,
+    url: topicMaterials.url,
+    fileSize: topicMaterials.fileSize,
+    isRequired: topicMaterials.isRequired,
+    topicId: topicMaterials.topicId,
+    moduleId: topicMaterials.moduleId,
+    createdAt: topicMaterials.createdAt,
+    updatedAt: topicMaterials.updatedAt,
+  })
+    .from(topicMaterials)
+    .where(eq(topicMaterials.professorId, professorId))
+    .orderBy(desc(topicMaterials.createdAt));
+  
+  return materials;
+}
+
 // ==================== MODULE MATERIALS ====================
 
 export async function createModuleMaterial(data: { moduleId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'other'; url: string; fileSize?: number; isRequired?: boolean }) {

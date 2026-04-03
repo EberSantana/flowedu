@@ -6071,6 +6071,10 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         return await db.getModuleMaterials(input.moduleId);
       }),
 
+    // Listar todos os materiais do professor (visão centralizada)
+    listAll: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getAllMaterialsByProfessor(ctx.user.id);
+    }),
     // Obter uso e limite de armazenamento individual do professor logado
     getMyStorageInfo: protectedProcedure.query(async ({ ctx }) => {
       const usage = await db.getTeacherStorageUsage(ctx.user.id);

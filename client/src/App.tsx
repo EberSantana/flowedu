@@ -64,6 +64,7 @@ const TeacherGradePanel = lazy(() => import("./pages/TeacherGradePanel"));
 const TeacherForum = lazy(() => import("./pages/TeacherForum"));
 const TeacherMural = lazy(() => import("./pages/TeacherMural"));
 const TeacherGlossary = lazy(() => import("./pages/TeacherGlossary"));
+const TeacherStudyMaterials = lazy(() => import("./pages/TeacherStudyMaterials"));
 
 // Lazy loaded pages - Student Portal
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
@@ -185,6 +186,7 @@ function Router() {
           <Route path={"/teacher-forum"} component={TeacherForum} />
           <Route path={"/teacher-mural"} component={TeacherMural} />
           <Route path={"/teacher-glossary"} component={TeacherGlossary} />
+          <Route path={"/teacher-study-materials"} component={TeacherStudyMaterials} />
           <Route path={"/assessments-manager"} component={AssessmentsManager} />
 
           {/* Student Portal - lazy loaded */}

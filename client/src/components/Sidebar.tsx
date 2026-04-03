@@ -191,6 +191,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <ClipboardList className="h-5 w-5" />,
         href: "/assessments-manager",
       },
+      {
+        label: "Materiais de Estudo",
+        icon: <FileText className="h-5 w-5" />,
+        href: "/teacher-study-materials",
+      },
     ],
   },
   {
