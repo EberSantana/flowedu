@@ -6098,8 +6098,8 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
       return await db.getAllMaterialsByProfessor(ctx.user.id);
     }),
     // Listar materiais disponíveis para o aluno (das disciplinas matriculadas)
-    listForStudent: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getMaterialsForStudent(ctx.user.id);
+    listForStudent: studentProcedure.query(async ({ ctx }) => {
+      return await db.getMaterialsForStudent(ctx.studentSession.studentId);
     }),
     // Atualizar subjectId de um material
     updateSubject: protectedProcedure
@@ -6114,7 +6114,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         return { success: true };
       }),
     // Registrar download de material
-    trackDownload: protectedProcedure
+    trackDownload: studentProcedure
       .input(z.object({ materialId: z.number() }))
       .mutation(async ({ input }) => {
         const database = await getDb();

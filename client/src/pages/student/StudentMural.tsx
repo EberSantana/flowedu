@@ -160,7 +160,7 @@ export default function StudentMural() {
   })) || [];
 
   const { data: muralData, refetch: refetchMural, isLoading } = trpc.mural.getForStudent.useQuery(
-    { subjectId: selectedSubjectId!, classId: selectedClassId ?? undefined },
+    { subjectId: selectedSubjectId!, classId: selectedClassId ?? null },
     { enabled: !!selectedSubjectId }
   );
 
@@ -244,7 +244,7 @@ export default function StudentMural() {
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
   // ── Seletor de disciplina/turma ────────────────────────────────────────────
-  if (!selectedSubjectId || !selectedClassId) {
+  if (!selectedSubjectId) {
     return (
       <StudentLayout>
         <div className="min-h-screen bg-background">

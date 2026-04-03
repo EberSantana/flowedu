@@ -1676,14 +1676,25 @@ export async function getMaterialsForStudent(studentId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Get subjects the student is enrolled in
-  const enrollments = await db.select({
+  // Get subjects the student is enrolled in (from BOTH enrollment tables)
+  const enrollmentsFromSubject = await db.select({
     subjectId: subjectEnrollments.subjectId,
   })
     .from(subjectEnrollments)
     .where(eq(subjectEnrollments.studentId, studentId));
   
-  const enrolledSubjectIds = enrollments.map(e => e.subjectId);
+  const enrollmentsFromStudent = await db.select({
+    subjectId: studentEnrollments.subjectId,
+  })
+    .from(studentEnrollments)
+    .where(eq(studentEnrollments.studentId, studentId));
+  
+  // Combine and deduplicate subject IDs
+  const allSubjectIds = new Set([
+    ...enrollmentsFromSubject.map(e => e.subjectId),
+    ...enrollmentsFromStudent.map(e => e.subjectId),
+  ]);
+  const enrolledSubjectIds = Array.from(allSubjectIds);
   
   if (enrolledSubjectIds.length === 0) return [];
   
