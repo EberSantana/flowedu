@@ -149,6 +149,11 @@ export default function TeacherMural() {
     onError: (e) => toast.error(e.message),
   });
 
+  const deleteMural = trpc.mural.deleteMural.useMutation({
+    onSuccess: () => { toast.success("Mural excluído permanentemente!"); setSelectedMuralId(null); refetchMurals(); },
+    onError: (e) => toast.error("Erro ao excluir mural: " + e.message),
+  });
+
   const replyCard = trpc.mural.replyCard.useMutation({
     onSuccess: () => {
       toast.success("Resposta enviada!");
@@ -412,10 +417,24 @@ export default function TeacherMural() {
                           archiveMural.mutate({ id: selectedMuralId! });
                         }
                       }}
-                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+                      className="gap-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20 border-amber-300 dark:border-amber-700"
                     >
                       <Archive className="h-3.5 w-3.5" />
                       <span className="hidden sm:inline">Arquivar</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm("ATENÇÃO: Excluir permanentemente este mural e todos os seus cards? Esta ação NÃO pode ser desfeita!")) {
+                          deleteMural.mutate({ id: selectedMuralId! });
+                        }
+                      }}
+                      disabled={deleteMural.isPending}
+                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">{deleteMural.isPending ? "Excluindo..." : "Excluir"}</span>
                     </Button>
                   </div>
                 </div>
