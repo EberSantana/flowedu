@@ -305,13 +305,17 @@ const studentNavItems: NavItem[] = [
     icon: <Brain className="h-5 w-5" />,
     href: "/student/mistake-notebook",
   },
-  {
+   {
     label: "Avisos",
     icon: <Megaphone className="h-5 w-5" />,
     href: "/student/announcements",
   },
+  {
+    label: "Glossário",
+    icon: <BookOpen className="h-5 w-5" />,
+    href: "/student/glossary",
+  },
 ];
-
 export default function Sidebar() {
   const [location] = useLocation();
   const { user } = useAuth();
