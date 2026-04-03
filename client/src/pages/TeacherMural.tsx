@@ -111,8 +111,7 @@ export default function TeacherMural() {
   // Form criar mural
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newSubjectId, setNewSubjectId] = useState<string>("");
-  const [newClassId, setNewClassId] = useState<string>("");
+  const [newSubjectClassKey, setNewSubjectClassKey] = useState<string>("");
 
   // Queries
   const { data: murals = [], refetch: refetchMurals } = trpc.mural.list.useQuery({
@@ -120,8 +119,7 @@ export default function TeacherMural() {
     includeArchived: false,
   });
 
-  const { data: subjects = [] } = trpc.subjects.list.useQuery();
-  const { data: classes = [] } = trpc.classes.list.useQuery();
+  const { data: subjectsWithClass = [] } = trpc.subjects.listWithClass.useQuery();
 
   const { data: muralDetail, refetch: refetchDetail, isLoading: loadingDetail } = trpc.mural.getById.useQuery(
     { id: selectedMuralId! },
@@ -135,8 +133,7 @@ export default function TeacherMural() {
       setShowCreateDialog(false);
       setNewTitle("");
       setNewDescription("");
-      setNewSubjectId("");
-      setNewClassId("");
+      setNewSubjectClassKey("");
       refetchMurals();
     },
     onError: (e) => toast.error("Erro ao criar mural: " + e.message),
@@ -169,15 +166,18 @@ export default function TeacherMural() {
   });
 
   const handleCreateMural = () => {
-    if (!newTitle.trim() || !newSubjectId || !newClassId) {
+    if (!newTitle.trim() || !newSubjectClassKey) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
+    const parts = newSubjectClassKey.split(":");
+    const subjectId = parseInt(parts[0]);
+    const classId = parts[1] ? parseInt(parts[1]) : undefined;
     createMural.mutate({
       title: newTitle,
       description: newDescription || undefined,
-      subjectId: parseInt(newSubjectId),
-      classId: parseInt(newClassId),
+      subjectId,
+      classId: classId!,
     });
   };
 
@@ -286,8 +286,8 @@ export default function TeacherMural() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as disciplinas</SelectItem>
-                {(subjects as any[]).map((s: any) => (
-                  <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                {(subjectsWithClass as any[]).map((s: any) => (
+                  <SelectItem key={s.filterKey} value={String(s.id)}>{s.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -582,33 +582,20 @@ export default function TeacherMural() {
                       rows={2}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label>Disciplina *</Label>
-                      <Select value={newSubjectId} onValueChange={setNewSubjectId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(subjects as any[]).map((s: any) => (
-                            <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Turma *</Label>
-                      <Select value={newClassId} onValueChange={setNewClassId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(classes as any[]).map((c: any) => (
-                            <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-1.5">
+                    <Label>Disciplina — Turma *</Label>
+                    <Select value={newSubjectClassKey} onValueChange={setNewSubjectClassKey}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar disciplina e turma" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(subjectsWithClass as any[]).map((s: any) => (
+                          <SelectItem key={s.filterKey} value={s.filterKey}>
+                            {s.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-xs text-blue-700 dark:text-blue-400 flex items-start gap-2">
                     <Bell className="h-3.5 w-3.5 shrink-0 mt-0.5" />
