@@ -6,6 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -53,7 +59,6 @@ type Glossary = {
 };
 
 export default function StudentGlossary() {
-  
   const utils = trpc.useUtils();
 
   const [expandedGlossary, setExpandedGlossary] = useState<number | null>(null);
@@ -112,11 +117,12 @@ export default function StudentGlossary() {
     });
   };
 
-  const filteredEntries = (entries as GlossaryEntry[]).filter(
+  const approvedEntries = (entries as GlossaryEntry[]).filter((e) => e.isApproved);
+
+  const filteredEntries = approvedEntries.filter(
     (e) =>
-      e.isApproved &&
-      (e.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.definition.toLowerCase().includes(searchTerm.toLowerCase()))
+      e.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.definition.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Group entries alphabetically
@@ -131,194 +137,222 @@ export default function StudentGlossary() {
 
   return (
     <StudentLayout>
-      <div className="p-4 max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <BookOpen className="w-6 h-6" />
-            Glossário
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Consulte os termos e definições das suas disciplinas.
-          </p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header Banner */}
+        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <BookOpen className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Glossário</h1>
+                <p className="text-primary-foreground/80 mt-1">
+                  Consulte os termos e definições das suas disciplinas
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Loading */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
-        )}
+        {/* Content */}
+        <div className="container mx-auto py-8 px-4">
+          {/* Loading */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          )}
 
-        {/* Empty state */}
-        {!isLoading && (glossaries as Glossary[]).length === 0 && (
-          <div className="border rounded-lg p-12 text-center">
-            <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Nenhum glossário disponível ainda.</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Seu professor ainda não criou glossários para as suas disciplinas.
-            </p>
-          </div>
-        )}
+          {/* Empty state */}
+          {!isLoading && (glossaries as Glossary[]).length === 0 && (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium text-muted-foreground mb-2">
+                  Nenhum glossário disponível ainda.
+                </p>
+                <p className="text-sm text-muted-foreground text-center max-w-sm">
+                  Seu professor ainda não criou glossários para as suas disciplinas.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Glossaries list */}
-        {!isLoading && (glossaries as Glossary[]).length > 0 && (
-          <div className="space-y-4">
-            {(glossaries as Glossary[]).map((glossary) => (
-              <div key={glossary.id} className="border rounded-lg overflow-hidden">
-                {/* Glossary header */}
-                <div
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/50 transition-colors"
-                  onClick={() => {
-                    if (expandedGlossary === glossary.id) {
-                      setExpandedGlossary(null);
-                    } else {
-                      setExpandedGlossary(glossary.id);
-                      setSearchTerm("");
-                    }
-                  }}
+          {/* Glossaries list */}
+          {!isLoading && (glossaries as Glossary[]).length > 0 && (
+            <div className="space-y-4">
+              {(glossaries as Glossary[]).map((glossary) => (
+                <Card
+                  key={glossary.id}
+                  className={`overflow-hidden transition-all duration-200 hover:shadow-md ${
+                    expandedGlossary === glossary.id
+                      ? "border-l-4 border-l-primary"
+                      : "border-l-4 border-l-muted"
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <BookMarked className="w-5 h-5 text-primary flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-foreground">{glossary.title}</h3>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        {glossary.subjectName && (
-                          <Badge variant="outline" className="text-xs">
-                            {glossary.subjectName}
-                          </Badge>
-                        )}
-                        {glossary.className && (
-                          <Badge variant="outline" className="text-xs">
-                            <Users className="w-3 h-3 mr-1" />
-                            {glossary.className}
-                          </Badge>
-                        )}
-                        {glossary.allowStudentContributions && (
-                          <Badge variant="secondary" className="text-xs">
-                            Colaborativo
-                          </Badge>
+                  {/* Glossary header */}
+                  <div
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/20 transition-colors"
+                    onClick={() => {
+                      if (expandedGlossary === glossary.id) {
+                        setExpandedGlossary(null);
+                      } else {
+                        setExpandedGlossary(glossary.id);
+                        setSearchTerm("");
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <BookMarked className="w-5 h-5 text-primary flex-shrink-0" />
+                      <div>
+                        <h3 className="font-semibold text-foreground text-base">{glossary.title}</h3>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          {glossary.subjectName && (
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              <BookOpen className="w-3 h-3 mr-1" />
+                              {glossary.subjectName}
+                            </Badge>
+                          )}
+                          {glossary.className && (
+                            <Badge variant="outline" className="text-xs">
+                              <Users className="w-3 h-3 mr-1" />
+                              {glossary.className}
+                            </Badge>
+                          )}
+                          {glossary.allowStudentContributions && (
+                            <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200">
+                              Colaborativo
+                            </Badge>
+                          )}
+                        </div>
+                        {glossary.description && (
+                          <p className="text-xs text-muted-foreground mt-1">{glossary.description}</p>
                         )}
                       </div>
-                      {glossary.description && (
-                        <p className="text-xs text-muted-foreground mt-1">{glossary.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {glossary.allowStudentContributions && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedGlossary(glossary);
+                            setExpandedGlossary(glossary.id);
+                            setShowContributeModal(true);
+                          }}
+                          className="text-primary border-primary hover:bg-primary/10"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Contribuir
+                        </Button>
+                      )}
+                      {expandedGlossary === glossary.id ? (
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {glossary.allowStudentContributions && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedGlossary(glossary);
-                          setExpandedGlossary(glossary.id);
-                          setShowContributeModal(true);
-                        }}
-                        className="text-primary border-primary hover:bg-primary/10"
-                      >
-                        <Plus className="w-4 h-4 mr-1" />
-                        Contribuir
-                      </Button>
-                    )}
-                    {expandedGlossary === glossary.id ? (
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
 
-                {/* Expanded entries */}
-                {expandedGlossary === glossary.id && (
-                  <div className="border-t bg-background">
-                    {/* Search */}
-                    <div className="p-3 border-b">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Buscar termos..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="pl-9 h-8 text-sm"
-                        />
+                  {/* Expanded entries */}
+                  {expandedGlossary === glossary.id && (
+                    <div className="border-t bg-background">
+                      {/* Search */}
+                      <div className="p-4 border-b">
+                        <div className="relative max-w-sm">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Buscar termos..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-9 h-9"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Alphabet navigation */}
-                    {sortedLetters.length > 0 && (
-                      <div className="flex flex-wrap gap-1 p-3 border-b">
-                        {sortedLetters.map((letter) => (
-                          <button
-                            key={letter}
-                            className="w-7 h-7 text-xs font-medium rounded border hover:bg-primary hover:text-primary-foreground transition-colors"
-                            onClick={() => {
-                              const el = document.getElementById(`letter-${letter}`);
-                              el?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }}
-                          >
-                            {letter}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                      {/* Alphabet navigation */}
+                      {sortedLetters.length > 0 && (
+                        <div className="flex flex-wrap gap-1 p-3 border-b bg-muted/20">
+                          {sortedLetters.map((letter) => (
+                            <button
+                              key={letter}
+                              className="w-7 h-7 text-xs font-medium rounded border bg-background hover:bg-primary hover:text-primary-foreground transition-colors"
+                              onClick={() => {
+                                const el = document.getElementById(`letter-${letter}`);
+                                el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                              }}
+                            >
+                              {letter}
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
-                    {/* Entries */}
-                    {filteredEntries.length === 0 ? (
-                      <div className="p-8 text-center text-muted-foreground text-sm">
-                        {(entries as GlossaryEntry[]).filter((e) => e.isApproved).length === 0
-                          ? "Nenhum termo adicionado ainda."
-                          : "Nenhum termo encontrado para esta busca."}
-                      </div>
-                    ) : (
-                      <div className="divide-y">
-                        {sortedLetters.map((letter) => (
-                          <div key={letter} id={`letter-${letter}`}>
-                            {/* Letter header */}
-                            <div className="px-4 py-2 bg-muted/30 sticky top-0">
-                              <span className="text-lg font-bold text-primary">{letter}</span>
-                            </div>
-                            {/* Entries for this letter */}
-                            {groupedEntries[letter].map((entry) => (
-                              <div key={entry.id} className="px-4 py-4 hover:bg-accent/20 transition-colors">
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <h4 className="font-semibold text-foreground">{entry.term}</h4>
-                                      {entry.category && (
-                                        <Badge variant="outline" className="text-xs">
-                                          <Tag className="w-3 h-3 mr-1" />
-                                          {entry.category}
+                      {/* Entries */}
+                      {filteredEntries.length === 0 ? (
+                        <div className="p-8 text-center text-muted-foreground text-sm">
+                          {approvedEntries.length === 0
+                            ? "Nenhum termo adicionado ainda."
+                            : "Nenhum termo encontrado para esta busca."}
+                        </div>
+                      ) : (
+                        <div className="divide-y">
+                          {sortedLetters.map((letter) => (
+                            <div key={letter} id={`letter-${letter}`}>
+                              {/* Letter header */}
+                              <div className="px-4 py-2 bg-muted/20 sticky top-0 z-10">
+                                <span className="text-lg font-bold text-primary">{letter}</span>
+                              </div>
+                              {/* Entries for this letter */}
+                              {groupedEntries[letter].map((entry) => (
+                                <div
+                                  key={entry.id}
+                                  className="px-4 py-4 hover:bg-accent/20 transition-colors"
+                                >
+                                  <div className="flex items-start gap-4">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                                        <h4 className="font-semibold text-foreground">{entry.term}</h4>
+                                        {entry.category && (
+                                          <Badge variant="outline" className="text-xs">
+                                            <Tag className="w-3 h-3 mr-1" />
+                                            {entry.category}
+                                          </Badge>
+                                        )}
+                                        <Badge
+                                          className={
+                                            entry.authorType === "teacher"
+                                              ? "bg-blue-100 text-blue-700 border-blue-200 text-xs"
+                                              : "bg-purple-100 text-purple-700 border-purple-200 text-xs"
+                                          }
+                                        >
+                                          {entry.authorType === "teacher" ? "Professor" : "Aluno"}
                                         </Badge>
+                                      </div>
+                                      <p className="text-muted-foreground text-sm">{entry.definition}</p>
+                                      {entry.example && (
+                                        <p className="text-xs italic text-muted-foreground/70 mt-1">
+                                          <span className="font-medium not-italic">Exemplo:</span>{" "}
+                                          {entry.example}
+                                        </p>
                                       )}
-                                      <Badge
-                                        variant={entry.authorType === "teacher" ? "default" : "secondary"}
-                                        className="text-xs"
-                                      >
-                                        {entry.authorType === "teacher" ? "Professor" : "Aluno"}
-                                      </Badge>
                                     </div>
-                                    <p className="text-muted-foreground text-sm mt-1">{entry.definition}</p>
-                                    {entry.example && (
-                                      <p className="text-xs italic text-muted-foreground/70 mt-1">
-                                        <span className="font-medium not-italic">Exemplo:</span> {entry.example}
-                                      </p>
-                                    )}
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Contribute Modal */}
         <Dialog open={showContributeModal} onOpenChange={setShowContributeModal}>
@@ -378,7 +412,13 @@ export default function StudentGlossary() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => { setShowContributeModal(false); resetForm(); }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowContributeModal(false);
+                  resetForm();
+                }}
+              >
                 Cancelar
               </Button>
               <Button onClick={handleContribute} disabled={addEntry.isPending}>
