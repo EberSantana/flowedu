@@ -450,12 +450,28 @@ export const topicMaterials = mysqlTable("topic_materials", {
   fileSize: int("fileSize"), // Tamanho em bytes (para uploads)
   orderIndex: int("orderIndex").default(0).notNull(),
   isRequired: boolean("isRequired").default(false).notNull(), // Material obrigatório
+  downloadCount: int("downloadCount").default(0).notNull(), // Contador de downloads
+  folderId: int("folderId"), // Pasta/categoria do material
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export type TopicMaterial = typeof topicMaterials.$inferSelect;
 export type InsertTopicMaterial = typeof topicMaterials.$inferInsert;
+
+// Pastas/categorias para organizar materiais de estudo
+export const materialFolders = mysqlTable("material_folders", {
+  id: int("id").autoincrement().primaryKey(),
+  professorId: int("professorId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  color: varchar("color", { length: 20 }).default("#0d9488").notNull(),
+  subjectId: int("subjectId"),
+  orderIndex: int("orderIndex").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type MaterialFolder = typeof materialFolders.$inferSelect;
+export type InsertMaterialFolder = typeof materialFolders.$inferInsert;
 
 /**
  * Diário de Aprendizagem do Aluno

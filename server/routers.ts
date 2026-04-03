@@ -5991,16 +5991,38 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         url: z.string(),
         fileSize: z.number().optional(),
         isRequired: z.boolean().optional(),
+        folderId: z.number().nullable().optional(),
+        subjectId: z.number().nullable().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const material = await db.createTopicMaterial({
           ...input,
           professorId: ctx.user.id,
         });
-        
-        // Notificações serão implementadas em segundo plano
-        // TODO: Adicionar worker para notificar alunos sobre novos materiais
-        
+        // Notificar alunos quando material obrigatório é adicionado
+        if (input.isRequired && input.subjectId) {
+          try {
+            const database = await getDb();
+            if (database) {
+              const enrolled = await database.select({ studentId: subjectEnrollments.studentId })
+                .from(subjectEnrollments)
+                .where(eq(subjectEnrollments.subjectId, input.subjectId));
+              for (const e of enrolled) {
+                if (e.studentId) {
+                  await db.createNotification({
+                    userId: e.studentId,
+                    type: 'new_material',
+                    title: 'Novo Material Obrigatório',
+                    message: `O professor adicionou um novo material obrigatório: "${input.title}". Acesse para baixar.`,
+                    link: '/student/materials',
+                    relatedId: material.id,
+                  });
+                }
+              }
+              console.log(`[Materials] Notificação enviada para ${enrolled.length} alunos`);
+            }
+          } catch (err: any) { console.error(`[Materials] Erro notificação: ${err.message}`); }
+        }
         return material;
       }),
     
@@ -6089,6 +6111,65 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         await database.update(topicMaterials)
           .set({ subjectId: input.subjectId })
           .where(and(eq(topicMaterials.id, input.materialId), eq(topicMaterials.professorId, ctx.user.id)));
+        return { success: true };
+      }),
+    // Registrar download de material
+    trackDownload: protectedProcedure
+      .input(z.object({ materialId: z.number() }))
+      .mutation(async ({ input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const { topicMaterials } = await import("../drizzle/schema");
+        await database.update(topicMaterials)
+          .set({ downloadCount: sql`downloadCount + 1` })
+          .where(eq(topicMaterials.id, input.materialId));
+        return { success: true };
+      }),
+    // Listar pastas do professor
+    listFolders: protectedProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) throw new Error("Database not available");
+      const { materialFolders } = await import("../drizzle/schema");
+      return await database.select().from(materialFolders)
+        .where(eq(materialFolders.professorId, ctx.user.id))
+        .orderBy(materialFolders.orderIndex);
+    }),
+    createFolder: protectedProcedure
+      .input(z.object({ name: z.string(), description: z.string().optional(), color: z.string().optional(), subjectId: z.number().nullable().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const { materialFolders } = await import("../drizzle/schema");
+        const [result]: any = await database.insert(materialFolders).values({ professorId: ctx.user.id, name: input.name, description: input.description || null, color: input.color || '#0d9488', subjectId: input.subjectId || null });
+        return { id: Number(result.insertId || 0), ...input };
+      }),
+    updateFolder: protectedProcedure
+      .input(z.object({ id: z.number(), name: z.string().optional(), description: z.string().optional(), color: z.string().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const { materialFolders } = await import("../drizzle/schema");
+        const { id, ...data } = input;
+        await database.update(materialFolders).set(data as any).where(and(eq(materialFolders.id, id), eq(materialFolders.professorId, ctx.user.id)));
+        return { success: true };
+      }),
+    deleteFolder: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const { materialFolders, topicMaterials } = await import("../drizzle/schema");
+        await database.update(topicMaterials).set({ folderId: null }).where(and(eq(topicMaterials.folderId, input.id), eq(topicMaterials.professorId, ctx.user.id)));
+        await database.delete(materialFolders).where(and(eq(materialFolders.id, input.id), eq(materialFolders.professorId, ctx.user.id)));
+        return { success: true };
+      }),
+    moveToFolder: protectedProcedure
+      .input(z.object({ materialId: z.number(), folderId: z.number().nullable() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const { topicMaterials } = await import("../drizzle/schema");
+        await database.update(topicMaterials).set({ folderId: input.folderId }).where(and(eq(topicMaterials.id, input.materialId), eq(topicMaterials.professorId, ctx.user.id)));
         return { success: true };
       }),
     // Obter uso e limite de armazenamento individual do professor logado

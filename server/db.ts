@@ -163,6 +163,7 @@ import {
   InsertAssessment,
   forumTopics,
   forumReplies,
+  materialFolders,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { invokeLLM } from './_core/llm';
@@ -1642,7 +1643,7 @@ export async function getAllMaterialsByProfessor(professorId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Get all materials from this professor, joining with subjects for context
+  // Get all materials from this professor, joining with subjects and folders
   const materials = await db.select({
     id: topicMaterials.id,
     title: topicMaterials.title,
@@ -1654,12 +1655,17 @@ export async function getAllMaterialsByProfessor(professorId: number) {
     topicId: topicMaterials.topicId,
     moduleId: topicMaterials.moduleId,
     subjectId: topicMaterials.subjectId,
+    folderId: topicMaterials.folderId,
+    downloadCount: topicMaterials.downloadCount,
     createdAt: topicMaterials.createdAt,
     updatedAt: topicMaterials.updatedAt,
     subjectName: subjects.name,
+    folderName: materialFolders.name,
+    folderColor: materialFolders.color,
   })
     .from(topicMaterials)
     .leftJoin(subjects, eq(topicMaterials.subjectId, subjects.id))
+    .leftJoin(materialFolders, eq(topicMaterials.folderId, materialFolders.id))
     .where(eq(topicMaterials.professorId, professorId))
     .orderBy(desc(topicMaterials.createdAt));
   
@@ -1681,7 +1687,7 @@ export async function getMaterialsForStudent(studentId: number) {
   
   if (enrolledSubjectIds.length === 0) return [];
   
-  // Get materials for enrolled subjects
+  // Get materials for enrolled subjects with folder info
   const materials = await db.select({
     id: topicMaterials.id,
     title: topicMaterials.title,
@@ -1691,11 +1697,16 @@ export async function getMaterialsForStudent(studentId: number) {
     fileSize: topicMaterials.fileSize,
     isRequired: topicMaterials.isRequired,
     subjectId: topicMaterials.subjectId,
+    folderId: topicMaterials.folderId,
+    downloadCount: topicMaterials.downloadCount,
     createdAt: topicMaterials.createdAt,
     subjectName: subjects.name,
+    folderName: materialFolders.name,
+    folderColor: materialFolders.color,
   })
     .from(topicMaterials)
     .leftJoin(subjects, eq(topicMaterials.subjectId, subjects.id))
+    .leftJoin(materialFolders, eq(topicMaterials.folderId, materialFolders.id))
     .where(inArray(topicMaterials.subjectId, enrolledSubjectIds))
     .orderBy(desc(topicMaterials.createdAt));
   
