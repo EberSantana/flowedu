@@ -2969,3 +2969,49 @@ export const muralVotes = mysqlTable("mural_votes", {
 });
 export type MuralVote = typeof muralVotes.$inferSelect;
 export type InsertMuralVote = typeof muralVotes.$inferInsert;
+
+// ==================== GLOSSÁRIO COLABORATIVO ====================
+export const glossaries = mysqlTable("glossaries", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  subjectId: int("subjectId").notNull(),
+  classId: int("classId"),
+  createdByUserId: int("createdByUserId").notNull(),
+  allowStudentContributions: boolean("allowStudentContributions").default(true).notNull(),
+  requireApproval: boolean("requireApproval").default(false).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type Glossary = typeof glossaries.$inferSelect;
+export type InsertGlossary = typeof glossaries.$inferInsert;
+
+export const glossaryEntries = mysqlTable("glossary_entries", {
+  id: int("id").autoincrement().primaryKey(),
+  glossaryId: int("glossaryId").notNull(),
+  term: varchar("term", { length: 255 }).notNull(),
+  definition: text("definition").notNull(),
+  example: text("example"),
+  category: varchar("category", { length: 100 }),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),
+  authorStudentId: int("authorStudentId"),
+  isApproved: boolean("isApproved").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type GlossaryEntry = typeof glossaryEntries.$inferSelect;
+export type InsertGlossaryEntry = typeof glossaryEntries.$inferInsert;
+
+export const glossaryComments = mysqlTable("glossary_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  entryId: int("entryId").notNull(),
+  comment: text("comment").notNull(),
+  authorType: mysqlEnum("authorType", ["teacher", "student"]).notNull(),
+  authorUserId: int("authorUserId"),
+  authorStudentId: int("authorStudentId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type GlossaryComment = typeof glossaryComments.$inferSelect;
+export type InsertGlossaryComment = typeof glossaryComments.$inferInsert;

@@ -63,6 +63,7 @@ const TeacherDoubts = lazy(() => import("./pages/TeacherDoubts"));
 const TeacherGradePanel = lazy(() => import("./pages/TeacherGradePanel"));
 const TeacherForum = lazy(() => import("./pages/TeacherForum"));
 const TeacherMural = lazy(() => import("./pages/TeacherMural"));
+const TeacherGlossary = lazy(() => import("./pages/TeacherGlossary"));
 
 // Lazy loaded pages - Student Portal
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
@@ -86,6 +87,7 @@ const StudentLearningJournal = lazy(() => import("./pages/StudentLearningJournal
 const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
 const StudentForum = lazy(() => import("./pages/StudentForum"));
 const StudentMural = lazy(() => import("./pages/student/StudentMural"));
+const StudentGlossary = lazy(() => import("./pages/StudentGlossary"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
 const StudentGradeBook = lazy(() => import("./pages/StudentGradeBook"));
@@ -182,6 +184,7 @@ function Router() {
           <Route path={"/teacher-grades"} component={TeacherGradePanel} />
           <Route path={"/teacher-forum"} component={TeacherForum} />
           <Route path={"/teacher-mural"} component={TeacherMural} />
+          <Route path={"/teacher-glossary"} component={TeacherGlossary} />
           <Route path={"/assessments-manager"} component={AssessmentsManager} />
 
           {/* Student Portal - lazy loaded */}
@@ -206,6 +209,7 @@ function Router() {
           <Route path={"/student/doubts"} component={StudentDoubts} />
           <Route path={"/student/forum"} component={StudentForum} />
           <Route path={"/student/mural"} component={StudentMural} />
+          <Route path={"/student/glossary"} component={StudentGlossary} />
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
           <Route path={"/student/grade-book"} component={StudentGradeBook} />

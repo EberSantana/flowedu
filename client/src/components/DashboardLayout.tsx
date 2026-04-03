@@ -59,6 +59,7 @@ const menuItems = [
   { icon: Layers,          label: "Trilhas de Aprendizagem", path: "/learning-paths" },
   { icon: Layout,          label: "Mural Colaborativo", path: "/teacher-mural" },
   { icon: MessageSquare,   label: "Fórum", path: "/teacher-forum" },
+  { icon: BookOpen,        label: "Glossário", path: "/teacher-glossary" },
   { icon: MessageSquare,   label: "Dúvidas", path: "/teacher-doubts" },
   { icon: Star,            label: "Notas", path: "/teacher-grades" },
   { icon: Newspaper,       label: "Avisos", path: "/announcements" },

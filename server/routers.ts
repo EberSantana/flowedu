@@ -12407,6 +12407,243 @@ Retorne em formato JSON com estrutura:
         return { success: true };
       }),
   }),
+
+  // ==================== GLOSSÁRIO COLABORATIVO ====================
+  glossary: router({
+    // Listar glossários do professor
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const db2 = await import('./db').then(m => m.getDb());
+      if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      const { glossaries, subjects, classes } = await import('../drizzle/schema');
+      const { eq } = await import('drizzle-orm');
+      const result = await db2
+        .select({
+          id: glossaries.id,
+          title: glossaries.title,
+          description: glossaries.description,
+          subjectId: glossaries.subjectId,
+          classId: glossaries.classId,
+          allowStudentContributions: glossaries.allowStudentContributions,
+          requireApproval: glossaries.requireApproval,
+          isActive: glossaries.isActive,
+          createdAt: glossaries.createdAt,
+          subjectName: subjects.name,
+          className: classes.name,
+        })
+        .from(glossaries)
+        .leftJoin(subjects, eq(glossaries.subjectId, subjects.id))
+        .leftJoin(classes, eq(glossaries.classId, classes.id))
+        .where(eq(glossaries.createdByUserId, ctx.user.id))
+        .orderBy(glossaries.createdAt);
+      return result;
+    }),
+
+    // Listar glossários para aluno
+    listForStudent: studentProcedure.query(async ({ ctx }) => {
+      const db2 = await import('./db').then(m => m.getDb());
+      if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      const { glossaries, subjects, classes, subjectEnrollments } = await import('../drizzle/schema');
+      const { eq, inArray } = await import('drizzle-orm');
+      const studentId = ctx.studentSession.studentId;
+      // Buscar disciplinas do aluno
+      const enrollments = await db2.select({ subjectId: subjectEnrollments.subjectId })
+        .from(subjectEnrollments)
+        .where(eq(subjectEnrollments.studentId, studentId));
+      const subjectIds = enrollments.map((e: any) => e.subjectId).filter(Boolean) as number[];
+      if (subjectIds.length === 0) return [];
+      const result = await db2
+        .select({
+          id: glossaries.id,
+          title: glossaries.title,
+          description: glossaries.description,
+          subjectId: glossaries.subjectId,
+          classId: glossaries.classId,
+          allowStudentContributions: glossaries.allowStudentContributions,
+          requireApproval: glossaries.requireApproval,
+          isActive: glossaries.isActive,
+          createdAt: glossaries.createdAt,
+          subjectName: subjects.name,
+          className: classes.name,
+        })
+        .from(glossaries)
+        .leftJoin(subjects, eq(glossaries.subjectId, subjects.id))
+        .leftJoin(classes, eq(glossaries.classId, classes.id))
+        .where(inArray(glossaries.subjectId, subjectIds))
+        .orderBy(glossaries.createdAt);
+      return result;
+    }),
+
+    // Criar glossário
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(3).max(255),
+        description: z.string().optional(),
+        subjectId: z.number(),
+        classId: z.number().optional(),
+        allowStudentContributions: z.boolean().default(true),
+        requireApproval: z.boolean().default(false),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaries } = await import('../drizzle/schema');
+        const [result] = await db2.insert(glossaries).values({
+          ...input,
+          createdByUserId: ctx.user.id,
+        });
+        return result;
+      }),
+
+    // Deletar glossário
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaries, glossaryEntries, glossaryComments } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        // Deletar comentários das entradas
+        const entries = await db2.select({ id: glossaryEntries.id }).from(glossaryEntries).where(eq(glossaryEntries.glossaryId, input.id));
+        for (const entry of entries) {
+          await db2.delete(glossaryComments).where(eq(glossaryComments.entryId, entry.id));
+        }
+        await db2.delete(glossaryEntries).where(eq(glossaryEntries.glossaryId, input.id));
+        await db2.delete(glossaries).where(eq(glossaries.id, input.id));
+        return { success: true };
+      }),
+
+    // Listar entradas de um glossário
+    listEntries: publicProcedure
+      .input(z.object({ glossaryId: z.number() }))
+      .query(async ({ input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryEntries, users, students } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const entries = await db2
+          .select()
+          .from(glossaryEntries)
+          .where(eq(glossaryEntries.glossaryId, input.glossaryId))
+          .orderBy(glossaryEntries.term);
+        return entries;
+      }),
+
+    // Adicionar entrada ao glossário (professor)
+    addEntry: protectedProcedure
+      .input(z.object({
+        glossaryId: z.number(),
+        term: z.string().min(1).max(255),
+        definition: z.string().min(1),
+        example: z.string().optional(),
+        category: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryEntries } = await import('../drizzle/schema');
+        const [result] = await db2.insert(glossaryEntries).values({
+          ...input,
+          authorType: 'teacher',
+          authorUserId: ctx.user.id,
+          isApproved: true,
+        });
+        return result;
+      }),
+
+    // Adicionar entrada ao glossário (aluno)
+    addEntryStudent: studentProcedure
+      .input(z.object({
+        glossaryId: z.number(),
+        term: z.string().min(1).max(255),
+        definition: z.string().min(1),
+        example: z.string().optional(),
+        category: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryEntries, glossaries } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        // Verificar se aluno pode contribuir
+        const [glossary] = await db2.select().from(glossaries).where(eq(glossaries.id, input.glossaryId));
+        if (!glossary || !glossary.allowStudentContributions) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Contribuições de alunos não permitidas neste glossário' });
+        }
+        const [result] = await db2.insert(glossaryEntries).values({
+          ...input,
+          authorType: 'student',
+          authorStudentId: ctx.studentSession.studentId,
+          isApproved: !glossary.requireApproval,
+        });
+        return result;
+      }),
+
+    // Deletar entrada
+    deleteEntry: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryEntries, glossaryComments } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        await db2.delete(glossaryComments).where(eq(glossaryComments.entryId, input.id));
+        await db2.delete(glossaryEntries).where(eq(glossaryEntries.id, input.id));
+        return { success: true };
+      }),
+
+    // Aprovar entrada (professor)
+    approveEntry: protectedProcedure
+      .input(z.object({ id: z.number(), approved: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryEntries } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        await db2.update(glossaryEntries).set({ isApproved: input.approved }).where(eq(glossaryEntries.id, input.id));
+        return { success: true };
+      }),
+
+    // Listar comentários de uma entrada
+    listComments: publicProcedure
+      .input(z.object({ entryId: z.number() }))
+      .query(async ({ input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryComments } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        return db2.select().from(glossaryComments).where(eq(glossaryComments.entryId, input.entryId)).orderBy(glossaryComments.createdAt);
+      }),
+
+    // Adicionar comentário (professor)
+    addComment: protectedProcedure
+      .input(z.object({ entryId: z.number(), comment: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryComments } = await import('../drizzle/schema');
+        const [result] = await db2.insert(glossaryComments).values({
+          ...input,
+          authorType: 'teacher',
+          authorUserId: ctx.user.id,
+        });
+        return result;
+      }),
+
+    // Adicionar comentário (aluno)
+    addCommentStudent: studentProcedure
+      .input(z.object({ entryId: z.number(), comment: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const db2 = await import('./db').then(m => m.getDb());
+        if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { glossaryComments } = await import('../drizzle/schema');
+        const [result] = await db2.insert(glossaryComments).values({
+          ...input,
+          authorType: 'student',
+          authorStudentId: ctx.studentSession.studentId,
+        });
+        return result;
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
 
