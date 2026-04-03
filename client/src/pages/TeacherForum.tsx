@@ -24,6 +24,8 @@ import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Inbox } from "lucide-react";
 
 type View = "subjects" | "forums" | "topics" | "topic_detail" | "grades";
 
@@ -159,28 +161,80 @@ export default function TeacherForum() {
     <>
       <Sidebar />
       <PageWrapper className="min-h-screen bg-background">
-        <div className="p-6 max-w-5xl mx-auto w-full">
-          {/* Breadcrumb */}
-          <Breadcrumb items={[
-            { label: "Início", href: "/" },
-            { label: "Comunicação" },
-            { label: "Fórum de Discussão", href: "/teacher-forum" },
-            ...(selectedSubjectName ? [{ label: selectedSubjectName }] : []),
-            ...(selectedForumTitle ? [{ label: selectedForumTitle }] : []),
-            ...(selectedTopicTitle ? [{ label: selectedTopicTitle }] : []),
-          ]} />
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-4"
+            onClick={() => setLocation("/dashboard")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Dashboard
+          </Button>
+          <Breadcrumb
+            items={[
+              { label: "Comunicação" },
+              { label: "Fórum de Discussão" },
+              ...(selectedSubjectName ? [{ label: selectedSubjectName }] : []),
+              ...(selectedForumTitle ? [{ label: selectedForumTitle }] : []),
+              ...(selectedTopicTitle ? [{ label: selectedTopicTitle }] : []),
+            ]}
+          />
 
           {/* ============ VIEW: DISCIPLINAS ============ */}
           {view === "subjects" && (
             <>
-              <div className="flex items-center gap-3 mb-2 mt-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-primary" />
-                </div>
+              {/* Header */}
+              <div className="mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">Fórum de Discussão</h1>
-                  <p className="text-sm text-muted-foreground">Selecione uma disciplina para gerenciar os fóruns</p>
+                  <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                    <MessageSquare className="w-8 h-8 text-primary" />
+                    Fórum de Discussão
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    Gerencie os fóruns de discussão das suas disciplinas
+                  </p>
                 </div>
+              </div>
+              {/* Cards de Estatísticas */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <Card className="border-l-4 border-l-primary">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Inbox className="h-4 w-4 text-primary" />
+                      Disciplinas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{subjects?.length ?? 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Com fórum disponível</p>
+                  </CardContent>
+                </Card>
+                <Card className="border-l-4 border-l-green-500">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4 text-green-500" />
+                      Fóruns Ativos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{subjects?.length ?? 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Abertos para discussão</p>
+                  </CardContent>
+                </Card>
+                <Card className="border-l-4 border-l-yellow-500">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Users className="h-4 w-4 text-yellow-500" />
+                      Participação
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">—</div>
+                    <p className="text-xs text-muted-foreground mt-1">Selecione um fórum</p>
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
