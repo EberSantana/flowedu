@@ -6075,6 +6075,22 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
     listAll: protectedProcedure.query(async ({ ctx }) => {
       return await db.getAllMaterialsByProfessor(ctx.user.id);
     }),
+    // Listar materiais disponíveis para o aluno (das disciplinas matriculadas)
+    listForStudent: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getMaterialsForStudent(ctx.user.id);
+    }),
+    // Atualizar subjectId de um material
+    updateSubject: protectedProcedure
+      .input(z.object({ materialId: z.number(), subjectId: z.number().nullable() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const { topicMaterials } = await import("../drizzle/schema");
+        await database.update(topicMaterials)
+          .set({ subjectId: input.subjectId })
+          .where(and(eq(topicMaterials.id, input.materialId), eq(topicMaterials.professorId, ctx.user.id)));
+        return { success: true };
+      }),
     // Obter uso e limite de armazenamento individual do professor logado
     getMyStorageInfo: protectedProcedure.query(async ({ ctx }) => {
       const usage = await db.getTeacherStorageUsage(ctx.user.id);

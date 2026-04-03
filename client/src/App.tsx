@@ -89,6 +89,7 @@ const StudentDoubts = lazy(() => import("./pages/StudentDoubts"));
 const StudentForum = lazy(() => import("./pages/StudentForum"));
 const StudentMural = lazy(() => import("./pages/student/StudentMural"));
 const StudentGlossary = lazy(() => import("./pages/StudentGlossary"));
+const StudentStudyMaterials = lazy(() => import("./pages/StudentStudyMaterials"));
 const StudentStatistics = lazy(() => import("./pages/StudentStatistics"));
 const StudentNotebook = lazy(() => import("./pages/StudentNotebook"));
 const StudentGradeBook = lazy(() => import("./pages/StudentGradeBook"));
@@ -212,6 +213,7 @@ function Router() {
           <Route path={"/student/forum"} component={StudentForum} />
           <Route path={"/student/mural"} component={StudentMural} />
           <Route path={"/student/glossary"} component={StudentGlossary} />
+          <Route path={"/student/materials"} component={StudentStudyMaterials} />
           <Route path={"/student/statistics"} component={StudentStatistics} />
           <Route path={"/student/notebook"} component={StudentNotebook} />
           <Route path={"/student/grade-book"} component={StudentGradeBook} />

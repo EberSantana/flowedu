@@ -15,6 +15,9 @@ import {
   Download,
   Presentation,
   FolderOpen,
+  Eye,
+  X,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,9 +92,13 @@ export default function TeacherStudyMaterials() {
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [filterType, setFilterType] = useState<string>("all");
+  const [filterSubject, setFilterSubject] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<string>("");
+  const [previewTitle, setPreviewTitle] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -101,6 +108,7 @@ export default function TeacherStudyMaterials() {
     url: "",
     isRequired: false,
     topicId: 0,
+    subjectId: "" as string,
   });
   const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
 
@@ -136,11 +144,23 @@ export default function TeacherStudyMaterials() {
     onError: (err) => toast.error(err.message),
   });
 
+  const updateSubject = trpc.materials.updateSubject.useMutation({
+    onSuccess: () => {
+      toast.success("Disciplina atualizada!");
+      refetch();
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
   // Filtered materials
   const filteredMaterials = useMemo(() => {
     let filtered = allMaterials;
     if (filterType !== "all") {
       filtered = filtered.filter((m) => m.type === filterType);
+    }
+    if (filterSubject !== "all") {
+      const subjectId = parseInt(filterSubject);
+      filtered = filtered.filter((m) => m.subjectId === subjectId);
     }
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
@@ -151,7 +171,7 @@ export default function TeacherStudyMaterials() {
       );
     }
     return filtered;
-  }, [allMaterials, filterType, searchTerm]);
+  }, [allMaterials, filterType, filterSubject, searchTerm]);
 
   // Stats
   const totalMaterials = allMaterials.length;
@@ -172,6 +192,7 @@ export default function TeacherStudyMaterials() {
       url: "",
       isRequired: false,
       topicId: 0,
+      subjectId: "",
     });
     setSelectedFile(null);
     setUploadProgress(0);
@@ -198,11 +219,25 @@ export default function TeacherStudyMaterials() {
     }));
   }
 
+  function canPreview(type: string, url: string): boolean {
+    if (type === "pdf" || type === "video") return true;
+    if (type === "link" && url) return true;
+    return false;
+  }
+
+  function handlePreview(material: { type: string; url: string; title: string }) {
+    setPreviewUrl(material.url);
+    setPreviewType(material.type);
+    setPreviewTitle(material.title);
+  }
+
   async function handleSubmit() {
     if (!formData.title.trim()) {
       toast.error("Título é obrigatório");
       return;
     }
+
+    const subjectIdNum = formData.subjectId ? parseInt(formData.subjectId) : undefined;
 
     if (formData.type === "link") {
       if (!formData.url.trim()) {
@@ -217,6 +252,15 @@ export default function TeacherStudyMaterials() {
         url: formData.url,
         isRequired: formData.isRequired,
       });
+      // Update subject after creation
+      if (subjectIdNum) {
+        setTimeout(() => {
+          const latest = allMaterials[0];
+          if (latest) {
+            updateSubject.mutate({ materialId: latest.id, subjectId: subjectIdNum });
+          }
+        }, 500);
+      }
       return;
     }
 
@@ -323,8 +367,8 @@ export default function TeacherStudyMaterials() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <HardDrive className="h-5 w-5 text-primary" />
-                  <span className="font-medium">
-                    <span className="text-emerald-600 font-bold">
+                  <span>
+                    <span className="text-primary font-bold">
                       {usedMB.toFixed(1)} MB
                     </span>{" "}
                     de{" "}
@@ -426,6 +470,19 @@ export default function TeacherStudyMaterials() {
                     Filtrar:
                   </span>
                 </div>
+                <Select value={filterSubject} onValueChange={setFilterSubject}>
+                  <SelectTrigger className="w-[220px]">
+                    <SelectValue placeholder="Todas as disciplinas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as disciplinas</SelectItem>
+                    {subjects.map((s: any) => (
+                      <SelectItem key={s.id} value={String(s.id)}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Todos os tipos" />
@@ -472,11 +529,11 @@ export default function TeacherStudyMaterials() {
                     Nenhum material encontrado
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {searchTerm || filterType !== "all"
+                    {searchTerm || filterType !== "all" || filterSubject !== "all"
                       ? "Tente ajustar os filtros de busca"
                       : "Adicione materiais de estudo para seus alunos"}
                   </p>
-                  {!searchTerm && filterType === "all" && (
+                  {!searchTerm && filterType === "all" && filterSubject === "all" && (
                     <Button onClick={() => setShowAddDialog(true)}>
                       <Plus className="mr-2 h-4 w-4" />
                       Adicionar Primeiro Material
@@ -510,10 +567,27 @@ export default function TeacherStudyMaterials() {
                                 Obrigatório
                               </Badge>
                             ) : null}
+                            {(material as any).subjectName && (
+                              <Badge variant="outline" className="text-xs">
+                                <BookOpen className="h-3 w-3 mr-1" />
+                                {(material as any).subjectName}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                        {/* Pré-visualização */}
+                        {canPreview(material.type, material.url) && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handlePreview(material)}
+                            title="Pré-visualizar"
+                          >
+                            <Eye className="h-4 w-4 text-primary" />
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"
@@ -560,6 +634,59 @@ export default function TeacherStudyMaterials() {
         </div>
       </PageWrapper>
 
+      {/* Dialog de Pré-visualização */}
+      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-primary" />
+              {previewTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="w-full" style={{ minHeight: "500px" }}>
+            {previewType === "pdf" && previewUrl && (
+              <iframe
+                src={previewUrl}
+                className="w-full rounded-lg border"
+                style={{ height: "70vh" }}
+                title={previewTitle}
+              />
+            )}
+            {previewType === "video" && previewUrl && (
+              <video
+                src={previewUrl}
+                controls
+                className="w-full rounded-lg"
+                style={{ maxHeight: "70vh" }}
+              >
+                Seu navegador não suporta reprodução de vídeo.
+              </video>
+            )}
+            {previewType === "link" && previewUrl && (
+              <iframe
+                src={previewUrl}
+                className="w-full rounded-lg border"
+                style={{ height: "70vh" }}
+                title={previewTitle}
+                sandbox="allow-scripts allow-same-origin"
+              />
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewUrl(null)}>
+              <X className="mr-2 h-4 w-4" />
+              Fechar
+            </Button>
+            {previewUrl && (
+              <Button onClick={() => window.open(previewUrl, "_blank")}>
+                <Download className="mr-2 h-4 w-4" />
+                Abrir em Nova Aba
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Dialog de Adicionar Material */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="sm:max-w-lg">
@@ -570,6 +697,28 @@ export default function TeacherStudyMaterials() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {/* Seletor de Disciplina */}
+            <div>
+              <Label>Disciplina</Label>
+              <Select
+                value={formData.subjectId}
+                onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, subjectId: val }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a disciplina (opcional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subjects.map((s: any) => (
+                    <SelectItem key={s.id} value={String(s.id)}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label>Tipo de Material</Label>
               <Select

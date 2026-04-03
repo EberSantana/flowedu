@@ -7739,3 +7739,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Adicionar item "Materiais de Estudo" no menu Conteúdo (Sidebar.tsx)
 - [ ] Registrar rota no App.tsx
 - [ ] Deploy no VPS
+
+## Melhorias Materiais de Estudo v2
+- [ ] Seletor de disciplina no formulário de upload do professor
+- [ ] Pré-visualização inline de PDFs e vídeos na lista de materiais
+- [ ] Página StudentStudyMaterials no portal do aluno com filtro por disciplina
+- [ ] Registrar rota e menu no portal do aluno
+- [ ] Deploy no VPS

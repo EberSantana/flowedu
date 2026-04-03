@@ -441,6 +441,7 @@ export const topicMaterials = mysqlTable("topic_materials", {
   topicId: int("topicId"),
   moduleId: int("moduleId"),
   professorId: int("professorId").notNull(),
+  subjectId: int("subjectId"), // Disciplina associada ao material
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   type: mysqlEnum("type", ["pdf", "video", "link", "presentation", "document", "other"]).notNull(),

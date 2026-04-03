@@ -24,7 +24,8 @@ import {
   Smartphone,
   BookMarked,
   Activity,
-  Layout
+  Layout,
+  FolderOpen
 } from "lucide-react";
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
@@ -131,6 +132,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         { icon: MessageSquare, label: "Fórum de Discussão", path: "/student/forum" },
         { icon: Layout, label: "Mural Colaborativo", path: "/student/mural" },
         { icon: BookOpen, label: "Glossário", path: "/student/glossary" },
+        { icon: FolderOpen, label: "Materiais de Estudo", path: "/student/materials" },
         { icon: PenLine, label: "Diário de Aprendizagem", path: "/student/learning-journal" },
       ],
     },

@@ -1642,7 +1642,7 @@ export async function getAllMaterialsByProfessor(professorId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Get all materials from this professor, joining with topics/modules/subjects for context
+  // Get all materials from this professor, joining with subjects for context
   const materials = await db.select({
     id: topicMaterials.id,
     title: topicMaterials.title,
@@ -1653,11 +1653,50 @@ export async function getAllMaterialsByProfessor(professorId: number) {
     isRequired: topicMaterials.isRequired,
     topicId: topicMaterials.topicId,
     moduleId: topicMaterials.moduleId,
+    subjectId: topicMaterials.subjectId,
     createdAt: topicMaterials.createdAt,
     updatedAt: topicMaterials.updatedAt,
+    subjectName: subjects.name,
   })
     .from(topicMaterials)
+    .leftJoin(subjects, eq(topicMaterials.subjectId, subjects.id))
     .where(eq(topicMaterials.professorId, professorId))
+    .orderBy(desc(topicMaterials.createdAt));
+  
+  return materials;
+}
+
+export async function getMaterialsForStudent(studentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get subjects the student is enrolled in
+  const enrollments = await db.select({
+    subjectId: subjectEnrollments.subjectId,
+  })
+    .from(subjectEnrollments)
+    .where(eq(subjectEnrollments.studentId, studentId));
+  
+  const enrolledSubjectIds = enrollments.map(e => e.subjectId);
+  
+  if (enrolledSubjectIds.length === 0) return [];
+  
+  // Get materials for enrolled subjects
+  const materials = await db.select({
+    id: topicMaterials.id,
+    title: topicMaterials.title,
+    description: topicMaterials.description,
+    type: topicMaterials.type,
+    url: topicMaterials.url,
+    fileSize: topicMaterials.fileSize,
+    isRequired: topicMaterials.isRequired,
+    subjectId: topicMaterials.subjectId,
+    createdAt: topicMaterials.createdAt,
+    subjectName: subjects.name,
+  })
+    .from(topicMaterials)
+    .leftJoin(subjects, eq(topicMaterials.subjectId, subjects.id))
+    .where(inArray(topicMaterials.subjectId, enrolledSubjectIds))
     .orderBy(desc(topicMaterials.createdAt));
   
   return materials;
