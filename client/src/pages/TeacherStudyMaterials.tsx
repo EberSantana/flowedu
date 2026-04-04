@@ -282,6 +282,9 @@ export default function TeacherStudyMaterials() {
               </p>
             </div>
             <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowFolderDialog(true)}>
+                <FolderPlus className="mr-2 h-4 w-4" /> Nova Pasta
+              </Button>
               <Button onClick={() => setShowAddDialog(true)}>
                 <Plus className="mr-2 h-4 w-4" /> Adicionar Material
               </Button>
@@ -541,6 +544,40 @@ export default function TeacherStudyMaterials() {
               </Button>
             ))}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Criar Pasta */}
+      <Dialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><FolderPlus className="h-5 w-5 text-primary" />Nova Pasta</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label>Nome da Pasta <span className="text-red-500">*</span></Label>
+              <Input placeholder="Ex: Aula 01, Provas, Exercícios..." value={folderForm.name} onChange={(e) => setFolderForm((p) => ({ ...p, name: e.target.value }))} />
+            </div>
+            <div>
+              <Label>Descrição (opcional)</Label>
+              <Textarea placeholder="Breve descrição da pasta..." value={folderForm.description} onChange={(e) => setFolderForm((p) => ({ ...p, description: e.target.value }))} rows={2} />
+            </div>
+            <div>
+              <Label>Cor da Pasta</Label>
+              <div className="flex gap-2 mt-2">
+                {["#0d9488", "#2563eb", "#7c3aed", "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#64748b"].map((color) => (
+                  <button key={color} className={`w-8 h-8 rounded-full border-2 transition-all ${folderForm.color === color ? "border-foreground scale-110" : "border-transparent"}`}
+                    style={{ backgroundColor: color }} onClick={() => setFolderForm((p) => ({ ...p, color }))} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowFolderDialog(false); setFolderForm({ name: "", description: "", color: "#0d9488" }); }}>Cancelar</Button>
+            <Button onClick={() => { if (!folderForm.name.trim()) { toast.error("Nome da pasta é obrigatório"); return; } createFolder.mutate(folderForm); }} disabled={createFolder.isPending}>
+              {createFolder.isPending ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Criando...</>) : (<><FolderPlus className="mr-2 h-4 w-4" />Criar Pasta</>)}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
