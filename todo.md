@@ -7760,3 +7760,14 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Associar materiais sem disciplina ao subjectId correto no banco
 - [x] Notificação automática ao professor quando aluno contribuir com novo termo no glossário
 - [ ] Restaurar botão de criar pastas nos Materiais de Estudo
+
+## Correção de Pastas nos Materiais de Estudo
+
+- [x] Corrigir exibição de pastas criadas nos Materiais de Estudo (pastas não apareciam na interface)
+- [x] Redesenhar agrupamento: Disciplina > Pastas > Materiais soltos
+- [x] Adicionar seletor de disciplina no dialog de criação de pasta
+- [x] Adicionar dialog "Mover para Pasta" com botão em cada material
+- [x] Exibir pastas vazias dentro das disciplinas
+- [x] Adicionar card de estatísticas com contagem de pastas
+- [x] Permitir selecionar pasta ao adicionar novo material
+- [x] Exibir sub-seção "Sem pasta" para materiais não organizados
