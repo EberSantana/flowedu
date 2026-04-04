@@ -466,6 +466,27 @@
   background-color: hsl(var(--muted));
 }
 
+/* Shepherd element - seguir tema */
+.shepherd-element {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
+
+.shepherd-text {
+  color: hsl(var(--card-foreground));
+}
+
+.shepherd-arrow:before {
+  background: hsl(var(--card)) !important;
+}
+
+/* Caixa de dica dentro do tour - segue o tema */
+.shepherd-tip-box {
+  background-color: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary) / 0.2);
+}
+
 /* ===== ANIMAÇÕES SUTIS PARA UI/UX ===== */
 
 /* Animação fade-in com slide-up */

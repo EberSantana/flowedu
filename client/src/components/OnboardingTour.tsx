@@ -48,10 +48,10 @@ export function useOnboardingTour() {
       text: `
         <div class="shepherd-content-custom">
           <h3 class="text-xl font-bold mb-2">👋 Bem-vindo ao FlowEdu!</h3>
-          <p class="text-gray-700 mb-2">
+          <p class="opacity-80 mb-2">
             <strong>Onde a educação flui.</strong>
           </p>
-          <p class="text-gray-700">
+          <p class="opacity-80">
             Aqui você tem uma visão geral do sistema: disciplinas, turmas, aulas agendadas e estatísticas de aulas dadas.
           </p>
         </div>
@@ -81,10 +81,10 @@ export function useOnboardingTour() {
       text: `
         <div class="shepherd-content-custom">
           <h3 class="text-xl font-bold mb-2">📚 Disciplinas</h3>
-          <p class="text-gray-700 mb-3">
+          <p class="opacity-80 mb-3">
             Comece criando suas disciplinas. Você pode adicionar nome, código, ementa e carga horária.
           </p>
-          <p class="text-sm text-purple-700 bg-purple-50 p-2 rounded">
+          <p class="text-sm p-2 rounded shepherd-tip-box">
             💡 Dica: Acesse o menu lateral "Disciplinas" para gerenciar todas as suas matérias.
           </p>
         </div>
@@ -112,16 +112,16 @@ export function useOnboardingTour() {
       text: `
         <div class="shepherd-content-custom">
           <h3 class="text-xl font-bold mb-2">🚀 Trilhas de Aprendizagem com IA</h3>
-          <p class="text-gray-700 mb-3">
+          <p class="opacity-80 mb-3">
             A funcionalidade mais poderosa! Cole a ementa da disciplina e a IA cria automaticamente:
           </p>
-          <ul class="list-disc list-inside text-gray-700 space-y-1 mb-3">
+          <ul class="list-disc list-inside opacity-80 space-y-1 mb-3">
             <li>Módulos organizados</li>
             <li>Tópicos detalhados</li>
             <li>Distribuição de atividades (teoria/prática)</li>
             <li>Sugestões de planos de aula</li>
           </ul>
-          <p class="text-sm text-purple-700 bg-purple-50 p-2 rounded">
+          <p class="text-sm p-2 rounded shepherd-tip-box">
             ✨ Acesse "Trilhas de Aprendizagem" no menu lateral!
           </p>
         </div>
@@ -145,10 +145,10 @@ export function useOnboardingTour() {
       text: `
         <div class="shepherd-content-custom">
           <h3 class="text-xl font-bold mb-2">📅 Grade Semanal</h3>
-          <p class="text-gray-700 mb-3">
+          <p class="opacity-80 mb-3">
             Organize suas aulas semanalmente. Visualize horários, salas e marque o status de cada aula (dada, não dada ou cancelada).
           </p>
-          <p class="text-sm text-cyan-700 bg-cyan-50 p-2 rounded">
+          <p class="text-sm p-2 rounded shepherd-tip-box">
             💡 Clique duas vezes em um status para desmarcá-lo!
           </p>
         </div>
@@ -172,16 +172,16 @@ export function useOnboardingTour() {
       text: `
         <div class="shepherd-content-custom">
           <h3 class="text-xl font-bold mb-2">📈 Relatórios</h3>
-          <p class="text-gray-700 mb-3">
+          <p class="opacity-80 mb-3">
             Acompanhe seu desempenho com relatórios detalhados:
           </p>
-          <ul class="list-disc list-inside text-gray-700 space-y-1 mb-3">
+          <ul class="list-disc list-inside opacity-80 space-y-1 mb-3">
             <li>Estatísticas por disciplina</li>
             <li>Gráficos visuais</li>
             <li>Filtros por período</li>
             <li>Exportação para PDF</li>
           </ul>
-          <p class="text-sm text-green-700 bg-green-50 p-2 rounded">
+          <p class="text-sm p-2 rounded shepherd-tip-box">
             ✅ Pronto! Agora você conhece as principais funcionalidades. Boa aula!
           </p>
         </div>

@@ -30,7 +30,10 @@ export function MotivationalBanner({
     <div
       className="relative overflow-hidden rounded-2xl mb-8"
       style={{
-        background: "linear-gradient(135deg, oklch(32% .14 145) 0%, oklch(42% .14 145) 40%, oklch(55% .10 145) 100%)",
+        background: `linear-gradient(135deg, 
+          color-mix(in oklch, hsl(var(--primary)) 100%, black 55%) 0%, 
+          color-mix(in oklch, hsl(var(--primary)) 100%, black 35%) 40%, 
+          color-mix(in oklch, hsl(var(--primary)) 85%, black 15%) 100%)`,
         boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
       }}
     >
@@ -102,12 +105,12 @@ export function MotivationalBanner({
                   className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-90"
                   style={{
                     background: isCustomizing
-                      ? "hsl(var(--primary) / 0.35)"
-                      : "hsl(var(--primary) / 0.18)",
-                    color: "hsl(var(--primary))",
+                      ? "rgba(255,255,255,0.35)"
+                      : "rgba(255,255,255,0.18)",
+                    color: "rgba(255,255,255,0.95)",
                     border: isCustomizing
-                      ? "1px solid hsl(var(--primary) / 0.7)"
-                      : "1px solid hsl(var(--primary) / 0.35)",
+                      ? "1px solid rgba(255,255,255,0.7)"
+                      : "1px solid rgba(255,255,255,0.35)",
                   }}
                 >
                   <Settings className="h-3 w-3" />
@@ -128,13 +131,13 @@ export function MotivationalBanner({
                 style={
                   chip.highlight
                     ? {
-                        background: "hsl(var(--primary) / 0.22)",
-                        border: "1px solid hsl(var(--primary) / 0.5)",
-                        color: "hsl(var(--primary))",
+                        background: "rgba(255,255,255,0.25)",
+                        border: "1px solid rgba(255,255,255,0.5)",
+                        color: "rgba(255,255,255,0.95)",
                       }
                     : {
-                        background: "rgba(255,255,255,0.35)",
-                        border: "1px solid rgba(0,0,0,0.20)",
+                        background: "rgba(255,255,255,0.15)",
+                        border: "1px solid rgba(255,255,255,0.25)",
                         color: "rgba(255,255,255,0.85)",
                       }
                 }
@@ -151,7 +154,7 @@ export function MotivationalBanner({
         <div
           className="mt-5 pt-4 text-xs italic"
           style={{
-            borderTop: "1px solid rgba(0,0,0,0.15)",
+            borderTop: "1px solid rgba(255,255,255,0.15)",
             color: "rgba(255,255,255,0.75)",
           }}
         >

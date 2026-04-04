@@ -7771,3 +7771,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar card de estatísticas com contagem de pastas
 - [x] Permitir selecionar pasta ao adicionar novo material
 - [x] Exibir sub-seção "Sem pasta" para materiais não organizados
+
+## Bug: Tela de Boas-Vindas com cor verde fixa
+
+- [x] Corrigir Welcome Tour para usar paleta de cores do tema selecionado ao invés de verde fixo
