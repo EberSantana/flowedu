@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Settings, RotateCcw, Calendar } from "lucide-react";
 import type { MotivationalGreeting } from "@/hooks/useMotivationalGreeting";
 
@@ -11,6 +11,60 @@ interface MotivationalBannerProps {
   onReset?: () => void;
 }
 
+/**
+ * Lê o valor da variável CSS --primary do documento e extrai o hue OKLCH.
+ * Retorna um gradient escuro baseado na cor primária do tema atual.
+ */
+function useBannerGradient() {
+  const [gradient, setGradient] = useState<string>("");
+
+  useEffect(() => {
+    function buildGradient() {
+      const root = document.documentElement;
+      const primary = getComputedStyle(root).getPropertyValue("--primary").trim();
+
+      // primary pode ser "oklch(0.45 0.12 230)", "oklch(42% .14 145)" ou "oklch(45% 12% 230)"
+      // Extraímos lightness, chroma e hue para criar versões mais escuras
+      const match = primary.match(/oklch\(\s*([\d.]+)%?\s+([\d.]+)%?\s+([\d.]+)\s*\)/);
+      if (match) {
+        // Normaliza: se for porcentagem (ex: 42%), divide por 100
+        const rawL = parseFloat(match[1]);
+        const rawC = parseFloat(match[2]);
+        const l = rawL > 1 ? rawL / 100 : rawL;
+        const c = rawC > 1 ? rawC / 100 : rawC;
+        const h = parseFloat(match[3]);
+
+        // Versões escuras da cor primária para o gradient
+        const darkL = Math.max(0.18, l * 0.45);
+        const midL  = Math.max(0.25, l * 0.60);
+        const lightL = Math.max(0.32, l * 0.75);
+
+        const start = `oklch(${darkL.toFixed(2)} ${c} ${h})`;
+        const mid   = `oklch(${midL.toFixed(2)} ${c} ${h})`;
+        const end   = `oklch(${lightL.toFixed(2)} ${(c * 0.85).toFixed(3)} ${h})`;
+
+        setGradient(`linear-gradient(135deg, ${start} 0%, ${mid} 40%, ${end} 100%)`);
+      } else {
+        // Fallback: usa a cor primária diretamente com opacidade
+        setGradient(`linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%)`);
+      }
+    }
+
+    buildGradient();
+
+    // Observar mudanças no atributo style do html (quando o tema muda)
+    const observer = new MutationObserver(buildGradient);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return gradient;
+}
+
 export function MotivationalBanner({
   greeting,
   avatarInitial,
@@ -19,6 +73,8 @@ export function MotivationalBanner({
   onCustomize,
   onReset,
 }: MotivationalBannerProps) {
+  const gradient = useBannerGradient();
+
   const today = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     day: "numeric",
@@ -30,26 +86,23 @@ export function MotivationalBanner({
     <div
       className="relative overflow-hidden rounded-2xl mb-8"
       style={{
-        background: `linear-gradient(135deg, 
-          color-mix(in oklch, hsl(var(--primary)) 100%, black 55%) 0%, 
-          color-mix(in oklch, hsl(var(--primary)) 100%, black 35%) 40%, 
-          color-mix(in oklch, hsl(var(--primary)) 85%, black 15%) 100%)`,
+        background: gradient || "var(--primary)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
       }}
     >
       {/* Círculos decorativos de fundo */}
       <div
-        className="pointer-events-none absolute -right-8 -top-8 h-52 w-52 rounded-full opacity-10"
-        style={{ background: "hsl(var(--primary))" }}
+        className="pointer-events-none absolute -right-8 -top-8 h-52 w-52 rounded-full"
+        style={{ background: "rgba(255,255,255,0.08)" }}
       />
       <div
-        className="pointer-events-none absolute bottom-[-2.5rem] right-20 h-40 w-40 rounded-full opacity-[0.06]"
-        style={{ background: "hsl(var(--primary))" }}
+        className="pointer-events-none absolute bottom-[-2.5rem] right-20 h-40 w-40 rounded-full"
+        style={{ background: "rgba(255,255,255,0.04)" }}
       />
       {/* Linha de brilho superior */}
       <div
-        className="absolute top-0 left-0 right-0 h-px opacity-20"
-        style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)" }}
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)" }}
       />
 
       <div className="relative z-10 p-6 sm:p-8">
@@ -68,10 +121,10 @@ export function MotivationalBanner({
               {avatarInitial}
             </div>
             <div>
-              <h1 className="text-2xl font-bold leading-tight sm:text-3xl" style={{color: "rgba(255,255,255,0.95)"}}>
+              <h1 className="text-2xl font-bold leading-tight sm:text-3xl" style={{ color: "rgba(255,255,255,0.95)" }}>
                 {greeting.greeting} {greeting.emoji}
               </h1>
-              <p className="mt-1 max-w-lg text-sm leading-relaxed" style={{color: "rgba(255,255,255,0.85)"}}>
+              <p className="mt-1 max-w-lg text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>
                 {greeting.message}
               </p>
             </div>
@@ -79,7 +132,7 @@ export function MotivationalBanner({
 
           {/* Data + botão Personalizar (empilhados) */}
           <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-1.5 text-xs font-medium" style={{color: "rgba(255,255,255,0.75)"}}>
+            <div className="flex items-center gap-1.5 text-xs font-medium" style={{ color: "rgba(255,255,255,0.75)" }}>
               <Calendar className="h-3.5 w-3.5" />
               <span>{todayFormatted}</span>
             </div>
@@ -104,9 +157,7 @@ export function MotivationalBanner({
                   onClick={onCustomize}
                   className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-90"
                   style={{
-                    background: isCustomizing
-                      ? "rgba(255,255,255,0.35)"
-                      : "rgba(255,255,255,0.18)",
+                    background: isCustomizing ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.18)",
                     color: "rgba(255,255,255,0.95)",
                     border: isCustomizing
                       ? "1px solid rgba(255,255,255,0.7)"

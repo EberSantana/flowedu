@@ -7775,3 +7775,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Tela de Boas-Vindas com cor verde fixa
 
 - [x] Corrigir Welcome Tour para usar paleta de cores do tema selecionado ao invés de verde fixo
+
+## Bug: Tela de boas-vindas perdeu referência do tema
+
+- [x] Corrigir banner de boas-vindas do PROFESSOR para manter referência correta do tema selecionado
+- [x] Corrigir banner de boas-vindas do ALUNO para manter referência correta do tema selecionado
