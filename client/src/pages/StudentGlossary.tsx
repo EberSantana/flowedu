@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ type GlossaryEntry = {
   example?: string | null;
   category?: string | null;
   authorType: "teacher" | "student";
+  authorStudentId?: number | null;
   isApproved: boolean;
   createdAt: Date;
 };
@@ -66,6 +68,8 @@ type Glossary = {
 
 export default function StudentGlossary() {
   const utils = trpc.useUtils();
+  const { student } = useStudentAuth();
+  const currentStudentId = student?.id;
 
   const [selectedGlossaryId, setSelectedGlossaryId] = useState<string>("");
   const [selectedLetter, setSelectedLetter] = useState<string>("all");
@@ -143,11 +147,14 @@ export default function StudentGlossary() {
     });
   };
 
-  const approvedEntries = (entries as GlossaryEntry[]).filter((e) => e.isApproved);
+  // Mostrar: termos aprovados + termos pendentes do próprio aluno
+  const visibleEntries = (entries as GlossaryEntry[]).filter(
+    (e) => e.isApproved || (e.authorType === 'student' && e.authorStudentId === currentStudentId)
+  );
 
   // Filter by letter and search
   const displayEntries = useMemo(() => {
-    let filtered = approvedEntries;
+    let filtered = visibleEntries;
 
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
@@ -165,7 +172,7 @@ export default function StudentGlossary() {
     }
 
     return filtered.sort((a, b) => a.term.localeCompare(b.term, "pt-BR"));
-  }, [approvedEntries, searchTerm, selectedLetter]);
+  }, [visibleEntries, searchTerm, selectedLetter]);
 
   // Group by letter
   const groupedByLetter = useMemo(() => {
@@ -181,14 +188,14 @@ export default function StudentGlossary() {
   // Count per letter
   const letterCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    approvedEntries.forEach((entry) => {
+    visibleEntries.forEach((entry) => {
       const letter = entry.term.charAt(0).toUpperCase();
       counts[letter] = (counts[letter] || 0) + 1;
     });
     return counts;
-  }, [approvedEntries]);
+  }, [visibleEntries]);
 
-  const totalTerms = approvedEntries.length;
+  const totalTerms = visibleEntries.length;
 
   return (
     <StudentLayout>
@@ -512,6 +519,11 @@ export default function StudentGlossary() {
                                             <><User className="w-3 h-3 mr-1" /> Aluno</>
                                           )}
                                         </Badge>
+                                        {!entry.isApproved && (
+                                          <Badge className="text-xs bg-amber-100 text-amber-700 border-amber-200 animate-pulse">
+                                            ⏳ Aguardando aprovação
+                                          </Badge>
+                                        )}
                                       </div>
 
                                       {/* Definição */}
