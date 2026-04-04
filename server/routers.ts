@@ -12663,8 +12663,8 @@ Retorne em formato JSON com estrutura:
       .mutation(async ({ ctx, input }) => {
         const db2 = await import('./db').then(m => m.getDb());
         if (!db2) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
-        const { glossaryEntries, glossaries } = await import('../drizzle/schema');
-        const { eq } = await import('drizzle-orm');
+        const { glossaryEntries, glossaries, students, notifications } = await import('../drizzle/schema');
+        const { eq, sql } = await import('drizzle-orm');
         // Verificar se aluno pode contribuir
         const [glossary] = await db2.select().from(glossaries).where(eq(glossaries.id, input.glossaryId));
         if (!glossary || !glossary.allowStudentContributions) {
@@ -12676,6 +12676,64 @@ Retorne em formato JSON com estrutura:
           authorStudentId: ctx.studentSession.studentId,
           isApproved: !glossary.requireApproval,
         });
+
+        // Notificar o professor (dono do glossário) sobre a nova contribuição
+        try {
+          // Buscar nome do aluno
+          const [student] = await db2.select().from(students).where(eq(students.id, ctx.studentSession.studentId));
+          const studentName = student?.fullName || 'Aluno';
+          const statusText = glossary.requireApproval ? ' (aguardando aprovação)' : '';
+
+          // Criar notificação no banco para o professor
+          if (glossary.createdByUserId) {
+            await db2.execute(sql`
+              INSERT INTO notifications (userId, type, title, message, link, relatedId, relatedType, isRead, createdAt)
+              VALUES (
+                ${glossary.createdByUserId},
+                'glossary_contribution',
+                ${'📖 Nova contribuição no Glossário'},
+                ${`${studentName} adicionou o termo "${input.term}" no glossário "${glossary.title}"${statusText}`},
+                ${'/glossary'},
+                ${glossary.id},
+                'glossary',
+                0,
+                NOW()
+              )
+            `);
+          }
+
+          // Enviar push notification ao professor
+          try {
+            if (glossary.createdByUserId) {
+              await pushNotif.sendPushNotification(
+                glossary.createdByUserId,
+                {
+                  title: '📖 Nova contribuição no Glossário',
+                  body: `${studentName} adicionou "${input.term}" no glossário "${glossary.title}"${statusText}`,
+                  url: '/glossary',
+                  type: 'task_reminder' as const,
+                }
+              );
+            }
+          } catch (pushErr) {
+            console.error('[Glossary] Erro ao enviar push notification:', pushErr);
+          }
+
+          // Notificar via notifyOwner (Manus)
+          try {
+            const { notifyOwner } = await import('./_core/notification');
+            await notifyOwner({
+              title: `📖 Nova Contribuição no Glossário`,
+              content: `**${studentName}** adicionou o termo **"${input.term}"** no glossário **"${glossary.title}"**${statusText}\n\n**Definição:** ${input.definition.substring(0, 200)}${input.definition.length > 200 ? '...' : ''}`,
+            });
+          } catch (ownerErr) {
+            console.error('[Glossary] Erro ao notificar owner:', ownerErr);
+          }
+        } catch (notifErr) {
+          console.error('[Glossary] Erro ao criar notificação:', notifErr);
+          // Não bloquear a operação se a notificação falhar
+        }
+
         return result;
       }),
 

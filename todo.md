@@ -7758,3 +7758,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Agrupar materiais por disciplina em pastas automáticas no frontend do professor
 - [ ] Agrupar materiais por disciplina em pastas automáticas no frontend do aluno
 - [ ] Associar materiais sem disciplina ao subjectId correto no banco
+- [ ] Notificação automática ao professor quando aluno contribuir com novo termo no glossário
