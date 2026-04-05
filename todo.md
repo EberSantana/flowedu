@@ -7789,3 +7789,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Integrar ThemeSelector do professor para salvar/buscar tema do banco
 - [x] Adicionar seletor de temas no sidebar do portal do aluno (já existia)
 - [x] Integrar ThemeSelector do aluno para salvar/buscar tema do banco
+
+## Bug: Erro "Importing a module script failed"
+
+- [ ] Diagnosticar e corrigir erro de importação de módulo que impede carregamento do site
+
+## Bug: Cache no Mobile - Site demora para atualizar
+
+- [x] Configurar headers de cache corretos no servidor para forçar atualização no mobile
+- [x] Corrigir Service Worker para injetar timestamp único a cada deploy (invalidar cache mobile)
