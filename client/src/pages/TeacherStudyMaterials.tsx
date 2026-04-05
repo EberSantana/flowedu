@@ -4,6 +4,7 @@ import {
   FileText, Video, LinkIcon, File, Upload, Loader2, ArrowLeft, Trash2,
   HardDrive, Filter, Plus, Download, Presentation, FolderOpen, Eye, X,
   BookOpen, FolderPlus, Folder, MoveRight, BarChart3, ChevronDown, ChevronRight, Tag,
+  Music, ImageIcon, CloudUpload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,13 +40,15 @@ function getFileIcon(type: string) {
     case "link": return <LinkIcon className="h-5 w-5 text-blue-500" />;
     case "presentation": return <Presentation className="h-5 w-5 text-orange-500" />;
     case "document": return <FileText className="h-5 w-5 text-blue-600" />;
+    case "audio": return <Music className="h-5 w-5 text-green-500" />;
+    case "image": return <ImageIcon className="h-5 w-5 text-pink-500" />;
     default: return <File className="h-5 w-5 text-gray-500" />;
   }
 }
 
 function getTypeBadge(type: string) {
   const labels: Record<string, string> = {
-    pdf: "PDF", video: "Vídeo", link: "Link", presentation: "Apresentação", document: "Documento", other: "Outro",
+    pdf: "PDF", video: "Vídeo", link: "Link", presentation: "Apresentação", document: "Documento", audio: "Áudio", image: "Imagem", other: "Outro",
   };
   return labels[type] || type;
 }
@@ -168,9 +171,10 @@ export default function TeacherStudyMaterials() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
-    title: "", description: "", type: "pdf" as "pdf" | "video" | "link" | "presentation" | "document" | "other",
+    title: "", description: "", type: "pdf" as "pdf" | "video" | "link" | "presentation" | "document" | "audio" | "image" | "other",
     url: "", isRequired: false, topicId: 0, subjectId: "" as string, folderId: "" as string,
   });
+  const [isDragOver, setIsDragOver] = useState(false);
   const [folderForm, setFolderForm] = useState({ name: "", description: "", color: "#0d9488", subjectId: "" as string });
   const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
 
@@ -325,15 +329,31 @@ export default function TeacherStudyMaterials() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  function detectFileType(file: globalThis.File): typeof formData.type {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    if (ext === "pdf") return "pdf";
+    if (["mp4", "webm", "avi", "mov", "mkv"].includes(ext)) return "video";
+    if (["pptx", "ppt", "key"].includes(ext)) return "presentation";
+    if (["doc", "docx", "txt", "odt"].includes(ext)) return "document";
+    if (["mp3", "m4a", "wav", "ogg", "aac", "flac"].includes(ext)) return "audio";
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"].includes(ext)) return "image";
+    return "other";
+  }
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    let type: typeof formData.type = "other";
-    if (ext === "pdf") type = "pdf";
-    else if (["mp4", "webm", "avi", "mov", "mkv"].includes(ext)) type = "video";
-    else if (["pptx", "ppt", "key"].includes(ext)) type = "presentation";
-    else if (["doc", "docx", "txt", "odt"].includes(ext)) type = "document";
+    const type = detectFileType(file);
+    setSelectedFile(file);
+    setFormData((prev) => ({ ...prev, title: prev.title || file.name.replace(/\.[^/.]+$/, ""), type }));
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    const type = detectFileType(file);
     setSelectedFile(file);
     setFormData((prev) => ({ ...prev, title: prev.title || file.name.replace(/\.[^/.]+$/, ""), type }));
   }
@@ -877,6 +897,8 @@ export default function TeacherStudyMaterials() {
                 <SelectContent>
                   <SelectItem value="pdf">PDF</SelectItem>
                   <SelectItem value="video">Vídeo</SelectItem>
+                  <SelectItem value="audio">Áudio</SelectItem>
+                  <SelectItem value="image">Imagem</SelectItem>
                   <SelectItem value="link">Link Externo</SelectItem>
                   <SelectItem value="presentation">Apresentação</SelectItem>
                   <SelectItem value="document">Documento</SelectItem>
@@ -889,8 +911,79 @@ export default function TeacherStudyMaterials() {
             ) : (
               <div>
                 <Label>Arquivo</Label>
-                <Input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.webm,.avi,.mov,.txt,.odt,.key,.mkv,.m4a,.mp3" onChange={handleFileSelect} />
-                {selectedFile && (<p className="text-xs text-muted-foreground mt-1">{selectedFile.name} ({formatFileSize(selectedFile.size)})</p>)}
+                {/* Drag & Drop Zone */}
+                <div
+                  className={`mt-1 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                    isDragOver
+                      ? "border-primary bg-primary/10"
+                      : selectedFile
+                      ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                      : "border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/30"
+                  }`}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragEnter={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={handleDrop}
+                >
+                  {selectedFile ? (
+                    <div className="flex flex-col items-center gap-2">
+                      {getFileIcon(formData.type)}
+                      <p className="text-sm font-medium text-foreground">{selectedFile.name}</p>
+                      <p className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
+                      <button
+                        type="button"
+                        className="text-xs text-destructive hover:underline mt-1"
+                        onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                      >
+                        Remover arquivo
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <CloudUpload className="h-8 w-8" />
+                      <p className="text-sm font-medium">
+                        {isDragOver ? "Solte o arquivo aqui" : "Arraste e solte ou clique para selecionar"}
+                      </p>
+                      <p className="text-xs">
+                        {formData.type === "audio"
+                          ? "MP3, M4A, WAV, OGG, AAC, FLAC"
+                          : formData.type === "image"
+                          ? "JPG, PNG, GIF, WEBP, SVG"
+                          : formData.type === "video"
+                          ? "MP4, WEBM, AVI, MOV, MKV"
+                          : formData.type === "pdf"
+                          ? "PDF"
+                          : formData.type === "presentation"
+                          ? "PPTX, PPT, KEY"
+                          : formData.type === "document"
+                          ? "DOC, DOCX, TXT, ODT"
+                          : "Todos os formatos suportados"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept={
+                    formData.type === "audio"
+                      ? ".mp3,.m4a,.wav,.ogg,.aac,.flac"
+                      : formData.type === "image"
+                      ? ".jpg,.jpeg,.png,.gif,.webp,.svg,.bmp"
+                      : formData.type === "video"
+                      ? ".mp4,.webm,.avi,.mov,.mkv"
+                      : formData.type === "pdf"
+                      ? ".pdf"
+                      : formData.type === "presentation"
+                      ? ".pptx,.ppt,.key"
+                      : formData.type === "document"
+                      ? ".doc,.docx,.txt,.odt"
+                      : ".pdf,.doc,.docx,.ppt,.pptx,.mp4,.webm,.avi,.mov,.txt,.odt,.key,.mkv,.m4a,.mp3,.jpg,.jpeg,.png,.gif,.webp,.svg,.wav,.ogg,.aac,.flac"
+                  }
+                  onChange={handleFileSelect}
+                />
               </div>
             )}
             <div><Label>Título</Label><Input placeholder="Nome do material" value={formData.title} onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))} /></div>

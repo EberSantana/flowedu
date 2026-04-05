@@ -7798,3 +7798,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Configurar headers de cache corretos no servidor para forçar atualização no mobile
 - [x] Corrigir Service Worker para injetar timestamp único a cada deploy (invalidar cache mobile)
+
+## Melhoria: Formulário de Materiais de Estudo
+
+- [x] Adicionar tipos Áudio e Imagem no campo "Tipo de Material"
+- [x] Implementar drag & drop (arrastar e soltar) no campo de upload de arquivo

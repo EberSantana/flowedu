@@ -6017,7 +6017,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         topicId: z.number(),
         title: z.string(),
         description: z.string().optional(),
-        type: z.enum(['pdf', 'video', 'link', 'presentation', 'document', 'other']),
+        type: z.enum(['pdf', 'video', 'link', 'presentation', 'document', 'audio', 'image', 'other']),
         url: z.string(),
         fileSize: z.number().optional(),
         isRequired: z.boolean().optional(),

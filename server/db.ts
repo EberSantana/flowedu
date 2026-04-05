@@ -1570,7 +1570,7 @@ export async function getStudentProgressBySubject(studentId: number, subjectId: 
 
 // ==================== TOPIC MATERIALS ====================
 
-export async function createTopicMaterial(data: { topicId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'other'; url: string; fileSize?: number; isRequired?: boolean }) {
+export async function createTopicMaterial(data: { topicId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'audio' | 'image' | 'other'; url: string; fileSize?: number; isRequired?: boolean; folderId?: number | null; subjectId?: number | null }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -1726,7 +1726,7 @@ export async function getMaterialsForStudent(studentId: number) {
 
 // ==================== MODULE MATERIALS ====================
 
-export async function createModuleMaterial(data: { moduleId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'other'; url: string; fileSize?: number; isRequired?: boolean }) {
+export async function createModuleMaterial(data: { moduleId: number; professorId: number; title: string; description?: string; type: 'pdf' | 'video' | 'link' | 'presentation' | 'document' | 'audio' | 'image' | 'other'; url: string; fileSize?: number; isRequired?: boolean }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   

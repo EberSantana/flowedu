@@ -446,7 +446,7 @@ export const topicMaterials = mysqlTable("topic_materials", {
   subjectId: int("subjectId"), // Disciplina associada ao material
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  type: mysqlEnum("type", ["pdf", "video", "link", "presentation", "document", "other"]).notNull(),
+  type: mysqlEnum("type", ["pdf", "video", "link", "presentation", "document", "audio", "image", "other"]).notNull(),
   contentType: mysqlEnum("contentType", ["text", "video", "exercise", "quiz", "project"]).default("text"), // Tipo de conteúdo pedagógico
   url: text("url").notNull(), // URL do arquivo ou link externo
   fileSize: int("fileSize"), // Tamanho em bytes (para uploads)
