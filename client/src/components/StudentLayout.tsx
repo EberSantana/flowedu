@@ -30,6 +30,7 @@ import {
 import { Link } from "wouter";
 import StudentNotifications from "@/components/StudentNotifications";
 import { ThemeSelector } from "@/components/ThemeSelector";
+import { InstallPWAButton } from "@/components/InstallPWA";
 import { Palette } from "lucide-react";
 import { useStudentAuth } from "@/hooks/useStudentAuth";
 import { trpc } from "@/lib/trpc";
@@ -203,16 +204,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           <span className="text-sm font-medium">Meu Perfil</span>
         </Button>
       </Link>
-      <Link href="/student/instalar-app">
-        <Button
-          onClick={closeSidebar ? () => setSidebarOpen(false) : undefined}
-          variant="outline"
-          className="w-full justify-start gap-3 h-11"
-        >
-          <Smartphone className="w-5 h-5" />
-          <span className="text-sm font-medium">Instalar App</span>
-        </Button>
-      </Link>
+      <InstallPWAButton className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors" />
       <a
         href="/api/logout"
         className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"

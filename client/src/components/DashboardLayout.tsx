@@ -30,6 +30,7 @@ import {
   MessageSquare,
   HelpCircle,
   LogOut,
+  Download,
   PanelLeft,
   GraduationCap,
   Layers,
@@ -46,6 +47,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { InstallPWAButton } from "./InstallPWA";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -241,6 +243,7 @@ function DashboardLayoutContent({
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
+                <InstallPWAButton className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground w-full" />
                 <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"

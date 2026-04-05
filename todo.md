@@ -7803,3 +7803,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Adicionar tipos Áudio e Imagem no campo "Tipo de Material"
 - [x] Implementar drag & drop (arrastar e soltar) no campo de upload de arquivo
+
+## PWA - Instalação como App Nativo
+
+- [x] Criar hook `useInstallPWA` compartilhado para gerenciar o evento de instalação
+- [x] Reescrever InstallPWA.tsx com banner melhorado e suporte iOS/Android
+- [x] Adicionar botão "Instalar App" no menu do professor (DashboardLayout)
+- [x] Adicionar botão "Instalar App" funcional no sidebar do aluno (StudentLayout)
+- [x] Suporte a iOS com guia passo a passo para adicionar à tela inicial
+- [x] Banner automático após 5 segundos para usuários que ainda não instalaram
