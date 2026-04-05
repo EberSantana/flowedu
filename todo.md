@@ -7780,3 +7780,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Corrigir banner de boas-vindas do PROFESSOR para manter referência correta do tema selecionado
 - [x] Corrigir banner de boas-vindas do ALUNO para manter referência correta do tema selecionado
+
+## Persistência de Tema por Usuário e Tema no Portal do Aluno
+
+- [x] Adicionar campo `colorTheme` e `themeMode` na tabela users do banco de dados
+- [x] Criar endpoint tRPC `user.saveTheme` para salvar tema do usuário
+- [x] Criar endpoint tRPC `user.getTheme` para buscar tema do usuário
+- [x] Integrar ThemeSelector do professor para salvar/buscar tema do banco
+- [x] Adicionar seletor de temas no sidebar do portal do aluno (já existia)
+- [x] Integrar ThemeSelector do aluno para salvar/buscar tema do banco

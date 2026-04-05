@@ -1592,6 +1592,36 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);
       }),
+
+    // Salvar tema de cores do usuário no banco de dados
+    saveTheme: protectedProcedure
+      .input(z.object({
+        colorTheme: z.string().max(32),
+        themeMode: z.string().max(16),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        await database.execute(
+          sql`UPDATE users SET colorTheme = ${input.colorTheme}, themeMode = ${input.themeMode} WHERE id = ${ctx.user.id}`
+        );
+        return { success: true };
+      }),
+
+    // Buscar tema de cores do usuário
+    getTheme: protectedProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      const result = await database.execute(
+        sql`SELECT colorTheme, themeMode FROM users WHERE id = ${ctx.user.id} LIMIT 1`
+      ) as any;
+      const rows = Array.isArray(result) && Array.isArray(result[0]) ? result[0] : (Array.isArray(result) ? result : []);
+      const row = rows[0];
+      return {
+        colorTheme: row?.colorTheme || 'default',
+        themeMode: row?.themeMode || 'system',
+      };
+    }),
   }),
 
   admin: router({

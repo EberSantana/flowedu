@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 
 interface ThemeSelectorProps {
   trigger?: React.ReactNode;
@@ -22,7 +23,33 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
   const [colorTheme, setColorTheme] = useState(getSavedColorTheme());
   const [open, setOpen] = useState(false);
 
-  // Aplicar tema ao carregar e quando mudar
+  // Mutation para salvar tema no banco
+  const saveThemeMutation = trpc.user.saveTheme.useMutation();
+
+  // Query para buscar tema do banco (só executa se autenticado)
+  const { data: savedThemeData } = trpc.user.getTheme.useQuery(undefined, {
+    retry: false,
+    staleTime: 1000 * 60 * 60, // 1 hora
+  });
+
+  // Sincronizar tema do banco quando os dados chegarem
+  useEffect(() => {
+    if (!savedThemeData) return;
+    if (savedThemeData.colorTheme && savedThemeData.colorTheme !== "default") {
+      saveColorTheme(savedThemeData.colorTheme);
+      setColorTheme(savedThemeData.colorTheme);
+      applyTheme(savedThemeData.colorTheme, effectiveTheme);
+    }
+    if (savedThemeData.themeMode && setModeTheme) {
+      const localMode = localStorage.getItem("theme") as "light" | "dark" | "system" | null;
+      if (!localMode || localMode === "system") {
+        setModeTheme(savedThemeData.themeMode as "light" | "dark" | "system");
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedThemeData]);
+
+  // Aplicar tema ao carregar e quando mudar o modo (claro/escuro)
   useEffect(() => {
     const savedTheme = getSavedColorTheme();
     if (savedTheme && savedTheme !== "default") {
@@ -34,11 +61,21 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
     setColorTheme(themeId);
     saveColorTheme(themeId);
     applyTheme(themeId, effectiveTheme);
+    // Persistir no banco de dados
+    saveThemeMutation.mutate({
+      colorTheme: themeId,
+      themeMode: modeTheme || "system",
+    });
   };
 
   const handleModeChange = (mode: "light" | "dark" | "system") => {
     if (setModeTheme) {
       setModeTheme(mode);
+      // Persistir modo no banco de dados
+      saveThemeMutation.mutate({
+        colorTheme: colorTheme || "default",
+        themeMode: mode,
+      });
     }
   };
 
@@ -59,7 +96,7 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
             Personalizar Aparência
           </DialogTitle>
           <DialogDescription>
-            Escolha o modo de exibição e a paleta de cores do sistema
+            Escolha o modo de exibição e a paleta de cores do sistema. Suas preferências são salvas automaticamente.
           </DialogDescription>
         </DialogHeader>
 
@@ -226,6 +263,12 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
                 </p>
               </div>
             </div>
+            {saveThemeMutation.isSuccess && (
+              <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                <Check className="h-3 w-3" />
+                Tema salvo com sucesso
+              </p>
+            )}
           </div>
         </div>
       </DialogContent>

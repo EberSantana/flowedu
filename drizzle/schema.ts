@@ -17,6 +17,8 @@ export const users = mysqlTable("users", {
   inviteCode: varchar("inviteCode", { length: 20 }), // Código de convite usado no cadastro
   passwordHash: varchar("passwordHash", { length: 255 }), // Hash da senha para login direto
   storageLimitMB: int("storageLimitMB").default(1024).notNull(), // Limite de armazenamento individual em MB (padrão 1GB)
+  colorTheme: varchar("colorTheme", { length: 32 }).default("default"), // Tema de cores selecionado pelo usuário
+  themeMode: varchar("themeMode", { length: 16 }).default("system"), // Modo claro/escuro/sistema
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
