@@ -7812,3 +7812,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Adicionar botão "Instalar App" funcional no sidebar do aluno (StudentLayout)
 - [x] Suporte a iOS com guia passo a passo para adicionar à tela inicial
 - [x] Banner automático após 5 segundos para usuários que ainda não instalaram
+
+## Bug: Login retornando "Credenciais inválidas"
+
+- [ ] Diagnosticar e corrigir erro de login após deploy
+
+## Bug: Unable to preload CSS for /assets/Dashboard-TRZluGMH.css
+
+- [x] Fazer novo build e deploy completo dos assets para corrigir erro de preload CSS
