@@ -7853,3 +7853,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Backend: procedimento para buscar atividades com prazos próximos
 - [ ] Backend: tabela/sistema de notificações internas (novas atividades, prazos, notas)
 - [ ] Deploy na VPS
+
+## Correção: Nota mais alta por atividade no boletim
+
+- [x] Corrigir getGradesByClass (boletim professor) — nota mais alta por exercício, atividade e prova
+- [x] Corrigir getStudentReport (relatório individual) — nota mais alta por exercício, atividade e prova
+- [x] Corrigir getGradeBook (boletim aluno - exercícios) — nota mais alta por exercício
+- [x] Corrigir getActivityGrades (boletim aluno - atividades) — nota mais alta por atividade
+- [x] Corrigir getStudentAssessmentGrades (boletim aluno - provas) — nota mais alta por prova

@@ -4070,7 +4070,7 @@ JSON (descrições MAX 15 chars):
         const studentId = ctx.studentSession.studentId;
 
         const result = await dbConn.execute(
-          sql`SELECT aa.id as attemptId, aa.score, aa.percentage, aa.passed,
+          sql`SELECT aa.id as attemptId, aa.assessmentId, aa.score, aa.percentage, aa.passed,
                      aa.totalCorrect, aa.totalWrong, aa.submittedAt,
                      a.title, a.totalPoints, a.passingScore, a.assessmentType,
                      s.name as subjectName, s.color as subjectColor
@@ -4080,7 +4080,17 @@ JSON (descrições MAX 15 chars):
               WHERE aa.studentId = ${studentId} AND aa.status = 'submitted'
               ORDER BY aa.submittedAt DESC`
         ) as any[];
-        return (result[0] as any[]) || [];
+        const allAttempts = (result[0] as any[]) || [];
+        // Retornar apenas a nota mais alta por prova (assessmentId)
+        const bestByAssessment = new Map<number, any>();
+        for (const attempt of allAttempts) {
+          const key = attempt.assessmentId;
+          const existing = bestByAssessment.get(key);
+          if (!existing || parseFloat(String(attempt.score ?? 0)) > parseFloat(String(existing.score ?? 0))) {
+            bestByAssessment.set(key, attempt);
+          }
+        }
+        return Array.from(bestByAssessment.values());
       }),
 
     // Buscar notas de provas dos alunos (para boletim do professor)
@@ -8095,12 +8105,23 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           if (approved) bySubject[a.subjectId].approvedCount++;
         }
 
-        // Calcular média por disciplina
+        // Calcular média por disciplina — usando nota mais alta por exercício
         for (const s of Object.values(bySubject)) {
           if (s.grades.length > 0) {
+            // Agrupar por exerciseId e pegar a nota mais alta de cada
+            const bestByExercise = new Map<number, typeof s.grades[0]>();
+            for (const g of s.grades) {
+              const existing = bestByExercise.get(g.exerciseId);
+              if (!existing || g.grade > existing.grade) {
+                bestByExercise.set(g.exerciseId, g);
+              }
+            }
+            const bestGrades = Array.from(bestByExercise.values());
+            s.grades = bestGrades; // Substituir grades pelas melhores notas
             s.average = parseFloat(
-              (s.grades.reduce((sum, g) => sum + g.grade, 0) / s.grades.length).toFixed(2)
+              (bestGrades.reduce((sum, g) => sum + g.grade, 0) / bestGrades.length).toFixed(2)
             );
+            s.approvedCount = bestGrades.filter(g => g.approved).length;
           }
         }
 
@@ -8193,12 +8214,24 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           if (approved) bySubject[subId].approvedCount++;
         }
 
-        // Calcular média por disciplina
+        // Calcular média por disciplina — usando nota mais alta por atividade
         for (const sub of Object.values(bySubject)) {
           if (sub.grades.length > 0) {
+            // Agrupar por activityId e pegar a nota mais alta de cada
+            const bestByActivity = new Map<number, typeof sub.grades[0]>();
+            for (const g of sub.grades) {
+              const existing = bestByActivity.get(g.activityId);
+              if (!existing || g.grade10 > existing.grade10) {
+                bestByActivity.set(g.activityId, g);
+              }
+            }
+            const bestGrades = Array.from(bestByActivity.values());
+            sub.grades = bestGrades;
             sub.average = parseFloat(
-              (sub.grades.reduce((sum, g) => sum + g.grade10, 0) / sub.grades.length).toFixed(2)
+              (bestGrades.reduce((sum, g) => sum + g.grade10, 0) / bestGrades.length).toFixed(2)
             );
+            sub.totalGraded = bestGrades.length;
+            sub.approvedCount = bestGrades.filter(g => g.grade10 >= 6).length;
           }
         }
 

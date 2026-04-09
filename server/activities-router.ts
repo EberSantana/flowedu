@@ -689,16 +689,31 @@ export const activitiesRouter = router({
         assessmentGradesRaw = (result[0] as any[]) || [];
       }
 
+      // Helper: pegar nota mais alta por item (múltiplas tentativas)
+      function bestByKey<T>(items: T[], keyFn: (item: T) => string | number, scoreFn: (item: T) => number): T[] {
+        const best = new Map<string | number, T>();
+        for (const item of items) {
+          const key = keyFn(item);
+          const existing = best.get(key);
+          if (!existing || scoreFn(item) > scoreFn(existing)) {
+            best.set(key, item);
+          }
+        }
+        return Array.from(best.values());
+      }
+
       // Montar resultado por aluno
       return enrolledStudents.map(student => {
-        // Exercícios do aluno
-        const studentExGrades = exerciseGrades.filter(g => g.studentId === student.studentId);
+        // Exercícios do aluno — nota mais alta por exercício
+        const allStudentExGrades = exerciseGrades.filter(g => g.studentId === student.studentId);
+        const studentExGrades = bestByKey(allStudentExGrades, g => g.exerciseId, g => g.score ?? 0);
         const exerciseAvg = studentExGrades.length > 0
           ? studentExGrades.reduce((sum, g) => sum + ((g.score ?? 0) / 10), 0) / studentExGrades.length
           : null;
 
-        // Atividades do aluno
-        const studentActGrades = activityGrades.filter(g => g.studentId === student.studentId);
+        // Atividades do aluno — nota mais alta por atividade
+        const allStudentActGrades = activityGrades.filter(g => g.studentId === student.studentId);
+        const studentActGrades = bestByKey(allStudentActGrades, g => g.activityId, g => parseFloat(String(g.score ?? 0)));
         const activityAvg = studentActGrades.length > 0
           ? studentActGrades.reduce((sum, g) => {
               const score = parseFloat(String(g.score ?? 0));
@@ -707,8 +722,9 @@ export const activitiesRouter = router({
             }, 0) / studentActGrades.length
           : null;
 
-        // Notas de provas do aluno
-        const studentAssessGrades = assessmentGradesRaw.filter((g: any) => g.studentId === student.studentId);
+        // Notas de provas do aluno — nota mais alta por prova
+        const allStudentAssessGrades = assessmentGradesRaw.filter((g: any) => g.studentId === student.studentId);
+        const studentAssessGrades = bestByKey(allStudentAssessGrades, (g: any) => g.assessmentId, (g: any) => parseFloat(String(g.score ?? 0)));
         const assessmentAvg = studentAssessGrades.length > 0
           ? studentAssessGrades.reduce((sum: number, g: any) => {
               const totalPoints = parseFloat(String(g.totalPoints ?? 10));
@@ -717,9 +733,7 @@ export const activitiesRouter = router({
             }, 0) / studentAssessGrades.length
           : null;
 
-        // Média geral: soma de TODAS as notas individuais / quantidade total de itens avaliados
-        // Fórmula correta: (ex1 + ex2 + at1 + at2 + prova1) / 5
-        // Fórmula anterior (errada): (mediaEx + mediaAt + mediaProva) / 3
+        // Média geral: soma de TODAS as notas mais altas individuais / quantidade total de itens
         const allIndividualGrades: number[] = [
           ...studentExGrades.map(g => (g.score ?? 0) / 10),
           ...studentActGrades.map(g => {
@@ -875,6 +889,26 @@ export const activitiesRouter = router({
         assessmentResults = (result[0] as any[]) || [];
       }
 
+      // Helper: pegar nota mais alta por item (múltiplas tentativas)
+      function bestByKeyReport<T>(items: T[], keyFn: (item: T) => string | number, scoreFn: (item: T) => number): T[] {
+        const best = new Map<string | number, T>();
+        for (const item of items) {
+          const key = keyFn(item);
+          const existing = best.get(key);
+          if (!existing || scoreFn(item) > scoreFn(existing)) {
+            best.set(key, item);
+          }
+        }
+        return Array.from(best.values());
+      }
+
+      // Nota mais alta por exercício
+      const bestExercises = bestByKeyReport(exerciseResults, e => e.exerciseId, e => e.score ?? 0);
+      // Nota mais alta por atividade
+      const bestActivities = bestByKeyReport(activityResults, a => a.activityId, a => parseFloat(String(a.score ?? 0)));
+      // Nota mais alta por prova
+      const bestAssessments = bestByKeyReport(assessmentResults, (g: any) => g.assessmentId, (g: any) => parseFloat(String(g.score ?? 0)));
+
       return {
         student: {
           id: student.id,
@@ -882,7 +916,7 @@ export const activitiesRouter = router({
           registrationNumber: student.registrationNumber,
           email: student.email,
         },
-        exercises: exerciseResults.map(e => ({
+        exercises: bestExercises.map(e => ({
           exerciseId: e.exerciseId,
           title: e.exerciseTitle,
           subjectName: e.subjectName,
@@ -892,7 +926,7 @@ export const activitiesRouter = router({
           approved: (e.score ?? 0) >= (e.passingScore ?? 60),
           completedAt: e.completedAt,
         })),
-        activities: activityResults.map(a => ({
+        activities: bestActivities.map(a => ({
           activityId: a.activityId,
           title: a.activityTitle,
           subjectName: a.subjectName,
@@ -905,7 +939,7 @@ export const activitiesRouter = router({
           gradedAt: a.gradedAt,
           submittedAt: a.submittedAt,
          })),
-        assessments: assessmentResults.map((g: any) => ({
+        assessments: bestAssessments.map((g: any) => ({
           assessmentId: g.assessmentId,
           title: g.assessmentTitle,
           subjectName: g.subjectName,
