@@ -174,7 +174,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         <p className="px-4 mb-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
           {section.label}
         </p>
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           {renderNavItems(section.items, closeSidebar)}
         </div>
       </div>
@@ -182,7 +182,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   );
 
   const renderBottomActions = (closeSidebar?: boolean) => (
-    <div className="p-4 border-t border-border bg-muted/30 space-y-2">
+    <div className="p-4 border-t border-border bg-muted/30 space-y-3">
       <ThemeSelector
         portal="student"
         trigger={

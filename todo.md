@@ -7891,3 +7891,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Frontend ExercisePerformanceReport: seletor de data início e fim + botão aplicar
 - [x] Identificar segundo relatório com Evolução Temporal (era o mesmo relatório)
 - [x] Backend do segundo relatório: não necessário (mesmo componente)
+
+## UX: Espaçamento Menu Inferior Portal do Aluno
+
+- [x] Ajustar espaçamento entre botões do menu inferior do StudentLayout (Personalizar Tema, Meu Perfil, Instalar App, Sair) — muito colados
