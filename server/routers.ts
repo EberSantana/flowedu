@@ -6008,6 +6008,132 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         );
         return results.filter(Boolean);
       }),
+
+    // ─── PRÓXIMOS PRAZOS ──────────────────────────────────────────────
+    getUpcomingDeadlines: studentProcedure
+      .query(async ({ ctx }) => {
+        const dbConn = await db.getDb();
+        if (!dbConn) return [];
+        const studentId = ctx.studentSession.studentId;
+
+        // Buscar disciplinas e turmas do aluno
+        const enrollResult = await dbConn.execute(
+          sql`SELECT DISTINCT subjectId FROM subjectEnrollments WHERE studentId = ${studentId} AND status = 'active'`
+        ) as any[];
+        const subjectIds = ((enrollResult[0] as any[]) || []).map((r: any) => r.subjectId).filter(Boolean) as number[];
+
+        const classResult = await dbConn.execute(
+          sql`SELECT DISTINCT classId FROM student_class_enrollments WHERE studentId = ${studentId}`
+        ) as any[];
+        const classIds = ((classResult[0] as any[]) || []).map((r: any) => r.classId).filter(Boolean) as number[];
+
+        if (subjectIds.length === 0 && classIds.length === 0) return [];
+
+        const deadlines: Array<{
+          id: number;
+          title: string;
+          type: 'activity' | 'assignment' | 'assessment';
+          dueDate: string;
+          subjectName: string | null;
+          className: string | null;
+          submitted: boolean;
+        }> = [];
+
+        // Prazos: de 2 dias atrás até 30 dias no futuro
+        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+        const subjectPlaceholders = subjectIds.length > 0 ? subjectIds.map(id => sql`${id}`) : [sql`NULL`];
+        const classPlaceholders = classIds.length > 0 ? classIds.map(id => sql`${id}`) : [sql`NULL`];
+
+        // 1) Atividades (activities) com dueDate
+        try {
+          const actResult = await dbConn.execute(
+            sql`SELECT a.id, a.title, a.dueDate, s.name AS subjectName, c.name AS className,
+                       (SELECT COUNT(*) FROM activity_submissions asub WHERE asub.activityId = a.id AND asub.studentId = ${studentId}) AS submitted
+                FROM activities a
+                LEFT JOIN subjects s ON a.subjectId = s.id
+                LEFT JOIN classes c ON a.classId = c.id
+                WHERE a.status = 'published'
+                  AND a.dueDate IS NOT NULL
+                  AND a.dueDate >= ${twoDaysAgo}
+                  AND (
+                    a.subjectId IN (${sql.join(subjectPlaceholders, sql`, `)})
+                    OR a.classId IN (${sql.join(classPlaceholders, sql`, `)})
+                  )
+                ORDER BY a.dueDate ASC
+                LIMIT 20`
+          ) as any[];
+          for (const row of (actResult[0] || []) as any[]) {
+            deadlines.push({
+              id: row.id,
+              title: row.title,
+              type: 'activity',
+              dueDate: row.dueDate ? new Date(row.dueDate).toISOString() : '',
+              subjectName: row.subjectName || null,
+              className: row.className || null,
+              submitted: Number(row.submitted) > 0,
+            });
+          }
+        } catch (e) { /* ignore */ }
+
+        // 2) Exercícios de tópico (topic_assignments) com dueDate
+        try {
+          const assignResult = await dbConn.execute(
+            sql`SELECT ta.id, ta.title, ta.dueDate, s.name AS subjectName
+                FROM topic_assignments ta
+                JOIN ct_topics ct ON ta.topicId = ct.id
+                JOIN ct_modules cm ON ct.moduleId = cm.id
+                JOIN subjects s ON cm.subjectId = s.id
+                WHERE ta.dueDate IS NOT NULL
+                  AND ta.dueDate >= ${twoDaysAgo}
+                  AND s.id IN (${sql.join(subjectPlaceholders, sql`, `)})
+                ORDER BY ta.dueDate ASC
+                LIMIT 20`
+          ) as any[];
+          for (const row of (assignResult[0] || []) as any[]) {
+            deadlines.push({
+              id: row.id,
+              title: row.title,
+              type: 'assignment',
+              dueDate: row.dueDate ? new Date(row.dueDate).toISOString() : '',
+              subjectName: row.subjectName || null,
+              className: null,
+              submitted: false,
+            });
+          }
+        } catch (e) { /* ignore */ }
+
+        // 3) Provas (assessments) com availableTo
+        try {
+          const assessResult = await dbConn.execute(
+            sql`SELECT a.id, a.title, a.availableTo AS dueDate, s.name AS subjectName,
+                       (SELECT COUNT(*) FROM assessment_attempts aa WHERE aa.assessmentId = a.id AND aa.studentId = ${studentId}) AS attempted
+                FROM assessments a
+                LEFT JOIN subjects s ON a.subjectId = s.id
+                WHERE a.status = 'published'
+                  AND a.availableTo IS NOT NULL
+                  AND a.availableTo >= ${twoDaysAgo}
+                  AND a.subjectId IN (${sql.join(subjectPlaceholders, sql`, `)})
+                ORDER BY a.availableTo ASC
+                LIMIT 10`
+          ) as any[];
+          for (const row of (assessResult[0] || []) as any[]) {
+            deadlines.push({
+              id: row.id,
+              title: row.title,
+              type: 'assessment',
+              dueDate: row.dueDate ? new Date(row.dueDate).toISOString() : '',
+              subjectName: row.subjectName || null,
+              className: null,
+              submitted: Number(row.attempted) > 0,
+            });
+          }
+        } catch (e) { /* ignore */ }
+
+        // Ordenar por data mais próxima
+        deadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+
+        return deadlines.slice(0, 15);
+      }),
   }),
 
   // Professor Materials Management

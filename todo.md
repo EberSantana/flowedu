@@ -7845,3 +7845,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Corrigir cálculo da média geral no StudentGradeBook.tsx (soma de todas as notas / total de itens)
 - [x] Corrigir badges checkNightOwlBadge e checkEarlyBirdBadge para usar UTC em vez de getHours()
 - [x] Adicionar tooltip no mapa de calor mostrando horário e quantidade de acessos
+
+## Notificações e Prazos para Alunos
+
+- [ ] Painel "Próximos Prazos" no dashboard do aluno (vermelho=hoje, amarelo=2 dias, verde=3+ dias)
+- [ ] Sino de notificações no header do portal do aluno com badge de contagem
+- [ ] Backend: procedimento para buscar atividades com prazos próximos
+- [ ] Backend: tabela/sistema de notificações internas (novas atividades, prazos, notas)
+- [ ] Deploy na VPS

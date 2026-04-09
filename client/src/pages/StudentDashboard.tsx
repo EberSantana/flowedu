@@ -12,7 +12,11 @@ import {
   Bell,
   User,
   BarChart3,
-  CheckCircle
+  CheckCircle,
+  CalendarClock,
+  ClipboardList,
+  PenTool,
+  FileCheck
 } from "lucide-react";
 import StudentLayout from '../components/StudentLayout';
 import { Link } from "wouter";
@@ -28,6 +32,7 @@ export default function StudentDashboard() {
   const { data: pendingExercisesData } = trpc.studentExercises.getPendingCount.useQuery();
   const { data: unreadAnnouncementsData } = trpc.announcements.getUnreadCount.useQuery();
   const { data: unseenAnswersData } = trpc.studentDoubts.getUnseenAnswersCount.useQuery();
+  const { data: upcomingDeadlines } = trpc.student.getUpcomingDeadlines.useQuery();
 
   const activeSubjects = enrolledSubjects?.filter(e => e.status === 'active') || [];
   const completedSubjects = enrolledSubjects?.filter(e => e.status === 'completed') || [];
@@ -92,6 +97,81 @@ export default function StudentDashboard() {
             ))}
           </div>
         </div>
+
+        {/* Painel de Próximos Prazos */}
+        {upcomingDeadlines && upcomingDeadlines.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-orange-500 rounded-xl">
+                <CalendarClock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Próximos Prazos</h2>
+                <p className="text-sm text-gray-500">{upcomingDeadlines.length} prazo{upcomingDeadlines.length !== 1 ? 's' : ''} próximo{upcomingDeadlines.length !== 1 ? 's' : ''}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {upcomingDeadlines.slice(0, 6).map((deadline: any) => {
+                const dueDate = new Date(deadline.dueDate);
+                const now = new Date();
+                const diffMs = dueDate.getTime() - now.getTime();
+                const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                
+                let urgencyColor = 'border-green-400 bg-green-50';
+                let urgencyBadge = 'bg-green-100 text-green-700';
+                let urgencyText = `${diffDays} dia${diffDays !== 1 ? 's' : ''}`;
+                
+                if (diffDays <= 0) {
+                  urgencyColor = 'border-red-400 bg-red-50';
+                  urgencyBadge = 'bg-red-100 text-red-700';
+                  urgencyText = diffDays === 0 ? 'Vence hoje!' : 'Atrasado';
+                } else if (diffDays <= 2) {
+                  urgencyColor = 'border-yellow-400 bg-yellow-50';
+                  urgencyBadge = 'bg-yellow-100 text-yellow-700';
+                  urgencyText = diffDays === 1 ? 'Vence amanhã' : 'Vence em 2 dias';
+                }
+
+                const typeIcon = deadline.type === 'assessment' ? PenTool 
+                  : deadline.type === 'activity' ? ClipboardList 
+                  : FileCheck;
+                const typeLabel = deadline.type === 'assessment' ? 'Prova' 
+                  : deadline.type === 'activity' ? 'Atividade' 
+                  : 'Exercício';
+                const TypeIcon = typeIcon;
+
+                return (
+                  <div
+                    key={`${deadline.type}-${deadline.id}`}
+                    className={`rounded-lg border-l-4 p-3 ${urgencyColor} transition-all hover:shadow-md`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2 flex-1 min-w-0">
+                        <TypeIcon className="w-4 h-4 mt-0.5 text-gray-600 shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 text-sm line-clamp-1">{deadline.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {typeLabel} {deadline.subjectName ? `• ${deadline.subjectName}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      {deadline.submitted && (
+                        <CheckCircle className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-gray-500">
+                        {dueDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} às {dueDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${urgencyBadge}`}>
+                        {urgencyText}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-20">

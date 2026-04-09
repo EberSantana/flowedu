@@ -327,6 +327,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
       {/* Main Content */}
       <div className="lg:pl-72">
+        {/* Desktop Top Bar */}
+        <header className="hidden lg:flex sticky top-0 z-30 bg-card/80 backdrop-blur-md border-b border-border items-center justify-end px-6 py-3 gap-3">
+          <StudentNotifications />
+        </header>
+
         {/* Mobile Header */}
         <header className="lg:hidden sticky top-0 z-30 bg-card border-b border-border shadow-sm">
           <div className="flex items-center justify-between px-4 py-4">
