@@ -45,7 +45,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import NotificationBell from "@/components/NotificationBell";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -321,6 +321,26 @@ export default function Sidebar() {
   const { user } = useAuth();
   const { profile } = useUserProfile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Swipe para fechar o menu mobile
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    if (deltaX < -60 && deltaY < 80) {
+      setIsMobileMenuOpen(false);
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, []);
   const { isCompact, setIsCompact } = useSidebarContext();
   
   // Estado para dialog de logout
@@ -577,22 +597,24 @@ export default function Sidebar() {
       </button>
 
       {/* Overlay for mobile */}
-      {isMobileMenuOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ease-in-out ${
+          isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
 
       {/* Sidebar */}
       <aside
         className={`
           fixed top-0 left-0 h-screen bg-gradient-to-b from-card via-card to-card/95 border-r border-border/50 shadow-xl z-40
           transition-all duration-300 ease-in-out
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0
+          ${isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
+          lg:translate-x-0 lg:opacity-100
           ${isCompact ? 'w-16' : 'w-64 max-w-[85vw] sm:max-w-[320px]'}
         `}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -730,11 +752,11 @@ export default function Sidebar() {
                   </div>
                 </div>
                 
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <Link
                     href="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200"
                   >
                     <User className="h-4 w-4" />
                     <span className="text-sm">Meu Perfil</span>
@@ -747,16 +769,16 @@ export default function Sidebar() {
                   <ThemeSelector
                     portal="professor"
                     trigger={
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200">
+                      <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200">
                         <Palette className="h-4 w-4" />
                         <span className="text-sm">Tema</span>
                       </button>
                     }
                   />
-                  
+                  <hr className="border-border/50 my-1" />
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200"
                   >
                     <LogOut className="h-4 w-4" />
                     <span className="text-sm">Sair</span>

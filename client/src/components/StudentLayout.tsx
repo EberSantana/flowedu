@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -49,6 +49,27 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const { student, loading, logout, isAuthenticated } = useStudentAuth();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Swipe para fechar o menu mobile
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    // Fecha se deslizou mais de 60px para a esquerda e o movimento horizontal é dominante
+    if (deltaX < -60 && deltaY < 80) {
+      setSidebarOpen(false);
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, []);
 
   // Buscar contagem de avisos não lidos - DEVE ficar antes dos early returns
   const { data: unreadAnnouncementsCount } = trpc.announcements.getUnreadCount.useQuery(
@@ -276,6 +297,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         className={`fixed inset-y-0 left-0 w-72 bg-card shadow-2xl z-50 transform transition-all duration-300 ease-in-out lg:hidden ${
           sidebarOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
         }`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="flex flex-col h-full">
           {/* Logo + Close */}

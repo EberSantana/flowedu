@@ -7901,3 +7901,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Aumentar altura dos botões do menu inferior de h-11 para h-12
 - [x] Adicionar separador visual (hr) entre "Instalar App" e "Sair"
 - [x] Adicionar animação suave ao abrir menu lateral no mobile
+
+## UX: Swipe e Melhorias Sidebar Professor
+
+- [x] Swipe para fechar menu mobile no StudentLayout (deslizar dedo para esquerda)
+- [x] Aplicar h-12, space-y-3, separador e animação ao Sidebar do professor
