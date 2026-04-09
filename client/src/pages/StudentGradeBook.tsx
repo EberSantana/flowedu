@@ -78,16 +78,28 @@ export default function StudentGradeBook() {
         }, 0) / assessmentGrades.length).toFixed(2)
       : "—";
 
-  // Média geral combinada
-  const allAverages: number[] = [];
-  if (gradeBook) gradeBook.forEach((s) => { if (s.totalAttempts > 0) allAverages.push(s.average); });
-  if (activityGrades) activityGrades.forEach((s) => { if (s.totalGraded > 0) allAverages.push(s.average); });
-  if (assessmentGrades && assessmentGrades.length > 0) {
-    const avg = parseFloat(assessmentAverage);
-    if (!isNaN(avg)) allAverages.push(avg);
+  // Média geral combinada: soma de TODAS as notas individuais / total de itens avaliados
+  // Fórmula correta: (ex1 + ex2 + at1 + at2 + prova1) / 5
+  const allIndividualGrades: number[] = [];
+  if (gradeBook) {
+    gradeBook.forEach((s) => {
+      s.grades.forEach((g: any) => allIndividualGrades.push(g.grade));
+    });
   }
-  const overallAverage = allAverages.length > 0
-    ? (allAverages.reduce((a, b) => a + b, 0) / allAverages.length).toFixed(2)
+  if (activityGrades) {
+    activityGrades.forEach((s) => {
+      s.grades.forEach((g: any) => allIndividualGrades.push(g.grade10));
+    });
+  }
+  if (assessmentGrades) {
+    assessmentGrades.forEach((a: any) => {
+      const totalPoints = parseFloat(String(a.totalPoints ?? 10));
+      const score = parseFloat(String(a.score ?? 0));
+      if (totalPoints > 0) allIndividualGrades.push((score / totalPoints) * 10);
+    });
+  }
+  const overallAverage = allIndividualGrades.length > 0
+    ? (allIndividualGrades.reduce((a, b) => a + b, 0) / allIndividualGrades.length).toFixed(2)
     : "—";
 
   const isLoading = loadingExercises || loadingActivities || loadingAssessments;

@@ -717,13 +717,24 @@ export const activitiesRouter = router({
             }, 0) / studentAssessGrades.length
           : null;
 
-        // Média geral
-        const allGrades: number[] = [];
-        if (exerciseAvg !== null) allGrades.push(exerciseAvg);
-        if (activityAvg !== null) allGrades.push(activityAvg);
-        if (assessmentAvg !== null) allGrades.push(assessmentAvg);
-        const overallAvg = allGrades.length > 0
-          ? allGrades.reduce((a, b) => a + b, 0) / allGrades.length
+        // Média geral: soma de TODAS as notas individuais / quantidade total de itens avaliados
+        // Fórmula correta: (ex1 + ex2 + at1 + at2 + prova1) / 5
+        // Fórmula anterior (errada): (mediaEx + mediaAt + mediaProva) / 3
+        const allIndividualGrades: number[] = [
+          ...studentExGrades.map(g => (g.score ?? 0) / 10),
+          ...studentActGrades.map(g => {
+            const score = parseFloat(String(g.score ?? 0));
+            const maxScore = parseFloat(String(g.maxScore ?? 10));
+            return maxScore > 0 ? (score / maxScore) * 10 : 0;
+          }),
+          ...studentAssessGrades.map((g: any) => {
+            const totalPoints = parseFloat(String(g.totalPoints ?? 10));
+            const score = parseFloat(String(g.score ?? 0));
+            return totalPoints > 0 ? (score / totalPoints) * 10 : 0;
+          }),
+        ];
+        const overallAvg = allIndividualGrades.length > 0
+          ? allIndividualGrades.reduce((a, b) => a + b, 0) / allIndividualGrades.length
           : null;
 
         return {

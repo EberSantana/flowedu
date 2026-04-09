@@ -50,6 +50,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Monitor, Smartphone, Globe } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -850,6 +851,7 @@ export default function AccessLogsPage() {
                       </div>
 
                       {/* Linhas por dia da semana */}
+                      <TooltipProvider delayDuration={100}>
                       {DAYS.map((day, d) => (
                         <div key={d} className="flex items-center mb-1">
                           <div className="w-10 shrink-0 text-xs font-medium text-muted-foreground text-right pr-2">
@@ -858,21 +860,29 @@ export default function AccessLogsPage() {
                           {HOURS.map((h) => {
                             const val = matrix[d]?.[h] ?? 0;
                             return (
-                              <div
-                                key={h}
-                                title={`${DAYS_FULL[d]} às ${h}h–${h+1}h (Manaus): ${val} ${val !== 1 ? 'acessos' : 'acesso'}`}
-                                className={`flex-1 h-7 mx-px rounded-sm flex items-center justify-center cursor-default transition-opacity hover:opacity-80 ${getHeatColor(val, maxValue)}`}
-                              >
-                                {val > 0 && (
-                                  <span className={`text-[9px] font-bold ${getHeatTextColor(val, maxValue)}`}>
-                                    {val}
-                                  </span>
-                                )}
-                              </div>
+                              <Tooltip key={h}>
+                                <TooltipTrigger asChild>
+                                  <div
+                                    className={`flex-1 h-7 mx-px rounded-sm flex items-center justify-center cursor-default transition-opacity hover:opacity-80 ${getHeatColor(val, maxValue)}`}
+                                  >
+                                    {val > 0 && (
+                                      <span className={`text-[9px] font-bold ${getHeatTextColor(val, maxValue)}`}>
+                                        {val}
+                                      </span>
+                                    )}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">
+                                  <p className="font-semibold">{DAYS_FULL[d]}</p>
+                                  <p>{h}h–{h+1}h (Manaus)</p>
+                                  <p className="text-primary font-bold">{val} {val !== 1 ? 'acessos' : 'acesso'}</p>
+                                </TooltipContent>
+                              </Tooltip>
                             );
                           })}
                         </div>
                       ))}
+                      </TooltipProvider>
 
                       {/* Legenda */}
                       <div className="flex items-center gap-2 mt-3 justify-end">

@@ -7838,3 +7838,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Mapa de Calor com horário +4h a mais
 
 - [x] Corrigir timezone na conexão MySQL (adicionar timezone: '+00:00' no createPool do db.ts)
+
+## Correções de Boletim e Badges
+
+- [x] Corrigir cálculo do overallAverage no activities-router.ts (soma de todas as notas / total de itens)
+- [x] Corrigir cálculo da média geral no StudentGradeBook.tsx (soma de todas as notas / total de itens)
+- [x] Corrigir badges checkNightOwlBadge e checkEarlyBirdBadge para usar UTC em vez de getHours()
+- [x] Adicionar tooltip no mapa de calor mostrando horário e quantidade de acessos

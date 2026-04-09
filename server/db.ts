@@ -6163,20 +6163,24 @@ export async function checkMarathonBadge(studentId: number) {
 
 /**
  * Verificar e conceder badge "Coruja Noturna" (exercício após 22h)
+ * Usa UTC-4 (Manaus) para determinar o horário local do aluno.
+ * Com timezone: '+00:00' no mysql2, completedAt já é UTC puro.
  */
 export async function checkNightOwlBadge(studentId: number, completedAt: Date) {
-  const hour = completedAt.getHours();
-  if (hour >= 22 || hour < 6) { // Entre 22h e 6h
+  // Converter UTC para Manaus (UTC-4): subtrair 4h
+  const manausHour = ((completedAt.getUTCHours() - 4) + 24) % 24;
+  if (manausHour >= 22 || manausHour < 6) { // Entre 22h e 6h
     await awardBadgeToStudent(studentId, 'night_owl');
   }
 }
-
 /**
  * Verificar e conceder badge "Madrugador" (exercício antes das 7h)
+ * Usa UTC-4 (Manaus) para determinar o horário local do aluno.
  */
 export async function checkEarlyBirdBadge(studentId: number, completedAt: Date) {
-  const hour = completedAt.getHours();
-  if (hour >= 5 && hour < 7) { // Entre 5h e 7h
+  // Converter UTC para Manaus (UTC-4): subtrair 4h
+  const manausHour = ((completedAt.getUTCHours() - 4) + 24) % 24;
+  if (manausHour >= 5 && manausHour < 7) { // Entre 5h e 7h
     await awardBadgeToStudent(studentId, 'early_bird');
   }
 }
