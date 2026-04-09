@@ -67,12 +67,7 @@ export default function StudentMyQuestions() {
                   <p className="text-primary-foreground/80 mt-1">Acompanhe o status das suas dúvidas enviadas</p>
                 </div>
               </div>
-              <Link href="/student/submit-question">
-                <Button variant="secondary">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Dúvida
-                </Button>
-              </Link>
+
             </div>
           </div>
         </div>

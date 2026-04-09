@@ -109,98 +109,7 @@ export default function StudentLearningJournal() {
                 </div>
               </div>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-white text-primary hover:bg-primary/10">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nova Entrada
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar Entrada no Diário</DialogTitle>
-                    <DialogDescription>
-                      Registre suas reflexões e aprendizados sobre um tópico específico
-                    </DialogDescription>
-                  </DialogHeader>
 
-                  <div className="space-y-4 mt-4">
-                    <div>
-                      <Label>Tópico</Label>
-                      <Select
-                        value={selectedTopicId?.toString() || ""}
-                        onValueChange={(value) => setSelectedTopicId(parseInt(value))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um tópico" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {subjects?.map((enrollment) => (
-                            <SelectItem key={enrollment.id} value={enrollment.id.toString()}>
-                              {enrollment.subject?.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label>Como você se sentiu estudando este tópico?</Label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-2">
-                        {Object.entries(moodIcons).map(([key, { icon: Icon, label, color }]) => (
-                          <Button
-                            key={key}
-                            type="button"
-                            variant={mood === key ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setMood(key as any)}
-                            className="w-full"
-                          >
-                            <Icon className={`w-4 h-4 mr-1 ${mood === key ? "" : color}`} />
-                            <span className="truncate">{label}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label>Suas Reflexões</Label>
-                      <Textarea
-                        placeholder="O que você aprendeu? Quais insights teve? O que ainda precisa revisar?"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        rows={6}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Tags (opcional)</Label>
-                      <Input
-                        placeholder="Ex: importante, revisar, dúvida"
-                        value={tags}
-                        onChange={(e) => setTags(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div className="flex gap-2 justify-end pt-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        onClick={handleSubmit}
-                        disabled={addEntryMutation.isPending}
-                      >
-                        {addEntryMutation.isPending ? "Salvando..." : "Salvar Entrada"}
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
             </div>
           </div>
         </div>
@@ -267,6 +176,93 @@ export default function StudentLearningJournal() {
               </CardContent>
             </Card>
           )}
+          {/* Dialog para nova entrada */}
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Adicionar Entrada no Diário</DialogTitle>
+                <DialogDescription>
+                  Registre suas reflexões e aprendizados sobre um tópico específico
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 mt-4">
+                <div>
+                  <Label>Tópico</Label>
+                  <Select
+                    value={selectedTopicId?.toString() || ""}
+                    onValueChange={(value) => setSelectedTopicId(parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um tópico" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects?.map((enrollment) => (
+                        <SelectItem key={enrollment.id} value={enrollment.id.toString()}>
+                          {enrollment.subject?.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Como você se sentiu estudando este tópico?</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-2">
+                    {Object.entries(moodIcons).map(([key, { icon: Icon, label, color }]) => (
+                      <Button
+                        key={key}
+                        type="button"
+                        variant={mood === key ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setMood(key as any)}
+                        className="w-full"
+                      >
+                        <Icon className={`w-4 h-4 mr-1 ${mood === key ? "" : color}`} />
+                        <span className="truncate">{label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Suas Reflexões</Label>
+                  <Textarea
+                    placeholder="O que você aprendeu? Quais insights teve? O que ainda precisa revisar?"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    rows={6}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label>Tags (opcional)</Label>
+                  <Input
+                    placeholder="Ex: importante, revisar, dúvida"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="flex gap-2 justify-end pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={addEntryMutation.isPending}
+                  >
+                    {addEntryMutation.isPending ? "Salvando..." : "Salvar Entrada"}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </StudentLayout>
