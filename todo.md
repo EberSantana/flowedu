@@ -7906,3 +7906,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Swipe para fechar menu mobile no StudentLayout (deslizar dedo para esquerda)
 - [x] Aplicar h-12, space-y-3, separador e animação ao Sidebar do professor
+
+## UX: Reposicionamento do Sino de Notificações
+
+- [x] Mover sino de notificações do portal do aluno para ao lado direito da matrícula no menu lateral

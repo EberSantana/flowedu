@@ -264,9 +264,12 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <p className="font-semibold text-foreground truncate text-base">
                   {student?.fullName || "Aluno"}
                 </p>
-                <p className="text-sm text-muted-foreground font-mono">
-                  Mat: {student?.registrationNumber || "N/A"}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-sm text-muted-foreground font-mono">
+                    Mat: {student?.registrationNumber || "N/A"}
+                  </p>
+                  <StudentNotifications />
+                </div>
               </div>
             </div>
           </div>
@@ -330,9 +333,12 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <p className="font-semibold text-foreground truncate text-base">
                   {student?.fullName || "Aluno"}
                 </p>
-                <p className="text-sm text-muted-foreground font-mono">
-                  Mat: {student?.registrationNumber || "N/A"}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-sm text-muted-foreground font-mono">
+                    Mat: {student?.registrationNumber || "N/A"}
+                  </p>
+                  <StudentNotifications />
+                </div>
               </div>
             </div>
           </div>
@@ -352,9 +358,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
       {/* Main Content */}
       <div className="lg:pl-72">
-        {/* Desktop Top Bar */}
+        {/* Desktop Top Bar — sino movido para o sidebar */}
         <header className="hidden lg:flex sticky top-0 z-30 bg-card/80 backdrop-blur-md border-b border-border items-center justify-end px-6 py-3 gap-3">
-          <StudentNotifications />
         </header>
 
         {/* Mobile Header */}
