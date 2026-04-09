@@ -201,15 +201,15 @@ export default function StudentGlossary() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-8 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
                 <BookOpen className="h-8 w-8" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold">Glossário Colaborativo</h1>
-                <p className="text-white/80 mt-1">
+                <h1 className="text-4xl font-bold">Glossário Colaborativo</h1>
+                <p className="text-primary-foreground/80 mt-1">
                   Dicionário de termos construído por todos — clique em uma letra e contribua!
                 </p>
               </div>
@@ -222,7 +222,7 @@ export default function StudentGlossary() {
           {/* Loading */}
           {isLoading && (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
           )}
 
@@ -268,10 +268,10 @@ export default function StudentGlossary() {
                   </Select>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <BookMarked className="w-5 h-5 text-emerald-600" />
+                    <BookMarked className="w-5 h-5 text-primary" />
                     <span className="font-semibold text-foreground">{glossaryList[0]?.title}</span>
                     {glossaryList[0]?.subjectName && (
-                      <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+                      <Badge variant="outline" className="text-xs">
                         {glossaryList[0].subjectName}
                       </Badge>
                     )}
@@ -329,8 +329,8 @@ export default function StudentGlossary() {
                         onClick={() => setSelectedLetter("all")}
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                           selectedLetter === "all"
-                            ? "bg-emerald-600 text-white shadow-md"
-                            : "bg-gray-100 text-gray-600 hover:bg-emerald-100 hover:text-emerald-700"
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : "bg-gray-100 text-gray-600 hover:bg-primary/10 hover:text-primary"
                         }`}
                       >
                         Todos
@@ -344,15 +344,15 @@ export default function StudentGlossary() {
                             onClick={() => setSelectedLetter(letter)}
                             className={`w-10 h-10 rounded-lg text-sm font-bold transition-all relative ${
                               isSelected
-                                ? "bg-emerald-600 text-white shadow-md scale-110"
+                                ? "bg-primary text-primary-foreground shadow-md scale-110"
                                 : count > 0
-                                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
-                                : "bg-gray-50 text-gray-400 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 hover:border-emerald-200"
+                                ? "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30"
+                                : "bg-gray-50 text-gray-400 hover:bg-primary/10 hover:text-primary border border-gray-200 hover:border-primary/30"
                             }`}
                           >
                             {letter}
                             {count > 0 && !isSelected && (
-                              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-emerald-600 text-white text-[10px] rounded-full flex items-center justify-center font-semibold shadow-sm">
+                              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-semibold shadow-sm">
                                 {count}
                               </span>
                             )}
@@ -371,8 +371,8 @@ export default function StudentGlossary() {
                     <div className="mb-4">
                       <div className="flex items-center justify-between bg-white border rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-3">
-                          <div className="w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center">
-                            <span className="text-3xl font-black text-emerald-700">{selectedLetter}</span>
+                          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <span className="text-3xl font-black text-primary">{selectedLetter}</span>
                           </div>
                           <div>
                             <h2 className="text-lg font-bold text-gray-900">
@@ -388,7 +388,7 @@ export default function StudentGlossary() {
                         {activeGlossary.allowStudentContributions && (
                           <Button
                             onClick={() => openContributeForLetter(selectedLetter)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className=""
                             size="sm"
                           >
                             <Plus className="w-4 h-4 mr-1" />
@@ -408,7 +408,6 @@ export default function StudentGlossary() {
                           setEntryTerm("");
                           setShowContributeModal(true);
                         }}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
                       >
                         <Plus className="w-4 h-4 mr-1" />
                         Contribuir com um Termo
@@ -418,13 +417,13 @@ export default function StudentGlossary() {
 
                   {/* Lista de termos */}
                   {displayEntries.length === 0 ? (
-                    <Card className="border-dashed border-2 border-emerald-200 bg-emerald-50/30">
+                    <Card className="border-dashed border-2 border-primary/20 bg-primary/5">
                       <CardContent className="flex flex-col items-center justify-center py-12">
-                        <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                           {selectedLetter !== "all" ? (
-                            <span className="text-4xl font-black text-emerald-400">{selectedLetter}</span>
+                            <span className="text-4xl font-black text-primary/50">{selectedLetter}</span>
                           ) : (
-                            <BookOpen className="w-10 h-10 text-emerald-400" />
+                            <BookOpen className="w-10 h-10 text-primary/50" />
                           )}
                         </div>
                         <p className="text-lg font-medium text-gray-600 mb-1">
@@ -450,7 +449,6 @@ export default function StudentGlossary() {
                                 setShowContributeModal(true);
                               }
                             }}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
                           >
                             <Plus className="w-4 h-4 mr-1" />
                             {selectedLetter !== "all"
@@ -469,17 +467,17 @@ export default function StudentGlossary() {
                             {/* Letra separadora (só mostra quando "Todos" está selecionado) */}
                             {selectedLetter === "all" && (
                               <div className="flex items-center gap-3 mb-3">
-                                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                                  <span className="text-2xl font-black text-emerald-700">{letter}</span>
+                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                                  <span className="text-2xl font-black text-primary">{letter}</span>
                                 </div>
-                                <div className="flex-1 h-px bg-emerald-200" />
+                                <div className="flex-1 h-px bg-primary/20" />
                                 <span className="text-xs text-gray-400">
                                   {groupedByLetter[letter].length} {groupedByLetter[letter].length === 1 ? "termo" : "termos"}
                                 </span>
                                 {activeGlossary.allowStudentContributions && (
                                   <button
                                     onClick={() => openContributeForLetter(letter)}
-                                    className="text-xs text-emerald-600 hover:text-emerald-800 font-medium flex items-center gap-1"
+                                    className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1"
                                   >
                                     <Plus className="w-3 h-3" />
                                     Adicionar
@@ -493,7 +491,7 @@ export default function StudentGlossary() {
                               {groupedByLetter[letter].map((entry) => (
                                 <div
                                   key={entry.id}
-                                  className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow border-l-4 border-l-emerald-400"
+                                  className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow border-l-4 border-l-primary"
                                 >
                                   <div className="flex items-start gap-3">
                                     <div className="flex-1 min-w-0">
@@ -533,8 +531,8 @@ export default function StudentGlossary() {
 
                                       {/* Exemplo */}
                                       {entry.example && (
-                                        <div className="mt-3 pl-3 border-l-2 border-emerald-200 bg-emerald-50/50 rounded-r-md py-2 pr-3">
-                                          <p className="text-xs text-emerald-700">
+                                        <div className="mt-3 pl-3 border-l-2 border-primary/20 bg-primary/5 rounded-r-md py-2 pr-3">
+                                          <p className="text-xs text-primary">
                                             <span className="font-semibold">Exemplo:</span> {entry.example}
                                           </p>
                                         </div>
@@ -564,7 +562,7 @@ export default function StudentGlossary() {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-emerald-600" />
+                <MessageSquare className="w-5 h-5 text-primary" />
                 {contributeLetter
                   ? `Adicionar Termo — Letra ${contributeLetter}`
                   : "Contribuir com um Termo"}
@@ -578,8 +576,8 @@ export default function StudentGlossary() {
               </div>
             )}
 
-            <div className="bg-emerald-50 border border-emerald-200 rounded-md p-3 text-sm text-emerald-700 flex items-start gap-2">
-              <span className="text-emerald-500 mt-0.5">💡</span>
+            <div className="bg-primary/5 border border-primary/20 rounded-md p-3 text-sm text-primary flex items-start gap-2">
+              <span className="mt-0.5">💡</span>
               Seu termo ficará visível para todos os colegas da disciplina. Contribua com definições claras e exemplos práticos!
             </div>
 
@@ -645,7 +643,6 @@ export default function StudentGlossary() {
               <Button
                 onClick={handleContribute}
                 disabled={addEntry.isPending || (!!contributeLetter && !!entryTerm && !entryTerm.toUpperCase().startsWith(contributeLetter))}
-                className="bg-emerald-600 hover:bg-emerald-700"
               >
                 {addEntry.isPending ? "Enviando..." : "Enviar Termo"}
               </Button>

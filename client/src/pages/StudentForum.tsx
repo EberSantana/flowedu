@@ -121,10 +121,24 @@ export default function StudentForum() {
 
   return (
     <StudentLayout>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gray-50">
+        {/* Banner padrão */}
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <MessageSquare className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Fórum de Discussão</h1>
+                <p className="text-primary-foreground/80 mt-1">Participe das discussões e tire suas dúvidas com colegas e professores</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="container mx-auto py-6 px-4 max-w-5xl">
 
-          {/* ── Cabeçalho ── */}
+          {/* ── Navegação interna ── */}
           <div className="mb-5">
             {view !== "subjects" && (
               <Button variant="ghost" size="sm" className="mb-3 -ml-2" onClick={() => {
@@ -135,19 +149,20 @@ export default function StudentForum() {
                 <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
             )}
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2 mb-1">
-              <MessageSquare className="h-6 w-6 text-primary" />
-              {view === "subjects" && "Fórum de Discussão"}
-              {view === "forums" && selectedSubjectName}
-              {view === "topics" && selectedForumTitle}
-              {view === "topic_detail" && selectedTopicTitle}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {view === "subjects" && "Selecione uma disciplina para acessar os fóruns"}
-              {view === "forums" && (selectedForumDesc || `Fóruns da disciplina ${selectedSubjectCode || selectedSubjectName}`)}
-              {view === "topics" && "Selecione um tópico para participar da discussão"}
-              {view === "topic_detail" && "Leia e responda o tópico"}
-            </p>
+            {view !== "subjects" && (
+              <h2 className="text-xl font-bold text-foreground flex items-center gap-2 mb-1">
+                {view === "forums" && selectedSubjectName}
+                {view === "topics" && selectedForumTitle}
+                {view === "topic_detail" && selectedTopicTitle}
+              </h2>
+            )}
+            {view !== "subjects" && (
+              <p className="text-sm text-muted-foreground">
+                {view === "forums" && (selectedForumDesc || `Fóruns da disciplina ${selectedSubjectCode || selectedSubjectName}`)}
+                {view === "topics" && "Selecione um tópico para participar da discussão"}
+                {view === "topic_detail" && "Leia e responda o tópico"}
+              </p>
+            )}
           </div>
 
           {renderBreadcrumb()}

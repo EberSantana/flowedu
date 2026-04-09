@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, BookOpen, CheckCircle2, XCircle, Star, BookMarked, TrendingUp, Clock, Lightbulb, ExternalLink, AlertCircle } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
+import StudentLayout from '@/components/StudentLayout';
 
 export default function StudentNotebook() {
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
@@ -103,16 +104,23 @@ export default function StudentNotebook() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
-          <BookOpen className="h-8 w-8 text-primary" />
-          Meu Caderno de Exercícios
-        </h1>
-        <p className="text-muted-foreground">
-          Revise suas questões, acompanhe seu progresso e receba sugestões personalizadas de estudo
-        </p>
-      </div>
+    <StudentLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Banner padrão */}
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <BookMarked className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Meu Caderno de Exercícios</h1>
+                <p className="text-primary-foreground/80 mt-1">Revise suas questões, acompanhe seu progresso e receba sugestões personalizadas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto py-8 px-4">
 
       {/* Estatísticas */}
       {stats && (
@@ -456,6 +464,8 @@ export default function StudentNotebook() {
           ))}
         </div>
       )}
-    </div>
+        </div>
+      </div>
+    </StudentLayout>
   );
 }

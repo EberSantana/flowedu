@@ -20,6 +20,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Link } from "wouter";
+import StudentLayout from "@/components/StudentLayout";
 
 export default function StudentSmartReview() {
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>(undefined);
@@ -68,16 +69,23 @@ export default function StudentSmartReview() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
-          <Brain className="h-8 w-8 text-primary" />
-          Revisão Inteligente
-        </h1>
-        <p className="text-muted-foreground">
-          Sistema de repetição espaçada para otimizar seu aprendizado
-        </p>
-      </div>
+    <StudentLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Banner padrão */}
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <Brain className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Revisão Inteligente</h1>
+                <p className="text-primary-foreground/80 mt-1">Sistema de repetição espaçada para otimizar seu aprendizado</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto py-8 px-4">
 
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
@@ -343,6 +351,8 @@ export default function StudentSmartReview() {
           </Tabs>
         </>
       )}
-    </div>
+        </div>
+      </div>
+    </StudentLayout>
   );
 }

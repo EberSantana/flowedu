@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Loader2, Send, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import StudentLayout from '@/components/StudentLayout';
 
 export default function StudentSubmitQuestion() {
   const [, setLocation] = useLocation();
@@ -57,16 +58,23 @@ export default function StudentSubmitQuestion() {
   };
 
   return (
-    <div className="container py-8 max-w-3xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <HelpCircle className="h-8 w-8" />
-          Enviar Dúvida
-        </h1>
-        <p className="text-muted-foreground">
-          Envie sua dúvida para o professor. Você receberá uma resposta em breve!
-        </p>
-      </div>
+    <StudentLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Banner padrão */}
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
+          <div className="container mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <HelpCircle className="h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">Enviar Dúvida</h1>
+                <p className="text-primary-foreground/80 mt-1">Envie sua dúvida para o professor. Você receberá uma resposta em breve!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto py-8 px-4 max-w-3xl">
 
       <Card>
         <CardHeader>
@@ -200,11 +208,11 @@ export default function StudentSubmitQuestion() {
       </Card>
 
       {/* Dicas */}
-      <Card className="mt-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+      <Card className="mt-6 border-primary/20 bg-primary/5">
         <CardHeader>
-          <CardTitle className="text-blue-900 dark:text-blue-100">💡 Dicas para uma boa dúvida</CardTitle>
+          <CardTitle className="text-primary">💡 Dicas para uma boa dúvida</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+        <CardContent className="text-sm text-foreground space-y-2">
           <p>• Seja específico sobre o que você não entendeu</p>
           <p>• Mencione o que você já tentou fazer para resolver</p>
           <p>• Se possível, cite exemplos ou situações concretas</p>
@@ -212,6 +220,8 @@ export default function StudentSubmitQuestion() {
           <p>• Você pode enviar dúvidas anônimas se preferir</p>
         </CardContent>
       </Card>
-    </div>
+        </div>
+      </div>
+    </StudentLayout>
   );
 }

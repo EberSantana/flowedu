@@ -137,9 +137,9 @@ export default function StudentStatistics() {
 
   return (
     <StudentLayout>
-      <div className="min-h-screen bg-background">
-        {/* Header - usando gradiente do tema */}
-        <div className={`bg-gradient-to-r ${colors.primary.gradient} text-primary-foreground py-12 px-4`}>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-10 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">

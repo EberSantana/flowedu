@@ -7824,3 +7824,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Botão "Instalar App" sumiu no portal do aluno
 
 - [x] Corrigir InstallPWAButton para aparecer sempre (não depender de canInstall=true)
+
+## Padronização de Layout do Portal do Aluno
+
+- [x] Padronizar StudentForum - adicionar banner from-primary to-accent
+- [x] Padronizar StudentGlossary - substituir cores emerald/teal por variáveis de tema
+- [x] Padronizar StudentStatistics - substituir cores fixas por from-primary to-accent
+- [x] Padronizar StudentMyQuestions - adicionar StudentLayout + banner padrão
+- [x] Padronizar StudentNotebook - adicionar StudentLayout + banner padrão
+- [x] Padronizar StudentSmartReview - adicionar StudentLayout + banner padrão
+- [x] Padronizar StudentSubmitQuestion - adicionar StudentLayout + banner padrão
