@@ -678,8 +678,8 @@ export default function Sidebar() {
           </TooltipProvider>
 
           {/* User Section */}
-          <div className={`border-t border-border/50 bg-gradient-to-r from-primary/5 to-transparent transition-all duration-300 ${
-            isCompact ? 'p-2' : 'p-4'
+          <div className={`border-t border-border bg-muted/30 transition-all duration-300 ${
+            isCompact ? 'p-2' : 'px-4 pt-4 pb-5'
           }`}>
             {isCompact ? (
               <TooltipProvider delayDuration={300}>
@@ -752,36 +752,34 @@ export default function Sidebar() {
                   </div>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <Link
                     href="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200"
+                    className="flex items-center gap-3 px-4 h-11 rounded-xl text-foreground hover:bg-accent/60 transition-all duration-200"
                   >
-                    <User className="h-4 w-4" />
-                    <span className="text-sm">Meu Perfil</span>
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Meu Perfil</span>
                   </Link>
-                  
 
-
-
-                  
                   <ThemeSelector
                     portal="professor"
                     trigger={
-                      <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-gradient-to-r hover:from-accent hover:to-accent/50 hover:text-accent-foreground hover:shadow-md transition-all duration-200">
-                        <Palette className="h-4 w-4" />
-                        <span className="text-sm">Tema</span>
+                      <button className="w-full flex items-center gap-3 px-4 h-11 rounded-xl text-foreground hover:bg-accent/60 transition-all duration-200">
+                        <Palette className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Tema</span>
                       </button>
                     }
                   />
-                  <hr className="border-border/50 my-1" />
+                  <div className="pt-1 pb-0.5">
+                    <hr className="border-border/60" />
+                  </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-destructive hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/5 hover:shadow-md transition-all duration-200"
+                    className="w-full flex items-center gap-3 px-4 h-11 rounded-xl text-destructive hover:bg-destructive/10 transition-all duration-200"
                   >
                     <LogOut className="h-4 w-4" />
-                    <span className="text-sm">Sair</span>
+                    <span className="text-sm font-medium">Sair</span>
                   </button>
                 </div>
               </>

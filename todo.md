@@ -7915,3 +7915,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Remover label "Período:" dos filtros do Relatório de Desempenho
 - [x] Ajustar espaçamento entre botões do menu inferior do portal do aluno (Personalizar Tema, Meu Perfil, Instalar App, Sair)
+
+## UX: Redesenho Menu Inferior Sidebar Professor
+
+- [x] Aplicar ghost, rounded-xl, h-11, space-y-2.5, separador com respiro ao menu inferior do Sidebar do professor
