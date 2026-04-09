@@ -94,7 +94,7 @@ export default function StudentLearningJournal() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

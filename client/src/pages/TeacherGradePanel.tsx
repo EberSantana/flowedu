@@ -71,8 +71,8 @@ export default function TeacherGradePanel() {
 
   // Buscar notas da disciplina selecionada (filtrando pela turma quando disponível)
   const { data: gradesData, isLoading: loadingGrades } = trpc.activities.getGradesByClass.useQuery(
-    { classId: selectedSubjectId!, subjectId: selectedSubjectId ?? undefined },
-    { enabled: !!selectedSubjectId }
+    { classId: selectedClassId!, subjectId: selectedSubjectId ?? undefined },
+    { enabled: !!selectedSubjectId && !!selectedClassId }
   );
 
   // Buscar relatório individual do aluno

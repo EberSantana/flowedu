@@ -7869,5 +7869,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug: Tema do professor aplicando no portal do aluno
 
-- [ ] Investigar como o tema é armazenado e compartilhado
-- [ ] Separar armazenamento de tema para professor e aluno
+- [x] Investigar como o tema é armazenado e compartilhado
+- [x] Separar armazenamento de tema para professor e aluno
+
+## Auditoria FlowEdu — Correções
+
+- [x] Bug #1: Corrigir classId errado no TeacherGradePanel (selectedSubjectId → selectedClassId)
+- [x] Bug #2: Remover link /student/mistake-notebook do Sidebar (rota inexistente, 404)
+- [x] Layout #3: text-white → text-primary-foreground no banner de 8 páginas do aluno
+- [x] Layout #4: Adicionar bg-gray-50 no conteúdo do StudentGradeBook
+- [x] Layout #5: Adicionar bg-gray-50 no conteúdo do StudentExercises

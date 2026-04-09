@@ -306,11 +306,6 @@ const studentNavItems: NavItem[] = [
     href: "/student/notebook",
   },
   {
-    label: "Caderno Inteligente IA",
-    icon: <Brain className="h-5 w-5" />,
-    href: "/student/mistake-notebook",
-  },
-   {
     label: "Avisos",
     icon: <Megaphone className="h-5 w-5" />,
     href: "/student/announcements",

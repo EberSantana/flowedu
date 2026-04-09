@@ -86,7 +86,7 @@ export default function StudentAssessmentsPage() {
     <StudentLayout>
       <div className="min-h-screen bg-gray-50">
         {/* Header gradiente padrão */}
-        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
           <div className="container mx-auto">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">

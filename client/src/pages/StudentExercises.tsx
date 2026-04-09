@@ -125,9 +125,9 @@ export default function StudentExercises() {
 
   return (
     <StudentLayout>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gray-50">
         {/* Header gradiente */}
-        <div className="bg-gradient-to-r from-primary to-accent text-white py-12 px-4">
+        <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-12 px-4">
           <div className="container mx-auto max-w-7xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function StudentExercises() {
                 </div>
                 <div>
                   <h1 className="text-4xl font-bold">Exercícios Disponíveis</h1>
-                  <p className="text-white/80 mt-1 text-sm">Pratique e aprimore seus conhecimentos</p>
+                  <p className="text-primary-foreground/80 mt-1 text-sm">Pratique e aprimore seus conhecimentos</p>
                 </div>
               </div>
               <Button
@@ -144,7 +144,7 @@ export default function StudentExercises() {
                 disabled={isFetching}
                 variant="outline"
                 size="sm"
-                className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+                className="bg-white/10 border-white/30 text-primary-foreground hover:bg-white/20"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
                 {isFetching ? 'Atualizando...' : 'Atualizar'}
