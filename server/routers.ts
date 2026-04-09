@@ -8590,28 +8590,48 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
-        const recentAttempts = completedAttempts.filter(a => 
-          a.completedAt && new Date(a.completedAt) >= thirtyDaysAgo
-        );
+        // Usar TODAS as tentativas recentes (não só completed) para calcular taxa de conclusão
+        const allRecentAttempts = attempts.filter(a => {
+          // Para tentativas completadas, usar completedAt
+          if (a.status === 'completed' && a.completedAt) {
+            return new Date(a.completedAt) >= thirtyDaysAgo;
+          }
+          // Para tentativas não completadas, não incluir na evolução temporal
+          return false;
+        });
         
         const temporalData = new Map<string, { scores: number[], total: number, completed: number }>();
         
-        recentAttempts.forEach(attempt => {
-          if (!attempt.completedAt) return;
-          const date = new Date(attempt.completedAt).toISOString().split('T')[0];
-          if (!temporalData.has(date)) {
-            temporalData.set(date, { scores: [], total: 0, completed: 0 });
+        // Primeiro, contar todas as tentativas por data (incluindo não completadas)
+        attempts.forEach(attempt => {
+          let dateStr: string;
+          if (attempt.completedAt) {
+            const d = new Date(attempt.completedAt);
+            if (d < thirtyDaysAgo) return;
+            dateStr = d.toISOString().split('T')[0];
+          } else {
+            return; // Sem data, ignorar
           }
-          const data = temporalData.get(date)!;
-          data.scores.push(attempt.score || 0);
-          data.completed++;
+          if (!temporalData.has(dateStr)) {
+            temporalData.set(dateStr, { scores: [], total: 0, completed: 0 });
+          }
+          const data = temporalData.get(dateStr)!;
+          data.total++;
+          if (attempt.status === 'completed') {
+            data.scores.push(attempt.score || 0);
+            data.completed++;
+          }
         });
         
         const temporalEvolution = Array.from(temporalData.entries())
           .map(([date, data]) => ({
             date,
-            averageScore: Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length) * 10) / 10,
-            completionRate: Math.round((data.completed / data.total) * 100 * 10) / 10,
+            averageScore: data.scores.length > 0 
+              ? Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length) * 10) / 10 
+              : 0,
+            completionRate: data.total > 0 
+              ? Math.round((data.completed / data.total) * 100 * 10) / 10 
+              : 0,
           }))
           .sort((a, b) => a.date.localeCompare(b.date));
         

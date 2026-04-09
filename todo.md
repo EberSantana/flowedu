@@ -7879,3 +7879,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Layout #3: text-white → text-primary-foreground no banner de 8 páginas do aluno
 - [x] Layout #4: Adicionar bg-gray-50 no conteúdo do StudentGradeBook
 - [x] Layout #5: Adicionar bg-gray-50 no conteúdo do StudentExercises
+
+## Bug: Gráfico de Evolução Temporal no Relatório de Desempenho mostra 0%
+
+- [x] Investigar cálculos do backend para Evolução Temporal (Média de Acertos e Taxa de Conclusão)
+- [x] Corrigir dados retornados pelo backend para o gráfico
