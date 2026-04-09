@@ -188,7 +188,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         trigger={
           <Button
             variant="outline"
-            className="w-full justify-start gap-3 h-11"
+            className="w-full justify-start gap-3 h-12"
           >
             <Palette className="w-5 h-5" />
             <span className="text-sm font-medium">Personalizar Tema</span>
@@ -199,16 +199,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         <Button
           onClick={closeSidebar ? () => setSidebarOpen(false) : undefined}
           variant="outline"
-          className="w-full justify-start gap-3 h-11"
+          className="w-full justify-start gap-3 h-12"
         >
           <User className="w-5 h-5" />
           <span className="text-sm font-medium">Meu Perfil</span>
         </Button>
       </Link>
-      <InstallPWAButton className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors" />
+      <InstallPWAButton className="w-full flex items-center justify-start gap-3 h-12 px-4 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors" />
+      <hr className="border-border my-1" />
       <a
         href="/api/logout"
-        className="w-full flex items-center justify-start gap-3 h-11 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+        className="w-full flex items-center justify-start gap-3 h-12 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
       >
         <LogOut className="w-5 h-5" />
         <span className="text-sm font-medium">Sair</span>
@@ -263,17 +264,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       </aside>
 
       {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ease-in-out ${
+          sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setSidebarOpen(false)}
+      />
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-72 bg-card shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 w-72 bg-card shadow-2xl z-50 transform transition-all duration-300 ease-in-out lg:hidden ${
+          sidebarOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
         }`}
       >
         <div className="flex flex-col h-full">

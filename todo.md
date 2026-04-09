@@ -7895,3 +7895,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## UX: Espaçamento Menu Inferior Portal do Aluno
 
 - [x] Ajustar espaçamento entre botões do menu inferior do StudentLayout (Personalizar Tema, Meu Perfil, Instalar App, Sair) — muito colados
+
+## UX: Melhorias Menu Lateral Portal do Aluno
+
+- [x] Aumentar altura dos botões do menu inferior de h-11 para h-12
+- [x] Adicionar separador visual (hr) entre "Instalar App" e "Sair"
+- [x] Adicionar animação suave ao abrir menu lateral no mobile
