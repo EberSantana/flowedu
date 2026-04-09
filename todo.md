@@ -7910,3 +7910,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## UX: Reposicionamento do Sino de Notificações
 
 - [x] Mover sino de notificações do portal do aluno para ao lado direito da matrícula no menu lateral
+
+## UX: Ajustes de Layout
+
+- [x] Remover label "Período:" dos filtros do Relatório de Desempenho
+- [x] Ajustar espaçamento entre botões do menu inferior do portal do aluno (Personalizar Tema, Meu Perfil, Instalar App, Sair)

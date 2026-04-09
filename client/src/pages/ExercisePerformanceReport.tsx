@@ -188,7 +188,6 @@ export default function ExercisePerformanceReport() {
               <div className="space-y-4">
               {/* Atalhos de período */}
               <div className="flex flex-wrap gap-2">
-                <span className="text-sm font-semibold text-gray-700 self-center">Período:</span>
                 {[
                   { label: '7 dias', days: 7 },
                   { label: '30 dias', days: 30 },

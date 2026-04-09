@@ -203,36 +203,38 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   );
 
   const renderBottomActions = (closeSidebar?: boolean) => (
-    <div className="p-4 border-t border-border bg-muted/30 space-y-3">
+    <div className="px-4 pt-4 pb-5 border-t border-border bg-muted/30 space-y-2.5">
       <ThemeSelector
         portal="student"
         trigger={
           <Button
-            variant="outline"
-            className="w-full justify-start gap-3 h-12"
+            variant="ghost"
+            className="w-full justify-start gap-3 h-11 px-4 rounded-xl hover:bg-accent/60 transition-all duration-200"
           >
-            <Palette className="w-5 h-5" />
-            <span className="text-sm font-medium">Personalizar Tema</span>
+            <Palette className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">Personalizar Tema</span>
           </Button>
         }
       />
       <Link href="/student-profile">
         <Button
           onClick={closeSidebar ? () => setSidebarOpen(false) : undefined}
-          variant="outline"
-          className="w-full justify-start gap-3 h-12"
+          variant="ghost"
+          className="w-full justify-start gap-3 h-11 px-4 rounded-xl hover:bg-accent/60 transition-all duration-200"
         >
-          <User className="w-5 h-5" />
-          <span className="text-sm font-medium">Meu Perfil</span>
+          <User className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Meu Perfil</span>
         </Button>
       </Link>
-      <InstallPWAButton className="w-full flex items-center justify-start gap-3 h-12 px-4 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors" />
-      <hr className="border-border my-1" />
+      <InstallPWAButton className="w-full flex items-center justify-start gap-3 h-11 px-4 rounded-xl text-sm font-medium text-foreground hover:bg-accent/60 transition-all duration-200" />
+      <div className="pt-1 pb-0.5">
+        <hr className="border-border/60" />
+      </div>
       <a
         href="/api/logout"
-        className="w-full flex items-center justify-start gap-3 h-12 px-4 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+        className="w-full flex items-center justify-start gap-3 h-11 px-4 rounded-xl text-destructive hover:bg-destructive/10 transition-all duration-200"
       >
-        <LogOut className="w-5 h-5" />
+        <LogOut className="w-4 h-4" />
         <span className="text-sm font-medium">Sair</span>
       </a>
     </div>
