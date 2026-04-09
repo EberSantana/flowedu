@@ -111,15 +111,23 @@ export function InstallPWA() {
 }
 
 // Botão compacto para menus e sidebars
+// Aparece sempre (mesmo sem beforeinstallprompt), exceto quando já instalado como PWA
 export function InstallPWAButton({ className }: { className?: string }) {
-  const { canInstall, installed, triggerInstall } = useInstallPWA();
+  const { installPrompt, installed, triggerInstall } = useInstallPWA();
   const [showIOSGuide, setShowIOSGuide] = useState(false);
 
-  if (installed || !canInstall) return null;
+  // Não mostrar se já está instalado como PWA (modo standalone)
+  if (installed) return null;
 
   async function handleClick() {
-    const result = await triggerInstall();
-    if (result === "ios") setShowIOSGuide(true);
+    if (installPrompt) {
+      // Android/Chrome: usa o prompt nativo
+      const result = await triggerInstall();
+      if (result === "ios") setShowIOSGuide(true);
+    } else {
+      // iOS ou browser sem suporte nativo: mostra guia manual
+      setShowIOSGuide(true);
+    }
   }
 
   return (
@@ -133,23 +141,41 @@ export function InstallPWAButton({ className }: { className?: string }) {
         <div className="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50" onClick={() => setShowIOSGuide(false)}>
           <div className="bg-background rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base">Instalar no iPhone/iPad</h3>
+              <h3 className="font-bold text-base">Instalar o FlowEdu</h3>
               <button onClick={() => setShowIOSGuide(false)} className="text-muted-foreground"><X className="h-5 w-5" /></button>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
-                <p className="text-sm">Toque no botão <strong>Compartilhar <Share className="inline h-3.5 w-3.5" /></strong> na barra inferior do Safari</p>
+            {isIOS() ? (
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                  <p className="text-sm">Toque no botão <strong>Compartilhar <Share className="inline h-3.5 w-3.5" /></strong> na barra inferior do Safari</p>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                  <p className="text-sm">Role e toque em <strong>"Adicionar à Tela de Início"</strong></p>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                  <p className="text-sm">Toque em <strong>"Adicionar"</strong> no canto superior direito</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
-                <p className="text-sm">Role e toque em <strong>"Adicionar à Tela de Início"</strong></p>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Para instalar o FlowEdu como app no seu dispositivo:</p>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                  <p className="text-sm">No Chrome, toque no menu <strong>⋮</strong> (três pontos) no canto superior direito</p>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                  <p className="text-sm">Toque em <strong>"Adicionar à tela inicial"</strong> ou <strong>"Instalar app"</strong></p>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                  <p className="text-sm">Confirme tocando em <strong>"Instalar"</strong></p>
+                </div>
               </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
-                <p className="text-sm">Toque em <strong>"Adicionar"</strong> no canto superior direito</p>
-              </div>
-            </div>
+            )}
             <Button variant="outline" className="w-full" onClick={() => setShowIOSGuide(false)}>Entendido</Button>
           </div>
         </div>

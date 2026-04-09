@@ -7820,3 +7820,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Unable to preload CSS for /assets/Dashboard-TRZluGMH.css
 
 - [x] Fazer novo build e deploy completo dos assets para corrigir erro de preload CSS
+
+## Bug: Botão "Instalar App" sumiu no portal do aluno
+
+- [x] Corrigir InstallPWAButton para aparecer sempre (não depender de canInstall=true)
