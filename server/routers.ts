@@ -6144,6 +6144,38 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
 
         return deadlines.slice(0, 15);
       }),
+
+    // Salvar tema de cores do aluno (independente do professor)
+    saveTheme: studentProcedure
+      .input(z.object({
+        colorTheme: z.string().max(32),
+        themeMode: z.string().max(16),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const studentId = ctx.studentSession.studentId;
+        await database.execute(
+          sql`UPDATE students SET colorTheme = ${input.colorTheme}, themeMode = ${input.themeMode} WHERE id = ${studentId}`
+        );
+        return { success: true };
+      }),
+
+    // Buscar tema de cores do aluno
+    getTheme: studentProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      const studentId = ctx.studentSession.studentId;
+      const result = await database.execute(
+        sql`SELECT colorTheme, themeMode FROM students WHERE id = ${studentId} LIMIT 1`
+      ) as any;
+      const rows = Array.isArray(result) && Array.isArray(result[0]) ? result[0] : (Array.isArray(result) ? result : []);
+      const row = rows[0];
+      return {
+        colorTheme: row?.colorTheme || 'default',
+        themeMode: row?.themeMode || 'system',
+      };
+    }),
   }),
 
   // Professor Materials Management

@@ -184,6 +184,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const renderBottomActions = (closeSidebar?: boolean) => (
     <div className="p-4 border-t border-border bg-muted/30 space-y-2">
       <ThemeSelector
+        portal="student"
         trigger={
           <Button
             variant="outline"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Check, Sun, Moon, Monitor, Palette } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { themes, applyTheme, getSavedColorTheme, saveColorTheme } from "@/lib/themes";
+import { themes, applyTheme } from "@/lib/themes";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,29 +14,53 @@ import {
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 
-interface ThemeSelectorProps {
-  trigger?: React.ReactNode;
+// Funções de localStorage com chave por portal
+function getLocalStorageKey(portal: "professor" | "student") {
+  return portal === "student" ? "color-theme-student" : "color-theme";
 }
 
-export function ThemeSelector({ trigger }: ThemeSelectorProps) {
+function getSavedColorThemeForPortal(portal: "professor" | "student"): string {
+  return localStorage.getItem(getLocalStorageKey(portal)) || "default";
+}
+
+function saveColorThemeForPortal(portal: "professor" | "student", themeId: string): void {
+  localStorage.setItem(getLocalStorageKey(portal), themeId);
+}
+
+interface ThemeSelectorProps {
+  trigger?: React.ReactNode;
+  portal?: "professor" | "student";
+}
+
+export function ThemeSelector({ trigger, portal = "professor" }: ThemeSelectorProps) {
   const { theme: modeTheme, setTheme: setModeTheme, effectiveTheme } = useTheme();
-  const [colorTheme, setColorTheme] = useState(getSavedColorTheme());
+  const [colorTheme, setColorTheme] = useState(getSavedColorThemeForPortal(portal));
   const [open, setOpen] = useState(false);
 
-  // Mutation para salvar tema no banco
-  const saveThemeMutation = trpc.user.saveTheme.useMutation();
+  // Mutation e Query diferentes por portal
+  const saveThemeProfessor = trpc.user.saveTheme.useMutation();
+  const saveThemeStudent = trpc.student.saveTheme.useMutation();
+  const saveThemeMutation = portal === "student" ? saveThemeStudent : saveThemeProfessor;
 
-  // Query para buscar tema do banco (só executa se autenticado)
-  const { data: savedThemeData } = trpc.user.getTheme.useQuery(undefined, {
+  const { data: professorThemeData } = trpc.user.getTheme.useQuery(undefined, {
     retry: false,
-    staleTime: 1000 * 60 * 60, // 1 hora
+    staleTime: 1000 * 60 * 60,
+    enabled: portal === "professor",
   });
+
+  const { data: studentThemeData } = trpc.student.getTheme.useQuery(undefined, {
+    retry: false,
+    staleTime: 1000 * 60 * 60,
+    enabled: portal === "student",
+  });
+
+  const savedThemeData = portal === "student" ? studentThemeData : professorThemeData;
 
   // Sincronizar tema do banco quando os dados chegarem
   useEffect(() => {
     if (!savedThemeData) return;
     if (savedThemeData.colorTheme && savedThemeData.colorTheme !== "default") {
-      saveColorTheme(savedThemeData.colorTheme);
+      saveColorThemeForPortal(portal, savedThemeData.colorTheme);
       setColorTheme(savedThemeData.colorTheme);
       applyTheme(savedThemeData.colorTheme, effectiveTheme);
     }
@@ -51,15 +75,15 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
 
   // Aplicar tema ao carregar e quando mudar o modo (claro/escuro)
   useEffect(() => {
-    const savedTheme = getSavedColorTheme();
+    const savedTheme = getSavedColorThemeForPortal(portal);
     if (savedTheme && savedTheme !== "default") {
       applyTheme(savedTheme, effectiveTheme);
     }
-  }, [effectiveTheme]);
+  }, [effectiveTheme, portal]);
 
   const handleColorThemeChange = (themeId: string) => {
     setColorTheme(themeId);
-    saveColorTheme(themeId);
+    saveColorThemeForPortal(portal, themeId);
     applyTheme(themeId, effectiveTheme);
     // Persistir no banco de dados
     saveThemeMutation.mutate({
@@ -277,11 +301,12 @@ export function ThemeSelector({ trigger }: ThemeSelectorProps) {
 }
 
 /**
- * Componente compacto para uso na sidebar
+ * Componente compacto para uso na sidebar do professor
  */
 export function ThemeSelectorCompact() {
   return (
     <ThemeSelector
+      portal="professor"
       trigger={
         <Button variant="ghost" size="icon" className="h-9 w-9">
           <Palette className="h-4 w-4" />

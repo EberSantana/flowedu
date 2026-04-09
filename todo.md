@@ -7866,3 +7866,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Remover "+ Nova Dúvida" do banner de Minhas Dúvidas
 - [x] Remover "+ Nova Entrada" do banner do Diário de Aprendizagem
+
+## Bug: Tema do professor aplicando no portal do aluno
+
+- [ ] Investigar como o tema é armazenado e compartilhado
+- [ ] Separar armazenamento de tema para professor e aluno

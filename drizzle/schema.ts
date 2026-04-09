@@ -636,6 +636,8 @@ export const students = mysqlTable("students", {
   avatarPose: varchar("avatarPose", { length: 30 }).default("standing"),
   specialKimono: varchar("specialKimono", { length: 30 }).default("none"),
   avatarAccessories: varchar("avatarAccessories", { length: 255 }).default("none"),
+  colorTheme: varchar("colorTheme", { length: 32 }).default("default"), // Tema de cores do aluno (independente do professor)
+  themeMode: varchar("themeMode", { length: 16 }).default("system"), // Modo claro/escuro/sistema do aluno
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
