@@ -187,6 +187,11 @@ export async function getDb() {
         ssl: {
           rejectUnauthorized: false
         },
+        // Force UTC so mysql2 returns TIMESTAMP columns as UTC strings.
+        // Without this, mysql2 converts timestamps to the server's local timezone
+        // before returning them, causing Drizzle to misinterpret the values
+        // and introduce a double-offset error in heatmaps and time-based queries.
+        timezone: '+00:00',
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0

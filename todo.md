@@ -7834,3 +7834,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Padronizar StudentNotebook - adicionar StudentLayout + banner padrão
 - [x] Padronizar StudentSmartReview - adicionar StudentLayout + banner padrão
 - [x] Padronizar StudentSubmitQuestion - adicionar StudentLayout + banner padrão
+
+## Bug: Mapa de Calor com horário +4h a mais
+
+- [x] Corrigir timezone na conexão MySQL (adicionar timezone: '+00:00' no createPool do db.ts)
