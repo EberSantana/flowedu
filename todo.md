@@ -7919,3 +7919,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## UX: Redesenho Menu Inferior Sidebar Professor
 
 - [x] Aplicar ghost, rounded-xl, h-11, space-y-2.5, separador com respiro ao menu inferior do Sidebar do professor
+
+## Remover Card de Filtros de Período
+
+- [x] Remover Card de Filtros de período (7 dias, 30 dias, Bimestres, datas, Aplicar) do ExercisePerformanceReport
