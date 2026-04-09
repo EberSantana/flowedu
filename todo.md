@@ -7884,3 +7884,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Investigar cálculos do backend para Evolução Temporal (Média de Acertos e Taxa de Conclusão)
 - [x] Corrigir dados retornados pelo backend para o gráfico
+
+## Filtro de Período Personalizado — Evolução Temporal
+
+- [x] Backend: aceitar dateFrom e dateTo no getStatistics de teacherExercises
+- [x] Frontend ExercisePerformanceReport: seletor de data início e fim + botão aplicar
+- [x] Identificar segundo relatório com Evolução Temporal (era o mesmo relatório)
+- [x] Backend do segundo relatório: não necessário (mesmo componente)

@@ -8465,6 +8465,8 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
       .input(z.object({
         subjectId: z.number(),
         exerciseId: z.number().optional(),
+        dateFrom: z.string().optional(), // ISO date string ex: "2025-01-01"
+        dateTo: z.string().optional(),   // ISO date string ex: "2025-03-31"
       }))
       .query(async ({ ctx, input }) => {
         const db_instance = await db.getDb();
@@ -8586,28 +8588,28 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
           }
         }
         
-        // Evolução temporal (últimos 30 dias)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        // Usar TODAS as tentativas recentes (não só completed) para calcular taxa de conclusão
-        const allRecentAttempts = attempts.filter(a => {
-          // Para tentativas completadas, usar completedAt
-          if (a.status === 'completed' && a.completedAt) {
-            return new Date(a.completedAt) >= thirtyDaysAgo;
-          }
-          // Para tentativas não completadas, não incluir na evolução temporal
-          return false;
-        });
+        // Evolução temporal — período personalizado ou últimos 30 dias
+        let periodStart: Date;
+        let periodEnd: Date;
+        if (input.dateFrom) {
+          periodStart = new Date(input.dateFrom);
+          periodStart.setHours(0, 0, 0, 0);
+          periodEnd = input.dateTo ? new Date(input.dateTo) : new Date();
+          periodEnd.setHours(23, 59, 59, 999);
+        } else {
+          periodEnd = new Date();
+          periodStart = new Date();
+          periodStart.setDate(periodStart.getDate() - 30);
+        }
         
         const temporalData = new Map<string, { scores: number[], total: number, completed: number }>();
         
-        // Primeiro, contar todas as tentativas por data (incluindo não completadas)
+        // Contar todas as tentativas por data dentro do período selecionado
         attempts.forEach(attempt => {
           let dateStr: string;
           if (attempt.completedAt) {
             const d = new Date(attempt.completedAt);
-            if (d < thirtyDaysAgo) return;
+            if (d < periodStart || d > periodEnd) return;
             dateStr = d.toISOString().split('T')[0];
           } else {
             return; // Sem data, ignorar
