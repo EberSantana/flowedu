@@ -4690,6 +4690,39 @@ JSON (descrições MAX 15 chars):
         };
       }),
 
+    // Calendário anual: mapa de calor com acessos por dia (estilo GitHub contributions)
+    getYearlyCalendar: protectedProcedure
+      .input(z.object({
+        year: z.number().min(2020).max(2030).default(new Date().getFullYear()),
+        userType: z.enum(['all', 'teacher', 'student']).default('all'),
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const yearStart = new Date(`${input.year}-01-01T00:00:00Z`);
+        const yearEnd = new Date(`${input.year}-12-31T23:59:59Z`);
+        // Buscar todos os logs do ano (sem filtrar por teacherId, igual ao getSummary)
+        const whereConditions = [
+          gte(accessLogs.accessedAt, yearStart),
+          lte(accessLogs.accessedAt, yearEnd),
+        ];
+        if (input.userType !== 'all') {
+          whereConditions.push(eq(accessLogs.userType, input.userType));
+        }
+        const allLogs = await database
+          .select({ accessedAt: accessLogs.accessedAt, userType: accessLogs.userType })
+          .from(accessLogs)
+          .where(and(...whereConditions));
+        // Agrupar por data (YYYY-MM-DD) com offset Manaus (UTC-4)
+        const dailyCounts: Record<string, number> = {};
+        for (const log of allLogs) {
+          const d = new Date(log.accessedAt.getTime() - 4 * 60 * 60 * 1000);
+          const key = d.toISOString().slice(0, 10);
+          dailyCounts[key] = (dailyCounts[key] || 0) + 1;
+        }
+        return { year: input.year, dailyCounts, total: allLogs.length };
+      }),
+
     // Exportar todos os logs em CSV
     exportCSV: protectedProcedure
       .input(z.object({

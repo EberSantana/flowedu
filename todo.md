@@ -7923,3 +7923,4 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Remover Card de Filtros de Período
 
 - [x] Remover Card de Filtros de período (7 dias, 30 dias, Bimestres, datas, Aplicar) do ExercisePerformanceReport
+- [x] Mapa de calor estilo calendário anual na página de Logs de Acesso (12 meses com quadradinhos coloridos por dia)

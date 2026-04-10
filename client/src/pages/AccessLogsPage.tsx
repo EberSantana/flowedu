@@ -61,6 +61,27 @@ const DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const DAYS_FULL = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 // Horas do dia (0..23)
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
+// Meses em PT-BR
+const MONTHS_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const MONTHS_FULL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+function getCalendarHeatColor(value: number, max: number): string {
+  if (max === 0 || value === 0) return "bg-muted/40";
+  const ratio = value / max;
+  if (ratio < 0.2) return "bg-emerald-200";
+  if (ratio < 0.4) return "bg-emerald-300";
+  if (ratio < 0.6) return "bg-emerald-400";
+  if (ratio < 0.8) return "bg-emerald-500";
+  return "bg-emerald-600";
+}
+
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfMonth(year: number, month: number): number {
+  return new Date(year, month, 1).getDay();
+}
 
 function getHeatColor(value: number, max: number): string {
   if (max === 0 || value === 0) return "bg-gray-100";
@@ -134,6 +155,14 @@ export default function AccessLogsPage() {
   const [historyDays, setHistoryDays] = useState(30);
 
   const utils = trpc.useUtils();
+
+  // Calendário anual de acessos
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+  const [calendarUserType, setCalendarUserType] = useState<"all" | "teacher" | "student">("all");
+  const { data: calendarData, isLoading: calendarLoading } = trpc.accessLogs.getYearlyCalendar.useQuery(
+    { year: calendarYear, userType: calendarUserType },
+    { refetchOnWindowFocus: false }
+  );
 
   // Análise acadêmica com IA
   const [academicDays, setAcademicDays] = useState(90);
@@ -909,6 +938,164 @@ export default function AccessLogsPage() {
                   </div>
                 </>
               )}
+            </CardContent>
+          </Card>
+
+          {/* ===== CALENDÁRIO ANUAL DE ACESSOS ===== */}
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <CalendarIcon className="h-5 w-5 text-emerald-500" />
+                    Calendário Anual de Acessos
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Visualização mensal dos acessos ao longo do ano • Manaus (UTC−4)
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    value={calendarUserType}
+                    onValueChange={(v) => setCalendarUserType(v as "all" | "teacher" | "student")}
+                  >
+                    <SelectTrigger className="w-36">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="teacher">Professores</SelectItem>
+                      <SelectItem value="student">Alunos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCalendarYear(y => y - 1)}
+                      disabled={calendarYear <= 2020}
+                    >
+                      ◀
+                    </Button>
+                    <span className="text-lg font-bold px-3 min-w-[60px] text-center">{calendarYear}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCalendarYear(y => y + 1)}
+                      disabled={calendarYear >= new Date().getFullYear()}
+                    >
+                      ▶
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {calendarLoading ? (
+                <p className="text-muted-foreground text-sm py-4 text-center">Carregando calendário...</p>
+              ) : !calendarData || calendarData.total === 0 ? (
+                <p className="text-muted-foreground text-sm py-4 text-center">
+                  Nenhum acesso registrado em {calendarYear}.
+                </p>
+              ) : (() => {
+                const counts = calendarData.dailyCounts;
+                const allValues = Object.values(counts);
+                const calMax = allValues.length > 0 ? Math.max(...allValues) : 0;
+                const totalYear = calendarData.total;
+                const daysWithAccess = allValues.filter(v => v > 0).length;
+                return (
+                  <>
+                    {/* Resumo do ano */}
+                    <div className="mb-4 flex flex-wrap items-center gap-4 text-sm">
+                      <Badge variant="secondary" className="text-xs">
+                        {totalYear.toLocaleString('pt-BR')} acessos em {calendarYear}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {daysWithAccess} dias com acesso
+                      </Badge>
+                      {calMax > 0 && (
+                        <Badge variant="outline" className="text-xs text-emerald-600">
+                          Pico: {calMax} acessos/dia
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Grid de 12 meses (4 colunas x 3 linhas) */}
+                    <TooltipProvider delayDuration={100}>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {MONTHS_SHORT.map((monthName, monthIdx) => {
+                        const daysInMonth = getDaysInMonth(calendarYear, monthIdx);
+                        const firstDay = getFirstDayOfMonth(calendarYear, monthIdx);
+                        // Calcular total do mês
+                        let monthTotal = 0;
+                        for (let d = 1; d <= daysInMonth; d++) {
+                          const key = `${calendarYear}-${String(monthIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                          monthTotal += counts[key] || 0;
+                        }
+                        return (
+                          <div key={monthIdx} className="border rounded-lg p-3 bg-card">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-semibold text-foreground">{monthName}</span>
+                              <span className="text-[10px] text-muted-foreground">{monthTotal > 0 ? `${monthTotal}` : ''}</span>
+                            </div>
+                            {/* Cabeçalho dos dias da semana */}
+                            <div className="grid grid-cols-7 gap-[2px] mb-1">
+                              {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
+                                <div key={i} className="text-[8px] text-muted-foreground text-center font-medium">{d}</div>
+                              ))}
+                            </div>
+                            {/* Grid de dias */}
+                            <div className="grid grid-cols-7 gap-[2px]">
+                              {/* Espaços vazios antes do primeiro dia */}
+                              {Array.from({ length: firstDay }).map((_, i) => (
+                                <div key={`empty-${i}`} className="w-full aspect-square" />
+                              ))}
+                              {/* Dias do mês */}
+                              {Array.from({ length: daysInMonth }).map((_, d) => {
+                                const dayNum = d + 1;
+                                const dateKey = `${calendarYear}-${String(monthIdx + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                                const val = counts[dateKey] || 0;
+                                const isFuture = new Date(calendarYear, monthIdx, dayNum) > new Date();
+                                return (
+                                  <Tooltip key={dayNum}>
+                                    <TooltipTrigger asChild>
+                                      <div
+                                        className={`w-full aspect-square rounded-[3px] cursor-default transition-opacity hover:opacity-80 ${
+                                          isFuture ? 'bg-transparent' : getCalendarHeatColor(val, calMax)
+                                        }`}
+                                        title={isFuture ? '' : `${dayNum}/${monthIdx + 1}: ${val} acesso${val !== 1 ? 's' : ''}`}
+                                      />
+                                    </TooltipTrigger>
+                                    {!isFuture && (
+                                      <TooltipContent side="top" className="text-xs">
+                                        <p className="font-semibold">{dayNum} de {MONTHS_FULL[monthIdx]}</p>
+                                        <p className="text-primary font-bold">{val} {val !== 1 ? 'acessos' : 'acesso'}</p>
+                                      </TooltipContent>
+                                    )}
+                                  </Tooltip>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    </TooltipProvider>
+
+                    {/* Legenda */}
+                    <div className="flex items-center gap-2 mt-4 justify-end">
+                      <span className="text-xs text-muted-foreground">Menos</span>
+                      <div className="w-4 h-4 rounded-[3px] bg-muted/40" />
+                      <div className="w-4 h-4 rounded-[3px] bg-emerald-200" />
+                      <div className="w-4 h-4 rounded-[3px] bg-emerald-300" />
+                      <div className="w-4 h-4 rounded-[3px] bg-emerald-400" />
+                      <div className="w-4 h-4 rounded-[3px] bg-emerald-500" />
+                      <div className="w-4 h-4 rounded-[3px] bg-emerald-600" />
+                      <span className="text-xs text-muted-foreground">Mais</span>
+                    </div>
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
 
