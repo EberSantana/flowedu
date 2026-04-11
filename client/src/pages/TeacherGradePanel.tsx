@@ -456,7 +456,7 @@ export default function TeacherGradePanel() {
 
         {/* Modal: Relatório Individual do Aluno */}
         <Dialog open={showReport} onOpenChange={setShowReport}>
-          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogContent className="max-w-xl max-h-[75vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <ClipboardList className="w-5 h-5 text-primary" />

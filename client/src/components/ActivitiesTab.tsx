@@ -469,7 +469,7 @@ export default function ActivitiesTab() {
 
       {/* ── Dialog: Ver Submissões ────────────────────────────────── */}
       <Dialog open={!!viewingSubmissions} onOpenChange={(open) => { if (!open) setViewingSubmissions(null); }}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[70vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Submissões — {viewingSubmissions?.title}</DialogTitle>
             <DialogDescription>

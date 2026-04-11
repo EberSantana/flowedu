@@ -4352,11 +4352,16 @@ JSON (descrições MAX 15 chars):
 
         // Contar por USUÁRIO ÚNICO POR DIA (não cada clique)
         // Professor: chave = userId + dia; Aluno: chave = studentId + dia
+        // Usar timezone de Manaus (UTC-4) para agrupar por dia
+        const toManausDate = (d: Date) => {
+          const m = toManaus(new Date(d));
+          return `${m.getUTCFullYear()}-${String(m.getUTCMonth()+1).padStart(2,'0')}-${String(m.getUTCDate()).padStart(2,'0')}`;
+        };
         const teacherUniqueDays = new Set(
-          teacherLogs.map(l => `${l.userId}::${l.accessedAt.toISOString().slice(0, 10)}`)
+          teacherLogs.map(l => `${l.userId}::${toManausDate(l.accessedAt)}`)
         );
         const studentUniqueDays = new Set(
-          studentLogs.map(l => `${l.studentId ?? l.userId}::${l.accessedAt.toISOString().slice(0, 10)}`)
+          studentLogs.map(l => `${l.studentId ?? l.userId}::${toManausDate(l.accessedAt)}`)
         );
 
         // Acessos por dia (contando usuários únicos por dia)
@@ -4377,24 +4382,17 @@ JSON (descrições MAX 15 chars):
         const uniqueStudents = new Set(studentLogs.map(l => l.studentId ?? l.userId)).size;
 
         // Top usuários (por número de dias únicos de acesso)
-        const teacherDayCount: Record<string, number> = {};
-        for (const l of teacherLogs) {
-          const name = l.userName || `Professor #${l.userId}`;
-          const key = `${l.userId}::${l.accessedAt.toISOString().slice(0, 10)}`;
-          if (!teacherDayCount[name]) teacherDayCount[name] = 0;
-          // Conta apenas dias únicos por professor
-        }
         const teacherDaySet: Record<string, Set<string>> = {};
         for (const l of teacherLogs) {
           const name = l.userName || `Professor #${l.userId}`;
           if (!teacherDaySet[name]) teacherDaySet[name] = new Set();
-          teacherDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
+          teacherDaySet[name].add(toManausDate(l.accessedAt));
         }
         const studentDaySet: Record<string, Set<string>> = {};
         for (const l of studentLogs) {
           const name = l.userName || `Aluno #${l.studentId}`;
           if (!studentDaySet[name]) studentDaySet[name] = new Set();
-          studentDaySet[name].add(l.accessedAt.toISOString().slice(0, 10));
+          studentDaySet[name].add(toManausDate(l.accessedAt));
         }
 
         // Acessos hoje em Manaus (UTC-4)

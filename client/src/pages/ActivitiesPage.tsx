@@ -542,15 +542,15 @@ export default function ActivitiesPage() {
 
         {/* ── Dialog: Ver Submissões ────────────────────────────────── */}
         <Dialog open={!!viewingSubmissions} onOpenChange={(open) => { if (!open) setViewingSubmissions(null); }}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-md sm:max-w-lg max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Submissões: {viewingSubmissions?.title}</DialogTitle>
-              <DialogDescription>
-                Nota máxima: {viewingSubmissions?.maxScore} | {(submissionsData as any)?.submissions?.length ?? 0} submissão(ões)
+              <DialogTitle className="text-base">Submissões — {viewingSubmissions?.title}</DialogTitle>
+              <DialogDescription className="text-xs">
+                {(submissionsData as any)?.submissions?.length ?? 0} submissão(ões) recebida(s)
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-3 py-2">
+            <div className="space-y-2 py-1">
               {!submissionsData || !(submissionsData as any)?.submissions?.length ? (
                 <div className="text-center py-8 text-gray-500">
                   <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -558,12 +558,11 @@ export default function ActivitiesPage() {
                 </div>
               ) : (
                 ((submissionsData as any)?.submissions ?? []).map((sub: any) => (
-                  <Card key={sub.id} className="bg-white border">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-3">
+                  <div key={sub.id} className="bg-white border rounded-lg p-3">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900">{sub.studentName || `Aluno #${sub.studentId}`}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-semibold text-sm text-gray-900">{sub.studentName || `Aluno #${sub.studentId}`}</p>
+                          <p className="text-xs text-gray-500">
                             Enviado em: {formatDate(sub.submittedAt)}
                           </p>
                           {sub.fileUrl && (
@@ -571,19 +570,19 @@ export default function ActivitiesPage() {
                               href={sub.fileUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mt-1"
+                              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1"
                             >
-                              <Download className="w-3.5 h-3.5" />
+                              <Download className="w-3 h-3" />
                               {sub.fileName || "Baixar arquivo"}
                             </a>
                           )}
                           {sub.score !== null && sub.score !== undefined && (
-                            <div className="mt-2 p-2 bg-emerald-50 rounded border border-emerald-200">
-                              <p className="text-sm font-medium text-emerald-700">
+                            <div className="mt-1.5 px-2 py-1 bg-emerald-50 rounded border border-emerald-200">
+                              <p className="text-xs font-medium text-emerald-700">
                                 Nota: {sub.score}/{viewingSubmissions?.maxScore}
                               </p>
                               {sub.feedback && (
-                                <p className="text-sm text-gray-600 mt-1">Feedback: {sub.feedback}</p>
+                                <p className="text-xs text-gray-600 mt-0.5">Feedback: {sub.feedback}</p>
                               )}
                             </div>
                           )}
@@ -597,14 +596,13 @@ export default function ActivitiesPage() {
                               feedback: sub.feedback || "",
                             });
                           }}
-                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                          className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-2 py-1 h-7 flex-shrink-0"
                         >
                           <MessageSquare className="mr-1 h-3 w-3" />
                           {sub.score !== null ? "Reavaliar" : "Avaliar"}
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
+                  </div>
                 ))
               )}
             </div>

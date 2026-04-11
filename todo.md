@@ -7924,3 +7924,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 - [x] Remover Card de Filtros de período (7 dias, 30 dias, Bimestres, datas, Aplicar) do ExercisePerformanceReport
 - [x] Mapa de calor estilo calendário anual na página de Logs de Acesso (12 meses com quadradinhos coloridos por dia)
+## Bugs e Melhorias - 11/04/2026
+- [ ] Modal de notas de atividade em sala muito grande - reduzir tamanho
+- [ ] Bug: Acessos Hoje mostra 0 mesmo com acessos registrados em 11/04 nos Acessos Recentes
+- [ ] Bug: Calendário Anual não reflete dados de abril corretamente
+- [ ] Adicionar seletor de período com date picker (De/Até) nos cards de resumo dos Logs de Acesso
