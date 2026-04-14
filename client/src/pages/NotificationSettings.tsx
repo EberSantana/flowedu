@@ -162,10 +162,21 @@ export default function NotificationSettings() {
     }
 
     try {
-      await savePrefsMutation.mutateAsync({
-        ...prefs,
+      // Enviar apenas os campos aceitos pelo schema, sem campos extras (id, userId, etc.)
+      const cleanPrefs = {
+        classReminders: prefs?.classReminders ?? true,
+        eventReminders: prefs?.eventReminders ?? true,
+        taskReminders: prefs?.taskReminders ?? true,
+        dailySummary: prefs?.dailySummary ?? false,
+        classReminderMinutes: prefs?.classReminderMinutes ?? 15,
+        eventReminderMinutes: prefs?.eventReminderMinutes ?? 60,
+        dailySummaryTime: prefs?.dailySummaryTime ?? '07:00',
+        activeDays: Array.isArray(prefs?.activeDays) ? prefs.activeDays : [1, 2, 3, 4, 5],
+        quietHoursStart: prefs?.quietHoursStart ?? '22:00',
+        quietHoursEnd: prefs?.quietHoursEnd ?? '06:00',
         [key]: value,
-      });
+      };
+      await savePrefsMutation.mutateAsync(cleanPrefs);
     } catch (error: any) {
       toast.error("Erro ao salvar preferência: " + error.message);
     }
