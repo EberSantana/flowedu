@@ -2,7 +2,11 @@
  * Sistema de Notificações Push - FlowEdu
  * Usa Web Push API para enviar lembretes sobre aulas e eventos
  */
-import * as webpush from 'web-push';
+import { createRequire as _createRequire } from 'module';
+// web-push é um módulo CommonJS; usar createRequire para compatibilidade ESM
+const _require = _createRequire(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const webpush = _require('web-push') as typeof import('web-push');
 import { getDb } from './db';
 import { pushSubscriptions, notificationPreferences, pushNotificationLog, scheduledClasses, calendarEvents, timeSlots, subjects, classes, tasks } from '../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';

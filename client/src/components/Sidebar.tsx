@@ -233,6 +233,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <BookOpen className="h-5 w-5" />,
         href: "/teacher-glossary",
       },
+      {
+        label: "Notificações Push",
+        icon: <BellRing className="h-5 w-5" />,
+        href: "/notification-settings",
+      },
     ],
   },
   {
@@ -314,6 +319,11 @@ const studentNavItems: NavItem[] = [
     label: "Glossário",
     icon: <BookOpen className="h-5 w-5" />,
     href: "/student/glossary",
+  },
+  {
+    label: "Notificações Push",
+    icon: <BellRing className="h-5 w-5" />,
+    href: "/notification-settings",
   },
 ];
 export default function Sidebar() {
