@@ -2,7 +2,7 @@
  * Sistema de Notificações Push - FlowEdu
  * Usa Web Push API para enviar lembretes sobre aulas e eventos
  */
-import webpush from 'web-push';
+import * as webpush from 'web-push';
 import { getDb } from './db';
 import { pushSubscriptions, notificationPreferences, pushNotificationLog, scheduledClasses, calendarEvents, timeSlots, subjects, classes, tasks } from '../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
@@ -192,7 +192,7 @@ export async function sendPushNotification(
     badge?: string;
     tag?: string;
     url?: string;
-    type: 'class_reminder' | 'event_reminder' | 'task_reminder' | 'daily_summary';
+    type: 'class_reminder' | 'event_reminder' | 'task_reminder' | 'daily_summary' | 'announcement' | 'activity' | 'mural';
     referenceId?: string;
     referenceDate?: string;
   }

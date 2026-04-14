@@ -7024,18 +7024,30 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         const enrolledStudents = await db.getStudentsBySubject(input.subjectId, ctx.user.id);
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
         
-        // Criar notificação para cada aluno matriculado
+        // Criar notificação interna + push para cada aluno matriculado
+        const pushTitle = input.isImportant ? `🚨 Aviso Importante: ${input.title}` : `📢 Novo Aviso: ${input.title}`;
+        const pushBody = `${subject?.name || 'Disciplina'}: ${input.message.substring(0, 100)}${input.message.length > 100 ? '...' : ''}`;
         for (const student of enrolledStudents) {
           if (!student.userId) continue; // Pular alunos sem conta de usuário
           try {
+            // Notificação interna (aparece dentro do app)
             await db.createNotification({
               userId: student.userId,
               type: 'new_announcement',
-              title: input.isImportant ? `🚨 Aviso Importante: ${input.title}` : `📢 Novo Aviso: ${input.title}`,
-              message: `${subject?.name || 'Disciplina'}: ${input.message.substring(0, 100)}${input.message.length > 100 ? '...' : ''}`,
+              title: pushTitle,
+              message: pushBody,
               link: '/student-announcements',
               relatedId: announcement.id,
             });
+            // Push notification (chega mesmo com app fechado)
+            pushNotif.sendPushNotification(student.userId, {
+              title: pushTitle,
+              body: pushBody,
+              tag: `announcement-${announcement.id}`,
+              url: '/student-announcements',
+              type: 'announcement',
+              referenceId: String(announcement.id),
+            }).catch(err => console.error('[Push] Erro ao enviar push de aviso para aluno', student.userId, err));
           } catch (error) {
             console.error('Erro ao criar notificação para aluno:', student.studentId, error);
           }

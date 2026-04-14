@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
 import { getDb, createNotification, getStudentsBySubject } from "./db";
+import * as pushNotif from './push-notifications';
 import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts, scheduledClasses } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
@@ -86,15 +87,26 @@ export const activitiesRouter = router({
             ? ` Prazo: ${new Date(input.dueDate).toLocaleDateString('pt-BR')}.`
             : '';
 
+          const actTitle = '📋 Nova Atividade Disponível';
+          const actBody = `A atividade "${input.title}" foi publicada.${dueDateMsg}`;
           for (const student of studentsToNotify) {
             await createNotification({
               userId: student.userId,
               type: 'new_activity',
-              title: '📋 Nova Atividade Disponível',
-              message: `A atividade "${input.title}" foi publicada.${dueDateMsg}`,
+              title: actTitle,
+              message: actBody,
               link: '/student/activities',
               relatedId: activityId,
             });
+            // Push notification (chega mesmo com app fechado)
+            pushNotif.sendPushNotification(student.userId, {
+              title: actTitle,
+              body: actBody,
+              tag: `activity-${activityId}`,
+              url: '/student/activities',
+              type: 'activity',
+              referenceId: String(activityId),
+            }).catch(err => console.error('[Push] Erro ao enviar push de atividade', student.userId, err));
           }
         } catch (e) {
           console.error('[activities.create] Erro ao notificar alunos:', e);

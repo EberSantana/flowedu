@@ -2489,7 +2489,7 @@ export type InsertNotificationPreference = typeof notificationPreferences.$infer
 export const pushNotificationLog = mysqlTable("push_notification_log", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull(),
-  type: mysqlEnum("type", ["class_reminder", "event_reminder", "task_reminder", "daily_summary"]).notNull(),
+  type: mysqlEnum("type", ["class_reminder", "event_reminder", "task_reminder", "daily_summary", "announcement", "activity", "mural"]).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   body: text("body").notNull(),
   referenceId: varchar("data", { length: 100 }), // ID do evento/aula referenciado
