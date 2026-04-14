@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   Bell, BellRing, BellOff, Smartphone, BarChart3, BookOpen, 
-  CalendarDays, ListTodo, Sunrise, Send, Loader2
+  CalendarDays, ListTodo, Sunrise, Send, Loader2, Moon, Clock
 } from "lucide-react";
 
 export default function NotificationSettings() {
@@ -300,6 +300,32 @@ export default function NotificationSettings() {
                 </Button>
               </div>
             )}
+          </Card>
+
+          {/* Horário Silencioso */}
+          <Card className="p-6 border-l-4 border-l-indigo-500">
+            <div className="flex items-start gap-4">
+              <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                <Moon className="h-6 w-6 text-indigo-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">Horário Silencioso</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  As notificações push são enviadas apenas entre <strong>07:00</strong> e <strong>21:59</strong> (horário de Manaus).
+                  Fora desse período, nenhuma notificação será enviada ao seu dispositivo.
+                </p>
+                <div className="flex items-center gap-4 mt-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-green-600" />
+                    <span className="text-green-700 font-medium">Ativo: 07:00 – 21:59</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Moon className="h-4 w-4 text-indigo-500" />
+                    <span className="text-indigo-600 font-medium">Silencioso: 22:00 – 06:59</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </Card>
 
           {/* Notification Types Grid */}

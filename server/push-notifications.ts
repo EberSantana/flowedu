@@ -205,6 +205,14 @@ export async function sendPushNotification(
     console.warn('[Push] VAPID não configurado, notificação não enviada');
     return { sent: 0, failed: 0 };
   }
+
+  // ── Horário silencioso fixo: só envia entre 07:00 e 21:59 (Manaus UTC-4) ──
+  const nowManaus = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Manaus' }));
+  const hora = nowManaus.getHours();
+  if (hora < 7 || hora >= 22) {
+    console.log(`[Push] Horário silencioso (${hora}h Manaus). Notificação não enviada para userId=${userId}`);
+    return { sent: 0, failed: 0, silenced: true };
+  }
   
   const db = await getDb();
   if (!db) throw new Error('Database not available');
