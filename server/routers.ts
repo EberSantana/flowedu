@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, studentProcedure, router } from ".
 import { z } from "zod";
 import * as db from "./db";
 import bcrypt from "bcryptjs";
-import { tasks, studentExerciseAnswers, subjects, accessLogs, accessLogArchives, classes, studentClassEnrollments, subjectEnrollments, learningModules, students } from "../drizzle/schema";
+import { tasks, studentExerciseAnswers, subjects, accessLogs, accessLogArchives, classes, studentClassEnrollments, subjectEnrollments, learningModules, students, pushNotificationQueue } from "../drizzle/schema";
 import { and, eq, sql, gte, lt, lte, desc, inArray, ne, or, isNull, isNotNull, between } from "drizzle-orm";
 import { getDb } from "./db";
 import jwt from "jsonwebtoken";
@@ -11839,6 +11839,51 @@ Retorne em formato JSON com estrutura:
     getStats: protectedProcedure
       .query(async ({ ctx }) => {
         return await pushNotif.getNotificationStats(ctx.user.id);
+      }),
+
+    // Obter estatísticas da fila de notificações adiadas
+    getQueueStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const database = await getDb();
+        if (!database) return { pending: 0, sent: 0, failed: 0, items: [] };
+        
+        // Contar por status
+        const counts = await database.select({
+          status: pushNotificationQueue.status,
+          count: sql<number>`count(*)`
+        })
+          .from(pushNotificationQueue)
+          .groupBy(pushNotificationQueue.status);
+        
+        const pending = counts.find(c => c.status === 'pending')?.count || 0;
+        const sent = counts.find(c => c.status === 'sent')?.count || 0;
+        const failed = counts.find(c => c.status === 'failed')?.count || 0;
+        
+        return { pending, sent, failed };
+      }),
+
+    // Listar itens da fila com detalhes
+    getQueueItems: protectedProcedure
+      .input(z.object({
+        status: z.enum(['pending', 'sent', 'failed']).optional(),
+        limit: z.number().min(1).max(50).default(20),
+      }))
+      .query(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) return [];
+        
+        const conditions = [];
+        if (input.status) {
+          conditions.push(eq(pushNotificationQueue.status, input.status));
+        }
+        
+        const items = await database.select()
+          .from(pushNotificationQueue)
+          .where(conditions.length > 0 ? and(...conditions) : undefined)
+          .orderBy(desc(pushNotificationQueue.queuedAt))
+          .limit(input.limit);
+        
+        return items;
       }),
   }),
 

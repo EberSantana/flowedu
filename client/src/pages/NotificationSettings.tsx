@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   Bell, BellRing, BellOff, Smartphone, BarChart3, BookOpen, 
-  CalendarDays, ListTodo, Sunrise, Send, Loader2, Moon, Clock
+  CalendarDays, ListTodo, Sunrise, Send, Loader2, Moon, Clock,
+  Inbox, CheckCircle2, XCircle, ChevronDown, ChevronUp
 } from "lucide-react";
 
 export default function NotificationSettings() {
@@ -22,6 +23,13 @@ export default function NotificationSettings() {
   const vapidKey = vapidKeyData?.key;
   const { data: prefs, refetch: refetchPrefs } = trpc.pushNotifications.getPreferences.useQuery();
   const { data: stats, refetch: refetchStats } = trpc.pushNotifications.getStats.useQuery();
+  const { data: queueStats } = trpc.pushNotifications.getQueueStats.useQuery();
+  const [showQueueDetails, setShowQueueDetails] = useState(false);
+  const [queueFilter, setQueueFilter] = useState<'pending' | 'sent' | 'failed' | undefined>(undefined);
+  const { data: queueItems } = trpc.pushNotifications.getQueueItems.useQuery(
+    { status: queueFilter, limit: 20 },
+    { enabled: showQueueDetails }
+  );
 
   const subscribeMutation = trpc.pushNotifications.subscribe.useMutation({
     onSuccess: () => {
@@ -327,6 +335,118 @@ export default function NotificationSettings() {
               </div>
             </div>
           </Card>
+
+          {/* Painel de Fila de Notificações */}
+          {(queueStats?.pending || queueStats?.sent || queueStats?.failed) ? (
+            <Card className="p-6 border-l-4 border-l-amber-500">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                  <Inbox className="h-6 w-6 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">Fila de Notificações</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowQueueDetails(!showQueueDetails)}
+                    >
+                      {showQueueDetails ? (
+                        <ChevronUp className="h-4 w-4 mr-1" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 mr-1" />
+                      )}
+                      {showQueueDetails ? 'Ocultar' : 'Ver detalhes'}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Notificações enviadas durante o horário silencioso são enfileiradas e enviadas às 07:00.
+                  </p>
+                  <div className="flex items-center gap-4 mt-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-4 w-4 text-amber-500" />
+                      <span className="text-amber-700 font-medium">Pendentes: {queueStats?.pending || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      <span className="text-green-700 font-medium">Enviadas: {queueStats?.sent || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <XCircle className="h-4 w-4 text-red-500" />
+                      <span className="text-red-700 font-medium">Falhas: {queueStats?.failed || 0}</span>
+                    </div>
+                  </div>
+
+                  {showQueueDetails && (
+                    <div className="mt-4">
+                      <div className="flex gap-2 mb-3">
+                        <Button
+                          variant={queueFilter === undefined ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setQueueFilter(undefined)}
+                        >
+                          Todas
+                        </Button>
+                        <Button
+                          variant={queueFilter === 'pending' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setQueueFilter('pending')}
+                        >
+                          Pendentes
+                        </Button>
+                        <Button
+                          variant={queueFilter === 'sent' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setQueueFilter('sent')}
+                        >
+                          Enviadas
+                        </Button>
+                        <Button
+                          variant={queueFilter === 'failed' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setQueueFilter('failed')}
+                        >
+                          Falhas
+                        </Button>
+                      </div>
+
+                      {queueItems && queueItems.length > 0 ? (
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                          {queueItems.map((item: any) => (
+                            <div
+                              key={item.id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-muted/50 text-sm"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{item.title}</div>
+                                <div className="text-muted-foreground truncate text-xs">{item.body}</div>
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  Enfileirada: {new Date(item.queuedAt).toLocaleString('pt-BR', { timeZone: 'America/Manaus' })}
+                                  {item.sentAt && (
+                                    <> · Enviada: {new Date(item.sentAt).toLocaleString('pt-BR', { timeZone: 'America/Manaus' })}</>
+                                  )}
+                                </div>
+                              </div>
+                              <Badge
+                                variant={item.status === 'pending' ? 'outline' : item.status === 'sent' ? 'default' : 'destructive'}
+                                className="ml-2 shrink-0"
+                              >
+                                {item.status === 'pending' ? 'Pendente' : item.status === 'sent' ? 'Enviada' : 'Falha'}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Nenhuma notificação na fila{queueFilter ? ` com status "${queueFilter === 'pending' ? 'pendente' : queueFilter === 'sent' ? 'enviada' : 'falha'}"` : ''}.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ) : null}
 
           {/* Notification Types Grid */}
           <div>
