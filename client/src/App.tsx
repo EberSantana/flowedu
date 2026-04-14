@@ -9,6 +9,7 @@ import { InstallPWA } from "./components/InstallPWA";
 import OfflineIndicator from "./components/OfflineIndicator";
 import { CommandPalette } from "./components/CommandPalette";
 import { Toaster } from "@/components/ui/sonner";
+import PushActivationBanner from "./components/PushActivationBanner";
 
 // Páginas críticas carregadas imediatamente (login/portal)
 import PortalChoice from "./pages/PortalChoice";
@@ -250,6 +251,7 @@ function App() {
         <SidebarProvider>
           <TooltipProvider>
             <Router />
+            <PushActivationBanner />
             <Toaster position="top-right" richColors closeButton />
           </TooltipProvider>
         </SidebarProvider>

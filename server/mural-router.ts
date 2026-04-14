@@ -11,6 +11,7 @@ import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { broadcastMuralEvent } from "./mural-ws";
 import { createNotification } from "./db";
+import * as pushNotif from './push-notifications';
 
 // ── Configurações padrão de colunas ──────────────────────────────────────────
 const DEFAULT_COLUMNS = [
@@ -231,8 +232,9 @@ export const muralRouter = router({
           .from(studentClassEnrollments)
           .where(eq(studentClassEnrollments.classId, input.classId));
 
-        // Criar notificação in-app para cada aluno (com deduplicação automática)
+        // Criar notificação in-app + push para cada aluno
         for (const { studentId } of enrolledStudents) {
+          // Notificação in-app
           try {
             await createNotification({
               userId: studentId,
@@ -243,7 +245,19 @@ export const muralRouter = router({
               relatedId: muralId,
             });
           } catch (err) {
-            console.error('[Mural] Erro ao notificar aluno', studentId, err);
+            console.error('[Mural] Erro ao notificar aluno (in-app)', studentId, err);
+          }
+          // Push notification
+          try {
+            await pushNotif.sendPushNotification(studentId, {
+              title: `🖼️ Mural Ativo: ${input.title}`,
+              body: `${subjectName}: Um novo mural colaborativo está disponível. Participe agora!`,
+              url: '/student/mural',
+              type: 'mural',
+              tag: `mural-${muralId}`,
+            });
+          } catch (err) {
+            console.error('[Mural] Erro ao enviar push para aluno', studentId, err);
           }
         }
       } catch (err) {

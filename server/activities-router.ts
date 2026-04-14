@@ -294,6 +294,7 @@ export const activitiesRouter = router({
             const maxScore = activity.maxScore ? Number(activity.maxScore) : 10;
             const nota = maxScore > 0 ? ((input.score / maxScore) * 10).toFixed(1) : input.score.toFixed(1);
             const feedbackMsg = input.feedback ? ` Feedback: "${input.feedback.slice(0, 80)}${input.feedback.length > 80 ? '...' : ''}"` : '';
+            // Notificação in-app
             await createNotification({
               userId: studentRow.userId,
               type: 'grade_received',
@@ -302,6 +303,18 @@ export const activitiesRouter = router({
               link: '/student/activities',
               relatedId: sub.activityId,
             });
+            // Push notification
+            try {
+              await pushNotif.sendPushNotification(studentRow.userId, {
+                title: `✅ Nota lançada: ${activity.title}`,
+                body: `Sua atividade foi corrigida. Nota: ${nota}/10.${input.feedback ? ' Veja o feedback!' : ''}`,
+                url: '/student/activities',
+                type: 'activity',
+                tag: `grade-${sub.activityId}-${sub.id}`,
+              });
+            } catch (pushErr) {
+              console.error('[Push] Erro ao enviar push de nota', pushErr);
+            }
           }
         } catch (e) { /* notificação não deve bloquear correção */ }
       }
