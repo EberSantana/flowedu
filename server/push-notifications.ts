@@ -8,7 +8,7 @@ const _require = _createRequire(import.meta.url);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const webpush = _require('web-push') as typeof import('web-push');
 import { getDb } from './db';
-import { pushSubscriptions, notificationPreferences, pushNotificationLog, scheduledClasses, calendarEvents, timeSlots, subjects, classes, tasks } from '../drizzle/schema';
+import { pushSubscriptions, notificationPreferences, pushNotificationLog, pushNotificationQueue, scheduledClasses, calendarEvents, timeSlots, subjects, classes, tasks } from '../drizzle/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
 
 // VAPID keys - geradas uma vez e armazenadas
@@ -210,8 +210,29 @@ export async function sendPushNotification(
   const nowManaus = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Manaus' }));
   const hora = nowManaus.getHours();
   if (hora < 7 || hora >= 22) {
-    console.log(`[Push] Horário silencioso (${hora}h Manaus). Notificação não enviada para userId=${userId}`);
-    return { sent: 0, failed: 0, silenced: true };
+    // Enfileirar para envio às 07:00
+    try {
+      const db = await getDb();
+      if (db) {
+        await db.insert(pushNotificationQueue).values({
+          userId,
+          type: payload.type,
+          title: payload.title,
+          body: payload.body,
+          icon: payload.icon || null,
+          badge: payload.badge || null,
+          tag: payload.tag || null,
+          url: payload.url || null,
+          referenceId: payload.referenceId || null,
+          referenceDate: payload.referenceDate || null,
+          status: 'pending',
+        });
+        console.log(`[Push] Horário silencioso (${hora}h Manaus). Notificação enfileirada para userId=${userId} - será enviada às 07:00`);
+      }
+    } catch (queueError) {
+      console.error('[Push] Erro ao enfileirar notificação:', queueError);
+    }
+    return { sent: 0, failed: 0, silenced: true, queued: true };
   }
   
   const db = await getDb();
@@ -356,6 +377,15 @@ export async function checkAndSendReminders() {
   const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
   
   console.log(`[Push] Verificando lembretes: ${today} ${currentTimeStr} (dia ${currentDayOfWeek})`);
+  
+  // ── Processar fila de notificações adiadas às 07:00-07:04 ──
+  if (currentHour === 7 && currentMinute < 5) {
+    try {
+      await processQueuedNotifications();
+    } catch (qErr) {
+      console.error('[Push] Erro ao processar fila:', qErr);
+    }
+  }
   
   // Buscar todos os usuários com subscriptions ativas
   const activeUsers = await db.selectDistinct({ userId: pushSubscriptions.userId })
@@ -735,6 +765,112 @@ export async function getNotificationStats(userId: number) {
 
 // Intervalo do job de verificação (5 minutos)
 let reminderInterval: NodeJS.Timeout | null = null;
+
+/**
+ * Processa a fila de notificações adiadas (enviadas durante horário silencioso)
+ * Chamada automaticamente às 07:00-07:04 pelo job de lembretes
+ */
+export async function processQueuedNotifications() {
+  if (!vapidConfigured) return;
+  
+  const db = await getDb();
+  if (!db) return;
+  
+  // Buscar todas as notificações pendentes na fila
+  const pending = await db.select()
+    .from(pushNotificationQueue)
+    .where(eq(pushNotificationQueue.status, 'pending'));
+  
+  if (pending.length === 0) return;
+  
+  console.log(`[Push] Processando fila: ${pending.length} notificação(ões) adiada(s)`);
+  
+  let processed = 0;
+  let errors = 0;
+  
+  for (const item of pending) {
+    try {
+      // Buscar subscriptions ativas do usuário
+      const subs = await db.select()
+        .from(pushSubscriptions)
+        .where(
+          and(
+            eq(pushSubscriptions.userId, item.userId),
+            eq(pushSubscriptions.isActive, true)
+          )
+        );
+      
+      if (subs.length === 0) {
+        // Sem dispositivos ativos, marcar como enviado (não há destino)
+        await db.update(pushNotificationQueue)
+          .set({ status: 'sent', sentAt: new Date() })
+          .where(eq(pushNotificationQueue.id, item.id));
+        continue;
+      }
+      
+      const notificationPayload = JSON.stringify({
+        title: item.title,
+        body: item.body,
+        icon: item.icon || '/icon-192.png',
+        badge: item.badge || '/icon-192.png',
+        tag: item.tag || `flowedu-${item.type}-queued-${Date.now()}`,
+        data: {
+          url: item.url || '/',
+          type: item.type,
+        },
+      });
+      
+      let sent = 0;
+      for (const sub of subs) {
+        try {
+          await webpush.sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: { p256dh: sub.p256dh, auth: sub.auth },
+            },
+            notificationPayload
+          );
+          sent++;
+        } catch (sendErr: any) {
+          if (sendErr.statusCode === 410 || sendErr.statusCode === 404) {
+            await db.update(pushSubscriptions)
+              .set({ isActive: false })
+              .where(eq(pushSubscriptions.id, sub.id));
+          }
+        }
+      }
+      
+      // Marcar como enviado
+      await db.update(pushNotificationQueue)
+        .set({ status: 'sent', sentAt: new Date() })
+        .where(eq(pushNotificationQueue.id, item.id));
+      
+      // Registrar no log
+      try {
+        await db.insert(pushNotificationLog).values({
+          userId: item.userId,
+          type: item.type,
+          title: `[Adiada] ${item.title}`,
+          body: item.body,
+          referenceId: item.referenceId || null,
+          referenceDate: item.referenceDate || null,
+          delivered: sent > 0,
+          error: null,
+        });
+      } catch (_) { /* log error silently */ }
+      
+      processed++;
+    } catch (err: any) {
+      errors++;
+      console.error(`[Push] Erro ao processar fila item ${item.id}:`, err.message);
+      await db.update(pushNotificationQueue)
+        .set({ status: 'failed', error: err.message })
+        .where(eq(pushNotificationQueue.id, item.id));
+    }
+  }
+  
+  console.log(`[Push] Fila processada: ${processed} enviada(s), ${errors} erro(s)`);
+}
 
 /**
  * Inicia o job periódico de verificação de lembretes

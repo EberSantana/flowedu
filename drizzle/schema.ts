@@ -2503,6 +2503,31 @@ export type PushNotificationLog = typeof pushNotificationLog.$inferSelect;
 export type InsertPushNotificationLog = typeof pushNotificationLog.$inferInsert;
 
 /**
+ * Fila de notificações push adiadas (horário silencioso)
+ * Pushes bloqueados entre 22:00-06:59 são enfileirados e enviados às 07:00
+ */
+export const pushNotificationQueue = mysqlTable("push_notification_queue", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  type: mysqlEnum("type", ["class_reminder", "event_reminder", "task_reminder", "daily_summary", "announcement", "activity", "mural"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body").notNull(),
+  icon: varchar("icon", { length: 255 }),
+  badge: varchar("badge", { length: 255 }),
+  tag: varchar("tag", { length: 255 }),
+  url: varchar("url", { length: 500 }),
+  referenceId: varchar("reference_id", { length: 100 }),
+  referenceDate: varchar("reference_date", { length: 10 }),
+  status: mysqlEnum("status", ["pending", "sent", "failed"]).default("pending").notNull(),
+  error: text("error"),
+  queuedAt: timestamp("queued_at").defaultNow().notNull(),
+  sentAt: timestamp("sent_at"),
+});
+
+export type PushNotificationQueue = typeof pushNotificationQueue.$inferSelect;
+export type InsertPushNotificationQueue = typeof pushNotificationQueue.$inferInsert;
+
+/**
  * Configurações do Sistema (Admin)
  * Armazena configurações globais como limite de armazenamento
  */
