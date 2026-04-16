@@ -7937,3 +7937,5 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bugs - 15/04/2026
 - [x] BUG CRÍTICO: Banco de Provas e Exercícios sumiu todo o conteúdo - RESOLVIDO: dados migrados de userId=1 para userId=3600001 (ebersantana@flowedu.app)
+- [x] Garantir que os 16 exercícios órfãos (disciplinas deletadas) apareçam no Banco de Provas e Exercícios - RESOLVIDO: 6 disciplinas recriadas no banco
+- [x] BUG GRAVÍSSIMO: Exercícios dos alunos com notas sumiram após migração - RESOLVIDO: restaurado backup 10/04 da VPS + patches aplicados diretamente no index.js (VPS usa banco MySQL local, não TiDB)
