@@ -151,13 +151,13 @@ export default function StudentStudyMaterials() {
   }
 
   function getPreviewSrc(type: string, url: string): string {
-    if (type === "pdf") {
-      // Usar PDF.js viewer do Mozilla para qualquer URL (local ou CloudFront)
-      return `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(url)}`;
-    }
-    if (type === "document" || type === "presentation") {
-      // Documentos Office: usar Office Online Viewer (suporta URLs públicas)
-      return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+    if (type === "pdf" || type === "document" || type === "presentation") {
+      // Usar proxy local para evitar bloqueio de iframe (CloudFront, CORS, X-Frame-Options)
+      // URLs locais (/uploads/...) são servidas diretamente; externas passam pelo proxy
+      if (url.startsWith('/') || url.startsWith(window.location.origin)) {
+        return url;
+      }
+      return `/api/file-proxy?url=${encodeURIComponent(url)}`;
     }
     if (type === "link") {
       const ytEmbed = getYouTubeEmbedUrl(url);

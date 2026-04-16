@@ -158,6 +158,36 @@ async function startServer() {
   // Backup download endpoint
   app.use("/api", backupDownloadRouter);
   
+  // Proxy de PDF/documentos — serve arquivos do CloudFront sem bloqueio de iframe
+  app.get("/api/file-proxy", async (req, res) => {
+    const fileUrl = req.query.url as string;
+    if (!fileUrl) return res.status(400).send('URL obrigatória');
+    // Permitir apenas URLs do CloudFront e uploads locais
+    const allowed = [
+      'd2xsxph8kpxj0f.cloudfront.net',
+      'flowedu.app',
+      'localhost',
+    ];
+    let hostname = '';
+    try { hostname = new URL(fileUrl).hostname; } catch { return res.status(400).send('URL inválida'); }
+    if (!allowed.some(h => hostname.endsWith(h))) {
+      return res.status(403).send('Domínio não permitido');
+    }
+    try {
+      const upstream = await fetch(fileUrl, { headers: { 'User-Agent': 'FlowEdu-Proxy/1.0' } });
+      if (!upstream.ok) return res.status(upstream.status).send('Erro ao buscar arquivo');
+      const ct = upstream.headers.get('content-type') || 'application/octet-stream';
+      res.setHeader('Content-Type', ct);
+      res.setHeader('Content-Disposition', 'inline');
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      const buf = Buffer.from(await upstream.arrayBuffer());
+      res.send(buf);
+    } catch (e) {
+      res.status(500).send('Erro interno no proxy');
+    }
+  });
+
   // Rota de logout via GET (para links diretos)
   app.get("/api/logout", (req, res) => {
     const cookieOptions = getSessionCookieOptions(req);
