@@ -91,4 +91,17 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     console.log('[PWA] Novo SW ativo, recarregando...');
     window.location.reload();
   });
+
+  // 6. Ouvir mensagens do SW (ex: NOTIFICATION_CLICKED)
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'NOTIFICATION_CLICKED') {
+      const url = event.data.url;
+      if (url) {
+        // Navegar para a URL indicada pela notificação
+        window.location.href = url;
+      }
+      // Invalidar queries de notificações para atualizar contagem
+      queryClient.invalidateQueries();
+    }
+  });
 }

@@ -27,6 +27,27 @@ export default function NotificationBell() {
     { refetchInterval: 30000 }
   );
 
+  // Sincronizar badge do PWA com contagem de não lidas
+  useEffect(() => {
+    if (typeof unreadCount === 'number') {
+      // Atualizar badge do ícone do app via Badge API
+      if ('setAppBadge' in navigator) {
+        if (unreadCount > 0) {
+          (navigator as any).setAppBadge(unreadCount).catch(() => {});
+        } else {
+          (navigator as any).clearAppBadge().catch(() => {});
+        }
+      }
+      // Sincronizar com o Service Worker
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: unreadCount > 0 ? 'SET_BADGE' : 'CLEAR_BADGE',
+          count: unreadCount,
+        });
+      }
+    }
+  }, [unreadCount]);
+
   const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
     onSuccess: () => {
       refetch();
@@ -38,6 +59,13 @@ export default function NotificationBell() {
     onSuccess: () => {
       refetch();
       refetchCount();
+      // Limpar badge do PWA
+      if ('setAppBadge' in navigator) {
+        (navigator as any).clearAppBadge().catch(() => {});
+      }
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_BADGE' });
+      }
       toast.success("Todas as notificações marcadas como lidas");
     },
   });

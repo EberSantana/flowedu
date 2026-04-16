@@ -103,6 +103,49 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// ==================== BADGE COUNTER ====================
+let badgeCount = 0;
+
+async function updateBadge(increment) {
+  try {
+    if (increment) {
+      badgeCount += 1;
+    }
+    if (navigator.setAppBadge) {
+      if (badgeCount > 0) {
+        await navigator.setAppBadge(badgeCount);
+      } else {
+        await navigator.clearAppBadge();
+      }
+      console.log('[SW] Badge atualizado:', badgeCount);
+    }
+  } catch (e) {
+    console.warn('[SW] Erro ao atualizar badge:', e);
+  }
+}
+
+async function clearBadge() {
+  try {
+    badgeCount = 0;
+    if (navigator.setAppBadge) {
+      await navigator.clearAppBadge();
+      console.log('[SW] Badge limpo');
+    }
+  } catch (e) {
+    console.warn('[SW] Erro ao limpar badge:', e);
+  }
+}
+
+// Listener para mensagens do frontend (limpar badge, sincronizar contagem)
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_BADGE') {
+    clearBadge();
+  } else if (event.data && event.data.type === 'SET_BADGE') {
+    badgeCount = event.data.count || 0;
+    updateBadge(false);
+  }
+});
+
 // ==================== PUSH NOTIFICATIONS ====================
 self.addEventListener('push', (event) => {
   let data = {
@@ -124,19 +167,22 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: data.icon || '/icon-192.png',
-      badge: data.badge || '/icon-192.png',
-      tag: data.tag || 'flowedu-notification',
-      vibrate: [200, 100, 200],
-      requireInteraction: false,
-      data: data.data || { url: '/dashboard' },
-      actions: [
-        { action: 'open', title: 'Abrir' },
-        { action: 'dismiss', title: 'Dispensar' },
-      ],
-    })
+    Promise.all([
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: data.icon || '/icon-192.png',
+        badge: data.badge || '/icon-192.png',
+        tag: data.tag || `flowedu-${Date.now()}`,
+        vibrate: [200, 100, 200],
+        requireInteraction: false,
+        data: data.data || { url: '/dashboard' },
+        actions: [
+          { action: 'open', title: 'Abrir' },
+          { action: 'dismiss', title: 'Dispensar' },
+        ],
+      }),
+      updateBadge(true),
+    ])
   );
 });
 
@@ -144,10 +190,17 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   if (event.action === 'dismiss') return;
   const url = event.notification.data?.url || '/dashboard';
+  
+  // Decrementar badge ao clicar na notificação
+  if (badgeCount > 0) badgeCount -= 1;
+  updateBadge(false);
+  
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
+          // Avisar o frontend para sincronizar o badge
+          client.postMessage({ type: 'NOTIFICATION_CLICKED', url });
           client.navigate(url);
           return client.focus();
         }
