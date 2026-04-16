@@ -376,13 +376,13 @@ export default function TeacherStudyMaterials() {
   }
 
   function getPreviewSrc(type: string, url: string): string {
-    if (type === "pdf" || type === "document" || type === "presentation") {
-      // URLs locais (/uploads/...) são servidas diretamente pelo servidor
-      // URLs externas (CloudFront, etc.) usam Google Docs Viewer
-      if (url.startsWith('/') || url.startsWith(window.location.origin)) {
-        return url;
-      }
-      return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    if (type === "pdf") {
+      // Usar PDF.js viewer do Mozilla para qualquer URL (local ou CloudFront)
+      return `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(url)}`;
+    }
+    if (type === "document" || type === "presentation") {
+      // Documentos Office: usar Office Online Viewer (suporta URLs públicas)
+      return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
     }
     if (type === "link") {
       const ytEmbed = getYouTubeEmbedUrl(url);
