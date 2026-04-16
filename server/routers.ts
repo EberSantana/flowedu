@@ -2771,6 +2771,10 @@ ${JSON.stringify(modulesContent, null, 2)}
 IMPORTANTE:
 - SEMPRE inclua "correctAnswer" com a resposta correta (para objetivas: a letra da alternativa; para subjetivas/casos: deixe como "N/A")
 - SEMPRE inclua "expectedAnswer" com a justificativa detalhada ou resposta esperada (OBRIGATÓRIO para TODAS as questões)
+- CADA QUESTÃO DEVE SER ÚNICA E DIFERENTE DAS DEMAIS — NUNCA repita o mesmo enunciado, tema ou conteúdo em questões diferentes
+- Distribua as questões entre os diferentes módulos e tópicos disponíveis para garantir variedade máxima
+- Se houver múltiplos módulos, distribua as questões proporcionalmente entre eles
+- Para provas com muitas questões (10+), explore subtópicos distintos dentro de cada módulo
 
 REGRA DE PONTUAÇÃO OBRIGATÓRIA:
 - O total da prova é SEMPRE 10 pontos
@@ -2846,7 +2850,25 @@ Retorne um JSON com a estrutura:
         const content = typeof response.choices[0].message.content === 'string' 
           ? response.choices[0].message.content 
           : JSON.stringify(response.choices[0].message.content);
-        return JSON.parse(content || '{}');
+        const parsed = JSON.parse(content || '{}');
+        
+        // Remover questões duplicadas (mesmo enunciado ou enunciado muito similar)
+        if (parsed.questions && Array.isArray(parsed.questions)) {
+          const seenQuestions = new Set<string>();
+          const uniqueQuestions: any[] = [];
+          for (const q of parsed.questions) {
+            // Normalizar o texto para comparação (minúsculas, sem espaços extras, primeiros 120 chars)
+            const normalizedText = (q.question || '').toLowerCase().trim().replace(/\s+/g, ' ').substring(0, 120);
+            if (!seenQuestions.has(normalizedText)) {
+              seenQuestions.add(normalizedText);
+              uniqueQuestions.push(q);
+            }
+          }
+          // Renumerar questões após remoção de duplicatas
+          parsed.questions = uniqueQuestions.map((q: any, idx: number) => ({ ...q, number: idx + 1 }));
+        }
+        
+        return parsed;
       }),
 
     // Gerar exercícios para um módulo específico

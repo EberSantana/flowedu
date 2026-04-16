@@ -166,6 +166,7 @@ export default function TeacherStudyMaterials() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewType, setPreviewType] = useState<string>("");
   const [previewTitle, setPreviewTitle] = useState<string>("");
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [collapsedSubjects, setCollapsedSubjects] = useState<Set<string>>(new Set());
   const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -359,17 +360,34 @@ export default function TeacherStudyMaterials() {
   }
 
   function canPreview(type: string, url: string): boolean {
-    return (type === "pdf" || type === "video" || type === "image" || type === "document" || type === "presentation" || (type === "link" && !!url));
+    return (type === "pdf" || type === "video" || type === "audio" || type === "image" || type === "document" || type === "presentation" || (type === "link" && !!url));
+  }
+
+  function getYouTubeEmbedUrl(url: string): string | null {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)?([\w-]{11})/,
+    ];
+    const ytPattern = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)?([\w-]{11})/;
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)?([\w-]{11})/);
+      if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=0&rel=0`;
+    }
+    return null;
   }
 
   function getPreviewSrc(type: string, url: string): string {
     if (type === "pdf" || type === "document" || type === "presentation") {
       return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
     }
+    if (type === "link") {
+      const ytEmbed = getYouTubeEmbedUrl(url);
+      if (ytEmbed) return ytEmbed;
+    }
     return url;
   }
 
   function handlePreview(material: { type: string; url: string; title: string }) {
+    setPreviewLoading(true);
     setPreviewUrl(material.url); setPreviewType(material.type); setPreviewTitle(material.title);
   }
 
@@ -731,12 +749,20 @@ export default function TeacherStudyMaterials() {
       </PageWrapper>
 
       {/* Dialog Pré-visualização */}
-      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+      <Dialog open={!!previewUrl} onOpenChange={() => { setPreviewUrl(null); setPreviewLoading(false); }}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Eye className="h-5 w-5 text-primary" />{previewTitle}</DialogTitle>
           </DialogHeader>
-          <div className="w-full" style={{ minHeight: "500px" }}>
+          <div className="w-full relative" style={{ minHeight: "500px" }}>
+            {previewLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10 rounded-lg">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                  <span className="text-sm text-muted-foreground">Carregando pré-visualização...</span>
+                </div>
+              </div>
+            )}
             {(previewType === "pdf" || previewType === "document" || previewType === "presentation") && previewUrl && (
               <iframe
                 src={getPreviewSrc(previewType, previewUrl)}
@@ -744,20 +770,51 @@ export default function TeacherStudyMaterials() {
                 style={{ height: "70vh" }}
                 title={previewTitle}
                 allow="fullscreen"
+                onLoad={() => setPreviewLoading(false)}
               />
             )}
             {previewType === "video" && previewUrl && (
-              <video src={previewUrl} controls className="w-full rounded-lg" style={{ maxHeight: "70vh" }}>Seu navegador não suporta reprodução de vídeo.</video>
+              <video src={previewUrl} controls className="w-full rounded-lg" style={{ maxHeight: "70vh" }} onLoadedData={() => setPreviewLoading(false)}>Seu navegador não suporta reprodução de vídeo.</video>
+            )}
+            {previewType === "audio" && previewUrl && (
+              <div className="flex flex-col items-center justify-center py-16 gap-6">
+                <div className="bg-primary/10 rounded-full p-8">
+                  <Music className="h-16 w-16 text-primary" />
+                </div>
+                <audio src={previewUrl} controls className="w-full max-w-lg" onLoadedData={() => setPreviewLoading(false)}>
+                  Seu navegador não suporta reprodução de áudio.
+                </audio>
+              </div>
             )}
             {previewType === "image" && previewUrl && (
-              <img src={previewUrl} alt={previewTitle} className="w-full rounded-lg object-contain" style={{ maxHeight: "70vh" }} />
+              <img src={previewUrl} alt={previewTitle} className="w-full rounded-lg object-contain" style={{ maxHeight: "70vh" }} onLoad={() => setPreviewLoading(false)} />
             )}
-            {previewType === "link" && previewUrl && (
-              <iframe src={previewUrl} className="w-full rounded-lg border" style={{ height: "70vh" }} title={previewTitle} sandbox="allow-scripts allow-same-origin allow-popups" />
-            )}
+            {previewType === "link" && previewUrl && (() => {
+              const ytEmbed = getYouTubeEmbedUrl(previewUrl);
+              return ytEmbed ? (
+                <iframe
+                  src={ytEmbed}
+                  className="w-full rounded-lg border"
+                  style={{ height: "70vh" }}
+                  title={previewTitle}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  allowFullScreen
+                  onLoad={() => setPreviewLoading(false)}
+                />
+              ) : (
+                <iframe
+                  src={previewUrl}
+                  className="w-full rounded-lg border"
+                  style={{ height: "70vh" }}
+                  title={previewTitle}
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                  onLoad={() => setPreviewLoading(false)}
+                />
+              );
+            })()}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPreviewUrl(null)}><X className="mr-2 h-4 w-4" />Fechar</Button>
+            <Button variant="outline" onClick={() => { setPreviewUrl(null); setPreviewLoading(false); }}><X className="mr-2 h-4 w-4" />Fechar</Button>
             {previewUrl && (<Button onClick={() => window.open(previewUrl, "_blank")}><Download className="mr-2 h-4 w-4" />Abrir em Nova Aba</Button>)}
           </DialogFooter>
         </DialogContent>
