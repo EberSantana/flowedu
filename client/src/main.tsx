@@ -48,7 +48,8 @@ createRoot(document.getElementById("root")!).render(
 );
 
 // ==================== SERVICE WORKER ====================
-if ('serviceWorker' in navigator) {
+// Só registrar SW em produção (não em dev/preview para evitar cache de assets antigos)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', async () => {
     try {
       // 1. Verificar se há um SW antigo registrado

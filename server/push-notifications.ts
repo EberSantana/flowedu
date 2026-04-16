@@ -141,7 +141,7 @@ export async function getNotificationPrefs(userId: number) {
   
   return {
     ...prefs,
-    activeDays: JSON.parse(prefs.activeDays || '[1,2,3,4,5]'),
+    activeDays: (() => { try { const v = prefs.activeDays; if (Array.isArray(v)) return v; const s = String(v || '[1,2,3,4,5]').trim(); return JSON.parse(s.startsWith('[') ? s : '[1,2,3,4,5]'); } catch { return [1,2,3,4,5]; } })(),
   };
 }
 

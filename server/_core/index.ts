@@ -90,6 +90,8 @@ async function startServer() {
       },
     } : false, // Desabilitado em desenvolvimento para HMR funcionar
     crossOriginEmbedderPolicy: false, // Permite embeds de terceiros
+    crossOriginResourcePolicy: false, // Permite imports dinâmicos no preview do Manus
+    crossOriginOpenerPolicy: false, // Permite iframes no preview
   }));
   
   // ============================================
