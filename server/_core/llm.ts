@@ -385,7 +385,7 @@ async function logAIUsage(params: {
     const dbConn = await getDb();
     if (!dbConn) return;
     await dbConn.execute(
-      sql`INSERT INTO ai_usage_logs (provider, model, feature, promptTokens, completionTokens, totalTokens, success, errorMessage) VALUES (${params.provider}, ${params.model}, ${params.feature}, ${params.promptTokens}, ${params.completionTokens}, ${params.totalTokens}, ${params.success ? 1 : 0}, ${params.errorMessage || null})`
+      sql`INSERT INTO ai_usage_logs (provider, model, feature, prompt_tokens, completion_tokens, total_tokens, success, error_message) VALUES (${params.provider}, ${params.model}, ${params.feature}, ${params.promptTokens}, ${params.completionTokens}, ${params.totalTokens}, ${params.success ? 1 : 0}, ${params.errorMessage || null})`
     );
   } catch (e) {
     // Falha no log não deve impedir o fluxo principal

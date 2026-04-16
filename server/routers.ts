@@ -12482,18 +12482,18 @@ Retorne em formato JSON com estrutura:
         if (!dbConn) return { totalCalls: 0, totalTokens: 0, promptTokens: 0, completionTokens: 0, successCalls: 0, errorCalls: 0, estimatedCost: 0, byFeature: [], byProvider: [], daily: [], recent: [] };
         const days = input.period === '7d' ? 7 : input.period === '30d' ? 30 : input.period === '90d' ? 90 : null;
         const totalsRes = days
-          ? await dbConn.execute(sql`SELECT COUNT(*) as totalCalls, SUM(totalTokens) as totalTokens, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successCalls, SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as errorCalls FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`) as any[]
-          : await dbConn.execute(sql`SELECT COUNT(*) as totalCalls, SUM(totalTokens) as totalTokens, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successCalls, SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as errorCalls FROM ai_usage_logs`) as any[];
+          ? await dbConn.execute(sql`SELECT COUNT(*) as totalCalls, SUM(total_tokens) as totalTokens, SUM(prompt_tokens) as promptTokens, SUM(completion_tokens) as completionTokens, SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successCalls, SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as errorCalls FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`) as any[]
+          : await dbConn.execute(sql`SELECT COUNT(*) as totalCalls, SUM(total_tokens) as totalTokens, SUM(prompt_tokens) as promptTokens, SUM(completion_tokens) as completionTokens, SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successCalls, SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as errorCalls FROM ai_usage_logs`) as any[];
         const byFeatureRes = days
-          ? await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[]
-          : await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[];
+          ? await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(total_tokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[]
+          : await dbConn.execute(sql`SELECT feature, COUNT(*) as calls, SUM(total_tokens) as tokens FROM ai_usage_logs GROUP BY feature ORDER BY calls DESC LIMIT 10`) as any[];
         const byProviderRes = days
-          ? await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY provider`) as any[]
-          : await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(promptTokens) as promptTokens, SUM(completionTokens) as completionTokens, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY provider`) as any[];
+          ? await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(prompt_tokens) as promptTokens, SUM(completion_tokens) as completionTokens, SUM(total_tokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY provider`) as any[]
+          : await dbConn.execute(sql`SELECT provider, COUNT(*) as calls, SUM(prompt_tokens) as promptTokens, SUM(completion_tokens) as completionTokens, SUM(total_tokens) as tokens FROM ai_usage_logs GROUP BY provider`) as any[];
         const dailyRes = days
-          ? await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[]
-          : await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(totalTokens) as tokens FROM ai_usage_logs GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[];
-        const recentRes = await dbConn.execute(sql`SELECT id, provider, model, feature, promptTokens, completionTokens, totalTokens, success, errorMessage, createdAt FROM ai_usage_logs ORDER BY createdAt DESC LIMIT 20`) as any[];
+          ? await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(total_tokens) as tokens FROM ai_usage_logs WHERE createdAt >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[]
+          : await dbConn.execute(sql`SELECT DATE(createdAt) as date, COUNT(*) as calls, SUM(total_tokens) as tokens FROM ai_usage_logs GROUP BY DATE(createdAt) ORDER BY date ASC`) as any[];
+        const recentRes = await dbConn.execute(sql`SELECT id, provider, model, feature, prompt_tokens as promptTokens, completion_tokens as completionTokens, total_tokens as totalTokens, success, error_message as errorMessage, createdAt FROM ai_usage_logs ORDER BY createdAt DESC LIMIT 20`) as any[];
         const total = ((totalsRes[0] as any[])[0]) || {};
         // Tabela de preços por provedor (USD por 1M tokens)
         const PRICING: Record<string, { input: number; output: number; label: string }> = {
