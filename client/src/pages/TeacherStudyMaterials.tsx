@@ -377,6 +377,11 @@ export default function TeacherStudyMaterials() {
 
   function getPreviewSrc(type: string, url: string): string {
     if (type === "pdf" || type === "document" || type === "presentation") {
+      // URLs locais (/uploads/...) são servidas diretamente pelo servidor
+      // URLs externas (CloudFront, etc.) usam Google Docs Viewer
+      if (url.startsWith('/') || url.startsWith(window.location.origin)) {
+        return url;
+      }
       return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
     }
     if (type === "link") {
