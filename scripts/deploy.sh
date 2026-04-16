@@ -4,15 +4,23 @@
 # =============================================================================
 # Este script faz:
 # 1. Incrementa a versão automaticamente no package.json (patch: x.y.Z+1)
-# 2. Faz o build do projeto
-# 3. Substitui __SW_VERSION__ no sw.js pela versão atual
-# 4. Reinicia o PM2
+# 2. Git pull para sincronizar com o repositório remoto
+# 3. Instala dependências (se necessário)
+# 4. Valida queries SQL contra o schema do TiDB (bloqueia deploy se houver problemas)
+# 5. Faz o build do projeto
+# 6. Substitui __SW_VERSION__ no sw.js pela versão atual
+# 7. Commit e push da nova versão
+# 8. Reinicia o PM2
 #
 # Uso:
 #   ./scripts/deploy.sh          → incrementa versão patch (2.5.0 → 2.5.1)
 #   ./scripts/deploy.sh minor    → incrementa versão minor (2.5.0 → 2.6.0)
 #   ./scripts/deploy.sh major    → incrementa versão major (2.5.0 → 3.0.0)
 #   ./scripts/deploy.sh skip     → não incrementa versão (usa a atual)
+#
+# Pré-requisito para validação SQL:
+#   node scripts/validate-sql-schema.mjs --fetch-schema
+#   (executar após cada pnpm db:push para manter o cache atualizado)
 # =============================================================================
 
 set -e
@@ -92,11 +100,32 @@ if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
     pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 fi
 
-# ---- PASSO 4: Build do projeto ----
+# ---- PASSO 4: Validação de queries SQL vs schema TiDB ----
+echo -e "${YELLOW}🔍 Validando queries SQL contra o schema do banco...${NC}"
+
+SCHEMA_CACHE="$PROJECT_DIR/scripts/tidb-schema-cache.json"
+
+if [ -f "$SCHEMA_CACHE" ]; then
+    # Cache existe — executar auditoria em modo estrito
+    if node scripts/validate-sql-schema.mjs --strict 2>&1; then
+        echo -e "${GREEN}✅ Todas as queries SQL estão compatíveis com o schema${NC}"
+    else
+        echo -e "${RED}❌ DEPLOY BLOQUEADO: Queries SQL incompatíveis com o schema do banco!${NC}"
+        echo -e "${RED}   Execute: node scripts/validate-sql-schema.mjs --report${NC}"
+        echo -e "${RED}   para ver o relatório detalhado dos problemas.${NC}"
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}⚠️  Cache do schema não encontrado. Pulando validação SQL.${NC}"
+    echo -e "${YELLOW}   Execute: node scripts/validate-sql-schema.mjs --fetch-schema${NC}"
+    echo -e "${YELLOW}   para gerar o cache e habilitar a validação automática.${NC}"
+fi
+
+# ---- PASSO 5: Build do projeto ----
 echo -e "${YELLOW}🔨 Fazendo build do projeto...${NC}"
 pnpm build
 
-# ---- PASSO 5: Substituir __SW_VERSION__ no sw.js ----
+# ---- PASSO 6: Substituir __SW_VERSION__ no sw.js ----
 SW_FILE="$PROJECT_DIR/dist/public/sw.js"
 if [ -f "$SW_FILE" ]; then
     sed -i "s/__SW_VERSION__/${NEW_VERSION}/g" "$SW_FILE"
@@ -105,14 +134,14 @@ else
     echo -e "${RED}⚠️  sw.js não encontrado em dist/public/${NC}"
 fi
 
-# ---- PASSO 6: Commit da versão (se incrementou) ----
+# ---- PASSO 7: Commit da versão (se incrementou) ----
 if [ "$INCREMENT_TYPE" != "skip" ]; then
     git add package.json 2>/dev/null || true
     git commit -m "chore: bump version to v${NEW_VERSION}" 2>/dev/null || true
     git push 2>/dev/null || echo "Push falhou (sem remote configurado)"
 fi
 
-# ---- PASSO 7: Reiniciar PM2 ----
+# ---- PASSO 8: Reiniciar PM2 ----
 echo -e "${YELLOW}🔄 Reiniciando servidor...${NC}"
 if command -v pm2 &> /dev/null; then
     pm2 restart flowedu 2>/dev/null || pm2 restart all 2>/dev/null || echo "PM2 restart falhou"
