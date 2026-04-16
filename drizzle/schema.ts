@@ -2494,7 +2494,7 @@ export const pushNotificationLog = mysqlTable("push_notification_log", {
   type: mysqlEnum("type", ["class_reminder", "event_reminder", "task_reminder", "daily_summary", "announcement", "activity", "mural"]).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   body: text("body").notNull(),
-  referenceId: varchar("data", { length: 100 }), // ID do evento/aula referenciado
+  referenceId: json("data"), // ID do evento/aula referenciado (stored as JSON)
   referenceDate: varchar("status", { length: 10 }), // Data de referência YYYY-MM-DD
   delivered: boolean("delivered").default(false).notNull(),
   error: text("error_message"),

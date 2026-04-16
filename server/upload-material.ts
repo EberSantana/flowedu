@@ -213,4 +213,92 @@ router.delete('/delete-file', async (req, res) => {
   }
 });
 
+// Endpoint de migração temporária: move arquivos locais para S3
+// ATENÇÃO: Remover este endpoint após a migração ser concluída
+router.post('/migrate-to-s3', async (req, res) => {
+  const { secret } = req.body;
+  // Proteção simples com secret
+  if (secret !== 'flowedu-migrate-2026') {
+    return res.status(403).json({ error: 'Acesso negado' });
+  }
+
+  console.log('[Migration] Iniciando migração de arquivos locais para S3...');
+  const results: { filename: string; status: string; url?: string; error?: string }[] = [];
+
+  try {
+    const { storagePut } = await import('./storage');
+    const mysql = await import('mysql2/promise');
+    const { ENV } = await import('./_core/env');
+
+    // Conectar ao banco
+    const dbUrl = ENV.databaseUrl || process.env.DATABASE_URL || '';
+    const match = dbUrl.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+    if (!match) throw new Error('DATABASE_URL inválida');
+    const conn = await mysql.createConnection({
+      user: decodeURIComponent(match[1]),
+      password: decodeURIComponent(match[2]),
+      host: match[3],
+      port: parseInt(match[4]),
+      database: match[5].split('?')[0],
+      ssl: { rejectUnauthorized: false },
+    });
+
+    // Buscar materiais com URL local
+    const [rows] = await conn.execute(
+      "SELECT id, title, url FROM topic_materials WHERE url LIKE '/uploads/materials/%'"
+    ) as any[];
+
+    console.log(`[Migration] ${rows.length} materiais para migrar`);
+
+    for (const row of rows) {
+      const filename = path.basename(row.url);
+      const localPath = path.join(UPLOADS_DIR, filename);
+
+      if (!fs.existsSync(localPath)) {
+        results.push({ filename, status: 'skipped', error: 'Arquivo não encontrado localmente' });
+        continue;
+      }
+
+      try {
+        const buffer = fs.readFileSync(localPath);
+        const ext = path.extname(filename).toLowerCase();
+        const mimeMap: Record<string, string> = {
+          '.pdf': 'application/pdf', '.mp4': 'video/mp4', '.mp3': 'audio/mpeg',
+          '.m4a': 'audio/mp4', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+        };
+        const contentType = mimeMap[ext] || 'application/octet-stream';
+        const fileKey = `materials/${filename}`;
+
+        const { url: s3Url } = await storagePut(fileKey, buffer, contentType);
+
+        // Atualizar URL no banco
+        await conn.execute('UPDATE topic_materials SET url = ? WHERE id = ?', [s3Url, row.id]);
+
+        console.log(`[Migration] ✅ ${filename} -> ${s3Url.substring(0, 60)}...`);
+        results.push({ filename, status: 'migrated', url: s3Url });
+      } catch (err: any) {
+        console.error(`[Migration] ❌ ${filename}: ${err.message}`);
+        results.push({ filename, status: 'error', error: err.message });
+      }
+
+      // Pausa para não sobrecarregar a API
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    await conn.end();
+
+    const migrated = results.filter(r => r.status === 'migrated').length;
+    const failed = results.filter(r => r.status === 'error').length;
+    const skipped = results.filter(r => r.status === 'skipped').length;
+
+    console.log(`[Migration] Concluído: ${migrated} migrados, ${failed} erros, ${skipped} ignorados`);
+    res.json({ success: true, migrated, failed, skipped, results });
+  } catch (err: any) {
+    console.error('[Migration] Erro fatal:', err.message);
+    res.status(500).json({ error: err.message, results });
+  }
+});
+
 export default router;

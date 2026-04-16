@@ -4,7 +4,7 @@ import StudentLayout from "@/components/StudentLayout";
 import {
   FileText, Video, LinkIcon, File, Loader2, Download, Presentation,
   FolderOpen, Eye, X, BookOpen, Filter, Search, Folder,
-  ChevronDown, ChevronRight,
+  ChevronDown, ChevronRight, Music,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,13 +33,14 @@ function getFileIcon(type: string) {
     case "link": return <LinkIcon className="h-5 w-5 text-blue-500" />;
     case "presentation": return <Presentation className="h-5 w-5 text-orange-500" />;
     case "document": return <FileText className="h-5 w-5 text-blue-600" />;
+    case "audio": return <Music className="h-5 w-5 text-green-500" />;
     default: return <File className="h-5 w-5 text-gray-500" />;
   }
 }
 
 function getTypeBadge(type: string) {
   const labels: Record<string, string> = {
-    pdf: "PDF", video: "Vídeo", link: "Link", presentation: "Apresentação", document: "Documento", other: "Outro",
+    pdf: "PDF", video: "Vídeo", link: "Link", presentation: "Apresentação", document: "Documento", audio: "Áudio", other: "Outro",
   };
   return labels[type] || type;
 }

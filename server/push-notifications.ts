@@ -308,7 +308,7 @@ export async function sendPushNotification(
       type: payload.type,
       title: payload.title,
       body: payload.body,
-      referenceId: payload.referenceId || null,
+      referenceId: payload.referenceId ? { id: payload.referenceId } : null,
       referenceDate: payload.referenceDate || null,
       delivered: sent > 0,
       error: failed > 0 ? `${failed} de ${subs.length} falhou` : null,
@@ -337,7 +337,7 @@ async function wasNotificationSent(
       and(
         eq(pushNotificationLog.userId, userId),
         eq(pushNotificationLog.type, type as any),
-        eq(pushNotificationLog.referenceId, referenceId),
+        sql`JSON_EXTRACT(${pushNotificationLog.referenceId}, '$.id') = ${referenceId}`,
         eq(pushNotificationLog.referenceDate, referenceDate)
       )
     );
@@ -859,7 +859,7 @@ export async function processQueuedNotifications() {
           type: item.type,
           title: `[Adiada] ${item.title}`,
           body: item.body,
-          referenceId: item.referenceId || null,
+          referenceId: item.referenceId ? { id: item.referenceId } : null,
           referenceDate: item.referenceDate || null,
           delivered: sent > 0,
           error: null,
@@ -989,7 +989,7 @@ export async function retryFailedNotification(queueItemId: number) {
         type: item.type,
         title: `[Reenvio] ${item.title}`,
         body: item.body,
-        referenceId: item.referenceId || null,
+        referenceId: item.referenceId ? { id: item.referenceId } : null,
         referenceDate: item.referenceDate || null,
         delivered: true,
         error: null,
