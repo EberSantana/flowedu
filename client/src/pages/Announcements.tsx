@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { trpc } from "../lib/trpc";
 import { Button } from "../components/ui/button";
-import { Plus, Edit, Trash2, AlertCircle, Megaphone, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2, AlertCircle, Megaphone, ArrowLeft, Siren } from "lucide-react";
 import { toast } from "sonner";
 import Sidebar from '../components/Sidebar';
 import PageWrapper from '../components/PageWrapper';
@@ -13,6 +13,7 @@ export function Announcements() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [isImportant, setIsImportant] = useState(false);
+  const [isUrgent, setIsUrgent] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
 
   const { data: announcements, isLoading } = trpc.announcements.list.useQuery();
@@ -56,6 +57,7 @@ export function Announcements() {
     setTitle("");
     setMessage("");
     setIsImportant(false);
+    setIsUrgent(false);
     setSelectedSubjectId(null);
     setIsCreating(false);
     setEditingId(null);
@@ -81,6 +83,7 @@ export function Announcements() {
         title,
         message,
         isImportant,
+        isUrgent,
         subjectId: selectedSubjectId,
       });
     }
@@ -91,6 +94,7 @@ export function Announcements() {
     setTitle(announcement.title);
     setMessage(announcement.message);
     setIsImportant(announcement.isImportant);
+    setIsUrgent(announcement.isUrgent || false);
     setSelectedSubjectId(announcement.subjectId);
     setIsCreating(true);
   };
@@ -195,17 +199,32 @@ export function Announcements() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="isImportant"
-                    checked={isImportant}
-                    onChange={(e) => setIsImportant(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <label htmlFor="isImportant" className="text-sm text-gray-700">
-                    Marcar como importante (destaque vermelho)
-                  </label>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="isImportant"
+                      checked={isImportant}
+                      onChange={(e) => setIsImportant(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    <label htmlFor="isImportant" className="text-sm text-gray-700">
+                      Marcar como importante (destaque vermelho)
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="isUrgent"
+                      checked={isUrgent}
+                      onChange={(e) => setIsUrgent(e.target.checked)}
+                      className="w-4 h-4 accent-orange-600"
+                    />
+                    <label htmlFor="isUrgent" className="text-sm text-orange-700 font-medium flex items-center gap-1">
+                      <Siren className="w-4 h-4" />
+                      Urgente (ignora horário silencioso — envia imediatamente)
+                    </label>
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -245,12 +264,20 @@ export function Announcements() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
+                        {announcement.isUrgent && (
+                          <Siren className="w-5 h-5 text-orange-600" />
+                        )}
                         {announcement.isImportant && (
                           <AlertCircle className="w-5 h-5 text-red-600" />
                         )}
                         <h3 className="font-semibold text-gray-900">
                           {announcement.title}
                         </h3>
+                        {announcement.isUrgent && (
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+                            URGENTE
+                          </span>
+                        )}
                       </div>
                       
                       <p className="text-sm text-gray-600 mb-2">

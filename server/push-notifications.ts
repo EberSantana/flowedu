@@ -199,6 +199,7 @@ export async function sendPushNotification(
     type: 'class_reminder' | 'event_reminder' | 'task_reminder' | 'daily_summary' | 'announcement' | 'activity' | 'mural';
     referenceId?: string;
     referenceDate?: string;
+    urgent?: boolean; // Se true, ignora horário silencioso
   }
 ) {
   if (!vapidConfigured) {
@@ -207,9 +208,10 @@ export async function sendPushNotification(
   }
 
   // ── Horário silencioso fixo: só envia entre 07:00 e 21:59 (Manaus UTC-4) ──
+  // Push urgente IGNORA o horário silencioso
   const nowManaus = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Manaus' }));
   const hora = nowManaus.getHours();
-  if (hora < 7 || hora >= 22) {
+  if (!payload.urgent && (hora < 7 || hora >= 22)) {
     // Enfileirar para envio às 07:00
     try {
       const db = await getDb();
@@ -233,6 +235,11 @@ export async function sendPushNotification(
       console.error('[Push] Erro ao enfileirar notificação:', queueError);
     }
     return { sent: 0, failed: 0, silenced: true, queued: true };
+  }
+  
+  // Log quando push urgente ignora horário silencioso
+  if (payload.urgent && (hora < 7 || hora >= 22)) {
+    console.log(`[Push] ⚠️ Push URGENTE enviado fora do horário ativo (${hora}h Manaus) para userId=${userId}: ${payload.title}`);
   }
   
   const db = await getDb();
@@ -873,6 +880,132 @@ export async function processQueuedNotifications() {
 }
 
 /**
+ * Limpa registros antigos da fila (sent/failed com mais de 30 dias)
+ * Chamada automaticamente pelo job semanal
+ */
+export async function cleanOldQueueItems() {
+  const db = await getDb();
+  if (!db) return { deleted: 0 };
+  
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  try {
+    // Deletar registros sent ou failed com mais de 30 dias
+    const result = await db.delete(pushNotificationQueue)
+      .where(
+        and(
+          sql`${pushNotificationQueue.status} IN ('sent', 'failed')`,
+          lte(pushNotificationQueue.queuedAt, thirtyDaysAgo)
+        )
+      );
+    
+    const deleted = (result as any)[0]?.affectedRows || 0;
+    console.log(`[Push] Limpeza da fila: ${deleted} registro(s) antigo(s) removido(s)`);
+    return { deleted };
+  } catch (error) {
+    console.error('[Push] Erro na limpeza da fila:', error);
+    return { deleted: 0 };
+  }
+}
+
+/**
+ * Reenvia uma notificação que falhou (retry manual)
+ */
+export async function retryFailedNotification(queueItemId: number) {
+  if (!vapidConfigured) {
+    return { success: false, error: 'VAPID não configurado' };
+  }
+  
+  const db = await getDb();
+  if (!db) return { success: false, error: 'Database não disponível' };
+  
+  // Buscar o item da fila
+  const [item] = await db.select()
+    .from(pushNotificationQueue)
+    .where(eq(pushNotificationQueue.id, queueItemId));
+  
+  if (!item) return { success: false, error: 'Item não encontrado' };
+  if (item.status === 'sent') return { success: false, error: 'Notificação já foi enviada' };
+  
+  // Buscar subscriptions ativas do usuário
+  const subs = await db.select()
+    .from(pushSubscriptions)
+    .where(
+      and(
+        eq(pushSubscriptions.userId, item.userId),
+        eq(pushSubscriptions.isActive, true)
+      )
+    );
+  
+  if (subs.length === 0) {
+    await db.update(pushNotificationQueue)
+      .set({ status: 'failed', error: 'Sem dispositivos ativos' })
+      .where(eq(pushNotificationQueue.id, queueItemId));
+    return { success: false, error: 'Usuário sem dispositivos ativos' };
+  }
+  
+  const notificationPayload = JSON.stringify({
+    title: item.title,
+    body: item.body,
+    icon: item.icon || '/icon-192.png',
+    badge: item.badge || '/icon-192.png',
+    tag: item.tag || `flowedu-${item.type}-retry-${Date.now()}`,
+    data: {
+      url: item.url || '/',
+      type: item.type,
+    },
+  });
+  
+  let sent = 0;
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(
+        {
+          endpoint: sub.endpoint,
+          keys: { p256dh: sub.p256dh, auth: sub.auth },
+        },
+        notificationPayload
+      );
+      sent++;
+    } catch (sendErr: any) {
+      if (sendErr.statusCode === 410 || sendErr.statusCode === 404) {
+        await db.update(pushSubscriptions)
+          .set({ isActive: false })
+          .where(eq(pushSubscriptions.id, sub.id));
+      }
+    }
+  }
+  
+  if (sent > 0) {
+    await db.update(pushNotificationQueue)
+      .set({ status: 'sent', sentAt: new Date(), error: null })
+      .where(eq(pushNotificationQueue.id, queueItemId));
+    
+    // Registrar no log
+    try {
+      await db.insert(pushNotificationLog).values({
+        userId: item.userId,
+        type: item.type,
+        title: `[Reenvio] ${item.title}`,
+        body: item.body,
+        referenceId: item.referenceId || null,
+        referenceDate: item.referenceDate || null,
+        delivered: true,
+        error: null,
+      });
+    } catch (_) { /* log error silently */ }
+    
+    return { success: true, sent };
+  } else {
+    await db.update(pushNotificationQueue)
+      .set({ error: 'Falha ao reenviar para todos os dispositivos' })
+      .where(eq(pushNotificationQueue.id, queueItemId));
+    return { success: false, error: 'Falha ao enviar' };
+  }
+}
+
+/**
  * Inicia o job periódico de verificação de lembretes
  */
 export function startReminderJob() {
@@ -897,6 +1030,16 @@ export function startReminderJob() {
       console.error('[Push] Erro na primeira verificação:', err)
     );
   }, 10000); // 10 segundos após iniciar
+  
+  // Job semanal de limpeza da fila (todo domingo às 03:00 Manaus)
+  setInterval(async () => {
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Manaus' }));
+    // Executar apenas no domingo (0) às 03:00-03:04
+    if (now.getDay() === 0 && now.getHours() === 3 && now.getMinutes() < 5) {
+      console.log('[Push] Executando limpeza semanal da fila...');
+      await cleanOldQueueItems();
+    }
+  }, 5 * 60 * 1000); // Verificar a cada 5 minutos (mesmo intervalo do job principal)
 }
 
 /**

@@ -7929,3 +7929,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] Bug: Acessos Hoje mostra 0 mesmo com acessos registrados em 11/04 nos Acessos Recentes
 - [ ] Bug: Calendário Anual não reflete dados de abril corretamente
 - [ ] Adicionar seletor de período com date picker (De/Até) nos cards de resumo dos Logs de Acesso
+
+## Melhorias Push Notifications - 15/04/2026
+- [x] Push Urgente: campo "Urgente" nos avisos que ignora horário silencioso (22h-06:59)
+- [x] Limpeza automática da fila: job semanal removendo registros sent/failed com +30 dias
+- [x] Reenvio manual de push falhos: botão "Reenviar" no painel de fila de notificações

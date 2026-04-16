@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { 
   Bell, BellRing, BellOff, Smartphone, BarChart3, BookOpen, 
   CalendarDays, ListTodo, Sunrise, Send, Loader2, Moon, Clock,
-  Inbox, CheckCircle2, XCircle, ChevronDown, ChevronUp
+  Inbox, CheckCircle2, XCircle, ChevronDown, ChevronUp, RefreshCw, Trash2, RotateCcw
 } from "lucide-react";
 
 export default function NotificationSettings() {
@@ -26,10 +26,51 @@ export default function NotificationSettings() {
   const { data: queueStats } = trpc.pushNotifications.getQueueStats.useQuery();
   const [showQueueDetails, setShowQueueDetails] = useState(false);
   const [queueFilter, setQueueFilter] = useState<'pending' | 'sent' | 'failed' | undefined>(undefined);
-  const { data: queueItems } = trpc.pushNotifications.getQueueItems.useQuery(
+  const [retryingId, setRetryingId] = useState<number | null>(null);
+  const utils = trpc.useUtils();
+  const { data: queueItems, refetch: refetchQueueItems } = trpc.pushNotifications.getQueueItems.useQuery(
     { status: queueFilter, limit: 20 },
     { enabled: showQueueDetails }
   );
+
+  const retryMutation = trpc.pushNotifications.retryFailed.useMutation({
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success(`Notificação reenviada com sucesso! (${result.sent} dispositivo(s))`);
+      } else {
+        toast.error(`Falha ao reenviar: ${result.error}`);
+      }
+      refetchQueueItems();
+      utils.pushNotifications.getQueueStats.invalidate();
+      setRetryingId(null);
+    },
+    onError: (err) => {
+      toast.error('Erro ao reenviar: ' + err.message);
+      setRetryingId(null);
+    },
+  });
+
+  const retryAllMutation = trpc.pushNotifications.retryAllFailed.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Reenvio em lote: ${result.success} sucesso, ${result.failed} falha(s) de ${result.retried} total`);
+      refetchQueueItems();
+      utils.pushNotifications.getQueueStats.invalidate();
+    },
+    onError: (err) => {
+      toast.error('Erro ao reenviar em lote: ' + err.message);
+    },
+  });
+
+  const cleanMutation = trpc.pushNotifications.cleanOldItems.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Limpeza concluída: ${result.deleted} registro(s) antigo(s) removido(s)`);
+      refetchQueueItems();
+      utils.pushNotifications.getQueueStats.invalidate();
+    },
+    onError: (err) => {
+      toast.error('Erro na limpeza: ' + err.message);
+    },
+  });
 
   const subscribeMutation = trpc.pushNotifications.subscribe.useMutation({
     onSuccess: () => {
@@ -410,6 +451,46 @@ export default function NotificationSettings() {
                         </Button>
                       </div>
 
+                      {/* Botões de ação da fila */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm('Reenviar TODAS as notificações que falharam?')) {
+                              retryAllMutation.mutate();
+                            }
+                          }}
+                          disabled={retryAllMutation.isPending || !queueStats || queueStats.failed === 0}
+                          className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                        >
+                          {retryAllMutation.isPending ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <RotateCcw className="h-3 w-3 mr-1" />
+                          )}
+                          Reenviar Todos Falhos ({queueStats?.failed || 0})
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm('Limpar registros enviados/falhos com mais de 30 dias?')) {
+                              cleanMutation.mutate();
+                            }
+                          }}
+                          disabled={cleanMutation.isPending}
+                          className="text-red-600 border-red-300 hover:bg-red-50"
+                        >
+                          {cleanMutation.isPending ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3 w-3 mr-1" />
+                          )}
+                          Limpar Antigos (+30 dias)
+                        </Button>
+                      </div>
+
                       {queueItems && queueItems.length > 0 ? (
                         <div className="space-y-2 max-h-64 overflow-y-auto">
                           {queueItems.map((item: any) => (
@@ -425,14 +506,37 @@ export default function NotificationSettings() {
                                   {item.sentAt && (
                                     <> · Enviada: {new Date(item.sentAt).toLocaleString('pt-BR', { timeZone: 'America/Manaus' })}</>
                                   )}
+                                  {item.error && (
+                                    <span className="text-red-500"> · Erro: {item.error}</span>
+                                  )}
                                 </div>
                               </div>
-                              <Badge
-                                variant={item.status === 'pending' ? 'outline' : item.status === 'sent' ? 'default' : 'destructive'}
-                                className="ml-2 shrink-0"
-                              >
-                                {item.status === 'pending' ? 'Pendente' : item.status === 'sent' ? 'Enviada' : 'Falha'}
-                              </Badge>
+                              <div className="flex items-center gap-2 ml-2 shrink-0">
+                                {(item.status === 'failed' || item.status === 'pending') && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setRetryingId(item.id);
+                                      retryMutation.mutate({ queueItemId: item.id });
+                                    }}
+                                    disabled={retryingId === item.id}
+                                    className="h-7 px-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                    title="Reenviar esta notificação"
+                                  >
+                                    {retryingId === item.id ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      <RefreshCw className="h-3 w-3" />
+                                    )}
+                                  </Button>
+                                )}
+                                <Badge
+                                  variant={item.status === 'pending' ? 'outline' : item.status === 'sent' ? 'default' : 'destructive'}
+                                >
+                                  {item.status === 'pending' ? 'Pendente' : item.status === 'sent' ? 'Enviada' : 'Falha'}
+                                </Badge>
+                              </div>
                             </div>
                           ))}
                         </div>

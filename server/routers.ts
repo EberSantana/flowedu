@@ -7091,6 +7091,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         title: z.string().min(1),
         message: z.string().min(1),
         isImportant: z.boolean(),
+        isUrgent: z.boolean().optional().default(false),
         subjectId: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -7105,7 +7106,10 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         const subject = await db.getSubjectById(input.subjectId, ctx.user.id);
         
         // Criar notificação interna + push para cada aluno matriculado
-        const pushTitle = input.isImportant ? `🚨 Aviso Importante: ${input.title}` : `📢 Novo Aviso: ${input.title}`;
+        const urgentPrefix = input.isUrgent ? '⚠️ URGENTE: ' : '';
+        const pushTitle = input.isImportant 
+          ? `🚨 ${urgentPrefix}Aviso Importante: ${input.title}` 
+          : `📢 ${urgentPrefix}Novo Aviso: ${input.title}`;
         const pushBody = `${subject?.name || 'Disciplina'}: ${input.message.substring(0, 100)}${input.message.length > 100 ? '...' : ''}`;
         for (const student of enrolledStudents) {
           if (!student.userId) continue; // Pular alunos sem conta de usuário
@@ -7120,6 +7124,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
               relatedId: announcement.id,
             });
             // Push notification (chega mesmo com app fechado)
+            // Se urgente, ignora horário silencioso
             pushNotif.sendPushNotification(student.userId, {
               title: pushTitle,
               body: pushBody,
@@ -7127,6 +7132,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
               url: '/student-announcements',
               type: 'announcement',
               referenceId: String(announcement.id),
+              urgent: input.isUrgent,
             }).catch(err => console.error('[Push] Erro ao enviar push de aviso para aluno', student.userId, err));
           } catch (error) {
             console.error('Erro ao criar notificação para aluno:', student.studentId, error);
@@ -11964,6 +11970,40 @@ Retorne em formato JSON com estrutura:
           .limit(input.limit);
         
         return items;
+      }),
+
+    // Reenviar notificação que falhou
+    retryFailed: protectedProcedure
+      .input(z.object({ queueItemId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await pushNotif.retryFailedNotification(input.queueItemId);
+      }),
+
+    // Reenviar TODAS as notificações que falharam
+    retryAllFailed: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const database = await getDb();
+        if (!database) return { retried: 0, success: 0, failed: 0 };
+        
+        const failedItems = await database.select()
+          .from(pushNotificationQueue)
+          .where(eq(pushNotificationQueue.status, 'failed'));
+        
+        let success = 0;
+        let failed = 0;
+        for (const item of failedItems) {
+          const result = await pushNotif.retryFailedNotification(item.id);
+          if (result.success) success++;
+          else failed++;
+        }
+        
+        return { retried: failedItems.length, success, failed };
+      }),
+
+    // Limpar registros antigos da fila (sent/failed com +30 dias)
+    cleanOldItems: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return await pushNotif.cleanOldQueueItems();
       }),
   }),
 

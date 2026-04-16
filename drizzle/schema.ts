@@ -708,6 +708,7 @@ export const announcements = mysqlTable("announcements", {
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
   isImportant: boolean("isImportant").default(false).notNull(),
+  isUrgent: boolean("isUrgent").default(false).notNull(), // Ignora horário silencioso
   subjectId: int("subjectId").notNull(), // Disciplina relacionada
   userId: int("userId").notNull(), // Professor que criou
   createdAt: timestamp("createdAt").defaultNow().notNull(),
