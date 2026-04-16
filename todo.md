@@ -7939,3 +7939,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] BUG CRÍTICO: Banco de Provas e Exercícios sumiu todo o conteúdo - RESOLVIDO: dados migrados de userId=1 para userId=3600001 (ebersantana@flowedu.app)
 - [x] Garantir que os 16 exercícios órfãos (disciplinas deletadas) apareçam no Banco de Provas e Exercícios - RESOLVIDO: 6 disciplinas recriadas no banco
 - [x] BUG GRAVÍSSIMO: Exercícios dos alunos com notas sumiram após migração - RESOLVIDO: restaurado backup 10/04 da VPS + patches aplicados diretamente no index.js (VPS usa banco MySQL local, não TiDB)
+
+## Bugs - 16/04/2026
+- [x] BUG: Erro ao salvar prova - "Failed query: insert into assessments" com classId default - RESOLVIDO: coluna shuffleQuestions estava faltando no banco MySQL da VPS, adicionada via ALTER TABLE
+- [x] Verificar e reaplicar melhorias de push (Urgente, Limpeza, Reenvio) na VPS
+- [x] Verificar e corrigir lógica de embaralhamento de questões nas provas da VPS
+
+## Bugs - 16/04/2026 (tarde)
+- [ ] BUG: Calendário Anual de Acessos tem registros mas não aparece (getYearlyCalendar não funciona na VPS)
+- [ ] BUG: Toggles de notificações (Lembretes de Aula, Eventos, Tarefas, Resumo Diário) não funcionam - cinza e não mudam ao clicar
+- [ ] BUG: Erro "No procedure found on path learningPath.updateAssessmentShuffle" na VPS

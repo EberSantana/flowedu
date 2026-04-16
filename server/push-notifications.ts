@@ -404,7 +404,7 @@ export async function checkAndSendReminders() {
       const prefs = await getNotificationPrefs(userId);
       
       // Verificar se é dia ativo
-      const activeDays = Array.isArray(prefs.activeDays) ? prefs.activeDays : JSON.parse(String(prefs.activeDays));
+      const activeDays = Array.isArray(prefs.activeDays) ? prefs.activeDays : (typeof prefs.activeDays === 'string' && prefs.activeDays.startsWith('[') ? JSON.parse(prefs.activeDays) : [1,2,3,4,5]);
       if (!activeDays.includes(currentDayOfWeek)) continue;
       
       // Verificar horário silencioso
