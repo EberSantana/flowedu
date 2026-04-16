@@ -7934,3 +7934,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Push Urgente: campo "Urgente" nos avisos que ignora horário silencioso (22h-06:59)
 - [x] Limpeza automática da fila: job semanal removendo registros sent/failed com +30 dias
 - [x] Reenvio manual de push falhos: botão "Reenviar" no painel de fila de notificações
+
+## Bugs - 15/04/2026
+- [x] BUG CRÍTICO: Banco de Provas e Exercícios sumiu todo o conteúdo - RESOLVIDO: dados migrados de userId=1 para userId=3600001 (ebersantana@flowedu.app)
