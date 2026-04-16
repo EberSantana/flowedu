@@ -3534,7 +3534,7 @@ JSON (descrições MAX 15 chars):
                 const res = await dbConn.execute(sql`
                   SELECT DISTINCT s.userId FROM students s
                   JOIN student_class_enrollments sce ON sce.studentId = s.id
-                  WHERE sce.classId = ${input.classId} AND sce.status = 'active' AND s.userId IS NOT NULL
+                  WHERE sce.classId = ${input.classId} AND s.userId IS NOT NULL
                 `) as any[];
                 studentRows = (res[0] as any[]) || [];
               } else if (input.subjectId) {
@@ -3806,7 +3806,7 @@ JSON (descrições MAX 15 chars):
                 studentQuery = dbConn.execute(sql`
                   SELECT DISTINCT s.userId FROM students s
                   JOIN student_class_enrollments sce ON sce.studentId = s.id
-                  WHERE sce.classId = ${assessment.classId} AND sce.status = 'active' AND s.userId IS NOT NULL
+                  WHERE sce.classId = ${assessment.classId} AND s.userId IS NOT NULL
                 `);
               } else {
                 studentQuery = dbConn.execute(sql`
@@ -4181,7 +4181,7 @@ JSON (descrições MAX 15 chars):
         if (!dbConn) return [];
 
         const result = await dbConn.execute(
-          sql`SELECT st.id as studentId, st.name as studentName,
+          sql`SELECT st.id as studentId, st.fullName as studentName,
                      a.id as assessmentId, a.title as assessmentTitle, a.totalPoints,
                      aa.score, aa.percentage, aa.passed, aa.submittedAt
               FROM students st
@@ -4191,7 +4191,7 @@ JSON (descrições MAX 15 chars):
               WHERE se.subjectId = ${input.subjectId}
                 AND a.teacherId = ${ctx.user.id}
                 AND se.status = 'active'
-              ORDER BY st.name, a.title`
+              ORDER BY st.fullName, a.title`
         ) as any[];
         return (result[0] as any[]) || [];
       }),
