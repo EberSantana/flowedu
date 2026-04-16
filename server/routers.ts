@@ -3483,6 +3483,7 @@ JSON (descrições MAX 15 chars):
         availableTo: z.string().optional(),
         status: z.enum(['draft', 'published']).default('published'),
         shuffleQuestions: z.boolean().default(false),
+        shuffleAlternatives: z.boolean().default(false),
         questions: z.array(z.object({
           number: z.number(),
           type: z.string(),
@@ -3515,6 +3516,7 @@ JSON (descrições MAX 15 chars):
           availableFrom: input.availableFrom ? new Date(input.availableFrom) : undefined,
           availableTo: input.availableTo ? new Date(input.availableTo) : undefined,
           shuffleQuestions: input.shuffleQuestions ?? false,
+          shuffleAlternatives: input.shuffleAlternatives ?? false,
         });
         const assessmentId = (result as any)[0]?.insertId || (result as any).insertId;
         if (!assessmentId) throw new Error('Erro ao criar avaliação');
@@ -3653,7 +3655,7 @@ JSON (descrições MAX 15 chars):
 
         // Verificar que a prova está publicada e o aluno tem acesso (via subjectEnrollments)
         const checkResult = await dbConn.execute(
-          sql`SELECT a.id FROM assessments a
+          sql`SELECT a.id, a.shuffleQuestions, a.shuffleAlternatives FROM assessments a
               JOIN subjectEnrollments se ON se.subjectId = a.subjectId
               WHERE a.id = ${input.assessmentId}
                 AND a.status = 'published'
@@ -3665,6 +3667,9 @@ JSON (descrições MAX 15 chars):
         if (checkRows.length === 0) {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
         }
+        const assessmentConfig = checkRows[0];
+        const shouldShuffleQuestions = !!assessmentConfig.shuffleQuestions;
+        const shouldShuffleAlternatives = !!assessmentConfig.shuffleAlternatives;
 
         // Buscar questões
         const result = await dbConn.execute(
@@ -3675,7 +3680,60 @@ JSON (descrições MAX 15 chars):
               WHERE assessmentId = ${input.assessmentId}
               ORDER BY questionNumber ASC`
         ) as any[];
-        return (result[0] as unknown) as any[];
+        let questions = (result[0] as any[]) || [];
+
+        // Função de embaralhamento determinístico (seeded) por aluno
+        // Cada aluno recebe a mesma ordem sempre, mas diferente de outros alunos
+        function seededShuffle<T>(arr: T[], seed: number): T[] {
+          const shuffled = [...arr];
+          let s = seed;
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            s = (s * 1664525 + 1013904223) & 0x7fffffff; // LCG
+            const j = s % (i + 1);
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          return shuffled;
+        }
+
+        // Embaralhar ordem das questões
+        if (shouldShuffleQuestions && questions.length > 1) {
+          const seed = studentId * 31 + input.assessmentId * 7;
+          questions = seededShuffle(questions, seed);
+          // Renumerar questões após embaralhamento
+          questions = questions.map((q: any, idx: number) => ({ ...q, questionNumber: idx + 1 }));
+        }
+
+        // Embaralhar alternativas de múltipla escolha
+        if (shouldShuffleAlternatives) {
+          questions = questions.map((q: any, qIdx: number) => {
+            if (!q.optionA) return q; // Pular questões sem alternativas
+            const options = [
+              { key: 'A', text: q.optionA },
+              { key: 'B', text: q.optionB },
+              { key: 'C', text: q.optionC },
+              { key: 'D', text: q.optionD },
+              ...(q.optionE ? [{ key: 'E', text: q.optionE }] : []),
+            ].filter(o => o.text); // Remover opções nulas
+            const seed = studentId * 17 + input.assessmentId * 13 + (q.id || qIdx) * 3;
+            const shuffledOptions = seededShuffle(options, seed);
+            const newQ = { ...q };
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            shuffledOptions.forEach((opt, idx) => {
+              newQ[`option${letters[idx]}`] = opt.text;
+            });
+            // Atualizar a resposta correta para a nova posição
+            if (q.correctAnswer) {
+              const correctOriginalKey = q.correctAnswer.trim().toUpperCase().charAt(0);
+              const newIdx = shuffledOptions.findIndex(o => o.key === correctOriginalKey);
+              if (newIdx >= 0) {
+                newQ.correctAnswer = letters[newIdx];
+              }
+            }
+            return newQ;
+          });
+        }
+
+        return questions as any[];
       }),
 
     // Listar todas as provas do professor (para gestão)
@@ -3691,6 +3749,7 @@ JSON (descrições MAX 15 chars):
           SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
                  a.totalPoints, a.passingScore, a.duration, a.status,
                  a.applicationDate, a.createdAt, a.maxAttempts,
+                 a.shuffleQuestions, a.shuffleAlternatives,
                  s.name as subjectName, s.color as subjectColor,
                  c.name as className
           FROM assessments a

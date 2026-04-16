@@ -378,6 +378,11 @@ export default function AssessmentsManager() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{assessment.title}</h3>
+                              {assessment.shuffleQuestions && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700" title="Questões e/ou alternativas embaralhadas para cada aluno">
+                                  🎲 Embaralhada
+                                </span>
+                              )}
                               {getStatusBadge(assessment.status)}
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">

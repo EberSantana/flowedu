@@ -70,6 +70,8 @@ export default function ExamGeneratorModal({
   const [selectedModules, setSelectedModules] = useState<number[]>([]);
   const [generatedExam, setGeneratedExam] = useState<GeneratedExam | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [shuffleAlternatives, setShuffleAlternatives] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedAssessmentId, setSavedAssessmentId] = useState<number | null>(null);
 
@@ -94,6 +96,8 @@ export default function ExamGeneratorModal({
       instructions: generatedExam.instructions,
       totalPoints: generatedExam.totalPoints,
       status: 'published',
+      shuffleQuestions,
+      shuffleAlternatives,
       questions: generatedExam.questions.map((q) => ({
         number: q.number,
         type: q.type,
@@ -563,6 +567,45 @@ export default function ExamGeneratorModal({
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>5</span>
                 <span>30</span>
+              </div>
+            </div>
+
+            {/* Embaralhamento Anti-Cola */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold flex items-center gap-2">
+                <Shuffle className="h-4 w-4 text-purple-600" />
+                Embaralhamento (Anti-Cola)
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Cada aluno recebe uma versão diferente da prova, dificultando a cola
+              </p>
+              <div className="space-y-3 bg-purple-50 rounded-lg p-4 border border-purple-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="shuffle-questions"
+                      checked={shuffleQuestions}
+                      onCheckedChange={(checked) => setShuffleQuestions(checked as boolean)}
+                    />
+                    <Label htmlFor="shuffle-questions" className="text-sm font-medium cursor-pointer">
+                      🔀 Embaralhar ordem das questões
+                    </Label>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground ml-6">Cada aluno recebe as questões em ordem diferente</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="shuffle-alternatives"
+                      checked={shuffleAlternatives}
+                      onCheckedChange={(checked) => setShuffleAlternatives(checked as boolean)}
+                    />
+                    <Label htmlFor="shuffle-alternatives" className="text-sm font-medium cursor-pointer">
+                      🎲 Embaralhar alternativas (A, B, C, D)
+                    </Label>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground ml-6">As alternativas de múltipla escolha aparecem em ordem diferente para cada aluno</p>
               </div>
             </div>
 

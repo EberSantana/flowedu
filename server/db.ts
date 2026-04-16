@@ -10874,6 +10874,7 @@ export async function createAssessment(data: {
   availableFrom?: Date;
   availableTo?: Date;
   shuffleQuestions?: boolean;
+  shuffleAlternatives?: boolean;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -10890,6 +10891,7 @@ export async function createAssessment(data: {
     generalInstructions: data.generalInstructions || null,
     status: 'draft',
     shuffleQuestions: data.shuffleQuestions ? 1 : 0,
+    shuffleAlternatives: data.shuffleAlternatives ? 1 : 0,
   };
   
   // Só incluir classId se tiver valor válido > 0, senão omitir para o banco usar NULL default
