@@ -53,6 +53,7 @@ import {
   UserX,
   Settings,
   RotateCcw,
+  Shuffle,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import ActivitiesTab from "@/components/ActivitiesTab";
@@ -203,6 +204,15 @@ export default function AssessmentsManager() {
       toast.error("Erro ao resetar tentativas: " + err.message);
       setResetConfirmStudent(null);
     },
+  });
+
+  // Mutation para atualizar embaralhamento
+  const updateShuffleMutation = trpc.learningPath.updateAssessmentShuffle.useMutation({
+    onSuccess: () => {
+      toast.success("Configuração de embaralhamento atualizada!");
+      utils.learningPath.getTeacherAssessments.invalidate();
+    },
+    onError: (err) => toast.error("Erro: " + err.message),
   });
 
   // Mutation para alterar status da prova
@@ -378,9 +388,9 @@ export default function AssessmentsManager() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{assessment.title}</h3>
-                              {assessment.shuffleQuestions && (
+                              {(assessment.shuffleQuestions || assessment.shuffleAlternatives) && (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700" title="Questões e/ou alternativas embaralhadas para cada aluno">
-                                  🎲 Embaralhada
+                                  🎲 {assessment.shuffleQuestions && assessment.shuffleAlternatives ? 'Tudo embaralhado' : assessment.shuffleQuestions ? 'Questões embaralhadas' : 'Alternativas embaralhadas'}
                                 </span>
                               )}
                               {getStatusBadge(assessment.status)}
@@ -443,6 +453,25 @@ export default function AssessmentsManager() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`border-purple-200 hover:bg-purple-50 ${assessment.shuffleQuestions || assessment.shuffleAlternatives ? 'text-purple-600 bg-purple-50' : 'text-gray-500'}`}
+                              onClick={() => {
+                                const sq = !assessment.shuffleQuestions;
+                                const sa = !assessment.shuffleAlternatives;
+                                updateShuffleMutation.mutate({
+                                  assessmentId: assessment.id,
+                                  shuffleQuestions: sq,
+                                  shuffleAlternatives: sa,
+                                });
+                              }}
+                              disabled={updateShuffleMutation.isPending}
+                              title={assessment.shuffleQuestions || assessment.shuffleAlternatives ? 'Desativar embaralhamento' : 'Ativar embaralhamento de questões e alternativas'}
+                            >
+                              <Shuffle className="h-4 w-4 mr-1" />
+                              {assessment.shuffleQuestions || assessment.shuffleAlternatives ? 'Desembaralhar' : 'Embaralhar'}
+                            </Button>
                             <Button
                               variant="outline"
                               size="sm"

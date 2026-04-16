@@ -3864,6 +3864,27 @@ JSON (descrições MAX 15 chars):
         return { success: true };
       }),
 
+    // Atualizar configuração de embaralhamento de uma prova existente
+    updateAssessmentShuffle: protectedProcedure
+      .input(z.object({
+        assessmentId: z.number(),
+        shuffleQuestions: z.boolean(),
+        shuffleAlternatives: z.boolean(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const check = await dbConn.execute(
+          sql`SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        const rows = (check[0] as any[]) || [];
+        if (rows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
+        await dbConn.execute(
+          sql`UPDATE assessments SET shuffleQuestions = ${input.shuffleQuestions ? 1 : 0}, shuffleAlternatives = ${input.shuffleAlternatives ? 1 : 0} WHERE id = ${input.assessmentId}`
+        );
+        return { success: true };
+      }),
+
     // ==================== TENTATIVAS DE PROVA ONLINE ====================
 
     // Iniciar ou retomar uma tentativa de prova
