@@ -134,7 +134,14 @@ export default function StudentStudyMaterials() {
   }
 
   function canPreview(type: string, url: string): boolean {
-    return (type === "pdf" || type === "video" || (type === "link" && !!url));
+    return (type === "pdf" || type === "video" || type === "image" || type === "document" || type === "presentation" || (type === "link" && !!url));
+  }
+
+  function getPreviewSrc(type: string, url: string): string {
+    if (type === "pdf" || type === "document" || type === "presentation") {
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    }
+    return url;
   }
 
   function handlePreview(material: { type: string; url: string; title: string }) {
@@ -339,14 +346,23 @@ export default function StudentStudyMaterials() {
             <DialogTitle className="flex items-center gap-2"><Eye className="h-5 w-5 text-primary" />{previewTitle}</DialogTitle>
           </DialogHeader>
           <div className="w-full" style={{ minHeight: "500px" }}>
-            {previewType === "pdf" && previewUrl && (
-              <iframe src={previewUrl} className="w-full rounded-lg border" style={{ height: "70vh" }} title={previewTitle} />
+            {(previewType === "pdf" || previewType === "document" || previewType === "presentation") && previewUrl && (
+              <iframe
+                src={getPreviewSrc(previewType, previewUrl)}
+                className="w-full rounded-lg border"
+                style={{ height: "70vh" }}
+                title={previewTitle}
+                allow="fullscreen"
+              />
             )}
             {previewType === "video" && previewUrl && (
               <video src={previewUrl} controls className="w-full rounded-lg" style={{ maxHeight: "70vh" }}>Seu navegador não suporta reprodução de vídeo.</video>
             )}
+            {previewType === "image" && previewUrl && (
+              <img src={previewUrl} alt={previewTitle} className="w-full rounded-lg object-contain" style={{ maxHeight: "70vh" }} />
+            )}
             {previewType === "link" && previewUrl && (
-              <iframe src={previewUrl} className="w-full rounded-lg border" style={{ height: "70vh" }} title={previewTitle} sandbox="allow-scripts allow-same-origin" />
+              <iframe src={previewUrl} className="w-full rounded-lg border" style={{ height: "70vh" }} title={previewTitle} sandbox="allow-scripts allow-same-origin allow-popups" />
             )}
           </div>
           <DialogFooter>
