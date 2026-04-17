@@ -10695,7 +10695,23 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Resposta inválida da IA' });
         }
 
-        const analysis = JSON.parse(content);
+        let analysis: any;
+        try {
+          analysis = JSON.parse(content);
+        } catch (parseErr) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Resposta da IA não é JSON válido' });
+        }
+
+        // Garantir que todos os campos sejam arrays (fallback para resposta incompleta do Groq)
+        const safeAnalysis = {
+          overallAssessment: analysis.overallAssessment || analysis.overall_assessment || 'Análise gerada com dados limitados.',
+          strengths: Array.isArray(analysis.strengths) ? analysis.strengths : [],
+          weaknesses: Array.isArray(analysis.weaknesses) ? analysis.weaknesses : [],
+          patterns: Array.isArray(analysis.patterns) ? analysis.patterns : [],
+          recommendations: Array.isArray(analysis.recommendations) ? analysis.recommendations : [],
+          alerts: Array.isArray(analysis.alerts) ? analysis.alerts : [],
+          confidence: typeof analysis.confidence === 'number' ? analysis.confidence : 0.5,
+        };
 
         // Salvar insight geral no histórico
         try {
@@ -10705,24 +10721,58 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
             subjectId: input.subjectId,
             insightType: 'recommendation',
             title: 'Análise de Aprendizado',
-            description: analysis.overallAssessment,
+            description: safeAnalysis.overallAssessment,
             actionable: true,
-            actionSuggestion: analysis.recommendations.join('\n'),
-            priority: analysis.alerts.length > 0 ? 'high' : 'medium',
-            confidence: analysis.confidence,
+            actionSuggestion: safeAnalysis.recommendations.length > 0 ? safeAnalysis.recommendations.join('\n') : 'Nenhuma recomendação específica gerada.',
+            priority: safeAnalysis.alerts.length > 0 ? 'high' : 'medium',
+            confidence: safeAnalysis.confidence,
             relatedData: JSON.stringify({
-              strengths: analysis.strengths,
-              weaknesses: analysis.weaknesses,
+              strengths: safeAnalysis.strengths,
+              weaknesses: safeAnalysis.weaknesses,
+              patterns: safeAnalysis.patterns,
+              alerts: safeAnalysis.alerts,
               progressPercentage,
               totalTopics,
               completedTopics,
             }),
           });
+
+          // Salvar insights adicionais para pontos fortes e fracos
+          if (safeAnalysis.strengths.length > 0) {
+            await db.saveAIInsight({
+              studentId: input.studentId,
+              userId: ctx.user.id,
+              subjectId: input.subjectId,
+              insightType: 'strength',
+              title: 'Pontos Fortes Identificados',
+              description: safeAnalysis.strengths.join(' | '),
+              actionable: false,
+              priority: 'low',
+              confidence: safeAnalysis.confidence,
+              relatedData: JSON.stringify({ strengths: safeAnalysis.strengths }),
+            });
+          }
+
+          if (safeAnalysis.weaknesses.length > 0) {
+            await db.saveAIInsight({
+              studentId: input.studentId,
+              userId: ctx.user.id,
+              subjectId: input.subjectId,
+              insightType: 'weakness',
+              title: 'Áreas que Precisam de Atenção',
+              description: safeAnalysis.weaknesses.join(' | '),
+              actionable: true,
+              actionSuggestion: safeAnalysis.recommendations.length > 0 ? safeAnalysis.recommendations[0] : undefined,
+              priority: 'medium',
+              confidence: safeAnalysis.confidence,
+              relatedData: JSON.stringify({ weaknesses: safeAnalysis.weaknesses }),
+            });
+          }
         } catch (e) {
           console.error('Erro ao salvar insight:', e);
         }
 
-        return analysis;
+        return safeAnalysis;
       }),
 
     // Obter padrões de aprendizado

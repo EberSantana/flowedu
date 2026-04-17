@@ -30,8 +30,8 @@ import { toast } from "sonner";
 export function LearningAnalytics() {
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
-  
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [lastAnalysis, setLastAnalysis] = useState<any>(null);
 
   // Queries
   const { data: subjects } = trpc.subjects.listWithClass.useQuery();
@@ -60,8 +60,9 @@ export function LearningAnalytics() {
 
   // Mutations
   const analyzeStudentMutation = trpc.analytics.analyzeStudent.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Análise concluída com sucesso!");
+      setLastAnalysis(data);
       refetchInsights();
       setIsAnalyzing(false);
     },
@@ -330,6 +331,100 @@ export function LearningAnalytics() {
               )}
             </CardContent>
           </Card>
+
+          {/* Painel de Análise Direta da IA */}
+          {lastAnalysis && selectedStudent && (
+            <Card className="shadow-lg border-2 border-primary/20">
+              <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-accent/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <Brain className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Resultado da Última Análise</CardTitle>
+                    <CardDescription>Análise gerada pela IA com base nos dados do aluno</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                {/* Avaliação Geral */}
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                    <Info className="h-4 w-4" /> Avaliação Geral
+                  </h4>
+                  <p className="text-blue-800 text-sm leading-relaxed">{lastAnalysis.overallAssessment}</p>
+                  <div className="mt-2 text-xs text-blue-600">Confiança: {Math.round((lastAnalysis.confidence || 0) * 100)}%</div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Pontos Fortes */}
+                  {lastAnalysis.strengths?.length > 0 && (
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <h4 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" /> Pontos Fortes
+                      </h4>
+                      <ul className="space-y-2">
+                        {lastAnalysis.strengths.map((s: string, i: number) => (
+                          <li key={i} className="text-green-800 text-sm flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span> {s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Áreas de Atenção */}
+                  {lastAnalysis.weaknesses?.length > 0 && (
+                    <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                      <h4 className="font-semibold text-orange-900 mb-3 flex items-center gap-2">
+                        <XCircle className="h-4 w-4" /> Áreas de Atenção
+                      </h4>
+                      <ul className="space-y-2">
+                        {lastAnalysis.weaknesses.map((w: string, i: number) => (
+                          <li key={i} className="text-orange-800 text-sm flex items-start gap-2">
+                            <span className="text-orange-500 mt-0.5">•</span> {w}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Recomendações */}
+                {lastAnalysis.recommendations?.length > 0 && (
+                  <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <h4 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" /> Recomendações para o Professor
+                    </h4>
+                    <ul className="space-y-2">
+                      {lastAnalysis.recommendations.map((r: string, i: number) => (
+                        <li key={i} className="text-purple-800 text-sm flex items-start gap-2">
+                          <ArrowRight className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" /> {r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Alertas */}
+                {lastAnalysis.alerts?.length > 0 && (
+                  <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                    <h4 className="font-semibold text-red-900 mb-3 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" /> Alertas
+                    </h4>
+                    <ul className="space-y-2">
+                      {lastAnalysis.alerts.map((a: any, i: number) => (
+                        <li key={i} className="text-red-800 text-sm flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                          <span><strong>{a.type}:</strong> {a.message}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Tabs de Análise - Quando aluno selecionado */}
           {selectedStudent && (
