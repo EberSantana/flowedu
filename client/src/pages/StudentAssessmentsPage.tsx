@@ -34,6 +34,7 @@ export default function StudentAssessmentsPage() {
   const [, navigate] = useLocation();
   const [viewQuestionsId, setViewQuestionsId] = useState<number | null>(null);
   const [viewQuestionsTitle, setViewQuestionsTitle] = useState<string>("");
+  const [viewQuestionsSubmitted, setViewQuestionsSubmitted] = useState<boolean>(false);
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
   const { data: assessments = [], isLoading } = trpc.learningPath.getAllStudentAssessments.useQuery();
@@ -188,6 +189,7 @@ export default function StudentAssessmentsPage() {
                         onClick={() => {
                           setViewQuestionsId(assessment.id);
                           setViewQuestionsTitle(assessment.title);
+                          setViewQuestionsSubmitted(assessment.attemptStatus === 'submitted');
                           setExpandedQuestion(null);
                         }}
                       >
@@ -238,6 +240,13 @@ export default function StudentAssessmentsPage() {
               {viewQuestionsTitle}
             </DialogTitle>
           </DialogHeader>
+
+          {viewQuestionsSubmitted && (
+            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-600" />
+              <span>Você já realizou esta prova. O gabarito e as justificativas das respostas não estão disponíveis.</span>
+            </div>
+          )}
 
           {loadingQuestions ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -338,7 +347,7 @@ export default function StudentAssessmentsPage() {
                               ))}
                             </div>
                           )}
-                          {parsedOptions.length === 0 && q.correctAnswer && (
+                          {parsedOptions.length === 0 && (
                             <div className="text-sm text-muted-foreground italic">
                               Questão dissertativa / resposta aberta
                             </div>

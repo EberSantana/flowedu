@@ -7998,3 +7998,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Feature: Badge "Aguardando Ativ. Sala" e Média de Aprovação 6.0
 - [x] Adicionar badge amarelo "Aguardando Ativ. Sala" no Bloco 1 quando activityAvg=null (TeacherGradePanel e StudentGradeBook) - CONCLUÍDO e deployado
 - [x] Corrigir média de aprovação de 7.0 para 6.0 em todo o sistema (TeacherGradePanel, StudentGradeBook, backend) - CONCLUÍDO e deployado
+
+## Bug/Feature: Bloquear Gabarito na Tela "Ver Questões" para Provas Realizadas
+- [x] Remover/ocultar resposta correta e justificativa na tela Ver Questões quando prova já foi realizada pelo aluno - CONCLUÍDO
+- [x] Backend: procedure getStudentAssessmentQuestions não retorna correctAnswer/answerExplanation quando aluno já submeteu a prova - CONCLUÍDO
+- [x] Frontend: StudentAssessmentsPage - exibe aviso âmbar "Gabarito não disponível" quando prova já foi realizada - CONCLUÍDO

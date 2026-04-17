@@ -3704,6 +3704,17 @@ JSON (descrições MAX 15 chars):
         const shouldShuffleQuestions = !!assessmentConfig.shuffleQuestions;
         const shouldShuffleAlternatives = !!assessmentConfig.shuffleAlternatives;
 
+        // Verificar se o aluno já realizou a prova (submitted)
+        const attemptResult = await dbConn.execute(
+          sql`SELECT id FROM assessment_attempts
+              WHERE assessmentId = ${input.assessmentId}
+                AND studentId = ${studentId}
+                AND status = 'submitted'
+              LIMIT 1`
+        ) as any[];
+        const attemptRows = (attemptResult[0] as any[]) || [];
+        const alreadySubmitted = attemptRows.length > 0;
+
         // Buscar questões
         const result = await dbConn.execute(
           sql`SELECT id, questionNumber, questionType, statement, context,
@@ -3763,6 +3774,14 @@ JSON (descrições MAX 15 chars):
               }
             }
             return newQ;
+          });
+        }
+
+        // Se o aluno já realizou a prova, remover gabarito e justificativas
+        if (alreadySubmitted) {
+          questions = questions.map((q: any) => {
+            const { correctAnswer, answerExplanation, ...rest } = q;
+            return rest;
           });
         }
 
