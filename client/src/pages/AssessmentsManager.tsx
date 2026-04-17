@@ -54,6 +54,8 @@ import {
   Settings,
   RotateCcw,
   Shuffle,
+  KeyRound,
+  LockKeyhole,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import ActivitiesTab from "@/components/ActivitiesTab";
@@ -228,6 +230,15 @@ export default function AssessmentsManager() {
   const updateShuffleMutation = trpc.learningPath.updateAssessmentShuffle.useMutation({
     onSuccess: () => {
       toast.success("Configuração de embaralhamento atualizada!");
+      utils.learningPath.getTeacherAssessments.invalidate();
+    },
+    onError: (err) => toast.error("Erro: " + err.message),
+  });
+
+  // Mutation para liberar/bloquear gabarito
+  const releaseAnswerKeyMutation = trpc.learningPath.releaseAssessmentAnswerKey.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.released ? "Gabarito liberado! Os alunos que realizaram a prova já podem ver as respostas." : "Gabarito bloqueado.");
       utils.learningPath.getTeacherAssessments.invalidate();
     },
     onError: (err) => toast.error("Erro: " + err.message),
@@ -512,6 +523,23 @@ export default function AssessmentsManager() {
                             >
                               <FileText className="h-4 w-4 mr-1" />
                               Ver Questões
+                            </Button>
+                            {/* Botão de liberar/bloquear gabarito */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={assessment.releaseAnswerKey
+                                ? "text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
+                                : "text-gray-500 border-gray-200 hover:bg-gray-50"
+                              }
+                              onClick={() => releaseAnswerKeyMutation.mutate({ assessmentId: assessment.id, release: !assessment.releaseAnswerKey })}
+                              disabled={releaseAnswerKeyMutation.isPending}
+                              title={assessment.releaseAnswerKey ? "Gabarito liberado — clique para bloquear" : "Gabarito bloqueado — clique para liberar"}
+                            >
+                              {assessment.releaseAnswerKey
+                                ? <><KeyRound className="h-4 w-4 mr-1" />Gabarito Liberado</>
+                                : <><LockKeyhole className="h-4 w-4 mr-1" />Liberar Gabarito</>
+                              }
                             </Button>
                             {assessment.status !== "published" ? (
                               <Button

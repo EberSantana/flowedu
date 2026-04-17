@@ -8003,3 +8003,13 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Remover/ocultar resposta correta e justificativa na tela Ver Questões quando prova já foi realizada pelo aluno - CONCLUÍDO
 - [x] Backend: procedure getStudentAssessmentQuestions não retorna correctAnswer/answerExplanation quando aluno já submeteu a prova - CONCLUÍDO
 - [x] Frontend: StudentAssessmentsPage - exibe aviso âmbar "Gabarito não disponível" quando prova já foi realizada - CONCLUÍDO
+
+## Feature: Gabarito Liberado pelo Professor + Nota no Modal Ver Questões - CONCLUÍDO
+- [x] Banco: coluna releaseAnswerKey (boolean, default false) adicionada na tabela assessments na VPS
+- [x] Backend: procedure releaseAssessmentAnswerKey para professor liberar/bloquear gabarito
+- [x] Backend: getTeacherAssessments retorna campo releaseAnswerKey por prova
+- [x] Backend: getStudentAssessmentQuestions retorna gabarito quando answerKeyReleased=true E aluno já submeteu
+- [x] Backend: getStudentAssessmentQuestions retorna nota do aluno (score, totalPoints, percentage, passed) quando já submeteu
+- [x] Frontend professor: AssessmentsManager - botão "Liberar Gabarito" / "Gabarito Liberado" por prova
+- [x] Frontend aluno: modal Ver Questões mostra nota obtida (score / totalPoints, Aprovado/Reprovado) quando prova realizada
+- [x] Frontend aluno: modal Ver Questões mostra gabarito (resposta correta destacada em verde + justificativa) quando professor liberou

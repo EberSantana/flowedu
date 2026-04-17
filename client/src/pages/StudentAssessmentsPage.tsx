@@ -24,6 +24,8 @@ import {
   Play,
   Trophy,
   ClipboardCheck,
+  KeyRound,
+  LockKeyhole,
 } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
 import { useLocation } from "wouter";
@@ -241,18 +243,60 @@ export default function StudentAssessmentsPage() {
             </DialogTitle>
           </DialogHeader>
 
-          {viewQuestionsSubmitted && (
-            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-600" />
-              <span>Você já realizou esta prova. O gabarito e as justificativas das respostas não estão disponíveis.</span>
-            </div>
-          )}
+          {/* Nota obtida pelo aluno */}
+          {(() => {
+            const data = assessmentQuestions as any;
+            const attempt = data?.attempt;
+            if (!attempt) return null;
+            const passed = !!attempt.passed;
+            return (
+              <div className={`flex items-center gap-3 rounded-lg p-3 border ${
+                passed
+                  ? 'bg-green-50 border-green-200 text-green-800'
+                  : 'bg-red-50 border-red-200 text-red-800'
+              }`}>
+                {passed
+                  ? <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  : <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                }
+                <div className="flex-1">
+                  <p className="font-semibold text-sm">
+                    Sua nota: {attempt.score} / {attempt.totalPoints} pontos
+                    {attempt.percentage != null && (
+                      <span className="ml-2 text-xs font-normal opacity-75">({attempt.percentage}%)</span>
+                    )}
+                  </p>
+                  <p className="text-xs mt-0.5">{passed ? 'Aprovado' : 'Reprovado'}</p>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Aviso de gabarito */}
+          {viewQuestionsSubmitted && (() => {
+            const data = assessmentQuestions as any;
+            const released = data?.answerKeyReleased;
+            if (released) {
+              return (
+                <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-800">
+                  <KeyRound className="h-4 w-4 mt-0.5 flex-shrink-0 text-emerald-600" />
+                  <span>O professor liberou o gabarito. As respostas corretas e justificativas estão visíveis abaixo.</span>
+                </div>
+              );
+            }
+            return (
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+                <LockKeyhole className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-600" />
+                <span>Você já realizou esta prova. O gabarito e as justificativas das respostas não estão disponíveis.</span>
+              </div>
+            );
+          })()}
 
           {loadingQuestions ? (
             <div className="text-center py-8 text-muted-foreground">
               Carregando questões...
             </div>
-          ) : !assessmentQuestions || (assessmentQuestions as any[]).length === 0 ? (
+          ) : !assessmentQuestions || !(assessmentQuestions as any)?.questions || (assessmentQuestions as any).questions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-30" />
               <p>Nenhuma questão disponível para esta prova.</p>
@@ -260,9 +304,9 @@ export default function StudentAssessmentsPage() {
           ) : (
             <div className="space-y-2 mt-2">
               <p className="text-sm text-muted-foreground">
-                {(assessmentQuestions as any[]).length} questão(ões)
+                {(assessmentQuestions as any).questions.length} questão(ões)
               </p>
-              {(assessmentQuestions as any[]).map((q: any, idx: number) => {
+              {(assessmentQuestions as any).questions.map((q: any, idx: number) => {
                 const isExpanded = expandedQuestion === idx;
                 const statement = q.statement || q.questionText || "";
                 const options: { label: string; text: string }[] = [];
@@ -334,22 +378,44 @@ export default function StudentAssessmentsPage() {
                           )}
                           {parsedOptions.length > 0 && (
                             <div className="space-y-1.5">
-                              {parsedOptions.map((opt) => (
-                                <div
-                                  key={opt.label}
-                                  className="flex items-start gap-2 p-2 rounded text-sm bg-muted/50 text-foreground"
-                                >
-                                  <span className="font-bold flex-shrink-0 text-muted-foreground">
-                                    {opt.label})
-                                  </span>
-                                  <span>{opt.text}</span>
-                                </div>
-                              ))}
+                              {parsedOptions.map((opt) => {
+                                const isCorrect = q.correctAnswer && q.correctAnswer.trim().toUpperCase().charAt(0) === opt.label;
+                                return (
+                                  <div
+                                    key={opt.label}
+                                    className={`flex items-start gap-2 p-2 rounded text-sm ${
+                                      isCorrect
+                                        ? 'bg-emerald-50 border border-emerald-300 text-emerald-900'
+                                        : 'bg-muted/50 text-foreground'
+                                    }`}
+                                  >
+                                    <span className={`font-bold flex-shrink-0 ${
+                                      isCorrect ? 'text-emerald-700' : 'text-muted-foreground'
+                                    }`}>
+                                      {opt.label})
+                                    </span>
+                                    <span>{opt.text}</span>
+                                    {isCorrect && (
+                                      <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0 ml-auto mt-0.5" />
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                           {parsedOptions.length === 0 && (
                             <div className="text-sm text-muted-foreground italic">
                               Questão dissertativa / resposta aberta
+                            </div>
+                          )}
+                          {/* Justificativa da resposta - exibida apenas quando gabarito liberado */}
+                          {q.answerExplanation && (
+                            <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-900">
+                              <p className="font-semibold mb-1 flex items-center gap-1.5">
+                                <KeyRound className="h-3.5 w-3.5" />
+                                Justificativa:
+                              </p>
+                              <p>{q.answerExplanation}</p>
                             </div>
                           )}
                         </div>

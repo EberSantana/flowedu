@@ -3655,6 +3655,7 @@ JSON (descrições MAX 15 chars):
           sql`SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
                      a.totalPoints, a.passingScore, a.duration, a.generalInstructions,
                      a.applicationDate, a.availableFrom, a.availableTo, a.status,
+                     a.releaseAnswerKey,
                      a.createdAt, u.name as teacherName, s.name as subjectName,
                      aa.status as attemptStatus, aa.score as attemptScore, aa.percentage as attemptPercentage,
                      aa.passed as attemptPassed, aa.id as attemptId,
@@ -3688,7 +3689,7 @@ JSON (descrições MAX 15 chars):
 
         // Verificar que a prova está publicada e o aluno tem acesso (via subjectEnrollments)
         const checkResult = await dbConn.execute(
-          sql`SELECT a.id, a.shuffleQuestions, a.shuffleAlternatives FROM assessments a
+          sql`SELECT a.id, a.shuffleQuestions, a.shuffleAlternatives, a.releaseAnswerKey, a.totalPoints FROM assessments a
               JOIN subjectEnrollments se ON se.subjectId = a.subjectId
               WHERE a.id = ${input.assessmentId}
                 AND a.status = 'published'
@@ -3703,17 +3704,21 @@ JSON (descrições MAX 15 chars):
         const assessmentConfig = checkRows[0];
         const shouldShuffleQuestions = !!assessmentConfig.shuffleQuestions;
         const shouldShuffleAlternatives = !!assessmentConfig.shuffleAlternatives;
+        const answerKeyReleased = !!assessmentConfig.releaseAnswerKey;
+        const assessmentTotalPoints = assessmentConfig.totalPoints ?? 100;
 
-        // Verificar se o aluno já realizou a prova (submitted)
+        // Verificar se o aluno já realizou a prova (submitted) e buscar nota
         const attemptResult = await dbConn.execute(
-          sql`SELECT id FROM assessment_attempts
+          sql`SELECT id, score, percentage, passed FROM assessment_attempts
               WHERE assessmentId = ${input.assessmentId}
                 AND studentId = ${studentId}
                 AND status = 'submitted'
+              ORDER BY id DESC
               LIMIT 1`
         ) as any[];
         const attemptRows = (attemptResult[0] as any[]) || [];
         const alreadySubmitted = attemptRows.length > 0;
+        const attemptData = alreadySubmitted ? attemptRows[0] : null;
 
         // Buscar questões
         const result = await dbConn.execute(
@@ -3777,15 +3782,27 @@ JSON (descrições MAX 15 chars):
           });
         }
 
-        // Se o aluno já realizou a prova, remover gabarito e justificativas
-        if (alreadySubmitted) {
+        // Se o aluno já realizou a prova:
+        // - remover gabarito/justificativas EXCETO se o professor liberou o gabarito
+        if (alreadySubmitted && !answerKeyReleased) {
           questions = questions.map((q: any) => {
             const { correctAnswer, answerExplanation, ...rest } = q;
             return rest;
           });
         }
 
-        return questions as any[];
+        // Retornar junto com metadados da tentativa e status do gabarito
+        return {
+          questions: questions as any[],
+          attempt: attemptData ? {
+            score: attemptData.score,
+            percentage: attemptData.percentage,
+            passed: !!attemptData.passed,
+            totalPoints: assessmentTotalPoints,
+          } : null,
+          answerKeyReleased,
+          alreadySubmitted,
+        };
       }),
 
     // Listar todas as provas do professor (para gestão)
@@ -3801,7 +3818,7 @@ JSON (descrições MAX 15 chars):
           SELECT a.id, a.title, a.description, a.assessmentType, a.totalQuestions,
                  a.totalPoints, a.passingScore, a.duration, a.status,
                  a.applicationDate, a.createdAt, a.maxAttempts,
-                 a.shuffleQuestions, a.shuffleAlternatives,
+                 a.shuffleQuestions, a.shuffleAlternatives, a.releaseAnswerKey,
                  s.name as subjectName, s.color as subjectColor,
                  c.name as className
           FROM assessments a
@@ -4429,6 +4446,22 @@ JSON (descrições MAX 15 chars):
           sql`DELETE FROM assessment_permissions WHERE assessmentId = ${input.assessmentId} AND studentId = ${input.studentId}`
         );
         return { success: true };
+      }),
+
+    // Liberar ou bloquear gabarito de uma prova para os alunos que já realizaram
+    releaseAssessmentAnswerKey: protectedProcedure
+      .input(z.object({ assessmentId: z.number(), release: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const check = await dbConn.execute(
+          sql`SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        if (((check[0] as any[]) || []).length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
+        await dbConn.execute(
+          sql`UPDATE assessments SET releaseAnswerKey = ${input.release ? 1 : 0} WHERE id = ${input.assessmentId}`
+        );
+        return { success: true, released: input.release };
       }),
   }),
   // Boletim de Atividades da Trilha por Turma

@@ -2159,6 +2159,8 @@ export const assessments = mysqlTable("assessments", {
   // Embaralhamento de questões por aluno (anti-cola)
   shuffleQuestions: boolean("shuffleQuestions").default(false).notNull(),
   shuffleAlternatives: boolean("shuffleAlternatives").default(false).notNull(), // Embaralhar alternativas A,B,C,D
+  // Gabarito
+  releaseAnswerKey: boolean("releaseAnswerKey").default(false).notNull(), // Professor libera gabarito para alunos que já realizaram
   // Statuss
   status: mysqlEnum("status", ["draft", "published", "applied", "corrected", "archived"]).default("draft").notNull(),
   
