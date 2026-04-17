@@ -7980,3 +7980,12 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Feature: Filtro de Disciplina no Boletim do Aluno
 - [x] Portal do Aluno (StudentGradeBook): adicionar seletor de disciplina quando aluno tem mais de uma disciplina - CORRIGIDO: seletor adicionado (aparece apenas quando há mais de uma disciplina)
 - [ ] Portal do Professor (TeacherGradePanel): boletim individual do aluno deve mostrar filtro por disciplina (pendente)
+
+## Feature: Controle de Acesso às Provas com Permissão do Professor
+- [x] Criar tabela assessment_permissions no banco (SQL direto na VPS)
+- [x] Backend: procedures grantAssessmentPermission e revokeAssessmentPermission
+- [x] Backend: getAllStudentAssessments retorna isLocked e hasPermission por aluno
+- [x] Backend: startAssessmentAttempt verifica permissão quando prova está fora do prazo
+- [x] Frontend professor: modal "Alunos da Prova" mostra botão "Liberar Acesso" para pendentes e badge "Acesso Liberado" + botão Revogar
+- [x] Frontend aluno: prova fora do prazo mostra badge "Prazo Encerrado" e texto "Solicite permissão ao professor"
+- [x] Deploy na VPS

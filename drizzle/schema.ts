@@ -3068,3 +3068,20 @@ export const glossaryComments = mysqlTable("glossary_comments", {
 });
 export type GlossaryComment = typeof glossaryComments.$inferSelect;
 export type InsertGlossaryComment = typeof glossaryComments.$inferInsert;
+
+// ─── Permissões de Acesso a Provas ───────────────────────────────────────────
+// Quando uma prova está fora do prazo (availableTo expirado), o professor pode
+// liberar acesso individual para alunos que não fizeram no dia.
+export const assessmentPermissions = mysqlTable("assessment_permissions", {
+  id: int("id").autoincrement().primaryKey(),
+  assessmentId: int("assessmentId").notNull(), // FK para assessments
+  studentId: int("studentId").notNull(),       // FK para students
+  grantedBy: int("grantedBy").notNull(),       // FK para users (professor)
+  grantedAt: timestamp("grantedAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"),           // null = sem expiração
+  note: varchar("note", { length: 500 }),      // Observação do professor
+  used: boolean("used").default(false).notNull(), // true quando o aluno realizou a prova
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type AssessmentPermission = typeof assessmentPermissions.$inferSelect;
+export type InsertAssessmentPermission = typeof assessmentPermissions.$inferInsert;

@@ -199,6 +199,14 @@ export default function StudentAssessmentsPage() {
                           <Trophy className="h-3 w-3" />
                           Realizada
                         </Badge>
+                      ) : (assessment as any).isLocked ? (
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge className="bg-red-100 text-red-700 border-red-200 gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            Prazo Encerrado
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">Solicite permissão ao professor</span>
+                        </div>
                       ) : (
                         <Button
                           size="sm"

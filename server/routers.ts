@@ -3657,16 +3657,25 @@ JSON (descrições MAX 15 chars):
                      a.applicationDate, a.availableFrom, a.availableTo, a.status,
                      a.createdAt, u.name as teacherName, s.name as subjectName,
                      aa.status as attemptStatus, aa.score as attemptScore, aa.percentage as attemptPercentage,
-                     aa.passed as attemptPassed, aa.id as attemptId
+                     aa.passed as attemptPassed, aa.id as attemptId,
+                     CASE WHEN ap.studentId IS NOT NULL THEN 1 ELSE 0 END as hasPermission
               FROM assessments a
               JOIN users u ON a.teacherId = u.id
               LEFT JOIN subjects s ON a.subjectId = s.id
               LEFT JOIN assessment_attempts aa ON aa.assessmentId = a.id AND aa.studentId = ${studentId}
+              LEFT JOIN assessment_permissions ap ON ap.assessmentId = a.id AND ap.studentId = ${studentId}
               WHERE a.subjectId IN (${sql.join(subjectIds.map(id => sql`${id}`), sql`, `)})
                 AND a.status = 'published'
               ORDER BY a.createdAt DESC`
         ) as any[];
-        return (result[0] as unknown) as any[];
+        // Adicionar campo isLocked: prova está bloqueada se availableTo expirou E não tem permissão
+        const now = new Date();
+        const rows = ((result[0] as unknown) as any[]) || [];
+        return rows.map((r: any) => ({
+          ...r,
+          hasPermission: !!r.hasPermission,
+          isLocked: !!(r.availableTo && new Date(r.availableTo) < now && !r.hasPermission),
+        }));
       }),
 
     // Aluno busca questões de uma prova publicada
@@ -3921,7 +3930,7 @@ JSON (descrições MAX 15 chars):
 
         // Verificar que a prova está publicada e o aluno tem acesso
         const checkResult = await dbConn.execute(
-          sql`SELECT a.id, a.title, a.totalQuestions, a.totalPoints, a.passingScore, a.duration, a.maxAttempts
+          sql`SELECT a.id, a.title, a.totalQuestions, a.totalPoints, a.passingScore, a.duration, a.maxAttempts, a.availableTo
               FROM assessments a
               JOIN subjectEnrollments se ON se.subjectId = a.subjectId
               WHERE a.id = ${input.assessmentId}
@@ -3933,6 +3942,25 @@ JSON (descrições MAX 15 chars):
         const checkRows = (checkResult[0] as any[]) || [];
         if (checkRows.length === 0) {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
+        }
+
+        // Verificar se a prova está dentro do prazo ou se o aluno tem permissão especial
+        const assessmentData = checkRows[0];
+        const availableTo = assessmentData.availableTo ? new Date(assessmentData.availableTo) : null;
+        const now = new Date();
+        if (availableTo && now > availableTo) {
+          // Prova fora do prazo - verificar se o aluno tem permissão especial
+          const permResult = await dbConn.execute(
+            sql`SELECT id FROM assessment_permissions
+                WHERE assessmentId = ${input.assessmentId}
+                  AND studentId = ${studentId}
+                  AND isActive = 1
+                LIMIT 1`
+          ) as any[];
+          const permRows = (permResult[0] as any[]) || [];
+          if (permRows.length === 0) {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'O prazo desta prova encerrou. Solicite permissão ao professor para realizar a prova.' });
+          }
         }
         const assessmentInfo = checkRows[0];
         const maxAttempts = (assessmentInfo.maxAttempts as number) ?? 1;
@@ -4310,7 +4338,78 @@ JSON (descrições MAX 15 chars):
         const doneIds = new Set(((doneResult[0] as any[]) || []).map((r: any) => r.studentId));
         const done = allStudents.filter(s => doneIds.has(s.studentId));
         const pending = allStudents.filter(s => !doneIds.has(s.studentId));
-        return { pending, done, total: allStudents.length };
+        // Buscar permissões já concedidas
+        const permResult = await dbConn.execute(
+          sql`SELECT studentId, expiresAt, note, used FROM assessment_permissions WHERE assessmentId = ${input.assessmentId}`
+        ) as any[];
+        const permMap = new Map(((permResult[0] as any[]) || []).map((r: any) => [r.studentId, r]));
+        const pendingWithPerm = pending.map(s => ({
+          ...s,
+          hasPermission: permMap.has(s.studentId),
+          permissionNote: permMap.get(s.studentId)?.note || null,
+          permissionUsed: permMap.get(s.studentId)?.used || false,
+        }));
+        return { pending: pendingWithPerm, done, total: allStudents.length };
+      }),
+
+    // Conceder permissão de acesso a uma prova para um aluno específico
+    grantAssessmentPermission: protectedProcedure
+      .input(z.object({
+        assessmentId: z.number(),
+        studentId: z.number(),
+        note: z.string().optional(),
+        expiresAt: z.string().optional(), // ISO date string
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        // Verificar que a prova pertence ao professor
+        const check = await dbConn.execute(
+          sql`SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        if (((check[0] as any[]) || []).length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
+        // Inserir ou atualizar permissão
+        const expiresAt = input.expiresAt ? new Date(input.expiresAt) : null;
+        await dbConn.execute(
+          sql`INSERT INTO assessment_permissions (assessmentId, studentId, grantedBy, expiresAt, note, used)
+              VALUES (${input.assessmentId}, ${input.studentId}, ${ctx.user.id}, ${expiresAt}, ${input.note || null}, false)
+              ON DUPLICATE KEY UPDATE expiresAt = ${expiresAt}, note = ${input.note || null}, used = false, grantedAt = NOW()`
+        );
+        // Notificar o aluno
+        try {
+          const studentResult = await dbConn.execute(
+            sql`SELECT s.userId, a.title FROM students s JOIN assessments a ON a.id = ${input.assessmentId} WHERE s.id = ${input.studentId} LIMIT 1`
+          ) as any[];
+          const studentRow = ((studentResult[0] as any[]) || [])[0];
+          if (studentRow?.userId) {
+            await dbConn.execute(sql`
+              INSERT INTO notifications (userId, type, title, message, link, relatedId, relatedType, isRead, createdAt)
+              VALUES (
+                ${studentRow.userId}, 'assessment_permission',
+                ${'✅ Permissão de Prova Concedida'},
+                ${`O professor liberou seu acesso à prova "${studentRow.title}". Você já pode realizá-la.`},
+                ${'/student/assessments'}, ${input.assessmentId}, 'assessment', 0, NOW()
+              )
+            `);
+          }
+        } catch (e) { /* silencioso */ }
+        return { success: true };
+      }),
+
+    // Revogar permissão de acesso a uma prova
+    revokeAssessmentPermission: protectedProcedure
+      .input(z.object({ assessmentId: z.number(), studentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const check = await dbConn.execute(
+          sql`SELECT id FROM assessments WHERE id = ${input.assessmentId} AND teacherId = ${ctx.user.id} LIMIT 1`
+        ) as any[];
+        if (((check[0] as any[]) || []).length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada' });
+        await dbConn.execute(
+          sql`DELETE FROM assessment_permissions WHERE assessmentId = ${input.assessmentId} AND studentId = ${input.studentId}`
+        );
+        return { success: true };
       }),
   }),
   // Boletim de Atividades da Trilha por Turma

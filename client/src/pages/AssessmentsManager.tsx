@@ -206,6 +206,24 @@ export default function AssessmentsManager() {
     },
   });
 
+  // Mutation para conceder permissão de acesso à prova
+  const grantPermissionMutation = trpc.learningPath.grantAssessmentPermission.useMutation({
+    onSuccess: () => {
+      toast.success("Acesso liberado! O aluno foi notificado.");
+      utils.learningPath.getPendingStudentsForAssessment.invalidate({ assessmentId: viewAssessmentStudentsId! });
+    },
+    onError: (err) => toast.error("Erro ao liberar acesso: " + err.message),
+  });
+
+  // Mutation para revogar permissão de acesso à prova
+  const revokePermissionMutation = trpc.learningPath.revokeAssessmentPermission.useMutation({
+    onSuccess: () => {
+      toast.success("Permissão revogada.");
+      utils.learningPath.getPendingStudentsForAssessment.invalidate({ assessmentId: viewAssessmentStudentsId! });
+    },
+    onError: (err) => toast.error("Erro ao revogar permissão: " + err.message),
+  });
+
   // Mutation para atualizar embaralhamento
   const updateShuffleMutation = trpc.learningPath.updateAssessmentShuffle.useMutation({
     onSuccess: () => {
@@ -952,43 +970,68 @@ export default function AssessmentsManager() {
                     <p className="text-xs text-blue-700 mt-1">Total</p>
                   </div>
                 </div>
-                {/* Listas lado a lado */}
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Pendentes */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-orange-700 flex items-center gap-1.5 mb-2">
-                      <UserX className="h-4 w-4" /> Faltam fazer ({assessmentStudentsData.pending.length})
-                    </h4>
-                    <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
-                      {assessmentStudentsData.pending.length === 0 ? (
-                        <p className="text-xs text-gray-400 py-2 text-center">Todos já fizeram!</p>
-                      ) : (
-                        assessmentStudentsData.pending.map((s: any) => (
-                          <div key={s.studentId} className="flex items-center gap-2 p-2 bg-orange-50 rounded text-sm">
+                {/* Lista de pendentes com botões de permissão */}
+                <div>
+                  <h4 className="text-sm font-semibold text-orange-700 flex items-center gap-1.5 mb-2">
+                    <UserX className="h-4 w-4" /> Faltam fazer ({assessmentStudentsData.pending.length})
+                  </h4>
+                  {assessmentStudentsData.pending.length === 0 ? (
+                    <p className="text-xs text-gray-400 py-3 text-center bg-orange-50 rounded">Todos já fizeram! 🎉</p>
+                  ) : (
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                      {assessmentStudentsData.pending.map((s: any) => (
+                        <div key={s.studentId} className={`flex items-center gap-2 p-2.5 rounded-lg border text-sm ${
+                          s.hasPermission ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-100'
+                        }`}>
+                          {s.hasPermission ? (
+                            <UserCheck className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
+                          ) : (
                             <UserX className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />
-                            <span className="truncate text-gray-700">{s.name}</span>
-                          </div>
-                        ))
-                      )}
+                          )}
+                          <span className="flex-1 truncate text-gray-700">{s.name}</span>
+                          {s.hasPermission ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">🔓 Acesso Liberado</span>
+                              <button
+                                onClick={() => revokePermissionMutation.mutate({ assessmentId: viewAssessmentStudentsId!, studentId: s.studentId })}
+                                disabled={revokePermissionMutation.isPending}
+                                className="text-xs text-red-500 hover:text-red-700 underline ml-1"
+                              >
+                                Revogar
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => grantPermissionMutation.mutate({ assessmentId: viewAssessmentStudentsId!, studentId: s.studentId })}
+                              disabled={grantPermissionMutation.isPending}
+                              className="flex items-center gap-1 text-xs bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded-md font-medium disabled:opacity-50 transition-colors"
+                            >
+                              🔓 Liberar Acesso
+                            </button>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  {/* Concluídos */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-green-700 flex items-center gap-1.5 mb-2">
-                      <UserCheck className="h-4 w-4" /> Concluíram ({assessmentStudentsData.done.length})
-                    </h4>
-                    <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
-                      {assessmentStudentsData.done.length === 0 ? (
-                        <p className="text-xs text-gray-400 py-2 text-center">Nenhum ainda.</p>
-                      ) : (
-                        assessmentStudentsData.done.map((s: any) => (
-                          <div key={s.studentId} className="flex items-center gap-2 p-2 bg-green-50 rounded text-sm">
-                            <UserCheck className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
-                            <span className="truncate text-gray-700">{s.name}</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                  )}
+                </div>
+
+                {/* Lista de concluídos */}
+                <div>
+                  <h4 className="text-sm font-semibold text-green-700 flex items-center gap-1.5 mb-2">
+                    <UserCheck className="h-4 w-4" /> Concluíram ({assessmentStudentsData.done.length})
+                  </h4>
+                  <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
+                    {assessmentStudentsData.done.length === 0 ? (
+                      <p className="text-xs text-gray-400 py-2 text-center">Nenhum ainda.</p>
+                    ) : (
+                      assessmentStudentsData.done.map((s: any) => (
+                        <div key={s.studentId} className="flex items-center gap-2 p-2 bg-green-50 border border-green-100 rounded-lg text-sm">
+                          <UserCheck className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                          <span className="truncate text-gray-700">{s.name}</span>
+                          <span className="ml-auto text-xs text-green-600 font-medium">✅ Concluído</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
