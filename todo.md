@@ -7962,3 +7962,9 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug: Análise de Aprendizado com IA
 - [x] Análise de Aprendizado com IA não mostra análise do aluno - CORRIGIDO: campo content na tabela ai_insights alterado para aceitar NULL + adicionado content em todas as chamadas saveAIInsight
+
+## Bug: Toggles de Notificações
+- [x] Toggles de notificações (Lembretes de Aula, Eventos, Tarefas, Resumo Diário) estão cinza e não mudam ao clicar - CORRIGIDO: removida restrição !isSubscribed do disabled dos Switches e da função togglePreference
+
+## Bug: Calendário Anual de Acessos
+- [x] Calendário Anual de Acessos tem registros mas não aparece (getYearlyCalendar não funciona na VPS) - INVESTIGADO: backend e banco estão corretos (1126 registros em 2026), o calendário funciona após aguardar o carregamento completo da página

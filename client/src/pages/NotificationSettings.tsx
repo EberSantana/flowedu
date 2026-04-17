@@ -205,11 +205,6 @@ export default function NotificationSettings() {
   };
 
   const togglePreference = async (key: string, value: boolean) => {
-    if (!isSubscribed) {
-      toast.error("Ative as notificações primeiro para configurar preferências");
-      return;
-    }
-
     try {
       // Enviar apenas os campos aceitos pelo schema, sem campos extras (id, userId, etc.)
       const cleanPrefs = {
@@ -584,7 +579,7 @@ export default function NotificationSettings() {
                         <Switch
                           checked={isEnabled}
                           onCheckedChange={(checked) => togglePreference(type.id, checked)}
-                          disabled={!isSubscribed || savePrefsMutation.isPending}
+                          disabled={savePrefsMutation.isPending}
                         />
                       </div>
                     </div>
