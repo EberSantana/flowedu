@@ -30,27 +30,27 @@ const BIMESTRES = [
 
 function gradeColor(grade: number | null): string {
   if (grade === null) return "text-muted-foreground";
-  if (grade >= 7) return "text-green-700";
+  if (grade >= 6) return "text-green-700";
   if (grade >= 5) return "text-yellow-700";
   return "text-red-700";
 }
 
 function gradeBg(grade: number): string {
-  if (grade >= 7) return "bg-green-50 border-green-200";
+  if (grade >= 6) return "bg-green-50 border-green-200";
   if (grade >= 5) return "bg-yellow-50 border-yellow-200";
   return "bg-red-50 border-red-200";
 }
 
 function gradeLabel(grade: number | null): string {
   if (grade === null) return "Sem notas";
-  if (grade >= 7) return "Aprovado";
+  if (grade >= 6) return "Aprovado";
   if (grade >= 5) return "Recuperação";
   return "Reprovado";
 }
 
 function gradeLabelColor(grade: number | null): string {
   if (grade === null) return "text-muted-foreground border-muted";
-  if (grade >= 7) return "bg-green-50 text-green-700 border-green-200";
+  if (grade >= 6) return "bg-green-50 text-green-700 border-green-200";
   if (grade >= 5) return "bg-yellow-50 text-yellow-700 border-yellow-200";
   return "bg-red-50 text-red-700 border-red-200";
 }
@@ -331,9 +331,17 @@ export default function StudentGradeBook() {
             <Card className="border-l-4 border-l-indigo-500">
               <CardContent className="pt-3 pb-3">
                 <p className="text-xs text-muted-foreground">Bloco 1</p>
-                <p className={`text-xl font-bold ${gradeColor(bimestreStats.bloco1)}`}>
-                  {fmtGrade(bimestreStats.bloco1)}
-                </p>
+                {bimestreStats.bloco1 !== null ? (
+                  <p className={`text-xl font-bold ${gradeColor(bimestreStats.bloco1)}`}>
+                    {fmtGrade(bimestreStats.bloco1)}
+                  </p>
+                ) : bimestreStats.exerciseAvg !== null && bimestreStats.activityAvg === null ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded px-1.5 py-0.5 mt-1">
+                    ⏳ Ag. Ativ. Sala
+                  </span>
+                ) : (
+                  <p className="text-xl font-bold text-muted-foreground">—</p>
+                )}
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-purple-500">

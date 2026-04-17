@@ -36,27 +36,27 @@ const BIMESTRES = [
 
 function gradeColor(grade: number | null): string {
   if (grade === null) return "text-muted-foreground";
-  if (grade >= 7) return "text-green-700";
+  if (grade >= 6) return "text-green-700";
   if (grade >= 5) return "text-yellow-700";
   return "text-red-700";
 }
 
 function gradeBg(grade: number): string {
-  if (grade >= 7) return "bg-green-50 border-green-200";
+  if (grade >= 6) return "bg-green-50 border-green-200";
   if (grade >= 5) return "bg-yellow-50 border-yellow-200";
   return "bg-red-50 border-red-200";
 }
 
 function gradeLabel(grade: number | null): string {
   if (grade === null) return "Sem notas";
-  if (grade >= 7) return "Aprovado";
+  if (grade >= 6) return "Aprovado";
   if (grade >= 5) return "Recuperação";
   return "Reprovado";
 }
 
 function gradeLabelColor(grade: number | null): string {
   if (grade === null) return "text-muted-foreground border-muted";
-  if (grade >= 7) return "bg-green-50 text-green-700 border-green-200";
+  if (grade >= 6) return "bg-green-50 text-green-700 border-green-200";
   if (grade >= 5) return "bg-yellow-50 text-yellow-700 border-yellow-200";
   return "bg-red-50 text-red-700 border-red-200";
 }
@@ -112,7 +112,7 @@ export default function TeacherGradePanel() {
       withGrades.length > 0
         ? withGrades.reduce((sum: number, s: any) => sum + (s.mediaBimestral ?? 0), 0) / withGrades.length
         : null;
-    const approved = withGrades.filter((s: any) => (s.mediaBimestral ?? 0) >= 7).length;
+    const approved = withGrades.filter((s: any) => (s.mediaBimestral ?? 0) >= 6).length;
     return {
       total: gradesData.length,
       avgBimestre: avg !== null ? parseFloat(avg.toFixed(2)) : null,
@@ -439,9 +439,17 @@ export default function TeacherGradePanel() {
                               )}
                             </td>
                             <td className="py-3 px-2 text-center bg-blue-50/30">
-                              <span className={`font-bold ${gradeColor(student.bloco1)}`}>
-                                {fmtGrade(student.bloco1)}
-                              </span>
+                              {student.bloco1 !== null ? (
+                                <span className={`font-bold ${gradeColor(student.bloco1)}`}>
+                                  {fmtGrade(student.bloco1)}
+                                </span>
+                              ) : student.exerciseAverage !== null && student.activityAverage === null ? (
+                                <span className="inline-flex items-center gap-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded px-1.5 py-0.5 whitespace-nowrap">
+                                  ⏳ Ag. Ativ. Sala
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
                             </td>
                             <td className="py-3 px-2 text-center">
                               {student.assessmentAverage !== null ? (

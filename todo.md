@@ -7994,3 +7994,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Bloco 1 sendo calculado com apenas Ativ. Trilha quando Ativ. Sala está ausente - CORRIGIDO: alterado de `||` para `&&` em activities-router.ts e StudentGradeBook.tsx (bimestreStats e allBimestresOverview)
 - [x] Corrigir: Bloco 1 só calculado quando AMBAS têm nota - CORRIGIDO
 - [x] Média Bimestral também é — quando Bloco 1 é — - CORRIGIDO (já usava `&&`)
+
+## Feature: Badge "Aguardando Ativ. Sala" e Média de Aprovação 6.0
+- [x] Adicionar badge amarelo "Aguardando Ativ. Sala" no Bloco 1 quando activityAvg=null (TeacherGradePanel e StudentGradeBook) - CONCLUÍDO e deployado
+- [x] Corrigir média de aprovação de 7.0 para 6.0 em todo o sistema (TeacherGradePanel, StudentGradeBook, backend) - CONCLUÍDO e deployado
