@@ -7968,3 +7968,7 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 
 ## Bug: Calendário Anual de Acessos
 - [x] Calendário Anual de Acessos tem registros mas não aparece (getYearlyCalendar não funciona na VPS) - INVESTIGADO: backend e banco estão corretos (1126 registros em 2026), o calendário funciona após aguardar o carregamento completo da página
+
+## Bug: Análise de Aprendizado com IA - Análise Incompleta
+- [x] analyzeStudent retorna apenas "Análise gerada com dados limitados. Confiança: 50%" sem pontos fortes/fracos/recomendações - CORRIGIDO: campo priority no banco alterado de INT para varchar(20) + prompt do LLM melhorado para sempre retornar arrays não-vazios
+- [x] Insights Gerados pela IA mostra "0 insights" / "Nenhum insight disponível" - CORRIGIDO: o INSERT falhava por causa do campo priority INT vs VARCHAR, agora salva corretamente (3 insights gerados)

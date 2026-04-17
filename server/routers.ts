@@ -10615,6 +10615,8 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
         
         const prompt = `Você é um especialista em pedagogia e análise de aprendizado. Analise os dados do aluno abaixo e forneça uma análise detalhada com recomendações práticas para o professor.
 
+IMPORTANTE: Você DEVE sempre retornar arrays não-vazios para strengths, weaknesses, recommendations e patterns. Mesmo que os dados sejam limitados, gere análises e recomendações baseadas na estrutura da trilha, no progresso do aluno e nas boas práticas pedagógicas. NUNCA retorne arrays vazios — sempre forneça pelo menos 2-3 itens em cada campo.
+
 **DADOS DO ALUNO:**
 - Nome: ${student.fullName}
 - Matrícula: ${student.registrationNumber}
@@ -10629,16 +10631,16 @@ Seja DETALHADO e ESPECÍFICO. Este material será usado pelo aluno para estudo a
 - Tópicos não iniciados: ${totalTopics - completedTopics - inProgressTopics}
 
 **PROGRESSO POR DISCIPLINA:**
-${progressDetails.length > 0 ? progressDetails.map(p => `- ${p.subject}: ${p.completed}/${p.total} concluídos (${p.total > 0 ? ((p.completed/p.total)*100).toFixed(0) : 0}%), ${p.inProgress} em andamento`).join('\n') : 'Sem dados de progresso registrados'}
+${progressDetails.length > 0 ? progressDetails.map(p => `- ${p.subject}: ${p.completed}/${p.total} concluídos (${p.total > 0 ? ((p.completed/p.total)*100).toFixed(0) : 0}%), ${p.inProgress} em andamento`).join('\n') : 'Sem dados de progresso registrados — recomende que o professor registre o progresso'}
 
 **ESTRUTURA DA TRILHA:**
-${learningPathInfo.length > 0 ? learningPathInfo.map(lp => `Disciplina: ${lp.subjectName}\n${lp.modules.map(m => `  Módulo: ${m.title} (${m.topics.length} tópicos: ${m.topics.map(t => t.title).join(', ')})`).join('\n')}`).join('\n\n') : 'Nenhuma trilha configurada'}
+${learningPathInfo.length > 0 ? learningPathInfo.map(lp => `Disciplina: ${lp.subjectName}\n${lp.modules.map(m => `  Módulo: ${m.title} (${m.topics.length} tópicos: ${m.topics.map(t => t.title).join(', ')})`).join('\n')}`).join('\n\n') : 'Nenhuma trilha configurada — recomende que o professor configure a trilha de aprendizagem'}
 
 **EXERCÍCIOS:** ${exerciseInfo}
 
 **COMPORTAMENTOS REGISTRADOS:** ${behaviorInfo}
 
-Com base nesses dados, forneça uma análise estruturada em JSON.`;
+Com base nesses dados, forneça uma análise estruturada em JSON. Lembre-se: SEMPRE preencha todos os arrays com pelo menos 2-3 itens relevantes e práticos.`;
 
         // ===== CHAMAR IA =====
         const response = await invokeLLM({
@@ -10646,7 +10648,7 @@ Com base nesses dados, forneça uma análise estruturada em JSON.`;
           messages: [
             {
               role: 'system',
-              content: 'Você é um especialista em pedagogia e análise de aprendizado. Analise os dados do aluno e forneça insights práticos. Sempre responda em JSON válido. Seja realista: se não há dados suficientes, diga isso claramente e foque nas recomendações baseadas na estrutura da trilha.'
+              content: 'Você é um especialista em pedagogia e análise de aprendizado. Analise os dados do aluno e forneça insights práticos. Sempre responda em JSON válido. REGRA OBRIGATÓRIA: Os campos strengths, weaknesses, recommendations e patterns NUNCA podem ser arrays vazios. Mesmo com dados limitados, gere pelo menos 2-3 itens em cada campo baseados nas boas práticas pedagógicas, na estrutura da trilha e no contexto do aluno. Se não há dados históricos, recomende ações para o professor coletar esses dados.'
             },
             { role: 'user', content: prompt }
           ],
