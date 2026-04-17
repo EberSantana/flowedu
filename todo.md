@@ -7959,3 +7959,6 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [ ] BUG: Calendário Anual de Acessos tem registros mas não aparece (getYearlyCalendar não funciona na VPS)
 - [ ] BUG: Toggles de notificações (Lembretes de Aula, Eventos, Tarefas, Resumo Diário) não funcionam - cinza e não mudam ao clicar
 - [ ] BUG: Erro "No procedure found on path learningPath.updateAssessmentShuffle" na VPS
+
+## Bug: Análise de Aprendizado com IA
+- [x] Análise de Aprendizado com IA não mostra análise do aluno - CORRIGIDO: campo content na tabela ai_insights alterado para aceitar NULL + adicionado content em todas as chamadas saveAIInsight
