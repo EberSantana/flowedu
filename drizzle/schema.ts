@@ -1210,6 +1210,7 @@ export const studentExercises = mysqlTable("student_exercises", {
   tags: json("tags"),
   metadata: json("metadata"),
   status: varchar("status", { length: 50 }).default("draft").notNull(),
+  bimestre: int("bimestre").notNull().default(1), // Bimestre (1-4)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -2161,6 +2162,9 @@ export const assessments = mysqlTable("assessments", {
   // Statuss
   status: mysqlEnum("status", ["draft", "published", "applied", "corrected", "archived"]).default("draft").notNull(),
   
+  // Bimestre
+  bimestre: int("bimestre").notNull().default(1), // Bimestre (1-4)
+  
   // Controle
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -2746,6 +2750,7 @@ export const activities = mysqlTable("activities", {
   allowedFormats: varchar("allowedFormats", { length: 100 }).default("pdf,doc,docx,ppt,pptx"), // Formatos permitidos
   maxFileSizeMB: int("maxFileSizeMB").default(20), // Tamanho máximo do arquivo em MB
   status: mysqlEnum("status", ["draft", "published", "closed"]).default("published").notNull(),
+  bimestre: int("bimestre").notNull().default(1), // Bimestre (1-4)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

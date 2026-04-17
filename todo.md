@@ -107,6 +107,16 @@
 - [x] Adicionar versionamento visual no rodapé do site para identificação da versão em produção
 - [ ] Criar testes de validação de conflitos
 
+## Reestruturação do Painel de Notas (4 Bimestres)
+- [x] Reestruturar painel de notas para 4 bimestres
+- [x] Cada bimestre: Nota1 (Atividade Trilha) + Nota2 (Atividade Sala) + Nota3 (Prova)
+- [x] Fórmula: Bloco1=(AtivTrilha+AtivSala)/2, Bloco2=Prova, MédiaBimestral=(Bloco1+Bloco2)/2
+- [x] Atualizar schema do banco para suportar 4 bimestres (campo bimestre em activities, studentExercises, assessments)
+- [x] Atualizar backend (procedures de notas com bimestre)
+- [x] Atualizar frontend professor (TeacherGradePanel com seletor de bimestre, tabela com Bloco1/Bloco2/Média)
+- [x] Atualizar frontend aluno (StudentGradeBook com seletor de bimestre, resumo anual)
+- [ ] Deploy na VPS
+
 ## Documentação
 - [ ] Documentar estrutura do banco de dados
 - [ ] Documentar rotas da API

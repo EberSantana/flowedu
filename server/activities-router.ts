@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure, publicProcedure, studentProcedure } from "./_core/trpc";
 import { getDb, createNotification, getStudentsBySubject } from "./db";
 import * as pushNotif from './push-notifications';
-import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts, scheduledClasses } from "../drizzle/schema";
+import { activities, activitySubmissions, students, subjects, classes, studentClassEnrollments, subjectEnrollments, studentExercises, studentExerciseAttempts, scheduledClasses, assessments } from "../drizzle/schema";
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -37,6 +37,7 @@ export const activitiesRouter = router({
       dueDate: z.string().optional(), // ISO string
       maxScore: z.number().min(0).max(1000).default(10),
       status: z.enum(["draft", "published"]).default("published"),
+      bimestre: z.number().min(1).max(4).default(1),
     }))
     .mutation(async ({ ctx, input }) => {
       const db = (await getDb())!;
@@ -49,6 +50,7 @@ export const activitiesRouter = router({
         dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
         maxScore: String(input.maxScore),
         status: input.status,
+        bimestre: input.bimestre,
       });
       const activityId = (result as any).insertId;
 
@@ -608,20 +610,19 @@ export const activitiesRouter = router({
     .input(z.object({
       classId: z.number(), // classId agora é o subjectId (mantido por compatibilidade)
       subjectId: z.number().optional(),
+      bimestre: z.number().min(1).max(4).optional(), // Filtro por bimestre (1-4)
     }))
     .query(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
-      // Usar subjectId diretamente (classId é na verdade o subjectId neste contexto)
-      // Verificar se a disciplina pertence ao professor
       const subjectIds = input.subjectId
         ? [input.subjectId]
         : (input.classId > 0 ? [input.classId] : []);
 
-      if (subjectIds.length === 0) return [];
+      if (subjectIds.length === 0) return { students: [], bimestre: input.bimestre || 0 };
 
-      // Buscar alunos matriculados nas disciplinas da turma (via subjectEnrollments)
+      // Buscar alunos matriculados
       const enrolledStudentsRaw = await db
         .select({
           studentId: subjectEnrollments.studentId,
@@ -638,7 +639,6 @@ export const activitiesRouter = router({
         )
         .orderBy(students.fullName);
 
-      // Remover duplicatas (aluno pode estar em múltiplas disciplinas da mesma turma)
       const seen = new Set<number>();
       const enrolledStudents = enrolledStudentsRaw.filter(s => {
         if (seen.has(s.studentId)) return false;
@@ -646,17 +646,18 @@ export const activitiesRouter = router({
         return true;
       });
 
-      if (enrolledStudents.length === 0) return [];
+      if (enrolledStudents.length === 0) return { students: [], bimestre: input.bimestre || 0 };
 
       const studentIds = enrolledStudents.map(s => s.studentId);
 
-      // Buscar notas de EXERCÍCIOS ONLINE
+      // Buscar notas de EXERCÍCIOS ONLINE (Atividade da Trilha)
       const exerciseGrades = await db
         .select({
           studentId: studentExerciseAttempts.studentId,
           exerciseId: studentExercises.id,
           exerciseTitle: studentExercises.title,
           subjectId: studentExercises.subjectId,
+          bimestre: studentExercises.bimestre,
           score: studentExerciseAttempts.score,
           passingScore: studentExercises.passingScore,
           status: studentExerciseAttempts.status,
@@ -668,7 +669,8 @@ export const activitiesRouter = router({
           and(
             inArray(studentExerciseAttempts.studentId, studentIds),
             eq(studentExerciseAttempts.status, 'completed'),
-            ...(input.subjectId ? [eq(studentExercises.subjectId, input.subjectId)] : [])
+            ...(input.subjectId ? [eq(studentExercises.subjectId, input.subjectId)] : []),
+            ...(input.bimestre ? [eq(studentExercises.bimestre, input.bimestre)] : [])
           )
         );
 
@@ -679,6 +681,7 @@ export const activitiesRouter = router({
           activityId: activities.id,
           activityTitle: activities.title,
           subjectId: activities.subjectId,
+          bimestre: activities.bimestre,
           score: activitySubmissions.score,
           maxScore: activities.maxScore,
           feedback: activitySubmissions.feedback,
@@ -692,23 +695,25 @@ export const activitiesRouter = router({
             inArray(activitySubmissions.studentId, studentIds),
             eq(activitySubmissions.status, 'graded'),
             eq(activities.userId, ctx.user.id),
-            ...(input.subjectId ? [eq(activities.subjectId, input.subjectId)] : [])
+            ...(input.subjectId ? [eq(activities.subjectId, input.subjectId)] : []),
+            ...(input.bimestre ? [eq(activities.bimestre, input.bimestre)] : [])
           )
         );
 
       // Buscar notas de PROVAS (assessment_attempts)
-      const dbConn = await getDb();
       let assessmentGradesRaw: any[] = [];
-      if (dbConn && studentIds.length > 0) {
+      if (studentIds.length > 0) {
         const subjectFilter = input.subjectId ? input.subjectId : (input.classId > 0 ? input.classId : null);
-        const result = await dbConn.execute(
+        const bimestreFilter = input.bimestre;
+        const result = await db.execute(
           sql`SELECT aa.studentId, aa.score, aa.percentage, aa.passed, aa.submittedAt,
-                     a.title as assessmentTitle, a.totalPoints, a.id as assessmentId, a.subjectId
+                     a.title as assessmentTitle, a.totalPoints, a.id as assessmentId, a.subjectId, a.bimestre
               FROM assessment_attempts aa
               JOIN assessments a ON aa.assessmentId = a.id
               WHERE aa.studentId IN (${sql.join(studentIds.map(id => sql`${id}`), sql`, `)})
                 AND aa.status = 'submitted'
                 ${subjectFilter ? sql`AND a.subjectId = ${subjectFilter}` : sql``}
+                ${bimestreFilter ? sql`AND a.bimestre = ${bimestreFilter}` : sql``}
               ORDER BY aa.submittedAt DESC`
         ) as any[];
         assessmentGradesRaw = (result[0] as any[]) || [];
@@ -727,16 +732,17 @@ export const activitiesRouter = router({
         return Array.from(best.values());
       }
 
-      // Montar resultado por aluno
-      return enrolledStudents.map(student => {
-        // Exercícios do aluno — nota mais alta por exercício
+      // Montar resultado por aluno com fórmula de bimestre
+      const studentsData = enrolledStudents.map(student => {
+        // Exercícios do aluno (Atividade da Trilha) — nota mais alta por exercício
         const allStudentExGrades = exerciseGrades.filter(g => g.studentId === student.studentId);
         const studentExGrades = bestByKey(allStudentExGrades, g => g.exerciseId, g => g.score ?? 0);
+        // Média dos exercícios normalizada para escala 0-10
         const exerciseAvg = studentExGrades.length > 0
           ? studentExGrades.reduce((sum, g) => sum + ((g.score ?? 0) / 10), 0) / studentExGrades.length
           : null;
 
-        // Atividades do aluno — nota mais alta por atividade
+        // Atividades do aluno (Atividade de Sala) — nota mais alta por atividade
         const allStudentActGrades = activityGrades.filter(g => g.studentId === student.studentId);
         const studentActGrades = bestByKey(allStudentActGrades, g => g.activityId, g => parseFloat(String(g.score ?? 0)));
         const activityAvg = studentActGrades.length > 0
@@ -758,38 +764,41 @@ export const activitiesRouter = router({
             }, 0) / studentAssessGrades.length
           : null;
 
-        // Média geral: soma de TODAS as notas mais altas individuais / quantidade total de itens
-        const allIndividualGrades: number[] = [
-          ...studentExGrades.map(g => (g.score ?? 0) / 10),
-          ...studentActGrades.map(g => {
-            const score = parseFloat(String(g.score ?? 0));
-            const maxScore = parseFloat(String(g.maxScore ?? 10));
-            return maxScore > 0 ? (score / maxScore) * 10 : 0;
-          }),
-          ...studentAssessGrades.map((g: any) => {
-            const totalPoints = parseFloat(String(g.totalPoints ?? 10));
-            const score = parseFloat(String(g.score ?? 0));
-            return totalPoints > 0 ? (score / totalPoints) * 10 : 0;
-          }),
-        ];
-        const overallAvg = allIndividualGrades.length > 0
-          ? allIndividualGrades.reduce((a, b) => a + b, 0) / allIndividualGrades.length
+        // === FÓRMULA POR BIMESTRE ===
+        // Bloco 1 = (Média Atividade Trilha + Média Atividade Sala) / 2
+        // Bloco 2 = Nota da Prova
+        // Média Bimestral = (Bloco1 + Bloco2) / 2
+        const bloco1 = (exerciseAvg !== null || activityAvg !== null)
+          ? ((exerciseAvg ?? 0) + (activityAvg ?? 0)) / ((exerciseAvg !== null ? 1 : 0) + (activityAvg !== null ? 1 : 0))
+          : null;
+        const bloco2 = assessmentAvg;
+        const mediaBimestral = (bloco1 !== null || bloco2 !== null)
+          ? ((bloco1 ?? 0) + (bloco2 ?? 0)) / ((bloco1 !== null ? 1 : 0) + (bloco2 !== null ? 1 : 0))
           : null;
 
         return {
           studentId: student.studentId,
           studentName: student.studentName,
           registrationNumber: student.registrationNumber,
+          // Contagens
           exerciseCount: studentExGrades.length,
-          exerciseAverage: exerciseAvg !== null ? parseFloat(exerciseAvg.toFixed(2)) : null,
           activityCount: studentActGrades.length,
-          activityAverage: activityAvg !== null ? parseFloat(activityAvg.toFixed(2)) : null,
           assessmentCount: studentAssessGrades.length,
+          // Médias individuais
+          exerciseAverage: exerciseAvg !== null ? parseFloat(exerciseAvg.toFixed(2)) : null,
+          activityAverage: activityAvg !== null ? parseFloat(activityAvg.toFixed(2)) : null,
           assessmentAverage: assessmentAvg !== null ? parseFloat(assessmentAvg.toFixed(2)) : null,
-          overallAverage: overallAvg !== null ? parseFloat(overallAvg.toFixed(2)) : null,
+          // Blocos e média bimestral
+          bloco1: bloco1 !== null ? parseFloat(bloco1.toFixed(2)) : null,
+          bloco2: bloco2 !== null ? parseFloat(bloco2.toFixed(2)) : null,
+          mediaBimestral: mediaBimestral !== null ? parseFloat(mediaBimestral.toFixed(2)) : null,
+          // Compatibilidade
+          overallAverage: mediaBimestral !== null ? parseFloat(mediaBimestral.toFixed(2)) : null,
+          // Detalhes
           exercises: studentExGrades.map(g => ({
             exerciseId: g.exerciseId,
             title: g.exerciseTitle,
+            bimestre: g.bimestre,
             grade: parseFloat(((g.score ?? 0) / 10).toFixed(2)),
             passingGrade: parseFloat(((g.passingScore ?? 60) / 10).toFixed(1)),
             approved: (g.score ?? 0) >= (g.passingScore ?? 60),
@@ -798,6 +807,7 @@ export const activitiesRouter = router({
           activities: studentActGrades.map(g => ({
             activityId: g.activityId,
             title: g.activityTitle,
+            bimestre: g.bimestre,
             score: parseFloat(String(g.score ?? 0)),
             maxScore: parseFloat(String(g.maxScore ?? 10)),
             grade10: parseFloat(String(g.maxScore ?? 10)) > 0
@@ -809,6 +819,7 @@ export const activitiesRouter = router({
           assessments: studentAssessGrades.map((g: any) => ({
             assessmentId: g.assessmentId,
             title: g.assessmentTitle,
+            bimestre: g.bimestre,
             score: parseFloat(String(g.score ?? 0)),
             totalPoints: parseFloat(String(g.totalPoints ?? 10)),
             grade10: parseFloat(String(g.totalPoints ?? 10)) > 0
@@ -820,6 +831,8 @@ export const activitiesRouter = router({
           })),
         };
       });
+
+      return { students: studentsData, bimestre: input.bimestre || 0 };
     }),
 
   // Buscar relatório individual detalhado de um aluno

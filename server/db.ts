@@ -10875,6 +10875,7 @@ export async function createAssessment(data: {
   availableTo?: Date;
   shuffleQuestions?: boolean;
   shuffleAlternatives?: boolean;
+  bimestre?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -10906,6 +10907,7 @@ export async function createAssessment(data: {
   if (data.applicationDate) insertData.applicationDate = data.applicationDate;
   if (data.availableFrom) insertData.availableFrom = data.availableFrom;
   if (data.availableTo) insertData.availableTo = data.availableTo;
+  if (data.bimestre) insertData.bimestre = data.bimestre;
 
   const result = await db.insert(assessments).values(insertData);
   return result;

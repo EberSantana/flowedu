@@ -3506,6 +3506,7 @@ JSON (descrições MAX 15 chars):
         status: z.enum(['draft', 'published']).default('published'),
         shuffleQuestions: z.boolean().default(false),
         shuffleAlternatives: z.boolean().default(false),
+        bimestre: z.number().min(1).max(4).default(1),
         questions: z.array(z.object({
           number: z.number(),
           type: z.string(),
@@ -3539,6 +3540,7 @@ JSON (descrições MAX 15 chars):
           availableTo: input.availableTo ? new Date(input.availableTo) : undefined,
           shuffleQuestions: input.shuffleQuestions ?? false,
           shuffleAlternatives: input.shuffleAlternatives ?? false,
+          bimestre: input.bimestre,
         });
         const assessmentId = (result as any)[0]?.insertId || (result as any).insertId;
         if (!assessmentId) throw new Error('Erro ao criar avaliação');
@@ -4174,7 +4176,7 @@ JSON (descrições MAX 15 chars):
         const result = await dbConn.execute(
           sql`SELECT aa.id as attemptId, aa.assessmentId, aa.score, aa.percentage, aa.passed,
                      aa.totalCorrect, aa.totalWrong, aa.submittedAt,
-                     a.title, a.totalPoints, a.passingScore, a.assessmentType,
+                     a.title, a.totalPoints, a.passingScore, a.assessmentType, a.bimestre,
                      s.name as subjectName, s.color as subjectColor
               FROM assessment_attempts aa
               JOIN assessments a ON a.id = aa.assessmentId
@@ -8217,6 +8219,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
             exerciseTitle: studentExercises.title,
             subjectId: studentExercises.subjectId,
             subjectName: subjects.name,
+            bimestre: studentExercises.bimestre,
             score: studentExerciseAttempts.score,
             passingScore: studentExercises.passingScore,
             totalQuestions: studentExercises.totalQuestions,
@@ -8243,6 +8246,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
             attemptId: number;
             exerciseId: number;
             exerciseTitle: string;
+            bimestre: number;
             grade: number;
             passingGrade: number;
             totalQuestions: number;
@@ -8277,6 +8281,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
             attemptId: a.attemptId,
             exerciseId: a.exerciseId,
             exerciseTitle: a.exerciseTitle,
+            bimestre: a.bimestre ?? 1,
             grade,
             passingGrade,
             totalQuestions: a.totalQuestions,
@@ -8327,6 +8332,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
             activityTitle: activities.title,
             subjectId: activities.subjectId,
             subjectName: subjects.name,
+            bimestre: activities.bimestre,
             maxScore: activities.maxScore,
             score: activitySubmissions.score,
             feedback: activitySubmissions.feedback,
@@ -8353,6 +8359,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
             submissionId: number;
             activityId: number;
             activityTitle: string;
+            bimestre: number;
             score: number;
             maxScore: number;
             grade10: number; // Nota convertida para escala 0-10
@@ -8386,6 +8393,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
             submissionId: s.submissionId,
             activityId: s.activityId,
             activityTitle: s.activityTitle,
+            bimestre: s.bimestre ?? 1,
             score: scoreNum,
             maxScore: maxScoreNum,
             grade10,
@@ -8448,6 +8456,7 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
         shuffleQuestions: z.boolean().default(false),
         availableFrom: z.date(),
         availableTo: z.date().optional(),
+        bimestre: z.number().min(1).max(4).default(1),
       }))
       .mutation(async ({ ctx, input }) => {
         const result = await db.createStudentExercise({
