@@ -768,8 +768,9 @@ export const activitiesRouter = router({
         // Bloco 1 = (Média Atividade Trilha + Média Atividade Sala) / 2
         // Bloco 2 = Nota da Prova
         // Média Bimestral = (Bloco1 + Bloco2) / 2
-        const bloco1 = (exerciseAvg !== null || activityAvg !== null)
-          ? ((exerciseAvg ?? 0) + (activityAvg ?? 0)) / ((exerciseAvg !== null ? 1 : 0) + (activityAvg !== null ? 1 : 0))
+        // Bloco 1 só é calculado quando AMBAS Ativ. Trilha (exerciseAvg) e Ativ. Sala (activityAvg) têm nota
+        const bloco1 = (exerciseAvg !== null && activityAvg !== null)
+          ? (exerciseAvg + activityAvg) / 2
           : null;
         const bloco2 = assessmentAvg;
         // Média Bimestral só é calculada quando AMBOS Bloco 1 e Bloco 2 existem

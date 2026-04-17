@@ -167,9 +167,9 @@ export default function StudentGradeBook() {
         }, 0) / filteredAssessments.length
       : null;
 
-    // Bloco 1 = (Ativ. Trilha + Ativ. Sala) / 2
-    const bloco1 = (exerciseAvg !== null || activityAvg !== null)
-      ? ((exerciseAvg ?? 0) + (activityAvg ?? 0)) / ((exerciseAvg !== null ? 1 : 0) + (activityAvg !== null ? 1 : 0))
+    // Bloco 1 = (Ativ. Trilha + Ativ. Sala) / 2 — só calculado quando AMBAS têm nota
+    const bloco1 = (exerciseAvg !== null && activityAvg !== null)
+      ? (exerciseAvg + activityAvg) / 2
       : null;
 
     // Bloco 2 = Prova
@@ -227,8 +227,9 @@ export default function StudentGradeBook() {
           }, 0) / assGrades.length
         : null;
 
-      const b1 = (exAvg !== null || actAvg !== null)
-        ? ((exAvg ?? 0) + (actAvg ?? 0)) / ((exAvg !== null ? 1 : 0) + (actAvg !== null ? 1 : 0))
+      // Bloco 1 só calculado quando AMBAS Ativ. Trilha e Ativ. Sala têm nota
+      const b1 = (exAvg !== null && actAvg !== null)
+        ? (exAvg + actAvg) / 2
         : null;
       const b2 = assAvg;
       // Média só calculada quando AMBOS Bloco 1 e Bloco 2 existem

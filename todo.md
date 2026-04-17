@@ -7989,3 +7989,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Frontend professor: modal "Alunos da Prova" mostra botão "Liberar Acesso" para pendentes e badge "Acesso Liberado" + botão Revogar
 - [x] Frontend aluno: prova fora do prazo mostra badge "Prazo Encerrado" e texto "Solicite permissão ao professor"
 - [x] Deploy na VPS
+
+## Bug: Fórmula Bloco 1 Incorreta
+- [x] Bloco 1 sendo calculado com apenas Ativ. Trilha quando Ativ. Sala está ausente - CORRIGIDO: alterado de `||` para `&&` em activities-router.ts e StudentGradeBook.tsx (bimestreStats e allBimestresOverview)
+- [x] Corrigir: Bloco 1 só calculado quando AMBAS têm nota - CORRIGIDO
+- [x] Média Bimestral também é — quando Bloco 1 é — - CORRIGIDO (já usava `&&`)
