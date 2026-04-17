@@ -17,7 +17,9 @@ import {
   FileText,
   MessageSquare,
   GraduationCap,
+  BookMarked,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const BIMESTRES = [
   { value: 1, label: "1º Bim" },
@@ -69,9 +71,24 @@ export default function StudentGradeBook() {
   const { data: assessmentGrades, isLoading: loadingAssessments } = trpc.learningPath.getStudentAssessmentGrades.useQuery();
 
   const [selectedBimestre, setSelectedBimestre] = useState<number>(1);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
 
   const isLoading = loadingExercises || loadingActivities || loadingAssessments;
+
+  // Extrair disciplinas únicas de todos os dados
+  const allSubjects = useMemo(() => {
+    const subjectMap = new Map<number, string>();
+    (gradeBook ?? []).forEach((s: any) => subjectMap.set(s.subjectId, s.subjectName));
+    (activityGrades ?? []).forEach((s: any) => subjectMap.set(s.subjectId, s.subjectName));
+    (assessmentGrades ?? []).forEach((a: any) => {
+      if (a.subjectId && a.subjectName) subjectMap.set(a.subjectId, a.subjectName);
+    });
+    return Array.from(subjectMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [gradeBook, activityGrades, assessmentGrades]);
+
+  // Inicializar disciplina selecionada quando dados chegarem
+  const effectiveSubjectId = selectedSubjectId ?? (allSubjects.length > 0 ? allSubjects[0].id : null);
 
   const toggleSubject = (key: string) => {
     setExpandedSubjects((prev) => {
@@ -82,10 +99,11 @@ export default function StudentGradeBook() {
     });
   };
 
-  // Filtrar dados por bimestre selecionado
+  // Filtrar dados por disciplina e bimestre selecionados
   const filteredExercises = useMemo(() => {
     if (!gradeBook) return [];
     return gradeBook
+      .filter((sub: any) => effectiveSubjectId === null || sub.subjectId === effectiveSubjectId)
       .map((sub: any) => ({
         ...sub,
         grades: sub.grades.filter((g: any) => (g.bimestre ?? 1) === selectedBimestre),
@@ -99,11 +117,12 @@ export default function StudentGradeBook() {
           : 0,
       }))
       .filter((sub: any) => sub.grades.length > 0);
-  }, [gradeBook, selectedBimestre]);
+  }, [gradeBook, selectedBimestre, effectiveSubjectId]);
 
   const filteredActivities = useMemo(() => {
     if (!activityGrades) return [];
     return activityGrades
+      .filter((sub: any) => effectiveSubjectId === null || sub.subjectId === effectiveSubjectId)
       .map((sub: any) => ({
         ...sub,
         grades: sub.grades.filter((g: any) => (g.bimestre ?? 1) === selectedBimestre),
@@ -117,12 +136,15 @@ export default function StudentGradeBook() {
           : 0,
       }))
       .filter((sub: any) => sub.grades.length > 0);
-  }, [activityGrades, selectedBimestre]);
+  }, [activityGrades, selectedBimestre, effectiveSubjectId]);
 
   const filteredAssessments = useMemo(() => {
     if (!assessmentGrades) return [];
-    return assessmentGrades.filter((a: any) => (a.bimestre ?? 1) === selectedBimestre);
-  }, [assessmentGrades, selectedBimestre]);
+    return assessmentGrades.filter((a: any) =>
+      ((a.bimestre ?? 1) === selectedBimestre) &&
+      (effectiveSubjectId === null || a.subjectId === effectiveSubjectId)
+    );
+  }, [assessmentGrades, selectedBimestre, effectiveSubjectId]);
 
   // Calcular médias por bimestre usando a fórmula
   const bimestreStats = useMemo(() => {
@@ -153,9 +175,9 @@ export default function StudentGradeBook() {
     // Bloco 2 = Prova
     const bloco2 = assessmentAvg;
 
-    // Média Bimestral = (Bloco1 + Bloco2) / 2
-    const mediaBimestral = (bloco1 !== null || bloco2 !== null)
-      ? ((bloco1 ?? 0) + (bloco2 ?? 0)) / ((bloco1 !== null ? 1 : 0) + (bloco2 !== null ? 1 : 0))
+    // Média Bimestral = (Bloco1 + Bloco2) / 2 - só calculada quando AMBOS existem
+    const mediaBimestral = (bloco1 !== null && bloco2 !== null)
+      ? (bloco1 + bloco2) / 2
       : null;
 
     return {
@@ -171,25 +193,32 @@ export default function StudentGradeBook() {
     };
   }, [filteredExercises, filteredActivities, filteredAssessments]);
 
-  // Resumo de todos os 4 bimestres
+  // Resumo de todos os 4 bimestres (filtrado por disciplina)
   const allBimestresOverview = useMemo(() => {
     if (!gradeBook && !activityGrades && !assessmentGrades) return [];
     return BIMESTRES.map((bim) => {
-      const exGrades = (gradeBook ?? []).flatMap((sub: any) =>
-        sub.grades.filter((g: any) => (g.bimestre ?? 1) === bim.value)
-      );
+      const exGrades = (gradeBook ?? [])
+        .filter((sub: any) => effectiveSubjectId === null || sub.subjectId === effectiveSubjectId)
+        .flatMap((sub: any) =>
+          sub.grades.filter((g: any) => (g.bimestre ?? 1) === bim.value)
+        );
       const exAvg = exGrades.length > 0
         ? exGrades.reduce((s: number, g: any) => s + g.grade, 0) / exGrades.length
         : null;
 
-      const actGrades = (activityGrades ?? []).flatMap((sub: any) =>
-        sub.grades.filter((g: any) => (g.bimestre ?? 1) === bim.value)
-      );
+      const actGrades = (activityGrades ?? [])
+        .filter((sub: any) => effectiveSubjectId === null || sub.subjectId === effectiveSubjectId)
+        .flatMap((sub: any) =>
+          sub.grades.filter((g: any) => (g.bimestre ?? 1) === bim.value)
+        );
       const actAvg = actGrades.length > 0
         ? actGrades.reduce((s: number, g: any) => s + g.grade10, 0) / actGrades.length
         : null;
 
-      const assGrades = (assessmentGrades ?? []).filter((a: any) => (a.bimestre ?? 1) === bim.value);
+      const assGrades = (assessmentGrades ?? []).filter((a: any) =>
+        (a.bimestre ?? 1) === bim.value &&
+        (effectiveSubjectId === null || a.subjectId === effectiveSubjectId)
+      );
       const assAvg = assGrades.length > 0
         ? assGrades.reduce((s: number, a: any) => {
             const tp = parseFloat(String(a.totalPoints ?? 10));
@@ -202,8 +231,9 @@ export default function StudentGradeBook() {
         ? ((exAvg ?? 0) + (actAvg ?? 0)) / ((exAvg !== null ? 1 : 0) + (actAvg !== null ? 1 : 0))
         : null;
       const b2 = assAvg;
-      const media = (b1 !== null || b2 !== null)
-        ? ((b1 ?? 0) + (b2 ?? 0)) / ((b1 !== null ? 1 : 0) + (b2 !== null ? 1 : 0))
+      // Média só calculada quando AMBOS Bloco 1 e Bloco 2 existem
+      const media = (b1 !== null && b2 !== null)
+        ? (b1 + b2) / 2
         : null;
 
       return {
@@ -237,6 +267,31 @@ export default function StudentGradeBook() {
         </div>
 
         <div className="container mx-auto py-8 px-4">
+          {/* Seletor de disciplina (só aparece quando há mais de uma) */}
+          {allSubjects.length > 1 && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <BookMarked className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Disciplina</span>
+              </div>
+              <Select
+                value={String(effectiveSubjectId ?? '')}
+                onValueChange={(v) => setSelectedSubjectId(v ? Number(v) : null)}
+              >
+                <SelectTrigger className="w-full sm:w-80 bg-white">
+                  <SelectValue placeholder="Selecionar disciplina" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allSubjects.map((s) => (
+                    <SelectItem key={s.id} value={String(s.id)}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Seletor de bimestre */}
           <div className="flex items-center gap-2 mb-6">
             {BIMESTRES.map((b) => (

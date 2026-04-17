@@ -7972,3 +7972,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 ## Bug: Análise de Aprendizado com IA - Análise Incompleta
 - [x] analyzeStudent retorna apenas "Análise gerada com dados limitados. Confiança: 50%" sem pontos fortes/fracos/recomendações - CORRIGIDO: campo priority no banco alterado de INT para varchar(20) + prompt do LLM melhorado para sempre retornar arrays não-vazios
 - [x] Insights Gerados pela IA mostra "0 insights" / "Nenhum insight disponível" - CORRIGIDO: o INSERT falhava por causa do campo priority INT vs VARCHAR, agora salva corretamente (3 insights gerados)
+
+## Bug: Média Bimestral Incorreta Quando Falta Prova
+- [x] Evelyn Pires dos Santos: tem Ativ. Trilha 10.0 mas sem Prova (Bloco 2), Média Bimestral mostra 10.0 em vez de indicar que falta a prova - CORRIGIDO: fórmula alterada no activities-router.ts e StudentGradeBook.tsx para exigir AMBOS Bloco 1 e Bloco 2
+- [x] Corrigir fórmula: Média Bimestral só deve ser calculada quando ambos Bloco 1 e Bloco 2 existem; se faltar Bloco 2, mostrar "—" - CORRIGIDO
+
+## Feature: Filtro de Disciplina no Boletim do Aluno
+- [x] Portal do Aluno (StudentGradeBook): adicionar seletor de disciplina quando aluno tem mais de uma disciplina - CORRIGIDO: seletor adicionado (aparece apenas quando há mais de uma disciplina)
+- [ ] Portal do Professor (TeacherGradePanel): boletim individual do aluno deve mostrar filtro por disciplina (pendente)

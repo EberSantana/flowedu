@@ -772,8 +772,9 @@ export const activitiesRouter = router({
           ? ((exerciseAvg ?? 0) + (activityAvg ?? 0)) / ((exerciseAvg !== null ? 1 : 0) + (activityAvg !== null ? 1 : 0))
           : null;
         const bloco2 = assessmentAvg;
-        const mediaBimestral = (bloco1 !== null || bloco2 !== null)
-          ? ((bloco1 ?? 0) + (bloco2 ?? 0)) / ((bloco1 !== null ? 1 : 0) + (bloco2 !== null ? 1 : 0))
+        // Média Bimestral só é calculada quando AMBOS Bloco 1 e Bloco 2 existem
+        const mediaBimestral = (bloco1 !== null && bloco2 !== null)
+          ? (bloco1 + bloco2) / 2
           : null;
 
         return {
