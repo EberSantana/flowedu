@@ -8013,3 +8013,8 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Frontend professor: AssessmentsManager - botão "Liberar Gabarito" / "Gabarito Liberado" por prova
 - [x] Frontend aluno: modal Ver Questões mostra nota obtida (score / totalPoints, Aprovado/Reprovado) quando prova realizada
 - [x] Frontend aluno: modal Ver Questões mostra gabarito (resposta correta destacada em verde + justificativa) quando professor liberou
+
+## Feature: Resposta do Aluno Destacada no Gabarito (Modal Ver Questões) - CONCLUÍDO
+- [x] Backend: getStudentAssessmentQuestions retorna as respostas do aluno (studentAnswer por questionId) quando gabarito liberado
+- [x] Frontend: destacar alternativa escolhida pelo aluno com borda azul (errada) ou verde (acerto) no modal Ver Questões
+- [x] Frontend: badge "Sua resposta" em cada alternativa escolhida pelo aluno + ícone ✓ na correta

@@ -376,33 +376,55 @@ export default function StudentAssessmentsPage() {
                               <strong>Contexto:</strong> {q.context}
                             </div>
                           )}
-                          {parsedOptions.length > 0 && (
-                            <div className="space-y-1.5">
-                              {parsedOptions.map((opt) => {
-                                const isCorrect = q.correctAnswer && q.correctAnswer.trim().toUpperCase().charAt(0) === opt.label;
-                                return (
-                                  <div
-                                    key={opt.label}
-                                    className={`flex items-start gap-2 p-2 rounded text-sm ${
-                                      isCorrect
-                                        ? 'bg-emerald-50 border border-emerald-300 text-emerald-900'
-                                        : 'bg-muted/50 text-foreground'
-                                    }`}
-                                  >
-                                    <span className={`font-bold flex-shrink-0 ${
-                                      isCorrect ? 'text-emerald-700' : 'text-muted-foreground'
-                                    }`}>
-                                      {opt.label})
-                                    </span>
-                                    <span>{opt.text}</span>
-                                    {isCorrect && (
-                                      <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0 ml-auto mt-0.5" />
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
+                          {parsedOptions.length > 0 && (() => {
+                            const correctLetter = q.correctAnswer ? q.correctAnswer.trim().toUpperCase().charAt(0) : null;
+                            const studentLetter = q.studentAnswer ? q.studentAnswer.trim().toUpperCase().charAt(0) : null;
+                            const hasStudentAnswer = !!studentLetter;
+                            return (
+                              <div className="space-y-1.5">
+                                {parsedOptions.map((opt) => {
+                                  const isCorrect = correctLetter === opt.label;
+                                  const isStudentChoice = hasStudentAnswer && studentLetter === opt.label;
+                                  const isWrongStudentChoice = isStudentChoice && !isCorrect;
+
+                                  let className = 'bg-muted/50 text-foreground border border-transparent';
+                                  if (isCorrect && isStudentChoice) {
+                                    // Aluno acertou: verde
+                                    className = 'bg-emerald-50 border border-emerald-400 text-emerald-900';
+                                  } else if (isCorrect) {
+                                    // Resposta correta (aluno não escolheu): verde mais suave
+                                    className = 'bg-emerald-50 border border-emerald-300 text-emerald-900';
+                                  } else if (isWrongStudentChoice) {
+                                    // Aluno escolheu errado: azul
+                                    className = 'bg-blue-50 border border-blue-400 text-blue-900';
+                                  }
+
+                                  return (
+                                    <div key={opt.label} className={`flex items-start gap-2 p-2 rounded text-sm ${className}`}>
+                                      <span className={`font-bold flex-shrink-0 ${
+                                        isCorrect ? 'text-emerald-700' : isWrongStudentChoice ? 'text-blue-700' : 'text-muted-foreground'
+                                      }`}>
+                                        {opt.label})
+                                      </span>
+                                      <span className="flex-1">{opt.text}</span>
+                                      <span className="flex items-center gap-1 flex-shrink-0 ml-auto">
+                                        {isStudentChoice && (
+                                          <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${
+                                            isCorrect ? 'bg-emerald-200 text-emerald-800' : 'bg-blue-200 text-blue-800'
+                                          }`}>
+                                            Sua resposta
+                                          </span>
+                                        )}
+                                        {isCorrect && (
+                                          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                        )}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })()}
                           {parsedOptions.length === 0 && (
                             <div className="text-sm text-muted-foreground italic">
                               Questão dissertativa / resposta aberta

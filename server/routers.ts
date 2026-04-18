@@ -3791,6 +3791,27 @@ JSON (descrições MAX 15 chars):
           });
         }
 
+        // Buscar respostas do aluno quando gabarito está liberado
+        let studentAnswersMap: Record<number, string> = {};
+        if (alreadySubmitted && answerKeyReleased && attemptData) {
+          const answersResult = await dbConn.execute(
+            sql`SELECT questionId, selectedAnswer FROM assessment_answers
+                WHERE attemptId = ${attemptData.id}
+                ORDER BY questionId ASC`
+          ) as any[];
+          const answersRows = (answersResult[0] as any[]) || [];
+          for (const row of answersRows) {
+            if (row.questionId && row.selectedAnswer) {
+              studentAnswersMap[row.questionId] = row.selectedAnswer.trim().toUpperCase().charAt(0);
+            }
+          }
+          // Adicionar resposta do aluno em cada questão
+          questions = questions.map((q: any) => ({
+            ...q,
+            studentAnswer: studentAnswersMap[q.id] ?? null,
+          }));
+        }
+
         // Retornar junto com metadados da tentativa e status do gabarito
         return {
           questions: questions as any[],
