@@ -8018,3 +8018,15 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Backend: getStudentAssessmentQuestions retorna as respostas do aluno (studentAnswer por questionId) quando gabarito liberado
 - [x] Frontend: destacar alternativa escolhida pelo aluno com borda azul (errada) ou verde (acerto) no modal Ver Questões
 - [x] Frontend: badge "Sua resposta" em cada alternativa escolhida pelo aluno + ícone ✓ na correta
+
+## Bug Crítico: Cálculo de Pontuação de Provas Incorreto
+- [ ] Investigar dados da aluna 2024300015 no banco (tentativas, respostas, pontos)
+- [ ] Revisar lógica de cálculo de pontos em submitAssessmentAttempt
+- [ ] Corrigir fórmula: acertos × (totalPontos / totalQuestões)
+- [ ] Recalcular tentativas já submetidas incorretamente
+
+## Bug Crítico: correctAnswer Incorreto nas Provas - CORRIGIDO
+- [x] Bug 1: saveAssessment agora extrai apenas a letra (A/B/C/D) do correctAnswer retornado pela IA
+- [x] Bug 2: submitAssessment agora aplica shuffle determinístico antes de comparar resposta do aluno com gabarito
+- [x] Verificar procedure generateAssessmentWithAI e lógica de shuffle - CONCLUÍDO
+- [x] Corrigir ambos os bugs e fazer deploy - CONCLUÍDO

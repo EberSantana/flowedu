@@ -3593,17 +3593,31 @@ JSON (descrições MAX 15 chars):
         // Salvar as questões
         for (const q of input.questions) {
           const options = q.options || [];
+          // Bug Fix: A IA retorna correctAnswer como "A) texto completo" ou "A".
+          // Extrair APENAS a letra (A, B, C, D, E) para garantir comparação correta na correção.
+          let correctAnswerLetter = (q.correctAnswer || '').trim().toUpperCase().charAt(0);
+          // Validar que é uma letra válida de alternativa
+          if (!['A','B','C','D','E'].includes(correctAnswerLetter)) {
+            // Tentar extrair letra do formato "A) texto" ou "(A) texto"
+            const match = (q.correctAnswer || '').match(/\b([A-Ea-e])[\)\.]/);
+            correctAnswerLetter = match ? match[1].toUpperCase() : 'A';
+          }
+          // Limpar textos das opções: remover prefixos "A) ", "B) ", etc.
+          const cleanOption = (opt: string | undefined) => {
+            if (!opt) return opt;
+            return opt.replace(/^[A-Ea-e][\)\.]\s*/, '').trim();
+          };
           await db.addAssessmentQuestion({
             assessmentId,
             questionNumber: q.number,
             questionType: q.type === 'objective' ? 'multiple_choice' : q.type === 'subjective' ? 'essay' : 'essay',
             statement: q.question,
             context: q.caseContext,
-            optionA: options[0],
-            optionB: options[1],
-            optionC: options[2],
-            optionD: options[3],
-            correctAnswer: q.correctAnswer,
+            optionA: cleanOption(options[0]),
+            optionB: cleanOption(options[1]),
+            optionC: cleanOption(options[2]),
+            optionD: cleanOption(options[3]),
+            correctAnswer: correctAnswerLetter,
             answerExplanation: q.expectedAnswer,
             points: q.points,
             difficulty: (q.difficulty === 'easy' || q.difficulty === 'medium' || q.difficulty === 'hard') ? q.difficulty : 'medium',
@@ -4140,7 +4154,53 @@ JSON (descrições MAX 15 chars):
               FROM assessment_questions
               WHERE assessmentId = ${assessmentId} ORDER BY questionNumber ASC`
         ) as any[];
-        const questions = (questionsResult[0] as any[]) || [];
+        let questions = (questionsResult[0] as any[]) || [];
+
+        // Bug Fix: Se a prova tem shuffleAlternatives, o aluno respondeu com base nas alternativas
+        // embaralhadas. Precisamos aplicar o mesmo shuffle determinístico para saber qual letra
+        // o aluno usou corresponde à letra original do gabarito.
+        const attemptConfigResult = await dbConn.execute(
+          sql`SELECT shuffleAlternatives, shuffleQuestions FROM assessments WHERE id = ${assessmentId} LIMIT 1`
+        ) as any[];
+        const attemptConfig = ((attemptConfigResult[0] as any[]) || [])[0] || {};
+        const shouldShuffleAlts = !!attemptConfig.shuffleAlternatives;
+
+        // Função de embaralhamento determinístico (mesma seed usada na exibição)
+        function seededShuffleSubmit<T>(arr: T[], seed: number): T[] {
+          const shuffled = [...arr];
+          let s = seed;
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            s = (s * 1664525 + 1013904223) & 0x7fffffff;
+            const j = s % (i + 1);
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          return shuffled;
+        }
+
+        // Para cada questão com shuffle, calcular o mapeamento: letra_exibida -> letra_original
+        // Isso permite comparar a resposta do aluno (letra exibida) com o gabarito (letra original)
+        const questionShuffleMap: Record<number, Record<string, string>> = {};
+        if (shouldShuffleAlts) {
+          for (const q of questions) {
+            if (!q.optionA) continue; // Pular questões sem alternativas
+            const options = [
+              { key: 'A', text: q.optionA },
+              { key: 'B', text: q.optionB },
+              { key: 'C', text: q.optionC },
+              { key: 'D', text: q.optionD },
+              ...(q.optionE ? [{ key: 'E', text: q.optionE }] : []),
+            ].filter(o => o.text);
+            const seed = studentId * 17 + assessmentId * 13 + (q.id || 0) * 3;
+            const shuffledOptions = seededShuffleSubmit(options, seed);
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            // Mapa: letra_exibida_ao_aluno -> letra_original_no_banco
+            const displayToOriginal: Record<string, string> = {};
+            shuffledOptions.forEach((opt, idx) => {
+              displayToOriginal[letters[idx]] = opt.key; // letra exibida -> letra original
+            });
+            questionShuffleMap[q.id as number] = displayToOriginal;
+          }
+        }
 
         // Buscar respostas do aluno
         const answersResult = await dbConn.execute(
@@ -4156,7 +4216,12 @@ JSON (descrições MAX 15 chars):
         let scoreEarned = 0;
 
         for (const q of questions) {
-          const studentAns = (answerMap[q.id as number] || '').trim().toUpperCase();
+          const studentAnsDisplay = (answerMap[q.id as number] || '').trim().toUpperCase();
+          // Se houve shuffle, converter a letra exibida de volta para a letra original do gabarito
+          const shuffleMap = questionShuffleMap[q.id as number];
+          const studentAns = (shouldShuffleAlts && shuffleMap && studentAnsDisplay)
+            ? (shuffleMap[studentAnsDisplay] || studentAnsDisplay)
+            : studentAnsDisplay;
           const correctAns = (q.correctAnswer as string || '').trim().toUpperCase();
           const isCorrect = studentAns === correctAns && studentAns !== '';
           const pts = isCorrect ? (q.points as number) : 0;
