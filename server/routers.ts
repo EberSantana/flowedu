@@ -2755,7 +2755,9 @@ Crie sugestões no formato JSON:
           messages: [
             {
               role: 'system',
-              content: `Você é um professor especialista em criar provas e avaliações. Gere uma prova completa em português brasileiro com base no conteúdo fornecido. Retorne APENAS um JSON válido.`
+              content: `Você é um professor especialista em criar provas e avaliações. Gere uma prova completa em português brasileiro com base no conteúdo fornecido. Retorne APENAS um JSON válido.
+
+REGRA CRÍTICA: CADA QUESTÃO DEVE ABORDAR UM CONCEITO/TEMA COMPLETAMENTE DIFERENTE. NUNCA repita o mesmo tema, conceito, termo ou pergunta em questões diferentes. Se a prova tiver 20 questões, você DEVE cobrir 20 conceitos distintos e diferentes. É PROIBIDO usar o mesmo enunciado ou variação do mesmo enunciado mais de uma vez.`
             },
             {
               role: 'user',
@@ -2768,13 +2770,16 @@ Crie sugestões no formato JSON:
 Conteúdo dos módulos:
 ${JSON.stringify(modulesContent, null, 2)}
 
-IMPORTANTE:
-- SEMPRE inclua "correctAnswer" com a resposta correta (para objetivas: a letra da alternativa; para subjetivas/casos: deixe como "N/A")
+REGRAS OBRIGATÓRIAS:
+- SEMPRE inclua "correctAnswer" com APENAS A LETRA da resposta correta (ex: "A", "B", "C" ou "D" — NUNCA o texto completo)
 - SEMPRE inclua "expectedAnswer" com a justificativa detalhada ou resposta esperada (OBRIGATÓRIO para TODAS as questões)
-- CADA QUESTÃO DEVE SER ÚNICA E DIFERENTE DAS DEMAIS — NUNCA repita o mesmo enunciado, tema ou conteúdo em questões diferentes
+- CADA QUESTÃO DEVE ABORDAR UM CONCEITO/TEMA COMPLETAMENTE DIFERENTE — NUNCA repita o mesmo enunciado, tema, termo ou conceito
+- ANTES de escrever cada questão, verifique mentalmente se já escreveu algo parecido nas questões anteriores
 - Distribua as questões entre os diferentes módulos e tópicos disponíveis para garantir variedade máxima
 - Se houver múltiplos módulos, distribua as questões proporcionalmente entre eles
 - Para provas com muitas questões (10+), explore subtópicos distintos dentro de cada módulo
+- As alternativas devem ser escritas SEM prefixo de letra (ex: "Confidencialidade" e não "A) Confidencialidade")
+- NUNCA use o mesmo enunciado ou variação do mesmo enunciado em questões diferentes
 
 REGRA DE PONTUAÇÃO OBRIGATÓRIA:
 - O total da prova é SEMPRE 10 pontos
@@ -2852,15 +2857,26 @@ Retorne um JSON com a estrutura:
           : JSON.stringify(response.choices[0].message.content);
         const parsed = JSON.parse(content || '{}');
         
-        // Remover questões duplicadas (mesmo enunciado ou enunciado muito similar)
+        // Remover questões duplicadas com detecção aprimorada
         if (parsed.questions && Array.isArray(parsed.questions)) {
           const seenQuestions = new Set<string>();
+          const seenKeywords = new Set<string>(); // detectar duplicatas por palavras-chave
           const uniqueQuestions: any[] = [];
           for (const q of parsed.questions) {
-            // Normalizar o texto para comparação (minúsculas, sem espaços extras, primeiros 120 chars)
-            const normalizedText = (q.question || '').toLowerCase().trim().replace(/\s+/g, ' ').substring(0, 120);
-            if (!seenQuestions.has(normalizedText)) {
-              seenQuestions.add(normalizedText);
+            const text = (q.question || '').toLowerCase().trim().replace(/\s+/g, ' ');
+            // Normalizar: remover pontuacao e artigos para comparacao
+            const normalized = text.replace(/[?!.,;:]/g, '').replace(/\b(o|a|os|as|um|uma|de|do|da|em|no|na|que|qual|quais|como|por|para|se|ao|ou|e|é|são|foi|tem|pode|deve|quando|onde)\b/g, '').replace(/\s+/g, ' ').trim();
+            // Chave curta: primeiros 60 chars normalizados
+            const shortKey = normalized.substring(0, 60);
+            // Chave de palavras-chave: 3 palavras mais longas do enunciado
+            const keywords = text.split(' ').filter((w: string) => w.length > 5).sort((a: string, b: string) => b.length - a.length).slice(0, 3).sort().join('|');
+            
+            const isDuplicate = seenQuestions.has(shortKey) || 
+              (keywords.length > 0 && seenKeywords.has(keywords));
+            
+            if (!isDuplicate) {
+              seenQuestions.add(shortKey);
+              if (keywords.length > 0) seenKeywords.add(keywords);
               uniqueQuestions.push(q);
             }
           }

@@ -8030,3 +8030,10 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Bug 2: submitAssessment agora aplica shuffle determinístico antes de comparar resposta do aluno com gabarito
 - [x] Verificar procedure generateAssessmentWithAI e lógica de shuffle - CONCLUÍDO
 - [x] Corrigir ambos os bugs e fazer deploy - CONCLUÍDO
+
+## Bug: Questões Duplicadas na Geração por IA - CORRIGIDO
+- [x] Investigar prova de Segurança da Informação (id=120002) - confirmado 10 questões repetidas nas 20
+- [x] Fortalecer prompt da IA: regra crítica no system prompt + instrução explícita de 20 conceitos distintos
+- [x] Melhorar detecção anti-duplicatas: comparação por palavras-chave além de texto curto
+- [x] Instruir IA a retornar alternativas SEM prefixo de letra (evitar "A) texto")
+- [x] Deploy na VPS - CONCLUÍDO
