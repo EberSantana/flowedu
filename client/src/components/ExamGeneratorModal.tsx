@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
@@ -72,6 +73,7 @@ export default function ExamGeneratorModal({
   const [showAnswers, setShowAnswers] = useState(false);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [shuffleAlternatives, setShuffleAlternatives] = useState(false);
+  const [bimestre, setBimestre] = useState<number>(1);
   const [isSaving, setIsSaving] = useState(false);
   const [savedAssessmentId, setSavedAssessmentId] = useState<number | null>(null);
 
@@ -98,6 +100,7 @@ export default function ExamGeneratorModal({
       status: 'published',
       shuffleQuestions,
       shuffleAlternatives,
+      bimestre,
       questions: generatedExam.questions.map((q) => ({
         number: q.number,
         type: q.type,
@@ -568,6 +571,22 @@ export default function ExamGeneratorModal({
                 <span>5</span>
                 <span>30</span>
               </div>
+            </div>
+
+            {/* Bimestre */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Bimestre</Label>
+              <Select value={String(bimestre)} onValueChange={(v) => setBimestre(Number(v))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione o bimestre" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1º Bimestre</SelectItem>
+                  <SelectItem value="2">2º Bimestre</SelectItem>
+                  <SelectItem value="3">3º Bimestre</SelectItem>
+                  <SelectItem value="4">4º Bimestre</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Embaralhamento Anti-Cola */}

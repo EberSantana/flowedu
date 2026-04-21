@@ -80,6 +80,7 @@ export default function ExerciseGeneratorModal({
     maxAttempts: 3,
     timeLimit: 0, // 0 = sem limite
     showAnswersAfter: "submission" as "submission" | "deadline" | "never",
+    bimestre: 1,
   });
 
   const generateExercisesMutation = trpc.learningPath.generateModuleExercises.useMutation({
@@ -105,6 +106,7 @@ export default function ExerciseGeneratorModal({
         maxAttempts: 3,
         timeLimit: 0,
         showAnswersAfter: "submission",
+        bimestre: 1,
       });
     },
     onError: (error: any) => {
@@ -826,6 +828,27 @@ export default function ExerciseGeneratorModal({
             <p className="text-xs text-gray-500">Deixe 0 para não ter limite de tempo</p>
           </div>
 
+          {/* Bimestre */}
+          <div className="space-y-2">
+            <Label htmlFor="bimestre" className="text-sm font-semibold">
+              Bimestre
+            </Label>
+            <Select
+              value={String(publishConfig.bimestre)}
+              onValueChange={(value) => setPublishConfig({ ...publishConfig, bimestre: parseInt(value) })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1º Bimestre</SelectItem>
+                <SelectItem value="2">2º Bimestre</SelectItem>
+                <SelectItem value="3">3º Bimestre</SelectItem>
+                <SelectItem value="4">4º Bimestre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Quando mostrar respostas */}
           <div className="space-y-2">
             <Label htmlFor="show-answers-after" className="text-sm font-semibold">
@@ -857,6 +880,7 @@ export default function ExerciseGeneratorModal({
               <li>• {publishConfig.maxAttempts === 999 ? "Tentativas ilimitadas" : `${publishConfig.maxAttempts} tentativa(s)`}</li>
               <li>• {publishConfig.timeLimit > 0 ? `${publishConfig.timeLimit} minutos` : "Sem limite de tempo"}</li>
               <li>• Respostas: {publishConfig.showAnswersAfter === "submission" ? "Imediatas" : publishConfig.showAnswersAfter === "deadline" ? "Após prazo" : "Não mostrar"}</li>
+              <li>• Bimestre: {publishConfig.bimestre}º</li>
             </ul>
           </div>
         </div>
@@ -899,6 +923,7 @@ export default function ExerciseGeneratorModal({
                 maxAttempts: publishConfig.maxAttempts === 999 ? 999 : publishConfig.maxAttempts,
                 timeLimit: publishConfig.timeLimit > 0 ? publishConfig.timeLimit : undefined,
                 showAnswersAfter: publishConfig.showAnswersAfter === "submission",
+                bimestre: publishConfig.bimestre,
                 availableFrom: publishConfig.availableFrom ? new Date(publishConfig.availableFrom) : new Date(),
                 availableTo: publishConfig.availableUntil ? new Date(publishConfig.availableUntil) : undefined,
               });

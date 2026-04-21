@@ -118,6 +118,8 @@
 - [x] Deploy na VPS
 - [x] Filtro de bimestre (1-4) em todas as telas: ActivitiesPage, AssessmentsManager, StudentAssessmentsPage, StudentActivitiesPage, StudentExercises
 - [x] Badge de bimestre nos cards de atividades, provas e exercícios
+- [x] Seletor de bimestre no formulário de criação de provas (ExamGeneratorModal)
+- [x] Seletor de bimestre no formulário de publicação de exercícios (ExerciseGeneratorModal)
 
 ## Documentação
 - [ ] Documentar estrutura do banco de dados
