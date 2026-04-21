@@ -227,25 +227,40 @@ export default function StudentGradeBook() {
           }, 0) / assGrades.length
         : null;
 
-      // Bloco 1 só calculado quando AMBAS Ativ. Trilha e Ativ. Sala têm nota
+      // Bloco 1: se AMBAS têm nota, calcula média; se só uma tem, usa a disponível
       const b1 = (exAvg !== null && actAvg !== null)
         ? (exAvg + actAvg) / 2
-        : null;
+        : exAvg !== null
+          ? exAvg
+          : actAvg !== null
+            ? actAvg
+            : null;
       const b2 = assAvg;
-      // Média só calculada quando AMBOS Bloco 1 e Bloco 2 existem
+      // Média: calculada quando ao menos um bloco existe
       const media = (b1 !== null && b2 !== null)
         ? (b1 + b2) / 2
-        : null;
+        : b1 !== null
+          ? b1
+          : b2 !== null
+            ? b2
+            : null;
+
+      // Indicadores de completude do Bloco 1
+      const b1HasEx = exAvg !== null;
+      const b1HasAct = actAvg !== null;
+      const b1Partial = (b1HasEx || b1HasAct) && !(b1HasEx && b1HasAct);
 
       return {
         bimestre: bim.value,
         label: bim.label,
         bloco1: b1 !== null ? parseFloat(b1.toFixed(1)) : null,
+        bloco1Partial: b1Partial,
         bloco2: b2 !== null ? parseFloat(b2.toFixed(1)) : null,
         media: media !== null ? parseFloat(media.toFixed(1)) : null,
+        hasAnyData: b1 !== null || b2 !== null,
       };
     });
-  }, [gradeBook, activityGrades, assessmentGrades]);
+  }, [gradeBook, activityGrades, assessmentGrades, effectiveSubjectId]);
 
   return (
     <StudentLayout>
@@ -483,9 +498,18 @@ export default function StudentGradeBook() {
                             {bim.label}estre
                           </td>
                           <td className="py-3 px-2 text-center">
-                            <span className={`font-bold ${gradeColor(bim.bloco1)}`}>
-                              {fmtGrade(bim.bloco1)}
-                            </span>
+                            {bim.bloco1 !== null ? (
+                              <div className="flex flex-col items-center">
+                                <span className={`font-bold ${gradeColor(bim.bloco1)}`}>
+                                  {fmtGrade(bim.bloco1)}
+                                </span>
+                                {bim.bloco1Partial && (
+                                  <span className="text-xs text-amber-600 mt-0.5">(parcial)</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
                           </td>
                           <td className="py-3 px-2 text-center">
                             <span className={`font-bold ${gradeColor(bim.bloco2)}`}>
@@ -493,14 +517,29 @@ export default function StudentGradeBook() {
                             </span>
                           </td>
                           <td className="py-3 px-2 text-center">
-                            <span className={`text-lg font-bold ${gradeColor(bim.media)}`}>
-                              {fmtGrade(bim.media)}
-                            </span>
+                            {bim.media !== null ? (
+                              <div className="flex flex-col items-center">
+                                <span className={`text-lg font-bold ${gradeColor(bim.media)}`}>
+                                  {fmtGrade(bim.media)}
+                                </span>
+                                {(bim.bloco1Partial || (bim.bloco1 === null) !== (bim.bloco2 === null)) && (
+                                  <span className="text-xs text-amber-600 mt-0.5">(parcial)</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
                           </td>
                           <td className="py-3 px-2 text-center">
-                            <Badge variant="outline" className={gradeLabelColor(bim.media)}>
-                              {gradeLabel(bim.media)}
-                            </Badge>
+                            {bim.hasAnyData ? (
+                              <Badge variant="outline" className={gradeLabelColor(bim.media)}>
+                                {bim.media !== null ? gradeLabel(bim.media) : "Em andamento"}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-muted-foreground border-muted">
+                                Sem notas
+                              </Badge>
+                            )}
                           </td>
                         </tr>
                       ))}

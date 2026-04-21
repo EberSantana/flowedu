@@ -62,6 +62,28 @@ const BIMESTRE_COLORS: Record<number, string> = {
   4: "bg-purple-100 text-purple-800 border-purple-200",
 };
 
+// Cores do cabeçalho dos cards de bimestre
+const BIMESTRE_HEADER_COLORS: Record<number, string> = {
+  1: "#3b82f6", // blue-500
+  2: "#22c55e", // green-500
+  3: "#f59e0b", // amber-500
+  4: "#a855f7", // purple-500
+};
+
+const BIMESTRE_PROGRESS_COLORS: Record<number, string> = {
+  1: "bg-blue-500",
+  2: "bg-green-500",
+  3: "bg-amber-500",
+  4: "bg-purple-500",
+};
+
+const BIMESTRE_ICONS: Record<number, string> = {
+  1: "I",
+  2: "II",
+  3: "III",
+  4: "IV",
+};
+
 function formatDate(dateStr: string | Date | null | undefined) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);
@@ -524,91 +546,117 @@ export default function AcademicPeriods() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="bg-white shadow-lg">
-                <CardContent className="p-0">
-                <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Bimestre</TableHead>
-                    <TableHead>Início</TableHead>
-                    <TableHead>Término</TableHead>
-                    <TableHead>Duração</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Observação</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {periods.map((p: any) => {
-                    const start = new Date(p.startDate);
-                    const end = new Date(p.endDate);
-                    const today = new Date();
-                    const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-                    const isCurrentPeriod =
-                      currentPeriod?.id === p.id;
-                    const isPast = end < today;
-                    const isFuture = start > today;
-                    return (
-                      <TableRow key={p.id}>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={BIMESTRE_COLORS[p.bimestre]}
-                          >
-                            {BIMESTRE_LABELS[p.bimestre]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm">{formatDate(p.startDate)}</TableCell>
-                        <TableCell className="text-sm">{formatDate(p.endDate)}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{diffDays} dias</TableCell>
-                        <TableCell>
-                          {!p.isActive ? (
-                            <Badge variant="secondary">Inativo</Badge>
-                          ) : isCurrentPeriod ? (
-                            <Badge className="bg-green-100 text-green-800 border-green-200">Em andamento</Badge>
-                          ) : isPast ? (
-                            <Badge variant="outline" className="text-muted-foreground">Concluído</Badge>
-                          ) : isFuture ? (
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700">Futuro</Badge>
-                          ) : null}
-                        </TableCell>
-                        <TableCell className="text-xs text-muted-foreground max-w-[180px] truncate">
-                          {p.description || "-"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => {
-                                setEditingPeriod({
-                                  ...p,
-                                  startDate: new Date(p.startDate).toISOString().split("T")[0],
-                                  endDate: new Date(p.endDate).toISOString().split("T")[0],
-                                });
-                                setShowPeriodDialog(true);
-                              }}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
-                              onClick={() => setDeletingPeriodId(p.id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {periods.map((p: any) => {
+                  const start = new Date(p.startDate);
+                  const end = new Date(p.endDate);
+                  const today = new Date();
+                  const totalDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                  const elapsedDays = Math.max(0, Math.min(totalDays, Math.ceil((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))));
+                  const progressPct = Math.round((elapsedDays / totalDays) * 100);
+                  const isCurrentPeriod = currentPeriod?.id === p.id;
+                  const isPast = end < today;
+                  const isFuture = start > today;
+                  const headerColor = BIMESTRE_HEADER_COLORS[p.bimestre] ?? "#6b7280";
+                  const progressColor = BIMESTRE_PROGRESS_COLORS[p.bimestre] ?? "bg-gray-500";
+                  const romanNum = BIMESTRE_ICONS[p.bimestre] ?? String(p.bimestre);
+
+                  return (
+                    <Card key={p.id} className="bg-white shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
+                      {/* Cabeçalho colorido */}
+                      <CardHeader style={{ backgroundColor: headerColor }} className="text-white pb-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-xs font-medium opacity-80 uppercase tracking-wider">Bimestre</div>
+                            <CardTitle className="text-2xl font-bold mt-0.5">{romanNum}</CardTitle>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-                </CardContent>
-              </Card>
+                          <div className="text-right">
+                            {!p.isActive ? (
+                              <span className="inline-block bg-white/20 text-white text-xs font-semibold px-2 py-1 rounded-full">Inativo</span>
+                            ) : isCurrentPeriod ? (
+                              <span className="inline-block bg-white/20 text-white text-xs font-semibold px-2 py-1 rounded-full">Em andamento</span>
+                            ) : isPast ? (
+                              <span className="inline-block bg-white/20 text-white text-xs font-semibold px-2 py-1 rounded-full">Concluído</span>
+                            ) : isFuture ? (
+                              <span className="inline-block bg-white/20 text-white text-xs font-semibold px-2 py-1 rounded-full">Futuro</span>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="text-sm font-medium opacity-90 mt-1">{BIMESTRE_LABELS[p.bimestre]}</div>
+                      </CardHeader>
+
+                      <CardContent className="pt-4 space-y-3">
+                        {/* Datas */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Início</span>
+                            <span className="font-medium">{formatDate(p.startDate)}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Término</span>
+                            <span className="font-medium">{formatDate(p.endDate)}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Duração</span>
+                            <span className="font-medium text-muted-foreground">{totalDays} dias</span>
+                          </div>
+                        </div>
+
+                        {/* Barra de progresso */}
+                        {p.isActive && !isFuture && (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span>Progresso</span>
+                              <span>{Math.min(100, progressPct)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${progressColor}`}
+                                style={{ width: `${Math.min(100, progressPct)}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Observação */}
+                        {p.description && (
+                          <p className="text-xs text-muted-foreground border-t pt-2 truncate" title={p.description}>
+                            {p.description}
+                          </p>
+                        )}
+
+                        {/* Botões de ação */}
+                        <div className="flex gap-2 pt-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              setEditingPeriod({
+                                ...p,
+                                startDate: new Date(p.startDate).toISOString().split("T")[0],
+                                endDate: new Date(p.endDate).toISOString().split("T")[0],
+                              });
+                              setShowPeriodDialog(true);
+                            }}
+                          >
+                            <Pencil className="h-3.5 w-3.5 mr-1" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDeletingPeriodId(p.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             )}
             </TabsContent>
 
