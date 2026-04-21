@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/Sidebar";
@@ -66,6 +66,7 @@ import { ptBR } from "date-fns/locale";
 export default function AssessmentsManager() {
   const { user } = useAuth();
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
+  const [bimestreFilter, setBimestreFilter] = useState<string>("all");
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string; type: "assessment" | "exercise" } | null>(null);
   const [viewQuestionsId, setViewQuestionsId] = useState<number | null>(null);
   const [viewQuestionsTitle, setViewQuestionsTitle] = useState<string>("");
@@ -312,8 +313,20 @@ export default function AssessmentsManager() {
     return <Badge className="bg-yellow-100 text-yellow-700 text-xs">Médio</Badge>;
   };
 
-  const totalPublished = assessments?.filter((a: any) => a.status === 'published').length ?? 0;
-  const totalDraft = assessments?.filter((a: any) => a.status !== 'published').length ?? 0;
+  const filteredAssessments = useMemo(() => {
+    if (!assessments) return [];
+    if (bimestreFilter === "all") return assessments as any[];
+    return (assessments as any[]).filter((a: any) => String(a.bimestre || 1) === bimestreFilter);
+  }, [assessments, bimestreFilter]);
+
+  const filteredExercises = useMemo(() => {
+    if (!exercises) return [];
+    if (bimestreFilter === "all") return exercises as any[];
+    return (exercises as any[]).filter((e: any) => String(e.bimestre || 1) === bimestreFilter);
+  }, [exercises, bimestreFilter]);
+
+  const totalPublished = filteredAssessments.filter((a: any) => a.status === 'published').length;
+  const totalDraft = filteredAssessments.filter((a: any) => a.status !== 'published').length;
 
   return (
     <>
@@ -339,6 +352,18 @@ export default function AssessmentsManager() {
                   {subjectsWithClass?.map((s) => (
                     <SelectItem key={s.filterKey} value={s.filterKey}>{s.label}</SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+              <Select value={bimestreFilter} onValueChange={setBimestreFilter}>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Bimestre" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Bimestres</SelectItem>
+                  <SelectItem value="1">1º Bimestre</SelectItem>
+                  <SelectItem value="2">2º Bimestre</SelectItem>
+                  <SelectItem value="3">3º Bimestre</SelectItem>
+                  <SelectItem value="4">4º Bimestre</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -410,13 +435,14 @@ export default function AssessmentsManager() {
                 </Card>
               ) : (
                 <div className="space-y-3">
-                  {assessments.map((assessment: any) => (
+                  {filteredAssessments.map((assessment: any) => (
                     <Card key={assessment.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold text-gray-900 truncate">{assessment.title}</h3>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">{assessment.bimestre ? `${assessment.bimestre}º Bim` : '1º Bim'}</span>
                               {(assessment.shuffleQuestions || assessment.shuffleAlternatives) && (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700" title="Questões e/ou alternativas embaralhadas para cada aluno">
                                   🎲 {assessment.shuffleQuestions && assessment.shuffleAlternatives ? 'Tudo embaralhado' : assessment.shuffleQuestions ? 'Questões embaralhadas' : 'Alternativas embaralhadas'}
@@ -598,7 +624,7 @@ export default function AssessmentsManager() {
                 </Card>
               ) : (
                 <div className="space-y-3">
-                  {exercises.map((exercise: any) => {
+                  {filteredExercises.map((exercise: any) => {
                     const stats = completionStats?.[exercise.id];
                     const done = stats?.done ?? 0;
                     const total = stats?.total ?? 0;

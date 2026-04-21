@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { toast } from "sonner";
 import { Upload, FileText, Clock, CheckCircle, Star, AlertCircle, Download, X, ClipboardList, Calendar } from "lucide-react";
 import StudentLayout from "@/components/StudentLayout";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Activity = {
   id: number;
@@ -46,6 +47,7 @@ const MAX_SIZE = 16 * 1024 * 1024; // 16MB
 export default function StudentActivitiesPage() {
   const { student } = useStudentAuth();
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [bimestreFilter, setBimestreFilter] = useState<string>("all");
   const [showSubmit, setShowSubmit] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [comment, setComment] = useState("");
@@ -213,6 +215,22 @@ export default function StudentActivitiesPage() {
             </Card>
           </div>
 
+          {/* Filtro de Bimestre */}
+          <div className="flex items-center gap-2 mb-4">
+            <Select value={bimestreFilter} onValueChange={setBimestreFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Bimestre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos Bimestres</SelectItem>
+                <SelectItem value="1">1º Bimestre</SelectItem>
+                <SelectItem value="2">2º Bimestre</SelectItem>
+                <SelectItem value="3">3º Bimestre</SelectItem>
+                <SelectItem value="4">4º Bimestre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Activities List */}
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -233,7 +251,7 @@ export default function StudentActivitiesPage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-              {(activities as Activity[]).map((activity) => {
+              {(activities as Activity[]).filter((a: any) => bimestreFilter === "all" || String((a as any).bimestre || 1) === bimestreFilter).map((activity) => {
                 const statusInfo = getStatusInfo(activity);
                 const StatusIcon = statusInfo.icon;
                 const overdue = isPastDue(activity.dueDate);
@@ -255,6 +273,7 @@ export default function StudentActivitiesPage() {
                         {activity.className && (
                           <Badge variant="outline" className="text-xs">{activity.className}</Badge>
                         )}
+                        <Badge className="bg-blue-100 text-blue-800 text-xs">{(activity as any).bimestre ? `${(activity as any).bimestre}º Bim` : '1º Bim'}</Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="flex flex-col flex-1 gap-3">

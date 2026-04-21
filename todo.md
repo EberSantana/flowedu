@@ -115,7 +115,9 @@
 - [x] Atualizar backend (procedures de notas com bimestre)
 - [x] Atualizar frontend professor (TeacherGradePanel com seletor de bimestre, tabela com Bloco1/Bloco2/Média)
 - [x] Atualizar frontend aluno (StudentGradeBook com seletor de bimestre, resumo anual)
-- [ ] Deploy na VPS
+- [x] Deploy na VPS
+- [x] Filtro de bimestre (1-4) em todas as telas: ActivitiesPage, AssessmentsManager, StudentAssessmentsPage, StudentActivitiesPage, StudentExercises
+- [x] Badge de bimestre nos cards de atividades, provas e exercícios
 
 ## Documentação
 - [ ] Documentar estrutura do banco de dados

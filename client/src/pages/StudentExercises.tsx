@@ -22,11 +22,13 @@ import {
 import { useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import StudentLayout from "@/components/StudentLayout";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function StudentExercises() {
   const [, setLocation] = useLocation();
   const [selectedSubject, setSelectedSubject] = useState<number | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [bimestreFilter, setBimestreFilter] = useState<string>("all");
 
   // Buscar exercícios disponíveis
   const { data: exercises = [], isLoading, refetch, isFetching } = trpc.studentExercises.listAvailable.useQuery(
@@ -95,8 +97,9 @@ export default function StudentExercises() {
     setLocation(`/student-exercises/${exerciseId}/attempt`);
   };
 
-  // Filtrar exercícios por busca
+  // Filtrar exercícios por busca e bimestre
   const filteredExercises = exercises.filter((exercise: any) => {
+    if (bimestreFilter !== "all" && String(exercise.bimestre || 1) !== bimestreFilter) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -188,6 +191,18 @@ export default function StudentExercises() {
                 </div>
               )}
             </div>
+            <Select value={bimestreFilter} onValueChange={setBimestreFilter}>
+              <SelectTrigger className="w-[180px] h-9">
+                <SelectValue placeholder="Bimestre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos Bimestres</SelectItem>
+                <SelectItem value="1">1º Bimestre</SelectItem>
+                <SelectItem value="2">2º Bimestre</SelectItem>
+                <SelectItem value="3">3º Bimestre</SelectItem>
+                <SelectItem value="4">4º Bimestre</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {searchQuery && (
@@ -231,6 +246,9 @@ export default function StudentExercises() {
                       {exercise.title}
                     </CardTitle>
                     {getStatusBadge(exercise)}
+                  </div>
+                  <div className="flex gap-1.5 flex-wrap">
+                    <Badge className="bg-blue-100 text-blue-800 text-xs">{exercise.bimestre ? `${exercise.bimestre}º Bim` : '1º Bim'}</Badge>
                   </div>
                   <CardDescription className="text-sm text-muted-foreground line-clamp-2">
                     {exercise.description || "Sem descrição"}

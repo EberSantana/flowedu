@@ -31,9 +31,11 @@ import StudentLayout from "@/components/StudentLayout";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function StudentAssessmentsPage() {
   const [, navigate] = useLocation();
+  const [bimestreFilter, setBimestreFilter] = useState<string>("all");
   const [viewQuestionsId, setViewQuestionsId] = useState<number | null>(null);
   const [viewQuestionsTitle, setViewQuestionsTitle] = useState<string>("");
   const [viewQuestionsSubmitted, setViewQuestionsSubmitted] = useState<boolean>(false);
@@ -104,6 +106,22 @@ export default function StudentAssessmentsPage() {
         </div>
         <div className="p-6 space-y-5">
 
+        {/* Filtro de Bimestre */}
+        <div className="flex items-center gap-2">
+          <Select value={bimestreFilter} onValueChange={setBimestreFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Bimestre" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos Bimestres</SelectItem>
+              <SelectItem value="1">1º Bimestre</SelectItem>
+              <SelectItem value="2">2º Bimestre</SelectItem>
+              <SelectItem value="3">3º Bimestre</SelectItem>
+              <SelectItem value="4">4º Bimestre</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Conteúdo */}
         {isLoading ? (
           <div className="text-center py-16 text-muted-foreground">
@@ -122,7 +140,7 @@ export default function StudentAssessmentsPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {(assessments as any[]).map((assessment: any) => (
+            {(assessments as any[]).filter((a: any) => bimestreFilter === "all" || String(a.bimestre || 1) === bimestreFilter).map((assessment: any) => (
               <Card
                 key={assessment.id}
                 className="border border-border hover:border-primary/30 transition-colors"
@@ -136,6 +154,9 @@ export default function StudentAssessmentsPage() {
                         </h3>
                         <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
                           {getTypeLabel(assessment.assessmentType)}
+                        </Badge>
+                        <Badge className="bg-blue-100 text-blue-800 text-xs">
+                          {assessment.bimestre ? `${assessment.bimestre}º Bim` : '1º Bim'}
                         </Badge>
                       </div>
 

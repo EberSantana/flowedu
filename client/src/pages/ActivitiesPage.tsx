@@ -22,6 +22,7 @@ export default function ActivitiesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSubject, setFilterSubject] = useState<string>("all");
   const [filterClass, setFilterClass] = useState<string>("all");
+  const [filterBimestre, setFilterBimestre] = useState<string>("all");
 
   // Dialog states
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -34,6 +35,7 @@ export default function ActivitiesPage() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    bimestre: "1",
     subjectId: "",
     classId: "",
     dueDate: "",
@@ -104,7 +106,7 @@ export default function ActivitiesPage() {
 
   // Helpers
   const resetForm = () => {
-    setFormData({ title: "", description: "", subjectId: "", classId: "", dueDate: "", maxScore: "10", status: "published" });
+    setFormData({ title: "", description: "", bimestre: "1", subjectId: "", classId: "", dueDate: "", maxScore: "10", status: "published" });
   };
 
   const openEdit = (activity: any) => {
@@ -112,6 +114,7 @@ export default function ActivitiesPage() {
     setFormData({
       title: activity.title,
       description: activity.description || "",
+      bimestre: String(activity.bimestre || 1),
       subjectId: activity.subjectId ? String(activity.subjectId) : "",
       classId: activity.classId ? String(activity.classId) : "",
       dueDate: activity.dueDate ? new Date(activity.dueDate).toISOString().slice(0, 16) : "",
@@ -134,7 +137,8 @@ export default function ActivitiesPage() {
       dueDate: formData.dueDate || undefined,
       maxScore: Number(formData.maxScore) || 10,
       status: formData.status,
-    };
+      bimestre: Number(formData.bimestre) || 1,
+    } as any;
 
     if (editingActivity) {
       updateMutation.mutate({ id: editingActivity.id, ...payload });
@@ -158,13 +162,17 @@ export default function ActivitiesPage() {
   // Filter activities
   const filteredActivities = useMemo(() => {
     if (!activitiesData) return [];
-    if (!searchTerm) return activitiesData as any[];
+    let result = activitiesData as any[];
+    if (filterBimestre !== "all") {
+      result = result.filter((a: any) => String(a.bimestre || 1) === filterBimestre);
+    }
+    if (!searchTerm) return result;
     const term = searchTerm.toLowerCase();
-    return (activitiesData as any[]).filter((a: any) =>
+    return result.filter((a: any) =>
       a.title.toLowerCase().includes(term) ||
       (a.description && a.description.toLowerCase().includes(term))
     );
-  }, [activitiesData, searchTerm]);
+  }, [activitiesData, searchTerm, filterBimestre]);
 
   // Subject/Class name helpers
   const getSubjectName = (id: number | null) => {
@@ -302,6 +310,18 @@ export default function ActivitiesPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={filterBimestre} onValueChange={setFilterBimestre}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Bimestre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos Bimestres</SelectItem>
+                <SelectItem value="1">1º Bimestre</SelectItem>
+                <SelectItem value="2">2º Bimestre</SelectItem>
+                <SelectItem value="3">3º Bimestre</SelectItem>
+                <SelectItem value="4">4º Bimestre</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {searchTerm && (
@@ -349,6 +369,7 @@ export default function ActivitiesPage() {
                             <h3 className="font-bold text-lg text-gray-900 truncate">{activity.title}</h3>
                             {subjectName && <p className="text-sm text-gray-500">Disciplina: {subjectName}</p>}
                             {className_ && <p className="text-sm text-gray-500">Turma: {className_}</p>}
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">{activity.bimestre ? `${activity.bimestre}º Bim` : '1º Bim'}</span>
                           </div>
                         </div>
                         <Badge className={`flex-shrink-0 ${
@@ -514,6 +535,18 @@ export default function ActivitiesPage() {
                 </div>
               </div>
 
+              <div>
+                <Label>Bimestre</Label>
+                <Select value={formData.bimestre} onValueChange={(v) => setFormData({ ...formData, bimestre: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1º Bimestre</SelectItem>
+                    <SelectItem value="2">2º Bimestre</SelectItem>
+                    <SelectItem value="3">3º Bimestre</SelectItem>
+                    <SelectItem value="4">4º Bimestre</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <Label>Status</Label>
                 <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v as "draft" | "published" })}>
