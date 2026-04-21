@@ -59,6 +59,7 @@ const VPSMonitoring = lazy(() => import("./pages/VPSMonitoring"));
 const AISettingsPage = lazy(() => import("./pages/AISettingsPage"));
 const LearningPathReport = lazy(() => import("./pages/LearningPathReport"));
 const AssessmentsManager = lazy(() => import("./pages/AssessmentsManager"));
+const AcademicPeriods = lazy(() => import("./pages/AcademicPeriods"));
 const AccessLogsPage = lazy(() => import("./pages/AccessLogsPage"));
 const TeacherDoubts = lazy(() => import("./pages/TeacherDoubts"));
 const TeacherGradePanel = lazy(() => import("./pages/TeacherGradePanel"));
@@ -156,6 +157,7 @@ function Router() {
           <Route path={"/shifts/:shiftId/timeslots"} component={TimeSlots} />
           <Route path={"/schedule"} component={Schedule} />
           <Route path={"/calendar"} component={Calendar} />
+          <Route path={"/academic-periods"} component={AcademicPeriods} />
           <Route path={"/learning-analytics"} component={LearningAnalytics} />
           <Route path="/exercise-performance" component={ExercisePerformanceReport} />
           <Route path="/learning-path-report" component={LearningPathReport} />

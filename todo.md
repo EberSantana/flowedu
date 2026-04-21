@@ -120,6 +120,10 @@
 - [x] Badge de bimestre nos cards de atividades, provas e exercícios
 - [x] Seletor de bimestre no formulário de criação de provas (ExamGeneratorModal)
 - [x] Seletor de bimestre no formulário de publicação de exercícios (ExerciseGeneratorModal)
+- [x] Página Períodos Letivos (/academic-periods) com configuração de datas por bimestre
+- [x] Agendamento de provas com notificação automática para alunos
+- [x] Tabelas academic_periods e assessment_schedules criadas no banco da VPS
+- [x] Item de menu "Períodos Letivos" adicionado na sidebar do professor
 
 ## Documentação
 - [ ] Documentar estrutura do banco de dados

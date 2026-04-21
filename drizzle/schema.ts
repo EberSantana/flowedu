@@ -3087,3 +3087,39 @@ export const assessmentPermissions = mysqlTable("assessment_permissions", {
 });
 export type AssessmentPermission = typeof assessmentPermissions.$inferSelect;
 export type InsertAssessmentPermission = typeof assessmentPermissions.$inferInsert;
+
+// ─── Períodos Letivos (Bimestres) ────────────────────────────────────────────
+// Permite ao professor definir as datas de início e término de cada bimestre
+// e agendar provas/exercícios vinculados a esses períodos.
+export const academicPeriods = mysqlTable("academic_periods", {
+  id: int("id").autoincrement().primaryKey(),
+  teacherId: int("teacherId").notNull(),         // FK para users (professor)
+  schoolYear: int("schoolYear").notNull(),        // Ano letivo (ex: 2025)
+  bimestre: int("bimestre").notNull(),            // 1, 2, 3 ou 4
+  startDate: date("startDate").notNull(),         // Data de início do bimestre
+  endDate: date("endDate").notNull(),             // Data de término do bimestre
+  description: varchar("description", { length: 300 }), // Observação opcional
+  isActive: boolean("isActive").default(true).notNull(), // Período ativo/inativo
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AcademicPeriod = typeof academicPeriods.$inferSelect;
+export type InsertAcademicPeriod = typeof academicPeriods.$inferInsert;
+
+// ─── Agendamento de Provas ────────────────────────────────────────────────────
+// Vincula uma prova a um período letivo e define data/hora de aplicação
+export const assessmentSchedules = mysqlTable("assessment_schedules", {
+  id: int("id").autoincrement().primaryKey(),
+  assessmentId: int("assessmentId").notNull(),    // FK para assessments
+  academicPeriodId: int("academicPeriodId"),       // FK para academic_periods (opcional)
+  teacherId: int("teacherId").notNull(),           // FK para users (professor)
+  scheduledDate: timestamp("scheduledDate").notNull(), // Data/hora agendada
+  location: varchar("location", { length: 200 }), // Local (sala, laboratório, etc.)
+  notes: text("notes"),                            // Observações do agendamento
+  notifyStudents: boolean("notifyStudents").default(true).notNull(), // Notificar alunos
+  notifiedAt: timestamp("notifiedAt"),             // Quando os alunos foram notificados
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AssessmentSchedule = typeof assessmentSchedules.$inferSelect;
+export type InsertAssessmentSchedule = typeof assessmentSchedules.$inferInsert;

@@ -18,6 +18,7 @@ import { sendPasswordResetEmail } from './_core/email';
 import { emailRouter } from './email-router';
 import { activitiesRouter } from './activities-router';
 import { muralRouter } from './mural-router';
+import { academicPeriodsRouter, assessmentSchedulesRouter } from './academic-periods-router';
 import { handleAsync, validateExists, validateOwnership } from "./errorHandler";
 import { createCachedQuery } from "./queryOptimizer";
 import * as pushNotif from './push-notifications';
@@ -12472,6 +12473,9 @@ Retorne em formato JSON com estrutura:
   // ==================== ATIVIDADES EM SALA ====================
   activities: activitiesRouter,
   mural: muralRouter,
+  // ==================== PERÍODOS LETÍVOS (BIMESTRES) ====================
+  academicPeriods: academicPeriodsRouter,
+  assessmentSchedules: assessmentSchedulesRouter,
   // ==================== VPS MONITORING ====================
   vps: router({
     // Listar todos os servidores VPS
@@ -13711,3 +13715,7 @@ Retorne JSON com:
     };
   }
 }
+
+// ─── Períodos Letivos e Agendamento de Provas ─────────────────────────────────
+// Nota: Adicionado via append. O appRouter principal está definido acima.
+// Estes routers são exportados separadamente e registrados via patch abaixo.
