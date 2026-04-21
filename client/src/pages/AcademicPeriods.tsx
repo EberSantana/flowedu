@@ -1,5 +1,9 @@
 import { useState, useMemo } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import Sidebar from "@/components/Sidebar";
+import PageWrapper from "@/components/PageWrapper";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "wouter";
+import { ArrowLeft } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -416,95 +420,115 @@ export default function AcademicPeriods() {
   }, [currentYear]);
 
   return (
-    <DashboardLayout>
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CalendarDays className="h-7 w-7 text-primary" />
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Períodos Letivos</h1>
-              <p className="text-sm text-muted-foreground">
-                Configure as datas de cada bimestre e agende provas
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className="flex min-h-screen bg-background">
+      <Sidebar />
+      <PageWrapper className="min-h-screen bg-background">
+        <div className="container mx-auto py-6 px-4">
+          {/* Botão Voltar ao Dashboard */}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Dashboard
+            </Button>
+          </Link>
 
-        {/* Bimestre atual */}
-        {currentPeriod && (
-          <div className="flex items-center gap-3 p-3 rounded-lg border bg-primary/5 border-primary/20">
-            <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
-            <div>
-              <span className="font-medium text-sm">Período atual: </span>
-              <span className="text-sm">
-                {BIMESTRE_LABELS[currentPeriod.bimestre]} de {currentPeriod.schoolYear} —{" "}
-                {formatDate(currentPeriod.startDate)} até {formatDate(currentPeriod.endDate)}
-              </span>
-              {currentPeriod.description && (
-                <span className="text-xs text-muted-foreground ml-2">({currentPeriod.description})</span>
-              )}
-            </div>
-          </div>
-        )}
-        {!currentPeriod && !currentPeriodQuery.isLoading && (
-          <div className="flex items-center gap-3 p-3 rounded-lg border bg-amber-50 border-amber-200 text-amber-800">
-            <AlertCircle className="h-5 w-5 shrink-0" />
-            <span className="text-sm">Nenhum bimestre ativo para hoje. Configure os períodos letivos abaixo.</span>
-          </div>
-        )}
-
-        <Tabs defaultValue="periods">
-          <TabsList>
-            <TabsTrigger value="periods">Bimestres</TabsTrigger>
-            <TabsTrigger value="schedules">Agendamento de Provas</TabsTrigger>
-          </TabsList>
-
-          {/* ── Aba Bimestres ── */}
-          <TabsContent value="periods" className="space-y-4 pt-2">
+          {/* Header */}
+          <div className="mb-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Label>Ano letivo:</Label>
-                <Select
-                  value={String(selectedYear)}
-                  onValueChange={(v) => setSelectedYear(parseInt(v))}
-                >
-                  <SelectTrigger className="w-28">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {yearOptions.map((y) => (
-                      <SelectItem key={y} value={String(y)}>
-                        {y}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button
-                onClick={() => {
-                  setEditingPeriod(null);
-                  setShowPeriodDialog(true);
-                }}
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Novo Período
-              </Button>
-            </div>
-
-            {periodsQuery.isLoading ? (
-              <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
-            ) : periods.length === 0 ? (
-              <div className="text-center py-12 border rounded-lg bg-muted/20">
-                <CalendarDays className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm font-medium">Nenhum período configurado para {selectedYear}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Clique em "Novo Período" para definir as datas de cada bimestre.
+              <div>
+                <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                  <CalendarDays className="w-8 h-8 text-primary" />
+                  Períodos Letivos
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Configure as datas de cada bimestre e agende provas
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Bimestre atual */}
+          {currentPeriod && (
+            <div className="flex items-center gap-3 p-3 rounded-lg border bg-primary/5 border-primary/20 mb-4">
+              <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+              <div>
+                <span className="font-medium text-sm">Período atual: </span>
+                <span className="text-sm">
+                  {BIMESTRE_LABELS[currentPeriod.bimestre]} de {currentPeriod.schoolYear} —{" "}
+                  {formatDate(currentPeriod.startDate)} até {formatDate(currentPeriod.endDate)}
+                </span>
+                {currentPeriod.description && (
+                  <span className="text-xs text-muted-foreground ml-2">({currentPeriod.description})</span>
+                )}
+              </div>
+            </div>
+          )}
+          {!currentPeriod && !currentPeriodQuery.isLoading && (
+            <div className="flex items-center gap-3 p-3 rounded-lg border bg-amber-50 border-amber-200 text-amber-800 mb-4">
+              <AlertCircle className="h-5 w-5 shrink-0" />
+              <span className="text-sm">Nenhum bimestre ativo para hoje. Configure os períodos letivos abaixo.</span>
+            </div>
+          )}
+
+          <Tabs defaultValue="periods">
+            <TabsList>
+              <TabsTrigger value="periods">Bimestres</TabsTrigger>
+              <TabsTrigger value="schedules">Agendamento de Provas</TabsTrigger>
+            </TabsList>
+
+            {/* ── Aba Bimestres ── */}
+            <TabsContent value="periods" className="space-y-4 pt-4">
+              <Card className="bg-white shadow-lg mb-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Label className="font-medium">Ano letivo:</Label>
+                      <Select
+                        value={String(selectedYear)}
+                        onValueChange={(v) => setSelectedYear(parseInt(v))}
+                      >
+                        <SelectTrigger className="w-28">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {yearOptions.map((y) => (
+                            <SelectItem key={y} value={String(y)}>
+                              {y}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setEditingPeriod(null);
+                        setShowPeriodDialog(true);
+                      }}
+                      className="bg-primary hover:bg-primary/90 text-white"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Novo Período
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+
+              {periodsQuery.isLoading ? (
+              <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
+            ) : periods.length === 0 ? (
+              <Card className="bg-white shadow-lg">
+                <CardContent className="text-center py-12">
+                  <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm font-medium">Nenhum período configurado para {selectedYear}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Clique em "Novo Período" para definir as datas de cada bimestre.
+                  </p>
+                </CardContent>
+              </Card>
             ) : (
-              <Table>
+              <Card className="bg-white shadow-lg">
+                <CardContent className="p-0">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Bimestre</TableHead>
@@ -585,40 +609,51 @@ export default function AcademicPeriods() {
                   })}
                 </TableBody>
               </Table>
+                </CardContent>
+              </Card>
             )}
-          </TabsContent>
+            </TabsContent>
 
-          {/* ── Aba Agendamento de Provas ── */}
-          <TabsContent value="schedules" className="space-y-4 pt-2">
-            <div className="flex justify-end">
-              <Button
-                onClick={() => setShowScheduleDialog(true)}
-                size="sm"
-                disabled={assessments.length === 0}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Agendar Prova
-              </Button>
-            </div>
+            {/* ── Aba Agendamento de Provas ── */}
+            <TabsContent value="schedules" className="space-y-4 pt-4">
+              <Card className="bg-white shadow-lg mb-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Provas Agendadas</span>
+                    <Button
+                      onClick={() => setShowScheduleDialog(true)}
+                      className="bg-primary hover:bg-primary/90 text-white"
+                      disabled={assessments.length === 0}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Agendar Prova
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
 
-            {assessments.length === 0 && (
-              <div className="text-center py-4 text-sm text-muted-foreground border rounded-lg bg-muted/10">
-                Nenhuma prova publicada encontrada. Crie e publique provas no Banco de Provas para agendá-las.
-              </div>
-            )}
+              {assessments.length === 0 && (
+                <div className="text-center py-4 text-sm text-muted-foreground border rounded-lg bg-muted/10">
+                  Nenhuma prova publicada encontrada. Crie e publique provas no Banco de Provas para agendá-las.
+                </div>
+              )}
 
-            {schedulesQuery.isLoading ? (
-              <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
-            ) : schedules.length === 0 ? (
-              <div className="text-center py-12 border rounded-lg bg-muted/20">
-                <Clock className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm font-medium">Nenhuma prova agendada</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Agende provas para notificar seus alunos com antecedência.
-                </p>
-              </div>
-            ) : (
-              <Table>
+              {schedulesQuery.isLoading ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
+              ) : schedules.length === 0 ? (
+                <Card className="bg-white shadow-lg">
+                  <CardContent className="text-center py-12">
+                    <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm font-medium">Nenhuma prova agendada</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Agende provas para notificar seus alunos com antecedência.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="bg-white shadow-lg">
+                  <CardContent className="p-0">
+                  <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Prova</TableHead>
@@ -694,10 +729,13 @@ export default function AcademicPeriods() {
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </PageWrapper>
 
       {/* Dialog: Criar/Editar Período */}
       <Dialog open={showPeriodDialog} onOpenChange={(open) => { if (!open) { setShowPeriodDialog(false); setEditingPeriod(null); } }}>
@@ -782,6 +820,6 @@ export default function AcademicPeriods() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+    </div>
   );
 }
