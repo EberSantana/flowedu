@@ -4414,6 +4414,75 @@ JSON (descrições MAX 15 chars):
         return (result[0] as any[]) || [];
       }),
 
+    // Lançar nota de prova manualmente (professor lança nota de prova presencial)
+    manualGradeAssessment: protectedProcedure
+      .input(z.object({
+        assessmentId: z.number(),
+        studentId: z.number(),
+        score: z.number().min(0),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        const { assessmentAttempts, assessments } = await import('../drizzle/schema');
+        // Verificar que o professor é dono da prova
+        const [assessment] = await dbConn.select().from(assessments)
+          .where(and(eq(assessments.id, input.assessmentId), eq(assessments.teacherId, ctx.user.id)))
+          .limit(1);
+        if (!assessment) throw new TRPCError({ code: 'FORBIDDEN', message: 'Prova não encontrada ou sem permissão' });
+        const totalPoints = assessment.totalPoints ?? 100;
+        const score = Math.min(input.score, totalPoints);
+        const percentage = totalPoints > 0 ? (score / totalPoints) * 100 : 0;
+        const passed = percentage >= (assessment.passingScore ?? 60);
+        // Verificar se já existe tentativa para este aluno nesta prova
+        const existing = await dbConn.execute(
+          sql`SELECT id FROM assessment_attempts WHERE assessmentId = ${input.assessmentId} AND studentId = ${input.studentId} AND status = 'submitted' LIMIT 1`
+        ) as any[];
+        const existingRows = (existing[0] as any[]) || [];
+        if (existingRows.length > 0) {
+          // Atualizar tentativa existente
+          await dbConn.update(assessmentAttempts)
+            .set({ score, percentage, passed, submittedAt: new Date(), status: 'submitted' })
+            .where(eq(assessmentAttempts.id, existingRows[0].id));
+          return { success: true, attemptId: existingRows[0].id, updated: true };
+        } else {
+          // Criar nova tentativa manual
+          const [result] = await dbConn.insert(assessmentAttempts).values({
+            assessmentId: input.assessmentId,
+            studentId: input.studentId,
+            status: 'submitted',
+            totalCorrect: 0,
+            totalWrong: 0,
+            score,
+            percentage,
+            passed,
+            startedAt: new Date(),
+            submittedAt: new Date(),
+            timeSpentSeconds: 0,
+          });
+          return { success: true, attemptId: (result as any).insertId, updated: false };
+        }
+      }),
+    // Listar alunos matriculados em uma prova (para lançamento manual)
+    getStudentsForAssessment: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const dbConn = await getDb();
+        if (!dbConn) return [];
+        const result = await dbConn.execute(
+          sql`SELECT st.id as studentId, st.fullName, st.registrationNumber,
+                     aa.id as attemptId, aa.score, aa.percentage, aa.passed, aa.submittedAt
+              FROM assessments a
+              JOIN subjectEnrollments se ON se.subjectId = a.subjectId
+              JOIN students st ON st.id = se.studentId
+              LEFT JOIN assessment_attempts aa ON aa.assessmentId = a.id AND aa.studentId = st.id AND aa.status = 'submitted'
+              WHERE a.id = ${input.assessmentId}
+                AND a.teacherId = ${ctx.user.id}
+                AND se.status = 'active'
+              ORDER BY st.fullName`
+        ) as any[];
+        return (result[0] as any[]) || [];
+      }),
     // Buscar questões de uma prova (para visualização)
     getAssessmentQuestions: protectedProcedure
       .input(z.object({ assessmentId: z.number() }))

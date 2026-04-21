@@ -98,11 +98,17 @@ function PeriodForm({
   isSaving: boolean;
 }) {
   const currentYear = new Date().getFullYear();
+  // Garantir que datas sejam sempre strings YYYY-MM-DD (podem vir como Date do banco)
+  const toDateStr = (v: any): string => {
+    if (!v) return "";
+    if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
+    try { return new Date(v).toISOString().split("T")[0]; } catch { return ""; }
+  };
   const [form, setForm] = useState<PeriodFormData>({
     schoolYear: initial?.schoolYear ?? currentYear,
     bimestre: initial?.bimestre ?? 1,
-    startDate: initial?.startDate ?? "",
-    endDate: initial?.endDate ?? "",
+    startDate: toDateStr(initial?.startDate),
+    endDate: toDateStr(initial?.endDate),
     description: initial?.description ?? "",
     isActive: initial?.isActive ?? true,
     id: initial?.id,

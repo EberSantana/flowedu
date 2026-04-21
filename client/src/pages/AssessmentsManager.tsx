@@ -56,6 +56,7 @@ import {
   Shuffle,
   KeyRound,
   LockKeyhole,
+  PenLine,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import ActivitiesTab from "@/components/ActivitiesTab";
@@ -77,6 +78,13 @@ export default function AssessmentsManager() {
   // Estado para o modal de alunos pendentes de PROVA
   const [viewAssessmentStudentsId, setViewAssessmentStudentsId] = useState<number | null>(null);
   const [viewAssessmentStudentsTitle, setViewAssessmentStudentsTitle] = useState<string>("");
+
+  // Estado para o modal de lançamento manual de nota
+  const [manualGradeAssessmentId, setManualGradeAssessmentId] = useState<number | null>(null);
+  const [manualGradeAssessmentTitle, setManualGradeAssessmentTitle] = useState<string>("");
+  const [manualGradeAssessmentTotalPoints, setManualGradeAssessmentTotalPoints] = useState<number>(100);
+  const [manualGradeStudentId, setManualGradeStudentId] = useState<string>("");
+  const [manualGradeScore, setManualGradeScore] = useState<string>("");
 
   // Estado para o modal de configurações de exercício
   const [editExerciseId, setEditExerciseId] = useState<number | null>(null);
@@ -244,6 +252,38 @@ export default function AssessmentsManager() {
     },
     onError: (err) => toast.error("Erro: " + err.message),
   });
+
+  // Query para buscar alunos para lançamento manual de nota
+  const { data: studentsForManualGrade, isLoading: loadingStudentsForGrade } = trpc.learningPath.getStudentsForAssessment.useQuery(
+    { assessmentId: manualGradeAssessmentId ?? 0 },
+    {
+      enabled: manualGradeAssessmentId !== null && manualGradeAssessmentId > 0,
+      staleTime: 0,
+      refetchOnMount: true,
+    }
+  );
+
+  // Mutation para lançar nota manualmente
+  const manualGradeMutation = trpc.learningPath.manualGradeAssessment.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.updated ? "Nota atualizada com sucesso!" : "Nota lançada com sucesso!");
+      utils.learningPath.getStudentsForAssessment.invalidate({ assessmentId: manualGradeAssessmentId! });
+      setManualGradeStudentId("");
+      setManualGradeScore("");
+    },
+    onError: (err) => toast.error("Erro ao lançar nota: " + err.message),
+  });
+
+  const handleManualGrade = () => {
+    if (!manualGradeAssessmentId || !manualGradeStudentId || manualGradeScore === "") return;
+    const scoreNum = parseFloat(manualGradeScore);
+    if (isNaN(scoreNum) || scoreNum < 0) { toast.error("Nota inválida"); return; }
+    manualGradeMutation.mutate({
+      assessmentId: manualGradeAssessmentId,
+      studentId: parseInt(manualGradeStudentId),
+      score: scoreNum,
+    });
+  };
 
   // Mutation para alterar status da prova
   const toggleStatusMutation = trpc.learningPath.toggleAssessmentStatus.useMutation({
@@ -590,6 +630,22 @@ export default function AssessmentsManager() {
                                 Despublicar
                               </Button>
                             )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                              onClick={() => {
+                                setManualGradeAssessmentId(assessment.id);
+                                setManualGradeAssessmentTitle(assessment.title);
+                                setManualGradeAssessmentTotalPoints(assessment.totalPoints ?? 100);
+                                setManualGradeStudentId("");
+                                setManualGradeScore("");
+                              }}
+                              title="Lançar nota manualmente para um aluno (prova presencial)"
+                            >
+                              <PenLine className="h-4 w-4 mr-1" />
+                              Lançar Nota
+                            </Button>
                             <Button
                               variant="outline"
                               size="sm"
@@ -1208,6 +1264,88 @@ export default function AssessmentsManager() {
                 })}
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de Lançamento Manual de Nota */}
+        <Dialog open={manualGradeAssessmentId !== null} onOpenChange={(open) => { if (!open) setManualGradeAssessmentId(null); }}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <PenLine className="h-5 w-5 text-orange-600" />
+                Lançar Nota — {manualGradeAssessmentTitle}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-2">
+              <p className="text-sm text-gray-500">Lance a nota de uma prova presencial diretamente para o aluno. A nota máxima desta prova é <strong>{manualGradeAssessmentTotalPoints} pontos</strong>.</p>
+              {/* Formulário de lançamento */}
+              <div className="flex gap-3 items-end">
+                <div className="flex-1">
+                  <Label className="text-sm font-medium mb-1 block">Aluno</Label>
+                  <Select value={manualGradeStudentId} onValueChange={setManualGradeStudentId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o aluno..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {loadingStudentsForGrade ? (
+                        <SelectItem value="loading" disabled>Carregando...</SelectItem>
+                      ) : (studentsForManualGrade ?? []).map((s: any) => (
+                        <SelectItem key={s.studentId} value={String(s.studentId)}>
+                          {s.fullName} ({s.registrationNumber})
+                          {s.score != null && <span className="ml-2 text-xs text-gray-400">Nota atual: {parseFloat(String(s.score)).toFixed(1)}</span>}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="w-32">
+                  <Label className="text-sm font-medium mb-1 block">Nota (0–{manualGradeAssessmentTotalPoints})</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={manualGradeAssessmentTotalPoints}
+                    step={0.1}
+                    value={manualGradeScore}
+                    onChange={(e) => setManualGradeScore(e.target.value)}
+                    placeholder="Ex: 8.5"
+                  />
+                </div>
+                <Button
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                  onClick={handleManualGrade}
+                  disabled={!manualGradeStudentId || manualGradeScore === "" || manualGradeMutation.isPending}
+                >
+                  {manualGradeMutation.isPending ? "Salvando..." : "Lançar"}
+                </Button>
+              </div>
+              {/* Tabela de notas já lançadas */}
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Notas lançadas</h4>
+                {loadingStudentsForGrade ? (
+                  <p className="text-sm text-gray-400">Carregando...</p>
+                ) : (studentsForManualGrade ?? []).filter((s: any) => s.score != null).length === 0 ? (
+                  <p className="text-sm text-gray-400">Nenhuma nota lançada ainda.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {(studentsForManualGrade ?? []).filter((s: any) => s.score != null).map((s: any) => (
+                      <div key={s.studentId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium">{s.fullName}</p>
+                          <p className="text-xs text-gray-400">{s.registrationNumber}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-lg font-bold ${s.passed ? 'text-green-600' : 'text-red-600'}`}>
+                            {parseFloat(String(s.score)).toFixed(1)}
+                          </span>
+                          <span className="text-xs text-gray-400 ml-1">/ {manualGradeAssessmentTotalPoints}</span>
+                          <p className="text-xs text-gray-400">{parseFloat(String(s.percentage)).toFixed(0)}% — {s.passed ? '✅ Aprovado' : '❌ Reprovado'}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </PageWrapper>
