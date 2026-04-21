@@ -44,14 +44,25 @@ export const academicPeriodsRouter = router({
       if (!db2) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       const { academicPeriods } = await import("../drizzle/schema");
       const { eq, and } = await import("drizzle-orm");
+      // Garantir formato YYYY-MM-DD para colunas do tipo date no MySQL
+      const toDateStr = (s: string): string => {
+        const d = new Date(s);
+        const y = d.getUTCFullYear();
+        const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+      const startDateStr = toDateStr(input.startDate);
+      const endDateStr = toDateStr(input.endDate);
+
       if (input.id) {
         await db2
           .update(academicPeriods)
           .set({
             schoolYear: input.schoolYear,
             bimestre: input.bimestre,
-            startDate: new Date(input.startDate) as any,
-            endDate: new Date(input.endDate) as any,
+            startDate: startDateStr as any,
+            endDate: endDateStr as any,
             description: input.description,
             isActive: input.isActive,
           })
@@ -67,8 +78,8 @@ export const academicPeriodsRouter = router({
           teacherId: ctx.user.id,
           schoolYear: input.schoolYear,
           bimestre: input.bimestre,
-          startDate: new Date(input.startDate) as any,
-          endDate: new Date(input.endDate) as any,
+          startDate: startDateStr as any,
+          endDate: endDateStr as any,
           description: input.description,
           isActive: input.isActive,
         });
