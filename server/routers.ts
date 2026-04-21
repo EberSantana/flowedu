@@ -4344,6 +4344,7 @@ JSON (descrições MAX 15 chars):
           sql`SELECT aa.id as attemptId, aa.assessmentId, aa.score, aa.percentage, aa.passed,
                      aa.totalCorrect, aa.totalWrong, aa.submittedAt,
                      a.title, a.totalPoints, a.passingScore, a.assessmentType, a.bimestre,
+                     a.subjectId,
                      s.name as subjectName, s.color as subjectColor
               FROM assessment_attempts aa
               JOIN assessments a ON a.id = aa.assessmentId
