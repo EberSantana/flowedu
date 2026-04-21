@@ -142,6 +142,11 @@ const teacherNavCategories: NavCategory[] = [
         icon: <CalendarDays className="h-5 w-5" />,
         href: "/calendar",
       },
+      {
+        label: "Períodos Letivos",
+        icon: <CalendarDays className="h-5 w-5" />,
+        href: "/academic-periods",
+      },
     ],
   },
   {
