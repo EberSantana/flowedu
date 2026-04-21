@@ -413,6 +413,12 @@ export default function Sidebar() {
     enabled: !isStudent && !!user, // Só executa se for professor autenticado
   });
   const pendingDoubtsCount = pendingDoubtsData?.count ?? 0;
+  // Query para bimestre ativo (badge no Períodos Letivos)
+  const { data: currentPeriod } = trpc.academicPeriods.getCurrent.useQuery(undefined, {
+    refetchInterval: 300000, // Atualiza a cada 5 minutos
+    enabled: !isStudent && !!user,
+  });
+  const currentBimestreLabel = currentPeriod ? `${currentPeriod.bimestre}º Bim` : null;
 
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
@@ -478,6 +484,7 @@ export default function Sidebar() {
     const isCalendar = item.href === '/calendar';
     const isAnnouncementsMenu = item.label === 'Avisos';
     const isTeacherDoubts = item.href === '/teacher-doubts';
+    const isAcademicPeriods = item.href === '/academic-periods';
     
     let notificationCount = 0;
     if (isCalendar && upcomingEvents) {
@@ -518,6 +525,16 @@ export default function Sidebar() {
             ${isCompact ? 'absolute w-4 h-4 -top-1 -right-1' : 'w-5 h-5 ml-auto'}
           `}>
             {notificationCount}
+          </span>
+        )}
+        {isAcademicPeriods && currentBimestreLabel && !isCompact && (
+          <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 whitespace-nowrap">
+            {currentBimestreLabel}
+          </span>
+        )}
+        {isAcademicPeriods && currentBimestreLabel && isCompact && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center text-[8px] font-bold rounded-full bg-emerald-500 text-white">
+            {currentPeriod?.bimestre}
           </span>
         )}
       </Link>

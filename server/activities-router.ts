@@ -1148,4 +1148,147 @@ export const activitiesRouter = router({
       const pending = allStudents.filter(s => !doneIds.has(s.studentId));
       return { pending, done, total: allStudents.length };
     }),
+
+  // ── Professor: lançar nota manual (sem submissão de arquivo) ─────────────────────
+  manualGradeActivity: protectedProcedure
+    .input(z.object({
+      activityId: z.number(),
+      studentId: z.number(),
+      score: z.number().min(0).max(1000),
+      feedback: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = (await getDb())!;
+      const [activity] = await db
+        .select({ id: activities.id, title: activities.title, maxScore: activities.maxScore, userId: activities.userId })
+        .from(activities)
+        .where(and(eq(activities.id, input.activityId), eq(activities.userId, ctx.user.id)));
+      if (!activity) throw new TRPCError({ code: 'FORBIDDEN', message: 'Atividade não encontrada ou sem permissão' });
+
+      // Verificar se já existe submissão para este aluno (manual ou não)
+      const existingResult = await db.execute(
+        sql`SELECT id FROM activity_submissions WHERE activityId = ${input.activityId} AND studentId = ${input.studentId} LIMIT 1`
+      ) as any[];
+      const existingRows = (existingResult[0] as any[]) || [];
+
+      if (existingRows.length > 0) {
+        await db.update(activitySubmissions)
+          .set({
+            score: String(input.score),
+            feedback: input.feedback,
+            status: 'graded',
+            gradedAt: new Date(),
+            gradedBy: ctx.user.id,
+          })
+          .where(eq(activitySubmissions.id, existingRows[0].id));
+      } else {
+        await db.insert(activitySubmissions).values({
+          activityId: input.activityId,
+          studentId: input.studentId,
+          fileUrl: 'manual',
+          fileKey: 'manual',
+          fileName: 'Lançamento manual',
+          fileMimeType: 'text/plain',
+          fileSizeBytes: 0,
+          status: 'graded',
+          score: String(input.score),
+          feedback: input.feedback,
+          gradedAt: new Date(),
+          gradedBy: ctx.user.id,
+          submittedAt: new Date(),
+        });
+      }
+
+      // Notificar o aluno
+      try {
+        const [studentRow] = await db
+          .select({ userId: students.userId })
+          .from(students)
+          .where(eq(students.id, input.studentId));
+        if (studentRow?.userId) {
+          const maxScore = activity.maxScore ? Number(activity.maxScore) : 10;
+          const nota = maxScore > 0 ? ((input.score / maxScore) * 10).toFixed(1) : input.score.toFixed(1);
+          const feedbackMsg = input.feedback ? ` Feedback: "${input.feedback.slice(0, 80)}${input.feedback.length > 80 ? '...' : ''}"` : '';
+          await createNotification({
+            userId: studentRow.userId,
+            type: 'grade_received',
+            title: 'Nota Lançada',
+            message: `Sua nota na atividade "${activity.title}" foi lançada: ${nota}/10.${feedbackMsg}`,
+            link: '/student/activities',
+            relatedId: input.activityId,
+          });
+          try {
+            await pushNotif.sendPushNotification(studentRow.userId, {
+              title: `✅ Nota lançada: ${activity.title}`,
+              body: `Nota: ${nota}/10.${input.feedback ? ' Veja o feedback!' : ''}`,
+              url: '/student/activities',
+              type: 'activity',
+              tag: `manual-grade-${input.activityId}-${input.studentId}`,
+            });
+          } catch (_) { /* push não bloqueia */ }
+        }
+      } catch (_) { /* notificação não bloqueia */ }
+
+      return { success: true };
+    }),
+
+  // ── Professor: listar alunos com notas de uma atividade (para dialog de lançamento) ─────────────────────
+  getStudentsWithGradesForActivity: protectedProcedure
+    .input(z.object({ activityId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = (await getDb())!;
+      const actResult = await db.execute(
+        sql`SELECT id, subjectId, classId, maxScore FROM activities WHERE id = ${input.activityId} AND userId = ${ctx.user.id} LIMIT 1`
+      ) as any[];
+      const actRows = (actResult[0] as any[]) || [];
+      if (actRows.length === 0) throw new TRPCError({ code: 'FORBIDDEN', message: 'Atividade não encontrada' });
+      const { subjectId, classId, maxScore } = actRows[0];
+
+      let studentsResult: any[];
+      if (subjectId) {
+        studentsResult = await db.execute(
+          sql`SELECT s.id AS studentId, s.fullName AS name
+              FROM students s
+              INNER JOIN subjectEnrollments se ON se.studentId = s.id
+              WHERE se.subjectId = ${subjectId} AND se.status = 'active'
+              ORDER BY s.fullName ASC`
+        ) as any[];
+      } else if (classId) {
+        studentsResult = await db.execute(
+          sql`SELECT s.id AS studentId, s.fullName AS name
+              FROM students s
+              INNER JOIN studentClassEnrollments sce ON sce.studentId = s.id
+              WHERE sce.classId = ${classId}
+              ORDER BY s.fullName ASC`
+        ) as any[];
+      } else {
+        studentsResult = await db.execute(
+          sql`SELECT s.id AS studentId, s.fullName AS name
+              FROM students s
+              WHERE s.userId = ${ctx.user.id}
+              ORDER BY s.fullName ASC`
+        ) as any[];
+      }
+      const allStudents = ((studentsResult[0] as any[]) || []).map((r: any) => ({
+        studentId: r.studentId as number,
+        name: (r.name || `Aluno #${r.studentId}`) as string,
+      }));
+
+      const gradesResult = await db.execute(
+        sql`SELECT studentId, score, feedback, status FROM activity_submissions WHERE activityId = ${input.activityId}`
+      ) as any[];
+      const gradesMap = new Map<number, { score: string | null; feedback: string | null; status: string }>(
+        ((gradesResult[0] as any[]) || []).map((r: any) => [r.studentId, { score: r.score, feedback: r.feedback, status: r.status }])
+      );
+
+      return {
+        maxScore: Number(maxScore) || 10,
+        students: allStudents.map(s => ({
+          ...s,
+          score: gradesMap.get(s.studentId)?.score ?? null,
+          feedback: gradesMap.get(s.studentId)?.feedback ?? null,
+          graded: gradesMap.has(s.studentId),
+        })),
+      };
+    }),
 });

@@ -17,7 +17,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
   ClipboardList, Plus, Pencil, Trash2, Search, X,
-  Calendar, FileText, Users, Download, MessageSquare, Star,
+  Calendar, FileText, Users, Download, MessageSquare, Star, ClipboardCheck,
 } from "lucide-react";
 
 export default function ActivitiesTab() {
@@ -33,6 +33,10 @@ export default function ActivitiesTab() {
   const [exportingActivity, setExportingActivity] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
   const [viewingPendingActivity, setViewingPendingActivity] = useState<any>(null);
+  // Dialog: Lançar Nota Manual
+  const [gradingActivity, setGradingActivity] = useState<any>(null); // atividade selecionada para lançamento
+  const [manualGradeStudent, setManualGradeStudent] = useState<any>(null); // aluno sendo avaliado
+  const [manualGradeData, setManualGradeData] = useState({ score: "", feedback: "" });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -99,6 +103,23 @@ export default function ActivitiesTab() {
     },
     onError: (err) => toast.error("Erro ao excluir: " + err.message),
   });
+  // Mutation: lançar nota manual
+  const manualGradeMutation = trpc.activities.manualGradeActivity.useMutation({
+    onSuccess: () => {
+      toast.success("Nota lançada com sucesso!");
+      setManualGradeStudent(null);
+      setManualGradeData({ score: "", feedback: "" });
+      utils.activities.getStudentsWithGradesForActivity.invalidate({ activityId: gradingActivity?.id ?? 0 });
+      utils.activities.listByProfessor.invalidate();
+    },
+    onError: (err) => toast.error("Erro ao lançar nota: " + err.message),
+  });
+  // Query: alunos com notas para lançamento manual
+  const { data: studentsWithGrades, isLoading: loadingStudentsGrades } = trpc.activities.getStudentsWithGradesForActivity.useQuery(
+    { activityId: gradingActivity?.id ?? 0 },
+    { enabled: !!gradingActivity, staleTime: 0 }
+  );
+
   const gradeMutation = trpc.activities.gradeSubmission.useMutation({
     onSuccess: () => {
       toast.success("Avaliação salva com sucesso!");
@@ -323,6 +344,16 @@ export default function ActivitiesTab() {
                     </div>
                   )}
                   <div className="flex flex-col gap-1.5 mt-auto pt-2">
+                    {/* Botão Lançar Nota */}
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setGradingActivity(activity)}
+                      className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white text-xs"
+                    >
+                      <ClipboardCheck className="mr-1.5 h-3 w-3" />
+                      Lançar Nota
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -545,6 +576,126 @@ export default function ActivitiesTab() {
           </DialogFooter>
         </DialogContent>
        </Dialog>
+
+      {/* ── Dialog: Lançar Nota Manual ─────────────────────────────── */}
+      <Dialog open={!!gradingActivity && !manualGradeStudent} onOpenChange={(open) => { if (!open) setGradingActivity(null); }}>
+        <DialogContent className="max-w-lg max-h-[75vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardCheck className="h-5 w-5 text-indigo-600" />
+              Lançar Nota — {gradingActivity?.title}
+            </DialogTitle>
+            <DialogDescription>
+              Nota máxima: {studentsWithGrades?.maxScore ?? gradingActivity?.maxScore ?? 10} pts · Selecione um aluno para lançar a nota
+            </DialogDescription>
+          </DialogHeader>
+          {loadingStudentsGrades ? (
+            <div className="text-center py-8 text-muted-foreground">Carregando alunos...</div>
+          ) : !studentsWithGrades || studentsWithGrades.students.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">Nenhum aluno matriculado nesta atividade.</p>
+              <p className="text-xs mt-1">Associe a atividade a uma disciplina ou turma com alunos.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {studentsWithGrades.students.map((s: any) => (
+                <div
+                  key={s.studentId}
+                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/40 cursor-pointer transition-colors"
+                  onClick={() => {
+                    setManualGradeStudent(s);
+                    setManualGradeData({ score: s.score !== null ? String(Number(s.score)) : "", feedback: s.feedback || "" });
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-700">
+                      {s.name?.charAt(0)?.toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{s.name}</p>
+                      {s.graded && s.score !== null && (
+                        <p className="text-xs text-emerald-600">Nota: {Number(s.score).toFixed(1)}/{studentsWithGrades.maxScore}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {s.graded ? (
+                      <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs">Avaliado</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-orange-600 border-orange-200 text-xs">Pendente</Badge>
+                    )}
+                    <Button size="sm" variant="ghost" className="h-7 px-2 text-indigo-600 hover:bg-indigo-50">
+                      {s.graded ? "Reeditar" : "Lançar"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setGradingActivity(null)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Dialog: Lançar Nota de Aluno Específico ─────────────────── */}
+      <Dialog open={!!manualGradeStudent} onOpenChange={(open) => { if (!open) { setManualGradeStudent(null); setManualGradeData({ score: "", feedback: "" }); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Lançar Nota</DialogTitle>
+            <DialogDescription>
+              Aluno: <strong>{manualGradeStudent?.name}</strong> · Atividade: {gradingActivity?.title}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="manual-score">Nota (máx: {studentsWithGrades?.maxScore ?? gradingActivity?.maxScore ?? 10})</Label>
+              <Input
+                id="manual-score"
+                type="number"
+                min="0"
+                max={studentsWithGrades?.maxScore ?? gradingActivity?.maxScore ?? 10}
+                step="0.1"
+                value={manualGradeData.score}
+                onChange={(e) => setManualGradeData({ ...manualGradeData, score: e.target.value })}
+                placeholder="Ex: 8.5"
+                autoFocus
+              />
+            </div>
+            <div>
+              <Label htmlFor="manual-feedback">Feedback (opcional)</Label>
+              <Textarea
+                id="manual-feedback"
+                value={manualGradeData.feedback}
+                onChange={(e) => setManualGradeData({ ...manualGradeData, feedback: e.target.value })}
+                placeholder="Comentário para o aluno..."
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setManualGradeStudent(null); setManualGradeData({ score: "", feedback: "" }); }}>
+              Voltar
+            </Button>
+            <LoadingButton
+              loading={manualGradeMutation.isPending}
+              onClick={() => {
+                if (!manualGradeData.score) { toast.error("Informe a nota!"); return; }
+                manualGradeMutation.mutate({
+                  activityId: gradingActivity.id,
+                  studentId: manualGradeStudent.studentId,
+                  score: Number(manualGradeData.score),
+                  feedback: manualGradeData.feedback || undefined,
+                });
+              }}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              Salvar Nota
+            </LoadingButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* ── Dialog: Alunos Pendentes / Concluídos ─────────────────── */}
       <Dialog open={!!viewingPendingActivity} onOpenChange={(open) => { if (!open) setViewingPendingActivity(null); }}>
