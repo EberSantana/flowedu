@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
@@ -420,10 +421,10 @@ export default function AcademicPeriods() {
   }, [currentYear]);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <>
       <Sidebar />
-      <PageWrapper className="min-h-screen bg-background">
-        <div className="container mx-auto py-6 px-4">
+      <PageWrapper className="min-h-[calc(100vh-120px)] bg-background flex flex-col">
+        <div className="container mx-auto py-6 px-4 flex-1">
           {/* Botão Voltar ao Dashboard */}
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="mb-4">
@@ -432,18 +433,18 @@ export default function AcademicPeriods() {
             </Button>
           </Link>
 
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                  <CalendarDays className="w-8 h-8 text-primary" />
-                  Períodos Letivos
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  Configure as datas de cada bimestre e agende provas
-                </p>
-              </div>
+          <Breadcrumb items={[{ label: "Planejamento" }, { label: "Períodos Letivos" }]} />
+
+          {/* Header com botão de ação à direita */}
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <CalendarDays className="w-8 h-8 text-primary" />
+                Períodos Letivos
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Configure as datas de cada bimestre e agende provas
+              </p>
             </div>
           </div>
 
@@ -478,40 +479,37 @@ export default function AcademicPeriods() {
 
             {/* ── Aba Bimestres ── */}
             <TabsContent value="periods" className="space-y-4 pt-4">
-              <Card className="bg-white shadow-lg mb-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Label className="font-medium">Ano letivo:</Label>
-                      <Select
-                        value={String(selectedYear)}
-                        onValueChange={(v) => setSelectedYear(parseInt(v))}
-                      >
-                        <SelectTrigger className="w-28">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {yearOptions.map((y) => (
-                            <SelectItem key={y} value={String(y)}>
-                              {y}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setEditingPeriod(null);
-                        setShowPeriodDialog(true);
-                      }}
-                      className="bg-primary hover:bg-primary/90 text-white"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Novo Período
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-              </Card>
+              {/* Filtro de ano + botão Novo Período */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Label className="font-medium">Ano letivo:</Label>
+                  <Select
+                    value={String(selectedYear)}
+                    onValueChange={(v) => setSelectedYear(parseInt(v))}
+                  >
+                    <SelectTrigger className="w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {yearOptions.map((y) => (
+                        <SelectItem key={y} value={String(y)}>
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={() => {
+                    setEditingPeriod(null);
+                    setShowPeriodDialog(true);
+                  }}
+                  size="lg"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Período
+                </Button>
+              </div>
 
               {periodsQuery.isLoading ? (
               <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
@@ -616,21 +614,18 @@ export default function AcademicPeriods() {
 
             {/* ── Aba Agendamento de Provas ── */}
             <TabsContent value="schedules" className="space-y-4 pt-4">
-              <Card className="bg-white shadow-lg mb-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Provas Agendadas</span>
-                    <Button
-                      onClick={() => setShowScheduleDialog(true)}
-                      className="bg-primary hover:bg-primary/90 text-white"
-                      disabled={assessments.length === 0}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Agendar Prova
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-              </Card>
+              {/* Header da aba de agendamentos */}
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Provas Agendadas</h2>
+                <Button
+                  onClick={() => setShowScheduleDialog(true)}
+                  size="lg"
+                  disabled={assessments.length === 0}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agendar Prova
+                </Button>
+              </div>
 
               {assessments.length === 0 && (
                 <div className="text-center py-4 text-sm text-muted-foreground border rounded-lg bg-muted/10">
@@ -820,6 +815,6 @@ export default function AcademicPeriods() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
