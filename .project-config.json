@@ -1,0 +1,46 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "db",
+    "server",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://4EmYiUJsZhACerp.0e9436e27250:qNDC4S3ker0S85xsY2bS@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/c6FhCpifoFzEQqXNtsKEU6?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": null,
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310419663028972937/c6FhCpifoFzEQqXNtsKEU6",
+    "access_key_id": "ASIAZV3A2ECZKNDS5LJK",
+    "secret_access_key": "Q4JsKu1sirY+sjlq3NbwVK/mXtHMRYwlkyyRXZPF",
+    "session_token": "IQoJb3JpZ2luX2VjEBEaCXVzLWVhc3QtMSJHMEUCIFYgqT06TSwRlQ4kb/M71DgGiSpEtV9qutt3iJsmuVJDAiEA8TtY6H88NNN14hPhkpe2kz+hPWovJsyfgFP5AfwwLgsq/wMI2v//////////ARAEGgw2NjUzODYwOTg4NjYiDA6mqxVI4OLLyTElfirTA3j5qdEDfe58RMBvS8TcNjAY8EwVjtUWREUV0KdKGm6r7Tekk76DDdxuAb0YsZYJWR3MvyTwWG4aBt3c83v3g9IZBcsyFeMC01b2yGvAj2OFEy6axDvY6dPv+a1eurEmgIgRjIXezKBUvUbds8Lru4R8oUsdkdqfVFE0fJtfThG5pLJeW51Sm8zUFUk3rFlgfjVdjRAl0+LDGW9/SmNwAtDfSOkJ6WnyR/WycLuPySsxLllQ/WFKhXmJRSQ4n30UwZcdkvtOM7Puj9qtWY2Z4YaPPdodz1z0e+3RhdYCmKV641oG/YPJY4LyO6/z+S/4NZl5p/TmVkKcEbFtGNF1+nv1+l7HJWfJOEwwHB/E/V/sAC4Fapw1NxNTYaRDzRShID9gEuBSR2p7y16Ra/JCKGg58s31+DiOXi2s7bP1aqeeO8sxKPq33azzZYhG1vGZTnn8ptqR7gULv3y18WjRSlOgJhQKwSfumdfszlc/n03M/kCRH7M6aExSgitjk99/+xlHgj4u6wekVgPf0gcRwnaow3/YTi67q6e6iTWTeNHevna4IRwSbLI+rB4MjtXvMYZDXvtYrEwt6moDeRUa/oe1Hh2uM1RwQ50LPTMRxD3Ml1DhMNOustAGOp0BL82J1Hz0pibsMM+pjxozeWJKY50zSadhOJyWQI2ypZct3PYvgBNETKzKj31k/1KzcIppyhUFoMVKsD4597M7Be73f2kgbE/w+hZeddix9n/4qxW5UQ9VJ0ejgCRRi9zKIskox02Hj5zha51owVinX3UMVE3UlX9IjhVfDA9bT9WdNVF9qyKKYthnxq+UiKVd98uiiJDwEwzMa3oD/A==",
+    "expiration": "2026-05-20T05:01:07.000Z"
+  },
+  "name": "teacher_schedule_system",
+  "path": "/home/ubuntu/teacher_schedule_system",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "NYSLt3Ah4xuzZ539HJXcgU",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "EMAIL_FROM": "ebersantana@profsistemp.info",
+    "GROQ_API_KEY": "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",
+    "JWT_SECRET": "SjF5Yy3T5CQ8ZLRzqLkFhY",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Eber Santana",
+    "OWNER_OPEN_ID": "7sChm8RBMMiktScwVezDbQ",
+    "RESEND_API_KEY": "re_DVGmVE1j_PUjh5AAYRG3erQFq5xskAxrr",
+    "VAPID_PRIVATE_KEY": "J72TlO66ZFO5hFj26aPJGGnhI-UsYU1MkPn-qXNF8Po",
+    "VAPID_PUBLIC_KEY": "BN9JYhB4sCcxdcKSBuA0A_eZ1Pvfw8AO4ZezDtWzlSzO_hGgP3sZFXLEJWs1Lyi4fnSZAlGHNCSMdHZLgfLHJC4",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "3bfa3b2e-fa7b-44ff-bc22-bf2843450b6b",
+    "VITE_APP_ID": "c6FhCpifoFzEQqXNtsKEU6",
+    "VITE_APP_LOGO": "https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310419663028972937/ZgnEhdHbgwNsqxkO.png",
+    "VITE_APP_TITLE": "Sistema de Gestão de Tempo para Professores",
+    "VITE_FRONTEND_FORGE_API_KEY": "igsy2Km7io3tZscviL587d",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-db-user",
+  "test_command": "pnpm test"
+}

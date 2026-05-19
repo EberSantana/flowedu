@@ -3871,6 +3871,7 @@ JSON (descrições MAX 15 chars):
                  a.totalPoints, a.passingScore, a.duration, a.status,
                  a.applicationDate, a.createdAt, a.maxAttempts,
                  a.shuffleQuestions, a.shuffleAlternatives, a.releaseAnswerKey,
+                 a.bimestre,
                  s.name as subjectName, s.color as subjectColor,
                  c.name as className
           FROM assessments a
