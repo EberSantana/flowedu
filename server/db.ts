@@ -940,7 +940,16 @@ export async function createAuditLog(log: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.insert(auditLogs).values(log);
+  await db.insert(auditLogs).values({
+    adminId: log.adminId,
+    adminName: log.adminName,
+    action: log.action,
+    targetUserId: log.targetUserId ?? null,
+    targetUserName: log.targetUserName ?? null,
+    oldData: log.oldData ?? null,
+    newData: log.newData ?? null,
+    ipAddress: log.ipAddress ?? null,
+  });
   return { success: true };
 }
 
