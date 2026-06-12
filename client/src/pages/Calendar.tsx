@@ -493,7 +493,6 @@ export default function Calendar() {
                   { value: 'todos', label: 'Todos', color: 'bg-gray-600' },
                   { value: 'integrado', label: 'Integrado', color: 'bg-blue-600' },
                   { value: 'subsequente_graduacao', label: 'Subsequente/Graduação', color: 'bg-emerald-600' },
-                  { value: 'geral', label: 'Geral', color: 'bg-purple-600' },
                 ].map(opt => (
                   <button
                     key={opt.value}
