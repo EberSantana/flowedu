@@ -2,7 +2,18 @@ import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
+import { ENV } from "./env";
 import { sdk } from "./sdk";
+
+// Lista de openIds autorizados a acessar o portal do professor
+// Inclui o dono do sistema + lista adicional via env ALLOWED_TEACHER_OPENIDS
+function getAllowedOpenIds(): Set<string> {
+  const allowed = new Set<string>();
+  if (ENV.ownerOpenId) allowed.add(ENV.ownerOpenId);
+  const extra = process.env.ALLOWED_TEACHER_OPENIDS ?? "";
+  extra.split(",").map(s => s.trim()).filter(Boolean).forEach(id => allowed.add(id));
+  return allowed;
+}
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -24,6 +35,13 @@ export function registerOAuthRoutes(app: Express) {
       const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
 
       console.log('[OAuth] User info received:', userInfo);
+
+      // Verificar se o usuário está autorizado a acessar o portal do professor
+      const allowedOpenIds = getAllowedOpenIds();
+      if (allowedOpenIds.size > 0 && !allowedOpenIds.has(userInfo.openId)) {
+        console.warn('[OAuth] Acesso negado para openId não autorizado:', userInfo.openId);
+        return res.redirect('/?error=acesso_nao_autorizado');
+      }
 
       // Upsert user in local database
       await db.upsertUser({

@@ -24,8 +24,27 @@ const EVENT_TYPES = {
   holiday: { label: "Feriado", color: "bg-red-500", dotColor: "#ef4444" },
   commemorative: { label: "Data Comemorativa", color: "bg-amber-500", dotColor: "#f59e0b" },
   school_event: { label: "Evento Escolar", color: "bg-blue-500", dotColor: "#3b82f6" },
-  personal: { label: "Observação Pessoal", color: "bg-purple-500", dotColor: "#8b5cf6" },
+  personal: { label: "Evento Personalizado", color: "bg-purple-500", dotColor: "#8b5cf6" },
 };
+
+const COLOR_PALETTE = [
+  { hex: "#ef4444", name: "Vermelho" },
+  { hex: "#f97316", name: "Laranja" },
+  { hex: "#f59e0b", name: "Âmbar" },
+  { hex: "#22c55e", name: "Verde" },
+  { hex: "#14b8a6", name: "Teal" },
+  { hex: "#3b82f6", name: "Azul" },
+  { hex: "#6366f1", name: "Índigo" },
+  { hex: "#8b5cf6", name: "Roxo" },
+  { hex: "#ec4899", name: "Rosa" },
+  { hex: "#6b7280", name: "Cinza" },
+];
+
+const CALENDAR_TYPE_OPTIONS = [
+  { value: "geral", label: "Geral" },
+  { value: "integrado", label: "Integrado" },
+  { value: "subsequente_graduacao", label: "Subsequente/Graduação" },
+];
 
 export default function Calendar() {
   const today = new Date();
@@ -41,6 +60,7 @@ export default function Calendar() {
     eventType: "personal" as "personal" | "holiday" | "commemorative" | "school_event",
     isRecurring: 0,
     color: "#8b5cf6",
+    calendarType: "geral",
   });
   
   // Estados para importação de PDF
@@ -200,6 +220,7 @@ export default function Calendar() {
       eventType: "personal",
       isRecurring: 0,
       color: "#8b5cf6",
+      calendarType: "geral",
     });
     setEditingEvent(null);
     setIsDialogOpen(false);
@@ -223,7 +244,8 @@ export default function Calendar() {
       eventDate: event.eventDate, // Já é YYYY-MM-DD, não converter via Date
       eventType: event.eventType,
       isRecurring: event.isRecurring,
-      color: event.color,
+      color: event.color || "#8b5cf6",
+      calendarType: event.calendarType || "geral",
     });
     setIsDialogOpen(true);
   };
@@ -721,67 +743,151 @@ export default function Calendar() {
           </div>
         </div>
 
-        {/* Dialog de Criação/Edição */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-md">
+        {/* Dialog de Criação/Edição de Evento Personalizado */}
+        <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) resetForm(); }}>
+          <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>{editingEvent ? "Editar Evento" : "Novo Evento"}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <span
+                  className="inline-block w-4 h-4 rounded-full border-2 border-white shadow"
+                  style={{ backgroundColor: formData.color }}
+                />
+                {editingEvent ? "Editar Evento" : "Novo Evento Personalizado"}
+              </DialogTitle>
               <DialogDescription>
-                {editingEvent ? "Atualize as informações do evento" : "Adicione um novo evento ao calendário"}
+                {editingEvent ? "Atualize as informações do evento" : "Crie um evento personalizado no seu calendário acadêmico"}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
+              <div className="space-y-4 py-1">
+                {/* Título */}
                 <div>
                   <Label htmlFor="title">Título *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Ex: Dia do Professor"
+                    placeholder="Ex: Reunião Pedagógica, Semana de Provas..."
                     required
+                    className="mt-1"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="eventDate">Data *</Label>
-                  <Input
-                    id="eventDate"
-                    type="date"
-                    value={formData.eventDate}
-                    onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                    required
-                  />
+
+                {/* Data e Tipo lado a lado */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="eventDate">Data *</Label>
+                    <Input
+                      id="eventDate"
+                      type="date"
+                      value={formData.eventDate}
+                      onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="eventType">Categoria *</Label>
+                    <Select value={formData.eventType} onValueChange={(value: any) => setFormData({ ...formData, eventType: value })}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(EVENT_TYPES).map(([key, val]) => (
+                          <SelectItem key={key} value={key}>
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: val.dotColor }} />
+                              {val.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="eventType">Tipo *</Label>
-                  <Select value={formData.eventType} onValueChange={(value: any) => setFormData({ ...formData, eventType: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(EVENT_TYPES).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>{value.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+
+                {/* Calendário e Recorrência lado a lado */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="calendarType">Calendário</Label>
+                    <Select value={formData.calendarType} onValueChange={(value) => setFormData({ ...formData, calendarType: value })}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CALENDAR_TYPE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col justify-end">
+                    <label className="flex items-center gap-2 cursor-pointer mt-1 h-10 px-3 border rounded-md hover:bg-muted/50 transition-colors">
+                      <Checkbox
+                        checked={formData.isRecurring === 1}
+                        onCheckedChange={(checked) => setFormData({ ...formData, isRecurring: checked ? 1 : 0 })}
+                      />
+                      <span className="text-sm font-medium">Repetir anualmente</span>
+                    </label>
+                  </div>
                 </div>
+
+                {/* Paleta de Cores */}
+                <div>
+                  <Label>Cor do Evento</Label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {COLOR_PALETTE.map((c) => (
+                      <button
+                        key={c.hex}
+                        type="button"
+                        title={c.name}
+                        onClick={() => setFormData({ ...formData, color: c.hex })}
+                        className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${
+                          formData.color === c.hex
+                            ? 'border-gray-800 scale-110 shadow-md'
+                            : 'border-transparent'
+                        }`}
+                        style={{ backgroundColor: c.hex }}
+                      />
+                    ))}
+                    {/* Input de cor customizada */}
+                    <label className="w-7 h-7 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:scale-110 transition-all" title="Cor personalizada">
+                      <span className="text-gray-500 text-xs font-bold">+</span>
+                      <input
+                        type="color"
+                        value={formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                        className="sr-only"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Descrição */}
                 <div>
                   <Label htmlFor="description">Descrição</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Detalhes adicionais..."
+                    placeholder="Detalhes, local, observações..."
                     rows={3}
+                    className="mt-1"
                   />
                 </div>
               </div>
+
               <DialogFooter className="mt-6">
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancelar
                 </Button>
-                <Button type="submit">
-                  {editingEvent ? "Atualizar" : "Criar"}
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  style={{ backgroundColor: formData.color }}
+                  className="text-white hover:opacity-90 border-0"
+                >
+                  {(createMutation.isPending || updateMutation.isPending) ? "Salvando..." : (editingEvent ? "Atualizar Evento" : "Criar Evento")}
                 </Button>
               </DialogFooter>
             </form>
@@ -1249,6 +1355,18 @@ export default function Calendar() {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      {/* Botão flutuante para criar evento */}
+      <button
+        onClick={() => {
+          resetForm();
+          setIsDialogOpen(true);
+        }}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center"
+        title="Criar novo evento"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
 
       </PageWrapper>
     </>

@@ -353,6 +353,14 @@ export const appRouter = router({
           throw new Error("Conta desativada. Entre em contato com o administrador.");
         }
 
+        // Verificar status de aprovação
+        if (user.approvalStatus === 'pending') {
+          throw new Error("Sua conta está aguardando aprovação do administrador. Você receberá um e-mail quando for aprovada.");
+        }
+        if (user.approvalStatus === 'rejected') {
+          throw new Error("Sua solicitação de cadastro foi recusada. Entre em contato com o administrador.");
+        }
+
         // Verificar senha
         if (!user.passwordHash) {
           throw new Error("Esta conta usa login social. Use o botão 'Entrar com Google'.");
@@ -1303,6 +1311,7 @@ export const appRouter = router({
           eventType: z.enum(["holiday", "commemorative", "school_event", "personal"]),
           isRecurring: z.number().default(0),
           color: z.string().optional(),
+          calendarType: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -1321,6 +1330,7 @@ export const appRouter = router({
           eventType: z.enum(["holiday", "commemorative", "school_event", "personal"]).optional(),
           isRecurring: z.number().optional(),
           color: z.string().optional(),
+          calendarType: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
