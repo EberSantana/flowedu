@@ -93,6 +93,7 @@ export const calendarEvents = mysqlTable("calendar_events", {
   eventType: mysqlEnum("eventType", ["holiday", "commemorative", "school_event", "personal"]).notNull(),
   isRecurring: int("isRecurring").default(0).notNull(), // 0 = não recorrente, 1 = recorrente anualmente
   color: varchar("color", { length: 7 }).default("#3b82f6"),
+  calendarType: varchar("calendarType", { length: 50 }).default("geral"), // 'geral', 'integrado', 'subsequente_graduacao'
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -2862,11 +2863,12 @@ export type InsertAiUsageLog = typeof aiUsageLogs.$inferInsert;
 // ============================================================
 export const aiSettings = mysqlTable("ai_settings", {
   id: int("id").autoincrement().primaryKey(),
-  provider: varchar("provider", { length: 50 }).default("groq").notNull(), // groq, gemini, openai, anthropic, manus
+  provider: varchar("provider", { length: 50 }).default("groq").notNull(), // groq, gemini, openai, anthropic, manus, cohere
   groqApiKey: text("groqApiKey"),
   geminiApiKey: text("geminiApiKey"),
   openaiApiKey: text("openaiApiKey"),
   anthropicApiKey: text("anthropicApiKey"),
+  cohereApiKey: text("cohereApiKey"),
   model: varchar("model", { length: 100 }).default("llama-3.3-70b-versatile").notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

@@ -53,7 +53,7 @@ const featureNames: Record<string, string> = {
   other: "Outros",
 };
 
-type Provider = "groq" | "gemini" | "openai" | "anthropic" | "manus";
+type Provider = "groq" | "gemini" | "openai" | "anthropic" | "manus" | "cohere";
 
 const PROVIDERS: {
   id: Provider;
@@ -140,6 +140,23 @@ const PROVIDERS: {
     ],
   },
   {
+    id: "cohere",
+    label: "Cohere",
+    emoji: "🔴",
+    color: "rose",
+    badgeColor: "bg-rose-100 text-rose-800 border-rose-200",
+    keyPlaceholder: "NQT...",
+    keyPrefix: "NQT",
+    docsUrl: "https://dashboard.cohere.com/api-keys",
+    docsLabel: "dashboard.cohere.com",
+    pricingNote: "Trial gratuito: 1.000 req/mês · Command R+: $2,50/1M tokens entrada",
+    models: [
+      { value: "command-r-plus-08-2024", label: "Command R+ (Mais capaz)" },
+      { value: "command-r-08-2024", label: "Command R (Equilibrado)" },
+      { value: "command-light", label: "Command Light (Rápido)" },
+    ],
+  },
+  {
     id: "manus",
     label: "Manus AI",
     emoji: "🟣",
@@ -167,6 +184,7 @@ const providerColors: Record<string, string> = {
   openai: "bg-green-100 text-green-800 border-green-200",
   anthropic: "bg-amber-100 text-amber-800 border-amber-200",
   gemini: "bg-blue-100 text-blue-800 border-blue-200",
+  cohere: "bg-rose-100 text-rose-800 border-rose-200",
   manus: "bg-purple-100 text-purple-800 border-purple-200",
 };
 
@@ -180,10 +198,10 @@ export default function AISettingsPage() {
 
   // Chaves de API — uma por provedor
   const [apiKeys, setApiKeys] = useState<Record<Provider, string>>({
-    groq: "", gemini: "", openai: "", anthropic: "", manus: "",
+    groq: "", gemini: "", openai: "", anthropic: "", manus: "", cohere: "",
   });
   const [showKey, setShowKey] = useState<Record<Provider, boolean>>({
-    groq: false, gemini: false, openai: false, anthropic: false, manus: false,
+    groq: false, gemini: false, openai: false, anthropic: false, manus: false, cohere: false,
   });
 
   const { data: settings, refetch: refetchSettings } = trpc.aiSettings.getSettings.useQuery();
@@ -219,7 +237,7 @@ export default function AISettingsPage() {
 
   const handleSaveSettings = async () => {
     // Identificar quais chaves foram preenchidas agora
-    const keysToValidate: Provider[] = (['groq', 'gemini', 'openai', 'anthropic'] as Provider[]).filter(p => apiKeys[p]?.trim());
+    const keysToValidate: Provider[] = (['groq', 'gemini', 'openai', 'anthropic', 'cohere'] as Provider[]).filter(p => apiKeys[p]?.trim());
     
     // Marcar como "validando" os provedores com chave nova
     if (keysToValidate.length > 0) {
@@ -236,6 +254,7 @@ export default function AISettingsPage() {
       geminiApiKey: apiKeys.gemini || undefined,
       openaiApiKey: apiKeys.openai || undefined,
       anthropicApiKey: apiKeys.anthropic || undefined,
+      cohereApiKey: apiKeys.cohere || undefined,
     });
     
     // Validar cada chave nova em paralelo
@@ -266,8 +285,8 @@ export default function AISettingsPage() {
   const [checkingKeys, setCheckingKeys] = useState(false);
   const [keyCheckResults, setKeyCheckResults] = useState<Record<string, { valid: boolean; message: string }> | null>(null);
   // Estado de validação individual por provedor (ao salvar)
-  const [keyValidationStatus, setKeyValidationStatus] = useState<Record<Provider, 'idle' | 'validating' | 'valid' | 'invalid'>>({ groq: 'idle', gemini: 'idle', openai: 'idle', anthropic: 'idle', manus: 'idle' });
-  const [keyValidationMsg, setKeyValidationMsg] = useState<Record<Provider, string>>({ groq: '', gemini: '', openai: '', anthropic: '', manus: '' });
+  const [keyValidationStatus, setKeyValidationStatus] = useState<Record<Provider, 'idle' | 'validating' | 'valid' | 'invalid'>>({ groq: 'idle', gemini: 'idle', openai: 'idle', anthropic: 'idle', manus: 'idle', cohere: 'idle' });
+  const [keyValidationMsg, setKeyValidationMsg] = useState<Record<Provider, string>>({ groq: '', gemini: '', openai: '', anthropic: '', manus: '', cohere: '' });
 
   const checkKeysMut = trpc.aiSettings.checkApiKeys.useMutation({
     onSuccess: (data: { results: { provider: string; valid: boolean; message: string }[] }) => {
@@ -295,6 +314,7 @@ export default function AISettingsPage() {
     if (pid === "gemini") return !!settings.hasGeminiKey;
     if (pid === "openai") return !!(settings as any).hasOpenaiKey;
     if (pid === "anthropic") return !!(settings as any).hasAnthropicKey;
+    if (pid === "cohere") return !!(settings as any).hasCohereKey;
     if (pid === "manus") return true;
     return false;
   };
@@ -305,6 +325,7 @@ export default function AISettingsPage() {
     if (pid === "gemini") return settings.geminiApiKeyPreview ?? null;
     if (pid === "openai") return (settings as any).openaiApiKeyPreview ?? null;
     if (pid === "anthropic") return (settings as any).anthropicApiKeyPreview ?? null;
+    if (pid === "cohere") return (settings as any).cohereApiKeyPreview ?? null;
     return null;
   };
 

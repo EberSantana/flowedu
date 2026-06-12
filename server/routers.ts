@@ -1269,9 +1269,15 @@ export const appRouter = router({
   
   calendar: router({
     listByYear: protectedProcedure
-      .input(z.object({ year: z.number() }))
+      .input(z.object({ year: z.number(), calendarType: z.string().optional() }))
       .query(async ({ ctx, input }) => {
-        return db.getCalendarEventsByYear(ctx.user.id, input.year);
+        const events = await db.getCalendarEventsByYear(ctx.user.id, input.year);
+        if (input.calendarType && input.calendarType !== 'todos') {
+          return (events as any[]).filter((e: any) => 
+            (e.calendarType || 'geral') === input.calendarType
+          );
+        }
+        return events;
       }),
     getUpcomingEvents: protectedProcedure
       .query(async ({ ctx }) => {
@@ -12775,12 +12781,13 @@ Retorne em formato JSON com estrutura:
     // Salvar configurações de IA
     saveSettings: protectedProcedure
       .input(z.object({
-        provider: z.enum(['groq', 'gemini', 'openai', 'anthropic', 'manus']),
+        provider: z.enum(['groq', 'gemini', 'openai', 'anthropic', 'manus', 'cohere']),
         model: z.string().min(1),
         groqApiKey: z.string().optional(),
         geminiApiKey: z.string().optional(),
         openaiApiKey: z.string().optional(),
         anthropicApiKey: z.string().optional(),
+        cohereApiKey: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') {
@@ -12800,11 +12807,12 @@ Retorne em formato JSON com estrutura:
             geminiApiKey = CASE WHEN ${input.geminiApiKey || ''} != '' THEN ${input.geminiApiKey || null} ELSE geminiApiKey END,
             openaiApiKey = CASE WHEN ${input.openaiApiKey || ''} != '' THEN ${input.openaiApiKey || null} ELSE openaiApiKey END,
             anthropicApiKey = CASE WHEN ${input.anthropicApiKey || ''} != '' THEN ${input.anthropicApiKey || null} ELSE anthropicApiKey END,
+            cohereApiKey = CASE WHEN ${(input as any).cohereApiKey || ''} != '' THEN ${(input as any).cohereApiKey || null} ELSE cohereApiKey END,
             updatedBy = ${ctx.user.id}
             WHERE id = ${existingId}`);
         } else {
-          await dbConn.execute(sql`INSERT INTO ai_settings (provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey, updatedBy)
-            VALUES (${input.provider}, ${input.model}, ${input.groqApiKey || null}, ${input.geminiApiKey || null}, ${input.openaiApiKey || null}, ${input.anthropicApiKey || null}, ${ctx.user.id})`);
+          await dbConn.execute(sql`INSERT INTO ai_settings (provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey, cohereApiKey, updatedBy)
+            VALUES (${input.provider}, ${input.model}, ${input.groqApiKey || null}, ${input.geminiApiKey || null}, ${input.openaiApiKey || null}, ${input.anthropicApiKey || null}, ${(input as any).cohereApiKey || null}, ${ctx.user.id})`);
         }
         invalidateAISettingsCache();
         return { success: true };
@@ -12812,7 +12820,7 @@ Retorne em formato JSON com estrutura:
     // Testar conexão com a API de IA
     testConnection: protectedProcedure
       .input(z.object({
-        provider: z.enum(['groq', 'gemini', 'openai', 'anthropic', 'manus']),
+        provider: z.enum(['groq', 'gemini', 'openai', 'anthropic', 'manus', 'cohere']),
         apiKey: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -12873,6 +12881,19 @@ Retorne em formato JSON com estrutura:
               throw new Error((err as any)?.error?.message || `HTTP ${response.status}`);
             }
             return { success: true, message: 'Conexão com Google Gemini estabelecida com sucesso!', model: 'gemini-1.5-flash' };
+          } else if (input.provider === 'cohere') {
+            const apiKey = input.apiKey;
+            if (!apiKey) throw new Error('Chave API Cohere não configurada');
+            const response = await fetch('https://api.cohere.com/compatibility/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ model: 'command-r-plus', messages: [{ role: 'user', content: 'Responda apenas: OK' }], max_tokens: 5 }),
+            });
+            if (!response.ok) {
+              const err = await response.json().catch(() => ({})) as any;
+              throw new Error((err as any)?.error?.message || `HTTP ${response.status}`);
+            }
+            return { success: true, message: 'Conexão com Cohere estabelecida com sucesso!', model: 'command-r-plus' };
           } else if (input.provider === 'manus') {
             await invokeLLM({ messages: [{ role: 'user', content: 'Responda apenas: OK' }] });
             return { success: true, message: 'Conexão com Manus AI estabelecida com sucesso!', model: 'manus-default' };

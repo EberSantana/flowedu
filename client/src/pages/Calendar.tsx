@@ -64,7 +64,10 @@ export default function Calendar() {
   const [newYearEvents, setNewYearEvents] = useState<any[]>([]);
   const [eventsToDelete, setEventsToDelete] = useState<any[]>([]);
 
-  const { data: events, isLoading } = trpc.calendar.listByYear.useQuery({ year: selectedYear });
+  // Estado para filtro de tipo de calendário
+  const [selectedCalendarType, setSelectedCalendarType] = useState<string>('todos');
+
+  const { data: events, isLoading } = trpc.calendar.listByYear.useQuery({ year: selectedYear, calendarType: selectedCalendarType });
   const utils = trpc.useUtils();
 
   const createMutation = trpc.calendar.create.useMutation({
@@ -462,6 +465,27 @@ export default function Calendar() {
               <p className="text-gray-600 mt-1">
                 {monthEvents.length} {monthEvents.length === 1 ? 'evento' : 'eventos'} em {MONTHS[selectedMonth]}
               </p>
+              {/* Seletor de tipo de calendário */}
+              <div className="flex gap-2 mt-3">
+                {[
+                  { value: 'todos', label: 'Todos', color: 'bg-gray-600' },
+                  { value: 'integrado', label: 'Integrado', color: 'bg-blue-600' },
+                  { value: 'subsequente_graduacao', label: 'Subsequente/Graduação', color: 'bg-emerald-600' },
+                  { value: 'geral', label: 'Geral', color: 'bg-purple-600' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setSelectedCalendarType(opt.value)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all border-2 ${
+                      selectedCalendarType === opt.value
+                        ? `${opt.color} text-white border-transparent shadow-md`
+                        : 'bg-transparent text-gray-600 border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex gap-3">
               <Button

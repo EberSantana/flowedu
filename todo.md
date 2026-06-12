@@ -8045,3 +8045,11 @@ Implementar sistema completo de personalização por perfil: Dashboard adaptativ
 - [x] Melhorar detecção anti-duplicatas: comparação por palavras-chave além de texto curto
 - [x] Instruir IA a retornar alternativas SEM prefixo de letra (evitar "A) texto")
 - [x] Deploy na VPS - CONCLUÍDO
+
+## Calendários IFS Campus Tobias Barreto 2026
+- [ ] Salvar dados extraídos dos PDFs em arquivo JSON estruturado
+- [ ] Criar os dois calendários no banco de dados (Integrado 2026 e Subsequente/Graduação 2026)
+- [ ] Adaptar a interface de seleção de calendário para alternar entre os dois
+- [ ] Remover referências ao IFAM e refletir o IFS Campus Tobias Barreto
+- [ ] Importar todos os eventos, feriados e bimestres de cada calendário
+- [ ] Deploy na VPS e validação

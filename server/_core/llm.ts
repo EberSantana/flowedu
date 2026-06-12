@@ -19,7 +19,7 @@ async function getConfiguredProvider(): Promise<{ provider: string; model: strin
     const dbConn = await getDb();
     if (!dbConn) return null;
     const result = await dbConn.execute(
-      sql`SELECT provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey FROM ai_settings WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1`
+      sql`SELECT provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey, cohereApiKey FROM ai_settings WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1`
     ) as any[];
     const rows = (result[0] as any[]) || [];
     if (rows.length === 0) return null;
@@ -44,6 +44,10 @@ async function getConfiguredProvider(): Promise<{ provider: string; model: strin
       case 'manus':
         apiKey = ENV.forgeApiKey || '';
         apiUrl = ENV.forgeApiUrl ? `${ENV.forgeApiUrl.replace(/\/$/, '')}/v1/chat/completions` : 'https://forge.manus.im/v1/chat/completions';
+        break;
+      case 'cohere':
+        apiKey = row.cohereApiKey || '';
+        apiUrl = 'https://api.cohere.com/compatibility/v1/chat/completions';
         break;
       case 'groq':
       default:
@@ -344,8 +348,9 @@ const normalizeResponseFormat = ({
       );
     }
     // Groq não suporta json_schema com strict mode - converter para json_object
+    // (Cohere também não suporta, mas a verificação do provedor ativo é feita em invokeLLM)
     if (explicitFormat.type === "json_schema" && ENV.groqApiKey) {
-      console.log('[LLM] Groq detected: converting json_schema to json_object');
+      console.log(`[LLM] Groq detected: converting json_schema to json_object`);
       return { type: "json_object" };
     }
     return explicitFormat;
@@ -458,6 +463,8 @@ export async function invokeLLM(params: InvokeParams & { feature?: string }): Pr
     payload.max_tokens = 8192;
   } else if (activeProvider === 'openai') {
     payload.max_tokens = 16384;
+  } else if (activeProvider === 'cohere') {
+    payload.max_tokens = 4096; // Cohere compatibility endpoint
   } else {
     payload.max_tokens = 32768;
   }
