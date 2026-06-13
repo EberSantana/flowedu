@@ -987,6 +987,25 @@ function Dashboard() {
                     
                     const style = eventStyles[event.eventType] || eventStyles.personal;
                     
+                    // Badge de tipo de calendário
+                    const calType = event.calendarType;
+                    let calBadge = null;
+                    if (calType === 'integrado') {
+                      calBadge = (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+                          Integrado
+                        </span>
+                      );
+                    } else if (calType === 'subsequente_graduacao') {
+                      calBadge = (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                          Subsequente/Grad.
+                        </span>
+                      );
+                    }
+                    
                     return (
                       <div
                         key={event.id}
@@ -1011,11 +1030,14 @@ function Dashboard() {
                             <p className="text-xs text-gray-600 mb-2">
                               {dayOfWeek}, {dayMonth}
                             </p>
-                            <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/50 border border-gray-300">
-                              {style.label}
-                            </span>
+                            <div className="flex flex-wrap gap-1.5 items-center">
+                              <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/50 border border-gray-300">
+                                {style.label}
+                              </span>
+                              {calBadge}
+                            </div>
                             {event.description && (
-                              <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                              <p className="text-xs text-gray-600 mt-1.5 line-clamp-2">
                                 {event.description}
                               </p>
                             )}
