@@ -629,6 +629,14 @@ export default function Calendar() {
                           <span className="text-xs text-gray-600">{value.label}</span>
                         </div>
                       ))}
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                        <span className="text-xs text-blue-800 font-medium">Integrado</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                        <span className="text-xs text-emerald-800 font-medium">Subsequente/Grad.</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -688,6 +696,25 @@ export default function Calendar() {
                         const { day: evDay, month: evMonth } = parseDateStr(event.eventDate);
                         const eventType = EVENT_TYPES[event.eventType as keyof typeof EVENT_TYPES] || { label: event.eventType, color: 'bg-gray-500', dotColor: '#6b7280' };
                         
+                        // Badge de tipo de calendário (lista lateral)
+                        const calTypeSidebar = event.calendarType;
+                        let calBadgeSidebar = null;
+                        if (calTypeSidebar === 'integrado') {
+                          calBadgeSidebar = (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+                              Integrado
+                            </span>
+                          );
+                        } else if (calTypeSidebar === 'subsequente_graduacao') {
+                          calBadgeSidebar = (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                              Subsequente/Grad.
+                            </span>
+                          );
+                        }
+
                         return (
                           <div
                             key={event.id}
@@ -703,9 +730,12 @@ export default function Calendar() {
                                 <p className="text-xs text-gray-500 mt-0.5">
                                   {evDay} de {MONTHS[evMonth]}
                                 </p>
-                                <span className={`inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${eventType.color}`}>
-                                  {eventType.label}
-                                </span>
+                                <div className="flex flex-wrap gap-1.5 mt-1.5 items-center">
+                                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${eventType.color}`}>
+                                    {eventType.label}
+                                  </span>
+                                  {calBadgeSidebar}
+                                </div>
                                 {event.description && (
                                   <p className="text-xs text-gray-600 mt-2 line-clamp-2">
                                     {event.description}
@@ -1261,12 +1291,24 @@ export default function Calendar() {
                   <DialogTitle className="text-lg">{viewingEvent.title}</DialogTitle>
                 </div>
                 <DialogDescription asChild>
-                  <div className="space-y-1 pt-1">
+                  <div className="flex flex-wrap gap-1.5 items-center pt-1">
                     <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium text-white ${
                       EVENT_TYPES[viewingEvent.eventType as keyof typeof EVENT_TYPES]?.color || 'bg-gray-500'
                     }`}>
                       {EVENT_TYPES[viewingEvent.eventType as keyof typeof EVENT_TYPES]?.label || viewingEvent.eventType}
                     </span>
+                    {viewingEvent.calendarType === 'integrado' && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+                        Integrado
+                      </span>
+                    )}
+                    {viewingEvent.calendarType === 'subsequente_graduacao' && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                        Subsequente/Grad.
+                      </span>
+                    )}
                   </div>
                 </DialogDescription>
               </DialogHeader>
@@ -1336,9 +1378,21 @@ export default function Calendar() {
                       onClick={() => setViewingEvent(evt)}
                       className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: evtType?.dotColor }} />
                         <span className="font-medium text-sm">{evt.title}</span>
+                        {evt.calendarType === 'integrado' && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+                            Integrado
+                          </span>
+                        )}
+                        {evt.calendarType === 'subsequente_graduacao' && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                            Subsequente/Grad.
+                          </span>
+                        )}
                       </div>
                       {evt.description && (
                         <p className="text-xs text-muted-foreground mt-1 ml-5 line-clamp-1">{evt.description}</p>
