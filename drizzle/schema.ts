@@ -194,7 +194,7 @@ export type InsertTeacherBeltHistory = typeof teacherBeltHistory.$inferInsert;
 export const subjects = mysqlTable("subjects", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 200 }).notNull(),
-  code: varchar("code", { length: 200 }).notNull().unique(),
+  code: varchar("code", { length: 200 }).notNull(),
   description: text("description"),
   color: varchar("color", { length: 7 }).default("#3b82f6"),
   userId: int("userId").notNull(),
