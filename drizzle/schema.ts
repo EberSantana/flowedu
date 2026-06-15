@@ -223,7 +223,7 @@ export type InsertSubject = typeof subjects.$inferInsert;
 export const classes = mysqlTable("classes", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 200 }).notNull(),
-  code: varchar("code", { length: 200 }).notNull().unique(),
+  code: varchar("code", { length: 200 }).notNull(),
   description: text("description"),
   userId: int("userId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

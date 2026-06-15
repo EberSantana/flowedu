@@ -365,6 +365,13 @@
     "when": 1768200000000,
     "tag": "0051_remove_subjects_code_unique",
     "breakpoints": true
+  },
+  {
+    "idx": 52,
+    "version": "5",
+    "when": 1768201000000,
+    "tag": "0052_remove_classes_code_unique",
+    "breakpoints": true
   }
 ]
 }
