@@ -2440,6 +2440,23 @@ export type InsertMistakeNotebookStudyPlan = typeof mistakeNotebookStudyPlans.$i
  */
 
 /**
+ * Tokens Firebase Cloud Messaging (FCM)
+ * Armazena os tokens FCM para enviar notificações push via Firebase
+ */
+export const fcmTokens = mysqlTable("fcm_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  token: text("token").notNull(), // Token FCM do dispositivo
+  userAgent: varchar("user_agent", { length: 500 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FCMToken = typeof fcmTokens.$inferSelect;
+export type InsertFCMToken = typeof fcmTokens.$inferInsert;
+
+/**
  * Assinaturas Push do navegador
  * Armazena as subscriptions para enviar notificações push
  */

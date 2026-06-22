@@ -13,10 +13,11 @@
   "experiments": null,
   "git_remote": {
     "repo_url": "s3://vida-prod-gitrepo/webdev-git/310419663028972937/c6FhCpifoFzEQqXNtsKEU6",
-    "access_key_id": "ASIAZV3A2ECZHXROTJTG",
-    "secret_access_key": "8cr+Ul5RmwEz9CLxyeWO8YzHSTuiY1/DHO2sreKO",
-    "session_token": "IQoJb3JpZ2luX2VjEBIaCXVzLWVhc3QtMSJHMEUCIEQ6M8JWGL0A2WXga8eegAmNPY4Ed13erJys+zre3/YwAiEAny3/53l7hIiOyj2c74evJppw3pBDWyT+LARb/sqdr6sq/wMI2///////////ARAEGgw2NjUzODYwOTg4NjYiDKXuKcmYtJKtF3AfgirTA6HRAXPG0MGBKfw6ShHCNVCOQZcgonLypLT2p0kYMQPElzfN6rAiqTKIXCcb4wryWM/ctDED6+RNVpVEtGJkbpjTdBHzPcCldrxFaqQT3dhc2heZAiizYFzGkzLlvUV/yxjm65c3ymDig1cjSNlpSza8tjxjxK+wvPLVGTVwKbkxR9+uujs6zwV4w9hXJAUcZyDeqgS1+iK7ArqjBz/rdUXR0b4NqVWIl4NLSeI7L78n1xScCL+2ZkboZ5aPI9ciER4LuZWGPkjPN9sq2SZ71gZnFHEmWu8EFSQWXzJ+RGB87kivus9jCalLC7WdA7Nx39bgi67PixysCaoIe9HnsxanNqyXVIgeM4oaLcKceBZJwjcqGDpd5ZPdaVkGQSKHsacRBUQ+lCKzwzuuUbnsg3/Za9P1KEqe5RSeYJ2+oTtctOQXvyPoqWnrRhNAlHyXcOVjeMgRzGh5nOX51CGI1Enj1CQHV4v7ZI533U3ugHFdEED/7sCwxFA0upzc5EgbX7WX+V9rNFKvx/AmPEf3GbfIqB7odG6hHV+sEkCH4aPSssKfjl4OpgrGf14DVeN51ITHA+ndhaBLjhzCT1376+feTv1F8bEfBv0fzOe9/uWOaLNfMKjKstAGOp0BHmRZ3Yl3MqO1eiHLoPkUf+vABLdfRve7gmj9kSenrFdC7i84Cw47xunt4lre/CYlbVPrB+pR31q/Rq/d3ByfJi5Ti/TRvdwnJg6ESQQryDmUwBq+lew9+EgGR7CTtME+AdjtDHvDApIZ7iYXAUo9wRjZ02qDZmk0zXvnfqe2OjTFvsBLLHarvQCHgGbrGjK5ta+R7MoqxQUlqEAJtA==",
-    "expiration": "2026-05-20T06:00:08.000Z"
+    "access_key_id": "ASIAZV3A2ECZNSJRHSGL",
+    "secret_access_key": "wGGs46GMIof/nZER54XBn8sHk0tjP1Emt36e/m0c",
+    "session_token": "IQoJb3JpZ2luX2VjEEYaCXVzLWVhc3QtMSJHMEUCICozBNjNmPRvR1jdQtzIqZ/w4T/Zd/Y/c7uprWsfnDqZAiEAtyF8cX0bc3WdGWEEfRUR3VG1J5T2tSGQxE3v6HOzkhkq9gMIDxAEGgw2NjUzODYwOTg4NjYiDBHyuauWfFC+McePOCrTA/Xulx4QmVdXKW8AsvmJrZUI3eOeYNigkSALlZrl4O+/rvbRpIcYMDyrWiBemIxfynAf1ezynTyOOq/Uiovrg7tVrXtL1unAMuGP4TwBnT3xBpIvt5f6Rg5t5/fudhdcXCCN2zjDSrprMPdSxKizAF4EJK9yTrf6lMBHQPcbWCKsTM1qc6OTZTxLWq6+VI5niZejiA07xFnnzSesvdC/jHLv55E6PuPKNVOLXdRRCnrA8lYMvngnX//GpidhkvLhl8kRPRh5+FB1ll4xeMlU+PNCBnhue9W8ldySjugdxm0Sp2t5mgVhYYLqFPjNWRb/JQKfNTTL6tRjztWmMGkrLcQiqdP3VJ9JsfoTJ/3vX8onYVu6oJGGrM2cWhjVXMusOW8Z6/xwWCm2f4nsdhQ1P5KQFvoIV3zOjZMnlaL9ChmtAVzzl1NvR+lRjjh6l2ZDzKrtt1z3fYOOs5Qxn9wLgwfmn6Kfjy/hgPwxC7/fTGEKo++Fsb+6VLqZo9LZ46TeX7/nhJmFljSXUsrJ6Kyoy7doC5uLuIfHjYOYIqAaeeHOx1HMaIi5nxw8YWXtgH5425Y1EOy98JhCXAeFi7DTijyhzRpYj0ggsRnGqjdbyKJ6pWRQMOXP5tEGOp0BUcqrohBke16vTqP7NmF14muBbV2AstfWrG5LwVCW65VFymHEf2vF3iwynez7Bwo5RTgTVXfCvnMUPzTCYERoNXbQ1UahBwFEGBRK2cEJFG7MUWbVgkHO8Zs7ulhp/I+U9DZJR5IZ5VOYmEnHARAXYl0gXKbURYpVB7H7WkspuhADw0e6bU0YqSDG7vY1JUdug5kqKM54K8aGOsrAuQ==",
+    "expiration": "2026-06-23T09:23:49.000Z",
+    "backend": "GIT_BACKEND_S3"
   },
   "name": "teacher_schedule_system",
   "path": "/home/ubuntu/teacher_schedule_system",

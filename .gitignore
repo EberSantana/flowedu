@@ -30,3 +30,4 @@ temp/
 uploads/
 .cache/
 .github/workflows/
+.project-config.json

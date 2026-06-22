@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import "./index.css";
+import { initializeFirebase } from "./lib/firebase-init";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,11 @@ const trpcClient = trpc.createClient({
     }),
   ],
 });
+
+// Inicializar Firebase em produção
+if (import.meta.env.PROD) {
+  initializeFirebase().catch(err => console.error('[Firebase] Erro ao inicializar:', err));
+}
 
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
