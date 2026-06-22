@@ -98,7 +98,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     window.location.reload();
   });
 
-  // 6. Ouvir mensagens do SW (ex: NOTIFICATION_CLICKED)
+  // 6. Ouvir mensagens do SW (ex: NOTIFICATION_CLICKED, SW_UPDATED)
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.type === 'NOTIFICATION_CLICKED') {
       const url = event.data.url;
@@ -108,6 +108,14 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       }
       // Invalidar queries de notificações para atualizar contagem
       queryClient.invalidateQueries();
+    }
+    // SW atualizado: recarregar para garantir que novos assets sejam carregados
+    if (event.data?.type === 'SW_UPDATED') {
+      console.log('[PWA] SW atualizado para versão', event.data.version, '- recarregando...');
+      if (!reloading) {
+        reloading = true;
+        window.location.reload();
+      }
     }
   });
 }

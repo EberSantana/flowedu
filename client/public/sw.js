@@ -27,6 +27,15 @@ self.addEventListener('activate', (event) => {
     }).then(() => {
       console.log('[SW] Versão', CACHE_VERSION, 'ativada');
       return self.clients.claim();
+    }).then(() => {
+      // Forçar reload em todos os clientes após atualização do SW
+      // Isso garante que o browser carregue os novos assets após deploy
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => {
+          console.log('[SW] Forçando reload do cliente após atualização');
+          client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
+        });
+      });
     })
   );
 });
