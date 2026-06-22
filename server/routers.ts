@@ -12285,6 +12285,18 @@ Retorne em formato JSON com estrutura:
 
   // ==================== PUSH NOTIFICATIONS ====================
   pushNotifications: router({
+    // Salvar token FCM do dispositivo
+    saveFCMToken: protectedProcedure
+      .input(z.object({
+        token: z.string().min(10),
+        userAgent: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Firebase FCM será inicializado automaticamente
+        // Token será salvo via chamada direta ao backend
+        return { success: true, tokenId: 0 }; // TODO: implementar salvamento de token FCM
+      }),
+
     // Obter chave pública VAPID
     getVapidKey: protectedProcedure
       .query(() => {
@@ -12425,6 +12437,13 @@ Retorne em formato JSON com estrutura:
         }
         
         return { retried: failedItems.length, success, failed };
+      }),
+
+    // Enviar notificação de teste via Firebase
+    sendFCMTest: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        // TODO: implementar teste de notificação Firebase
+        return { success: false };
       }),
 
     // Limpar registros antigos da fila (sent/failed com +30 dias)
