@@ -91,6 +91,18 @@ export function serveStatic(app: Express) {
     etag: false,  // Desabilitar ETag para todos os arquivos estáticos
     lastModified: false, // Desabilitar Last-Modified também
     setHeaders: (res, filePath) => {
+      // CORS headers para todos os assets (necessario para navegadores moveis)
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Range');
+      
+      // Content-Type correto para CSS e JS
+      if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      }
+      
       // Assets com hash do Vite: cache longo (1 ano)
       if (filePath.includes('/assets/')) {
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
