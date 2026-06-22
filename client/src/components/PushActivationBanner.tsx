@@ -31,6 +31,11 @@ export default function PushActivationBanner() {
     },
   });
 
+  // Detectar iOS
+  const isIOS = typeof window !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+    !(window as any).MSStream;
+
   useEffect(() => {
     // Só mostrar se:
     // 1. Notificações push são suportadas
@@ -39,20 +44,20 @@ export default function PushActivationBanner() {
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed) return;
 
-    if (
-      typeof window !== "undefined" &&
-      "serviceWorker" in navigator &&
-      "PushManager" in window
-    ) {
-      setPushSupported(true);
-      const perm = Notification.permission;
-      if (perm === "default") {
-        // Pequeno delay para não aparecer imediatamente ao abrir o app
-        const timer = setTimeout(() => setVisible(true), 2500);
-        return () => clearTimeout(timer);
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      // iOS Safari: PushManager pode existir mas não funciona via Web Push
+      // Mostrar banner apenas se não for iOS, ou se for iOS com suporte real
+      const hasPushSupport = "PushManager" in window && !isIOS;
+      if (hasPushSupport) {
+        setPushSupported(true);
+        const perm = Notification.permission;
+        if (perm === "default") {
+          const timer = setTimeout(() => setVisible(true), 2500);
+          return () => clearTimeout(timer);
+        }
       }
     }
-  }, []);
+  }, [isIOS]);
 
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, "1");
@@ -60,23 +65,41 @@ export default function PushActivationBanner() {
   };
 
   const handleEnable = async () => {
+    if (isIOS) {
+      toast.error("Notificações push não são suportadas no iOS Safari. Use Android ou desktop.");
+      dismiss();
+      return;
+    }
     if (!pushSupported || !vapidKeyData?.key) {
       toast.error("Notificações push não disponíveis neste navegador");
       return;
     }
     setSubscribing(true);
     try {
-      const permission = await Notification.requestPermission();
+      // Timeout de 10s para evitar travamento
+      const permissionPromise = Notification.requestPermission();
+      const permission = await Promise.race([
+        permissionPromise,
+        new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error("Tempo esgotado ao solicitar permissão")), 10000)
+        ),
+      ]) as NotificationPermission;
+
       if (permission !== "granted") {
         toast.error("Permissão negada. Você pode ativar depois em Comunicação → Notificações Push.");
         dismiss();
         return;
       }
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: vapidKeyData.key,
-      });
+      const subscription = await Promise.race([
+        registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: vapidKeyData.key,
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Tempo esgotado ao registrar push")), 15000)
+        ),
+      ]);
       const subJson = subscription.toJSON();
       await subscribeMutation.mutateAsync({
         endpoint: subJson.endpoint!,
