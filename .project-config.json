@@ -13,10 +13,10 @@
   "experiments": null,
   "git_remote": {
     "repo_url": "s3://vida-prod-gitrepo/webdev-git/310419663028972937/c6FhCpifoFzEQqXNtsKEU6",
-    "access_key_id": "ASIAZV3A2ECZNSJRHSGL",
-    "secret_access_key": "wGGs46GMIof/nZER54XBn8sHk0tjP1Emt36e/m0c",
-    "session_token": "IQoJb3JpZ2luX2VjEEYaCXVzLWVhc3QtMSJHMEUCICozBNjNmPRvR1jdQtzIqZ/w4T/Zd/Y/c7uprWsfnDqZAiEAtyF8cX0bc3WdGWEEfRUR3VG1J5T2tSGQxE3v6HOzkhkq9gMIDxAEGgw2NjUzODYwOTg4NjYiDBHyuauWfFC+McePOCrTA/Xulx4QmVdXKW8AsvmJrZUI3eOeYNigkSALlZrl4O+/rvbRpIcYMDyrWiBemIxfynAf1ezynTyOOq/Uiovrg7tVrXtL1unAMuGP4TwBnT3xBpIvt5f6Rg5t5/fudhdcXCCN2zjDSrprMPdSxKizAF4EJK9yTrf6lMBHQPcbWCKsTM1qc6OTZTxLWq6+VI5niZejiA07xFnnzSesvdC/jHLv55E6PuPKNVOLXdRRCnrA8lYMvngnX//GpidhkvLhl8kRPRh5+FB1ll4xeMlU+PNCBnhue9W8ldySjugdxm0Sp2t5mgVhYYLqFPjNWRb/JQKfNTTL6tRjztWmMGkrLcQiqdP3VJ9JsfoTJ/3vX8onYVu6oJGGrM2cWhjVXMusOW8Z6/xwWCm2f4nsdhQ1P5KQFvoIV3zOjZMnlaL9ChmtAVzzl1NvR+lRjjh6l2ZDzKrtt1z3fYOOs5Qxn9wLgwfmn6Kfjy/hgPwxC7/fTGEKo++Fsb+6VLqZo9LZ46TeX7/nhJmFljSXUsrJ6Kyoy7doC5uLuIfHjYOYIqAaeeHOx1HMaIi5nxw8YWXtgH5425Y1EOy98JhCXAeFi7DTijyhzRpYj0ggsRnGqjdbyKJ6pWRQMOXP5tEGOp0BUcqrohBke16vTqP7NmF14muBbV2AstfWrG5LwVCW65VFymHEf2vF3iwynez7Bwo5RTgTVXfCvnMUPzTCYERoNXbQ1UahBwFEGBRK2cEJFG7MUWbVgkHO8Zs7ulhp/I+U9DZJR5IZ5VOYmEnHARAXYl0gXKbURYpVB7H7WkspuhADw0e6bU0YqSDG7vY1JUdug5kqKM54K8aGOsrAuQ==",
-    "expiration": "2026-06-23T09:23:49.000Z",
+    "access_key_id": "ASIAZV3A2ECZE6WKXRM3",
+    "secret_access_key": "6HOtSGeUFp74+ZdDvJd6svpH7+CCuNlD7leqketo",
+    "session_token": "IQoJb3JpZ2luX2VjEEYaCXVzLWVhc3QtMSJIMEYCIQDiFu4AHUKTeXNWdh66D0yF9M8HvHuLavx0CXMzZ9O4awIhAP8mFHgTPIDZjfgHMKVNwpcu77ojHM1a0M4KGSYIttruKvYDCA8QBBoMNjY1Mzg2MDk4ODY2Igw65AOh2xv72vOTQ64q0wMfoU5Sc8b+uMr3Mt92mjMIU5AiGWJnWnZUlR7uO4OlHfN/pnPrqR2cyhd3pSJxXti+821wpiswo3F9KhTp5DofYFhMTMe9jy+tSn4q5nhIlu884Ku0hRgSCggHNoM4qW48QWV05l1fmdzdyGUsdMsFYve2I21k9cJJ80TIFqkH0o6r+zOjr84Wlc0pw+umxlkuZbgpw3H9UhsmsG/629U5SsQUf7uiIsMl/o9hwwT0m3CJdimG7fxt6rNcEJ0pH5j+WIb34Lgna7yT66Wk8eVv37fKs4qBniojaICrxVyo/2SrFmIyNq+ccrWwy/0mGvxW8qfc+BIu7I1wrESnKOgiO9RrfFWntDhfHAnN5fB2MhshawMdn1LzQuQ+UnTqtlpcSssHUce2l3m3JuJmrrb1Qdrr9OUmZkhO5y+6BWv5rtXX9RrzSi8w5pvtiTjKKEabcu1XW2Ulk89uAEyJ+SnzVYGZBYblR2FMj4Y1Rp8G8teSp7naRdfFMlJfybAnM4yLVyBwfYw83JM+kgG0+zKfeQx9sIpEfGTJSsgBuW1oFp7VWlt7ScoJaGRHQT303TDcguIAOn2HG21pme3ZEsx0LWphqTw2brrlVyFJW2TuPAXzEzD24ObRBjqcAW8RzQExF/9msIHStL76CNnmN3isuAjArsMXQQRrYaGe4h3Zk0oTV32iW/poY7QDerTF3WR9BmOM2tYHmp9VUtXaVFmbD2du1tUbzYiDo9xSFiuyY9lI6PgCjAwC4GAQpw8bRSbSOZYhMyjeW/m7RW61Kl+3wdug8QXrOARQ2ZH2Ush1EitAwgjIuLOhCJZ8XmeKFNj9vmciPEWs3Q==",
+    "expiration": "2026-06-23T10:00:22.000Z",
     "backend": "GIT_BACKEND_S3"
   },
   "name": "teacher_schedule_system",
@@ -26,7 +26,7 @@
     "BUILT_IN_FORGE_API_KEY": "NYSLt3Ah4xuzZ539HJXcgU",
     "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
     "EMAIL_FROM": "ebersantana@profsistemp.info",
-    "GROQ_API_KEY": "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",
+    "GROQ_API_KEY": "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",
     "JWT_SECRET": "SjF5Yy3T5CQ8ZLRzqLkFhY",
     "OAUTH_SERVER_URL": "https://api.manus.im",
     "OWNER_NAME": "Eber Santana",
