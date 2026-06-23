@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Sidebar from "@/components/Sidebar";
 import PageWrapper from "@/components/PageWrapper";
-import { UserPlus, Users, Trash2, CheckCircle2, XCircle, Search, Calendar, MoreVertical, GraduationCap, AlertTriangle } from "lucide-react";
+import { UserPlus, Users, Trash2, CheckCircle2, XCircle, Search, Calendar, MoreVertical, GraduationCap, AlertTriangle, FileDown } from "lucide-react";
+import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { Link } from "wouter";
 import {
@@ -125,6 +126,21 @@ export default function ManageEnrollments() {
   const allSelected = filteredEnrollments.length > 0 && selectedIds.size === filteredEnrollments.length;
   const someSelected = selectedIds.size > 0 && !allSelected;
 
+  // Exportar alunos para XLSX
+  const handleExportXLSX = () => {
+    const rows = (enrollments || []).map((e, idx) => ({
+      '#': idx + 1,
+      'Matrícula': e.registrationNumber || '',
+      'Nome': e.student?.name || 'Aluno',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    const sheetName = (subject?.code || 'Alunos').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, `${subject?.name || 'alunos'}-matriculados.xlsx`);
+    toast.success('Arquivo exportado com sucesso!');
+  };
+
   // Get status badge color
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -239,6 +255,19 @@ export default function ManageEnrollments() {
                 </div>
 
                 <div className="flex items-center gap-3 flex-wrap">
+                  {/* Botão exportar XLSX */}
+                  {enrollments && enrollments.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExportXLSX}
+                      className="flex items-center gap-2"
+                    >
+                      <FileDown className="h-4 w-4" />
+                      Exportar XLSX
+                    </Button>
+                  )}
+
                   {/* Botão de remoção em massa — aparece quando há selecionados */}
                   {selectedIds.size > 0 && (
                     <Button
