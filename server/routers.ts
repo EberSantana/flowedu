@@ -6904,6 +6904,21 @@ Estruture sua resposta em seções: Observações, Hipóteses, Implicações Ped
       .mutation(async ({ ctx, input }) => {
         return await db.deleteEnrollment(input.id, ctx.user.id);
       }),
+
+    deleteMany: protectedProcedure
+      .input(z.object({ ids: z.array(z.number()).min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        let deleted = 0;
+        for (const id of input.ids) {
+          try {
+            await db.deleteEnrollment(id, ctx.user.id);
+            deleted++;
+          } catch (e) {
+            console.error('[enrollments.deleteMany] Erro ao remover id', id, e);
+          }
+        }
+        return { deleted };
+      }),
   }),
 
   // Professor Assignment Management
