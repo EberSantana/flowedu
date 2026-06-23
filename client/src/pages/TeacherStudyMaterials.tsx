@@ -341,12 +341,22 @@ export default function TeacherStudyMaterials() {
     return "other";
   }
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const MAX_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB
+
+  function validateAndSetFile(file: globalThis.File) {
+    if (file.size > MAX_UPLOAD_SIZE) {
+      toast.error(`Arquivo muito grande: ${formatFileSize(file.size)}. O limite máximo é 100 MB.`);
+      return;
+    }
     const type = detectFileType(file);
     setSelectedFile(file);
     setFormData((prev) => ({ ...prev, title: prev.title || file.name.replace(/\.[^/.]+$/, ""), type }));
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    validateAndSetFile(file);
   }
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -354,9 +364,7 @@ export default function TeacherStudyMaterials() {
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
-    const type = detectFileType(file);
-    setSelectedFile(file);
-    setFormData((prev) => ({ ...prev, title: prev.title || file.name.replace(/\.[^/.]+$/, ""), type }));
+    validateAndSetFile(file);
   }
 
   function canPreview(type: string, url: string): boolean {
@@ -1018,11 +1026,11 @@ export default function TeacherStudyMaterials() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                      <CloudUpload className="h-8 w-8" />
+                      <CloudUpload className="h-10 w-10 mb-1" />
                       <p className="text-sm font-medium">
                         {isDragOver ? "Solte o arquivo aqui" : "Arraste e solte ou clique para selecionar"}
                       </p>
-                      <p className="text-xs">
+                      <p className="text-xs text-center">
                         {formData.type === "audio"
                           ? "MP3, M4A, WAV, OGG, AAC, FLAC"
                           : formData.type === "image"
@@ -1036,6 +1044,9 @@ export default function TeacherStudyMaterials() {
                           : formData.type === "document"
                           ? "DOC, DOCX, TXT, ODT"
                           : "Todos os formatos suportados"}
+                      </p>
+                      <p className="text-xs font-medium text-muted-foreground/70 mt-1">
+                        Tamanho máximo: <span className="text-primary font-semibold">100 MB</span>
                       </p>
                     </div>
                   )}
