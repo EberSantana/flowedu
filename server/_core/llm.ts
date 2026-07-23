@@ -19,7 +19,7 @@ async function getConfiguredProvider(): Promise<{ provider: string; model: strin
     const dbConn = await getDb();
     if (!dbConn) return null;
     const result = await dbConn.execute(
-      sql`SELECT provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey, cohereApiKey FROM ai_settings WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1`
+      sql`SELECT provider, model, groqApiKey, geminiApiKey, openaiApiKey, anthropicApiKey FROM ai_settings WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1`
     ) as any[];
     const rows = (result[0] as any[]) || [];
     if (rows.length === 0) return null;
