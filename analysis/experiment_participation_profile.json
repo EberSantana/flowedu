@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "generatedAtUtc": "2026-09-24T19:29:16.663Z",
+    "databaseName": "c6FhCpifoFzEQqXNtsKEU6",
+    "startUtc": "2026-01-05T00:00:00.000Z",
+    "endExclusiveUtc": "2026-03-16T00:00:00.000Z",
+    "method": "read-only aggregate queries; no names, emails, registration numbers, prompts, answers or IP addresses exported"
+  },
+  "base": {
+    "registeredStudents": 271,
+    "registeredTeachers": 30,
+    "activeApprovedAccounts": 28,
+    "registeredSubjects": 51,
+    "enrolledStudents": 0,
+    "subjectEnrolledStudents": 14,
+    "classEnrolledStudents": 0,
+    "exerciseAttempts": 34,
+    "studentsAttemptingExercises": 12,
+    "exerciseAnswers": 445,
+    "studentsAnsweringExercises": 10,
+    "assignmentSubmissions": 33,
+    "studentsSubmittingAssignments": 1,
+    "completedTopicEvents": 0,
+    "studentsCompletingTopics": 0,
+    "behaviorEvents": 36,
+    "studentsWithBehaviorEvents": 1,
+    "aiInsights": 14,
+    "studentsWithAiInsights": 3
+  },
+  "genderAll": {
+    "students": 271,
+    "masculino": 0,
+    "feminino": 0,
+    "naoBinario": 0,
+    "personalizar": 0,
+    "prefiroNaoInformar": 271,
+    "semGenero": 0,
+    "avatarMale": 271,
+    "avatarFemale": 0,
+    "semAvatarGender": 0
+  },
+  "integrity": {
+    "answerStudentIds": 10,
+    "answerStudentsFoundInStudents": 5,
+    "answerStudentIdsMissingInStudents": 5
+  },
+  "genderParticipants": [
+    {
+      "gender": "prefiro_nao_informar",
+      "students": 8
+    }
+  ],
+  "late": {
+    "lateAssignmentSubmissions": 0,
+    "studentsWithLateAssignment": 0,
+    "lateBehaviorEvents": 0,
+    "studentsWithLateBehavior": 0,
+    "lateExerciseAttempts": 3,
+    "studentsWithLateExercise": 1
+  },
+  "submissionsByStatus": [
+    {
+      "status": "graded",
+      "rowCount": 33,
+      "students": 1
+    }
+  ],
+  "attemptsByStatus": [
+    {
+      "status": "completed",
+      "rowCount": 32,
+      "students": 10
+    },
+    {
+      "status": "in_progress",
+      "rowCount": 2,
+      "students": 2
+    }
+  ],
+  "behaviorTypes": [
+    {
+      "behaviorType": "exercise_completion",
+      "rowCount": 12,
+      "students": 1
+    },
+    {
+      "behaviorType": "engagement_high",
+      "rowCount": 12,
+      "students": 1
+    },
+    {
+      "behaviorType": "struggle_detected",
+      "rowCount": 12,
+      "students": 1
+    }
+  ],
+  "teacherSupport": {
+    "materialsCreated": 7,
+    "teachersCreatingMaterials": 1,
+    "exercisesCreated": 21,
+    "teachersCreatingExercises": 6,
+    "assignmentsCreated": 0,
+    "teachersCreatingAssignments": 0,
+    "aiInsightsGenerated": 14,
+    "teachersGeneratingInsights": 1,
+    "teacherActivityRecords": 0,
+    "teachersWithActivityRecords": 0,
+    "professorComments": 0,
+    "teachersCommenting": 0,
+    "studentDoubts": 69,
+    "teachersReceivingDoubts": 1,
+    "loggedAiCalls": 0
+  },
+  "fieldSupport": {
+    "answersWithAiFeedback": 261,
+    "answersWithStudyTips": 167,
+    "answersWithAiAnalysis": 34,
+    "answersWithTeacherFeedback": 0,
+    "answersReviewedByTeacher": 0,
+    "reviewingTeachers": 0
+  },
+  "limitations": [
+    "The database has gender fields, but gender is sensitive personal data; any publication must use aggregate counts, suppress small cells where appropriate, and confirm the lawful basis and research ethics requirements.",
+    "The database does not contain an explicit experiment identifier, control group, consent flag, or reliable exposure/visualization event for every AI artifact.",
+    "Late assignment counts use submittedAt > topic_assignments.dueDate; late exercise counts use completedAt/updatedAt > student_exercises.availableTo. These are operational proxies, not a validated institutional lateness rule.",
+    "AI support fields in exercise answers are evidence of stored fields, not proof that a provider call generated them, because ai_usage_logs is empty.",
+    "Participation is reported by multiple operational definitions because no single experiment-participant table exists."
+  ]
+}
