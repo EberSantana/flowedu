@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "generatedAtUtc": "2026-09-24T16:48:45.204Z",
+    "databaseName": "c6FhCpifoFzEQqXNtsKEU6",
+    "periodDays": 70,
+    "analysisStart": "2026-01-05T00:00:00.000Z",
+    "analysisEnd": "2026-03-16T00:00:00.000Z",
+    "dataHandling": "Only aggregate, pseudonym-free queries were executed. No names, emails, registration numbers, prompts, responses, IP addresses, or user-agent strings were written to this output."
+  },
+  "baseCounts": {
+    "teachersRegistered": 30,
+    "teachersActiveApproved": 28,
+    "studentsRegistered": 271,
+    "subjectsRegistered": 51,
+    "aiCalls70d": 0,
+    "aiInsights70d": 14,
+    "aiCacheEntries70d": 1,
+    "modulesCreated70d": 18,
+    "topicsCreated70d": 26,
+    "assessmentsCreated70d": 0,
+    "assessmentAttempts70d": 0,
+    "topicProgressEvents70d": 55,
+    "behaviors70d": 36,
+    "accessLogs70d": 3
+  },
+  "allTimeCoverage": [
+    {
+      "sourceTable": "learning_modules",
+      "rows": 18,
+      "firstEventAt": "2026-02-11T18:41:12.000Z",
+      "lastEventAt": "2026-03-07T21:08:34.000Z"
+    },
+    {
+      "sourceTable": "ai_insights",
+      "rows": 14,
+      "firstEventAt": "2026-01-05T20:30:14.000Z",
+      "lastEventAt": "2026-01-19T15:23:26.000Z"
+    },
+    {
+      "sourceTable": "ai_analysis_cache",
+      "rows": 1,
+      "firstEventAt": "2026-03-07T21:08:38.000Z",
+      "lastEventAt": "2026-03-07T21:08:38.000Z"
+    },
+    {
+      "sourceTable": "learning_topics",
+      "rows": 26,
+      "firstEventAt": "2026-02-11T21:06:36.000Z",
+      "lastEventAt": "2026-03-07T21:08:34.000Z"
+    },
+    {
+      "sourceTable": "ai_usage_logs",
+      "rows": 0,
+      "firstEventAt": null,
+      "lastEventAt": null
+    },
+    {
+      "sourceTable": "student_topic_progress",
+      "rows": 55,
+      "firstEventAt": "2026-01-12T23:31:05.000Z",
+      "lastEventAt": "2026-03-07T21:08:33.000Z"
+    },
+    {
+      "sourceTable": "assessments",
+      "rows": 1,
+      "firstEventAt": "2026-03-18T15:00:12.000Z",
+      "lastEventAt": "2026-03-18T15:00:12.000Z"
+    },
+    {
+      "sourceTable": "assessment_answers",
+      "rows": 0,
+      "firstEventAt": null,
+      "lastEventAt": null
+    },
+    {
+      "sourceTable": "assessment_attempts",
+      "rows": 0,
+      "firstEventAt": null,
+      "lastEventAt": null
+    },
+    {
+      "sourceTable": "student_behaviors",
+      "rows": 36,
+      "firstEventAt": "2026-01-05T20:30:14.000Z",
+      "lastEventAt": "2026-01-19T15:23:26.000Z"
+    },
+    {
+      "sourceTable": "learning_recommendations",
+      "rows": 0,
+      "firstEventAt": null,
+      "lastEventAt": null
+    },
+    {
+      "sourceTable": "practice_question_hints",
+      "rows": 0,
+      "firstEventAt": null,
+      "lastEventAt": null
+    },
+    {
+      "sourceTable": "access_logs",
+      "rows": 3,
+      "firstEventAt": "2026-03-15T19:28:24.000Z",
+      "lastEventAt": "2026-03-15T20:10:16.000Z"
+    },
+    {
+      "sourceTable": "student_exercise_answers",
+      "rows": 458,
+      "firstEventAt": "2025-12-29T16:33:24.000Z",
+      "lastEventAt": "2026-02-17T17:47:55.000Z"
+    }
+  ],
+  "aiUsage": {
+    "totals": {
+      "calls": 0,
+      "successes": 0,
+      "failures": 0,
+      "successRate": null,
+      "failureRate": null,
+      "uniqueTeachers": 0,
+      "adoptionRateAmongActiveApprovedTeachers": 0,
+      "totalTokens": 0,
+      "avgTokensPerCall": null,
+      "avgPromptTokens": null,
+      "avgCompletionTokens": null,
+      "firstCallAt": null,
+      "lastCallAt": null
+    },
+    "byFeature": [],
+    "byModel": [],
+    "daily": []
+  },
+  "persistedAiArtifacts": {
+    "cacheByType": [
+      {
+        "analysisType": "test_analysis",
+        "entries": 1,
+        "uniqueTeachers": 1,
+        "totalCacheHits": 0,
+        "inputBytes": 46,
+        "outputBytes": 29,
+        "firstCreatedAt": "2026-03-07T21:08:38.000Z",
+        "lastCreatedAt": "2026-03-07T21:08:38.000Z"
+      }
+    ],
+    "insightsByType": [
+      {
+        "insightType": "recommendation",
+        "insights": 14,
+        "uniqueStudents": 3,
+        "uniqueTeachers": 1,
+        "actionableInsights": 14,
+        "dismissedInsights": 12
+      }
+    ]
+  },
+  "directStudentSupport": {
+    "studentsWithAiInsights": 3,
+    "studentsWithRecommendations": 0,
+    "studentsWithPracticeHints": 0,
+    "studentsWithAiExerciseFeedback": 7
+  },
+  "hints": [],
+  "exerciseAiFeedback": {
+    "answerRows": 445,
+    "withAiFeedback": 261,
+    "withStudyTips": 167,
+    "withAiAnalysis": 34,
+    "withDetailedExplanation": 0,
+    "flaggedForReview": 0,
+    "reviewedAtRecorded": 0
+  },
+  "aiArtifactCoverage": {
+    "subjectsWithAiInsights": 1,
+    "teachersWithAiInsights": 1,
+    "subjectsWithAiExerciseFeedback": 4,
+    "teachersWithAiExerciseFeedback": 1,
+    "studentsWithStudyTips": 4,
+    "studentsWithAnyDocumentedAiArtifact": 9,
+    "studentsWithCompletedTopicAfterAiInsight": 2,
+    "aiExerciseFieldBytes": 121653,
+    "aiInsightFieldBytes": 3399
+  },
+  "studyTips": {
+    "tipAnswerRows": 86,
+    "students": 4,
+    "topics": 0,
+    "minTipsPerStudent": 11,
+    "maxTipsPerStudent": 34,
+    "avgTipsPerStudent": 21.5,
+    "minTipsPerTopic": null,
+    "maxTipsPerTopic": null,
+    "avgTipsPerTopic": null
+  },
+  "progressByStudyTipCohort": [
+    {
+      "cohort": "with_study_tips",
+      "studentsWithTrackedProgress": 2,
+      "completedTopics": 34,
+      "trackedTopics": 35,
+      "meanCompletionRate": 0.5
+    },
+    {
+      "cohort": "without_study_tips",
+      "studentsWithTrackedProgress": 1,
+      "completedTopics": 20,
+      "trackedTopics": 20,
+      "meanCompletionRate": 1
+    }
+  ],
+  "assessments": {
+    "scoreDistributionAllAssessments": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "stdDevSample": null,
+      "min": null,
+      "q1": null,
+      "q3": null,
+      "max": null
+    },
+    "questionAccuracyAllAssessments": {
+      "answerRows": 0,
+      "correctAnswers": null,
+      "accuracyRate": null,
+      "distinctQuestions": 0,
+      "distinctAttempts": 0
+    },
+    "lifecycleByStatus": []
+  },
+  "behavior": {
+    "byType": [
+      {
+        "behaviorType": "exercise_completion",
+        "records": 12,
+        "uniqueStudents": 1
+      },
+      {
+        "behaviorType": "struggle_detected",
+        "records": 12,
+        "uniqueStudents": 1
+      },
+      {
+        "behaviorType": "engagement_high",
+        "records": 12,
+        "uniqueStudents": 1
+      }
+    ],
+    "daily": [
+      {
+        "date": "2026-01-05T00:00:00.000Z",
+        "records": 9
+      },
+      {
+        "date": "2026-01-08T00:00:00.000Z",
+        "records": 3
+      },
+      {
+        "date": "2026-01-11T00:00:00.000Z",
+        "records": 9
+      },
+      {
+        "date": "2026-01-14T00:00:00.000Z",
+        "records": 6
+      },
+      {
+        "date": "2026-01-16T00:00:00.000Z",
+        "records": 3
+      },
+      {
+        "date": "2026-01-19T00:00:00.000Z",
+        "records": 6
+      }
+    ]
+  },
+  "learningProgress": {
+    "byStatus": [
+      {
+        "status": "in_progress",
+        "rows": 1,
+        "uniqueStudents": 1
+      },
+      {
+        "status": "completed",
+        "rows": 54,
+        "uniqueStudents": 2
+      }
+    ]
+  },
+  "access": {
+    "byDeviceFamily": [
+      {
+        "userType": "teacher",
+        "os": "(not recorded)",
+        "browser": "(not recorded)",
+        "accesses": 3,
+        "uniqueStudents": 0
+      }
+    ]
+  },
+  "limitations": [
+    "The tables for learning trails, assessments, materials, and behavior records do not store a reliable aiGenerated flag or a generation-to-publication lineage. AI versus non-AI comparisons are therefore not identified from the current database alone.",
+    "The ai_usage_logs table stores provider, model, feature, token totals, success status, and timestamps, but does not store request latency, cost, prompt version, generation response, schema-validation result, or human-review/publish decisions.",
+    "Assessment tables store outcomes but do not label an assessment or a question as AI-generated, nor record question-level edit, discard, answer-key-error, or correction-completion events.",
+    "Access logs contain operating system and browser but do not link a visit to an AI feature, so device-level AI use cannot be measured reliably.",
+    "No validated teaching modality, institutional level, location, internet-access, disability/accommodation, perceived-benefit, or self-reported time-saving fields were found in the analyzed operational tables."
+  ]
+}

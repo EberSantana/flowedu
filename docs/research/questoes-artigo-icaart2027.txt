@@ -1,0 +1,159 @@
+Bloco 1 — Vantagens em Produtividade e Economia de Tempo Docente
+
+    Qual é o tempo médio entre a solicitação de geração por IA e a disponibilização do conteúdo gerado (trilhas, provas, planos de aula, infográficos, mapas mentais)?
+
+    Quantos materiais didáticos foram gerados por IA por professor ao longo dos 70 dias?
+
+    Qual é a distribuição de materiais gerados por IA por disciplina e por tipo de funcionalidade?
+
+    Quantas trilhas de aprendizagem foram geradas por IA e quantas foram efetivamente publicadas sem edição humana?
+
+    Quantas avaliações foram geradas por IA e qual foi o tempo médio entre geração e aplicação?
+
+    Quantos planos de aula, infográficos e mapas mentais foram gerados por IA e utilizados em sala?
+
+    Qual é a frequência de uso de cada funcionalidade de IA (trilha, prova, pensamento computacional, infográfico, mapa mental, plano de aula, análise de desempenho, dicas para exercícios) por professor?
+
+Bloco 2 — Vantagens em Personalização e Adaptação
+
+    Quantos alunos receberam dicas personalizadas geradas por IA para exercícios?
+
+    Qual é a distribuição de dicas personalizadas por aluno e por tópico?
+
+    Quantos alunos tiveram análise individual de desempenho gerada com apoio de IA?
+
+    Existe diferença no progresso em trilhas entre alunos que receberam dicas personalizadas por IA e os que não receberam?
+
+    Qual é a taxa de conclusão de tópicos em trilhas geradas por IA versus trilhas não geradas por IA?
+
+    Quantos tópicos foram adaptados ou reorganizados após recomendação da IA?
+
+Bloco 3 — Vantagens em Avaliação e Feedback
+
+    Qual é a distribuição completa das notas da prova gerada por IA (média, mediana, desvio padrão, quartis, mínimo, máximo)?
+
+    Qual é a taxa de acerto por questão (índice de dificuldade) na prova gerada por IA?
+
+    Quantas questões geradas por IA foram revisadas, editadas ou descartadas por professores antes da aplicação?
+
+    Qual é a proporção de questões geradas por IA que apresentaram erro de gabarito ou inconsistência?
+
+    Quantos alunos foram afetados pelos bugs de integração em avaliações geradas por IA?
+
+    Qual é o tempo médio de correção de avaliações geradas por IA versus avaliações tradicionais?
+
+    Quantas justificativas e gabaritos foram gerados automaticamente por IA e validados por professores?
+
+Bloco 4 — Vantagens em Acompanhamento e Análise de Desempenho
+
+    Quantos registros comportamentais foram gerados com apoio de IA e quantos foram registrados manualmente?
+
+    Qual é a distribuição temporal dos registros comportamentais ao longo dos 70 dias?
+
+    Existe correlação entre registros comportamentais e progresso nas trilhas?
+
+    Existe correlação entre progresso nas trilhas e desempenho na avaliação gerada por IA?
+
+    Quantos alunos apresentaram progresso em trilhas após receberem análise de desempenho gerada por IA?
+
+    Qual é a distribuição de alunos por faixa de progresso (iniciante, parcial, concluinte) e por desempenho (abaixo, na média, acima)?
+
+Bloco 5 — Vantagens em Cobertura e Escala
+
+    Quantas disciplinas foram cadastradas e quantas efetivamente utilizaram funcionalidades de IA?
+
+    Quantos alunos foram alcançados por conteúdo gerado por IA (direta ou indiretamente)?
+
+    Qual é a distribuição de uso de IA por professor e por disciplina?
+
+    Existe diferença de uso de IA entre disciplinas do ensino técnico e do ensino superior?
+
+    Quantos alunos únicos foram impactados por pelo menos uma funcionalidade de IA?
+
+    Qual é a taxa de adoção de funcionalidades de IA por parte dos professores cadastrados?
+
+Bloco 6 — Vantagens em Qualidade e Validação do Conteúdo Gerado
+
+    Quantas saídas de IA passaram por validação de esquema antes da persistência?
+
+    Quantas saídas de IA foram rejeitadas pelos mecanismos de deduplicação?
+
+    Quantas saídas de IA foram corrigidas por normalização no servidor?
+
+    Qual é a taxa de conteúdo gerado por IA que precisou de intervenção humana antes da publicação?
+
+    Quantas versões de um mesmo conteúdo gerado por IA foram criadas até a versão final publicada?
+
+    Qual é o tempo médio entre geração por IA, validação e publicação final?
+
+Bloco 7 — Vantagens em Governança, Rastreabilidade e Reprodutibilidade
+
+    Quantos registros de geração por IA possuem modelo, versão, prompt e parâmetros armazenados?
+
+    É possível reconstruir a cadeia completa de geração de cada conteúdo publicado (prompt → resposta → validação → edição → publicação)?
+
+    Quantos conteúdos gerados por IA possuem trilha de auditoria completa?
+
+    Quantos conteúdos gerados por IA foram publicados sem registro de revisão humana?
+
+    Qual é a distribuição de uso de modelos de IA (família Llama 3 e outros) ao longo do período?
+
+Bloco 8 — Vantagens Percebidas e Autorrelatadas (cruzamento com BD)
+
+    Quantos professores relataram economia de tempo após uso de IA e qual a economia média autorrelatada?
+
+    Existe associação entre frequência de uso de IA e percepção de utilidade pedagógica?
+
+    Quantos professores revisaram conteúdo gerado por IA antes de disponibilizar aos alunos?
+
+    Qual é a taxa de reuso de conteúdo gerado por IA em turmas ou semestres posteriores?
+
+    Quantos alunos relataram (ou registraram) benefício percebido com dicas personalizadas por IA?
+
+Bloco 9 — Vantagens Comparativas (IA vs. Não IA)
+
+    Existe diferença de progresso entre trilhas geradas por IA e trilhas estruturadas manualmente?
+
+    Existe diferença de desempenho entre alunos avaliados por prova gerada por IA e alunos avaliados por prova tradicional?
+
+    Existe diferença de tempo de preparação entre professores que usaram IA e professores que não usaram?
+
+    Existe diferença de engajamento entre disciplinas que usaram IA e disciplinas que não usaram?
+
+    Existe diferença de taxa de conclusão entre tópicos com dicas de IA e tópicos sem dicas de IA?
+
+Bloco 10 — Vantagens Contextuais (Amazônia / IFAM / Coari)
+
+    Qual é a distribuição de uso de IA por aluno considerando acesso à internet e localização geográfica?
+
+    Quantos alunos acessaram funcionalidades de IA por dispositivo (mobile vs. desktop)?
+
+    Qual é a taxa de uso de IA em disciplinas presenciais versus disciplinas com apoio remoto?
+
+    Existe diferença de adoção de IA entre alunos do interior e alunos da capital?
+
+    Quantos alunos utilizaram funcionalidades de IA fora do horário de aula?
+
+Bloco 11 — Vantagens em Inclusão e Acessibilidade
+
+    Quantos alunos com dificuldades relatadas receberam apoio de IA?
+
+    Existe correlação entre uso de dicas personalizadas por IA e melhoria em tópicos com maior dificuldade?
+
+    Quantos alunos com baixo desempenho inicial melhoraram após uso de funcionalidades de IA?
+
+    Qual é a distribuição de uso de IA por alunos com diferentes níveis de progresso inicial?
+
+Bloco 12 — Vantagens em Sustentabilidade e Escalabilidade do Sistema
+
+    Qual é o custo computacional médio por geração de conteúdo por IA?
+
+    Qual é o tempo médio de resposta da API de IA por funcionalidade?
+
+    Quantas chamadas à API de IA foram realizadas ao longo dos 70 dias?
+
+    Qual é a taxa de falha nas chamadas à API de IA?
+
+    Qual é o volume de dados gerados por IA armazenados no banco?
+
+    Quantos conteúdos gerados por IA poderiam ser reutilizados em outras turmas ou instituições?

@@ -10,13 +10,15 @@
     "DATABASE_URL": "mysql://4EmYiUJsZhACerp.0e9436e27250:qNDC4S3ker0S85xsY2bS@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/c6FhCpifoFzEQqXNtsKEU6?ssl={\"rejectUnauthorized\":true}",
     "DRIZZLE_DATABASE_URL": "mysql://4EmYiUJsZhACerp.0e9436e27250:qNDC4S3ker0S85xsY2bS@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/c6FhCpifoFzEQqXNtsKEU6?ssl={\"rejectUnauthorized\":true}"
   },
-  "experiments": null,
+  "experiments": [
+    "no_db_push"
+  ],
   "git_remote": {
     "repo_url": "s3://vida-prod-gitrepo/webdev-git/310419663028972937/c6FhCpifoFzEQqXNtsKEU6",
-    "access_key_id": "ASIAZV3A2ECZG7L6P5HS",
-    "secret_access_key": "Lg2N93FfoEE67mnOlbbdJZTWmBhoI2p+XTerpznV",
-    "session_token": "IQoJb3JpZ2luX2VjEOv//////////wEaCXVzLWVhc3QtMSJHMEUCIQDyKvg4yhE4FU2LeaJhR0dQXgrjTf/E1xmzIKOlo2mE1wIgKHZg7z9El3tbwNOYZGVRL4ujJynXrJlqVmq1SCERtOcq/wMItP//////////ARAEGgw2NjUzODYwOTg4NjYiDM6EhSWkayUETtfgayrTAxSf+KXkmD1qWfzemfACa9RlmLLnorN4/GSLAeDgz1DYCZxknT2tsf/l8II5E+rNtexMaXY/ZU0po1Q/VQMRMsa2LilPgWvgGukJvzZNIdYQj8yN/WvMhlhr4BPNsoW4zp1TD/3jOqTcl/AACrCqwyeZrwC6hYpBD5dPavJjVz2wuihc1yoHNEqKDwh+fEWklwrlCwcxN/wo6XwrI9nxP+Jw6oBi/86fjOIy85EWzl36S/onzl0yVYoXng/woX8xsoHVBnnrT3AAmC0LsJLDPfMxuMho5CV7WmcSdOpmC1ECKnrrs6QiLJ5CS+R4az7gSKI4y0NtLhz4XbUul+mHkOqHr1Dd/xsMzUu9oIIWbkE8rkeZm9Ef98n5mwT3MoMJ7nEaVndMqCeecQmb/Hhc8ddQAIlfGyEDV90Jjs1j9kIwbCsBGb9g+44VctX2Tra6R+PXJ8mzRlPItDTEV/XUxOXaq/ETq7A5ZMrwaJ0lRRCI1+Spnw1Y3qLsu377QX9tjD9lw+4Q6/ZLj9NQa7p5Iykw7VKFQzzOqsAJnMI1FMQQRwAZ6Fvf9pM4vyh7HNIsoBh21YYUbrB3u0RUCiA6hePhIcRjxoiCIr31tYLj7SROHzhOMP7bs9MGOp0BCuFBrLoWXt7nj68e3VNNVOUUm7l6nAbVpofdsWZakSXr0lTe2EvFIkw4k0Fj6zkB3OIfeL6khEXA1+X2/k/+qsar67AQ5lg3ziu/qL+c2GMJoz0pwvgkMi0RF3YjeRQ2d6HN/jKAs1TnXX8sPvv6ayXUJSKT+CF6FkcUssIAvqUANEwGBXkWm3EWbswnIFR2e84pZHIH/AM2ssgpnw==",
-    "expiration": "2026-08-01T06:48:30.000Z",
+    "access_key_id": "ASIAZV3A2ECZHSPV3KNB",
+    "secret_access_key": "xaICuvwp001lveoKG29jlWI12/7Cp4ZZabH4ef90",
+    "session_token": "IQoJb3JpZ2luX2VjEBEaCXVzLWVhc3QtMSJIMEYCIQD/Dg17Qbm3DkvRe+M8z4M4mM369Zt/piKrWvTVKD+2YQIhAL8rngi6+rsfwGqfIMPyCjU2kVLlEkLckkKcxO529nzOKv8DCNn//////////wEQBBoMNjY1Mzg2MDk4ODY2IgwhgBl+Eidkzg8UC60q0wMnQ8T3QTvc6C84gUoY9nizrrDDCclLwXqz30CJ2cpwYi2il686DW1lFCELaPZYjF9gXwEetTfIWnI7UBGu2zTlyOe4Sq1SCC8jOFWeigOd8v7lpjevCWSd0mF8FSydJghKZxFCSmwQfbk00jnneNIZefMBb5ukTWz5DZBrQc2SWWER+fZ3SpYIM+pz4EqDnvP8TjU+SdCfOxni0mg0Ejq52bCTfDjik24H5w5EdijvTQeJSsp56Bsxd3F0IK9rAYzcCCoINVww9T4QjhoWu1Zq1NmNptwuO66hECF+e5z0MUQXqKEfQnP0JIIzQrFreZ/Tl6p3jNNP+3YWsGmANrSiYaApO2mL8TZuse5IkWbYVB93Ds1TXednS/bM9Pfkcuj3Hi4mpg82nyKlSupe0RS4TCejRJFF6Tww2AH2IM0kdTSr+NbcBzqGvVKQP0hSoOD0bYo1ck5g1iaxlAXD45a09DCnaQVPod40b7w8hMWWS89psAaWvOrjvidWiLkWDdYoUgIG2HATW2oR8IMYH3tUYkKXEVOtdIFzoVHX58ZwPpBKEudC+C844zqGeoGbJ/pJsEUy8L0PqnVdCPYeuUE0HQohpGt25gC7wN0hTZ1GAK9GqDDQpNXVBjqcAZPImgmNhXEMbq0VyCwAXS079Q6+ipwSOqEI4hplPyWNLGk574rX65APOGe2BBlpZYtAA7M0dY00dR9yk9b1GZhX5zVFz0M2ArYUI9B6hkDz02fyiRLzAdBFnqwr3+U3wIEaqt4EPXcJZDkasUWnsEYemdvArKGZmwIZiaR3qIShLF9Zxo7/3RhfLtEYzq0GaywylcqxBWS2mpVO9A==",
+    "expiration": "2026-09-25T04:39:44.000Z",
     "backend": "GIT_BACKEND_S3"
   },
   "name": "teacher_schedule_system",
