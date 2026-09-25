@@ -1,0 +1,679 @@
+{
+  "metadata": {
+    "database": "flowedu",
+    "windowStart": "2026-07-17 00:00:00",
+    "windowEndExclusive": "2026-09-26 00:00:00",
+    "generatedAt": "2026-09-25T16:11:27.617Z",
+    "method": "read-only aggregates"
+  },
+  "tables": {
+    "count": 152,
+    "featureTables": [
+      "student_exercise_answers",
+      "learning_modules",
+      "mistake_notebook_topics",
+      "access_log_archives",
+      "assessment_attempts",
+      "topic_comments",
+      "student_exercise_results",
+      "topic_progress_history",
+      "learning_patterns",
+      "learning_journal_entries",
+      "student_exercises",
+      "mistake_notebook_questions",
+      "topic_materials",
+      "student_learning_journal",
+      "topic_assignments",
+      "ai_usage_logs",
+      "smart_review_items",
+      "assessment_answers",
+      "assessments",
+      "assessment_permissions",
+      "question_answers",
+      "ct_exercises",
+      "learning_topics",
+      "topic_class_links",
+      "student_exercise_attempts",
+      "review_history",
+      "assessment_questions",
+      "forum_topics",
+      "audit_logs",
+      "exercise_tags",
+      "student_topic_doubts",
+      "question_type_instructions",
+      "student_topic_progress",
+      "review_statistics",
+      "ai_insights",
+      "forum_topic_reads",
+      "assessment_schedules",
+      "questions",
+      "learning_recommendations",
+      "assessment_answer_sheets",
+      "ai_settings",
+      "access_logs",
+      "review_notifications",
+      "ai_analysis_cache",
+      "smart_review_queue",
+      "review_sessions"
+    ]
+  },
+  "counts": {
+    "users": 8,
+    "students": 366,
+    "subjects": 16,
+    "subjectEnrollments": 261,
+    "student_enrollments": 1,
+    "learning_modules": 73,
+    "learning_topics": 180,
+    "student_topic_progress": 251,
+    "assessments": 0,
+    "assessment_questions": 0,
+    "assessment_attempts": 30,
+    "assessment_answers": 580,
+    "student_exercises": 0,
+    "student_exercise_attempts": 0,
+    "student_exercise_answers": 0,
+    "student_behaviors": 427,
+    "ai_insights": 4,
+    "ai_usage_logs": 37,
+    "access_logs": 1431,
+    "audit_logs": 0,
+    "review_history": 0
+  },
+  "users": [
+    {
+      "role": "admin",
+      "c": 3
+    },
+    {
+      "role": "user",
+      "c": 5
+    }
+  ],
+  "demography": [
+    {
+      "total": 366,
+      "masculine": "40",
+      "feminine": "62",
+      "nonbinary": "1",
+      "preferNot": "261",
+      "nullGender": "0",
+      "nullPronoun": "0"
+    }
+  ],
+  "enrollment": [
+    {
+      "rowCount": 261,
+      "students": 258,
+      "subjects": 13,
+      "firstAt": "2026-02-23 14:53:01",
+      "lastAt": "2026-07-05 09:41:30"
+    }
+  ],
+  "progress": [
+    {
+      "status": "completed",
+      "rowCount": 203,
+      "students": 54,
+      "topics": 81,
+      "firstAt": "2026-02-18 00:20:31",
+      "lastAt": "2026-07-03 14:52:29"
+    },
+    {
+      "status": "in_progress",
+      "rowCount": 48,
+      "students": 25,
+      "topics": 26,
+      "firstAt": "2026-03-06 00:06:59",
+      "lastAt": "2026-09-20 03:19:28"
+    }
+  ],
+  "progressWindow": [
+    {
+      "status": "in_progress",
+      "rowCount": 1,
+      "students": 1
+    }
+  ],
+  "ai": [
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "generate_exercise",
+      "calls": 25,
+      "successes": "3",
+      "failures": "22",
+      "promptTokens": "4489",
+      "completionTokens": "5100",
+      "totalTokens": "9589",
+      "users": 0,
+      "firstAt": "2026-04-23 11:31:48",
+      "lastAt": "2026-07-23 16:39:01"
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "student_analysis",
+      "calls": 5,
+      "successes": "5",
+      "failures": "0",
+      "promptTokens": "4931",
+      "completionTokens": "3287",
+      "totalTokens": "8218",
+      "users": 0,
+      "firstAt": "2026-04-17 18:15:46",
+      "lastAt": "2026-04-30 21:16:34"
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "generate_assessment",
+      "calls": 3,
+      "successes": "3",
+      "failures": "0",
+      "promptTokens": "3063",
+      "completionTokens": "8751",
+      "totalTokens": "11814",
+      "users": 0,
+      "firstAt": "2026-04-17 22:03:06",
+      "lastAt": "2026-05-19 12:07:34"
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "other",
+      "calls": 3,
+      "successes": "1",
+      "failures": "2",
+      "promptTokens": "248",
+      "completionTokens": "181",
+      "totalTokens": "429",
+      "users": 0,
+      "firstAt": "2026-04-21 19:32:43",
+      "lastAt": "2026-04-21 19:32:44"
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "student_ai_hints",
+      "calls": 1,
+      "successes": "0",
+      "failures": "1",
+      "promptTokens": "0",
+      "completionTokens": "0",
+      "totalTokens": "0",
+      "users": 0,
+      "firstAt": "2026-09-11 17:19:34",
+      "lastAt": "2026-09-11 17:19:34"
+    }
+  ],
+  "aiWindow": [
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "generate_exercise",
+      "calls": 15,
+      "successes": "1",
+      "failures": "14",
+      "totalTokens": "2817",
+      "users": 0
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "feature": "student_ai_hints",
+      "calls": 1,
+      "successes": "0",
+      "failures": "1",
+      "totalTokens": "0",
+      "users": 0
+    }
+  ],
+  "aiByUserWindow": [
+    {
+      "userId": null,
+      "calls": 16,
+      "successes": "1",
+      "failures": "15"
+    }
+  ],
+  "aiDaily": [
+    {
+      "day": "2026-07-17",
+      "calls": 4,
+      "successes": "0",
+      "failures": "4"
+    },
+    {
+      "day": "2026-07-21",
+      "calls": 6,
+      "successes": "0",
+      "failures": "6"
+    },
+    {
+      "day": "2026-07-22",
+      "calls": 2,
+      "successes": "0",
+      "failures": "2"
+    },
+    {
+      "day": "2026-07-23",
+      "calls": 3,
+      "successes": "1",
+      "failures": "2"
+    },
+    {
+      "day": "2026-09-11",
+      "calls": 1,
+      "successes": "0",
+      "failures": "1"
+    }
+  ],
+  "assessment": [
+    {
+      "status": "in_progress",
+      "attempts": 1,
+      "students": 1,
+      "firstAt": "2026-03-18 17:33:33",
+      "lastAt": null,
+      "avgScore": 0,
+      "minScore": 0,
+      "maxScore": 0,
+      "avgPercentage": 0,
+      "avgSeconds": "0.0000",
+      "passed": "0"
+    },
+    {
+      "status": "submitted",
+      "attempts": 29,
+      "students": 28,
+      "firstAt": "2026-03-18 18:39:37",
+      "lastAt": "2026-04-17 22:48:00",
+      "avgScore": 6.758620689655173,
+      "minScore": 1,
+      "maxScore": 10,
+      "avgPercentage": 67.58620689655173,
+      "avgSeconds": "468.3103",
+      "passed": "22"
+    }
+  ],
+  "assessmentWindow": [
+    {
+      "attempts": 0,
+      "students": 0,
+      "avgScore": null,
+      "avgPercentage": null,
+      "avgSeconds": null,
+      "passed": null
+    }
+  ],
+  "behaviors": [
+    {
+      "behaviorType": "exercise_completion",
+      "events": 427,
+      "students": 146,
+      "firstAt": "2026-03-18 16:51:55",
+      "lastAt": "2026-05-03 16:33:59"
+    }
+  ],
+  "behaviorWindow": [],
+  "accessWindow": [
+    {
+      "events": 29,
+      "users": 10,
+      "firstAt": "2026-07-17 16:27:35",
+      "lastAt": "2026-09-20 03:18:29"
+    }
+  ],
+  "accessByHour": [
+    {
+      "hour": 0,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 1,
+      "events": 7,
+      "users": 2
+    },
+    {
+      "hour": 3,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 11,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 12,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 13,
+      "events": 4,
+      "users": 3
+    },
+    {
+      "hour": 14,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 15,
+      "events": 2,
+      "users": 2
+    },
+    {
+      "hour": 16,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 17,
+      "events": 3,
+      "users": 3
+    },
+    {
+      "hour": 18,
+      "events": 1,
+      "users": 1
+    },
+    {
+      "hour": 20,
+      "events": 2,
+      "users": 1
+    },
+    {
+      "hour": 21,
+      "events": 2,
+      "users": 2
+    },
+    {
+      "hour": 22,
+      "events": 2,
+      "users": 1
+    }
+  ],
+  "accessByWeekday": [
+    {
+      "weekday": 1,
+      "events": 3,
+      "users": 3
+    },
+    {
+      "weekday": 2,
+      "events": 2,
+      "users": 2
+    },
+    {
+      "weekday": 3,
+      "events": 6,
+      "users": 3
+    },
+    {
+      "weekday": 4,
+      "events": 4,
+      "users": 3
+    },
+    {
+      "weekday": 5,
+      "events": 4,
+      "users": 3
+    },
+    {
+      "weekday": 6,
+      "events": 9,
+      "users": 5
+    },
+    {
+      "weekday": 7,
+      "events": 1,
+      "users": 1
+    }
+  ],
+  "audit": {
+    "auditLogs": 0,
+    "reviewHistory": 0
+  },
+  "traceability": {
+    "columnFlags": [
+      {
+        "column": "ai_model_version",
+        "locations": []
+      },
+      {
+        "column": "prompt_id",
+        "locations": []
+      },
+      {
+        "column": "ai_request_id",
+        "locations": []
+      },
+      {
+        "column": "ai_source",
+        "locations": []
+      },
+      {
+        "column": "revisedBy",
+        "locations": []
+      },
+      {
+        "column": "reviewedAt",
+        "locations": [
+          "review_history"
+        ]
+      },
+      {
+        "column": "edited_content",
+        "locations": []
+      },
+      {
+        "column": "diff",
+        "locations": []
+      }
+    ]
+  },
+  "aiRelatedColumns": [
+    {
+      "table_name": "assessments",
+      "column_name": "availableFrom"
+    },
+    {
+      "table_name": "assessments",
+      "column_name": "availableTo"
+    },
+    {
+      "table_name": "question_answers",
+      "column_name": "content"
+    },
+    {
+      "table_name": "ct_exercises",
+      "column_name": "content"
+    },
+    {
+      "table_name": "forum_replies",
+      "column_name": "content"
+    },
+    {
+      "table_name": "notebook_entries",
+      "column_name": "content"
+    },
+    {
+      "table_name": "students",
+      "column_name": "email"
+    },
+    {
+      "table_name": "students",
+      "column_name": "avatarHairStyle"
+    },
+    {
+      "table_name": "students",
+      "column_name": "avatarHairColor"
+    },
+    {
+      "table_name": "ct_submissions",
+      "column_name": "feedback"
+    },
+    {
+      "table_name": "forum_topics",
+      "column_name": "content"
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "details"
+    },
+    {
+      "table_name": "email_campaigns",
+      "column_name": "email_config_id"
+    },
+    {
+      "table_name": "email_campaigns",
+      "column_name": "recipient_emails"
+    },
+    {
+      "table_name": "email_campaigns",
+      "column_name": "failed_count"
+    },
+    {
+      "table_name": "review_statistics",
+      "column_name": "dailyGoal"
+    },
+    {
+      "table_name": "review_statistics",
+      "column_name": "dailyProgress"
+    },
+    {
+      "table_name": "ai_insights",
+      "column_name": "generatedAt"
+    },
+    {
+      "table_name": "ai_insights",
+      "column_name": "content"
+    },
+    {
+      "table_name": "questions",
+      "column_name": "content"
+    },
+    {
+      "table_name": "assessment_answer_sheets",
+      "column_name": "feedback"
+    },
+    {
+      "table_name": "email_configs",
+      "column_name": "from_email"
+    },
+    {
+      "table_name": "ai_settings",
+      "column_name": "openaiApiKey"
+    },
+    {
+      "table_name": "ai_settings",
+      "column_name": "model"
+    },
+    {
+      "table_name": "users",
+      "column_name": "email"
+    },
+    {
+      "table_name": "ai_analysis_cache",
+      "column_name": "analysisType"
+    },
+    {
+      "table_name": "activity_submissions",
+      "column_name": "feedback"
+    },
+    {
+      "table_name": "mistake_notebook_insights",
+      "column_name": "content"
+    },
+    {
+      "table_name": "student_exercise_answers",
+      "column_name": "feedback"
+    },
+    {
+      "table_name": "subjects",
+      "column_name": "programContent"
+    },
+    {
+      "table_name": "topic_comments",
+      "column_name": "content"
+    },
+    {
+      "table_name": "learning_journal_entries",
+      "column_name": "content"
+    },
+    {
+      "table_name": "student_exercises",
+      "column_name": "availableFrom"
+    },
+    {
+      "table_name": "student_exercises",
+      "column_name": "availableTo"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "content"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "feedback"
+    },
+    {
+      "table_name": "topic_materials",
+      "column_name": "contentType"
+    },
+    {
+      "table_name": "student_learning_journal",
+      "column_name": "content"
+    },
+    {
+      "table_name": "notification_preferences",
+      "column_name": "daily_summary"
+    },
+    {
+      "table_name": "notification_preferences",
+      "column_name": "daily_summary_time"
+    },
+    {
+      "table_name": "ai_usage_logs",
+      "column_name": "model"
+    },
+    {
+      "table_name": "ai_usage_logs",
+      "column_name": "prompt_tokens"
+    },
+    {
+      "table_name": "forum_grades",
+      "column_name": "feedback"
+    }
+  ],
+  "aiContentStorage": [
+    {
+      "bytes": "821",
+      "nonNull": 4
+    },
+    {
+      "bytes": "821",
+      "nonNull": 4
+    },
+    {
+      "bytes": "6729",
+      "nonNull": 73
+    },
+    {
+      "bytes": "17986",
+      "nonNull": 180
+    },
+    {
+      "bytes": "0",
+      "nonNull": 0
+    },
+    {
+      "bytes": "0",
+      "nonNull": 0
+    }
+  ]
+}
